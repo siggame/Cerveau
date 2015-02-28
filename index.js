@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-require("./extensions/utilities");
+GLOBAL.extend = require("extend");
 require("./extensions/string");
 require("./extensions/array");
 

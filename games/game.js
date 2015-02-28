@@ -12,13 +12,28 @@ var Game = Class({
 
 		this.name = name;
 		this.session = session;
+		this._started = false;
 		this._maxNumberOfPlayers = 2;
 		this._nextID = 0;
 		this._trackedObjects = [];
 		this.over = false;
-		this.clients = []; // this is maintained by the server
+		this.clients = []; // the server will add and remove these
 		this._playerIDToClient = {};
 		this._clientToPlayerID = {};
+	},
+
+	addClient: function(client) {
+		this.clients.push(client);
+		client.game = this;
+	},
+
+	removeClient: function(client) {
+		this.clients.removeElement(client);
+
+		if(this.hasStarted() && !this.over) {
+			var player = this.getPlayerForClient(client);
+			this.declairLoser(player, "disconnected");
+		}
 	},
 
 	hasEnoughPlayers: function() {
@@ -51,6 +66,12 @@ var Game = Class({
 	// @inheritable: intended to be inherited and extended when the game should be started (e.g. initializing game objects)
 	start: function() { // TO INHERIT
 		this._initPlayers(this.clients);
+
+		this._started = true;
+	},
+
+	hasStarted: function() {
+		return this._started;
 	},
 
 	_initPlayers: function() {
@@ -70,7 +91,7 @@ var Game = Class({
 	// assumes when a player looses the rest could still be competing to win
 	declairLoser: function(loser, reason) {
 		loser.lost = reason || true;
-
+		console.log("player", loser.name, "lost because", reason);
 		this.checkForWinner();
 
 		return false;
@@ -87,7 +108,7 @@ var Game = Class({
 				player.lost = player.lost || true;
 			}
 		}
-
+		console.log("game", this.name, this.session, "is over");
 		this.over = true;
 	},
 

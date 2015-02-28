@@ -119,9 +119,15 @@ var CheckersGame = Class(Game, {
 			if(!jumped) {
 				return this.declairLoser(player, "tried to jump nothing");
 			}
+			else if(jumped.ownerID === checker.ownerID) {
+				return this.declairLoser(player, "tried to jump own checker");
+			}
 		}
-		else if(Math.abs(dx) === 1 && Math.abs(dy) === 1) { // then the move is valid
-			// valid as normal move
+		else if(Math.abs(dx) === 1 && Math.abs(dy) === 1) { // then they are just moving 1 tile diagonally
+			if(this.state.checkerMovedJumped) {
+				return this.declairLoser(player, "current checker must jump again, not move diagonally one tile");
+			}
+			// else valid as normal move
 		}
 		else {
 			return this.declairLoser(player, "can't move there");
