@@ -69,7 +69,11 @@ var CheckersGame = Class(Game, {
 		}
 	},
 
-	move: function(player, checker, x, y) {
+	move: function(player, data) {
+		var checker = data.checker;
+		var x = data.x;
+		var y = data.y;
+
 		var checkersOwner = this.getByID(checker.ownerID);
 		if(player !== checkersOwner) {
 			return this.declairLoser(player, "tried to move a checker they didn't own");

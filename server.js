@@ -1,5 +1,6 @@
 var Class = require("./structures/class");
 var Client = require("./client");
+var constants = require("./constants")
 
 // @class Server: The main class that handles incomming conncetions from clients via socket.io and managing the games they play
 var Server = Class({
@@ -170,9 +171,9 @@ var Server = Class({
 		}
 	},
 
-	recieveCommand: function(client, message) {
+	recieveCommand: function(client, json) {
 		// do game logic!!!
-		if(this.runCommandFor(client, message)) { // the command was valid
+		if(this.runCommandFor(client, json)) { // the command was valid
 			this.sendStateOf(client.game);
 
 			if(client.game.over) {
@@ -189,39 +190,21 @@ var Server = Class({
 	},
 
 	// when a client sends a command it is piped here. Then we will decipher what they sent and run that command (function) on the game that client is playing with the args they passed
-	runCommandFor: function(client, rawMessage) {
+	runCommandFor: function(client, json) {
 		var game = client.game;
-		var parameters = [];
-		parameters.push(game.getPlayerForClient(client));
+		var player = game.getPlayerForClient(client)
+		var data = JSON.parse(json)
 
-		var split = rawMessage.split(" ");
-		var command = split[0];
+		for(var key in data) {
+			var value = data[key]
 
-		for(var i = 1; i < split.length; i++) {
-			var arg = split[i];
-
-			if(arg.startsWith("#")) { // then it is an id to an object
-				var obj = game.getByID(arg.slice(1));
-
-				if(!obj) {
-					console.log("ERROR! no arg for " + arg);
-				}
-
-				arg = obj;
+			if(typeof(value) == "string" && value.startsWith(constants.ID_PREFIX)) { // convert strings that start with the id prefix to the object with their id
+				data[key] = game.getByID(value.slice(1));
 			}
-			else {
-				var toNumber = parseFloat(arg);
-				if(toNumber !== NaN) {
-					arg = toNumber;
-				}
-			}
-			// else it's a string
-
-			parameters.push(arg);
 		}
 
-		if(game[command]) {
-			return game[command].apply(game, parameters);
+		if(game[data.command]) {
+			return game[data.command].call(game, player, data);
 		} else {
 			console.log("ERROR! no command: ", command);
 			return false;
