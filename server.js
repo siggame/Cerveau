@@ -151,6 +151,9 @@ var Server = Class({
 			playerName: client.name,
 			gameName: game.name,
 			gameSession: game.session,
+			constants: {
+				ID_PREFIX: constants.ID_PREFIX,
+			},
 		}));
 
 		if(game.hasEnoughPlayers()) { // TODO: variable player count
@@ -199,7 +202,7 @@ var Server = Class({
 			var value = data[key]
 
 			if(typeof(value) == "string" && value.startsWith(constants.ID_PREFIX)) { // convert strings that start with the id prefix to the object with their id
-				data[key] = game.getByID(value.slice(1));
+				data[key] = game.getByID(value.slice(constants.ID_PREFIX.length));
 			}
 		}
 
