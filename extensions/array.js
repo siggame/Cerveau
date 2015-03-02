@@ -11,14 +11,17 @@ var ArrayExtensions = {
 
 		return false;
 	},
+
 	last: function() {
 		return this[this.length - 1];
 	},
+
 	isArray: function() {
-		return true;
+		return (Object.prototype.toString.call(this) === '[object Array]');
 	},
+
 	contains: function(element) {
-		return this.indexOf(element) > -1 ? true : false;
+		return (this.indexOf(element) > -1);
 	},
 };
 

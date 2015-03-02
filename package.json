@@ -2,9 +2,15 @@
   "name": "socket-chat-example",
   "version": "0.0.1",
   "description": "my first socket.io app",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/JacobFischer/Cerveau",
+    "private": true
+  },
   "dependencies": {
     "express": "^4.10.2",
     "socket.io": "^1.2.0",
-    "extend": "^2.0.0"
+    "extend": "^2.0.0",
+    "clone": "^1.0.0"
   }
 }

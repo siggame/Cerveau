@@ -1,16 +1,15 @@
-// @class Game: the base game plugin new games should inherit from.
+// @class BaseGame: the base game plugin new games should inherit from.
 var Class = require("../structures/class");
+var clone = require("clone");
+var getDelta = require("../utilities/getDelta");
 
-var Game = Class({
-	init: function(name, session) {
+var BaseGame = Class({
+	init: function(session) {
 		this.state = {
-			game: name,
-			session: session,
 			players: [],
 			currentPlayersIDs: [-1],
 		};
 
-		this.name = name;
 		this.session = session;
 		this._started = false;
 		this._maxNumberOfPlayers = 2;
@@ -20,6 +19,12 @@ var Game = Class({
 		this.clients = []; // the server will add and remove these
 		this._playerIDToClient = {};
 		this._clientToPlayerID = {};
+		this._validCommands = []; // should be extended by the GeneratedGame
+		this.gamelog = {
+			gameSession: session,
+			initialState: {},
+			deltaStates: [],
+		};
 	},
 
 	addClient: function(client) {
@@ -59,15 +64,51 @@ var Game = Class({
 		}
 	},
 
+	getCommand: function(commandString) {
+		if(this._validCommands.contains(commandString)) {
+			return this[commandString];
+		}
+	},
+
 	getState: function() {
-		return this.state;
+		return this._generatedState;
+	},
+
+	// generates and returns the difference between the last and current state
+	getDeltaState: function() { // TODO: impliment getDeltaStateFor player
+		this._generateState();
+
+		this._deltaState = getDelta(this._lastGeneratedState, this._generatedState);
+
+		this.gamelog.deltaStates.push(this._deltaState);
+
+		return this._deltaState;
+	},
+
+	// updates and generates new current and last states, for delta states.
+	_generateState: function() {
+		this._lastGeneratedState = this._generatedState || {};
+
+		this._generatedState = clone(this.state); // creates a deep copy of the current state
 	},
 
 	// @inheritable: intended to be inherited and extended when the game should be started (e.g. initializing game objects)
+	begin: function() {
+		// This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
+	},
+
 	start: function() { // TO INHERIT
 		this._initPlayers(this.clients);
 
+		this.begin();
+
+		this._generateState();
+		this.gamelog.initialState = this._generatedState;
 		this._started = true;
+	},
+
+	started: function() {
+		this._generateState();
 	},
 
 	hasStarted: function() {
@@ -108,8 +149,9 @@ var Game = Class({
 				player.lost = player.lost || true;
 			}
 		}
-		console.log("game", this.name, this.session, "is over");
+
 		this.over = true;
+		return true;
 	},
 
 	checkForWinner: function() {
@@ -128,8 +170,7 @@ var Game = Class({
 		}
 
 		if(winner) {
-			this.declairWinner(winner);
-			return true;
+			return this.declairWinner(winner);
 		}
 
 		return false;
@@ -156,4 +197,4 @@ var Game = Class({
 	},
 });
 
-module.exports = Game
+module.exports = BaseGame

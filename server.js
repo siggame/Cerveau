@@ -1,6 +1,7 @@
 var Class = require("./structures/class");
 var Client = require("./client");
-var constants = require("./constants")
+var constants = require("./constants");
+var fs = require('fs');
 
 // @class Server: The main class that handles incomming conncetions from clients via socket.io and managing the games they play
 var Server = Class({
@@ -37,7 +38,7 @@ var Server = Class({
 						if(client.game) {
 							client.game.removeClient(client);
 
-							if(client.game.over) {
+							if(!client.game.over) {
 								self.gameOver(client.game);
 							}
 						}
@@ -49,7 +50,7 @@ var Server = Class({
 
 	getGame: function(gameName, gameSession) {
 		if(!this.games[gameName]) {
-			this.gameClasses[gameName] = require("./games/" + gameName);
+			this.gameClasses[gameName] = require("./games/" + gameName + "/game");
 			this.games[gameName] = {};
 		}
 
@@ -72,7 +73,7 @@ var Server = Class({
 		if(!this.games[gameName][gameSession]) {
 			console.log("creating new game", gameName, gameSession);
 
-			this.games[gameName][gameSession] = new this.gameClasses[gameName](gameName, gameSession);
+			this.games[gameName][gameSession] = new this.gameClasses[gameName](gameSession);
 		}
 
 		return this.games[gameName][gameSession];
@@ -99,6 +100,10 @@ var Server = Class({
 		this.sendTo(game.clients, "state", JSON.stringify(game.getState()));
 	},
 
+	sendDeltaStateOf: function(game) {
+		this.sendTo(game.clients, "delta", JSON.stringify(game.getDeltaState()));
+	},
+
 	getCurrentClientsFor: function(game) {
 		var currentPlayers = game.getCurrentPlayers();
 		var currentClients = [];
@@ -123,6 +128,8 @@ var Server = Class({
 	},
 
 	gameOver: function(game) {
+		console.log("game", game.name, game.session, "is over");
+
 		var clients = [];
 		for(var i = 0; i < game.clients.length; i++) {
 			var client = game.clients[i];
@@ -132,7 +139,14 @@ var Server = Class({
 			}
 		}
 
-		this.sendTo(clients, "over");
+		this.sendTo(clients, "over"); // TODO: send link to gamelog
+
+		var gamelog = JSON.stringify(game.gamelog);
+		fs.writeFile("./gamelogs/" + (game.name || "UNKNOWN_GAME") + "-" + (game.session || "UNKNOWN_SESSION") + ".joue", gamelog, function(err) {
+			if(err) {
+				console.log(err);
+			}
+		}); 
 	},
 
 	// Functions invoked when a client sends a raw message to the server
@@ -151,9 +165,7 @@ var Server = Class({
 			playerName: client.name,
 			gameName: game.name,
 			gameSession: game.session,
-			constants: {
-				ID_PREFIX: constants.ID_PREFIX,
-			},
+			constants: constants.shared,
 		}));
 
 		if(game.hasEnoughPlayers()) { // TODO: variable player count
@@ -177,7 +189,7 @@ var Server = Class({
 	recieveCommand: function(client, json) {
 		// do game logic!!!
 		if(this.runCommandFor(client, json)) { // the command was valid
-			this.sendStateOf(client.game);
+			this.sendDeltaStateOf(client.game);
 
 			if(client.game.over) {
 				this.gameOver(client.game);
@@ -188,7 +200,7 @@ var Server = Class({
 		}
 		else {
 			this.sendTo(client, "invalid"); // TODO: rename
-			this.sendStateOf(client.game);
+			this.sendDeltaStateOf(client.game);
 		}
 	},
 
@@ -201,13 +213,14 @@ var Server = Class({
 		for(var key in data) {
 			var value = data[key]
 
-			if(typeof(value) == "string" && value.startsWith(constants.ID_PREFIX)) { // convert strings that start with the id prefix to the object with their id
-				data[key] = game.getByID(value.slice(constants.ID_PREFIX.length));
+			if(typeof(value) == "string" && value.startsWith(constants.shared.ID_PREFIX)) { // convert strings that start with the id prefix to the object with their id
+				data[key] = game.getByID(value.slice(constants.shared.ID_PREFIX.length));
 			}
 		}
 
-		if(game[data.command]) {
-			return game[data.command].call(game, player, data);
+		var commandFunction = game.getCommand(data.command);
+		if(commandFunction) {
+			return commandFunction.call(game, player, data);
 		} else {
 			console.log("ERROR! no command: ", command);
 			return false;
