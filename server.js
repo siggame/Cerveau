@@ -210,13 +210,7 @@ var Server = Class({
 		var player = game.getPlayerForClient(client)
 		var data = JSON.parse(json)
 
-		for(var key in data) {
-			var value = data[key]
-
-			if(typeof(value) == "string" && value.startsWith(constants.shared.ID_PREFIX)) { // convert strings that start with the id prefix to the object with their id
-				data[key] = game.getByID(value.slice(constants.shared.ID_PREFIX.length));
-			}
-		}
+		this._formatCommandDataFor(game, data);
 
 		var commandFunction = game.getCommand(data.command);
 		if(commandFunction) {
@@ -224,6 +218,20 @@ var Server = Class({
 		} else {
 			console.log("ERROR! no command: ", command);
 			return false;
+		}
+	},
+
+	_formatCommandDataFor: function(game, data) {
+		for(var key in data) {
+			var value = data[key];
+			if(typeof(value) == "object") {
+				if(value.id !== undefined) { // it's a tracked game object
+					data[key] = game.getByID(value.id);
+				}
+				else {
+					this._formatCommandDataFor(game, value);
+				}
+			}
 		}
 	},
 });
