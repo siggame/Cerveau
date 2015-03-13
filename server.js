@@ -1,6 +1,7 @@
 var Class = require("./structures/class");
 var Client = require("./client");
 var constants = require("./constants");
+var serializer = require("./utilities/serializer");
 var fs = require('fs');
 
 // @class Server: The main class that handles incomming conncetions from clients via socket.io and managing the games they play
@@ -37,10 +38,6 @@ var Server = Class({
 
 						if(client.game) {
 							client.game.removeClient(client);
-
-							if(!client.game.over) {
-								self.gameOver(client.game);
-							}
 						}
 					});
 				})(self, client);
@@ -96,24 +93,24 @@ var Server = Class({
 		}
 	},
 
-	sendStateOf: function(game) {
-		this.sendTo(game.clients, "state", JSON.stringify(game.getState()));
-	},
+	/*sendStateOf: function(game) {
+		this.sendTo(game.clients, "state", JSON.stringify(game.getSerializableState()));
+	},*/
 
 	sendDeltaStateOf: function(game) {
-		this.sendTo(game.clients, "delta", JSON.stringify(game.getDeltaState()));
+		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState()));
 	},
 
 	getCurrentClientsFor: function(game) {
 		var currentPlayers = game.getCurrentPlayers();
 		var currentClients = [];
 		for(var i = 0; i < currentPlayers.length; i++) {
-			currentClients.push(game.getClientForPlayerID(currentPlayers[i].id));
+			currentClients.push(currentPlayers[i]._client);
 		}
 		return currentClients;
 	},
 
-	updatePlayersAwaitingAndIgnoringIn: function(game) {
+	sendPlayersAwaitingAndIgnoringIn: function(game) {
 		var currentClients = this.getCurrentClientsFor(game);
 
 		for(var i = 0; i < game.clients.length; i++) {
@@ -162,40 +159,36 @@ var Server = Class({
 		console.log("player ", client.name, "joined", game.name, game.session, "which now has connections: ", game.clients.length);
 
 		this.sendTo(client, "connected", JSON.stringify({
-			playerName: client.name,
 			gameName: game.name,
 			gameSession: game.session,
 			constants: constants.shared,
 		}));
 
-		if(game.hasEnoughPlayers()) { // TODO: variable player count
-			console.log("game", game.name, game.session, "starting!");
-			game.start();
-
-			for(var i = 0; i < this.clients.length; i++) {
-				var client = this.clients[i];
+		if(game.hasStarted()) {
+			for(var i = 0; i < game.clients.length; i++) {
+				var client = game.clients[i];
 
 				this.sendTo(client, "start", JSON.stringify({
-					playerID: game.getPlayerForClient(client).id,
+					playerID: client.player.id,
+					playerName: client.player.name,
 				}));
 			}
 
-			this.sendStateOf(game);
+			this.sendDeltaStateOf(game);
 
-			this.updatePlayersAwaitingAndIgnoringIn(game)
+			this.sendPlayersAwaitingAndIgnoringIn(game)
 		}
 	},
 
 	recieveCommand: function(client, json) {
-		// do game logic!!!
 		if(this.runCommandFor(client, json)) { // the command was valid
 			this.sendDeltaStateOf(client.game);
 
-			if(client.game.over) {
+			if(client.game.isOver()) {
 				this.gameOver(client.game);
 			}
 			else { // game is still in progress, so tell the players who can send command and who can't now that the game state has changed
-				this.updatePlayersAwaitingAndIgnoringIn(client.game);
+				this.sendPlayersAwaitingAndIgnoringIn(client.game);
 			}
 		}
 		else {
@@ -206,33 +199,11 @@ var Server = Class({
 
 	// when a client sends a command it is piped here. Then we will decipher what they sent and run that command (function) on the game that client is playing with the args they passed
 	runCommandFor: function(client, json) {
-		var game = client.game;
-		var player = game.getPlayerForClient(client)
-		var data = JSON.parse(json)
+		var data = JSON.parse(json);
 
-		this._formatCommandDataFor(game, data);
+		data = serializer.unserialize(data, client.game);
 
-		var commandFunction = game.getCommand(data.command);
-		if(commandFunction) {
-			return commandFunction.call(game, player, data);
-		} else {
-			console.log("ERROR! no command: ", command);
-			return false;
-		}
-	},
-
-	_formatCommandDataFor: function(game, data) {
-		for(var key in data) {
-			var value = data[key];
-			if(typeof(value) == "object") {
-				if(value.id !== undefined) { // it's a tracked game object
-					data[key] = game.getByID(value.id);
-				}
-				else {
-					this._formatCommandDataFor(game, value);
-				}
-			}
-		}
+		return client.game.executeCommandFor(client, data);
 	},
 });
 

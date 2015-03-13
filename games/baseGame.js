@@ -1,67 +1,124 @@
-// @class BaseGame: the base game plugin new games should inherit from.
 var Class = require("../structures/class");
-var clone = require("clone");
-var getDelta = require("../utilities/getDelta");
 
+var constants = require("../constants");
+var serializer = require("../utilities/serializer");
+
+// @class BaseGame: the base game plugin new games should inherit from.
 var BaseGame = Class({
 	init: function(session) {
-		this.state = {
+		this.state = { // anything in here that is not a function and not starting with an '_' (private signifier) is sent to clients
 			players: [],
-			currentPlayersIDs: [-1],
+			currentPlayers: [], // players current awaiting commands from (basically turns)
+			gameObjects: {},
 		};
 
 		this.session = session;
+		this.clients = []; // the server will add and remove these via add/removeClient
+
 		this._started = false;
+		this._over = false;
+
 		this._maxNumberOfPlayers = 2;
-		this._nextID = 0;
-		this._trackedObjects = [];
-		this.over = false;
-		this.clients = []; // the server will add and remove these
-		this._playerIDToClient = {};
-		this._clientToPlayerID = {};
-		this._validCommands = []; // should be extended by the GeneratedGame
+		this._nextGameObjectID = 0;
+
+		this._lastSerializableState = null;
+		this._currentSerializableState = null;
+		this._serializableDeltaState = null;
 		this.gamelog = {
 			gameSession: session,
-			initialState: {},
-			deltaStates: [],
+			states: [],
 		};
 	},
 
-	addClient: function(client) {
-		this.clients.push(client);
-		client.game = this;
+
+	//--- Server starting methods ---\\
+
+	// Do not inherit this method, instead use begin()
+	_start: function() {
+		this._initPlayers(this.clients);
+
+		this.begin();
+
+		this._updateSerializableStates();
+		this._started = true;
 	},
 
-	removeClient: function(client) {
-		this.clients.removeElement(client);
+	hasStarted: function() {
+		return this._started;
+	},
 
-		if(this.hasStarted() && !this.over) {
-			var player = this.getPlayerForClient(client);
-			this.declairLoser(player, "disconnected");
+	// @inheritable: intended to be inherited and extended when the game should be started (e.g. initializing game objects)
+	begin: function() {
+		// This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
+	},
+
+
+
+	//--- Client/Player ---\\
+
+	_initPlayers: function() {
+		for(var i = 0; i < this.clients.length; i++) {
+			var client = this.clients[i];
+			var player = this.newPlayer({ // this method should be implimented in GeneratedGame
+				name: client.name || ("Player " + i),
+			});
+
+			player._client = client;
+			client.player = player;
+			this.state.players.push(player);
 		}
 	},
+
 
 	hasEnoughPlayers: function() {
 		return this.clients.length === this._maxNumberOfPlayers; //TODO: check to make sure the clients are all players and not something else... like a listener?
 	},
 
-	newObject: function(obj) {
-		obj = obj || {};
-		obj.id = this._getNextID();
-		this._trackedObjects[obj.id] = obj;
-
-		return obj;
+	getCurrentPlayers: function() {
+		var currentPlayers = [];
+		for(var i = 0; i < this.state.currentPlayers.length; i++) {
+			currentPlayers.push(this.state.currentPlayers[i]);
+		}
+		return currentPlayers;
 	},
 
-	_getNextID: function() { // TO INHERIT
-		return this._nextID++;
+	addClient: function(client) {
+		this.clients.push(client);
+		client.game = this;
+
+		if(this.hasEnoughPlayers()) {
+			console.log("game", this.name, this.session, "starting!");
+			this._start();
+		}
 	},
 
-	getByID: function(id) { // TO INHERIT
+	removeClient: function(client) {
+		var player = client.player;
+		this.clients.removeElement(client);
+		if(player) {
+			this.state.players.removeElement(player);
+
+			if(this.hasStarted() && !this.isOver()) {
+				this.declairLoser(player, "disconnected");
+			}
+		}
+	},
+
+
+
+	//--- Game Object & their commands ---\\
+
+	getGameObject: function(id) { // TO INHERIT
 		id = parseInt(id);
 		if(id !== NaN) {
-			return this._trackedObjects[id];
+			return this.state.gameObjects[id];
 		}
+	},
+
+	trackGameObject: function(gameObject) {
+		gameObject.id = this._nextGameObjectID++;
+		this.state.gameObjects[gameObject.id] = gameObject;
+		return gameObject.id;
 	},
 
 	getCommand: function(commandString) {
@@ -70,63 +127,52 @@ var BaseGame = Class({
 		}
 	},
 
-	getState: function() {
-		return this._generatedState;
-	},
+	executeCommandFor: function(client, data) {
+		var player = client.player;
+		var gameObject = this.getGameObject(data.caller.id);
+		var commandFunction = gameObject["command_" + data.command];
 
-	// generates and returns the difference between the last and current state
-	getDeltaState: function() { // TODO: impliment getDeltaStateFor player
-		this._generateState();
-
-		this._deltaState = getDelta(this._lastGeneratedState, this._generatedState);
-
-		this.gamelog.deltaStates.push(this._deltaState);
-
-		return this._deltaState;
-	},
-
-	// updates and generates new current and last states, for delta states.
-	_generateState: function() {
-		this._lastGeneratedState = this._generatedState || {};
-
-		this._generatedState = clone(this.state); // creates a deep copy of the current state
-	},
-
-	// @inheritable: intended to be inherited and extended when the game should be started (e.g. initializing game objects)
-	begin: function() {
-		// This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
-	},
-
-	start: function() { // TO INHERIT
-		this._initPlayers(this.clients);
-
-		this.begin();
-
-		this._generateState();
-		this.gamelog.initialState = this._generatedState;
-		this._started = true;
-	},
-
-	started: function() {
-		this._generateState();
-	},
-
-	hasStarted: function() {
-		return this._started;
-	},
-
-	_initPlayers: function() {
-		for(var i = 0; i < this.clients.length; i++) {
-			var client = this.clients[i];
-			var player = this.newObject({
-				name: client.name || ("Player " + i),
-			});
-
-			this._playerIDToClient[player.id] = client;
-			this.state.players[i] = player;
+		var success = false;
+		if(commandFunction) {
+			success = commandFunction.call(gameObject, player, data);
+		}
+		else {
+			console.error("No command", data.command, "in", gameObject.gameObjectName);
 		}
 
-		this.state.currentPlayersIDs[0] = this.state.players[0].id;
+		this._updateSerializableStates();
+		return success;
+	},
+
+
+
+	//--- State & Delta State ---\\
+
+	// generates and returns the difference between the last and current state
+	getSerializableDeltaState: function() { // TODO: impliment getDeltaStateFor player
+		return this._serializableDeltaState;
+	},
+
+	_updateSerializableStates: function() {
+		this._lastSerializableState = this._currentSerializableState || {};
+		this._currentSerializableState = serializer.serialize(this.state);
+		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState);
+
+		this.gamelog.states.push(this._serializableDeltaState);
+	},
+
+
+
+
+
+	//--- Winning and Loosing ---\\
+
+	isOver: function(isOver) {
+		if(isOver) {
+			this._over = true;
+		}
+
+		return this._over;
 	},
 
 	// assumes when a player looses the rest could still be competing to win
@@ -138,7 +184,7 @@ var BaseGame = Class({
 		return false;
 	},
 
-	// assumes when a player wins the rest lose.
+	// assumes when a player wins the rest lose (unless they've already been set to win)
 	declairWinner: function(winner, reason) {
 		winner.won = reason || true;
 
@@ -150,7 +196,7 @@ var BaseGame = Class({
 			}
 		}
 
-		this.over = true;
+		this.isOver(true);
 		return true;
 	},
 
@@ -174,26 +220,6 @@ var BaseGame = Class({
 		}
 
 		return false;
-	},
-
-	getCurrentPlayers: function() {
-		var currentPlayers = [];
-		for(var i = 0; i < this.state.currentPlayersIDs.length; i++) {
-			currentPlayers.push(this.getByID(this.state.currentPlayersIDs[i]));
-		}
-		return currentPlayers;
-	},
-
-	getClientForPlayerID: function(id) {
-		return this._playerIDToClient[id]
-	},
-
-	getPlayerForClient: function(client) {
-		for(var i = 0; i < this.clients.length; i++) {
-			if(this.clients[i] === client) {
-				return this.getByID(i);
-			}
-		}
 	},
 });
 

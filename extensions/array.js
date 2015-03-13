@@ -23,6 +23,12 @@ var ArrayExtensions = {
 	contains: function(element) {
 		return (this.indexOf(element) > -1);
 	},
+
+	empty: function() {
+		while(this.length > 0) {
+			this.pop();
+		}
+	},
 };
 
 for(var extension in ArrayExtensions) {
