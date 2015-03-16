@@ -12,6 +12,7 @@ td {
 	vertical-align: middle;
 	text-align: center;
 }
+#playerInfo {background: #121212; padding: 0.5em; font-size: 1.5em; line-height: 1.25em}
 .legend {background: #fff; color: #777;}
 .horizontal-legend {padding-bottom: 1em;}
 .vertical-legend {padding-right: 1em;}
@@ -190,7 +191,23 @@ function updateBoard(stateNumber) {
 		}
 	}
 
-	$playerInfo.html("Player: " + state.currentPlayer.id)
+	strs = [];
+	for(var i = 0; i < state.players.length; i++) {
+		var player = state.gameObjects[state.players[i].id];
+
+		var str = '<span class="owner-' + player.id + '">Player ' + player.name + " (id: " + player.id + ")" + (state.currentPlayer.id === player.id ? " <strong>is current player</strong>" : "");
+
+		if(player.won) {
+			str += '<br><strong style="margin-left: 1em">won</strong> because ' + player.won + "<br/>";
+		}
+		if(player.lost) {
+			str += '<br><strong style="margin-left: 1em">lost</strong> because ' + player.lost + "<br/>";
+		}
+
+		strs.push(str + "</span>");
+	}
+
+	$playerInfo.html(strs.join("<br/>"));
 };
 
 currentStateNum = 0;

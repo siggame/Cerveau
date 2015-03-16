@@ -11,6 +11,10 @@ html {
 	font-family: 'Roboto', sans-serif;
 }
 
+strong {
+	font-weight: bold;
+}
+
 #main {
 	font-size: 1em;
 	background-color: #fcfcfc;
