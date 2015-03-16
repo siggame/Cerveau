@@ -1,0 +1,22 @@
+<section id="games" class="info-block">
+	<h2>Available Games on this Server</h2>
+	<ul class="game-list">
+	{{#each games}}
+		<li><span class="game-name">{{this.name}}</span><span class="game-description">{{this.description}}</span></li>
+	{{/each}}
+	</ul>
+</section>
+
+<section id="gamelogs" class="info-block">
+	<h2>Game Archieves</h2>
+	<ul class="game-list">
+	{{#each gamelogs}}
+		<li>
+			<span class="gamelog-name">{{this.game}}</span>
+			<span class="gamelog-session">{{this.session}}</span>
+			<span class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</span>
+			<span class="gamelog-watch"><a href="visualizer?gamelog={{this.uri}}">Watch</a></span>
+		</li>
+	{{/each}}
+	</ul>
+</section>

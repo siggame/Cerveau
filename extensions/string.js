@@ -16,6 +16,24 @@ var StringExtensions = {
 	uncapitalize: function() {
 		return this.charAt(0).toLowerCase() + this.slice(1);
 	},
+
+	padLeft: function(padding, length) {
+		var str = "" + this;
+		while(str.length < length) {
+			str = "" + padding + str;
+		}
+
+		return str;
+	},
+
+	padRight: function(padding, length) {
+		var str = "" + this;
+		while(str.length < length) {
+			str = "" + str + padding;
+		}
+
+		return str;
+	},
 };
 
 for(var extension in StringExtensions) {

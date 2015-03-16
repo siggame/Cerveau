@@ -24,10 +24,7 @@ var BaseGame = Class({
 		this._lastSerializableState = null;
 		this._currentSerializableState = null;
 		this._serializableDeltaState = null;
-		this.gamelog = {
-			gameSession: session,
-			states: [],
-		};
+		this.states = []; // record of all delta states for the game log generation
 	},
 
 
@@ -158,7 +155,7 @@ var BaseGame = Class({
 		this._currentSerializableState = serializer.serialize(this.state);
 		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState);
 
-		this.gamelog.states.push(this._serializableDeltaState);
+		this.states.push(this._serializableDeltaState);
 	},
 
 

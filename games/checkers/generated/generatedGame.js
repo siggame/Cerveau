@@ -24,10 +24,6 @@ var GeneratedGame = Class(
 			boardHeight: 0,
 			checkerLastMoved: null,
 		});
-
-		extend(this.gamelog, {
-			gameName: "Checkers",
-		});
 	},
 
 	newGameObject: function(data) {

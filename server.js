@@ -1,5 +1,6 @@
 var Class = require("./structures/class");
 var Client = require("./client");
+var GameLogger = require("./gameLogger");
 var constants = require("./constants");
 var serializer = require("./utilities/serializer");
 var fs = require('fs');
@@ -12,6 +13,7 @@ var Server = Class({
 		this.games = [];
 		this.gameClasses = [];
 		this.nextGameNumber = 1;
+		this.gameLogger = new GameLogger('gamelogs/');
 
 		(function(self) {
 			self.io.on('connection', function(socket){
@@ -138,12 +140,7 @@ var Server = Class({
 
 		this.sendTo(clients, "over"); // TODO: send link to gamelog
 
-		var gamelog = JSON.stringify(game.gamelog);
-		fs.writeFile("./gamelogs/" + (game.name || "UNKNOWN_GAME") + "-" + (game.session || "UNKNOWN_SESSION") + ".joue", gamelog, function(err) {
-			if(err) {
-				console.log(err);
-			}
-		}); 
+		this.gameLogger.log(game);
 	},
 
 	// Functions invoked when a client sends a raw message to the server

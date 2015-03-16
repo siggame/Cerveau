@@ -53,10 +53,6 @@ var Generated${game_key} = Class(
 %>			${var_name}: ${var_default},
 % endfor
 		});
-
-		extend(this.gamelog, {
-			gameName: "${game_name}",
-		});
 	},
 
 % for obj_key, obj in game_objs.items():
