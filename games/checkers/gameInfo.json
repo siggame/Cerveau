@@ -1,0 +1,236 @@
+{
+    "Game": {
+        "attributes": {
+            "boardHeight": {
+                "default": 8,
+                "description": "The height of the board for the Y component of a checker.",
+                "type": "int"
+            },
+            "boardWidth": {
+                "default": 8,
+                "description": "The width of the board for X component of a checker.",
+                "type": "int"
+            },
+            "checkerLastJumped": {
+                "description": "If the last checker jumped, meaning it can move again.",
+                "type": "boolean"
+            },
+            "checkerLastMoved": {
+                "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
+                "type": "Checker"
+            },
+            "checkers": {
+                "description": "All the checkers currently in the game.",
+                "subType": "Checker",
+                "type": "array"
+            },
+            "currentPlayer": {
+                "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "serverPredefined": true,
+                "type": "Player"
+            },
+            "currentPlayers": {
+                "description": "List of all the players who can send commands to the server.",
+                "serverPredefined": true,
+                "subType": "Player",
+                "type": "array"
+            },
+            "currentTurn": {
+                "default": 0,
+                "description": "The current turn number, starting at 0 for the first player's turn",
+                "serverPredefined": true,
+                "type": "int"
+            },
+            "gameObjects": {
+                "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
+                "keyType": "int",
+                "serverPredefined": true,
+                "type": "dictionary",
+                "valueType": "GameObject"
+            },
+            "maxTurns": {
+                "default": 100,
+                "description": "The maximum number of turns before the game will automatically end.",
+                "serverPredefined": true,
+                "type": "int"
+            },
+            "players": {
+                "description": "List of all the players in the game.",
+                "serverPredefined": true,
+                "subType": "Player",
+                "type": "array"
+            }
+        },
+        "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that much move diagonally to the opposing side. Very simple.",
+        "functions": {},
+        "inheritedAttributes": {},
+        "inheritedFunctions": {},
+        "name": "Checkers",
+        "numberOfPlayers": 2,
+        "parentClasses": [],
+        "serverParentClasses": [
+            "TurnBasedGame"
+        ]
+    },
+    "gameObjects": {
+        "Checker": {
+            "attributes": {
+                "kinged": {
+                    "default": false,
+                    "description": "If the checker has been kinged and can move backwards.",
+                    "type": "boolean"
+                },
+                "owner": {
+                    "description": "The player that controls this Checker.",
+                    "type": "Player"
+                },
+                "x": {
+                    "description": "The x coordinate of the checker.",
+                    "type": "int"
+                },
+                "y": {
+                    "description": "The y coordinate of the checker.",
+                    "type": "int"
+                }
+            },
+            "description": "A checker on the game board.",
+            "functions": {
+                "move": {
+                    "arguments": [
+                        {
+                            "description": "The x coordinate to move to.",
+                            "name": "x",
+                            "type": "int"
+                        },
+                        {
+                            "description": "The y coordinate to move to.",
+                            "name": "y",
+                            "type": "int"
+                        }
+                    ],
+                    "description": "Moves the checker from its current location to the given (x, y)."
+                }
+            },
+            "inheritedAttributes": {
+                "id": {
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": "int"
+                },
+                "logs": {
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "subType": "string",
+                    "type": "array"
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "arguments": [
+                        {
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "type": "string"
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "GameObject": {
+            "attributes": {
+                "id": {
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "serverPredefined": true,
+                    "type": "int"
+                },
+                "logs": {
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "serverPredefined": true,
+                    "subType": "string",
+                    "type": "array"
+                }
+            },
+            "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
+            "functions": {
+                "log": {
+                    "arguments": [
+                        {
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "type": "string"
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "serverPredefined": true
+                }
+            },
+            "inheritedAttributes": {},
+            "inheritedFunctions": {},
+            "parentClasses": [],
+            "serverParentClasses": [
+                "BaseGameObject"
+            ]
+        },
+        "Player": {
+            "attributes": {
+                "clientType": {
+                    "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
+                    "type": "string"
+                },
+                "name": {
+                    "default": "Anonymous",
+                    "description": "The name of the player",
+                    "type": "string"
+                }
+            },
+            "description": "A player in this game. Every AI controls one player.",
+            "functions": {
+                "endTurn": {
+                    "description": "Tells the server that this player is done with their turn."
+                }
+            },
+            "inheritedAttributes": {
+                "id": {
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": "int"
+                },
+                "logs": {
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "subType": "string",
+                    "type": "array"
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "arguments": [
+                        {
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "type": "string"
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        }
+    }
+}

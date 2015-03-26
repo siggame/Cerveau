@@ -198,6 +198,10 @@ var Server = Class({
 	runCommandFor: function(client, json) {
 		var data = JSON.parse(json);
 
+		console.log("------------------------------");
+		console.log("COMMAND", data);
+		console.log("------------------------------");
+
 		data = serializer.unserialize(data, client.game);
 
 		return client.game.executeCommandFor(client, data);

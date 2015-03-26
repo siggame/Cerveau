@@ -5,19 +5,26 @@ var GameObject = require("../gameObject")
 
 
 // @class GeneratedChecker: The generated version of the Checker, that handles basic logic.
-module.exports = Class(GameObject, {
+var GeneratedChecker = Class(GameObject, {
 	init: function(data) {
 		GameObject.init.apply(this, arguments);
 
 		this.gameObjectName = "Checker";
 
+		this.x = parseInt(data.x === undefined ? 0 : data.x);
 		this.owner = (data.owner === undefined ? null : data.owner);
-		this.x = (data.x === undefined ? 0 : data.x);
-		this.y = (data.y === undefined ? 0 : data.y);
-	},
+		this.y = parseInt(data.y === undefined ? 0 : data.y);
+		this.kinged = (data.kinged === undefined ? false : data.kinged);
 
+		this._serializableKeys["x"] = true;
+		this._serializableKeys["owner"] = true;
+		this._serializableKeys["y"] = true;
+		this._serializableKeys["kinged"] = true;
+	},
 
 	command_move: function(player, data) {
 		return this.move(player, data.x, data.y);
 	},
 });
+
+module.exports = GeneratedChecker;

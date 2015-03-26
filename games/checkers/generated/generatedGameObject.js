@@ -5,16 +5,18 @@ var BaseGameObject = require("../../baseGameObject")
 
 
 // @class GeneratedGameObject: The generated version of the GameObject, that handles basic logic.
-module.exports = Class(BaseGameObject, {
+var GeneratedGameObject = Class(BaseGameObject, {
 	init: function(data) {
 		BaseGameObject.init.apply(this, arguments);
 
 		this.gameObjectName = "GameObject";
 
-	},
 
+	},
 
 	command_log: function(player, data) {
 		return this.log(player, data.message);
 	},
 });
+
+module.exports = GeneratedGameObject;

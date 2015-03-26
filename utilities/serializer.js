@@ -8,7 +8,7 @@ var serializer = {
 	},
 
 	isEmptyExceptFor: function(obj, key) {
-		return (this.isObject(obj) && Object.getOwnPropertyNames(obj).length === 1 && obj[key] !== undefined);
+		return (serializer.isObject(obj) && Object.getOwnPropertyNames(obj).length === 1 && obj[key] !== undefined);
 	},
 
 	isGameObjectReference: function(obj) {
@@ -17,6 +17,10 @@ var serializer = {
 
 	isObject: function(obj) {
 		return (typeof(obj) === 'object' && obj !== null);
+	},
+
+	isSerializable: function(obj, key) {
+		return serializer.isObject(obj) && obj.hasOwnProperty(key) && !String(key).startsWith("_") && (obj._serializableKeys === undefined || obj._serializableKeys[key]);
 	},
 
 	// serializes a game state to a structure that can be sent via json
@@ -29,11 +33,7 @@ var serializer = {
 		}
 
 		for(var key in state) {
-			if(state.hasOwnProperty(key)) {
-				if(typeof(key) == "string" && key.startsWith("_")) { // then it is a private variable in the real state, so skip it
-					continue;
-				}
-
+			if(serializer.isSerializable(state, key)) {
 				var value = state[key];
 				if(typeof(value) == "object" && value !== null) {
 					if(state !== gameObjects && value.id !== undefined) { // then this is a game object not part of the gameObjects array, so don't serialize it as normal. just make a reference to it

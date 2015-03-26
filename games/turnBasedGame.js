@@ -7,41 +7,47 @@ var TurnBasedGame = Class(BaseGame, {
 	init: function() {
 		BaseGame.init.apply(this, arguments);
 
-		extend(this.state, {
-			currentTurn: 0,
-			maxTurns: 100, // real class should override this during init
-			currentPlayer: null,
+		this.currentTurn = 0;
+		this.maxTurns = 100; // real class should override this during init
+		this.currentPlayer = null;
+
+		extend(this._serializableKeys, {
+			"currentTurn": true,
+			"maxTurns": true,
+			"currentPlayer": true,
 		});
 	},
 
+	/// begins the turn based game to the first player
 	begin: function() {
 		BaseGame.begin.apply(this, arguments);
-		this.state.currentPlayers.empty();
-		this.state.currentPlayers.push(this.state.players[0]);
-		this.state.currentPlayer = this.state.currentPlayers[0];
+		this.currentPlayers.empty();
+		this.currentPlayers.push(this.players[0]);
+		this.currentPlayer = this.currentPlayers[0];
 	},
 
+	/// transitions to the next turn, increasing turn and setting the currentPlayer to the next one
 	nextTurn: function() {
-		if(this.state.currentTurn + 1 === this.state.maxTurns) {
+		if(this.currentTurn + 1 === this.maxTurns) {
 			return this._maxTurnsReached();
 		}
 
-		this.state.currentTurn++;
-		var index = Math.max(0, this.state.players.indexOf(this.state.currentPlayers[0])); // turn based games will only ever have one current player
+		this.currentTurn++;
+		var index = Math.max(0, this.players.indexOf(this.currentPlayers[0])); // turn based games will only ever have one current player
 		index++;
 
-		if(index >= this.state.players.length) {
+		if(index >= this.players.length) {
 			index = 0;
 		}
 
-		this.state.currentPlayers[0] = this.state.players[index];
-		this.state.currentPlayer = this.state.currentPlayers[0];
+		this.currentPlayers[0] = this.players[index];
+		this.currentPlayer = this.currentPlayers[0];
 
 		return true;
 	},
 
+	/// intended to be inherited and then max turn victory conditions checked to find the winner/looser.
 	// @inheritable
-	// intended to be imherited and then max turn victory conditions checked to find the winner/looser.
 	_maxTurnsReached: function() {
 		this.isOver(true);
 		return true;

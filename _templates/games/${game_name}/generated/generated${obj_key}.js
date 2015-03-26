@@ -10,50 +10,86 @@ var ${parent_class} = require("../${uncapitalize(parent_class)}")
 <%
 	parent_classes = obj['parentClasses'] + obj['serverParentClasses']
 %>
+% if obj_key == "Game":
+
+// Custom Game Objects
+% for game_obj_key, game_obj in game_objs.items():
+var ${game_obj_key} = require("../${uncapitalize(game_obj_key)}");
+% endfor
+% endif
 
 // @class Generated${obj_key}: The generated version of the ${obj_key}, that handles basic logic.
-module.exports = Class(${", ".join(parent_classes) + "," if parent_classes else ""} {
+var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else ""} {
 	init: function(data) {
 % for parent_class in reversed(parent_classes):
 		${parent_class}.init.apply(this, arguments);
 % endfor
 
+% if obj_key == "Game":
+		this.name = "${game_name}";
+% endif
 		this.gameObjectName = "${obj_key}";
 
-% for var_name, var_parms in obj['attributes'].items():
+% for attr_name, attr_parms in obj['attributes'].items():
 <%
-	if 'serverPredefined' in var_parms and var_parms['serverPredefined']:
+	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
 		continue
 
-	var_default = var_parms["default"] if 'default' in var_parms else None
-	var_type = var_parms["type"]
+	attr_default = attr_parms["default"] if 'default' in attr_parms else None
+	attr_type = attr_parms["type"]
+	attr_cast = "";
 
-	if var_type == "string":
-		var_default = '"' + (var_default if var_default != None else '') + '"'
-	elif var_type == "array":
-		var_default = '[]'
-	elif var_type == "int" or var_type == "float":
-		var_default = 0
-	elif var_type == "dictionary":
-		var_default = '{}'
+	if attr_type == "string":
+		attr_default = '"' + (attr_default if attr_default != None else '') + '"'
+		attr_cast = "String"
+	elif attr_type == "array":
+		attr_default = '[]'
+	elif attr_type == "int":
+		attr_default = attr_default or 0
+		attr_cast = "parseInt"
+	elif attr_type == "float":
+		attr_default = attr_default or 0
+		attr_cast = "parseFloat"
+	elif attr_type == "dictionary":
+		attr_default = '{}'
+	elif attr_type == "boolean":
+		attr_default = 'false'
 	else:
-		var_default = "null"
-%>		this.${var_name} = (data.${var_name} === undefined ? ${var_default} : data.${var_name});
+		attr_default = "null"
+%>		this.${attr_name} = ${attr_cast}(data.${attr_name} === undefined ? ${attr_default} : data.${attr_name});
+% endfor
+
+% for attr_name, attr_parms in obj['attributes'].items():
+<%
+	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
+		continue
+%>		this._serializableKeys["${attr_name}"] = true;
 % endfor
 	},
-
-% for var_name, var_parms in obj['methods'].items():
+% for function_name, function_parms in obj['functions'].items():
 <%
 	argument_string = ""
 	argument_names = []
-	if 'arguments' in var_parms:
+	if 'arguments' in function_parms:
 		argument_names.append("")
-		for arg_parms in var_parms['arguments']:
+		for arg_parms in function_parms['arguments']:
 			argument_names.append(arg_parms['name'])
 		argument_string = ", data.".join(argument_names)
 %>
-	command_${var_name}: function(player, data) {
-		return this.${var_name}(player${argument_string});
+	command_${function_name}: function(player, data) {
+		return this.${function_name}(player${argument_string});
 	},
 % endfor
+% if obj_key == "Game":
+% for game_obj_key, game_obj in game_objs.items():
+
+	/// Creates a new instance of the ${game_obj_key} game object that has reference to the creating game
+	new${game_obj_key}: function(data) {
+		data.game = this;
+		return new ${game_obj_key}(data);
+	},
+% endfor
+% endif
 });
+
+module.exports = Generated${obj_key};

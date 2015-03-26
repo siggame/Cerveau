@@ -6,13 +6,12 @@ var serializer = require("../utilities/serializer");
 // @class BaseGame: the base game plugin new games should inherit from.
 var BaseGame = Class({
 	init: function(session) {
-		this.state = { // anything in here that is not a function and not starting with an '_' (private signifier) is sent to clients
-			players: [],
-			currentPlayers: [], // players current awaiting commands from (basically turns)
-			gameObjects: {},
-		};
+		this.players = [];
+		this.currentPlayers = []; // players current awaiting commands from (basically turns)
+		this.gameObjects = {};
 
 		this.session = session;
+		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
 		this.clients = []; // the server will add and remove these via add/removeClient
 
 		this._started = false;
@@ -24,7 +23,15 @@ var BaseGame = Class({
 		this._lastSerializableState = null;
 		this._currentSerializableState = null;
 		this._serializableDeltaState = null;
-		this.states = []; // record of all delta states for the game log generation
+		this.states = []; // record of all delta states, for the game log generation
+
+		this._serializableKeys = {
+			"players": true,
+			"currentPlayers": true,
+			"gameObjects": true,
+			"session": true,
+			"name": true,
+		};
 	},
 
 
@@ -62,7 +69,7 @@ var BaseGame = Class({
 
 			player._client = client;
 			client.player = player;
-			this.state.players.push(player);
+			this.players.push(player);
 		}
 	},
 
@@ -73,8 +80,8 @@ var BaseGame = Class({
 
 	getCurrentPlayers: function() {
 		var currentPlayers = [];
-		for(var i = 0; i < this.state.currentPlayers.length; i++) {
-			currentPlayers.push(this.state.currentPlayers[i]);
+		for(var i = 0; i < this.currentPlayers.length; i++) {
+			currentPlayers.push(this.currentPlayers[i]);
 		}
 		return currentPlayers;
 	},
@@ -93,7 +100,7 @@ var BaseGame = Class({
 		var player = client.player;
 		this.clients.removeElement(client);
 		if(player) {
-			this.state.players.removeElement(player);
+			this.players.removeElement(player);
 
 			if(this.hasStarted() && !this.isOver()) {
 				this.declairLoser(player, "disconnected");
@@ -108,13 +115,13 @@ var BaseGame = Class({
 	getGameObject: function(id) { // TO INHERIT
 		id = parseInt(id);
 		if(id !== NaN) {
-			return this.state.gameObjects[id];
+			return this.gameObjects[id];
 		}
 	},
 
 	trackGameObject: function(gameObject) {
 		gameObject.id = this._nextGameObjectID++;
-		this.state.gameObjects[gameObject.id] = gameObject;
+		this.gameObjects[gameObject.id] = gameObject;
 		return gameObject.id;
 	},
 
@@ -152,13 +159,11 @@ var BaseGame = Class({
 
 	_updateSerializableStates: function() {
 		this._lastSerializableState = this._currentSerializableState || {};
-		this._currentSerializableState = serializer.serialize(this.state);
-		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState);
+		this._currentSerializableState = serializer.serialize(this);
+		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState) || {};
 
 		this.states.push(this._serializableDeltaState);
 	},
-
-
 
 
 
@@ -185,8 +190,8 @@ var BaseGame = Class({
 	declairWinner: function(winner, reason) {
 		winner.won = reason || true;
 
-		for(var i = 0; i < this.state.players.length; i++) {
-			var player = this.state.players[i];
+		for(var i = 0; i < this.players.length; i++) {
+			var player = this.players[i];
 
 			if(player !== winner && !player.won) {
 				player.lost = player.lost || true;
@@ -199,8 +204,8 @@ var BaseGame = Class({
 
 	checkForWinner: function() {
 		var winner;
-		for(var i = 0; i < this.state.players.length; i++) {
-			var player = this.state.players[i];
+		for(var i = 0; i < this.players.length; i++) {
+			var player = this.players[i];
 
 			if(!player.lost) {
 				if(winner) {

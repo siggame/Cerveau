@@ -5,18 +5,22 @@ var GameObject = require("../gameObject")
 
 
 // @class GeneratedPlayer: The generated version of the Player, that handles basic logic.
-module.exports = Class(GameObject, {
+var GeneratedPlayer = Class(GameObject, {
 	init: function(data) {
 		GameObject.init.apply(this, arguments);
 
 		this.gameObjectName = "Player";
 
-		this.clientType = (data.clientType === undefined ? "" : data.clientType);
-		this.name = (data.name === undefined ? "Anonymous" : data.name);
-	},
+		this.name = String(data.name === undefined ? "Anonymous" : data.name);
+		this.clientType = String(data.clientType === undefined ? "" : data.clientType);
 
+		this._serializableKeys["name"] = true;
+		this._serializableKeys["clientType"] = true;
+	},
 
 	command_endTurn: function(player, data) {
 		return this.endTurn(player);
 	},
 });
+
+module.exports = GeneratedPlayer;

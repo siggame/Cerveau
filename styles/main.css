@@ -1,10 +1,33 @@
 @import url(http://fonts.googleapis.com/css?family=Roboto:400,700,700italic,400italic);
+@import url(http://fonts.googleapis.com/css?family=Inconsolata:400,700);
 
 .color-primary { color: #2D4671 }	/* Main Primary color */
 .color-primary-lightest { color: #7689A9 }
 .color-primary-light { color: #4D658D }
 .color-primary-dark { color: #152C55 }
 .color-primary-darkest { color: #051838 }
+
+.color-complement { color: #AA8239 }	/* Main Complement color */
+.color-complement-lightest { color: #FFE1AA }
+.color-complement-light { color: #D5AF6B }
+.color-complement-dark { color: #805A16 }
+.color-complement-darkest { color: #553700 }
+
+* {
+	-webkit-transition: all 333ms linear;
+	-moz-transition: all 333ms linear;
+	-o-transition: all 333ms linear;
+	-ms-transition: all 333ms linear;
+	transition: all 333ms linear;
+}
+
+::selection {
+  background: #FFE1AA; /* WebKit/Blink Browsers */
+}
+
+::-moz-selection {
+  background: #FFE1AA; /* Gecko Browsers */
+}
 
 html {
 	background-color: #152C55;
@@ -15,12 +38,53 @@ strong {
 	font-weight: bold;
 }
 
+a, a:visited {
+	color: #2D4671;
+	text-decoration: underline;
+}
+
+a:hover, a:focus, a:active {
+	color: #AA8239;
+}
+
+*:focus {
+	outline: dotted 0.125em #7689A9;
+}
+
+h1 {
+	font-size: 2.5em;
+	font-weight: bold;
+	color: #051838;
+}
+
+h2,
+.game-class > header {
+	font-size: 2em;
+	font-weight: bold;
+	color: #152C55;
+}
+
+h3,
+.game-class section > header {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #2D4671;
+}
+
+h4,
+.function header,
+.attribute header {
+	font-size: 1.25em;
+	font-weight: bold;
+	color: #051838;
+}
+
 #main {
 	font-size: 1em;
 	background-color: #fcfcfc;
 	color: #121212;
-	max-width: 640px;
-	margin: 0 auto;
+	max-width: 800px;
+	margin: 2em auto;
 	padding: 1em;
 }
 
@@ -39,8 +103,8 @@ strong {
 	text-decoration: none;
 }
 
-#site-title a:focus, #site-title a:hover, #site-title a:active {
-	color: #fcfcfc;
+#site-title a:hover, #site-title a:focus, #site-title a:active {
+	color: #FFE1AA;
 }
 
 .info-block h2 {
@@ -74,9 +138,129 @@ strong {
 	color: #051838;
 }
 
+.info-block li a:hover, .info-block li a:focus, .info-block li a:active {
+	color: #805A16;
+}
+
 .info-block li span {
 	display: inline-block;
 	margin: 0 1em;
 }
 
+
+
+/* --- Docs --- */
+
+.documentation > .game-class:first-child {
+	margin-top: 1em;
+}
+
+.documentation > .game-class {
+	margin-top: 3em;
+}
+
+.documentation * {
+	background-color: transparent;
+	outline: rgba(255, 255, 255, 0) 0.25em solid;
+}
+
+.documentation .anchor-highlight {
+	background-color: #FFE1AA;
+	outline-color: #AA8239;
+}
+
+.game-class > section {
+	margin-top: 1em;
+}
+
+.game-class > * {
+	margin-left: 2em;
+}
+
+.game-class > header {
+	margin-left: 0;
+}
+
+.attributes ul li, .functions ul li {
+	margin: 0.5em 0 0.5em 1em;
+}
+
+.attributes ul li:before, .functions ul li:before {
+	/*content: '▪ ';*/
+}
+
+.attributes ul li:first-child, .functions ul li:first-child {
+	margin-top: 0;
+}
+
+.attributes ul li:last-child, .functions ul li:last-child {
+	margin-bottom: 0;
+}
+
+.attributes > ul > li > *, .functions > ul > li > * {
+	margin-left: 2em;
+}
+
+.attributes > ul > li > header, .functions > ul > li > header {
+	margin-left: 0;
+}
+
+.attributes .name, .functions .name {
+	font-family: 'Inconsolata', monospace;
+	font-weight: bold;
+	color: #454545;
+}
+
+.documentation .type {
+	font-weight: normal;
+	color: #2D4671;
+}
+
+.documentation .default, .documentation .inherited {
+	font-style: italic;
+}
+
+.documentation .type:before {
+	content: '<';
+	color: #454545;
+}
+
+.documentation .type:after {
+	content: '>';
+	color: #454545;
+}
+
+.parentClasses {
+	font-style: italic;
+}
+
+.function .inline-arguments,
+.parentClasses ul {
+	display: inline;
+}
+
+.function .inline-arguments li,
+.parentClasses li {
+	display: inline;
+	margin: 0;
+}
+
+.function .inline-arguments li:after,
+.parentClasses li:after {
+	content: ", ";
+}
+
+.function .inline-arguments li:before,
+.parentClasses li:before {
+	content: none;
+}
+
+.function .inline-arguments li:last-child:after,
+.parentClasses li:last-child:after {
+	content: none;
+}
+
+.function .arguments header {
+	font-size: 1.125em;
+}
 

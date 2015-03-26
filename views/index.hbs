@@ -2,7 +2,11 @@
 	<h2>Available Games on this Server</h2>
 	<ul class="game-list">
 	{{#each games}}
-		<li><span class="game-name">{{this.name}}</span><span class="game-description">{{this.description}}</span></li>
+		<li>
+			<span class="game-name">{{this.name}}</span>
+			<span class="game-description">{{this.description}}</span>
+			<span class="game-documentation"><a href="/documentation/{{this.name}}">Documentation</a></span>
+		</li>
 	{{/each}}
 	</ul>
 </section>

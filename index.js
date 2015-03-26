@@ -6,6 +6,7 @@ var expressHbs = require('express3-handlebars');
 var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
+var extend = require('extend');
 require("./extensions/string");
 require("./extensions/array");
 
@@ -34,26 +35,43 @@ app.engine('hbs', expressHbs({
 	helpers: {
 		formatDate: function (date, format) {
 			return moment(date).format(format);
-		}
+		},
 	},
 }));
 app.set('view engine', 'hbs');
 
-app.get('/', function(req, res){
-	gameFolders = getDirectories("games/");
-	games = [];
+var gameInfos = {};
+
+function initGameInfos() {
+	var gameFolders = getDirectories("games/");
 	for(var i = 0; i < gameFolders.length; i++) {
 		var gameFolder = gameFolders[i];
 		if(!gameFolder.startsWith("_")) {
+			gameInfos[gameFolder] = gameInfos[gameFolder] || require('./games/' + gameFolder + "/gameInfo.json");
+		}
+	}
+};
+
+app.get('/', function(req, res){
+	initGameInfos();
+
+	var games = [];
+	for(var gameName in gameInfos) {
+		if(gameInfos.hasOwnProperty(gameName)) {
+			var gameInfo = gameInfos[gameName];
 			games.push({
-				name: gameFolder,
-				description: "this would be the game description...",
+				name: gameName,
+				description: gameInfo.Game.description,
 			});
 		}
 	}
 
-	logs = server.gameLogger.getLogs();
-	gamelogs = [];
+	games.sort(function(a, b) {
+		return a.name.toLowerCase() > b.name.toLowerCase();
+	});
+
+	var logs = server.gameLogger.getLogs();
+	var gamelogs = [];
 	for(var filename in logs) {
 		var log = logs[filename];
 		gamelogs.push({
@@ -73,6 +91,96 @@ app.get('/', function(req, res){
 app.get('/visualizer', function(req, res) {
 	res.render('visualizer');
 });
+
+var docDatas = {};
+app.get('/documentation/:gameName', function(req, res) {
+	var gameName = req.params.gameName;
+	initGameInfos();
+	var gameInfo = gameInfos[gameName];
+
+	if(!docDatas[gameName]) {
+		classes = [];
+
+		var objects = extend({'Game': gameInfo.Game}, gameInfo.gameObjects);
+
+		function sortNames(a, b) {
+			return a.name.toLowerCase() > b.name.toLowerCase();
+		};
+
+		function formatVariable(variable) {
+			if(variable.type === "dictionary") {
+				variable.type = "dictionary<" + variable.keyType + ", " + variable.valueType + ">";
+			}
+			else if(variable.type === "array") {
+				variable.type = "array<" + variable.subType + ">";
+			}
+
+			if(variable.type === "boolean" && variable['default'] !== undefined) {
+				variable['default'] = String(variable['default']);
+			}
+
+			if(variable.type === "string" && variable['default'] !== undefined) {
+				variable['default'] = '"' + variable['default'] + '"';
+			}
+		};
+
+		var gameClass = undefined;
+		for(var objName in objects) {
+			if(objects.hasOwnProperty(objName)) {
+				var gameObject = objects[objName];
+				var docClass = extend({}, gameObject, {
+					name: objName,
+					attributes: [],
+					functions: [],
+				});
+
+				function addTo(array, dict) {
+					for(var key in dict) {
+						if(!key.startsWith("_") && dict.hasOwnProperty(key)) {
+							array.push(extend({name: key}, dict[key]));
+						}
+					}
+				};
+
+				addTo(docClass.attributes, gameObject.attributes);
+				addTo(docClass.attributes, gameObject.inheritedAttributes);
+				docClass.attributes.sort(sortNames);
+				for(var i = 0; i < docClass.attributes.length; i++) {
+					formatVariable(docClass.attributes[i]);
+				}
+
+				addTo(docClass.functions, gameObject.functions);
+				addTo(docClass.functions, gameObject.inheritedFunctions);
+				docClass.functions.sort(sortNames);
+				for(var i = 0; i < docClass.functions; i++) {
+					for(var j = 0; j < docClass.functions[i].arguments.length; j++) {
+						formatVariable(docClass.functions[i].arguments[j]);
+					}
+				}
+
+				classes.push(docClass);
+
+				if(docClass.name == "Game") {
+					gameClass = docClass;
+				}
+			}
+		}
+
+		classes.removeElement(gameClass);
+
+		classes.sort(sortNames);
+		classes.unshift(gameClass);
+
+		docDatas[gameName] = classes;
+	}
+
+	res.render('documentation', {
+		gameName: gameName,
+		classes: docDatas[gameName],
+	});
+});
+
+
 
 // GET /static/style.css etc.
 app.use('/styles', express.static(__dirname + '/styles'));
