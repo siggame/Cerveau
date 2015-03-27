@@ -1,4 +1,4 @@
-var Class = require("../structures/class");
+var Class = require("../utilities/class");
 var BaseGame = require("./baseGame");
 var extend = require("extend");
 

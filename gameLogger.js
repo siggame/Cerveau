@@ -1,4 +1,4 @@
-var Class = require("./structures/class");
+var Class = require("./utilities/class");
 var fs = require('fs');
 var path = require('path');
 var moment = require('moment');

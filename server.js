@@ -1,4 +1,4 @@
-var Class = require("./structures/class");
+var Class = require("./utilities/class");
 var Client = require("./client");
 var GameLogger = require("./gameLogger");
 var constants = require("./constants");
@@ -80,7 +80,6 @@ var Server = Class({
 
 	// sends a message to ALL clients. use with care.
 	broadcast: function(event, message) {
-		//console.log("---> ALL", event, message);
 		this.io.emit(event, message);
 	},
 
@@ -100,7 +99,7 @@ var Server = Class({
 	},*/
 
 	sendDeltaStateOf: function(game) {
-		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState()));
+		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState();));
 	},
 
 	getCurrentClientsFor: function(game) {

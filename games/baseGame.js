@@ -1,5 +1,4 @@
-var Class = require("../structures/class");
-
+var Class = require("../utilities/class");
 var constants = require("../constants");
 var serializer = require("../utilities/serializer");
 

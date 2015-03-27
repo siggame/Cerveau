@@ -1,6 +1,6 @@
 // @class Client: the basic implimentation of a connection to the server in socket.io
 
-var Class = require("./structures/class");
+var Class = require("./utilities/class");
 
 var Client = Class({
 	init: function(socket) {

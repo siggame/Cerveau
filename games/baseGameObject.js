@@ -1,4 +1,4 @@
-var Class = require("../structures/class");
+var Class = require("../utilities/class");
 var extend = require("extend");
 
 // @class BaseGameObject: the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
