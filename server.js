@@ -99,7 +99,7 @@ var Server = Class({
 	},*/
 
 	sendDeltaStateOf: function(game) {
-		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState();));
+		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState()));
 	},
 
 	getCurrentClientsFor: function(game) {

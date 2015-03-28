@@ -1,6 +1,6 @@
 // ${header}
 // Note: this file should never be modified, instead if you want to add game logic modify just the ../${obj_key}.js file. This is to ease merging main.data changes
-var Class = require("../../../structures/class");
+var Class = require("../../../utilities/class");
 % for parent_class in obj['serverParentClasses']:
 var ${parent_class} = require("../../${uncapitalize(parent_class)}")
 % endfor

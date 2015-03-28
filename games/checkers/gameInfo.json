@@ -11,13 +11,13 @@
                 "description": "The width of the board for X component of a checker.",
                 "type": "int"
             },
-            "checkerLastJumped": {
-                "description": "If the last checker jumped, meaning it can move again.",
-                "type": "boolean"
-            },
-            "checkerLastMoved": {
+            "checkerMoved": {
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
                 "type": "Checker"
+            },
+            "checkerMovedJumped": {
+                "description": "If the last checker that moved jumped, meaning it can move again.",
+                "type": "boolean"
             },
             "checkers": {
                 "description": "All the checkers currently in the game.",
@@ -190,6 +190,10 @@
                     "default": "Anonymous",
                     "description": "The name of the player",
                     "type": "string"
+                },
+                "timeRemaining": {
+                    "description": "The amount of time (in ms) remaining for this AI to send commands.",
+                    "type": "int"
                 }
             },
             "description": "A player in this game. Every AI controls one player.",
