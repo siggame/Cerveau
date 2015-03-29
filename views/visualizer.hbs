@@ -193,10 +193,10 @@ function updateBoard(stateNumber) {
 		var str = '<span class="owner-' + player.id + '">Player ' + player.name + " (id: " + player.id + ")" + (state.currentPlayer.id === player.id ? " <strong>is current player</strong>" : "");
 
 		if(player.won) {
-			str += '<br><strong style="margin-left: 1em">won</strong> because ' + player.won + "<br/>";
+			str += '<br><strong style="margin-left: 1em">won</strong> because ' + player.winReason + "<br/>";
 		}
 		if(player.lost) {
-			str += '<br><strong style="margin-left: 1em">lost</strong> because ' + player.lost + "<br/>";
+			str += '<br><strong style="margin-left: 1em">lost</strong> because ' + player.loseReason + "<br/>";
 		}
 
 		strs.push(str + "</span>");

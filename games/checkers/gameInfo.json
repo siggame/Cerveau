@@ -186,6 +186,15 @@
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": "string"
                 },
+                "loseReason": {
+                    "description": "the reason why the player lost the game",
+                    "type": "string"
+                },
+                "lost": {
+                    "default": false,
+                    "description": "if the player lost the game or not",
+                    "type": "boolean"
+                },
                 "name": {
                     "default": "Anonymous",
                     "description": "The name of the player",
@@ -194,6 +203,15 @@
                 "timeRemaining": {
                     "description": "The amount of time (in ms) remaining for this AI to send commands.",
                     "type": "int"
+                },
+                "winReason": {
+                    "description": "the reason why the player won the game",
+                    "type": "string"
+                },
+                "won": {
+                    "default": false,
+                    "description": "if the player won the game or not",
+                    "type": "boolean"
                 }
             },
             "description": "A player in this game. Every AI controls one player.",

@@ -64,9 +64,11 @@ var BaseGame = Class({
 			var client = this.clients[i];
 			var player = this.newPlayer({ // this method should be implimented in GeneratedGame
 				name: client.name || ("Player " + i),
+				clientType: client.type || "Unknown",
 			});
 
-			player._client = client;
+			player.timeRemaining = player.timeRemaining || 10000; // 10 seconds (10,000ms)
+			player.client = client;
 			client.player = player;
 			this.players.push(player);
 		}
@@ -83,6 +85,13 @@ var BaseGame = Class({
 			currentPlayers.push(this.currentPlayers[i]);
 		}
 		return currentPlayers;
+	},
+
+	playerTimedOut: function(player) {
+		player.timeRemaining = 0;
+		this.declairLoser(player, "Timed out");
+
+		// TODO: server should probably subscribe to events like this...
 	},
 
 	addClient: function(client) {
@@ -102,7 +111,7 @@ var BaseGame = Class({
 			this.players.removeElement(player);
 
 			if(this.hasStarted() && !this.isOver()) {
-				this.declairLoser(player, "disconnected");
+				this.declairLoser(player, "Disconnected");
 			}
 		}
 	},
@@ -177,23 +186,32 @@ var BaseGame = Class({
 	},
 
 	// assumes when a player looses the rest could still be competing to win
-	declairLoser: function(loser, reason) {
-		loser.lost = reason || true;
+	declairLoser: function(loser, reason, flags) {
+		loser.lost = true;
+		loser.loseReason = reason || "Lost";
+		loser.won = false;
+		loser.winReason = "";
+
 		console.log("player", loser.name, "lost because", reason);
-		this.checkForWinner();
+		if(!flags || !flags.dontCheckForWinner) {
+			this.checkForWinner();
+		}
 
 		return false;
 	},
 
 	// assumes when a player wins the rest lose (unless they've already been set to win)
 	declairWinner: function(winner, reason) {
-		winner.won = reason || true;
+		winner.won = true;
+		winner.winReason = reason || "Won";
+		winner.lost = false;
+		winner.loseReason = "";
 
 		for(var i = 0; i < this.players.length; i++) {
 			var player = this.players[i];
 
 			if(player !== winner && !player.won) {
-				player.lost = player.lost || true;
+				this.declairLoser(player, "Other player won", {dontCheckForWinner: true});
 			}
 		}
 
@@ -217,9 +235,8 @@ var BaseGame = Class({
 		}
 
 		if(winner) {
-			return this.declairWinner(winner);
+			return this.declairWinner(winner, "All other players lost.");
 		}
-
 		return false;
 	},
 });

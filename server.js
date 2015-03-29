@@ -18,7 +18,7 @@ var Server = Class({
 		(function(self) {
 			self.io.on('connection', function(socket){
 				console.log("new connection!");
-				self.clients.push(new Client(socket));
+				self.clients.push(new Client(socket, self));
 
 				var client = self.clients.last();
 				for(var property in self.__proto__) {
@@ -106,7 +106,7 @@ var Server = Class({
 		var currentPlayers = game.getCurrentPlayers();
 		var currentClients = [];
 		for(var i = 0; i < currentPlayers.length; i++) {
-			currentClients.push(currentPlayers[i]._client);
+			currentClients.push(currentPlayers[i].client);
 		}
 		return currentClients;
 	},
@@ -118,10 +118,24 @@ var Server = Class({
 			var client = game.clients[i];
 			if(currentClients.contains(client)) {
 				this.sendTo(client, "awaiting");
+				client.startTimer();
 			}
 			else {
 				this.sendTo(client, "ignoring");
+				client.stopTimer();
 			}
+		}
+	},
+
+	clientTimedOut: function(client) {
+		client.game.playerTimedOut(client.player);
+
+		this.gameStateChanged(client.game);
+	},
+
+	stopTimersFor: function(game) {
+		for(var i = 0; i < game.clients.length; i++) {
+			game.clients[i].stopTimer();
 		}
 	},
 
@@ -137,7 +151,7 @@ var Server = Class({
 			}
 		}
 
-		this.sendTo(clients, "over"); // TODO: send link to gamelog
+		this.sendTo(clients, "over"); // TODO: send link to gamelog, or something like that.
 
 		this.gameLogger.log(game);
 	},
@@ -147,6 +161,7 @@ var Server = Class({
 		var data = JSON.parse(json);
 
 		client.name = data.playerName || "Anonymous"
+		client.type = data.clientType || "Unknown";
 		var gameName = data.gameName;
 		var gameSession = data.gameSession;
 
@@ -172,38 +187,39 @@ var Server = Class({
 
 			this.sendDeltaStateOf(game);
 
-			this.sendPlayersAwaitingAndIgnoringIn(game)
+			this.sendPlayersAwaitingAndIgnoringIn(game);
 		}
 	},
 
 	recieveCommand: function(client, json) {
-		if(this.runCommandFor(client, json)) { // the command was valid
-			this.sendDeltaStateOf(client.game);
+		this.stopTimersFor(client.game);
 
-			if(client.game.isOver()) {
-				this.gameOver(client.game);
-			}
-			else { // game is still in progress, so tell the players who can send command and who can't now that the game state has changed
-				this.sendPlayersAwaitingAndIgnoringIn(client.game);
-			}
+		if(!this.runCommandFor(client, json)) { // the command was invalid
+			this.sendTo(client, "invalid"); // TODO: send why?
 		}
-		else {
-			this.sendTo(client, "invalid"); // TODO: rename
-			this.sendDeltaStateOf(client.game);
-		}
+
+		// TODO: all this should probably happen whenever the state changes via a subscription or something
+		this.gameStateChanged(client.game);
 	},
 
 	// when a client sends a command it is piped here. Then we will decipher what they sent and run that command (function) on the game that client is playing with the args they passed
 	runCommandFor: function(client, json) {
 		var data = JSON.parse(json);
 
-		console.log("------------------------------");
-		console.log("COMMAND", data);
-		console.log("------------------------------");
-
 		data = serializer.unserialize(data, client.game);
 
 		return client.game.executeCommandFor(client, data);
+	},
+
+	gameStateChanged: function(game) {
+		this.sendDeltaStateOf(game);
+
+		if(game.isOver()) {
+			this.gameOver(game);
+		}
+		else { // game is still in progress, so tell the players who can send command and who can't now that the game state has changed
+			this.sendPlayersAwaitingAndIgnoringIn(game);
+		}
 	},
 });
 
