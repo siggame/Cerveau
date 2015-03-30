@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "express": "^4.10.2",
+    "express-handlebars": "^2.0.0",
     "socket.io": "^1.2.0",
     "extend": "^2.0.0",
     "clone": "^1.0.0",
