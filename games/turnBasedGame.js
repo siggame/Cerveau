@@ -2,7 +2,7 @@ var Class = require("../utilities/class");
 var BaseGame = require("./baseGame");
 var extend = require("extend");
 
-// @class TurnBasedGame: a base game that is turn based, with helper functions that should be common between turn based games
+// @class TurnBasedGame: a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
 var TurnBasedGame = Class(BaseGame, {
 	init: function() {
 		BaseGame.init.apply(this, arguments);

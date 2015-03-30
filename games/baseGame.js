@@ -46,6 +46,7 @@ var BaseGame = Class({
 		this._started = true;
 	},
 
+	// @returns boolean representing if the game has started yet.
 	hasStarted: function() {
 		return this._started;
 	},
@@ -74,11 +75,12 @@ var BaseGame = Class({
 		}
 	},
 
-
+	// @returns boolean representing if this game has enough players in it to start
 	hasEnoughPlayers: function() {
 		return this.clients.length === this._maxNumberOfPlayers; //TODO: check to make sure the clients are all players and not something else... like a listener?
 	},
 
+	// @returns array<Player> of all the Players currently awaiting commands from
 	getCurrentPlayers: function() {
 		var currentPlayers = [];
 		for(var i = 0; i < this.currentPlayers.length; i++) {
@@ -87,6 +89,7 @@ var BaseGame = Class({
 		return currentPlayers;
 	},
 
+	/// called when a player times out, which makes them loose this game.
 	playerTimedOut: function(player) {
 		player.timeRemaining = 0;
 		this.declairLoser(player, "Timed out");
@@ -94,6 +97,7 @@ var BaseGame = Class({
 		// TODO: server should probably subscribe to events like this...
 	},
 
+	/// for the server to add clients to this game. This does NOT create the player for the added client
 	addClient: function(client) {
 		this.clients.push(client);
 		client.game = this;
@@ -104,6 +108,7 @@ var BaseGame = Class({
 		}
 	},
 
+	/// remvoed the clien from the game and checks if they have a player and if removing them alters the game
 	removeClient: function(client) {
 		var player = client.player;
 		this.clients.removeElement(client);
@@ -120,6 +125,7 @@ var BaseGame = Class({
 
 	//--- Game Object & their commands ---\\
 
+	// @returns <BaseGameObject> with the given id
 	getGameObject: function(id) { // TO INHERIT
 		id = parseInt(id);
 		if(id !== NaN) {
@@ -127,18 +133,18 @@ var BaseGame = Class({
 		}
 	},
 
+	/// tracks the game object, should be called via BaseGameObjects during their initialization
+	// @returns int thier id
 	trackGameObject: function(gameObject) {
 		gameObject.id = this._nextGameObjectID++;
 		this.gameObjects[gameObject.id] = gameObject;
 		return gameObject.id;
 	},
 
-	getCommand: function(commandString) {
-		if(this._validCommands.contains(commandString)) {
-			return this[commandString];
-		}
-	},
-
+	/// executes a command for a client via reflection, which should alter the game state
+	// @param <Client> client that wants to execute the command
+	// @param <object> data: formatted command data that must include the caller.id and command string reprenting a function on the caller to execute. Any other keys are variables for that function.
+	// @returns boolean representing if the command was executed successfully (clients can send invalid data, it's up to the game logic being called to decide if it was valid here)
 	executeCommandFor: function(client, data) {
 		var player = client.player;
 		var gameObject = this.getGameObject(data.caller.id);
@@ -160,11 +166,12 @@ var BaseGame = Class({
 
 	//--- State & Delta State ---\\
 
-	// generates and returns the difference between the last and current state
+	/// generates and returns the difference between the last and current state
 	getSerializableDeltaState: function() { // TODO: impliment getDeltaStateFor player
 		return this._serializableDeltaState;
 	},
 
+	/// updates all the private states used to generate delta states and game logs
 	_updateSerializableStates: function() {
 		this._lastSerializableState = this._currentSerializableState || {};
 		this._currentSerializableState = serializer.serialize(this);
@@ -177,6 +184,7 @@ var BaseGame = Class({
 
 	//--- Winning and Loosing ---\\
 
+	/// @returns boolean representing if this game is over
 	isOver: function(isOver) {
 		if(isOver) {
 			this._over = true;
@@ -185,7 +193,10 @@ var BaseGame = Class({
 		return this._over;
 	},
 
-	// assumes when a player looses the rest could still be competing to win
+	/// declairs a player as having lost, and assumes when a player looses the rest could still be competing to win
+	// @param <Player> loser: player that lost the game
+	// @param <string> reason (optional): string that is the lose reason
+	// @param <object> flags (optional): 'dontCheckForWinner' key to set to not check for winner
 	declairLoser: function(loser, reason, flags) {
 		loser.lost = true;
 		loser.loseReason = reason || "Lost";
@@ -200,7 +211,9 @@ var BaseGame = Class({
 		return false;
 	},
 
-	// assumes when a player wins the rest lose (unless they've already been set to win)
+	/// declairs the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
+	// @param <Player> winner: player that won the game, the rest loose if not already won
+	// @param <string> reason (optional): the win reason string
 	declairWinner: function(winner, reason) {
 		winner.won = true;
 		winner.winReason = reason || "Won";
@@ -210,7 +223,7 @@ var BaseGame = Class({
 		for(var i = 0; i < this.players.length; i++) {
 			var player = this.players[i];
 
-			if(player !== winner && !player.won) {
+			if(player !== winner && !player.won && !player.lost) { // then this player has not lost yet and now looses because someone else won
 				this.declairLoser(player, "Other player won", {dontCheckForWinner: true});
 			}
 		}
@@ -219,6 +232,7 @@ var BaseGame = Class({
 		return true;
 	},
 
+	/// checks if this game is over because there is a winner (all other players have lost)
 	checkForWinner: function() {
 		var winner;
 		for(var i = 0; i < this.players.length; i++) {

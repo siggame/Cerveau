@@ -13,10 +13,12 @@ var Client = Class({
 		};
 	},
 
+	/// sends the message of type event to this client.
 	send: function(event, message) {
 		this.socket.emit(event, message);
 	},
 
+	/// starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for making commands.
 	startTimer: function() {
 		this.timer.start = (new Date()).getTime();
 		this.timer.ticking = true;
@@ -27,6 +29,7 @@ var Client = Class({
 		})(this);
 	},
 
+	/// stops (pauses) the timeout timer. This should be done any time we don't expect the client to be computing something.
 	stopTimer: function() {
 		if(this.timer.ticking) {
 			var endTime = (new Date()).getTime();
@@ -37,9 +40,10 @@ var Client = Class({
 		}
 	},
 
+	/// client calls this when it runs out of time. Probably because it infinte looped, broke, or is just very slow.
 	timedOut: function() {
 		this.stopTimer();
-		console.log("client", client.name, "timed out");
+		console.log("client", this.name, "timed out");
 		this.server.clientTimedOut(this);
 	},
 });

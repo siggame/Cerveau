@@ -3,14 +3,16 @@ var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 
+/// simple function to get files in a directory. TODO: might move to our own FileIO ultilites file.
 function getFiles(srcpath) {
 	return fs.readdirSync(srcpath).filter(function(file) {
 		return fs.statSync(path.join(srcpath, file)).isFile();
 	});
 };
 
-
+/// @class GameLogger: a simple manager that attaches to a directory and logs games (creates gamelogs) into that folder, as well as retrieves them from.
 var GameLogger = Class({
+	// @param <string> dir: path to directory to log games into, and to read them from
 	init: function(dir) {
 		this.gamelogExtension = ".joue";
 		this.gamelogsDirectory = dir || 'gamelogs/';
@@ -35,6 +37,8 @@ var GameLogger = Class({
 		}
 	},
 
+	/// creates a gamelog for the game in the directory set during init
+	// @param <Game> game: game to create gamelog for
 	log: function(game) {
 		var m = moment();
 		var gamelog = {
@@ -56,6 +60,7 @@ var GameLogger = Class({
 		}); 
 	},
 
+	/// gets all the gamelogs this GameLogger knows of.
 	getLogs: function(filters) {
 		filters = filters || {}; // TODO: use
 

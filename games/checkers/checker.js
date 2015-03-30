@@ -100,7 +100,15 @@ var Checker = Class(GeneratedChecker, {
 				}
 
 				if(checkersOwnerWon) {
-					return game.declairWinner(checkersOwner);
+					var otherPlayer = undefined;
+					for(var i = 0; i < game.players.length; i++) {
+						otherPlayer = game.players[i];
+						if(otherPlayer !== this.owner) {
+							break; // because we found the other player
+						}
+					}
+					game.declairLoser(otherPlayer, "No checkers remaining", {dontCheckForWinner: true});
+					return game.declairWinner(this.owner, "All enemy checkers jumped");
 				}
 			}
 
