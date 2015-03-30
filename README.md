@@ -3,7 +3,7 @@ The Node.js implementation of a multi-game server intended for games with AIs wi
 
 ![{Cadre}](http://i.imgur.com/17wwI3f.png)
 
-All inspiration taken from [MS&T's SIG-GAME framework](https://github.com/siggame), and most of the terminology is assuming some familiarity with it as this is a spiritual successor to it.
+All inspiration taken from [MST's SIG-GAME framework](https://github.com/siggame), and most of the terminology is assuming some familiarity with it as this is a spiritual successor to it.
 
 ## Features
 
@@ -48,4 +48,4 @@ Then fill in the functions for the functions to you make in your game objects. E
 
 ## Other notes
 
-This is a polished proof-of-concept part of the Cadre framework. There are plently of bugs and issues present. The purpose at this time is not to be perfect, but to show that this framework is robust and meets all the needs of MS&T's ACM SIG-GAME.
+This is a polished proof-of-concept part of the Cadre framework. There are plently of bugs and issues present. The purpose at this time is not to be perfect, but to show that this framework is robust and meets all the needs of MST's ACM SIG-GAME.
