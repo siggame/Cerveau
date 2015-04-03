@@ -5,24 +5,23 @@ var serializer = require("../utilities/serializer");
 // @class BaseGame: the base game plugin new games should inherit from.
 var BaseGame = Class({
 	init: function(session) {
+		// serializable member variables
 		this.players = [];
 		this.currentPlayers = []; // players current awaiting commands from (basically turns)
 		this.gameObjects = {};
-
 		this.session = session;
 		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
+
 		this.clients = []; // the server will add and remove these via add/removeClient
+		this.states = []; // record of all delta states, for the game log generation
 
 		this._started = false;
 		this._over = false;
-
 		this._maxNumberOfPlayers = 2;
 		this._nextGameObjectID = 0;
-
 		this._lastSerializableState = null;
 		this._currentSerializableState = null;
 		this._serializableDeltaState = null;
-		this.states = []; // record of all delta states, for the game log generation
 
 		this._serializableKeys = {
 			"players": true,
@@ -108,7 +107,7 @@ var BaseGame = Class({
 		}
 	},
 
-	/// remvoed the clien from the game and checks if they have a player and if removing them alters the game
+	/// remvoed the client from the game and checks if they have a player and if removing them alters the game
 	removeClient: function(client) {
 		var player = client.player;
 		this.clients.removeElement(client);
@@ -125,7 +124,7 @@ var BaseGame = Class({
 
 	//--- Game Object & their commands ---\\
 
-	// @returns <BaseGameObject> with the given id
+	// @returns BaseGameObject with the given id
 	getGameObject: function(id) { // TO INHERIT
 		id = parseInt(id);
 		if(id !== NaN) {
@@ -133,10 +132,19 @@ var BaseGame = Class({
 		}
 	},
 
+	// @returns boolean representing if the passed in obj is a tracked game object in this game
+	isGameObject: function(obj) {
+		return (serializer.isObject(obj) && obj.id !== undefined && this.getGameObject(obj.id) === obj);
+	},
+
+	_generateNextGameObjectID: function() {
+		return this._nextGameObjectID++; // returns this._nextGameObjectID then increments by 1 (that's how post++ works FYI)
+	},
+
 	/// tracks the game object, should be called via BaseGameObjects during their initialization
 	// @returns int thier id
 	trackGameObject: function(gameObject) {
-		gameObject.id = this._nextGameObjectID++;
+		gameObject.id = this._generateNextGameObjectID()
 		this.gameObjects[gameObject.id] = gameObject;
 		return gameObject.id;
 	},
@@ -166,8 +174,9 @@ var BaseGame = Class({
 
 	//--- State & Delta State ---\\
 
-	/// generates and returns the difference between the last and current state
-	getSerializableDeltaState: function() { // TODO: impliment getDeltaStateFor player
+	/// returns the difference between the last and current state for the given client
+	// @param <Client> client: for inheritance if the state differs between clients
+	getSerializableDeltaStateFor: function(client) {
 		return this._serializableDeltaState;
 	},
 

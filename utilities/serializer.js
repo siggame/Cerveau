@@ -35,7 +35,7 @@ var serializer = {
 		for(var key in state) {
 			if(serializer.isSerializable(state, key)) {
 				var value = state[key];
-				if(typeof(value) == "object" && value !== null) {
+				if(serializer.isObject(value)) {
 					if(state !== gameObjects && value.id !== undefined) { // then this is a game object not part of the gameObjects array, so don't serialize it as normal. just make a reference to it
 						serialized[key] = {
 							id: value.id,

@@ -103,15 +103,14 @@ var Server = Class({
 		}
 	},
 
-	/*sendStateOf: function(game) {
-		this.sendTo(game.clients, "state", JSON.stringify(game.getSerializableState()));
-	},*/
-
 	/// sends the current delta state of a game to all that game's the clients. Should be called when the game's state changes
 	// @param <Game> game: the game you want to send the current delta state of.
 	// TODO: pass in client/player to 'getSerializableDeltaState()' for individual delta states (e.g. Fog of War)
 	sendDeltaStateOf: function(game) {
-		this.sendTo(game.clients, "delta", JSON.stringify(game.getSerializableDeltaState()));
+		for(var i = 0; i < game.clients.length; i++) {
+			var client = game.clients[i];
+			this.sendTo(client, "delta", JSON.stringify(game.getSerializableDeltaStateFor(client)));
+		}
 	},
 
 	/// returns all the clients that the game is awaiting commands from
