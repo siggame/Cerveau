@@ -1,0 +1,2 @@
+require("./string");
+require("./array");

@@ -4,47 +4,41 @@ var GameLogger = require("./gameLogger");
 var constants = require("./constants");
 var serializer = require("./utilities/serializer");
 var fs = require('fs');
+var net = require('net');
 
-// @class Server: The main class that handles incomming conncetions from clients via socket.io and managing the games they play
+// @class Server: The main class that handles incomming conncetions from clients via a TCP socket and managing the games they play
 var Server = Class({
-	init: function(io) {
-		this.io = io;
+	init: function(host, port, options) {
 		this.clients = [];
 		this.games = [];
+		this.host = host;
+		this.port = port;
 		this.gameClasses = [];
 		this.nextGameNumber = 1;
+		this.noTimeout = options.noTimeout === undefined ? false : Boolean(options.noTimeout);
 		this.gameLogger = new GameLogger('gamelogs/');
 
+		// create the TCP socket server via node.js's net module
 		(function(self) { // stupid losing reference to 'this' during async
-			self.io.on('connection', function(socket){
+			self.netServer = net.createServer(function(socket) {
 				console.log("new connection!");
-				self.clients.push(new Client(socket, self));
-
-				var client = self.clients.last();
-				for(var property in self.__proto__) {
-					if(property.startsWith("recieve")) {
-						var clientMessageType = property.slice(7 /* length of "recieve"*/).toLowerCase();
-
-						(function(clientMessageType, property) { // force it to be evaluated right now so the on callback has reference back to the current value of clientMessageType
-							socket.on(clientMessageType, function(message) {
-								self[property].call(self, client, message);
-							});
-						})(clientMessageType, property);
-					}
-				}
-
-				(function(self, client) {
-					socket.on('disconnect', function() {
-						console.log("Client disconnected");
-						self.clients.removeElement(client);
-
-						if(client.game) {
-							client.game.removeClient(client);
-						}
-					});
-				})(self, client);
+				var client = new Client(socket, self);
+				self.clients.push(client);
 			});
+
+			self.netServer.listen(self.port, self.host);
 		})(this);
+	},
+
+	/// should be called by a client when it disconnects
+	// TODO: should be part of a subscription system?
+	clientDisconnected: function(client) {
+		console.log("Client disconnected");
+		this.clients.removeElement(client);
+
+		if(client.game) {
+			client.game.removeClient(client);
+		}
 	},
 
 	/// retrieves (and possibly creates) a new game of gameName in gameSession
@@ -82,13 +76,6 @@ var Server = Class({
 		return this.games[gameName][gameSession];
 	},
 
-	/// sends a message or type event to ALL clients, regardless of game. use with care.
-	// @param <string> event
-	// @param <string> message: probably json
-	broadcast: function(event, message) {
-		this.io.emit(event, message);
-	},
-
 	/// sends to a single/multiple clients the event and message
 	// @param <array<Client>> clients to send the message of type event to
 	// @param <string> event
@@ -99,17 +86,16 @@ var Server = Class({
 		}
 
 		for(var i = 0; i < clients.length; i++) {
-			clients[i].send(event, message)
+			clients[i].send(event, message);
 		}
 	},
 
 	/// sends the current delta state of a game to all that game's the clients. Should be called when the game's state changes
 	// @param <Game> game: the game you want to send the current delta state of.
-	// TODO: pass in client/player to 'getSerializableDeltaState()' for individual delta states (e.g. Fog of War)
 	sendDeltaStateOf: function(game) {
 		for(var i = 0; i < game.clients.length; i++) {
 			var client = game.clients[i];
-			this.sendTo(client, "delta", JSON.stringify(game.getSerializableDeltaStateFor(client)));
+			this.sendTo(client, "delta", game.getSerializableDeltaStateFor(client));
 		}
 	},
 
@@ -134,7 +120,9 @@ var Server = Class({
 			var client = game.clients[i];
 			if(currentClients.contains(client)) {
 				this.sendTo(client, "awaiting");
-				client.startTimer();
+				if(!this.noTimeout) {
+					client.startTimer();
+				}
 			}
 			else {
 				this.sendTo(client, "ignoring");
@@ -180,14 +168,23 @@ var Server = Class({
 
 
 
-	//--- Recieve functions. These should be invoked when a client sends something back to the server ---\\
+	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
+
+	/// when the client sends data via socket connection
+	// @param <Client> client that sent the data
+	// @param <object> data sent
+	clientSentData: function(client, data) {
+		if(client.isTicking()) {
+			client.refundTime(Math.max(data.sendTime - client.timer.startTime, 0), {resume: false});
+		}
+
+		this['recieve' + data.event.capitalize()].call(this, client, data.data);
+	},
 
 	/// when a client tells the server what it wants to play and as who.
 	// @param <Client> client that send the 'play'
-	// @param <string> json data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
-	recievePlay: function(client, json) {
-		var data = JSON.parse(json);
-
+	// @param <object> data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
+	recievePlay: function(client, data) {
 		client.name = data.playerName || "Anonymous"
 		client.type = data.clientType || "Unknown";
 		var gameName = data.gameName;
@@ -197,20 +194,20 @@ var Server = Class({
 		game.addClient(client);
 		console.log("player ", client.name, "joined", game.name, game.session, "which now has connections: ", game.clients.length);
 
-		this.sendTo(client, "connected", JSON.stringify({
+		this.sendTo(client, "playing", {
 			gameName: game.name,
 			gameSession: game.session,
 			constants: constants.shared,
-		}));
+		});
 
 		if(game.hasStarted()) {
 			for(var i = 0; i < game.clients.length; i++) {
 				var client = game.clients[i];
 
-				this.sendTo(client, "start", JSON.stringify({
+				this.sendTo(client, "start", {
 					playerID: client.player.id,
 					playerName: client.player.name,
-				}));
+				});
 			}
 
 			this.sendDeltaStateOf(game);
@@ -221,11 +218,11 @@ var Server = Class({
 
 	/// when a client sends a "command" which should be a game logic command.
 	// @param <Client> client that sent the message
-	// @param <string> json formatted string that contains the command data
-	recieveCommand: function(client, json) {
+	// @param <object> command data
+	recieveCommand: function(client, data) {
 		this.stopTimersFor(client.game);
 
-		if(!this.runCommandFor(client, json)) { // the command was invalid
+		if(!this.runCommandFor(client, data)) { // the command was invalid
 			this.sendTo(client, "invalid"); // TODO: send why?
 		}
 
@@ -235,11 +232,9 @@ var Server = Class({
 
 	/// when a client sends a command it is piped here. Then we will decipher what they sent and run that command (function) on the game that client is playing with the args they passed
 	// @param <Client> client that sent the message
-	// @param <string> json formatted data
+	// @param <object> data representing command
 	// @returns boolean representing if the command was successful.
-	runCommandFor: function(client, json) {
-		var data = JSON.parse(json);
-
+	runCommandFor: function(client, data) {
 		data = serializer.unserialize(data, client.game); // handles cycles and game object references in the data
 
 		return client.game.executeCommandFor(client, data);

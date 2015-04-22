@@ -13,7 +13,7 @@ var Game = Class(GeneratedGame, {
 
 		this.boardWidth = 8;
 		this.boardHeight = 8;
-		this.maxTurns = 300;
+		this.maxTurns = 100;
 	},
 
 	/// this is called when the game begins, once players are connected and ready to play. Anything in init() will not have players to assign units to.
@@ -28,10 +28,10 @@ var Game = Class(GeneratedGame, {
 				if(this.isValidTile(x, y)) {
 					var owner = undefined;
 
-					if(y < 3) { // then it is player 1's checker
+					if(y < 3) { // then it is player 0's checker
 						owner = this.players[0];
 					}
-					else if(y > 4) { // then it is player 2's checker
+					else if(y > 4) { // then it is player 1's checker
 						owner = this.players[1];
 					} // else is the middle, which has no intial checker pieces
 

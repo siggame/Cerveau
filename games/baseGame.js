@@ -138,7 +138,7 @@ var BaseGame = Class({
 	},
 
 	_generateNextGameObjectID: function() {
-		return this._nextGameObjectID++; // returns this._nextGameObjectID then increments by 1 (that's how post++ works FYI)
+		return String(this._nextGameObjectID++); // returns this._nextGameObjectID then increments by 1 (that's how post++ works FYI)
 	},
 
 	/// tracks the game object, should be called via BaseGameObjects during their initialization

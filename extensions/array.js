@@ -29,6 +29,15 @@ var ArrayExtensions = {
 			this.pop();
 		}
 	},
+
+	clone: function() {
+		var cloned = [];
+		for(var i = 0; i < this.length; i++) {
+			cloned[i] = this[i];
+		}
+
+		return cloned;
+	},
 };
 
 for(var extension in ArrayExtensions) {
