@@ -13,7 +13,7 @@ var Game = Class(GeneratedGame, {
 
 		this.boardWidth = 8;
 		this.boardHeight = 8;
-		this.maxTurns = 100;
+		this.maxTurns = 300;
 	},
 
 	/// this is called when the game begins, once players are connected and ready to play. Anything in init() will not have players to assign units to.

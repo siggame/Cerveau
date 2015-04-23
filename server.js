@@ -174,8 +174,8 @@ var Server = Class({
 	// @param <Client> client that sent the data
 	// @param <object> data sent
 	clientSentData: function(client, data) {
-		if(client.isTicking()) {
-			client.refundTime(Math.max(data.sendTime - client.timer.startTime, 0), {resume: false});
+		if(client.isTicking() && data.sentTime) {
+			client.refundTime(Math.max(data.sentTime - client.timer.startTime, 0), {resume: false});
 		}
 
 		this['recieve' + data.event.capitalize()].call(this, client, data.data);
@@ -193,7 +193,7 @@ var Server = Class({
 		var game = this.getGame(gameName, gameSession);
 		game.addClient(client);
 		console.log("player ", client.name, "joined", game.name, game.session, "which now has connections: ", game.clients.length);
-
+		
 		this.sendTo(client, "playing", {
 			gameName: game.name,
 			gameSession: game.session,

@@ -23,7 +23,7 @@ function getDirectories(srcpath) {
 //http://runnable.com/U07z_Y_j9rZk1tTx/handlebars-template-examples-with-express-4-for-node-js
 
 http.listen(3000, function(){
-	console.log('---- website on *:8000, game server on *:3000 ----');
+	console.log('---- running on *:3000 ----');
 });
 
 var server = new Server("127.0.0.1", 3000, args); // the game server for clients to connect to
