@@ -12,10 +12,12 @@
                 "type": "int"
             },
             "checkerMoved": {
+                "arenaInterest": "sum",
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
                 "type": "Checker"
             },
             "checkerMovedJumped": {
+                "arenaInterest": "sum",
                 "description": "If the last checker that moved jumped, meaning it can move again.",
                 "type": "boolean"
             },
@@ -76,6 +78,7 @@
         "Checker": {
             "attributes": {
                 "kinged": {
+                    "arenaInterest": "sum",
                     "default": false,
                     "description": "If the checker has been kinged and can move backwards.",
                     "type": "boolean"
@@ -116,7 +119,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
-                    "type": "int"
+                    "type": "string"
                 },
                 "logs": {
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
@@ -150,7 +153,7 @@
                 "id": {
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "serverPredefined": true,
-                    "type": "int"
+                    "type": "string"
                 },
                 "logs": {
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
@@ -182,6 +185,11 @@
         },
         "Player": {
             "attributes": {
+                "checkers": {
+                    "description": "All the checkers currently in the game owned by this player",
+                    "subType": "Checker",
+                    "type": "array"
+                },
                 "clientType": {
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": "string"
@@ -212,6 +220,10 @@
                     "default": false,
                     "description": "if the player won the game or not",
                     "type": "boolean"
+                },
+                "yDirection": {
+                    "description": "The direction your checkers must go along the y-axis until kinged",
+                    "type": "int"
                 }
             },
             "description": "A player in this game. Every AI controls one player.",
@@ -225,7 +237,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
-                    "type": "int"
+                    "type": "string"
                 },
                 "logs": {
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",

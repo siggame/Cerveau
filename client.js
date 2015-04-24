@@ -18,7 +18,6 @@ var Client = Class({
 			var buffer = "";
 			self.socket.on("data", function(str) {
 				buffer += str;
-
 				var split = buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
 
 				buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to buffer anyways
@@ -45,6 +44,7 @@ var Client = Class({
 	},
 
 	disconnected: function() {
+		this.stopTimer();
 		this.server.clientDisconnected(this);
 		this.socket.destroy();
 	},
