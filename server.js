@@ -1,9 +1,9 @@
 var Class = require("./utilities/class");
 var Client = require("./client");
 var GameLogger = require("./gameLogger");
+
 var constants = require("./constants");
 var serializer = require("./utilities/serializer");
-var fs = require('fs');
 var net = require('net');
 
 // @class Server: The main class that handles incomming conncetions from clients via a TCP socket and managing the games they play
@@ -15,7 +15,7 @@ var Server = Class({
 		this.port = port;
 		this.gameClasses = [];
 		this.nextGameNumber = 1;
-		this.noTimeout = options.noTimeout === undefined ? false : Boolean(options.noTimeout);
+		this.noTimeout = Boolean(options.noTimeout);
 		this.gameLogger = new GameLogger('gamelogs/');
 
 		// create the TCP socket server via node.js's net module
@@ -41,7 +41,7 @@ var Server = Class({
 		}
 	},
 
-	/// retrieves (and possibly creates) a new game of gameName in gameSession
+	/// retrieves, and possibly creates a new, game of gameName in gameSession
 	// @param <string> gameName: key identifying the name of the game you want. Should exist in games/
 	// @param <string> gameSession (optional): basically a room number. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one.
 	// @returns Game: the game of gameName and gameSession. If one does not exists a new instance will be created
@@ -52,7 +52,7 @@ var Server = Class({
 		}
 
 		if(gameSession === "*") { // then they want to join any game session
-			gameSession = "new" // if we couldn't find one give them a new game
+			gameSession = "new"; // if we couldn't find one give them a new game
 			var games = this.games[gameName];
 			for(var session in games) {
 				var game = games[session];
@@ -87,47 +87,6 @@ var Server = Class({
 
 		for(var i = 0; i < clients.length; i++) {
 			clients[i].send(event, message);
-		}
-	},
-
-	/// sends the current delta state of a game to all that game's the clients. Should be called when the game's state changes
-	// @param <Game> game: the game you want to send the current delta state of.
-	sendDeltaStateOf: function(game) {
-		for(var i = 0; i < game.clients.length; i++) {
-			var client = game.clients[i];
-			this.sendTo(client, "delta", game.getSerializableDeltaStateFor(client));
-		}
-	},
-
-	/// returns all the clients that the game is awaiting commands from
-	// @param <Game> game: game you want the current clients in (from it's current players)
-	// @returns <array<Client>>: clients that the game is awaiting commands from
-	getCurrentClientsFor: function(game) {
-		var currentPlayers = game.getCurrentPlayers();
-		var currentClients = [];
-		for(var i = 0; i < currentPlayers.length; i++) {
-			currentClients.push(currentPlayers[i].client);
-		}
-		return currentClients;
-	},
-
-	/// sends to all the clients in a game if the server is "awaiting" commands or "ignoring" commands from each one
-	// @param <Game> game to send "awaiting" or "ignoring" to.
-	sendPlayersAwaitingAndIgnoringIn: function(game) {
-		var currentClients = this.getCurrentClientsFor(game);
-
-		for(var i = 0; i < game.clients.length; i++) {
-			var client = game.clients[i];
-			if(currentClients.contains(client)) {
-				this.sendTo(client, "awaiting");
-				if(!this.noTimeout) {
-					client.startTimer();
-				}
-			}
-			else {
-				this.sendTo(client, "ignoring");
-				client.stopTimer();
-			}
 		}
 	},
 
@@ -178,13 +137,13 @@ var Server = Class({
 			client.refundTime(Math.max(data.sentTime - client.timer.startTime, 0), {resume: false});
 		}
 
-		this['recieve' + data.event.capitalize()].call(this, client, data.data);
+		this['client' + data.event.capitalize()].call(this, client, data.data);
 	},
 
 	/// when a client tells the server what it wants to play and as who.
 	// @param <Client> client that send the 'play'
 	// @param <object> data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
-	recievePlay: function(client, data) {
+	clientPlay: function(client, data) {
 		client.name = data.playerName || "Anonymous"
 		client.type = data.clientType || "Unknown";
 		var gameName = data.gameName;
@@ -210,46 +169,60 @@ var Server = Class({
 				});
 			}
 
-			this.sendDeltaStateOf(game);
-
-			this.sendPlayersAwaitingAndIgnoringIn(game);
+			this.gameStateChanged(game);
 		}
 	},
 
 	/// when a client sends a "command" which should be a game logic command.
 	// @param <Client> client that sent the message
-	// @param <object> command data
-	recieveCommand: function(client, data) {
+	// @param <object> response data
+	clientResponse: function(client, data) {
 		this.stopTimersFor(client.game);
 
-		if(!this.runCommandFor(client, data)) { // the command was invalid
-			this.sendTo(client, "invalid"); // TODO: send why?
+		var responseData = undefined;
+		if(data.data) {
+			responseData = serializer.unserialize(data.data, client.game);
 		}
 
-		// TODO: all this should probably happen whenever the state changes via a subscription or something
-		this.gameStateChanged(client.game);
-	},
+		if(!data.response || !client.game.handleResponse(client, data.response, responseData)) { // something fucked up
+			this.sendTo(client, "invalid", data);
+		}
 
-	/// when a client sends a command it is piped here. Then we will decipher what they sent and run that command (function) on the game that client is playing with the args they passed
-	// @param <Client> client that sent the message
-	// @param <object> data representing command
-	// @returns boolean representing if the command was successful.
-	runCommandFor: function(client, data) {
-		data = serializer.unserialize(data, client.game); // handles cycles and game object references in the data
-
-		return client.game.executeCommandFor(client, data);
+		if(client.game.hasStateChanged) {
+			this.gameStateChanged(client.game);
+		}
 	},
 
 	/// when the game state changes the clients need to know, and we need to check if that game ended when its state changed
 	// @param <Game> game which had a state change.
 	gameStateChanged: function(game) {
-		this.sendDeltaStateOf(game);
+		game.hasStateChanged = false;
+
+		// send the delta state to all clients
+		for(var i = 0; i < game.clients.length; i++) {
+			var client = game.clients[i];
+			this.sendTo(client, "delta", game.getSerializableDeltaStateFor(client));
+		}
 
 		if(game.isOver()) {
 			this.gameOver(game);
 		}
-		else { // game is still in progress, so tell the players who can send command and who can't now that the game state has changed
-			this.sendPlayersAwaitingAndIgnoringIn(game);
+		else { // game is still in progress, so send requests to players
+			this.sendRequestsFor(game);
+		}
+	},
+
+	/// sends to all the clients in a game if the server is "awaiting" commands or "ignoring" commands from each one
+	// @param <Game> game to send "awaiting" or "ignoring" to.
+	sendRequestsFor: function(game) {
+		var requests = game.popRequests();
+
+		for(var i = 0; i < requests.length; i++) {
+			var data = requests[i];
+			data.player.client.send("request", {
+				request: data.request,
+				args: data.args,
+			});
 		}
 	},
 });

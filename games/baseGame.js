@@ -7,7 +7,6 @@ var BaseGame = Class({
 	init: function(session) {
 		// serializable member variables
 		this.players = [];
-		this.currentPlayers = []; // players current awaiting commands from (basically turns)
 		this.gameObjects = {};
 		this.session = session;
 		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
@@ -15,6 +14,7 @@ var BaseGame = Class({
 		this.clients = []; // the server will add and remove these via add/removeClient
 		this.states = []; // record of all delta states, for the game log generation
 
+		this._currentRequests = []; // array of current requests
 		this._started = false;
 		this._over = false;
 		this._maxNumberOfPlayers = 2;
@@ -79,15 +79,6 @@ var BaseGame = Class({
 		return this.clients.length === this._maxNumberOfPlayers; //TODO: check to make sure the clients are all players and not something else... like a listener?
 	},
 
-	// @returns array<Player> of all the Players currently awaiting commands from
-	getCurrentPlayers: function() {
-		var currentPlayers = [];
-		for(var i = 0; i < this.currentPlayers.length; i++) {
-			currentPlayers.push(this.currentPlayers[i]);
-		}
-		return currentPlayers;
-	},
-
 	/// called when a player times out, which makes them loose this game.
 	playerTimedOut: function(player) {
 		player.timeRemaining = 0;
@@ -122,7 +113,7 @@ var BaseGame = Class({
 
 
 
-	//--- Game Object & their commands ---\\
+	//--- Game Objects ---\\
 
 	// @returns BaseGameObject with the given id
 	getGameObject: function(id) { // TO INHERIT
@@ -149,25 +140,56 @@ var BaseGame = Class({
 		return gameObject.id;
 	},
 
-	/// executes a command for a client via reflection, which should alter the game state
-	// @param <Client> client that wants to execute the command
-	// @param <object> data: formatted command data that must include the caller.id and command string reprenting a function on the caller to execute. Any other keys are variables for that function.
-	// @returns boolean representing if the command was executed successfully (clients can send invalid data, it's up to the game logic being called to decide if it was valid here)
-	executeCommandFor: function(client, data) {
-		var player = client.player;
-		var gameObject = this.getGameObject(data.caller.id);
-		var commandFunction = gameObject["command_" + data.command];
 
-		var success = false;
-		if(commandFunction) {
-			success = commandFunction.call(gameObject, player, data);
+
+	//--- Client Responses & Requests---\\
+
+	handleResponse: function(client, response, data) {
+		var callback = this["handle" + response.capitalize()];
+
+		if(callback) {
+			return callback.call(this, client.player, data);
 		}
 		else {
-			console.error("No command", data.command, "in", gameObject.gameObjectName);
+			console.error("game could not handle response", response, data);
+		}
+	},
+
+	/// executes a command for a client via reflection, which should alter the game state. This is the default response type by clients
+	// @param <Player> client that wants to execute the command
+	// @param <object> data: formatted command data that must include the caller.id and command string reprenting a function on the caller to execute. Any other keys are variables for that function.
+	// @returns boolean representing if the command was executed successfully (clients can send invalid data, it's up to the game logic being called to decide if it was valid here)
+	executeCommandFor: function(player, data) {
+		var success = false;
+		if(data._caller !== undefined && data._command !== undefined) {
+			var gameObject = this.getGameObject(data._caller.id);
+			var commandFunction = gameObject["command_" + data._command];
+
+			
+			if(commandFunction) {
+				success = commandFunction.call(gameObject, player, data);
+				this._updateSerializableStates();
+			}
+			else {
+				console.error("No command", data.command, "in", gameObject.gameObjectName);
+			}
 		}
 
-		this._updateSerializableStates();
-		return success;
+		return Boolean(success);
+	},
+
+	addRequest: function(player, request, args) {
+		this._currentRequests.push({
+			player: player,
+			request: request,
+			args: args,
+		});
+	},
+
+	popRequests: function() {
+		var requests = this._currentRequests.clone();
+		this._currentRequests.empty();
+		return requests;
 	},
 
 
@@ -182,6 +204,7 @@ var BaseGame = Class({
 
 	/// updates all the private states used to generate delta states and game logs
 	_updateSerializableStates: function() {
+		this.hasStateChanged = true; // for the server to see
 		this._lastSerializableState = this._currentSerializableState || {};
 		this._currentSerializableState = serializer.serialize(this);
 		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState) || {};

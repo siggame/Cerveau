@@ -23,8 +23,7 @@ var Client = Class({
 				buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to buffer anyways
 
 				for(var i = 0; i < split.length; i++) {
-					var json = split[i];
-					self.server.clientSentData(self, json && JSON.parse(json));
+					self.server.clientSentData(self, JSON.parse(split[i]));
 				}
 			});
 
@@ -49,9 +48,15 @@ var Client = Class({
 		this.socket.destroy();
 	},
 
+	sendRaw: function(str) {
+		this.socket.write(str);
+	},
+
 	/// sends the message of type event to this client.
+	// @param event string of the event
+	// @param data (optional) object to send about the event being sent
 	send: function(event, data) {
-		this.socket.write(
+		this.sendRaw(
 			JSON.stringify({
 				event: event,
 				data: data,

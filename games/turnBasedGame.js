@@ -21,27 +21,36 @@ var TurnBasedGame = Class(BaseGame, {
 	/// begins the turn based game to the first player
 	begin: function() {
 		BaseGame.begin.apply(this, arguments);
-		this.currentPlayers.empty();
-		this.currentPlayers.push(this.players[0]);
-		this.currentPlayer = this.currentPlayers[0];
+		
+		this.currentPlayer = this.players[0];
+		this.addRequest(this.currentPlayer, "runTurn");
+	},
+
+	handleRunTurn: function(player, data) {
+		var success = this.executeCommandFor(player, data);
+
+		if(success) {
+			this.addRequest(this.currentPlayer, "runTurn"); // tell the current player to run their turn, because the passed in player may no longer be the current player as we ran game logic above
+		}
+
+		return success;
 	},
 
 	/// transitions to the next turn, increasing turn and setting the currentPlayer to the next one
-	nextTurn: function() {
+	nextTurn: function(forcePlayer) {
 		if(this.currentTurn + 1 === this.maxTurns) {
 			return this._maxTurnsReached();
 		}
 
 		this.currentTurn++;
-		var index = Math.max(0, this.players.indexOf(this.currentPlayers[0])); // turn based games will only ever have one current player
+		var index = Math.max(0, this.players.indexOf(this.currentPlayer)); // turn based games will only ever have one current player
 		index++;
 
 		if(index >= this.players.length) {
 			index = 0;
 		}
 
-		this.currentPlayers[0] = this.players[index];
-		this.currentPlayer = this.currentPlayers[0];
+		this.currentPlayer = this.players[index];
 
 		return true;
 	},

@@ -31,12 +31,6 @@
                 "serverPredefined": true,
                 "type": "Player"
             },
-            "currentPlayers": {
-                "description": "List of all the players who can send commands to the server.",
-                "serverPredefined": true,
-                "subType": "Player",
-                "type": "array"
-            },
             "currentTurn": {
                 "default": 0,
                 "description": "The current turn number, starting at 0 for the first player's turn",
@@ -45,7 +39,7 @@
             },
             "gameObjects": {
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
-                "keyType": "int",
+                "keyType": "string",
                 "serverPredefined": true,
                 "type": "dictionary",
                 "valueType": "GameObject"
@@ -111,7 +105,11 @@
                             "type": "int"
                         }
                     ],
-                    "description": "Moves the checker from its current location to the given (x, y)."
+                    "description": "Moves the checker from its current location to the given (x, y).",
+                    "return": {
+                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
+                        "type": "Command"
+                    }
                 }
             },
             "inheritedAttributes": {
@@ -140,6 +138,10 @@
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
                     "inheritedFrom": "GameObject",
+                    "return": {
+                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
+                        "type": "Command"
+                    },
                     "serverPredefined": true
                 }
             },
@@ -173,6 +175,10 @@
                         }
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "return": {
+                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
+                        "type": "Command"
+                    },
                     "serverPredefined": true
                 }
             },
@@ -229,7 +235,11 @@
             "description": "A player in this game. Every AI controls one player.",
             "functions": {
                 "endTurn": {
-                    "description": "Tells the server that this player is done with their turn."
+                    "description": "Tells the server that this player is done with their turn.",
+                    "return": {
+                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
+                        "type": "Command"
+                    }
                 }
             },
             "inheritedAttributes": {
@@ -258,6 +268,10 @@
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
                     "inheritedFrom": "GameObject",
+                    "return": {
+                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
+                        "type": "Command"
+                    },
                     "serverPredefined": true
                 }
             },
