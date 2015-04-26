@@ -89,24 +89,26 @@ var serializer = {
 	},
 
 	unserialize: function(data, game) {
-		var result = data.isArray ? [] : {};
+		if(serializer.isObject(data) && game) {
+			var result = data.isArray ? [] : {};
 
-		for(var key in data) {
-			var value = data[key];
-			if(typeof(value) == "object") {
-				if(serializer.isGameObjectReference(value)) { // it's a tracked game object
-					result[key] = game.getGameObject(value.id);
+			for(var key in data) {
+				var value = data[key];
+				if(typeof(value) == "object") {
+					if(serializer.isGameObjectReference(value)) { // it's a tracked game object
+						result[key] = game.getGameObject(value.id);
+					}
+					else {
+						result[key] = serializer.unserialize(value, game);
+					}
 				}
 				else {
-					result[key] = serializer.unserialize(value, game);
+					result[key] = value;
 				}
 			}
-			else {
-				result[key] = value;
-			}
-		}
 
-		return result;
+			return result;
+		}
 	},
 }
 

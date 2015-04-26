@@ -57,7 +57,7 @@
                 "type": "array"
             }
         },
-        "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that much move diagonally to the opposing side. Very simple.",
+        "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged. Very simple.",
         "functions": {},
         "inheritedAttributes": {},
         "inheritedFunctions": {},
@@ -200,10 +200,6 @@
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": "string"
                 },
-                "loseReason": {
-                    "description": "the reason why the player lost the game",
-                    "type": "string"
-                },
                 "lost": {
                     "default": false,
                     "description": "if the player lost the game or not",
@@ -214,13 +210,17 @@
                     "description": "The name of the player",
                     "type": "string"
                 },
+                "reasonLost": {
+                    "description": "the reason why the player lost the game",
+                    "type": "string"
+                },
+                "reasonWon": {
+                    "description": "the reason why the player won the game",
+                    "type": "string"
+                },
                 "timeRemaining": {
                     "description": "The amount of time (in ms) remaining for this AI to send commands.",
                     "type": "int"
-                },
-                "winReason": {
-                    "description": "the reason why the player won the game",
-                    "type": "string"
                 },
                 "won": {
                     "default": false,

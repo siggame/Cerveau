@@ -161,13 +161,11 @@ var BaseGame = Class({
 	// @returns boolean representing if the command was executed successfully (clients can send invalid data, it's up to the game logic being called to decide if it was valid here)
 	executeCommandFor: function(player, data) {
 		var success = false;
-		if(data._caller !== undefined && data._command !== undefined) {
-			var gameObject = this.getGameObject(data._caller.id);
-			var commandFunction = gameObject["command_" + data._command];
+		if(data && data._caller && data._command) {
+			var commandFunction = data._caller["command_" + data._command];
 
-			
 			if(commandFunction) {
-				success = commandFunction.call(gameObject, player, data);
+				success = commandFunction.call(data._caller, player, data);
 				this._updateSerializableStates();
 			}
 			else {
@@ -182,7 +180,7 @@ var BaseGame = Class({
 		this._currentRequests.push({
 			player: player,
 			request: request,
-			args: args,
+			args: args || [],
 		});
 	},
 
@@ -231,9 +229,9 @@ var BaseGame = Class({
 	// @param <object> flags (optional): 'dontCheckForWinner' key to set to not check for winner
 	declairLoser: function(loser, reason, flags) {
 		loser.lost = true;
-		loser.loseReason = reason || "Lost";
+		loser.reasonLost = reason || "Lost";
 		loser.won = false;
-		loser.winReason = "";
+		loser.reasonWon = "";
 
 		console.log("player", loser.name, "lost because", reason);
 		if(!flags || !flags.dontCheckForWinner) {
@@ -248,9 +246,9 @@ var BaseGame = Class({
 	// @param <string> reason (optional): the win reason string
 	declairWinner: function(winner, reason) {
 		winner.won = true;
-		winner.winReason = reason || "Won";
+		winner.reasonWon = reason || "Won";
 		winner.lost = false;
-		winner.loseReason = "";
+		winner.reasonLost = "";
 
 		for(var i = 0; i < this.players.length; i++) {
 			var player = this.players[i];

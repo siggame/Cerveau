@@ -158,12 +158,7 @@ var Server = Class({
 	clientResponse: function(client, data) {
 		this.stopTimersFor(client.game);
 
-		var responseData = undefined;
-		if(data.data) {
-			responseData = serializer.unserialize(data.data, client.game);
-		}
-
-		if(!data.response || !client.game.handleResponse(client, data.response, responseData)) { // something fucked up
+		if(!data.response || !client.game.handleResponse(client, data.response, serializer.unserialize(data.data, client.game))) { // then something fucked up
 			client.send("invalid", data);
 		}
 
