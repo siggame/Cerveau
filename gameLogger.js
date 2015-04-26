@@ -29,7 +29,6 @@ var GameLogger = Class({
 							throw err;
 						}
 						var name = filename.substring(0, filename.length - self.gamelogExtension.length);
-						console.log("found gamelog", name);
 						self.gamelogs[name] = JSON.parse(data);
 					});
 				})(this, filename);

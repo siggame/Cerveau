@@ -14,9 +14,12 @@ var Client = Class({
 			startTime: undefined,
 		};
 
-		(function(self) {
+		(function clientSocketSetup(self) {
 			var buffer = "";
-			self.socket.on("data", function(str) {
+			self.socket.on("data", function onClientSocketData(str) {
+				if(self.server.printIO) {
+					console.log("FROM CLIENT <--", str, '\n--');
+				}
 				buffer += str;
 				var split = buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
 
@@ -27,11 +30,11 @@ var Client = Class({
 				}
 			});
 
-			self.socket.on("close", function() {
+			self.socket.on("close", function onClientSocketClose() {
 				self.disconnected();
 			});
 
-			self.socket.on("error", function() {
+			self.socket.on("error", function onClientSocketError() {
 				console.log("client errored out, disconnecting...");
 				self.disconnected();
 			});
@@ -48,7 +51,10 @@ var Client = Class({
 		this.socket.destroy();
 	},
 
-	sendRaw: function(str) {
+	_sendRaw: function(str) {
+		if(this.server.printIO) {
+			console.log("TO CLIENT -->", str, "\n---");
+		}
 		this.socket.write(str);
 	},
 
@@ -56,7 +62,7 @@ var Client = Class({
 	// @param event string of the event
 	// @param data (optional) object to send about the event being sent
 	send: function(event, data) {
-		this.sendRaw(
+		this._sendRaw(
 			JSON.stringify({
 				event: event,
 				data: data,

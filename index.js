@@ -6,9 +6,15 @@ var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 var extend = require('extend');
-var argh = require("argh");
-var args = argh.argv;
+var ArgumentParser = require('argparse').ArgumentParser;
 require("./extensions/"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
+
+var parser = new ArgumentParser({description: 'Run the JavaScript client with options to connect to a game server. Must provide a game name to play.'});
+parser.addArgument(['-p', '--port'], {action: 'store', dest: 'port', defaultValue: 3000, help: 'the port that clients should connect through'});
+parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) print IO through the TCP socket to the terminal'});
+parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) clients cannot time out'});
+
+var args = parser.parseArgs();
 
 var Server = require("./server");
 
@@ -22,11 +28,11 @@ function getDirectories(srcpath) {
 
 //http://runnable.com/U07z_Y_j9rZk1tTx/handlebars-template-examples-with-express-4-for-node-js
 
-http.listen(3000, function(){
-	console.log('---- running on *:3000 ----');
+http.listen(args.port, function(){
+	console.log('---- running on *:' + args.port + ' ----');
 });
 
-var server = new Server("127.0.0.1", 3000, args); // the game server for clients to connect to
+var server = new Server("127.0.0.1", args.port, args); // the game server for clients to connect to
 
 
 
@@ -41,6 +47,8 @@ app.engine('hbs', expressHbs({
 	},
 }));
 app.set('view engine', 'hbs');
+
+// TODO: move all this below to file(s).
 
 var gameInfos = {};
 

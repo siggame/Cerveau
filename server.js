@@ -16,6 +16,7 @@ var Server = Class({
 		this.gameClasses = [];
 		this.nextGameNumber = 1;
 		this.noTimeout = Boolean(options.noTimeout);
+		this.printIO = Boolean(options.printIO);
 		this.gameLogger = new GameLogger('gamelogs/');
 
 		// create the TCP socket server via node.js's net module
@@ -56,7 +57,7 @@ var Server = Class({
 			var games = this.games[gameName];
 			for(var session in games) {
 				var game = games[session];
-				if(!game.hasStarted() && !game.hasEnoughPlayers()) {
+				if(!game.hasStarted() && !game.hasEnoughPlayers()) { // then we found a game for them to join, so overwrite 'new'
 					gameSession = session;
 					break;
 				}
@@ -74,20 +75,6 @@ var Server = Class({
 		}
 
 		return this.games[gameName][gameSession];
-	},
-
-	/// sends to a single/multiple clients the event and message
-	// @param <array<Client>> clients to send the message of type event to
-	// @param <string> event
-	// @param <string> message: probably json
-	sendTo: function(clients, event, message) {
-		if(clients.socket) { // then they just sent a client, not an array of clients.
-			clients = [clients];
-		}
-
-		for(var i = 0; i < clients.length; i++) {
-			clients[i].send(event, message);
-		}
 	},
 
 	/// called from a client when it times out
@@ -111,16 +98,9 @@ var Server = Class({
 	gameOver: function(game) {
 		console.log("game", game.name, game.session, "is over");
 
-		var clients = [];
 		for(var i = 0; i < game.clients.length; i++) {
-			var client = game.clients[i];
-			if(!client.over) {
-				client.over = true;
-				clients.push(client);
-			}
+			game.clients[i].send("over"); // TODO: send link to gamelog, or something like that.
 		}
-
-		this.sendTo(clients, "over"); // TODO: send link to gamelog, or something like that.
 
 		this.gameLogger.log(game);
 	},
@@ -153,7 +133,7 @@ var Server = Class({
 		game.addClient(client);
 		console.log("player ", client.name, "joined", game.name, game.session, "which now has connections: ", game.clients.length);
 		
-		this.sendTo(client, "playing", {
+		client.send("lobbied", {
 			gameName: game.name,
 			gameSession: game.session,
 			constants: constants.shared,
@@ -163,9 +143,8 @@ var Server = Class({
 			for(var i = 0; i < game.clients.length; i++) {
 				var client = game.clients[i];
 
-				this.sendTo(client, "start", {
+				client.send("start", {
 					playerID: client.player.id,
-					playerName: client.player.name,
 				});
 			}
 
@@ -185,7 +164,7 @@ var Server = Class({
 		}
 
 		if(!data.response || !client.game.handleResponse(client, data.response, responseData)) { // something fucked up
-			this.sendTo(client, "invalid", data);
+			client.send("invalid", data);
 		}
 
 		if(client.game.hasStateChanged) {
@@ -201,7 +180,7 @@ var Server = Class({
 		// send the delta state to all clients
 		for(var i = 0; i < game.clients.length; i++) {
 			var client = game.clients[i];
-			this.sendTo(client, "delta", game.getSerializableDeltaStateFor(client));
+			client.send("delta", game.getSerializableDeltaStateFor(client));
 		}
 
 		if(game.isOver()) {
