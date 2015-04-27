@@ -1,4 +1,16 @@
 {
+    "AI": {
+        "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
+        "functions": {
+            "runTurn": {
+                "description": "This is called every time the AI is asked to respond with a command during their turn",
+                "return": {
+                    "description": "the Command you want to run on the server this turn from a game object's command functions. If you do not return your player's endTurn() then this runTurn function will be called again after the game state updates.",
+                    "type": "Command"
+                }
+            }
+        }
+    },
     "Game": {
         "attributes": {
             "boardHeight": {

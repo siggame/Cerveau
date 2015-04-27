@@ -212,6 +212,7 @@ h4,
 }
 
 .documentation .type {
+	font-family: 'Inconsolata', monospace;
 	font-weight: normal;
 	color: #2D4671;
 }
@@ -260,7 +261,8 @@ h4,
 	content: none;
 }
 
-.function .arguments header {
+.function .arguments header,
+.function .returns header {
 	font-size: 1.125em;
 }
 

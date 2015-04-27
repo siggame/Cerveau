@@ -111,7 +111,10 @@ app.get('/documentation/:gameName', function(req, res) {
 	if(!docDatas[gameName]) {
 		classes = [];
 
-		var objects = extend({'Game': gameInfo.Game}, gameInfo.gameObjects);
+		var objects = extend({
+			'Game': gameInfo.Game,
+			'AI': gameInfo.AI,
+		}, gameInfo.gameObjects);
 
 		function sortNames(a, b) {
 			return a.name.toLowerCase() > b.name.toLowerCase();
@@ -135,6 +138,7 @@ app.get('/documentation/:gameName', function(req, res) {
 		};
 
 		var gameClass = undefined;
+		var aiClass = undefined;
 		for(var objName in objects) {
 			if(objects.hasOwnProperty(objName)) {
 				var gameObject = objects[objName];
@@ -163,6 +167,7 @@ app.get('/documentation/:gameName', function(req, res) {
 				addTo(docClass.functions, gameObject.inheritedFunctions);
 				docClass.functions.sort(sortNames);
 				for(var i = 0; i < docClass.functions; i++) {
+					formatVariable(docClass.functions[i]['return']);
 					for(var j = 0; j < docClass.functions[i].arguments.length; j++) {
 						formatVariable(docClass.functions[i].arguments[j]);
 					}
@@ -173,12 +178,17 @@ app.get('/documentation/:gameName', function(req, res) {
 				if(docClass.name == "Game") {
 					gameClass = docClass;
 				}
+				else if(docClass.name == "AI") {
+					aiClass = docClass;
+				}
 			}
 		}
 
 		classes.removeElement(gameClass);
+		classes.removeElement(aiClass);
 
 		classes.sort(sortNames);
+		classes.unshift(aiClass);
 		classes.unshift(gameClass);
 
 		docDatas[gameName] = classes;
