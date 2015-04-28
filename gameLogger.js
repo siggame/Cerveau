@@ -37,24 +37,16 @@ var GameLogger = Class({
 	},
 
 	/// creates a gamelog for the game in the directory set during init
-	// @param <Game> game: game to create gamelog for
-	log: function(game) {
-		var m = moment();
-		var gamelog = {
-			gameName: (game.name !== undefined ? game.name : "UNKNOWN_GAME"),
-			gameSession: (game.session !== undefined ? game.session : "UNKNOWN_SESSION"),
-			states: game.states,
-			epoch: m.valueOf(),
-		}
-
+	// @p
+	log: function(gamelog) {
 		var serialized = JSON.stringify(gamelog);
-		var filename = m.format("YYYY.MM.DD.HH.mm.ss.SSS") + "-" + gamelog.gameName + "-" + gamelog.gameSession;
+		var filename = moment(gamelog.epoch).format("YYYY.MM.DD.HH.mm.ss.SSS") + "-" + gamelog.gameName + "-" + gamelog.gameSession;
 
 		this.gamelogs[filename] = gamelog;
 
 		fs.writeFile(this.gamelogsDirectory + filename + this.gamelogExtension, serialized, function(err) {
 			if(err) {
-				console.log(err);
+				console.error("Gamelog Write Error:", err);
 			}
 		}); 
 	},

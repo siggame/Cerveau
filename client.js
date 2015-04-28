@@ -14,35 +14,62 @@ var Client = Class({
 			startTime: undefined,
 		};
 
-		(function clientSocketSetup(self) {
-			var buffer = "";
-			self.socket.on("data", function onClientSocketData(str) {
-				if(self.server.printIO) {
-					console.log("FROM CLIENT <--", str, '\n--');
-				}
-				buffer += str;
-				var split = buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
+		this.attachToSocket();
+	},
 
-				buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to buffer anyways
+	attachToSocket: function() {
+		var self = this;
 
-				for(var i = 0; i < split.length; i++) {
-					self.server.clientSentData(self, JSON.parse(split[i]));
-				}
-			});
+		var buffer = "";
+		var socketListenerOnData = function(str) {
+			if(self.server.printIO) {
+				console.log(self.server.name + ": from client <--", str, '\n--');
+			}
 
-			self.socket.on("close", function onClientSocketClose() {
-				self.disconnected();
-			});
+			buffer += str;
+			var split = buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
+			buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to buffer anyways
 
-			self.socket.on("error", function onClientSocketError() {
-				console.log("client errored out, disconnecting...");
-				self.disconnected();
-			});
-		})(this);
+			for(var i = 0; i < split.length; i++) {
+				self.server.clientSentData(self, JSON.parse(split[i]));
+			}
+		};
+
+		var socketListenerOnClose = function() {
+			self.server.clientDisconnected(self);
+		};
+
+		var socketListenerOnError = function() {
+			console.log("client errored out");
+		};
+
+		this.socket
+			.on("data", socketListenerOnData)
+			.on("close", socketListenerOnClose)
+			.on("error", socketListenerOnError);
+
+		this._detachFromSocket = function() {
+			self.socket
+				.removeListener("data", socketListenerOnData)
+				.removeListener("close", socketListenerOnClose)
+				.removeListener("error", socketListenerOnError);
+		}
+	},
+
+	detachFromSocket: function() {
+		if(this._detachFromSocket) {
+			this._detachFromSocket();
+			delete this._detachFromSocket;
+			return true;
+		}
+
+		return false;
 	},
 
 	setPlayer: function(player) {
 		this.player = player;
+
+		this.timer.timeRemaining = player.timeRemaining || this.timer.timeRemaining;
 	},
 
 	disconnected: function() {

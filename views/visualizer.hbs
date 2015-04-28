@@ -64,12 +64,12 @@ function clone(obj) {
 
 function buildStates() {
 	var intialState = {
-		gameObjects: gamelog.states[0].gameObjects,
+		gameObjects: gamelog.deltas[0].gameObjects,
 	}
-	states.push(mergeDelta(intialState, gamelog.states[0]));
+	states.push(mergeDelta(intialState, gamelog.deltas[0]));
 
-	for(var i = 1; i < gamelog.states.length; i++) {
-		states.push(mergeDelta(clone(states[i-1]), gamelog.states[i]));
+	for(var i = 1; i < gamelog.deltas.length; i++) {
+		states.push(mergeDelta(clone(states[i-1]), gamelog.deltas[i]));
 	}
 };
 
@@ -284,7 +284,7 @@ function initButtons() {
 }
 
 function init() {
-	initialState = gamelog.states[0];
+	initialState = gamelog.deltas[0];
 
 	buildStates();
 

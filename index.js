@@ -11,12 +11,13 @@ require("./extensions/"); // extends built in JavaScript objects. Extend with ca
 
 var parser = new ArgumentParser({description: 'Run the JavaScript client with options to connect to a game server. Must provide a game name to play.'});
 parser.addArgument(['-p', '--port'], {action: 'store', dest: 'port', defaultValue: 3000, help: 'the port that clients should connect through'});
+parser.addArgument(['-H', '--host'], {action: 'store', dest: 'host', defaultValue: "localhost", help: 'the host that this should run on'});
 parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) print IO through the TCP socket to the terminal'});
 parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) clients cannot time out'});
 
 var args = parser.parseArgs();
 
-var Server = require("./server");
+var Lobby = require("./lobby");
 
 // Note: most of this file is just PoC level.
 
@@ -29,13 +30,14 @@ function getDirectories(srcpath) {
 //http://runnable.com/U07z_Y_j9rZk1tTx/handlebars-template-examples-with-express-4-for-node-js
 
 http.listen(args.port, function(){
-	console.log('---- running on *:' + args.port + ' ----');
+	console.log('--- Webserver running on ' + args.host + ':' + args.port + ' ---');
 });
 
-var server = new Server("127.0.0.1", args.port, args); // the game server for clients to connect to
+var lobby = new Lobby(args); // the game server for clients to connect to
 
 
 
+// TODO: move all this below to file(s).
 
 app.engine('hbs', expressHbs({
 	extname:'hbs',
@@ -47,8 +49,6 @@ app.engine('hbs', expressHbs({
 	},
 }));
 app.set('view engine', 'hbs');
-
-// TODO: move all this below to file(s).
 
 var gameInfos = {};
 
@@ -80,7 +80,7 @@ app.get('/', function(req, res){
 		return a.name.toLowerCase() > b.name.toLowerCase();
 	});
 
-	var logs = server.gameLogger.getLogs();
+	var logs = lobby.gameLogger.getLogs();
 	var gamelogs = [];
 	for(var filename in logs) {
 		var log = logs[filename];

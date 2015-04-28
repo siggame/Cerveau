@@ -1,23 +1,21 @@
 var Class = require("../utilities/class");
 var constants = require("../constants");
 var serializer = require("../utilities/serializer");
+var moment = require('moment');
 
 // @class BaseGame: the base game plugin new games should inherit from.
 var BaseGame = Class({
-	init: function(session) {
+	init: function(data) {
 		// serializable member variables
 		this.players = [];
 		this.gameObjects = {};
-		this.session = session;
+		this.session = (data.session === undefined ? "Unknown" : data.session);
 		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
 
-		this.clients = []; // the server will add and remove these via add/removeClient
-		this.states = []; // record of all delta states, for the game log generation
-
+		this._deltas = []; // record of all delta states, for the game log generation
 		this._currentRequests = []; // array of current requests
 		this._started = false;
 		this._over = false;
-		this._maxNumberOfPlayers = 2;
 		this._nextGameObjectID = 0;
 		this._lastSerializableState = null;
 		this._currentSerializableState = null;
@@ -32,12 +30,19 @@ var BaseGame = Class({
 		};
 	},
 
+	// @static - because that way this exicsts without making a new instance
+	numberOfPlayers: 2,
 
-	//--- Server starting methods ---\\
 
-	// Do not inherit this method, instead use begin()
-	_start: function() {
-		this._initPlayers(this.clients);
+
+	/////////////////////////////
+	// Server starting methods //
+	/////////////////////////////
+
+	/// Do not inherit this method, instead use begin()
+	// @param players {Array<Client>} of clients that are playing this game as a player
+	start: function(clients) {
+		this._initPlayers(clients);
 
 		this.begin();
 
@@ -57,11 +62,13 @@ var BaseGame = Class({
 
 
 
-	//--- Client/Player ---\\
+	/////////////
+	// Players //
+	/////////////
 
-	_initPlayers: function() {
-		for(var i = 0; i < this.clients.length; i++) {
-			var client = this.clients[i];
+	_initPlayers: function(clients) {
+		for(var i = 0; i < clients.length; i++) {
+			var client = clients[i];
 			var player = this.newPlayer({ // this method should be implimented in GeneratedGame
 				name: client.name || ("Player " + i),
 				clientType: client.type || "Unknown",
@@ -69,51 +76,25 @@ var BaseGame = Class({
 
 			player.timeRemaining = player.timeRemaining || 10000; // 10 seconds (10,000ms)
 			player.client = client;
-			client.player = player;
+			client.setPlayer(player);
 			this.players.push(player);
 		}
 	},
 
-	// @returns boolean representing if this game has enough players in it to start
-	hasEnoughPlayers: function() {
-		return this.clients.length === this._maxNumberOfPlayers; //TODO: check to make sure the clients are all players and not something else... like a listener?
-	},
-
-	/// called when a player times out, which makes them loose this game.
-	playerTimedOut: function(player) {
-		player.timeRemaining = 0;
-		this.declairLoser(player, "Timed out");
-
-		// TODO: server should probably subscribe to events like this...
-	},
-
-	/// for the server to add clients to this game. This does NOT create the player for the added client
-	addClient: function(client) {
-		this.clients.push(client);
-		client.game = this;
-
-		if(this.hasEnoughPlayers()) {
-			console.log("game", this.name, this.session, "starting!");
-			this._start();
-		}
-	},
-
-	/// remvoed the client from the game and checks if they have a player and if removing them alters the game
-	removeClient: function(client) {
-		var player = client.player;
-		this.clients.removeElement(client);
+	/// remove the client from the game and checks if they have a player and if removing them alters the game
+	playerDisconnected: function(player) {
 		if(player) {
-			this.players.removeElement(player);
-
 			if(this.hasStarted() && !this.isOver()) {
-				this.declairLoser(player, "Disconnected");
+				this.declairLoser(player, "Disconnected during gameplay.");
 			}
 		}
 	},
 
 
 
-	//--- Game Objects ---\\
+	//////////////////
+	// Game Objects //
+	//////////////////
 
 	// @returns BaseGameObject with the given id
 	getGameObject: function(id) { // TO INHERIT
@@ -142,23 +123,25 @@ var BaseGame = Class({
 
 
 
-	//--- Client Responses & Requests---\\
+	/////////////////////////////////
+	// Client Responses & Requests //
+	/////////////////////////////////
 
-	handleResponse: function(client, response, data) {
+	handleResponse: function(player, response, data) {
 		var callback = this["handle" + response.capitalize()];
 
 		if(callback) {
-			return callback.call(this, client.player, data);
+			return callback.call(this, player, data);
 		}
 		else {
 			console.error("game could not handle response", response, data);
 		}
 	},
 
-	/// executes a command for a client via reflection, which should alter the game state. This is the default response type by clients
-	// @param <Player> client that wants to execute the command
+	/// executes a command for a player via reflection, which should alter the game state. This is the default response type by players
+	// @param <Player> player that wants to execute the command
 	// @param <object> data: formatted command data that must include the caller.id and command string reprenting a function on the caller to execute. Any other keys are variables for that function.
-	// @returns boolean representing if the command was executed successfully (clients can send invalid data, it's up to the game logic being called to decide if it was valid here)
+	// @returns boolean representing if the command was executed successfully (players can send invalid data, it's up to the game logic being called to decide if it was valid here)
 	executeCommandFor: function(player, data) {
 		var success = false;
 		if(data && data._caller && data._command) {
@@ -192,11 +175,13 @@ var BaseGame = Class({
 
 
 
-	//--- State & Delta State ---\\
+	///////////////////////////
+	// States & Delta States //
+	///////////////////////////
 
-	/// returns the difference between the last and current state for the given client
-	// @param <Client> client: for inheritance if the state differs between clients
-	getSerializableDeltaStateFor: function(client) {
+	/// returns the difference between the last and current state for the given player
+	// @param <Player> player: for inheritance if the state differs between players
+	getSerializableDeltaStateFor: function(player) {
 		return this._serializableDeltaState;
 	},
 
@@ -207,12 +192,24 @@ var BaseGame = Class({
 		this._currentSerializableState = serializer.serialize(this);
 		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState) || {};
 
-		this.states.push(this._serializableDeltaState);
+		this._deltas.push(this._serializableDeltaState);
+	},
+
+	generateGamelog: function() {
+		var m = moment();
+		return {
+			gameName: (this.name !== undefined ? this.name : "UNKNOWN_GAME"),
+			gameSession: (this.session !== undefined ? this.session : "UNKNOWN_SESSION"),
+			deltas: this._deltas,
+			epoch: m.valueOf(),
+		};
 	},
 
 
 
-	//--- Winning and Loosing ---\\
+	/////////////////////////
+	// Winning and Loosing //
+	/////////////////////////
 
 	/// @returns boolean representing if this game is over
 	isOver: function(isOver) {
