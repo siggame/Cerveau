@@ -20,7 +20,8 @@ All inspiration taken from [MST's SIG-GAME framework](https://github.com/siggame
   * Gamelog viewer with visualizer for all games
   * Automatic general game documentation generation
 * A simple Class system that supports multiple inheritance
-* Networking via Socket IO
+* Truely multi-threaded. As opposed to using Node's internal thread pool, each game session is spun off to a seperate process to run until the game is complete.
+* Networking via TCP
   * Communication via json strings with support for cycles within game references
   * Only deltas in states are send over the network
 * Automatic gamelog generation as a json structure of deltas
@@ -33,7 +34,7 @@ Make sure Node.js is installed then:
 
 ```
 npm install
-node index.js
+node ./index.js
 ```
 
 That's it, your server is running! Now start up two Cadre clients such as the [Python](https://github.com/JacobFischer/Joueur.py) or [JavaScript](https://github.com/JacobFischer/Joueur.js) clients and connect them to the new server. Or visit the server in your webbrowser to view gamelogs and game documentation.
