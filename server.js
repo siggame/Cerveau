@@ -16,9 +16,9 @@ var Server = Class({
 		this.name = options.name || "Server";
 	},
 
-	addSocket: function(socket) {
+	addSocket: function(socket, clientInfo) {
 		console.log(this.name + ": received new connection!");
-		var client = new Client(socket, this);
+		var client = new Client(socket, this, clientInfo);
 		this.clients.push(client);
 
 		return client;

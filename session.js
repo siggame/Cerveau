@@ -11,25 +11,15 @@ var Session = Class(Server, {
 			session: args.gameSession,
 		});
 
-		this.name = process.pid + " @ " + this.game.name + " - " + this.game.session;
+		this.name = this.game.name + " - " + this.game.session + " @ " + process.pid;
 	},
 
 	// @overrides
-	addSocket: function(/* ... */) {
-		var client = Server.addSocket.apply(this, arguments);
+	addSocket: function(socket, clientInfo) {
+		Server.addSocket.call(this, socket, clientInfo);
 
 		if(this.clients.length === this.game.numberOfPlayers) {
-			this.game.start(this.clients);
-
-			for(var i = 0; i < this.clients.length; i++) {
-				var client = this.clients[i];
-
-				client.send("start", {
-					playerID: client.player.id,
-				});
-			}
-
-			this._checkGameState();
+			this.start();
 		}
 	},
 
@@ -46,6 +36,20 @@ var Session = Class(Server, {
 		if(this.game.isOver() && this.clients.length === 0) {
 			this.end();
 		}
+	},
+
+	start: function() {
+		this.game.start(this.clients);
+
+		for(var i = 0; i < this.clients.length; i++) {
+			var client = this.clients[i];
+
+			client.send("start", {
+				playerID: client.player.id,
+			});
+		}
+
+		this._checkGameState();
 	},
 
 	end: function() {
@@ -74,7 +78,7 @@ var Session = Class(Server, {
 
 	/// the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
 	_gameOver: function(game) {
-		console.log("game", this.game.name, this.game.session, "is over");
+		console.log(this.name + ": game is over");
 
 		for(var i = 0; i < this.clients.length; i++) {
 			this.clients[i].send("over"); // TODO: send link to gamelog, or something like that.
@@ -100,6 +104,13 @@ var Session = Class(Server, {
 
 
 	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
+
+	_clientSentPlayer: function(client, data) {
+		client.setInfo(data);
+		client.hasSentPlayerInfo = true;
+
+		
+	},
 
 	/// when a client sends a "command" which should be a game logic command.
 	// @param <Client> client that sent the message

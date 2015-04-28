@@ -1,6 +1,4 @@
-var gameName = process.env.gameName;
-var gameSession = process.env.gameSession;
-
+var data = JSON.parse(process.env.workerGameSessionData);
 require("./extensions/"); // because we are a new thread, and have not extended our base prototypes
 var cluster = require("cluster");
 var Session = require("./session");
@@ -10,16 +8,20 @@ if(cluster.isMaster) {
 }
 else {
 	var session = new Session({
-		gameName: gameName,
-		gameSession: gameSession,
-		gameClass: require("./games/" + gameName + "/game"),
+		gameName: data.gameName,
+		gameSession: data.gameSession,
+		gameClass: require("./games/" + data.gameName + "/game"),
+		printIO: data.printIO,
 	});
 
+	var socketIndex = 0;
 	process.on("message", function(message, handler) {
-		if(message === "socket") {
+		if(message === "socket") { // Note: Node js can only send sockets via handler if message === "socket", because passing sockets between threads is sketchy as fuck
 			var socket = handler;
 
-			session.addSocket(socket);
+			session.addSocket(socket, data.clientInfos[socketIndex]);
+
+			socketIndex++;
 		}
 	});
 }

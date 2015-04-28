@@ -230,7 +230,6 @@ var BaseGame = Class({
 		loser.won = false;
 		loser.reasonWon = "";
 
-		console.log("player", loser.name, "lost because", reason);
 		if(!flags || !flags.dontCheckForWinner) {
 			this.checkForWinner();
 		}

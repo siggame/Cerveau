@@ -1,5 +1,4 @@
 var Class = require("./utilities/class");
-var Client = require("./client");
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
 
@@ -12,7 +11,7 @@ var Lobby = Class(Server, {
 	init: function(args) {
 		Server.init.call(this, args);
 
-		this.name = "Lobby";
+		this.name = "Lobby @ " + process.pid;
 		this.host = args.host;
 		this.port = args.port;
 		this.gameSessions ={};
@@ -25,19 +24,19 @@ var Lobby = Class(Server, {
 			exec: 'worker.js',
 		});
 
+		var self = this; // for async reference in passed listener functions below
 		cluster.on("exit", function(worker) {
-			console.log("Lobby was told worker", worker.process.pid, "died");
+			console.log(self.name + ": Game Session @", worker.process.pid, "closed");
 		});
 
 		// create the TCP socket server via node.js's net module
-		(function asyncServerSetup(self) {
-			self.netServer = net.createServer(function(socket) {
-				self.addSocket(socket);
-			});
+		this.netServer = net.createServer(function(socket) {
+			self.addSocket(socket);
+		});
 
-			self.netServer.listen(self.port, self.host);
+		this.netServer.listen(this.port, this.host, function() {
 			console.log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
-		})(this);
+		});
 	},
 
 	/// retrieves, and possibly creates a new, game of gameName in gameSession which is on a completely different thread
@@ -45,11 +44,6 @@ var Lobby = Class(Server, {
 	// @param <string> sessionID (optional): basically a room number. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one.
 	// @returns Game: the game of gameName and gameSession. If one does not exists a new instance will be created
 	getRequestedGameSession: function(gameName, sessionID) {
-		if(!this.gameSessions[gameName]) {
-			this.gameClasses[gameName] = require("./games/" + gameName + "/game");
-			this.gameSessions[gameName] = {};
-		}
-
 		var gameSession = undefined; // the session we are trying to get
 
 		if(sessionID !== "new") {
@@ -95,25 +89,29 @@ var Lobby = Class(Server, {
 		return (gameSession !== undefined && !gameSession.worker && gameSession.clients.length < gameClass.numberOfPlayers);
 	},
 
-
-
-	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
-
 	/// when a client tells the server what it wants to play and as who.
 	// @param <Client> client that send the 'play'
 	// @param <object> data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
 	_clientSentPlay: function(client, data) {
-		client.name = data.playerName || "Anonymous"
-		client.type = data.clientType || "Unknown";
+		if(!this._initializeGameClass(data.gameName)) {
+			client.send("invalid", data);
+			client.disconnect();
+			return;
+		}
 
-		var gameSession = this.getRequestedGameSession(data.gameName, data.gameSession);
+		var gameSession = this.getRequestedGameSession(data.gameName, data.requestedSession);
+
+		client.setInfo({
+			name: data.playerName,
+			type: data.clientType,
+		});
 
 		gameSession.clients.push(client);
 
 		client.send("lobbied", {
 			gameName: gameSession.gameName,
 			gameSession: gameSession.id,
-			constants: constants,
+			constants: constants.shared,
 		});
 
 		if(gameSession.clients.length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
@@ -121,11 +119,41 @@ var Lobby = Class(Server, {
 		}
 	},
 
+	// @returns {boolean} is the fame was initialized successfully
+	_initializeGameClass: function(gameName) {
+		if(!this.gameClasses[gameName]) {
+			try {
+				this.gameClasses[gameName] = require("./games/" + gameName + "/game");
+				this.gameSessions[gameName] = {};
+			}
+			catch(e) {
+				console.error("Error trying to initialize game", gameName, e);
+				return false;
+			}
+		}
+		
+		return true; // already initialized
+	},
+
 	/// spins off the game and client logic to a new thread
 	_threadGameSession: function(gameSession) {
+		// each client sent their info with the 'play' event already, we need to send that to the new thread
+		var clientInfos = [];
+		for(var i = 0; i < gameSession.clients.length; i++) {
+			var client = gameSession.clients[i];
+			clientInfos.push({
+				name: client.name,
+				type: client.type,
+			});
+		}
+
 		gameSession.worker = cluster.fork({
-			gameSession: gameSession.id,
-			gameName: gameSession.gameName,
+			workerGameSessionData: JSON.stringify({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
+				gameSession: gameSession.id,
+				gameName: gameSession.gameName,
+				clientInfos: clientInfos,
+				printIO: this.printIO,
+			})
 		});
 
 		var self = this;
@@ -134,10 +162,10 @@ var Lobby = Class(Server, {
 			for(var i = 0; i < clients.length; i++) {
 				var client = clients[i];
 				client.detachFromSocket(); // we are about to send it, so we don't want this client object listening to it, as we no longer care.
-
 				gameSession.worker.send("socket", client.socket);
 
 				self.clients.removeElement(client); // the client is no longer ours, we sent it (via socket) to the worker thread
+				gameSession.clients.removeElement(client);
 			}
 		});
 

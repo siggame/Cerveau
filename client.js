@@ -1,11 +1,13 @@
-var EOT_CHAR = String.fromCharCode(4);
+var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to signify the string we sent is the end of a transmition and to parse the json string before it, because some socket APIs for clients will concat what we send
 var Class = require("./utilities/class");
 
 // @class Client: the basic implimentation of a connection to the server via a TCP socket
 var Client = Class({
-	init: function(socket, server) {
+	init: function(socket, server, info) {
 		this.socket = socket;
 		this.socket.setEncoding('utf8');
+
+		this.setInfo(info);
 
 		this.server = server;
 		this.timer = {
@@ -15,6 +17,11 @@ var Client = Class({
 		};
 
 		this.attachToSocket();
+	},
+
+	setInfo: function(data) {
+		this.name = String(data && data.name ? data.name : "No Name");
+		this.type = String(data && data.type ? data.type : "Unknown");
 	},
 
 	attachToSocket: function() {
@@ -72,6 +79,10 @@ var Client = Class({
 		this.timer.timeRemaining = player.timeRemaining || this.timer.timeRemaining;
 	},
 
+	disconnect: function() {
+		this.disconnected();
+	},
+
 	disconnected: function() {
 		this.stopTimer();
 		this.server.clientDisconnected(this);
@@ -80,7 +91,7 @@ var Client = Class({
 
 	_sendRaw: function(str) {
 		if(this.server.printIO) {
-			console.log("TO CLIENT -->", str, "\n---");
+			console.log(this.server.name + ": to client -->", str, "\n---");
 		}
 		this.socket.write(str);
 	},
