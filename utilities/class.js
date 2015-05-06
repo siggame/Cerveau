@@ -1,9 +1,17 @@
 // @function Class: a simple class building interface. Pass to it parent classes (built with Class()) then a dictionary of functions. This will assign all to the new classe's prototype object, and return that new class so you can instantiate it like normal javascarip "classes" with var a = new A()
 var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPrototype*/) {
-	var prototype = arguments[arguments.length - 1];
+	var prototype = arguments[arguments.length - 1]
+
+	if(prototype === undefined || Class.isClass(prototype)) {
+		prototype = {};
+	}
+
 	var parentClasses = [];
-	for(var i = 0; i < arguments.length - 1; i++) {
-		parentClasses.push(arguments[i]);
+	for(var i = 0; i < arguments.length; i++) {
+		var parentClass = arguments[i];
+		if(Class.isClass(parentClass)) {
+			parentClasses.push(parentClass);
+		}
 	}
 
 	var newClass = function() {
@@ -20,7 +28,10 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 		}
 	}
 
-	prototype._parentClasses = parentClass;
+	prototype.init = prototype.init || function() {};
+	prototype._isClass = true;
+	prototype._mainClass = newClass;
+	prototype._parentClasses = parentClasses;
 	newClass.prototype = prototype;
 
 	for(var property in prototype) { // also assign the properties of the prototype to this class so we can call super methods via SuperClass.SuperFunction.call(this, ...);
@@ -29,6 +40,29 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 
 	return newClass;
 }
+
+Class.isClass = function(klass) {
+	return (typeof(klass) === 'function' && klass._isClass);
+};
+
+Class.isInstance = function(obj, isClass) {
+	if(obj === null || typeof(obj) !== "object" || !obj._isClass) {
+		return false;
+	}
+
+	var classes = [ obj._mainClass ];
+	while(classes.length > 0) {
+		var theClass = classes.pop();
+
+		if(theClass === isClass) {
+			return true;
+		}
+
+		for(var i = 0; i < theClass._parentClasses.length; i++) {
+			classes.push(theClass._parentClasses[i]);
+		}
+	}
+};
 
 module.exports = Class;
 

@@ -30,7 +30,7 @@ var Client = Class({
 		var buffer = "";
 		var socketListenerOnData = function(str) {
 			if(self.server.printIO) {
-				console.log(self.server.name + ": from client <--", str, '\n--');
+				console.log(self.server.name + ": from client " + this.name + " <--", str, '\n--');
 			}
 
 			buffer += str;
@@ -53,7 +53,7 @@ var Client = Class({
 		this.socket
 			.on("data", socketListenerOnData)
 			.on("close", socketListenerOnClose)
-			.on("error", socketListenerOnError);
+			.on("error", socketListenerOnError)
 
 		this._detachFromSocket = function() {
 			self.socket
@@ -73,8 +73,10 @@ var Client = Class({
 		return false;
 	},
 
-	setPlayer: function(player) {
+	setGameData: function(game, player) {
+		this.game = game;
 		this.player = player;
+		this.name = player.name;
 
 		this.timer.timeRemaining = player.timeRemaining || this.timer.timeRemaining;
 	},
@@ -91,7 +93,7 @@ var Client = Class({
 
 	_sendRaw: function(str) {
 		if(this.server.printIO) {
-			console.log(this.server.name + ": to client -->", str, "\n---");
+			console.log(this.server.name + ": to client " + this.name + " -->", str, "\n---");
 		}
 		this.socket.write(str);
 	},

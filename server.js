@@ -53,7 +53,7 @@ var Server = Class({
 	},
 
 	clientDisconnected: function(client) {
-		console.log(this.name + ": Client disconnected");
+		console.log(this.name + ": Client " + client.name + " disconnected");
 
 		this.clients.removeElement(client);
 
@@ -63,7 +63,7 @@ var Server = Class({
 	/// called from a client when it times out
 	// @param <Client> client that timed out
 	clientTimedOut: function(client) {
-		console.log(this.name + ": Client timed out");
+		console.log(this.name + ": Client " + client.name + " timed out");
 
 		this.clientDisconnected(client);
 	},

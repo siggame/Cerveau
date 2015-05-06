@@ -23,23 +23,22 @@ var TurnBasedGame = Class(BaseGame, {
 		BaseGame.begin.apply(this, arguments);
 		
 		this.currentPlayer = this.players[0];
-		this.addRequest(this.currentPlayer, "runTurn");
+		this.order(this.currentPlayer, "runTurn");
 	},
 
-	handleRunTurn: function(player, data) {
-		var success = this.executeCommandFor(player, data);
-
-		if(success) {
-			this.addRequest(this.currentPlayer, "runTurn"); // tell the current player to run their turn, because the passed in player may no longer be the current player as we ran game logic above
+	aiFinished_runTurn: function(player, data) {
+		if(data === true) { // ais that return true from runTurn() mean they ran their turn, and are done with it
+			this.nextTurn();
 		}
 
-		return success;
+		this.order(this.currentPlayer, "runTurn"); // tell the current player to run their turn, because the passed in player may no longer be the current player as we ran game logic above
 	},
 
 	/// transitions to the next turn, increasing turn and setting the currentPlayer to the next one
-	nextTurn: function(forcePlayer) {
+	nextTurn: function() {
 		if(this.currentTurn + 1 === this.maxTurns) {
-			return this._maxTurnsReached();
+			this._maxTurnsReached();
+			return;
 		}
 
 		this.currentTurn++;
@@ -51,15 +50,11 @@ var TurnBasedGame = Class(BaseGame, {
 		}
 
 		this.currentPlayer = this.players[index];
-
-		return true;
 	},
 
 	/// intended to be inherited and then max turn victory conditions checked to find the winner/looser.
-	// @inheritable
 	_maxTurnsReached: function() {
 		this.isOver(true);
-		return true;
 	},
 });
 

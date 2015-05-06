@@ -1,15 +1,14 @@
 // ${header}
 // Note: this file should never be modified, instead if you want to add game logic modify just the ../${obj_key}.js file. This is to ease merging main.data changes
+<%include file="functions.noCreer" />
 var Class = require("../../../utilities/class");
 % for parent_class in obj['serverParentClasses']:
-var ${parent_class} = require("../../${uncapitalize(parent_class)}")
+var ${parent_class} = require("../../${uncapitalize(parent_class)}");
 % endfor
 % for parent_class in obj['parentClasses']:
-var ${parent_class} = require("../${uncapitalize(parent_class)}")
+var ${parent_class} = require("../${uncapitalize(parent_class)}");
 % endfor
-<%
-	parent_classes = obj['parentClasses'] + obj['serverParentClasses']
-%>
+<%parent_classes = obj['parentClasses'] + obj['serverParentClasses']%>
 % if obj_key == "Game":
 
 // Custom Game Objects
@@ -25,38 +24,11 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 		${parent_class}.init.apply(this, arguments);
 % endfor
 
-% if obj_key == "Game":
-		this.name = "${game_name}";
-% endif
-		this.gameObjectName = "${obj_key}";
-
 % for attr_name, attr_parms in obj['attributes'].items():
 <%
 	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
 		continue
-
-	attr_default = attr_parms["default"] if 'default' in attr_parms else None
-	attr_type = attr_parms["type"]
-	attr_cast = "";
-
-	if attr_type == "string":
-		attr_default = '"' + (attr_default if attr_default != None else '') + '"'
-		attr_cast = "String"
-	elif attr_type == "array":
-		attr_default = '[]'
-	elif attr_type == "int":
-		attr_default = attr_default or 0
-		attr_cast = "parseInt"
-	elif attr_type == "float":
-		attr_default = attr_default or 0
-		attr_cast = "parseFloat"
-	elif attr_type == "dictionary":
-		attr_default = '{}'
-	elif attr_type == "boolean":
-		attr_default = 'false'
-	else:
-		attr_default = "null"
-%>		this.${attr_name} = ${attr_cast}(data.${attr_name} === undefined ? ${attr_default} : data.${attr_name});
+%>		this.${attr_name} = ${shared['js']['cast'](attr_parms['type'])}(data.${attr_name} === undefined ? ${shared['js']['default'](attr_parms['type'])} : data.${attr_name});
 % endfor
 
 % for attr_name, attr_parms in obj['attributes'].items():
@@ -66,19 +38,23 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 %>		this._serializableKeys["${attr_name}"] = true;
 % endfor
 	},
+
+% if obj_key == "Game":
+	name: "${game_name}",
+	numberOfPlayers: ${obj['numberOfPlayers']},
+	maxInvalidsPerPlayer: ${obj['maxInvalidsPerPlayer']},
+% else:
+	gameObjectName: "${obj_key}",
+% endif
+
 % for function_name, function_parms in obj['functions'].items():
-<%
-	argument_string = ""
-	argument_names = []
-	if 'arguments' in function_parms:
-		argument_names.append("")
-		for arg_parms in function_parms['arguments']:
-			argument_names.append(arg_parms['name'])
-		argument_string = ", data.".join(argument_names)
-%>
-	command_${function_name}: function(player, data) {
-		return this.${function_name}(player${argument_string});
+	_run${function_name[0].upper() + function_name[1:]}: function(player, data) {
+		var returned = this.${function_name}(player${", data.".join([""] + function_parms['argumentNames'])});
+% if function_parms['returns'] != None:
+		return ${shared['js']['cast'](function_parms['returns']['type'])}(returned);
+% endif
 	},
+
 % endfor
 % if obj_key == "Game":
 % for game_obj_key, game_obj in game_objs.items():

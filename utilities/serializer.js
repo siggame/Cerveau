@@ -1,6 +1,8 @@
 // Deals with transforming game states to and from serializable objects when communicating between client <--> sever
 var constants = require("../constants");
 var extend = require("extend");
+var Class = require("./class");
+var BaseGameObject = require("../games/baseGameObject");
 
 var serializer = {
 	isEmpty: function(obj){
@@ -24,7 +26,14 @@ var serializer = {
 	},
 
 	// serializes a game state to a structure that can be sent via json
-	serialize: function(state, gameObjects) {
+	serialize: function(state, gameObjects, forceSerialize) {
+		if(!serializer.isObject(state)) {
+			return state;
+		}
+		else if(!forceSerialize && Class.isInstance(state, BaseGameObject)) { // no need to serialize this whole thing
+			return { id: state.id };
+		}
+
 		gameObjects = gameObjects || state.gameObjects;
 		var serialized = {};
 
@@ -36,14 +45,7 @@ var serializer = {
 			if(serializer.isSerializable(state, key)) {
 				var value = state[key];
 				if(serializer.isObject(value)) {
-					if(state !== gameObjects && value.id !== undefined) { // then this is a game object not part of the gameObjects array, so don't serialize it as normal. just make a reference to it
-						serialized[key] = {
-							id: value.id,
-						};
-					}
-					else {
-						serialized[key] = serializer.serialize(value, gameObjects);
-					}
+					serialized[key] = serializer.serialize(value, gameObjects, state === gameObjects);
 				}
 				else {
 					serialized[key] = value;
@@ -88,7 +90,7 @@ var serializer = {
 		return serializer.isEmpty(result) ? undefined : result;
 	},
 
-	unserialize: function(data, game) {
+	deserialize: function(data, game) {
 		if(serializer.isObject(data) && game) {
 			var result = data.isArray ? [] : {};
 
@@ -99,7 +101,7 @@ var serializer = {
 						result[key] = game.getGameObject(value.id);
 					}
 					else {
-						result[key] = serializer.unserialize(value, game);
+						result[key] = serializer.deserialize(value, game);
 					}
 				}
 				else {
@@ -109,6 +111,8 @@ var serializer = {
 
 			return result;
 		}
+
+		return data;
 	},
 }
 

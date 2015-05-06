@@ -7,6 +7,9 @@ var Session = Class(Server, {
 	init: function(args) {
 		Server.init.call(this, args);
 
+		this._needToSendStart = true;
+		this._sentOver = false;
+
 		this.game = new args.gameClass({
 			session: args.gameSession,
 		});
@@ -14,7 +17,7 @@ var Session = Class(Server, {
 		this.name = this.game.name + " - " + this.game.session + " @ " + process.pid;
 	},
 
-	// @overrides
+	// @override
 	addSocket: function(socket, clientInfo) {
 		Server.addSocket.call(this, socket, clientInfo);
 
@@ -23,7 +26,7 @@ var Session = Class(Server, {
 		}
 	},
 
-	// @overrides
+	// @override
 	clientDisconnected: function(client) {
 		Server.clientDisconnected.call(this, client);
 
@@ -40,14 +43,6 @@ var Session = Class(Server, {
 
 	start: function() {
 		this.game.start(this.clients);
-
-		for(var i = 0; i < this.clients.length; i++) {
-			var client = this.clients[i];
-
-			client.send("start", {
-				playerID: client.player.id,
-			});
-		}
 
 		this._checkGameState();
 	},
@@ -66,18 +61,30 @@ var Session = Class(Server, {
 				var client = this.clients[i];
 				client.send("delta", this.game.getSerializableDeltaStateFor(client));
 			}
+		}
 
-			if(this.game.isOver()) {
-				this._gameOver();
+		if(this._needToSendStart) {
+			this._needToSendStart = false;
+			for(var i = 0; i < this.clients.length; i++) {
+				var client = this.clients[i];
+
+				client.send("start", {
+					playerID: client.player.id,
+				});
 			}
-			else { // game is still in progress, so send requests to players
-				this._sendGameRequests();
-			}
+		}
+
+		if(this.game.isOver() && !this._sentOver) {
+			this._gameOver();
+		}
+		else { // game is still in progress, so send requests to players
+			this._sendGameOrders();
 		}
 	},
 
 	/// the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
 	_gameOver: function(game) {
+		this._sentOver = true;
 		console.log(this.name + ": game is over");
 
 		for(var i = 0; i < this.clients.length; i++) {
@@ -90,36 +97,64 @@ var Session = Class(Server, {
 	},
 
 	/// sends to all the clients in the game, that the game has requests for information for
-	_sendGameRequests: function() {
-		var requests = this.game.popRequests();
+	_sendGameOrders: function() {
+		var orders = this.game.popOrders();
 
-		for(var i = 0; i < requests.length; i++) {
-			var data = requests[i];
-			data.player.client.send("request", {
-				request: data.request,
+		for(var i = 0; i < orders.length; i++) {
+			var data = orders[i];
+			data.player.client.send("order", {
+				order: data.order,
 				args: data.args,
 			});
 		}
 	},
 
+	_checkToIgnoreClient: function(client) {
+		if(this.game.isOver() || client.player.lost || client.player.won) {
+			client.send("over");
+			return true;
+		}
+
+		return false;
+	},
+
 
 	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
 
-	_clientSentPlayer: function(client, data) {
-		client.setInfo(data);
-		client.hasSentPlayerInfo = true;
+	_clientSentRun: function(client, run) {
+		this.stopTimers();
 
-		
+		if(this._checkToIgnoreClient(client)) {
+			return;
+		}
+
+		var ran = this.game.aiRun(client.player, serializer.deserialize(run, this.game))
+
+		this._checkGameState();
+
+		if(ran === undefined) {
+			client.send("invalid", run);
+		}
+		else {
+			client.send("ran", serializer.serialize(ran.returned, this.game.gameObjects));
+		}
 	},
 
 	/// when a client sends a "command" which should be a game logic command.
 	// @param <Client> client that sent the message
 	// @param <object> response data
-	_clientSentResponse: function(client, data) {
+	_clientSentFinished: function(client, data) {
 		this.stopTimers();
 
-		if(!data.response || !this.game.handleResponse(client.player, data.response, serializer.unserialize(data.data, this.game))) { // then something fucked up
-			client.send("invalid", data);
+		if(this._checkToIgnoreClient(client)) {
+			return;
+		}
+
+		var returnedData = serializer.deserialize(data.returned, this.game);
+		var invalid = this.game.aiFinished(client.player, data.finished, returnedData);
+
+		if(invalid) {
+			client.send("invalid", invalid);
 		}
 
 		this._checkGameState();

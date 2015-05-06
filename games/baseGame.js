@@ -1,4 +1,5 @@
 var Class = require("../utilities/class");
+var errors = require("../errors");
 var constants = require("../constants");
 var serializer = require("../utilities/serializer");
 var moment = require('moment');
@@ -12,14 +13,14 @@ var BaseGame = Class({
 		this.session = (data.session === undefined ? "Unknown" : data.session);
 		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
 
-		this._deltas = []; // record of all delta states, for the game log generation
-		this._currentRequests = []; // array of current requests
+		this._orders = []; // orders to be sent to AI clients when the parent session is ready
 		this._started = false;
 		this._over = false;
 		this._nextGameObjectID = 0;
 		this._lastSerializableState = null;
 		this._currentSerializableState = null;
 		this._serializableDeltaState = null;
+		this._deltas = []; // record of all delta states, for the game log generation
 
 		this._serializableKeys = {
 			"players": true,
@@ -32,6 +33,7 @@ var BaseGame = Class({
 
 	// @static - because that way this exicsts without making a new instance
 	numberOfPlayers: 2,
+	maxInvalidsPerPlayer: 10,
 
 
 
@@ -74,9 +76,10 @@ var BaseGame = Class({
 				clientType: client.type || "Unknown",
 			});
 
+			player.invalidMessages = [];
 			player.timeRemaining = player.timeRemaining || 10000; // 10 seconds (10,000ms)
 			player.client = client;
-			client.setPlayer(player);
+			client.setGameData(this, player);
 			this.players.push(player);
 		}
 	},
@@ -127,50 +130,67 @@ var BaseGame = Class({
 	// Client Responses & Requests //
 	/////////////////////////////////
 
-	handleResponse: function(player, response, data) {
-		var callback = this["handle" + response.capitalize()];
+	aiFinished: function(player, finished, data) {
+		var callback = this["aiFinished_" + finished];
+		var invalid = undefined;
 
 		if(callback) {
-			return callback.call(this, player, data);
+			try {
+				callback.call(this, player, data);
+			}
+			catch(e) {
+				if(Class.isInstance(e, errors.GameLogicError)) {
+					invalid = {finished: finished, data: data, message: e.message};
+				}
+			}
+
+			this._updateSerializableStates();
 		}
 		else {
-			console.error("game could not handle response", response, data);
-		}
-	},
-
-	/// executes a command for a player via reflection, which should alter the game state. This is the default response type by players
-	// @param <Player> player that wants to execute the command
-	// @param <object> data: formatted command data that must include the caller.id and command string reprenting a function on the caller to execute. Any other keys are variables for that function.
-	// @returns boolean representing if the command was executed successfully (players can send invalid data, it's up to the game logic being called to decide if it was valid here)
-	executeCommandFor: function(player, data) {
-		var success = false;
-		if(data && data._caller && data._command) {
-			var commandFunction = data._caller["command_" + data._command];
-
-			if(commandFunction) {
-				success = commandFunction.call(data._caller, player, data);
-				this._updateSerializableStates();
-			}
-			else {
-				console.error("No command", data.command, "in", gameObject.gameObjectName);
-			}
+			invalid = {finished: finished}
 		}
 
-		return Boolean(success);
+		return invalid;
 	},
 
-	addRequest: function(player, request, args) {
-		this._currentRequests.push({
+	aiRun: function(player, run) {
+		var callback = run.caller["_run" + run.functionName.capitalize()];
+		var ran = {};
+
+		if(callback) {
+			try {
+				ran.returned = callback.call(run.caller, player, run.args || {});
+			}
+			catch(e) {
+				if(Class.isInstance(e, errors.GameLogicError)) {
+					ran.invalid = {args: run.args, message: e.message};
+				}
+				else {
+					throw e; // a different, unexpected, error occured
+				}
+			}
+			
+			this._updateSerializableStates();
+		}
+		else {
+			ran.invalid = {functionName: functionName};
+		}
+
+		return ran;
+	},
+
+	order: function(player, order, args) {
+		this._orders.push({
 			player: player,
-			request: request,
+			order: order,
 			args: args || [],
 		});
 	},
 
-	popRequests: function() {
-		var requests = this._currentRequests.clone();
-		this._currentRequests.empty();
-		return requests;
+	popOrders: function() {
+		var orders = this._orders.clone();
+		this._orders.empty();
+		return orders;
 	},
 
 
@@ -187,12 +207,20 @@ var BaseGame = Class({
 
 	/// updates all the private states used to generate delta states and game logs
 	_updateSerializableStates: function() {
-		this.hasStateChanged = true; // for the server to see
-		this._lastSerializableState = this._currentSerializableState || {};
-		this._currentSerializableState = serializer.serialize(this);
-		this._serializableDeltaState = serializer.getDelta(this._lastSerializableState, this._currentSerializableState) || {};
+		this.hasStateChanged = false;
 
-		this._deltas.push(this._serializableDeltaState);
+		var last = this._currentSerializableState || {};
+		var current = serializer.serialize(this);
+		var delta = serializer.getDelta(last, current);
+
+		if(delta && !serializer.isEmpty(delta)) { // then there is an actual difference between the last and current state
+			this.hasStateChanged = true;
+			this._lastSerializableState = last;
+			this._currentSerializableState = current;
+			this._serializableDeltaState = delta;
+
+			this._deltas.push(delta);
+		}
 	},
 
 	generateGamelog: function() {
@@ -220,6 +248,16 @@ var BaseGame = Class({
 		return this._over;
 	},
 
+	throwInvalidGameLogic: function(player, message) {
+		player.invalidMessages.push(message);
+
+		if(player.invalidMessages.length > this.maxInvalidsPerPlayer) {
+			this.declairLoser(player, message);
+		}
+		
+		throw new errors.GameLogicError(message);
+	},
+
 	/// declairs a player as having lost, and assumes when a player looses the rest could still be competing to win
 	// @param <Player> loser: player that lost the game
 	// @param <string> reason (optional): string that is the lose reason
@@ -233,8 +271,6 @@ var BaseGame = Class({
 		if(!flags || !flags.dontCheckForWinner) {
 			this.checkForWinner();
 		}
-
-		return false;
 	},
 
 	/// declairs the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
@@ -255,7 +291,6 @@ var BaseGame = Class({
 		}
 
 		this.isOver(true);
-		return true;
 	},
 
 	/// checks if this game is over because there is a winner (all other players have lost)
@@ -275,9 +310,9 @@ var BaseGame = Class({
 		}
 
 		if(winner) {
-			return this.declairWinner(winner, "All other players lost.");
+			this.declairWinner(winner, "All other players lost.");
+			return true;
 		}
-		return false;
 	},
 });
 

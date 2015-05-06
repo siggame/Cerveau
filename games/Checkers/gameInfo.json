@@ -3,10 +3,13 @@
         "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
         "functions": {
             "runTurn": {
+                "argumentNames": [],
+                "arguments": [],
                 "description": "This is called every time the AI is asked to respond with a command during their turn",
-                "return": {
-                    "description": "the Command you want to run on the server this turn from a game object's command functions. If you do not return your player's endTurn() then this runTurn function will be called again after the game state updates.",
-                    "type": "Command"
+                "returns": {
+                    "default": true,
+                    "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
+                    "type": "boolean"
                 }
             }
         }
@@ -104,23 +107,42 @@
             },
             "description": "A checker on the game board.",
             "functions": {
+                "isMine": {
+                    "altersState": false,
+                    "argumentNames": [],
+                    "arguments": [],
+                    "description": "returns if the checker is owned by your player or not",
+                    "returns": {
+                        "default": null,
+                        "description": "true if it is yours, false if it is not yours",
+                        "type": "boolean"
+                    }
+                },
                 "move": {
+                    "altersState": true,
+                    "argumentNames": [
+                        "x",
+                        "y"
+                    ],
                     "arguments": [
                         {
+                            "default": null,
                             "description": "The x coordinate to move to.",
                             "name": "x",
                             "type": "int"
                         },
                         {
+                            "default": null,
                             "description": "The y coordinate to move to.",
                             "name": "y",
                             "type": "int"
                         }
                     ],
                     "description": "Moves the checker from its current location to the given (x, y).",
-                    "return": {
-                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
-                        "type": "Command"
+                    "returns": {
+                        "default": null,
+                        "description": "Returns the same checker that moved if the move was successful. null otherwise.",
+                        "type": "Checker"
                     }
                 }
             },
@@ -141,8 +163,13 @@
             },
             "inheritedFunctions": {
                 "log": {
+                    "altersState": true,
+                    "argumentNames": [
+                        "message"
+                    ],
                     "arguments": [
                         {
+                            "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
                             "type": "string"
@@ -150,10 +177,7 @@
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
                     "inheritedFrom": "GameObject",
-                    "return": {
-                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
-                        "type": "Command"
-                    },
+                    "returns": null,
                     "serverPredefined": true
                 }
             },
@@ -179,18 +203,20 @@
             "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
             "functions": {
                 "log": {
+                    "altersState": true,
+                    "argumentNames": [
+                        "message"
+                    ],
                     "arguments": [
                         {
+                            "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
                             "type": "string"
                         }
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
-                    "return": {
-                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
-                        "type": "Command"
-                    },
+                    "returns": null,
                     "serverPredefined": true
                 }
             },
@@ -245,15 +271,7 @@
                 }
             },
             "description": "A player in this game. Every AI controls one player.",
-            "functions": {
-                "endTurn": {
-                    "description": "Tells the server that this player is done with their turn.",
-                    "return": {
-                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
-                        "type": "Command"
-                    }
-                }
-            },
+            "functions": {},
             "inheritedAttributes": {
                 "id": {
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
@@ -271,8 +289,13 @@
             },
             "inheritedFunctions": {
                 "log": {
+                    "altersState": true,
+                    "argumentNames": [
+                        "message"
+                    ],
                     "arguments": [
                         {
+                            "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
                             "type": "string"
@@ -280,10 +303,7 @@
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
                     "inheritedFrom": "GameObject",
-                    "return": {
-                        "description": "the command for the server to run this function against game logic, then send back the updated game state",
-                        "type": "Command"
-                    },
+                    "returns": null,
                     "serverPredefined": true
                 }
             },
