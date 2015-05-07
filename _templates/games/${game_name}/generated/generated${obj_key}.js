@@ -49,7 +49,7 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 
 % for function_name, function_parms in obj['functions'].items():
 	_run${function_name[0].upper() + function_name[1:]}: function(player, data) {
-		var returned = this.${function_name}(player${", data.".join([""] + function_parms['argumentNames'])});
+		var returned = this.${function_name}(player${", data.".join([""] + function_parms['argument_names'])});
 % if function_parms['returns'] != None:
 		return ${shared['js']['cast'](function_parms['returns']['type'])}(returned);
 % endif

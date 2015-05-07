@@ -22,7 +22,7 @@ var serializer = {
 	},
 
 	isSerializable: function(obj, key) {
-		return serializer.isObject(obj) && obj.hasOwnProperty(key) && !String(key).startsWith("_") && (obj._serializableKeys === undefined || obj._serializableKeys[key]);
+		return serializer.isObject(obj) && (obj.hasOwnProperty(key) || (obj._serializableKeys && obj._serializableKeys[key])) && !String(key).startsWith("_") && (obj._serializableKeys === undefined || obj._serializableKeys[key]);
 	},
 
 	// serializes a game state to a structure that can be sent via json

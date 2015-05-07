@@ -3,13 +3,15 @@
         "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
         "functions": {
             "runTurn": {
-                "argumentNames": [],
+                "argument_names": [],
                 "arguments": [],
                 "description": "This is called every time the AI is asked to respond with a command during their turn",
                 "returns": {
                     "default": true,
                     "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
-                    "type": "boolean"
+                    "keyType": null,
+                    "type": "boolean",
+                    "valueType": null
                 }
             }
         }
@@ -19,63 +21,86 @@
             "boardHeight": {
                 "default": 8,
                 "description": "The height of the board for the Y component of a checker.",
-                "type": "int"
+                "keyType": null,
+                "type": "int",
+                "valueType": null
             },
             "boardWidth": {
                 "default": 8,
                 "description": "The width of the board for X component of a checker.",
-                "type": "int"
+                "keyType": null,
+                "type": "int",
+                "valueType": null
             },
             "checkerMoved": {
                 "arenaInterest": "sum",
+                "default": null,
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
-                "type": "Checker"
+                "keyType": null,
+                "type": "Checker",
+                "valueType": null
             },
             "checkerMovedJumped": {
                 "arenaInterest": "sum",
+                "default": null,
                 "description": "If the last checker that moved jumped, meaning it can move again.",
-                "type": "boolean"
+                "keyType": null,
+                "type": "boolean",
+                "valueType": null
             },
             "checkers": {
+                "default": null,
                 "description": "All the checkers currently in the game.",
-                "subType": "Checker",
-                "type": "array"
+                "keyType": null,
+                "type": "array",
+                "valueType": null
             },
             "currentPlayer": {
+                "default": null,
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "keyType": null,
                 "serverPredefined": true,
-                "type": "Player"
+                "type": "Player",
+                "valueType": null
             },
             "currentTurn": {
                 "default": 0,
                 "description": "The current turn number, starting at 0 for the first player's turn",
+                "keyType": null,
                 "serverPredefined": true,
-                "type": "int"
+                "type": "int",
+                "valueType": null
             },
             "gameObjects": {
+                "default": null,
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
                 "keyType": "string",
                 "serverPredefined": true,
                 "type": "dictionary",
-                "valueType": "GameObject"
+                "valueType": null
             },
             "maxTurns": {
                 "default": 100,
                 "description": "The maximum number of turns before the game will automatically end.",
+                "keyType": null,
                 "serverPredefined": true,
-                "type": "int"
+                "type": "int",
+                "valueType": null
             },
             "players": {
+                "default": null,
                 "description": "List of all the players in the game.",
+                "keyType": null,
                 "serverPredefined": true,
-                "subType": "Player",
-                "type": "array"
+                "type": "array",
+                "valueType": null
             }
         },
         "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged. Very simple.",
         "functions": {},
         "inheritedAttributes": {},
         "inheritedFunctions": {},
+        "maxInvalidsPerPlayer": 10,
         "name": "Checkers",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -90,37 +115,50 @@
                     "arenaInterest": "sum",
                     "default": false,
                     "description": "If the checker has been kinged and can move backwards.",
-                    "type": "boolean"
+                    "keyType": null,
+                    "type": "boolean",
+                    "valueType": null
                 },
                 "owner": {
+                    "default": null,
                     "description": "The player that controls this Checker.",
-                    "type": "Player"
+                    "keyType": null,
+                    "type": "Player",
+                    "valueType": null
                 },
                 "x": {
+                    "default": null,
                     "description": "The x coordinate of the checker.",
-                    "type": "int"
+                    "keyType": null,
+                    "type": "int",
+                    "valueType": null
                 },
                 "y": {
+                    "default": null,
                     "description": "The y coordinate of the checker.",
-                    "type": "int"
+                    "keyType": null,
+                    "type": "int",
+                    "valueType": null
                 }
             },
             "description": "A checker on the game board.",
             "functions": {
                 "isMine": {
                     "altersState": false,
-                    "argumentNames": [],
+                    "argument_names": [],
                     "arguments": [],
                     "description": "returns if the checker is owned by your player or not",
                     "returns": {
                         "default": null,
                         "description": "true if it is yours, false if it is not yours",
-                        "type": "boolean"
+                        "keyType": null,
+                        "type": "boolean",
+                        "valueType": null
                     }
                 },
                 "move": {
                     "altersState": true,
-                    "argumentNames": [
+                    "argument_names": [
                         "x",
                         "y"
                     ],
@@ -128,51 +166,64 @@
                         {
                             "default": null,
                             "description": "The x coordinate to move to.",
+                            "keyType": null,
                             "name": "x",
-                            "type": "int"
+                            "type": "int",
+                            "valueType": null
                         },
                         {
                             "default": null,
                             "description": "The y coordinate to move to.",
+                            "keyType": null,
                             "name": "y",
-                            "type": "int"
+                            "type": "int",
+                            "valueType": null
                         }
                     ],
                     "description": "Moves the checker from its current location to the given (x, y).",
                     "returns": {
                         "default": null,
                         "description": "Returns the same checker that moved if the move was successful. null otherwise.",
-                        "type": "Checker"
+                        "keyType": null,
+                        "type": "Checker",
+                        "valueType": null
                     }
                 }
             },
             "inheritedAttributes": {
                 "id": {
+                    "default": null,
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "inheritedFrom": "GameObject",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "type": "string"
+                    "type": "string",
+                    "valueType": null
                 },
                 "logs": {
+                    "default": null,
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
                     "inheritedFrom": "GameObject",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "subType": "string",
-                    "type": "array"
+                    "type": "array",
+                    "valueType": null
                 }
             },
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
-                    "argumentNames": [
+                    "argument_names": [
                         "message"
                     ],
                     "arguments": [
                         {
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "keyType": null,
                             "name": "message",
-                            "type": "string"
+                            "type": "string",
+                            "valueType": null
                         }
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
@@ -189,30 +240,37 @@
         "GameObject": {
             "attributes": {
                 "id": {
+                    "default": null,
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "type": "string"
+                    "type": "string",
+                    "valueType": null
                 },
                 "logs": {
+                    "default": null,
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "subType": "string",
-                    "type": "array"
+                    "type": "array",
+                    "valueType": null
                 }
             },
             "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
             "functions": {
                 "log": {
                     "altersState": true,
-                    "argumentNames": [
+                    "argument_names": [
                         "message"
                     ],
                     "arguments": [
                         {
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "keyType": null,
                             "name": "message",
-                            "type": "string"
+                            "type": "string",
+                            "valueType": null
                         }
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",
@@ -230,75 +288,105 @@
         "Player": {
             "attributes": {
                 "checkers": {
+                    "default": null,
                     "description": "All the checkers currently in the game owned by this player",
-                    "subType": "Checker",
-                    "type": "array"
+                    "keyType": null,
+                    "type": "array",
+                    "valueType": null
                 },
                 "clientType": {
+                    "default": null,
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
-                    "type": "string"
+                    "keyType": null,
+                    "type": "string",
+                    "valueType": null
                 },
                 "lost": {
                     "default": false,
                     "description": "if the player lost the game or not",
-                    "type": "boolean"
+                    "keyType": null,
+                    "type": "boolean",
+                    "valueType": null
                 },
                 "name": {
                     "default": "Anonymous",
                     "description": "The name of the player",
-                    "type": "string"
+                    "keyType": null,
+                    "type": "string",
+                    "valueType": null
                 },
                 "reasonLost": {
+                    "default": null,
                     "description": "the reason why the player lost the game",
-                    "type": "string"
+                    "keyType": null,
+                    "type": "string",
+                    "valueType": null
                 },
                 "reasonWon": {
+                    "default": null,
                     "description": "the reason why the player won the game",
-                    "type": "string"
+                    "keyType": null,
+                    "type": "string",
+                    "valueType": null
                 },
                 "timeRemaining": {
+                    "default": null,
                     "description": "The amount of time (in ms) remaining for this AI to send commands.",
-                    "type": "int"
+                    "keyType": null,
+                    "type": "int",
+                    "valueType": null
                 },
                 "won": {
                     "default": false,
                     "description": "if the player won the game or not",
-                    "type": "boolean"
+                    "keyType": null,
+                    "type": "boolean",
+                    "valueType": null
                 },
                 "yDirection": {
+                    "default": null,
                     "description": "The direction your checkers must go along the y-axis until kinged",
-                    "type": "int"
+                    "keyType": null,
+                    "type": "int",
+                    "valueType": null
                 }
             },
             "description": "A player in this game. Every AI controls one player.",
             "functions": {},
             "inheritedAttributes": {
                 "id": {
+                    "default": null,
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "inheritedFrom": "GameObject",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "type": "string"
+                    "type": "string",
+                    "valueType": null
                 },
                 "logs": {
+                    "default": null,
                     "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
                     "inheritedFrom": "GameObject",
+                    "keyType": null,
                     "serverPredefined": true,
-                    "subType": "string",
-                    "type": "array"
+                    "type": "array",
+                    "valueType": null
                 }
             },
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
-                    "argumentNames": [
+                    "argument_names": [
                         "message"
                     ],
                     "arguments": [
                         {
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "keyType": null,
                             "name": "message",
-                            "type": "string"
+                            "type": "string",
+                            "valueType": null
                         }
                     ],
                     "description": "adds a message to this game object's log. Intended for debugging purposes.",

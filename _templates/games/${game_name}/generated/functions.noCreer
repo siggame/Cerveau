@@ -1,0 +1,57 @@
+<%
+if not 'js' in shared:
+    shared['js'] = {}
+
+    def js_default(base_type, default=None):
+        if default == None:
+            if base_type == "string":
+                return '""'
+            elif base_type == "dictionary":
+                return '{}'
+            elif base_type == "array":
+                return '[]'
+            elif base_type == "int" or base_type == "float":
+                return '0'
+            elif base_type == "boolean":
+                return 'false'
+            else:
+                return "null"
+        else:
+            if base_type == "string":
+                return '"' + default + '"'
+            elif base_type == "boolean":
+                return str(default).lower()
+    shared['js']['default'] = js_default
+
+
+    def js_type(base_type, value_type=None, key_type=None):
+        if isinstance(base_type, dict):
+            value_type = base_type['valueType']
+            key_type = base_type['keyType']
+            base_type = base_type['type']
+
+        if base_type == "dictionary":
+            return "Object.<" + js_type(keyType) + ", " + js_type(value_type) + ">"
+        elif base_type == "array":
+            return "Array.<" + js_type(value_type) + ">"
+        elif base_type == "int" or base_type == "float":
+            return "number"
+        else:
+            return base_type
+    shared['js']['type'] = js_type
+
+
+    def js_cast(base_type):
+        if base_type == "string":
+            return "String"
+        elif base_type == "int":
+            return "parseInt"
+        elif base_type == "float":
+            return "parseFloat"
+        elif base_type == "boolean":
+            return "Boolean"
+        else:
+            return ""
+    shared['js']['cast'] = js_cast
+
+%>
