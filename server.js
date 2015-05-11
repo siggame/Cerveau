@@ -24,24 +24,10 @@ var Server = Class({
 		return client;
 	},
 
-	/// stops the timeout timers for all clients in the game. Should be called when the server will be running game logic as to not reduct timeout time when we (the server) are doing calculations
-	stopTimers: function() {
-		for(var i = 0; i < this.clients.length; i++) {
-			this.clients[i].stopTimer();
-		}
-	},
-
-
-	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
-
-	/// when the client sends data via socket connection
+	/// when the client sends data via socket connection, invoked by Clients
 	// @param <Client> client that sent the data
 	// @param <object> data sent
 	clientSentData: function(client, data) {
-		if(client.isTicking() && data.sentTime) {
-			client.refundTime(Math.max(data.sentTime - client.timer.startTime, 0), {resume: false});
-		}
-
 		var callback = this['_clientSent' + data.event.capitalize()]; // should be in the inherited class
 
 		if(callback) {
@@ -52,7 +38,7 @@ var Server = Class({
 		}
 	},
 
-	clientDisconnected: function(client) {
+	clientDisconnected: function(client, reason) {
 		console.log(this.name + ": Client " + client.name + " disconnected");
 
 		this.clients.removeElement(client);
@@ -62,10 +48,10 @@ var Server = Class({
 
 	/// called from a client when it times out
 	// @param <Client> client that timed out
-	clientTimedOut: function(client) {
+	clientTimedOut: function(client, reason) {
 		console.log(this.name + ": Client " + client.name + " timed out");
 
-		this.clientDisconnected(client);
+		this.clientDisconnected(client, reason);
 	},
 });
 

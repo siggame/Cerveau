@@ -77,7 +77,7 @@ var BaseGame = Class({
 			});
 
 			player.invalidMessages = [];
-			player.timeRemaining = player.timeRemaining || 10000; // 10 seconds (10,000ms)
+			player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
 			player.client = client;
 			client.setGameData(this, player);
 			this.players.push(player);
@@ -85,11 +85,9 @@ var BaseGame = Class({
 	},
 
 	/// remove the client from the game and checks if they have a player and if removing them alters the game
-	playerDisconnected: function(player) {
-		if(player) {
-			if(this.hasStarted() && !this.isOver()) {
-				this.declairLoser(player, "Disconnected during gameplay.");
-			}
+	playerDisconnected: function(player, reason) {
+		if(player && this.hasStarted() && !this.isOver()) {
+			this.declairLoser(player, reason || "Disconnected during gameplay.");
 		}
 	},
 

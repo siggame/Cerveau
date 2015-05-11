@@ -11,7 +11,6 @@ var Client = Class({
 
 		this.server = server;
 		this.timer = {
-			timeRemaining: 10000,
 			timeout: undefined,
 			startTime: undefined,
 		};
@@ -111,47 +110,42 @@ var Client = Class({
 		);
 	},
 
+
+
+	/////////////////////////////////////////////////////////
+	// Timeouts. Timer should be started/paused by Session //
+	/////////////////////////////////////////////////////////
+
 	isTicking: function() {
-		return Boolean(this.timer.startTime);
-	},
-
-	refundTime: function(ms, options) {
-		this.stopTimer();
-
-		this.player.timeRemaining += ms;
-
-		if(!options || !options.resume) {
-			this.startTimer();
-		}
+		return this.timer.timeout !== undefined;
 	},
 
 	/// starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for making commands.
-	startTimer: function() {
-		this.timer.timeRemaining = Math.max(this.player.timeRemaining, 0);
+	startTicking: function() {
+		this.timer.startTime = process.hrtime();
 
-		this.timer.startTime = (new Date()).getTime();
-		(function(self) {
-			self.timer.timeout = setTimeout(function() {
-				self.timedOut();
-			}, self.timer.timeRemaining);
-		})(this);
+		var self = this;
+		this.timer.timeout = setTimeout(function() {
+			self._timedOut();
+		}, Math.ceil(this.player.timeRemaining / 1e6)); // ns to ms
 	},
 
-	/// stops (pauses) the timeout timer. This should be done any time we don't expect the client to be computing something.
-	stopTimer: function() {
+	/// pauses the timeout timer. This should be done any time we don't expect the client to be computing something.
+	pauseTicking: function() {
 		if(this.isTicking()) {
-			var endTime = (new Date()).getTime();
+			var timeDiff = process.hrtime(this.timer.startTime);
 
-			clearTimeout(this.timer.timeout);
-			this.player.timeRemaining -= Math.max(endTime - this.timer.startTime, 0);
-			this.startTime = undefined;
+			this.timer.timeout = undefined;
+			this.timer.startTime = undefined;
+
+			this.player.timeRemaining -= (timeDiff[0] * 1e9 + timeDiff[1]);
 		}
 	},
 
 	/// client calls this when it runs out of time. Probably because it infinte looped, broke, or is just very slow.
-	timedOut: function() {
-		this.stopTimer();
-		console.log("client", this.name, "timed out");
+	_timedOut: function() {
+		this.pauseTicking();
+		console.log(this.server.name + ": client", this.name, "timed out");
 		this.server.clientTimedOut(this);
 	},
 });

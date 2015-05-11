@@ -27,12 +27,15 @@ var Session = Class(Server, {
 	},
 
 	// @override
-	clientDisconnected: function(client) {
+	clientTimedOut: function(client) {
+		Server.clientTimedOut.call(this, client, "Timed out during gameplay.")
+	},
+
+	// @override
+	clientDisconnected: function(client, reason) {
 		Server.clientDisconnected.call(this, client);
 
-		client.socket.end();
-
-		this.game.playerDisconnected(client.player);
+		this.game.playerDisconnected(client.player, reason);
 
 		this._checkGameState();
 
@@ -48,7 +51,7 @@ var Session = Class(Server, {
 	},
 
 	end: function() {
-		process.exit(0);
+		process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
 	},
 
 	/// when the game state changes the clients need to know, and we need to check if that game ended when its state changed
@@ -106,6 +109,8 @@ var Session = Class(Server, {
 				order: data.order,
 				args: data.args,
 			});
+
+			data.player.client.startTicking();
 		}
 	},
 
@@ -122,7 +127,7 @@ var Session = Class(Server, {
 	//--- Client functions. These should be invoked when a client sends something back to the server ---\\
 
 	_clientSentRun: function(client, run) {
-		this.stopTimers();
+		client.pauseTicking();
 
 		if(this._checkToIgnoreClient(client)) {
 			return;
@@ -144,7 +149,7 @@ var Session = Class(Server, {
 	// @param <Client> client that sent the message
 	// @param <object> response data
 	_clientSentFinished: function(client, data) {
-		this.stopTimers();
+		client.pauseTicking();
 
 		if(this._checkToIgnoreClient(client)) {
 			return;
