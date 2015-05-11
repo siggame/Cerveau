@@ -1,3 +1,5 @@
+process.title = "Cerveau Game Server"
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
