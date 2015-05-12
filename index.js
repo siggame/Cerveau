@@ -135,13 +135,14 @@ app.get('/status/:gameName/:gameSession', function(req, res) {
 	res.json(response);
 });
 
-app.get('/gamelog/:gameName/:gameSession', function(req, res) {
+app.get('/gamelog/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
 	var response = {}
 	if(!req.params.gameName || !req.params.gameSession) {
 		response.error = "gameName or gameSession not sent!";
 	}
 	else {
-		var gamelog = lobby.gameLogger.getLog(req.params.gameName, req.params.gameSession, req.params.epoch);
+		req.params.requestedEpoch = req.params.requestedEpoch || 0;
+		var gamelog = lobby.gameLogger.getLog(req.params.gameName, req.params.gameSession, req.params.requestedEpoch);
 
 		if(gamelog) {
 			response = gamelog;
@@ -158,8 +159,8 @@ app.get('/gamelog/:gameName/:gameSession', function(req, res) {
 // HTML Responses //
 ////////////////////
 
-app.get('/visualizer', function(req, res) {
-	res.render('visualizer');
+app.get('/visualize/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
+	res.render('visualize', req.params);
 });
 
 var docDatas = {};
