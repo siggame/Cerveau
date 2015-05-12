@@ -102,6 +102,62 @@ app.get('/', function(req, res){
 	});
 });
 
+
+////////////////////
+// JSON Responses //
+////////////////////
+
+app.get('/status/:gameName/:gameSession', function(req, res) {
+	var response = {};
+	if(req.params.gameName && req.params.gameSession) {
+		var info = lobby.getGameSessionInfo(req.params.gameName, req.params.gameSession);
+		if(!info.error) {
+			response = info;
+			response.status = (info.over === true ? "over" : "running");
+			response.gamelog = undefined;
+		}
+		else {
+			if(info.sessionID !== undefined) {
+				response.status = "open";
+			}
+			else {
+				response.status = "error";
+				response.error = info.error;
+				response.gameName = info.gameName;
+			}
+		}
+	}
+	else {
+		response.status = "error";
+		response.error = "gameName or gameSession not sent!";
+	}
+
+	res.json(response);
+});
+
+app.get('/gamelog/:gameName/:gameSession', function(req, res) {
+	var response = {}
+	if(!req.params.gameName || !req.params.gameSession) {
+		response.error = "gameName or gameSession not sent!";
+	}
+	else {
+		var gamelog = lobby.gameLogger.getLog(req.params.gameName, req.params.gameSession, req.params.epoch);
+
+		if(gamelog) {
+			response = gamelog;
+		}
+		else {
+			response.error ="gamelog not found";
+		}
+	}
+
+	res.json(response);
+});
+
+////////////////////
+// HTML Responses //
+////////////////////
+
 app.get('/visualizer', function(req, res) {
 	res.render('visualizer');
 });

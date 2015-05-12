@@ -95,7 +95,7 @@ var Session = Class(Server, {
 		}
 
 		process.send({
-			gamelog: this.game.generateGamelog(),
+			gamelog: this.game.generateGamelog(this.clients),
 		});
 	},
 

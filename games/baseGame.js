@@ -11,7 +11,6 @@ var BaseGame = Class({
 		this.players = [];
 		this.gameObjects = {};
 		this.session = (data.session === undefined ? "Unknown" : data.session);
-		this.name = "Base Game"; // should be overwritten by the GeneratedGame inheriting this
 
 		this._orders = []; // orders to be sent to AI clients when the parent session is ready
 		this._started = false;
@@ -32,6 +31,7 @@ var BaseGame = Class({
 	},
 
 	// @static - because that way this exicsts without making a new instance
+	name: "Base Game", // should be overwritten by the GeneratedGame inheriting this
 	numberOfPlayers: 2,
 	maxInvalidsPerPlayer: 10,
 
@@ -221,13 +221,26 @@ var BaseGame = Class({
 		}
 	},
 
-	generateGamelog: function() {
-		var m = moment();
+	generateGamelog: function(clients) {
+		var winners = [];
+		var losers = [];
+
+		for(var i = 0; i < clients.length; i++) {
+			if(clients[i].player.won) {
+				winners.push(i);
+			}
+			else {
+				losers.push(i);
+			}
+		}
+
 		return {
-			gameName: (this.name !== undefined ? this.name : "UNKNOWN_GAME"),
-			gameSession: (this.session !== undefined ? this.session : "UNKNOWN_SESSION"),
+			gameName: this.name,
+			gameSession: this.session,
 			deltas: this._deltas,
-			epoch: m.valueOf(),
+			epoch: moment().valueOf(),
+			winners: winners,
+			losers: losers,
 		};
 	},
 

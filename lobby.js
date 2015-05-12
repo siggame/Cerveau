@@ -5,6 +5,14 @@ var Server = require("./server");
 var constants = require("./constants");
 var net = require("net");
 var cluster = require("cluster");
+var fs = require("fs");
+var path = require("path");
+
+function getDirs(srcpath) {
+	return fs.readdirSync(srcpath).filter(function(file) {
+		return fs.statSync(path.join(srcpath, file)).isDirectory();
+	});
+};
 
 // @class Lobby: The server clients initially connect to before being moved to their game session
 var Lobby = Class(Server, {
@@ -14,11 +22,16 @@ var Lobby = Class(Server, {
 		this.name = "Lobby @ " + process.pid;
 		this.host = args.host;
 		this.port = args.port;
-		this.gameSessions ={};
+		this.gameNames = [];
+		this.gameSessions = {};
 		this.gameClasses = [];
-		this.gameLogger = new GameLogger('gamelogs/');
 
+		this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
 		this._nextGameNumber = 1;
+
+		this._initializeGames();
+
+		this.gameLogger = new GameLogger('gamelogs/', this.gameNames);
 
 		cluster.setupMaster({
 			exec: 'worker.js',
@@ -26,7 +39,7 @@ var Lobby = Class(Server, {
 
 		var self = this; // for async reference in passed listener functions below
 		cluster.on("exit", function(worker) {
-			console.log(self.name + ": Game Session @", worker.process.pid, "closed");
+			self._gameSessionExited(self._threadedGameSessions[worker.process.pid]);
 		});
 
 		// create the TCP socket server via node.js's net module
@@ -37,6 +50,25 @@ var Lobby = Class(Server, {
 		this.netServer.listen(this.port, this.host, function() {
 			console.log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
 		});
+	},
+
+	/// initializes all the games in the games/ folder
+	_initializeGames: function() {
+		var dirs = getDirs("./games");
+
+		for(var i = 0; i < dirs.length; i++) {
+			var dir = dirs[i];
+			try {
+				var path = "./games/" + dir + "/game";
+				this.gameClasses[dir] = require(path);
+				this.gameNames.push(dir);
+				this.gameSessions[dir] = {};
+				console.log(this.name + ": found game '" + dir + "'");
+			}
+			catch(e) {
+				console.log(this.name + ": ERROR:  directory "+ dir + " in games/ is not a valid game.");
+			}
+		}
 	},
 
 	/// retrieves, and possibly creates a new, game of gameName in gameSession which is on a completely different thread
@@ -71,29 +103,74 @@ var Lobby = Class(Server, {
 		return gameSession;
 	},
 
-	// does not check to make sure keys are initialized via gameName like getGameSession does
+	getGameSessionInfo: function(gameName, sessionID) {
+		if(this.gameSessions[gameName]) {
+			var gameSession = (this.gameSessions[gameName] !== undefined && this.gameSessions[gameName][sessionID] !== undefined) ? this.gameSessions[gameName][sessionID] : null;
+			
+
+			if(gameSession !== null) {
+				return {
+					gameName: gameSession.gameName,
+					sessionID: gameSession.id,
+					running: gameSession.running,
+					over: gameSession.over,
+					winners: gameSession.gamelog.winners,
+					losers: gameSession.gamelog.losers,
+				};
+			}
+			else { // check if it was already ran
+				var gamelog = this.gameLogger.getLog(gameName, sessionID);
+				if(gamelog) {
+					return {
+						gameName: gamelog.gameName,
+						sessionID: gamelog.gameSession,
+						over: true,
+						winners: gamelog.winners,
+						losers: gamelog.losers,
+					}
+				}
+				else {
+					return {
+						error: "could not find game session with given gameName and sessionID",
+						sessionID: sessionID,
+					};
+				}
+			}
+		}
+		else {
+			return {
+				error: "game name is not valid",
+				gameName: gameName,
+			}
+		}
+	},
+
 	_getOpenGameSession: function(gameName) {
 		var gameClass = this.gameClasses[gameName];
-		for(var session in this.gameSessions[gameName]) {
-			var gameSession = this.gameSessions[gameName][session];
+		if(gameClass) {
+			for(var session in this.gameSessions[gameName]) {
+				var gameSession = this.gameSessions[gameName][session];
 
-			if(this._isGameSessionOpen(gameName, session)) {
-				return gameSession;
+				if(this._isGameSessionOpen(gameName, session)) {
+					return gameSession;
+				}
 			}
 		}
 	},
 
 	_isGameSessionOpen: function(gameName, session) {
 		var gameClass = this.gameClasses[gameName];
-		var gameSession = this.gameSessions[gameName][session];
-		return (gameSession !== undefined && !gameSession.worker && gameSession.clients.length < gameClass.numberOfPlayers);
+		if(gameClass) {
+			var gameSession = this.gameSessions[gameName][session];
+			return (gameSession !== undefined && !gameSession.worker && gameSession.clients.length < gameClass.numberOfPlayers);
+		}
 	},
 
 	/// when a client tells the server what it wants to play and as who.
 	// @param <Client> client that send the 'play'
 	// @param <object> data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
 	_clientSentPlay: function(client, data) {
-		if(!this._initializeGameClass(data.gameName)) {
+		if(!this.gameClasses[data.gameName]) {
 			client.send("invalid", data);
 			client.disconnect();
 			return;
@@ -117,22 +194,6 @@ var Lobby = Class(Server, {
 		if(gameSession.clients.length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
 			this._threadGameSession(gameSession);
 		}
-	},
-
-	// @returns {boolean} is the fame was initialized successfully
-	_initializeGameClass: function(gameName) {
-		if(!this.gameClasses[gameName]) {
-			try {
-				this.gameClasses[gameName] = require("./games/" + gameName + "/game");
-				this.gameSessions[gameName] = {};
-			}
-			catch(e) {
-				console.error("Error trying to initialize game", gameName, e);
-				return false;
-			}
-		}
-		
-		return true; // already initialized
 	},
 
 	/// spins off the game and client logic to a new thread
@@ -173,7 +234,25 @@ var Lobby = Class(Server, {
 			if(data.gamelog) {
 				self.gameLogger.log(data.gamelog);
 			}
-		})
+
+			gameSession.gamelog = data.gamelog;
+			gameSession.winners = data.winners;
+			gameSession.losers = data.losers;
+		});
+
+		this._threadedGameSessions[gameSession.worker.process.pid] = gameSession;
+
+		gameSession.running = true;
+		gameSession.over = false;
+	},
+
+	_gameSessionExited: function(gameSession) {
+		console.log(this.name + ": Game Session @", gameSession.worker.process.pid, "exited");
+
+		gameSession.running = false;
+		gameSession.over = true;
+
+		delete this._threadedGameSessions[gameSession.worker.process.pid];
 	},
 });
 
