@@ -86,13 +86,13 @@ app.get('/', function(req, res){
 
 	var logs = lobby.gameLogger.getLogs();
 	var gamelogs = [];
-	for(var filename in logs) {
-		var log = logs[filename];
+	for(var i = 0; i < logs.length; i++) {
+		var log = logs[i];
 		gamelogs.push({
 			game: log.gameName,
 			session: log.gameSession,
 			epoch: log.epoch,
-			uri: encodeURIComponent(filename),
+			uri: log.gameName + "/" + log.gameSession + "/" + log.epoch,
 		});
 	}
 
