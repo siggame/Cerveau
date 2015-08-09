@@ -47,8 +47,9 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 % endfor
 
 % endif
-% for attr_name, attr_parms in obj['attributes'].items():
+% for attr_name in obj['attribute_names']:
 <%
+	attr_parms = obj['attributes'][attr_name]
 	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
 		continue
 %>		this._serializableKeys["${attr_name}"] = true;
@@ -68,11 +69,11 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 %>	_run${function_name[0].upper() + function_name[1:]}: function(player, data) {
 % if function_parms['arguments']:
 % for arg_parms in function_parms['arguments']:
-		data.${arg_parms['name']} = ${shared['js']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
+		var ${arg_parms['name']} = ${shared['js']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
 % endfor
 
 % endif
-		var returned = this.${function_name}(player${", data.".join([""] + function_parms['argument_names'])});
+		var returned = this.${function_name}(player${", ".join([""] + function_parms['argument_names'])});
 % if function_parms['returns'] != None:
 		return ${shared['js']['cast'](function_parms['returns']['type'])}(returned);
 % endif
