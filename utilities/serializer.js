@@ -5,6 +5,29 @@ var Class = require("./class");
 var BaseGameObject = require("../games/baseGameObject");
 
 var serializer = {
+	toBoolean: function(b) {
+		switch(typeof(b)) {
+			case "string":
+				return b === "true";
+			case "number":
+				return b !== 0;
+			default:
+				return !!b;
+		}
+	},
+
+	toNumber: function(n) {
+		return Number(n);
+	},
+
+	toInteger: function(i) {
+		return parseInt(i);
+	},
+
+	toString: function(s) {
+		return String(s);
+	},
+
 	isEmpty: function(obj){
 		return (Object.getOwnPropertyNames(obj).length === 0);
 	},
@@ -90,7 +113,7 @@ var serializer = {
 		return serializer.isEmpty(result) ? undefined : result;
 	},
 
-	deserialize: function(data, game) {
+	deserialize: function(data, game, dataTypeConverter) {
 		if(serializer.isObject(data) && game) {
 			var result = data.isArray ? [] : {};
 
@@ -110,6 +133,10 @@ var serializer = {
 			}
 
 			return result;
+		}
+
+		if(dataTypeConverter) {
+			data = dataTypeConverter(data);
 		}
 
 		return data;

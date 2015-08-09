@@ -15,7 +15,7 @@ var parser = new ArgumentParser({description: 'Run the JavaScript client with op
 parser.addArgument(['-p', '--port'], {action: 'store', dest: 'port', defaultValue: 3000, help: 'the port that clients should connect through'});
 parser.addArgument(['-H', '--host'], {action: 'store', dest: 'host', defaultValue: "localhost", help: 'the host that this should run on'});
 parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) print IO through the TCP socket to the terminal'});
-parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) clients cannot time out'});
+parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'noTimeout', help: '(debugging) clients cannot time out'});
 
 var args = parser.parseArgs();
 

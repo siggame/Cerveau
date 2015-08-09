@@ -1,6 +1,7 @@
 // ${header}
 // Note: this file should never be modified, instead if you want to add game logic modify just the ../${obj_key}.js file. This is to ease merging main.data changes
 <%include file="functions.noCreer" />
+var serializer = require("../../../utilities/serializer");
 var Class = require("../../../utilities/class");
 % for parent_class in obj['serverParentClasses']:
 var ${parent_class} = require("../../${uncapitalize(parent_class)}");
@@ -24,13 +25,28 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 		${parent_class}.init.apply(this, arguments);
 % endfor
 
-% for attr_name, attr_parms in obj['attributes'].items():
+% for attr_name in obj['attribute_names']:
 <%
+	attr_parms = obj['attributes'][attr_name]
 	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
 		continue
 %>		this.${attr_name} = ${shared['js']['cast'](attr_parms['type'])}(data.${attr_name} === undefined ? ${shared['js']['default'](attr_parms['type'])} : data.${attr_name});
 % endfor
 
+% if obj_key == "Game":
+% for function_name in ai['function_names']:
+<%
+	function_parms = ai['functions'][function_name]
+	if function_parms['serverPredefined'] or not function_parms['returns']:
+		continue
+
+	converter = shared['js']['cast'](function_parms['returns']['type'])
+	if not converter:
+		continue
+%>		this._returnedDataTypeConverter["${function_name}"] = ${converter};
+% endfor
+
+% endif
 % for attr_name, attr_parms in obj['attributes'].items():
 <%
 	if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
@@ -47,8 +63,15 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 	gameObjectName: "${obj_key}",
 % endif
 
-% for function_name, function_parms in obj['functions'].items():
-	_run${function_name[0].upper() + function_name[1:]}: function(player, data) {
+% for function_name in obj['function_names']:
+<% function_parms = obj['functions'][function_name]
+%>	_run${function_name[0].upper() + function_name[1:]}: function(player, data) {
+% if function_parms['arguments']:
+% for arg_parms in function_parms['arguments']:
+		data.${arg_parms['name']} = ${shared['js']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
+% endfor
+
+% endif
 		var returned = this.${function_name}(player${", data.".join([""] + function_parms['argument_names'])});
 % if function_parms['returns'] != None:
 		return ${shared['js']['cast'](function_parms['returns']['type'])}(returned);

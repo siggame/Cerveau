@@ -214,6 +214,7 @@ var Lobby = Class(Server, {
 				gameName: gameSession.gameName,
 				clientInfos: clientInfos,
 				printIO: this.printIO,
+				noTimeout: this.noTimeout,
 			})
 		});
 

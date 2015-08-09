@@ -27,8 +27,9 @@ ${merge("\t\t//", "begin", "\t\t// any logic after init can be put here")}
 	},
 
 % endif
-% for function_name, function_parms in obj['functions'].items():
+% for function_name in obj['function_names']:
 <%
+	function_parms = obj['functions'][function_name]
 	if 'serverPredefined' in function_parms and function_parms['serverPredefined']:
 		continue
 %>
@@ -39,7 +40,7 @@ ${merge("\t\t//", "begin", "\t\t// any logic after init can be put here")}
 % endfor
 % endif
 % if function_parms['returns']:
-	// @returns {${shared['js']['type'](function_parms['returns'])}} ${function_parms['returns']['description']}
+	// @returns {${shared['js']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
 % endif
 	${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {
 ${merge("\t\t// ", function_name, (

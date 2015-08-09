@@ -76,8 +76,6 @@ var Client = Class({
 		this.game = game;
 		this.player = player;
 		this.name = player.name;
-
-		this.timer.timeRemaining = player.timeRemaining || this.timer.timeRemaining;
 	},
 
 	disconnect: function() {
@@ -122,6 +120,10 @@ var Client = Class({
 
 	/// starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for making commands.
 	startTicking: function() {
+		if(this.server.noTimeout) {
+			return false;
+		}
+
 		this.timer.startTime = process.hrtime();
 
 		var self = this;

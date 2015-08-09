@@ -1,6 +1,7 @@
 var Class = require("../utilities/class");
 var BaseGame = require("./baseGame");
 var extend = require("extend");
+var serializer = require("../utilities/serializer");
 
 // @class TurnBasedGame: a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
 var TurnBasedGame = Class(BaseGame, {
@@ -10,6 +11,10 @@ var TurnBasedGame = Class(BaseGame, {
 		this.currentTurn = 0;
 		this.maxTurns = 100; // real class should override this during init
 		this.currentPlayer = null;
+
+		extend(this._returnedDataTypeConverter, {
+			"runTurn": serializer.toBoolean,
+		});
 
 		extend(this._serializableKeys, {
 			"currentTurn": true,

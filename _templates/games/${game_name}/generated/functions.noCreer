@@ -2,13 +2,14 @@
 if not 'js' in shared:
     shared['js'] = {}
 
-    def js_default(base_type, default=None):
+    def js_default(type_obj, default=None):
+        base_type = type_obj['name']
         if default == None:
             if base_type == "string":
                 return '""'
             elif base_type == "dictionary":
                 return '{}'
-            elif base_type == "array":
+            elif base_type == "list":
                 return '[]'
             elif base_type == "int" or base_type == "float":
                 return '0'
@@ -24,16 +25,13 @@ if not 'js' in shared:
     shared['js']['default'] = js_default
 
 
-    def js_type(base_type, value_type=None, key_type=None):
-        if isinstance(base_type, dict):
-            value_type = base_type['valueType']
-            key_type = base_type['keyType']
-            base_type = base_type['type']
+    def js_type(type_obj):
+        base_type = type_obj['name']
 
         if base_type == "dictionary":
-            return "Object.<" + js_type(keyType) + ", " + js_type(value_type) + ">"
-        elif base_type == "array":
-            return "Array.<" + js_type(value_type) + ">"
+            return "Object.<" + js_type(type_obj['keyType']) + ", " + js_type(type_obj['valueType']) + ">"
+        elif base_type == "list":
+            return "list.<" + js_type(type_obj['valueType']) + ">"
         elif base_type == "int" or base_type == "float":
             return "number"
         else:
@@ -41,15 +39,17 @@ if not 'js' in shared:
     shared['js']['type'] = js_type
 
 
-    def js_cast(base_type):
+    def js_cast(type_obj):
+        base_type = type_obj['name']
+
         if base_type == "string":
-            return "String"
+            return "serializer.toString"
         elif base_type == "int":
-            return "parseInt"
+            return "serializer.toInteger"
         elif base_type == "float":
-            return "parseFloat"
+            return "serializer.toNumber"
         elif base_type == "boolean":
-            return "Boolean"
+            return "serializer.toBoolean"
         else:
             return ""
     shared['js']['cast'] = js_cast

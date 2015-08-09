@@ -3,6 +3,8 @@
 
 var Class = require("../../../utilities/class");
 var TurnBasedGame = require("../../turnBasedGame");
+var serializer = require("../../../utilities/serializer");
+
 
 
 // Custom Game Objects

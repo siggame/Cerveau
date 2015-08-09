@@ -3,6 +3,7 @@
 
 var Class = require("../../../utilities/class");
 var BaseGameObject = require("../../baseGameObject");
+var serializer = require("../../../utilities/serializer");
 
 
 // @class GeneratedGameObject: The generated version of the GameObject, that handles basic logic.
@@ -16,6 +17,8 @@ var GeneratedGameObject = Class(BaseGameObject, {
 	gameObjectName: "GameObject",
 
 	_runLog: function(player, data) {
+		data.message = serializer.toString(data.message);
+
 		var returned = this.log(player, data.message);
 	},
 

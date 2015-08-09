@@ -13,6 +13,7 @@ var BaseGame = Class({
 		this.session = (data.session === undefined ? "Unknown" : data.session);
 
 		this._orders = []; // orders to be sent to AI clients when the parent session is ready
+		this._returnedDataTypeConverter = {};
 		this._started = false;
 		this._over = false;
 		this._nextGameObjectID = 0;
@@ -130,6 +131,9 @@ var BaseGame = Class({
 
 	aiFinished: function(player, finished, data) {
 		var callback = this["aiFinished_" + finished];
+		if(this._returnedDataTypeConverter[finished]) {
+			data = this._returnedDataTypeConverter[finished](data);
+		}
 		var invalid = undefined;
 
 		if(callback) {
@@ -152,7 +156,7 @@ var BaseGame = Class({
 	},
 
 	aiRun: function(player, run) {
-		var callback = run.caller["_run" + run.functionName.capitalize()];
+		var callback = run.caller["_run" + run.functionName.upcaseFirst()];
 		var ran = {};
 
 		if(callback) {

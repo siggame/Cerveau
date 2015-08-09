@@ -1,6 +1,7 @@
 var Class = require("./utilities/class");
 var Server = require("./server");
 var serializer = require("./utilities/serializer");
+var utilities = require("./utilities/utilities")
 
 // @class Session: the handler of communications between a game and its clients
 var Session = Class(Server, {

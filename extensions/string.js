@@ -9,11 +9,11 @@ var StringExtensions = {
 		return this.slice(-str.length) == str;
 	},
 
-	capitalize: function() {
+	upcaseFirst: function() {
 		return this.charAt(0).toUpperCase() + this.slice(1);
 	},
 
-	uncapitalize: function() {
+	lowercaseFirst: function() {
 		return this.charAt(0).toLowerCase() + this.slice(1);
 	},
 

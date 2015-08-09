@@ -3,6 +3,7 @@
 
 var Class = require("../../../utilities/class");
 var GameObject = require("../gameObject");
+var serializer = require("../../../utilities/serializer");
 
 
 // @class GeneratedChecker: The generated version of the Checker, that handles basic logic.
@@ -29,6 +30,9 @@ var GeneratedChecker = Class(GameObject, {
 	},
 
 	_runMove: function(player, data) {
+		data.x = serializer.toInteger(data.x);
+		data.y = serializer.toInteger(data.y);
+
 		var returned = this.move(player, data.x, data.y);
 		return (returned);
 	},

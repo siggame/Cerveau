@@ -12,7 +12,11 @@ else {
 		gameSession: data.gameSession,
 		gameClass: require("./games/" + data.gameName + "/game"),
 		printIO: data.printIO,
+		noTimeout: data.noTimeout,
 	});
+
+	var portOffset = parseInt(data.gameSession) || process.pid;
+	process._debugPort = 5858 + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid
 
 	var socketIndex = 0;
 	process.on("message", function(message, handler) {

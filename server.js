@@ -28,13 +28,19 @@ var Server = Class({
 	// @param <Client> client that sent the data
 	// @param <object> data sent
 	clientSentData: function(client, data) {
-		var callback = this['_clientSent' + data.event.capitalize()]; // should be in the inherited class
+		if(data.event) {
+			var callback = this['_clientSent' + data.event.upcaseFirst()]; // should be in the inherited class
 
-		if(callback) {
-			callback.call(this, client, data.data);
+			if(callback) {
+				callback.call(this, client, data.data);
+			}
+			else {
+				console.error(this.name = ": Error - no callback for:", data.event);
+			}
 		}
 		else {
-			console.error(this.name = ": Error - not callback for:", data.event);
+			console.error(this.name + " Error - client '" + client.name + "' sent data with no event.");
+			client.send("invalid", "did not send event");
 		}
 	},
 
