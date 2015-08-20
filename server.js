@@ -4,7 +4,6 @@ var GameLogger = require("./gameLogger");
 
 var constants = require("./constants");
 var serializer = require("./utilities/serializer");
-var net = require('net');
 
 // @class Server: a base class that handles clients
 var Server = Class({
