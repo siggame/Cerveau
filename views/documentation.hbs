@@ -28,7 +28,7 @@
 			<ul>
 			{{#each functions}}
 				<li id="{{../name}}.{{name}}" class="function">
-					<header class="name"><span class="type">{{return.type}}</span> {{name}}(<ul class="inline-arguments">{{#each arguments}}<li><span class="type">{{type}}</span> {{name}}</li>{{/each}}</ul>)
+					<header class="name"><span class="type">{{returns.type}}</span> {{name}}(<ul class="inline-arguments">{{#each arguments}}<li><span class="type">{{type}}</span> {{name}}</li>{{/each}}</ul>)
 					</header>
 					{{#if inheritedFrom}}<p class="inherited">Inherited from <a href="#{{inheritedFrom}}.{{name}}">{{inheritedFrom}}.{{name}}</a></p>{{/if}}
 					<p class="description">{{description}}</p>
@@ -45,8 +45,8 @@
 					</section>
 					{{/if}}
 					<section class="returns">
-						<header>Returns <span class="type">{{return.type}}</span></header>
-						<p>{{return.description}}</p>
+						<header>Returns <span class="type">{{returns.type}}</span></header>
+						<p>{{returns.description}}</p>
 					</section>
 				</li>
 			{{/each}}

@@ -181,19 +181,28 @@ app.get('/documentation/:gameName', function(req, res) {
 			return a.name.toLowerCase() > b.name.toLowerCase();
 		};
 
-		function formatVariable(variable) {
-			if(variable.type === "dictionary") {
-				variable.type = "dictionary<" + variable.keyType + ", " + variable.valueType + ">";
+		function formatType(typeObj) {
+			var baseType = typeObj['name'];
+			switch(typeObj.name) {
+				case "dictionary":
+					return "dictionary<" + formatType(typeObj.keyType) + ", " + formatType(typeObj.valueType) + ">";
+				case "list":
+					return "list<" + formatType(typeObj.valueType) + ">";
+				default:
+					return String(baseType);
 			}
-			else if(variable.type === "array") {
-				variable.type = "array<" + variable.subType + ">";
+		};
+
+		function formatVariable(variable) {
+			if(variable.type) {
+				variable.type = formatType(variable.type);
 			}
 
-			if(variable.type === "boolean" && variable['default'] !== undefined) {
+			if(variable.type === "boolean" && variable['default'] !== null) {
 				variable['default'] = String(variable['default']);
 			}
 
-			if(variable.type === "string" && variable['default'] !== undefined) {
+			if(variable.type === "string" && variable['default'] !== null) {
 				variable['default'] = '"' + variable['default'] + '"';
 			}
 		};
@@ -227,9 +236,15 @@ app.get('/documentation/:gameName', function(req, res) {
 				addTo(docClass.functions, gameObject.functions);
 				addTo(docClass.functions, gameObject.inheritedFunctions);
 				docClass.functions.sort(sortNames);
-				for(var i = 0; i < docClass.functions; i++) {
-					formatVariable(docClass.functions[i]['return']);
-					for(var j = 0; j < docClass.functions[i].arguments.length; j++) {
+				for(var i = 0; i < docClass.functions.length; i++) {
+					var funct = docClass.functions[i];
+					if(funct.returns !== null) {
+						formatVariable(funct.returns);
+					}
+					else {
+						funct.returns = {type: "void"};
+					}
+					for(var j = 0; j < funct.arguments.length; j++) {
 						formatVariable(docClass.functions[i].arguments[j]);
 					}
 				}
