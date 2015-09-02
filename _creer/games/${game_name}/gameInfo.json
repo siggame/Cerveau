@@ -1,7 +1,7 @@
 <%
-	d = {
-		'Game': game,
-		'AI': ai,
-		"gameObjects": game_objs
-	}
+    d = {
+        'Game': game,
+        'AI': ai,
+        "gameObjects": game_objs
+    }
 %>${json.dumps(d, indent=4, sort_keys=True)}

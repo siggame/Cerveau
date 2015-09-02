@@ -10,122 +10,122 @@ var GeneratedGame = require("./generated/generatedGame");
 
 // @class Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged. Very simple.
 var Game = Class(GeneratedGame, {
-	init: function(data) {
-		GeneratedGame.init.apply(this, arguments);
+    init: function(data) {
+        GeneratedGame.init.apply(this, arguments);
 
-		//<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		this.boardWidth = 8;
-		this.boardHeight = 8;
-		this.maxTurns = 300;
-		//<<-- /Creer-Merge: init -->>
-	},
+        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        this.boardWidth = 8;
+        this.boardHeight = 8;
+        this.maxTurns = 300;
+        //<<-- /Creer-Merge: init -->>
+    },
 
-	/// this is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet.
-	begin: function() {
-		GeneratedGame.begin.apply(this, arguments);
+    /// this is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet.
+    begin: function() {
+        GeneratedGame.begin.apply(this, arguments);
 
-		//<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		this._initCheckerPieces();
-		//<<-- /Creer-Merge: begin -->>
-	},
-
-
-	//<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-	_initPlayers: function() {
-		GeneratedGame._initPlayers.apply(this, arguments);
-
-		// we can assume there are only 2 players, no need to loop through them
-		this.players[0].yDirection = 1;  // they are on top, and move down the board until kinged
-		this.players[1].yDirection = -1; // they are on bottom, and move up the board until kinged
-	},
-
-	/// initializes the checker game objects for this game
-	_initCheckerPieces: function() {
-		for(var y = 0; y < this.boardHeight; y++) {
-			for(var x = 0; x < this.boardWidth; x++) {
-				if(this.isValidTile(x, y)) {
-					var owner = undefined;
-
-					if(y < 3) { // then it is player 0's checker
-						owner = this.players[0];
-					}
-					else if(y > 4) { // then it is player 1's checker
-						owner = this.players[1];
-					} // else is the middle, which has no intial checker pieces
-
-					if(owner) {
-						var checker = this.newChecker({
-							owner: owner,
-							x: x,
-							y: y,
-							kinged: false,
-						});
-
-						this.checkers.push(checker);
-						owner.checkers.push(checker);
-					}
-				}
-
-			}
-		}
-	},
-
-	isValidTile: function(x, y) {
-		return (x + y)%2 == 1;
-	},
-
-	getCheckerAt: function(x, y) {
-		for(var i = 0; i < this.checkers.length; i++) {
-			var checker = this.checkers[i];
-
-			if(checker.x == x && checker.y == y) {
-				return checker;
-			}
-		}
-	},
+        //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        this._initCheckerPieces();
+        //<<-- /Creer-Merge: begin -->>
+    },
 
 
+    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-	///////////////////////////////
-	// Turn Based Game mechanics //
-	///////////////////////////////
+    _initPlayers: function() {
+        GeneratedGame._initPlayers.apply(this, arguments);
 
-	// inheritied from GeneratedGame (which inherited it from TurnBasedGame)
-	nextTurn: function() {
-		this.checkerMoved = null;
-		this.checkerMovedJumped = false;
+        // we can assume there are only 2 players, no need to loop through them
+        this.players[0].yDirection = 1;  // they are on top, and move down the board until kinged
+        this.players[1].yDirection = -1; // they are on bottom, and move up the board until kinged
+    },
 
-		return GeneratedGame.nextTurn.apply(this, arguments);
-	},
+    /// initializes the checker game objects for this game
+    _initCheckerPieces: function() {
+        for(var y = 0; y < this.boardHeight; y++) {
+            for(var x = 0; x < this.boardWidth; x++) {
+                if(this.isValidTile(x, y)) {
+                    var owner = undefined;
 
-	_maxTurnsReached: function() {
-		GeneratedGame._maxTurnsReached.apply(this, arguments);
+                    if(y < 3) { // then it is player 0's checker
+                        owner = this.players[0];
+                    }
+                    else if(y > 4) { // then it is player 1's checker
+                        owner = this.players[1];
+                    } // else is the middle, which has no intial checker pieces
 
-		var checkerValuesForPlayerID = {};
-		for(var i = 0; i < this.checkers.length; i++) {
-			var checker = this.checkers[i];
-			checkerValuesForPlayerID[checker.owner.id] = checkerValuesForPlayerID[checker.owner.id] || 1;
-			checkerValuesForPlayerID[checker.owner.id] += (checker.kinged ? 100 : 1);
-		}
+                    if(owner) {
+                        var checker = this.newChecker({
+                            owner: owner,
+                            x: x,
+                            y: y,
+                            kinged: false,
+                        });
 
-		// TODO: handle draw
-		var winner;
-		for(var i = 0; i < this.players.length; i++) {
-			var player = this.players[i];
-			winner = winner || player;
+                        this.checkers.push(checker);
+                        owner.checkers.push(checker);
+                    }
+                }
 
-			if(checkerValuesForPlayerID[player.id] > checkerValuesForPlayerID[winner.id]) {
-				winner = player;
-			}
-		}
+            }
+        }
+    },
 
-		if(winner) {
-			return this.declairWinner(winner, "Turn limit reached; has the most remaining checkers or kinged checkers");
-		}
-	},
+    isValidTile: function(x, y) {
+        return (x + y)%2 == 1;
+    },
 
-	//<<-- /Creer-Merge: added-functions -->>
+    getCheckerAt: function(x, y) {
+        for(var i = 0; i < this.checkers.length; i++) {
+            var checker = this.checkers[i];
+
+            if(checker.x == x && checker.y == y) {
+                return checker;
+            }
+        }
+    },
+
+
+
+    ///////////////////////////////
+    // Turn Based Game mechanics //
+    ///////////////////////////////
+
+    // inheritied from GeneratedGame (which inherited it from TurnBasedGame)
+    nextTurn: function() {
+        this.checkerMoved = null;
+        this.checkerMovedJumped = false;
+
+        return GeneratedGame.nextTurn.apply(this, arguments);
+    },
+
+    _maxTurnsReached: function() {
+        GeneratedGame._maxTurnsReached.apply(this, arguments);
+
+        var checkerValuesForPlayerID = {};
+        for(var i = 0; i < this.checkers.length; i++) {
+            var checker = this.checkers[i];
+            checkerValuesForPlayerID[checker.owner.id] = checkerValuesForPlayerID[checker.owner.id] || 1;
+            checkerValuesForPlayerID[checker.owner.id] += (checker.kinged ? 100 : 1);
+        }
+
+        // TODO: handle draw
+        var winner;
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            winner = winner || player;
+
+            if(checkerValuesForPlayerID[player.id] > checkerValuesForPlayerID[winner.id]) {
+                winner = player;
+            }
+        }
+
+        if(winner) {
+            return this.declairWinner(winner, "Turn limit reached; has the most remaining checkers or kinged checkers");
+        }
+    },
+
+    //<<-- /Creer-Merge: added-functions -->>
 
 });
 

@@ -10,19 +10,19 @@ var GeneratedPlayer = require("./generated/generatedPlayer");
 
 // @class Player: A player in this game. Every AI controls one player.
 var Player = Class(GeneratedPlayer, {
-	init: function(data) {
-		GeneratedPlayer.init.apply(this, arguments);
+    init: function(data) {
+        GeneratedPlayer.init.apply(this, arguments);
 
-		//<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		// put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
-		// NOTE: no players are connected at this point.
-		//<<-- /Creer-Merge: init -->>
-	},
+        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
+        // NOTE: no players are connected at this point.
+        //<<-- /Creer-Merge: init -->>
+    },
 
 
-	//<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-	// You can add additional functions here. These functions will not be directly callable by client AIs
-	//<<-- /Creer-Merge: added-functions -->>
+    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // You can add additional functions here. These functions will not be directly callable by client AIs
+    //<<-- /Creer-Merge: added-functions -->>
 
 });
 

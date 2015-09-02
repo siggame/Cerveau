@@ -8,52 +8,52 @@ ${merge("//", "requires", "// any additional requires you want can be required h
 
 // @class ${obj_key}: ${obj['description']}
 var ${obj_key} = Class(Generated${obj_key}, {
-	init: function(data) {
-		Generated${obj_key}.init.apply(this, arguments);
+    init: function(data) {
+        Generated${obj_key}.init.apply(this, arguments);
 
 ${merge("\t\t//", "init",
-"""		// put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
-		// NOTE: no players are connected at this point.
+"""        // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
+        // NOTE: no players are connected at this point.
 """
 )}
-	},
+    },
 
 % if obj_key == "Game":
-	/// this is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet.
-	begin: function() {
-		Generated${obj_key}.begin.apply(this, arguments);
+    /// this is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet.
+    begin: function() {
+        Generated${obj_key}.begin.apply(this, arguments);
 
 ${merge("\t\t//", "begin", "\t\t// any logic after init can be put here")}
-	},
+    },
 
 % endif
 % for function_name in obj['function_names']:
 <%
-	function_parms = obj['functions'][function_name]
-	if 'serverPredefined' in function_parms and function_parms['serverPredefined']:
-		continue
+    function_parms = obj['functions'][function_name]
+    if 'serverPredefined' in function_parms and function_parms['serverPredefined']:
+        continue
 %>
-	/// ${function_parms['description']}
+    /// ${function_parms['description']}
 % if 'arguments' in function_parms:
 % for arg_parms in function_parms['arguments']:
-	// @param {${shared['js']['type'](arg_parms['type'])}} ${arg_parms['name']}: ${arg_parms['description']}
+    // @param {${shared['js']['type'](arg_parms['type'])}} ${arg_parms['name']}: ${arg_parms['description']}
 % endfor
 % endif
 % if function_parms['returns']:
-	// @returns {${shared['js']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
+    // @returns {${shared['js']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
 % endif
-	${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {
+    ${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {
 ${merge("\t\t// ", function_name, (
-"""		// Put your game logic for the {0}'s {1} function here
-		return {2};
+"""        // Put your game logic for the {0}'s {1} function here
+        return {2};
 """
 ).format(obj_key, function_name, shared['js']['default'](function_parms['returns']['type'])))
 }
-	},
+    },
 % endfor
 
 ${merge("\t//", "added-functions",
-"""	// You can add additional functions here. These functions will not be directly callable by client AIs
+"""    // You can add additional functions here. These functions will not be directly callable by client AIs
 """
 )}
 

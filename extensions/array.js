@@ -1,47 +1,47 @@
 // Array Extensions: adding functions to the Array prototype
 
 var ArrayExtensions = {
-	removeElement: function(element) {
-		var index = this.indexOf(element);
+    removeElement: function(element) {
+        var index = this.indexOf(element);
 
-		if(index > -1) {
-			this.splice(index, 1);
-			return true;
-		}
+        if(index > -1) {
+            this.splice(index, 1);
+            return true;
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	last: function() {
-		return this[this.length - 1];
-	},
+    last: function() {
+        return this[this.length - 1];
+    },
 
-	isArray: function() {
-		return (Object.prototype.toString.call(this) === '[object Array]');
-	},
+    isArray: function() {
+        return (Object.prototype.toString.call(this) === '[object Array]');
+    },
 
-	contains: function(element) {
-		return (this.indexOf(element) > -1);
-	},
+    contains: function(element) {
+        return (this.indexOf(element) > -1);
+    },
 
-	empty: function() {
-		while(this.length > 0) {
-			this.pop();
-		}
-	},
+    empty: function() {
+        while(this.length > 0) {
+            this.pop();
+        }
+    },
 
-	clone: function() {
-		var cloned = [];
-		for(var i = 0; i < this.length; i++) {
-			cloned[i] = this[i];
-		}
+    clone: function() {
+        var cloned = [];
+        for(var i = 0; i < this.length; i++) {
+            cloned[i] = this[i];
+        }
 
-		return cloned;
-	},
+        return cloned;
+    },
 };
 
 for(var extension in ArrayExtensions) {
-	if (typeof Array.prototype[extension] != 'function') {
-		Array.prototype[extension] = ArrayExtensions[extension];
-	}
+    if (typeof Array.prototype[extension] != 'function') {
+        Array.prototype[extension] = ArrayExtensions[extension];
+    }
 }

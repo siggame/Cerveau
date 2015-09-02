@@ -34,7 +34,7 @@ Make sure Node.js is installed then:
 
 ```
 npm install
-node ./index.js
+node ./main.js
 ```
 
 That's it, your server is running! Now start up two Cadre clients such as the [Python](https://github.com/JacobFischer/Joueur.py) or [JavaScript](https://github.com/JacobFischer/Joueur.js) clients and connect them to the new server. Or visit the server in your webbrowser to view gamelogs and game documentation.
@@ -45,8 +45,3 @@ That's it, your server is running! Now start up two Cadre clients such as the [P
 You could manually code everything, but to more easily sync the game to clients (espcially non-dynamically types ones) use [Creer](https://github.com/JacobFischer/Creer) to generate some base code given the basic game structure.
 
 Then fill in the functions for the functions to you make in your game objects. Everything else should be handled by the base classes in both this server and the clients.
-
-
-## Other notes
-
-This is a polished proof-of-concept part of the Cadre framework. There are plently of bugs and issues present. The purpose at this time is not to be perfect, but to show that this framework is robust and meets all the needs of MST's ACM SIG-GAME.
