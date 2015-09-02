@@ -254,6 +254,7 @@
                             "default": null,
                             "description": "The x coordinate to move to.",
                             "name": "x",
+                            "optional": false,
                             "type": {
                                 "keyType": null,
                                 "name": "int",
@@ -264,6 +265,7 @@
                             "default": null,
                             "description": "The y coordinate to move to.",
                             "name": "y",
+                            "optional": false,
                             "type": {
                                 "keyType": null,
                                 "name": "int",
@@ -334,6 +336,7 @@
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
+                            "optional": false,
                             "type": {
                                 "keyType": null,
                                 "name": "string",
@@ -409,6 +412,7 @@
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
+                            "optional": false,
                             "type": {
                                 "keyType": null,
                                 "name": "string",
@@ -580,6 +584,7 @@
                             "default": null,
                             "description": "A string to add to this GameObject's log. Intended for debugging.",
                             "name": "message",
+                            "optional": false,
                             "type": {
                                 "keyType": null,
                                 "name": "string",
