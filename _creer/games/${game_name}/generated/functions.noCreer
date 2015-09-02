@@ -1,8 +1,8 @@
 <%
-if not 'js' in shared:
-    shared['js'] = {}
+if not 'cerveau' in shared:
+    shared['cerveau'] = {}
 
-    def js_default(type_obj, default=None):
+    def cerveau_default(type_obj, default=None):
         base_type = type_obj['name']
         if default == None:
             if base_type == "string":
@@ -22,24 +22,24 @@ if not 'js' in shared:
                 return '"' + default + '"'
             elif base_type == "boolean":
                 return str(default).lower()
-    shared['js']['default'] = js_default
+    shared['cerveau']['default'] = cerveau_default
 
 
-    def js_type(type_obj):
+    def cerveau_type(type_obj):
         base_type = type_obj['name']
 
         if base_type == "dictionary":
-            return "Object.<" + js_type(type_obj['keyType']) + ", " + js_type(type_obj['valueType']) + ">"
+            return "Object.<" + cerveau_type(type_obj['keyType']) + ", " + cerveau_type(type_obj['valueType']) + ">"
         elif base_type == "list":
-            return "list.<" + js_type(type_obj['valueType']) + ">"
+            return "list.<" + cerveau_type(type_obj['valueType']) + ">"
         elif base_type == "int" or base_type == "float":
             return "number"
         else:
             return base_type
-    shared['js']['type'] = js_type
+    shared['cerveau']['type'] = cerveau_type
 
 
-    def js_cast(type_obj):
+    def cerveau_cast(type_obj):
         base_type = type_obj['name']
 
         if base_type == "string":
@@ -52,6 +52,6 @@ if not 'js' in shared:
             return "serializer.toBoolean"
         else:
             return ""
-    shared['js']['cast'] = js_cast
+    shared['cerveau']['cast'] = cerveau_cast
 
 %>

@@ -1,7 +1,9 @@
-<%
-    d = {
+${json.dumps(
+    {
         'Game': game,
         'AI': ai,
         "gameObjects": game_objs
-    }
-%>${json.dumps(d, indent=4, sort_keys=True)}
+    },
+    indent=4,
+    sort_keys=True
+)}

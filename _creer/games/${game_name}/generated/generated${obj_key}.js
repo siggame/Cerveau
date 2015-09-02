@@ -30,7 +30,7 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
     attr_parms = obj['attributes'][attr_name]
     if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
         continue
-%>        this.${attr_name} = ${shared['js']['cast'](attr_parms['type'])}(data.${attr_name} === undefined ? ${shared['js']['default'](attr_parms['type'])} : data.${attr_name});
+%>        this.${attr_name} = ${shared['cerveau']['cast'](attr_parms['type'])}(data.${attr_name} === undefined ? ${shared['cerveau']['default'](attr_parms['type'])} : data.${attr_name});
 % endfor
 
 % if obj_key == "Game":
@@ -40,7 +40,7 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
     if function_parms['serverPredefined'] or not function_parms['returns']:
         continue
 
-    converter = shared['js']['cast'](function_parms['returns']['type'])
+    converter = shared['cerveau']['cast'](function_parms['returns']['type'])
     if not converter:
         continue
 %>        this._returnedDataTypeConverter["${function_name}"] = ${converter};
@@ -69,13 +69,13 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 %>    _run${function_name[0].upper() + function_name[1:]}: function(player, data) {
 % if function_parms['arguments']:
 % for arg_parms in function_parms['arguments']:
-        var ${arg_parms['name']} = ${shared['js']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
+        var ${arg_parms['name']} = ${shared['cerveau']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
 % endfor
 
 % endif
         var returned = this.${function_name}(player${", ".join([""] + function_parms['argument_names'])});
 % if function_parms['returns'] != None:
-        return ${shared['js']['cast'](function_parms['returns']['type'])}(returned);
+        return ${shared['cerveau']['cast'](function_parms['returns']['type'])}(returned);
 % endif
     },
 
