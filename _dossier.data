@@ -1,0 +1,14 @@
+{
+    "requirements": [ "jsdoc" ],
+    "command": [
+        "jsdoc",
+        {
+            "input_files": true,
+            "extension": "lua",
+            "path": "./"
+        },
+        "-d", {
+            "output_path": true
+        }
+    ]
+}
