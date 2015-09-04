@@ -8,6 +8,7 @@ label[for=stateSlider], #buttonControls {width: 100%; text-align: center; displa
 table, th, td {border: 1px solid black;}
 td { padding: 0.25em; width: 34px; height: 34px; vertical-align: middle; text-align: center; }
 #playerInfo {background: #121212; padding: 0.5em; font-size: 1.5em; line-height: 1.25em}
+#deltaInfo {background: #363036; padding: 0.5em; font-size: 0.75em; line-height: 1.25em; color: #eaefea; font-family: monospace;}
 .legend {background: #fff; color: #777;}
 .horizontal-legend {padding-bottom: 1em;}
 .vertical-legend {padding-right: 1em;}
@@ -19,6 +20,7 @@ td { padding: 0.25em; width: 34px; height: 34px; vertical-align: middle; text-al
 
 <div id="visualizer">
 	<div id="playerInfo"></div>
+	<div id="deltaInfo"></div>
 	<div id="gameBoard"></div>
 	<label for="stateSlider">0</label>
 	<input id="stateSlider" type="range" name="stateSlider" min="0" max="1000" />
@@ -34,6 +36,7 @@ td { padding: 0.25em; width: 34px; height: 34px; vertical-align: middle; text-al
 var $visualizer = $("#visualizer");
 var $gameBoard = $("#gameBoard");
 var $playerInfo = $("#playerInfo");
+var $deltaInfo = $("#deltaInfo");
 var $stateSlider = $("#stateSlider");
 var $stateNumber = $("label[for=stateSlider]");
 var $prevButton = $("#prevButton");
@@ -43,6 +46,7 @@ var $nextButton = $("#nextButton");
 var playString = "&#9658;";
 
 var gamelog = undefined;
+var initialState = undefined;
 var states = [];
 var tableCells = [];
 
@@ -51,13 +55,18 @@ function clone(obj) {
 };
 
 function buildStates() {
-	var intialState = {
-		gameObjects: gamelog.deltas[0].gameObjects,
+	var gameObjectState = {
+		game: { gameObjects: initialState.gameObjects }
 	}
-	states.push(mergeDelta(intialState, gamelog.deltas[0]));
+	states.push(mergeDelta(gameObjectState, gamelog.deltas[0])); // ensures there is a previous state (the intial one) for following loop which merges deltas
 
 	for(var i = 1; i < gamelog.deltas.length; i++) {
-		states.push(mergeDelta(clone(states[i-1]), gamelog.deltas[i]));
+		var delta = gamelog.deltas[i];
+		states.push({
+			type: delta.type,
+			data: delta.data,
+			game: mergeDelta(clone(states[i-1].game), gamelog.deltas[i].game)
+		});
 	}
 };
 
@@ -67,7 +76,7 @@ function isObject(obj) {
 
 function isGameObject(obj) {
 	return isObject(obj) && Object.keys(obj).length == 1 && obj.id !== undefined;
-}
+};
 
 function mergeDelta(state, delta) {
 	var deltaLength = delta["&LEN"];
@@ -140,20 +149,21 @@ var initGameBoard = function(data) {
 	}
 };
 
-function updateBoard(stateNumber) {
-	var state = states[stateNumber];
+function updateBoard(gameNumber) {
+	var state = states[gameNumber];
+	var game = state.game;
 	var locations = [];
-	for(var x = 0; x < state.boardWidth; x++) {
+	for(var x = 0; x < game.boardWidth; x++) {
 		locations[x] = [];
 	}
 
-	for(var i = 0; i < state.checkers.length; i++) {
-		var checker = state.gameObjects[state.checkers[i].id];
+	for(var i = 0; i < game.checkers.length; i++) {
+		var checker = game.gameObjects[game.checkers[i].id];
 		locations[checker.x][checker.y] = checker;
 	}
 
-	for(var x = 0; x < state.boardWidth; x++) {
-		for(var y = 0; y < state.boardHeight; y++) {
+	for(var x = 0; x < game.boardWidth; x++) {
+		for(var y = 0; y < game.boardHeight; y++) {
 			var cell = tableCells[x][y];
 			var checker = locations[x][y];
 			var val = "&nbsp;";
@@ -174,11 +184,14 @@ function updateBoard(stateNumber) {
 		}
 	}
 
-	strs = [];
-	for(var i = 0; i < state.players.length; i++) {
-		var player = state.gameObjects[state.players[i].id];
 
-		var str = '<span class="owner-' + player.id + '">Player ' + player.name + " (id: " + player.id + ")" + (state.currentPlayer.id === player.id ? " <strong>is current player</strong>" : "");
+	// update player info
+
+	strs = [];
+	for(var i = 0; i < game.players.length; i++) {
+		var player = game.gameObjects[game.players[i].id];
+
+		var str = '<span class="owner-' + player.id + '">Player ' + player.name + " (id: " + player.id + ")" + (game.currentPlayer.id === player.id ? " <strong>is current player</strong>" : "");
 
 		if(player.won) {
 			str += '<br><strong style="margin-left: 1em">won</strong> because ' + player.reasonWon + "<br/>";
@@ -191,6 +204,20 @@ function updateBoard(stateNumber) {
 	}
 
 	$playerInfo.html(strs.join("<br/>"));
+
+
+	// update delta info
+
+	str = "Delta: ";
+	if(state.type) {
+		str += state.type + " = ";
+	}
+
+	if(state.data) {
+		str += JSON.stringify(state.data);
+	}
+
+	$deltaInfo.html(str);
 };
 
 currentStateNum = 0;
@@ -272,7 +299,7 @@ function initButtons() {
 }
 
 function init() {
-	initialState = gamelog.deltas[0];
+	initialState = gamelog.deltas[0].game;
 
 	buildStates();
 
