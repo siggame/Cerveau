@@ -173,7 +173,7 @@ var Session = Class(Server, {
             return; // because they can't run anything right now
         }
 
-        var ran = this.game.aiRun(client.player, serializer.deserialize(run, this.game))
+        var ran = this.game.aiRun(client.player, run);
 
         this._checkGameState();
 
@@ -181,7 +181,7 @@ var Session = Class(Server, {
             client.send("invalid", run);
         }
         else {
-            client.send("ran", serializer.serialize(ran.returned, this.game.gameObjects));
+            client.send("ran", serializer.serialize(ran.returned, this.game));
         }
     },
 
@@ -198,8 +198,7 @@ var Session = Class(Server, {
             return;
         }
 
-        var returnedData = serializer.deserialize(data.returned, this.game);
-        var invalid = this.game.aiFinished(client.player, data.finished, returnedData);
+        var invalid = this.game.aiFinished(client.player, data.finished, data.returned);
 
         if(invalid) {
             client.send("invalid", invalid);

@@ -1,6 +1,5 @@
 var Class = require("../utilities/class");
 var errors = require("../errors");
-var constants = require("../constants");
 var serializer = require("../utilities/serializer");
 var moment = require('moment');
 
@@ -33,7 +32,7 @@ var BaseGame = Class({
         };
     },
 
-    // The following variable are static, and no game instances should override these
+    // The following variable are static, and no game instances should override these, but their class prototypes can
     name: "Base Game", // should be overwritten by the GeneratedGame inheriting this
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: 10,
@@ -47,21 +46,21 @@ var BaseGame = Class({
     /**
      * Called then the game starts. Do not inherit this method, instead use begin()
      *
-     * @param players {Array.<Client>} of clients that are playing this game as a player
+     * @param {Array.<Client>} clients - list of clients that are playing this game, and need a player
      */
     start: function(clients) {
         this._initPlayers(clients);
 
-        this.begin();
+        var startData = this.begin();
 
-        this._updateSerializableStates();
+        this._updateSerializableStates("start", startData);
         this._started = true;
     },
 
     /**
      * Returns a boolean representing if the game has started
      *
-     * @returns boolean representing if the game has started yet.
+     * @returns {boolean} represents if the game has started yet.
      */
     hasStarted: function() {
         return this._started;
@@ -71,6 +70,7 @@ var BaseGame = Class({
      * Called when the game actually starts and has it's players. Intended to be inherited and extended when the game should be started (e.g. initializing game objects)
      *
      * @inheritable
+     * @returns {*} returns any start data you want stored in the game log, such as the random seed (if any procedural generation is used)
      */
     begin: function() {
         // This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
@@ -85,7 +85,7 @@ var BaseGame = Class({
     /**
      * Initializes the players based on what clients are connected.
      *
-     * @param {Array.<Client>} all client connected to this game, each will have a corresponding player created for it.
+     * @param {Array.<Client>} clients - all client connected to this game, each will have a corresponding player created for it.
      */
     _initPlayers: function(clients) {
         for(var i = 0; i < clients.length; i++) {
@@ -106,8 +106,8 @@ var BaseGame = Class({
     /**
      * Called when a client disconnected to remove the client from the game and check if they have a player and if removing them alters the game
      *
-     * @param {Player} the player whose client disconnected
-     * @param {string} human readable resason why this player disconnected
+     * @param {Player} player - the player whose client disconnected
+     * @param {string} reason - human readable resason why this player disconnected
      */
     playerDisconnected: function(player, reason) {
         if(player && this.hasStarted() && !this.isOver()) {
@@ -172,27 +172,34 @@ var BaseGame = Class({
      * Called when a session gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
      *
      * @param {Player} the player this ai controls
-     * @param {string} the order they finished
-     * @param {Object} (optional) data returned from the ai executing that order
+     * @param {string} finished - the name of the order they finished
+     * @param {Object} [data] - serialized data returned from the ai executing that order
+     * @returns {Object|undefined} if an error was encountered an invalid object will be returned, undefined if everything went correctly.
      */
     aiFinished: function(player, finished, data) {
         var callback = this["aiFinished_" + finished];
-        if(this._returnedDataTypeConverter[finished]) {
-            data = this._returnedDataTypeConverter[finished](data);
+        var returned = serializer.deserialize(data, this);
+
+        if(this._returnedDataTypeConverter[finished]) { // then we need to "sanatize" what they sent to the type we expected them to return, e.g. C++ returning the string "true" instead of the boolean true.
+            returned = this._returnedDataTypeConverter[finished](returned);
         }
         var invalid = undefined;
 
         if(callback) {
             try {
-                callback.call(this, player, data);
+                callback.call(this, player, returned);
             }
             catch(e) {
                 if(Class.isInstance(e, errors.GameLogicError)) {
-                    invalid = {finished: finished, data: data, message: e.message};
+                    invalid = {finished: finished, returned: returned, message: e.message};
                 }
             }
 
-            this._updateSerializableStates();
+            this._updateSerializableStates("finished", {
+                player: serializer.serialize(player, this),
+                order: finished,
+                returned: data,
+            });
         }
         else {
             invalid = {finished: finished}
@@ -204,10 +211,12 @@ var BaseGame = Class({
     /**
      * Called when a session gets the "run" event from an ai (client), meaning they want the game to run some game logic.
      * 
-     * @param {Player} the player this ai controls
-     * @param {Object} data containing what game logic to run.
+     * @param {Player} player - the player this ai controls
+     * @param {Object} data - serialized data containing what game logic to run.
+     * @returns {*} Whatever the game logic returned from running the 'run' command.
      */
-    aiRun: function(player, run) {
+    aiRun: function(player, data) {
+        var run = serializer.deserialize(data, this);
         var callback = run.caller["_run" + run.functionName.upcaseFirst()];
         var ran = {};
 
@@ -224,7 +233,10 @@ var BaseGame = Class({
                 }
             }
             
-            this._updateSerializableStates();
+            this._updateSerializableStates("run", {
+                player: serializer.serialize(player, this),
+                data: data,
+            });
         }
         else {
             ran.invalid = {functionName: functionName};
@@ -277,8 +289,11 @@ var BaseGame = Class({
 
     /**
      * Updates all the private states used to generate delta states and game logs.
+     *
+     * @param {string} deltaType - the type of delta that occured (the reason why the state changed)
+     * @param {Object} [deltaData] - data about the delta, such as parameters sent that changed it
      */
-    _updateSerializableStates: function() {
+    _updateSerializableStates: function(deltaType, deltaData) {
         this.hasStateChanged = false;
 
         var last = this._currentSerializableState || {};
@@ -290,9 +305,13 @@ var BaseGame = Class({
             this._lastSerializableState = last;
             this._currentSerializableState = current;
             this._serializableDeltaState = delta;
-
-            this._deltas.push(delta);
         }
+
+        this._deltas.push({
+            type: deltaType,
+            data: deltaData,
+            game: delta,
+        });
     },
 
     /**
