@@ -4,7 +4,8 @@ var serializer = require("../utilities/serializer");
 var moment = require('moment');
 
 /**
- * @class BaseGame: the base game plugin new games should inherit from.
+ * @abstract
+ * @class BaseGame - the base game plugin new games should inherit from.
  */
 var BaseGame = Class({
     init: function(data) {

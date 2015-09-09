@@ -57,13 +57,14 @@ var Lobby = Class(Server, {
             var dir = dirs[i];
             try {
                 var path = "./games/" + dir + "/game";
-                this.gameClasses[dir] = require(path);
-                this.gameNames.push(dir);
-                this.gameSessions[dir] = {};
-                console.log(this.name + ": found game '" + dir + "'");
+                var gameName = dir.upcaseFirst();
+                this.gameClasses[gameName] = require(path);
+                this.gameNames.push(gameName);
+                this.gameSessions[gameName] = {};
+                console.log(this.name + ": found game '" + gameName + "'");
             }
             catch(e) {
-                console.log(this.name + ": ERROR:  directory "+ dir + " in games/ is not a valid game.");
+                console.log(this.name + ": ERROR:  directory '"+ dir + "'' in games/ is not a valid game.");
             }
         }
     },
@@ -71,8 +72,8 @@ var Lobby = Class(Server, {
     /**
      * Retrieves, and possibly creates a new, game of gameName in gameSession which is on a completely different thread
      *
-     * @param {string} key identifying the name of the game you want. Should exist in games/
-     * @param {string} (optional) basically a room id. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one, and "new" will always give you a brand new room even if there are open ones.
+     * @param {string} gameName - key identifying the name of the game you want. Should exist in games/
+     * @param {string} [sessionID] - basically a room id. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one, and "new" will always give you a brand new room even if there are open ones.
      * @returns {BaseGame} the game of gameName and gameSession. If one does not exists a new instance will be created
      */
     getRequestedGameSession: function(gameName, sessionID) {
@@ -106,8 +107,8 @@ var Lobby = Class(Server, {
     /**
      * Gets the game session info, which is basically all the information about the game running in another thread without bothering the thread itself.
      * 
-     * @param {string} the name of the game
-     * @param {string} the session for the game you want the info for
+     * @param {string} gameName - the name of the game
+     * @param {string} sessionID - the session for the game you want the info for
      * @returns {Object} all the data about the game session as last we heard from the game thread.
      */
     getGameSessionInfo: function(gameName, sessionID) {

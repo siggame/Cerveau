@@ -6,7 +6,8 @@ var constants = require("./constants");
 var serializer = require("./utilities/serializer");
 
 /**
- * @class Server: a base class that handles clients
+ * @abstract
+ * @class Server - a base class that handles clients. It does not automatically listen for clients, just handles sockets added to it.
  */
 var Server = Class({
     init: function(options) {
@@ -20,8 +21,8 @@ var Server = Class({
     /**
      * listener function that creates a new Client for the given socket being added
      *
-     * @param {net.Socket} socket connecting
-     * @param {Object} data about the connecting client
+     * @param {net.Socket} socket - socket connecting
+     * @param {Object} [clientInfo] - data about the connecting client
      * @returns {Client} newly created client for the passed in socket
      */
     addSocket: function(socket, clientInfo) {
@@ -35,8 +36,8 @@ var Server = Class({
     /**
      * When the client sends data via socket connection, invoked by Clients.
      *
-     * @param {Client} client that sent the data. This SHOULD be an event to be handled by the inheriting Server Class
-     * @param {object} data sent from client
+     * @param {Client} client - client that sent the data. This SHOULD be an event to be handled by the inheriting Server Class
+     * @param {object} data - data sent from client
      */
     clientSentData: function(client, data) {
         if(data.event) {
@@ -58,8 +59,8 @@ var Server = Class({
     /**
      * Called from a Client when it's socket disconnects
      * 
-     * @param {Client} the client that disconnected.
-     * @param {string} human readable string why it disconnected
+     * @param {Client} client - the client that disconnected.
+     * @param {string} [reason] - human readable string why it disconnected
      * @returns {Client} the same client that disconnected
      */
     clientDisconnected: function(client, reason) {
@@ -73,8 +74,8 @@ var Server = Class({
     /**
      * Called from a client when it times out
      *
-     * @param {Client} client that timed out
-     * @param {string} human readable string why the client timed out (probably just contains how long it waited before timing out).
+     * @param {Client} client - the client that timed out
+     * @param {string} [reason] - human readable string why the client timed out (probably just contains how long it waited before timing out).
      */
     clientTimedOut: function(client, reason) {
         console.log(this.name + ": Client " + client.name + " timed out");

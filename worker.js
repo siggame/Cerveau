@@ -11,7 +11,7 @@ else {
     var session = new Session({
         gameName: data.gameName,
         gameSession: data.gameSession,
-        gameClass: require("./games/" + data.gameName + "/game"),
+        gameClass: require("./games/" + data.gameName.lowercaseFirst() + "/game"),
         printIO: data.printIO,
         noTimeout: data.noTimeout,
     });

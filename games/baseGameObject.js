@@ -2,7 +2,8 @@ var Class = require("../utilities/class");
 var extend = require("extend");
 
 /**
- * @class BaseGameObject: the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
+ * @abstract
+ * @class BaseGameObject - the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
  */
 var BaseGameObject = Class({
     init: function(data) {
@@ -21,6 +22,9 @@ var BaseGameObject = Class({
 
     /**
      * logs a string to this BaseGameObject's log array, for debugging purposes. This is called from a 'run' event.
+     *
+     * @param {Player} player - the player requesting to log the string to this game object
+     * @param {string} message - string to log
      */
     log: function(player, message) {
         this.logs.push(message);

@@ -1,11 +1,12 @@
 {
-  "name": "socket-chat-example",
+  "name": "Cerveau",
   "version": "0.0.1",
   "description": "The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.",
   "repository": {
     "type": "git",
     "url": "git://github.com/JacobFischer/Cerveau"
   },
+  "private": true,
   "dependencies": {
     "express": "4.10.2",
     "express-handlebars": "2.0.0",
