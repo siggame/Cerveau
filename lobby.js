@@ -1,6 +1,7 @@
 var Class = require("./utilities/class");
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
+var Authenticator = require("./authenticator");
 
 var utilities = require("./utilities/utilities");
 var constants = require("./constants");
@@ -17,10 +18,12 @@ var Lobby = Class(Server, {
         this.name = "Lobby @ " + process.pid;
         this.host = args.host;
         this.port = args.port;
+        this.authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
         this.gameNames = [];
         this.gameSessions = {};
         this.gameClasses = [];
 
+        this._authenticator = new Authenticator(this.authenticate);
         this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
         this._nextGameNumber = 1;
 
@@ -190,34 +193,47 @@ var Lobby = Class(Server, {
     /**
      * When a client sends the 'play' event, which tells the server what it wants to play and as who.
      *
-     * @param {Client} client that send the 'play'
-     * @param {Object} data about playing. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
+     * @param {Client} client - the client that send the 'play'
+     * @param {Object} data - information about what this client wants to play. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
      */
     _clientSentPlay: function(client, data) {
         if(!this.gameClasses[data.gameName]) {
-            client.send("invalid", data);
+            client.send("invalid", {message: "invalid gameName"});
             client.disconnect();
             return;
         }
 
-        var gameSession = this.getRequestedGameSession(data.gameName, data.requestedSession);
+        var self = this;
+        this._authenticator.authenticate({
+            gameName: data.gameName,
+            username: data.playerName,
+            password: data.password,
+            success: function() {
+                var gameSession = self.getRequestedGameSession(data.gameName, data.requestedSession);
 
-        client.setInfo({
-            name: data.playerName,
-            type: data.clientType,
+                client.setInfo({
+                    name: data.playerName,
+                    type: data.clientType,
+                });
+
+                gameSession.clients.push(client);
+
+                client.send("lobbied", {
+                    gameName: gameSession.gameName,
+                    gameSession: gameSession.id,
+                    constants: constants.shared,
+                });
+
+                if(gameSession.clients.length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
+                    self._threadGameSession(gameSession);
+                }
+            },
+            failure: function() {
+                client.send("unauthenticated");
+                client.disconnect();
+                return;
+            },
         });
-
-        gameSession.clients.push(client);
-
-        client.send("lobbied", {
-            gameName: gameSession.gameName,
-            gameSession: gameSession.id,
-            constants: constants.shared,
-        });
-
-        if(gameSession.clients.length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
-            this._threadGameSession(gameSession);
-        }
     },
 
     /**
