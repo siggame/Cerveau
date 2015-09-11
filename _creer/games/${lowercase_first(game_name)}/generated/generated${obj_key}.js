@@ -4,17 +4,17 @@
 var serializer = require("../../../utilities/serializer");
 var Class = require("../../../utilities/class");
 % for parent_class in obj['serverParentClasses']:
-var ${parent_class} = require("../../${uncapitalize(parent_class)}");
+var ${parent_class} = require("../../${lowercase_first(parent_class)}");
 % endfor
 % for parent_class in obj['parentClasses']:
-var ${parent_class} = require("../${uncapitalize(parent_class)}");
+var ${parent_class} = require("../${lowercase_first(parent_class)}");
 % endfor
 <%parent_classes = obj['parentClasses'] + obj['serverParentClasses']%>
 % if obj_key == "Game":
 
 // Custom Game Objects
-% for game_obj_key, game_obj in game_objs.items():
-var ${game_obj_key} = require("../${uncapitalize(game_obj_key)}");
+% for game_obj_name in game_obj_names:
+var ${game_obj_name} = require("../${lowercase_first(game_obj_name)}");
 % endfor
 % endif
 
@@ -89,12 +89,16 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 
 % endfor
 % if obj_key == "Game":
-% for game_obj_key, game_obj in game_objs.items():
+% for game_obj_name in game_obj_names:
 
-    /// Creates a new instance of the ${game_obj_key} game object that has reference to the creating game
-    new${game_obj_key}: function(data) {
+    /**
+     * Creates a new instance of the ${game_obj_name} game object that has reference to the creating game
+     *
+     * @returns {${game_obj_name}} a new ${game_obj_name}
+     */
+    new${game_obj_name}: function(data) {
         data.game = this;
-        return new ${game_obj_key}(data);
+        return new ${game_obj_name}(data);
     },
 % endfor
 % endif

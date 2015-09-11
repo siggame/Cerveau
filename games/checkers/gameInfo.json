@@ -6,6 +6,7 @@
         ],
         "functions": {
             "runTurn": {
+                "altersState": true,
                 "argument_names": [],
                 "arguments": [],
                 "description": "This is called every time the AI is asked to respond with a command during their turn",
@@ -56,9 +57,9 @@
                 }
             },
             "checkerMoved": {
-                "arenaInterest": "sum",
                 "default": null,
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
+                "k-means": "sum",
                 "type": {
                     "keyType": null,
                     "name": "Checker",
@@ -66,9 +67,9 @@
                 }
             },
             "checkerMovedJumped": {
-                "arenaInterest": "sum",
                 "default": null,
                 "description": "If the last checker that moved jumped, meaning it can move again.",
+                "k-means": "sum",
                 "type": {
                     "keyType": null,
                     "name": "boolean",
@@ -184,9 +185,9 @@
             ],
             "attributes": {
                 "kinged": {
-                    "arenaInterest": "sum",
                     "default": false,
                     "description": "If the checker has been kinged and can move backwards.",
+                    "k-means": "sum",
                     "type": {
                         "keyType": null,
                         "name": "boolean",

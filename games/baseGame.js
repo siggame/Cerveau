@@ -181,42 +181,48 @@ var BaseGame = Class({
      */
     aiFinished: function(player, orderIndex, data) {
         var order = this._orders[orderIndex];
-        var finished = order.name;
-        var defaultCallback = this["aiFinished_" + finished];
-        var returned = serializer.deserialize(data, this);
-
-        if(this._returnedDataTypeConverter[finished]) { // then we need to "sanatize" what they sent to the type we expected them to return, e.g. C++ returning the string "true" instead of the boolean true.
-            returned = this._returnedDataTypeConverter[finished](returned);
-        }
-
         var invalid = undefined;
-        var hadCallback = true;
-        try {
-            if(order.callback) {
-                order.callback(returned);
-            }
-            else if(defaultCallback) {
-                defaultCallback.call(this, player, returned);
-            }
-            else {
-                hadCallback = false;
-            }
-        }
-        catch(e) {
-            if(Class.isInstance(e, errors.GameLogicError)) {
-                invalid = {finished: finished, returned: returned, message: e.message};
-            }
-        }
-
-        if(hadCallback) {
-            this._updateSerializableStates("finished", {
-                player: serializer.serialize(player, this),
-                order: finished,
-                returned: data,
-            });
+        if(order === undefined) {
+            invalid = {message: "no order found that you claim to have finished."}
         }
         else {
-            invalid = {finished: finished, message: "No callback for finshed order."}
+            var finished = order.name;
+            var defaultCallback = this["aiFinished_" + finished];
+            var returned = serializer.deserialize(data, this);
+
+            if(this._returnedDataTypeConverter[finished]) { // then we need to "sanatize" what they sent to the type we expected them to return, e.g. C++ returning the string "true" instead of the boolean true.
+                returned = this._returnedDataTypeConverter[finished](returned);
+            }
+
+            
+            var hadCallback = true;
+            try {
+                if(order.callback) {
+                    order.callback(returned);
+                }
+                else if(defaultCallback) {
+                    defaultCallback.call(this, player, returned);
+                }
+                else {
+                    hadCallback = false;
+                }
+            }
+            catch(e) {
+                if(Class.isInstance(e, errors.GameLogicError)) {
+                    invalid = {finished: finished, returned: returned, message: e.message};
+                }
+            }
+
+            if(hadCallback) {
+                this._updateSerializableStates("finished", {
+                    player: serializer.serialize(player, this),
+                    order: finished,
+                    returned: data,
+                });
+            }
+            else {
+                invalid = {finished: finished, message: "No callback for finshed order."}
+            }
         }
 
         return invalid;
