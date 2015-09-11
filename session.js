@@ -110,9 +110,9 @@ var Session = Class(Server, {
     /**
      * Called when the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
      */
-    _gameOver: function(game) {
+    _gameOver: function() {
         this._sentOver = true;
-        console.log(this.name + ": game is over");
+        console.log(this.name + ": Game is over.");
 
         for(var i = 0; i < this.clients.length; i++) {
             this.clients[i].send("over"); // TODO: send link to gamelog, or something like that.
@@ -130,20 +130,21 @@ var Session = Class(Server, {
         var orders = this.game.popOrders();
 
         for(var i = 0; i < orders.length; i++) {
-            var data = orders[i];
-            data.player.client.send("order", {
-                order: data.order,
-                args: data.args,
+            var order = orders[i];
+            order.player.client.send("order", {
+                name: order.name,
+                index: order.index,
+                args: order.args,
             });
 
-            data.player.client.startTicking();
+            order.player.client.startTicking();
         }
     },
 
     /**
      * Checks if the client should be ignored because it is in a game ending condition
      *
-     * @param {Client} client to check if it should be ignored
+     * @param {Client} client - client to check if it should be ignored
      * @returns {boolean} true if the client should be ignored, false otherwise
      */
     _checkToIgnoreClient: function(client) {
@@ -163,8 +164,8 @@ var Session = Class(Server, {
     /**
      * A client sent a 'run' command, which is a request for the game to run game logic
      *
-     * @param {Client} the client that sent this run event
-     * @param {Object} run data
+     * @param {Client} client - the client that sent this run event
+     * @param {Object} run - run data
      */
     _clientSentRun: function(client, run) {
         client.pauseTicking();
@@ -173,23 +174,23 @@ var Session = Class(Server, {
             return; // because they can't run anything right now
         }
 
-        var ran = this.game.aiRun(client.player, run);
+        var self = this;
+        this.game.aiRun(client.player, run)
+            .then(function(returned) {
+                self._checkGameState();
 
-        this._checkGameState();
-
-        if(ran === undefined) {
-            client.send("invalid", run);
-        }
-        else {
-            client.send("ran", serializer.serialize(ran.returned, this.game));
-        }
+                client.send("ran", serializer.serialize(returned, self.game));
+            })
+            .catch(function(reason) {
+                client.send("invalid", reason);
+            });
     },
 
     /**
      * A client sent a 'finished' command, which is what happens when it finished an order
      *
-     * @param {Client} the client that sent this finished event
-     * @param {Object} finished data
+     * @param {Client} client - the client that sent this finished event
+     * @param {Object} data - finished data
      */
     _clientSentFinished: function(client, data) {
         client.pauseTicking();
@@ -198,7 +199,7 @@ var Session = Class(Server, {
             return;
         }
 
-        var invalid = this.game.aiFinished(client.player, data.finished, data.returned);
+        var invalid = this.game.aiFinished(client.player, data.orderIndex, data.returned);
 
         if(invalid) {
             client.send("invalid", invalid);

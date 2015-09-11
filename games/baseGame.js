@@ -14,7 +14,8 @@ var BaseGame = Class({
         this.gameObjects = {};
         this.session = (data.session === undefined ? "Unknown" : data.session);
 
-        this._orders = []; // orders to be sent to AI clients when the parent session is ready
+        this._orders = [];
+        this._newOrdersToPopIndex = 0;
         this._returnedDataTypeConverter = {};
         this._started = false;
         this._over = false;
@@ -37,6 +38,7 @@ var BaseGame = Class({
     name: "Base Game", // should be overwritten by the GeneratedGame inheriting this
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: 10,
+    _orderFlag: {isOrderFlag: true},
 
 
 
@@ -173,29 +175,40 @@ var BaseGame = Class({
      * Called when a session gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
      *
      * @param {Player} the player this ai controls
-     * @param {string} finished - the name of the order they finished
+     * @param {number} orderIndex - the index of the order that finished
      * @param {Object} [data] - serialized data returned from the ai executing that order
      * @returns {Object|undefined} if an error was encountered an invalid object will be returned, undefined if everything went correctly.
      */
-    aiFinished: function(player, finished, data) {
-        var callback = this["aiFinished_" + finished];
+    aiFinished: function(player, orderIndex, data) {
+        var order = this._orders[orderIndex];
+        var finished = order.name;
+        var defaultCallback = this["aiFinished_" + finished];
         var returned = serializer.deserialize(data, this);
 
         if(this._returnedDataTypeConverter[finished]) { // then we need to "sanatize" what they sent to the type we expected them to return, e.g. C++ returning the string "true" instead of the boolean true.
             returned = this._returnedDataTypeConverter[finished](returned);
         }
+
         var invalid = undefined;
-
-        if(callback) {
-            try {
-                callback.call(this, player, returned);
+        var hadCallback = true;
+        try {
+            if(order.callback) {
+                order.callback(returned);
             }
-            catch(e) {
-                if(Class.isInstance(e, errors.GameLogicError)) {
-                    invalid = {finished: finished, returned: returned, message: e.message};
-                }
+            else if(defaultCallback) {
+                defaultCallback.call(this, player, returned);
             }
+            else {
+                hadCallback = false;
+            }
+        }
+        catch(e) {
+            if(Class.isInstance(e, errors.GameLogicError)) {
+                invalid = {finished: finished, returned: returned, message: e.message};
+            }
+        }
 
+        if(hadCallback) {
             this._updateSerializableStates("finished", {
                 player: serializer.serialize(player, this),
                 order: finished,
@@ -203,7 +216,7 @@ var BaseGame = Class({
             });
         }
         else {
-            invalid = {finished: finished}
+            invalid = {finished: finished, message: "No callback for finshed order."}
         }
 
         return invalid;
@@ -214,61 +227,79 @@ var BaseGame = Class({
      * 
      * @param {Player} player - the player this ai controls
      * @param {Object} data - serialized data containing what game logic to run.
-     * @returns {*} Whatever the game logic returned from running the 'run' command.
+     * @returns {Promise} A promise that should eventually resolve to whatever the game logic returned from running the 'run' command.
      */
     aiRun: function(player, data) {
         var run = serializer.deserialize(data, this);
-        var callback = run.caller["_run" + run.functionName.upcaseFirst()];
+        var runCallback = run.caller["_run" + run.functionName.upcaseFirst()];
         var ran = {};
 
-        if(callback) {
+        var kwargs = run.args || {};
+        var asyncReturnWrapper = {}; // just an object both asyncReturn and the promise have scope to to pass things to and from.
+        var asyncReturn = function(asyncReturnValue) { asyncReturnWrapper.callback(asyncReturnValue); }; // callback function setup below
+
+        var self = this;
+        return new Promise(function(resolve, reject) {
             try {
-                ran.returned = callback.call(run.caller, player, run.args || {});
-            }
-            catch(e) {
-                if(Class.isInstance(e, errors.GameLogicError)) {
-                    ran.invalid = {args: run.args, message: e.message};
+                var ranData = runCallback.call(run.caller, player, kwargs, asyncReturn);
+
+                if(ranData.altersState) {
+                    self._updateSerializableStates("run", {
+                        player: serializer.serialize(player, self),
+                        data: data,
+                    });
+                }
+
+                if(ranData.returned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
+                    asyncReturnWrapper.callback = function(asyncReturnValue) {
+                        resolve(asyncReturnValue);
+                    };
                 }
                 else {
-                    throw e; // a different, unexpected, error occured
+                    resolve(ranData.returned);
                 }
             }
-            
-            this._updateSerializableStates("run", {
-                player: serializer.serialize(player, this),
-                data: data,
-            });
-        }
-        else {
-            ran.invalid = {functionName: functionName};
-        }
-
-        return ran;
+            catch(e) {
+                reject(e);
+            }
+        });
     },
 
     /**
      * Called internally by games to order ais (clients) to execute some order.
      *
-     * @param {Player} player that we want to execture the order
-     * @param {string} the name of the order to execute
-     * @param {Array} (optional) an array that represents the args to send to the order function on the client ai
+     * @param {Player} player - the player that we want to execture the order
+     * @param {string} orderName - the name of the order to the player's ai to execute
+     * @param {Array} [args] - an array that represents the args to send to the order function on the client ai, or [callback] if no args
+     * @param {function} [callback] - callback function to execute instead of the normal aiFinished callback
      */
-    order: function(player, order, args) {
+    order: function(player, orderName, args, callback) {
+        if(callback === undefined && typeof(args) == "function") {
+            callback = args;
+        }
+
         this._orders.push({
             player: player,
-            order: order,
+            index: this._orders.length,
+            name: orderName,
             args: args || [],
+            callback: callback,
         });
+
+        return BaseGame._orderFlag;
     },
 
     /**
-     * Called from the session to send this order to the ais (clients). Pops an order off the internal orders stack.
+     * Called from the session to send this order to the ais (clients). Pops all orders added since the last time this was called
      *
-     * @param {Object} the order the session should send
+     * @returns {Array.<Object>} array of orders to send
      */
     popOrders: function() {
-        var orders = this._orders.clone();
-        this._orders.empty();
+        var orders = [];
+        for(var i = this._newOrdersToPopIndex; i < this._orders.length; i++) {
+            orders.push(this._orders[i]);
+        }
+        this._newOrdersToPopIndex = this._orders.length;
         return orders;
     },
 

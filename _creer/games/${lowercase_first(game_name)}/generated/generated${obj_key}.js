@@ -66,16 +66,24 @@ var Generated${obj_key} = Class(${", ".join(parent_classes) + "," if parent_clas
 
 % for function_name in obj['function_names']:
 <% function_parms = obj['functions'][function_name]
-%>    _run${function_name[0].upper() + function_name[1:]}: function(player, data) {
+%>    _run${upcase_first(function_name)}: function(player, data, asyncReturn) {
 % if function_parms['arguments']:
 % for arg_parms in function_parms['arguments']:
         var ${arg_parms['name']} = ${shared['cerveau']['cast'](arg_parms['type'])}(data.${arg_parms['name']});
+% if arg_parms['optional']:
+        ${arg_parms['name']} = (${arg_parms['name']} === undefined ? ${shared['cerveau']['default'](arg_parms['type'], arg_parms['default'])} : ${arg_parms['name']}); // this parameter is optional, so we will fill in the default value if it was not sent.
+% endif
 % endfor
 
 % endif
-        var returned = this.${function_name}(player${", ".join([""] + function_parms['argument_names'])});
+        var returned = this.${function_name}(player${", ".join([""] + function_parms['argument_names'])}, asyncReturn);
 % if function_parms['returns'] != None:
-        return ${shared['cerveau']['cast'](function_parms['returns']['type'])}(returned);
+        returned = ${shared['cerveau']['cast'](function_parms['returns']['type'])}(returned);
+
+        return {
+            returned: returned,
+            altersState: ${'true' if function_parms['altersState'] else 'false'},
+        };
 % endif
     },
 

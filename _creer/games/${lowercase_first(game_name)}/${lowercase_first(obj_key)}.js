@@ -53,11 +53,12 @@ ${merge("        //", "begin", "        // any logic after init can be put here"
      * @param {${shared['cerveau']['type'](arg_parms['type'])}} ${arg_parms['name']} - ${arg_parms['description']}
 % endfor
 % endif
+     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
 % if function_parms['returns']:
      * @returns {${shared['cerveau']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
 % endif
      */
-    ${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {
+    ${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}, asyncReturn) {
 ${merge("        // ", function_name, (
 """
         // Developer: Put your game logic for the {0}'s {1} function here

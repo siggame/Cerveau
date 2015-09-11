@@ -58,17 +58,12 @@ var Lobby = Class(Server, {
 
         for(var i = 0; i < dirs.length; i++) {
             var dir = dirs[i];
-            try {
-                var path = "./games/" + dir + "/game";
-                var gameName = dir.upcaseFirst();
-                this.gameClasses[gameName] = require(path);
-                this.gameNames.push(gameName);
-                this.gameSessions[gameName] = {};
-                console.log(this.name + ": found game '" + gameName + "'");
-            }
-            catch(e) {
-                console.log(this.name + ": ERROR:  directory '"+ dir + "'' in games/ is not a valid game.");
-            }
+            var path = "./games/" + dir + "/game";
+            var gameName = dir.upcaseFirst();
+            this.gameClasses[gameName] = require(path);
+            this.gameNames.push(gameName);
+            this.gameSessions[gameName] = {};
+            console.log(this.name + ": found game '" + gameName + "'");
         }
     },
 
