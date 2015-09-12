@@ -1,5 +1,5 @@
 // NOTE: FogOfWar games are not heavily tested
-var Class = require("../utilities/class");
+var Class = require(__basedir + "/utilities/class");
 var BaseGame = require("./baseGame");
 var clone = require("clone");
 

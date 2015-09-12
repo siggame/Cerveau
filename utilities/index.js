@@ -31,5 +31,4 @@ module.exports = {
     },
 
     Class: require("./class"),
-    serializer: require("./serializer"),
 };

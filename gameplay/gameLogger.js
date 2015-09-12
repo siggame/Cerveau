@@ -1,4 +1,4 @@
-var utilities = require("./utilities/");
+var utilities = require(__basedir + "/utilities/");
 var Class = utilities.Class;
 var fs = require('fs');
 var path = require('path');

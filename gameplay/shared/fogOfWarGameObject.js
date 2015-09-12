@@ -1,4 +1,4 @@
-var Class = require("../utilities/class");
+var Class = require(__basedir + "/utilities/class");
 var BaseGameObject = require("./baseGameObject");
 var extend = require("extend");
 

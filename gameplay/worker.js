@@ -1,6 +1,8 @@
 // This is the script that can be thought of as the 'main.js' for each worker thread that spins up a game session using true multithreading
 var data = JSON.parse(process.env.workerGameSessionData);
-require("./extensions/"); // because we are a new thread, and have not extended our base prototypes
+
+global.__basedir = data.__basedir;
+require(__basedir + "/extensions/"); // because we are a new thread, and have not extended our base prototypes
 var cluster = require("cluster");
 var Session = require("./session");
 
@@ -11,7 +13,7 @@ else {
     var session = new Session({
         gameName: data.gameName,
         gameSession: data.gameSession,
-        gameClass: require("./games/" + data.gameName.lowercaseFirst() + "/game"),
+        gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
         printIO: data.printIO,
         noTimeout: data.noTimeout,
     });

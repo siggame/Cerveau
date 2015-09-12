@@ -2,7 +2,7 @@ var http = require('http');
 var crypto = require("crypto");
 var querystring = require("querystring");
 var extend = require('extend');
-var Class = require("./utilities/class");
+var Class = require(__basedir + "/utilities/class");
 
 /*
  * @class Authenticator - Authenticates play requests with a server. Ideally for organizations outside SIG-GAME you'd inherit this and override how it works with your own web authentication

@@ -1,6 +1,6 @@
-var Class = require("../utilities/class");
+var Class = require(__basedir + "/utilities/class");
 var errors = require("../errors");
-var serializer = require("../utilities/serializer");
+var serializer = require("../serializer");
 var moment = require('moment');
 
 /**

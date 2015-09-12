@@ -1,10 +1,10 @@
 // ${header}
 // Note: this file should never be modified, instead if you want to add game logic modify just the ../${obj_key}.js file. This is to ease merging main.data changes
 <%include file="functions.noCreer" />
-var serializer = require("../../../utilities/serializer");
-var Class = require("../../../utilities/class");
+var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require(__basedir + "/utilities/class");
 % for parent_class in obj['serverParentClasses']:
-var ${parent_class} = require("../../${lowercase_first(parent_class)}");
+var ${parent_class} = require(__basedir + "/gameplay/shared/${lowercase_first(parent_class)}");
 % endfor
 % for parent_class in obj['parentClasses']:
 var ${parent_class} = require("../${lowercase_first(parent_class)}");

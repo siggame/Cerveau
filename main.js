@@ -11,10 +11,10 @@ parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'noTimeout', hel
 parser.addArgument(['--authenticate'], {action: 'storeTrue', dest: 'authenticate', help: 'forces clients to authenticate against the authentication server'});
 var args = parser.parseArgs();
 
-var Lobby = require("./lobby");
+var Lobby = require("./gameplay/lobby");
 var lobby = new Lobby(args); // the game server for clients to connect to
 
-var app = require("./app");
+var app = require("./website/app");
 var http = require('http').Server(app);
 http.listen(args.port + 80, function(){
     console.log('--- Webserver @ ' + process.pid + ' running on ' + args.host + ':' + (args.port+80) + ' ---');

@@ -1,10 +1,10 @@
-var utilities = require("./utilities/");
+var utilities = require(__basedir + "/utilities/");
 var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
 var Authenticator = require("./authenticator");
-
 var constants = require("./constants");
+
 var net = require("net");
 var cluster = require("cluster");
 
@@ -32,7 +32,7 @@ var Lobby = Class(Server, {
         this.gameLogger = new GameLogger('gamelogs/', this.gameNames);
 
         cluster.setupMaster({
-            exec: 'worker.js',
+            exec: __basedir + '/gameplay/worker.js',
         });
 
         var self = this; // for async reference in passed listener functions below
@@ -58,7 +58,7 @@ var Lobby = Class(Server, {
 
         for(var i = 0; i < dirs.length; i++) {
             var dir = dirs[i];
-            var path = "./games/" + dir + "/game";
+            var path = __basedir + "/games/" + dir + "/game";
             var gameName = dir.upcaseFirst();
             this.gameClasses[gameName] = require(path);
             this.gameNames.push(gameName);
@@ -249,6 +249,7 @@ var Lobby = Class(Server, {
 
         gameSession.worker = cluster.fork({
             workerGameSessionData: JSON.stringify({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
+                __basedir: __basedir,
                 gameSession: gameSession.id,
                 gameName: gameSession.gameName,
                 clientInfos: clientInfos,

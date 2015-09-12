@@ -1,6 +1,6 @@
-var Class = require("./utilities/class");
+var serializer = require("./serializer");
+var Class = require(__basedir + "/utilities/class");
 var Server = require("./server");
-var serializer = require("./utilities/serializer");
 
 /**
  * @class Session: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.

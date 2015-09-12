@@ -14,5 +14,12 @@
     "extend": "2.0.0",
     "clone": "1.0.0",
     "moment": "2.9.0"
-  }
+  },
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "scripts": {
+    "node main.js"
+  },
+  "license": "MIT"
 }

@@ -1,5 +1,5 @@
 var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to signify the string we sent is the end of a transmition and to parse the json string before it, because some socket APIs for clients will concat what we send
-var Class = require("./utilities/class");
+var Class = require(__basedir + "/utilities/class");
 
 /*
  * @class Client - the basic implimentation of a connection to the server via a TCP socket

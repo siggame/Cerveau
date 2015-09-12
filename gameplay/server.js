@@ -1,9 +1,9 @@
-var Class = require("./utilities/class");
+var Class = require(__basedir + "/utilities/class");
 var Client = require("./client");
 var GameLogger = require("./gameLogger");
 
 var constants = require("./constants");
-var serializer = require("./utilities/serializer");
+var serializer = require("./serializer");
 
 /**
  * @abstract

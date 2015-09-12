@@ -1,4 +1,4 @@
-var app = require("../app");
+var app = require("./app");
 var getGameInfos = require("./getGameInfos");
 var extend = require('extend');
 

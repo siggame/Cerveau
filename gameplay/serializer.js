@@ -1,7 +1,7 @@
-var constants = require("../constants");
+var constants = require("./constants");
 var extend = require("extend");
-var Class = require("./class");
-var BaseGameObject = require("../games/baseGameObject");
+var Class = require(__basedir + "/utilities/class");
+var BaseGameObject = require("./shared/baseGameObject");
 
 /**
  * A collection of static functions that deals with transforming game states to and from serializable objects when communicating between client <--> sever
@@ -19,15 +19,27 @@ var serializer = {
     },
 
     toNumber: function(n) {
-        return Number(n);
+        return Number(n) || 0.0;
     },
 
     toInteger: function(i) {
-        return parseInt(i);
+        return parseInt(i) || 0;
     },
 
     toString: function(s) {
-        return String(s);
+        return String(s) || "";
+    },
+
+    defaultArray: function(a) {
+        return (a.isArray ? a : []);
+    },
+
+    defaultObject: function(o) {
+        return (serializer.isObject(o) ? o : {});
+    },
+
+    defaultGameObject: function(o) {
+        return (Class.isInstance(o, BaseGameObject) ? o : null)
     },
 
     isEmpty: function(obj){
@@ -48,6 +60,10 @@ var serializer = {
 
     isSerializable: function(obj, key) {
         return serializer.isObject(obj) && (obj.hasOwnProperty(key) || (obj._serializableKeys && obj._serializableKeys[key])) && !String(key).startsWith("_") && (obj._serializableKeys === undefined || obj._serializableKeys[key]);
+    },
+
+    isDeltaArray: function(a) {
+        return (serializer.isObject(a) && a[constants.shared.DELTA_ARRAY_LENGTH] !== undefined);
     },
 
         /**
