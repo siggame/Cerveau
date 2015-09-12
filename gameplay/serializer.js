@@ -7,7 +7,7 @@ var BaseGameObject = require("./shared/baseGameObject");
  * A collection of static functions that deals with transforming game states to and from serializable objects when communicating between client <--> sever
  */
 var serializer = {
-    toBoolean: function(b) {
+    defaultBoolean: function(b) {
         switch(typeof(b)) {
             case "string":
                 return b === "true";
@@ -18,20 +18,20 @@ var serializer = {
         }
     },
 
-    toNumber: function(n) {
+    defaultNumber: function(n) {
         return Number(n) || 0.0;
     },
 
-    toInteger: function(i) {
+    defaultInteger: function(i) {
         return parseInt(i) || 0;
     },
 
-    toString: function(s) {
+    defaultString: function(s) {
         return String(s) || "";
     },
 
     defaultArray: function(a) {
-        return (a.isArray ? a : []);
+        return (Array.prototype.isArray.call(a) ? a : []);
     },
 
     defaultObject: function(o) {

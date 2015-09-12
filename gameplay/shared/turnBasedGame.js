@@ -14,15 +14,7 @@ var TurnBasedGame = Class(BaseGame, {
         this.maxTurns = 100; // real class should override this during init
         this.currentPlayer = null;
 
-        extend(this._returnedDataTypeConverter, {
-            "runTurn": serializer.toBoolean,
-        });
-
-        extend(this._serializableKeys, {
-            "currentTurn": true,
-            "maxTurns": true,
-            "currentPlayer": true,
-        });
+        this._addSerializableKeys(["currentTurn", "maxTurns", "currentPlayer"]);
     },
 
     /**

@@ -1,4 +1,5 @@
 var Class = require(__basedir + "/utilities/class");
+var DeltaMergeable = require("./deltaMergeable");
 var errors = require("../errors");
 var serializer = require("../serializer");
 var moment = require('moment');
@@ -7,8 +8,10 @@ var moment = require('moment');
  * @abstract
  * @class BaseGame - the base game plugin new games should inherit from.
  */
-var BaseGame = Class({
+var BaseGame = Class(DeltaMergeable, {
     init: function(data) {
+        DeltaMergeable.init.call(this);
+
         // serializable member variables
         this.players = [];
         this.gameObjects = {};
@@ -25,20 +28,20 @@ var BaseGame = Class({
         this._serializableDeltaState = null;
         this._deltas = []; // record of all delta states, for the game log generation
 
-        this._serializableKeys = {
-            "players": true,
-            "currentPlayers": true,
-            "gameObjects": true,
-            "session": true,
-            "name": true,
-        };
+        this._initGameManager();
+
+        this._addSerializableKeys(["players", "gameObjects", "session", "name"]);
     },
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
-    name: "Base Game", // should be overwritten by the GeneratedGame inheriting this
+    name: "Base Game", // should be overwritten by the child game class inheriting this
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: 10,
     _orderFlag: {isOrderFlag: true},
+
+    _initGameManager: function() {
+        this._gameManager = require(__basedir + "/games/" + this.name.lowercaseFirst() + "/gameManager");
+    },
 
 
 
@@ -93,7 +96,7 @@ var BaseGame = Class({
     _initPlayers: function(clients) {
         for(var i = 0; i < clients.length; i++) {
             var client = clients[i];
-            var player = this.newPlayer({ // this method should be implimented in GeneratedGame
+            var player = this.create("Player", { // this method should be implimented in GeneratedGame
                 name: client.name || ("Player " + i),
                 clientType: client.type || "Unknown",
             });
@@ -155,14 +158,19 @@ var BaseGame = Class({
     },
 
     /**
-     * Tracks the game object. Should be called via BaseGameObjects during their initialization.
+     * Creates and tracks a new game object.
      *
-     * @returns {number} thier id
+     * @param {string} gameObjectName - the name of the game object class
+     * @param {Object} [data] - initialization data for new game object
+     * @returns {BaseGameObject} the game object that was created, now being tracked by this game
      */
-    trackGameObject: function(gameObject) {
-        gameObject.id = this._generateNextGameObjectID()
+    create: function(gameObjectName, data) {
+        data = data || {};
+        data.id = this._generateNextGameObjectID();
+        data.game = this;
+        var gameObject = this._gameManager.createGameObject(gameObjectName, data);
         this.gameObjects[gameObject.id] = gameObject;
-        return gameObject.id;
+        return gameObject;
     },
 
 
@@ -190,10 +198,7 @@ var BaseGame = Class({
             var defaultCallback = this["aiFinished_" + finished];
             var returned = serializer.deserialize(data, this);
 
-            if(this._returnedDataTypeConverter[finished]) { // then we need to "sanatize" what they sent to the type we expected them to return, e.g. C++ returning the string "true" instead of the boolean true.
-                returned = this._returnedDataTypeConverter[finished](returned);
-            }
-
+            returned = this._gameManager.sanitizeFinished(order, returned);
             
             var hadCallback = true;
             try {
@@ -237,32 +242,37 @@ var BaseGame = Class({
      */
     aiRun: function(player, data) {
         var run = serializer.deserialize(data, this);
-        var runCallback = run.caller["_run" + run.functionName.upcaseFirst()];
+        var runCallback = run.caller[run.functionName];
         var ran = {};
 
-        var kwargs = run.args || {};
+        var argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
         var asyncReturnWrapper = {}; // just an object both asyncReturn and the promise have scope to to pass things to and from.
         var asyncReturn = function(asyncReturnValue) { asyncReturnWrapper.callback(asyncReturnValue); }; // callback function setup below
 
+        argsArray.unshift(player);
+        argsArray.push(asyncReturn);
+
         var self = this;
+        var sanitizeRan = function(returned) {
+            return self._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, returned);
+        }
+
         return new Promise(function(resolve, reject) {
             try {
-                var ranData = runCallback.call(run.caller, player, kwargs, asyncReturn);
+                var ranReturned = runCallback.apply(run.caller, argsArray);
 
-                if(ranData.altersState) {
-                    self._updateSerializableStates("run", {
-                        player: serializer.serialize(player, self),
-                        data: data,
-                    });
-                }
+                self._updateSerializableStates("run", {
+                    player: serializer.serialize(player, self),
+                    data: data,
+                });
 
-                if(ranData.returned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
+                if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
                     asyncReturnWrapper.callback = function(asyncReturnValue) {
-                        resolve(asyncReturnValue);
+                        resolve(sanitizeRan(asyncReturnValue));
                     };
                 }
                 else {
-                    resolve(ranData.returned);
+                    resolve(sanitizeRan(ranReturned));
                 }
             }
             catch(e) {
@@ -284,13 +294,16 @@ var BaseGame = Class({
             callback = args;
         }
 
-        this._orders.push({
+        var order = {
             player: player,
             index: this._orders.length,
             name: orderName,
             args: args || [],
             callback: callback,
-        });
+        };
+        this._gameManager.sanitizeOrder(order);
+
+        this._orders.push(order);
 
         return BaseGame._orderFlag;
     },

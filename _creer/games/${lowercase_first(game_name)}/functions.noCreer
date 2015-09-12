@@ -43,15 +43,19 @@ if not 'cerveau' in shared:
         base_type = type_obj['name']
 
         if base_type == "string":
-            return "serializer.toString"
+            return "serializer.defaultString"
         elif base_type == "int":
-            return "serializer.toInteger"
+            return "serializer.defaultInteger"
         elif base_type == "float":
-            return "serializer.toNumber"
+            return "serializer.defaultNumber"
         elif base_type == "boolean":
-            return "serializer.toBoolean"
+            return "serializer.defaultBoolean"
+        elif base_type == "list":
+            return "serializer.defaultArray"
+        elif base_type == "dictionary":
+            return "serializer.defaultObject"
         else:
-            return ""
+            return "serializer.defaultGameObject"
     shared['cerveau']['cast'] = cerveau_cast
 
 %>
