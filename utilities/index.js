@@ -3,6 +3,7 @@ var path = require("path");
 
 /**
  * This is a collection of static utility functions. They are to encourage DRY principles. If you find code being re-used and no natural place to put it consider placing it here.
+ * All functions in here should be cross project, that is generic enough to be useful on the website or game servers.
  */
 module.exports = {
     /**
@@ -28,4 +29,7 @@ module.exports = {
             return fs.statSync(path.join(srcpath, file)).isFile();
         });
     },
+
+    Class: require("./class"),
+    serializer: require("./serializer"),
 };

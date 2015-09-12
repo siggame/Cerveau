@@ -1,9 +1,9 @@
-var Class = require("./utilities/class");
+var utilities = require("./utilities/");
+var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
 var Authenticator = require("./authenticator");
 
-var utilities = require("./utilities/utilities");
 var constants = require("./constants");
 var net = require("net");
 var cluster = require("cluster");
@@ -46,7 +46,7 @@ var Lobby = Class(Server, {
         });
 
         this.netServer.listen(this.port, this.host, function() {
-            console.log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
+            console.log("--- Lobby @ " + process.pid + " listening on "+ self.host + ":" + self.port + " ---");
         });
     },
 

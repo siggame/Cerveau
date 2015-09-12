@@ -1,5 +1,5 @@
-var Class = require("./utilities/class");
-var utilities = require("./utilities/utilities");
+var utilities = require("./utilities/");
+var Class = utilities.Class;
 var fs = require('fs');
 var path = require('path');
 var moment = require('moment');

@@ -1,7 +1,7 @@
 // Exposed various uri schemes for other applications to query data from Cerveau
 // Basically http responses that are not HTML, probably JSON
 
-var app = require("./app");
+var app = require(__basedir + "/app");
 
 module.exports = function(args) {
     var lobby = args.lobby;

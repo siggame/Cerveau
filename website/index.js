@@ -1,4 +1,4 @@
-var app = require("./app");
+var app = require(__basedir + "/app");
 var getGameInfos = require("./getGameInfos");
 
 module.exports = function(args) {
