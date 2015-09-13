@@ -250,6 +250,7 @@ var Lobby = Class(Server, {
         gameSession.worker = cluster.fork({
             workerGameSessionData: JSON.stringify({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
                 __basedir: __basedir,
+                _mainDebugPort: process._debugPort,
                 gameSession: gameSession.id,
                 gameName: gameSession.gameName,
                 clientInfos: clientInfos,

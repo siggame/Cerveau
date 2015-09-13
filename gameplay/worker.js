@@ -19,7 +19,7 @@ else {
     });
 
     var portOffset = parseInt(data.gameSession) || process.pid;
-    process._debugPort = 5858 + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid
+    process._debugPort = (data._mainDebugPort || 5858) + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid
 
     var socketIndex = 0;
     process.on("message", function(message, handler) {
