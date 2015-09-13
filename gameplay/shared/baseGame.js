@@ -2,6 +2,7 @@ var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
 var errors = require("../errors");
 var serializer = require("../serializer");
+var constants = require("../constants");
 var moment = require('moment');
 
 /**
@@ -375,11 +376,12 @@ var BaseGame = Class(DeltaMergeable, {
         var losers = [];
 
         for(var i = 0; i < clients.length; i++) {
-            if(clients[i].player.won) {
-                winners.push(i);
+            var player = clients[i].player;
+            if(player.won) {
+                winners.push(player.id);
             }
             else {
-                losers.push(i);
+                losers.push(player.id);
             }
         }
 
@@ -387,6 +389,7 @@ var BaseGame = Class(DeltaMergeable, {
             gameName: this.name,
             gameSession: this.session,
             deltas: this._deltas,
+            constants: constants.shared,
             epoch: moment().valueOf(),
             winners: winners,
             losers: losers,

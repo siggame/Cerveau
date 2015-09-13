@@ -3,6 +3,6 @@
 module.exports = Object.freeze({
     shared: Object.freeze({ // constants put here will be sent to clients (hence shared between the server here and clients)
         DELTA_REMOVED: "&RM",
-        DELTA_ARRAY_LENGTH: "&LEN",
+        DELTA_LIST_LENGTH: "&LEN",
     }),
 });

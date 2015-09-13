@@ -63,7 +63,7 @@ var serializer = {
     },
 
     isDeltaArray: function(a) {
-        return (serializer.isObject(a) && a[constants.shared.DELTA_ARRAY_LENGTH] !== undefined);
+        return (serializer.isObject(a) && a[constants.shared.DELTA_LIST_LENGTH] !== undefined);
     },
 
         /**
@@ -86,7 +86,7 @@ var serializer = {
         var serialized = {};
 
         if(state.isArray) { // record the length, we never send arrays in serialized states because you can't tell when they change in size without sending all the elements
-            serialized[constants.shared.DELTA_ARRAY_LENGTH] = state.length;
+            serialized[constants.shared.DELTA_LIST_LENGTH] = state.length;
         }
 
         for(var key in state) {
@@ -114,8 +114,8 @@ var serializer = {
                     if (result[key] === undefined) { // then the object was empty, there was no change (this with removed values will have the constant strings set)
                         delete result[key];
                     }
-                    else if(result[key][constants.shared.DELTA_ARRAY_LENGTH] !== undefined) {
-                        var len = constants.shared.DELTA_ARRAY_LENGTH;
+                    else if(result[key][constants.shared.DELTA_LIST_LENGTH] !== undefined) {
+                        var len = constants.shared.DELTA_LIST_LENGTH;
                         if(serializer.isEmptyExceptFor(result[key], len) && first[key][len] === second[key][len]) { // then this is an array that did not change in size or any elements, so delete it.
                             delete result[key];
                         }
