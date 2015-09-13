@@ -1,4 +1,5 @@
 var serializer = require("./serializer");
+var errors = require("./errors");
 var Class = require(__basedir + "/utilities/class");
 var Server = require("./server");
 
@@ -165,7 +166,7 @@ var Session = Class(Server, {
      * A client sent a 'run' command, which is a request for the game to run game logic
      *
      * @param {Client} client - the client that sent this run event
-     * @param {Object} run - run data
+     * @param {Object} run - data about what they want the game server to run
      */
     _clientSentRun: function(client, run) {
         client.pauseTicking();
@@ -175,14 +176,17 @@ var Session = Class(Server, {
         }
 
         var self = this;
-        this.game.aiRun(client.player, run)
+        this.game.aiRun(client.player, run) // this is a Promise, the game server is promising that eventually it will run the logic, we do this because the game server may need to get info asyncronously (such as from other AIs) before it can resolve this run command
             .then(function(returned) {
                 self._checkGameState();
 
                 client.send("ran", serializer.serialize(returned, self.game));
             })
-            .catch(function(reason) {
-                client.send("invalid", reason);
+            .catch(function(error) {
+                if(!Class.isInstance(error, errors.CerveauError)) {
+                    throw error;
+                }
+                client.send("invalid", error);
             });
     },
 
@@ -199,10 +203,15 @@ var Session = Class(Server, {
             return;
         }
 
-        var invalid = this.game.aiFinished(client.player, data.orderIndex, data.returned);
-
-        if(invalid) {
-            client.send("invalid", invalid);
+        try {
+            this.game.aiFinished(client.player, data.orderIndex, data.returned);
+        }
+        catch(error)
+        {
+            if(!Class.isInstance(error, errors.CerveauError)) {
+                throw error;
+            }
+            client.send("invalid", error);
         }
 
         this._checkGameState();

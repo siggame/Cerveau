@@ -1,9 +1,10 @@
 var utilities = require(__basedir + "/utilities/");
+var constants = require("./constants");
+var errors = require("./errors");
 var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
 var Authenticator = require("./authenticator");
-var constants = require("./constants");
 
 var net = require("net");
 var cluster = require("cluster");
@@ -192,9 +193,9 @@ var Lobby = Class(Server, {
      * @param {Object} data - information about what this client wants to play. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
      */
     _clientSentPlay: function(client, data) {
-        if(!this.gameClasses[data.gameName]) {
-            client.send("invalid", {message: "invalid gameName"});
-            client.disconnect();
+        if(!data || !this.gameClasses[data.gameName]) {
+            client.send("invalid", new errors.CerveauError("Game of name '" + (data && data.gameName) + "' not found on this server."));
+            client.disconnect(); // no need to keep them connected, they want to play something we don't have
             return;
         }
 
@@ -226,7 +227,6 @@ var Lobby = Class(Server, {
             failure: function() {
                 client.send("unauthenticated");
                 client.disconnect();
-                return;
             },
         });
     },

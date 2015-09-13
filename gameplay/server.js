@@ -2,6 +2,7 @@ var Class = require(__basedir + "/utilities/class");
 var Client = require("./client");
 var GameLogger = require("./gameLogger");
 
+var errors = require("./errors");
 var constants = require("./constants");
 var serializer = require("./serializer");
 
@@ -47,12 +48,11 @@ var Server = Class({
                 callback.call(this, client, data.data);
             }
             else {
-                console.error(this.name = ": Error - no callback for:", data.event);
+                client.send("invalid", new errors.EventDataError("Server cannot handle event '" + data.event + "'"));
             }
         }
         else {
-            console.error(this.name + " Error - client '" + client.name + "' sent data with no event.");
-            client.send("invalid", "did not send event");
+            client.send("invalid", new errors.EventDataError("did not send event"));
         }
     },
 

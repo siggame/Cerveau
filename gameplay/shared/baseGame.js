@@ -102,7 +102,7 @@ var BaseGame = Class(DeltaMergeable, {
                 clientType: client.type || "Unknown",
             });
 
-            player.invalidMessages = [];
+            player.errors = [];
             player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
             player.client = client;
             client.setGameData(this, player);
@@ -183,6 +183,7 @@ var BaseGame = Class(DeltaMergeable, {
     /**
      * Called when a session gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
      *
+     * @throws {CerveauError} - game logic or event errors
      * @param {Player} the player this ai controls
      * @param {number} orderIndex - the index of the order that finished
      * @param {Object} [data] - serialized data returned from the ai executing that order
@@ -190,33 +191,25 @@ var BaseGame = Class(DeltaMergeable, {
      */
     aiFinished: function(player, orderIndex, data) {
         var order = this._orders[orderIndex];
-        var invalid = undefined;
         if(order === undefined) {
-            invalid = {message: "no order found that you claim to have finished."}
+            this.throwErrorClass(errors.EventDataError, "no order found that you claim to have finished.");
         }
         else {
             var finished = order.name;
             var defaultCallback = this["aiFinished_" + finished];
-            var returned = serializer.deserialize(data, this);
 
+            var returned = serializer.deserialize(data, this);
             returned = this._gameManager.sanitizeFinished(order, returned);
             
             var hadCallback = true;
-            try {
-                if(order.callback) {
-                    order.callback(returned);
-                }
-                else if(defaultCallback) {
-                    defaultCallback.call(this, player, returned);
-                }
-                else {
-                    hadCallback = false;
-                }
+            if(order.callback) {
+                order.callback(returned);
             }
-            catch(e) {
-                if(Class.isInstance(e, errors.GameLogicError)) {
-                    invalid = {finished: finished, returned: returned, message: e.message};
-                }
+            else if(defaultCallback) {
+                defaultCallback.call(this, player, returned);
+            }
+            else {
+                hadCallback = false;
             }
 
             if(hadCallback) {
@@ -227,11 +220,9 @@ var BaseGame = Class(DeltaMergeable, {
                 });
             }
             else {
-                invalid = {finished: finished, message: "No callback for finshed order."}
+                this.throwErrorClass(errors.EventDataError, "No callback for finshed order '" + finished + "'.");
             }
         }
-
-        return invalid;
     },
 
     /**
@@ -416,19 +407,31 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Throws an IvalidGameLogic error while declairing the player that did that as a loser
+     * Throws an error of specified type while checking to see if that player lost
      *
-     * @param {Player} player that looses because of it's bad logic
-     * @param {string} (optional) the human readable message why the logic is invalid
+     * @param {CerveaError} errorClass - the CerveauError class or subclass this error is of type
+     * @param {Player} player - player that did something invalid
+     * @param {string} reason - the human readable message why the logic is invalid
+     * @param {Object} [data] - any additional info about why the game logic is invalid
      */
-    throwInvalidGameLogic: function(player, message) {
-        player.invalidMessages.push(message);
+    throwErrorClass: function(errorClass, player, message, data) {
+        var error = new errorClass(message, data);
+        player.errors.push(error);
 
-        if(player.invalidMessages.length > this.maxInvalidsPerPlayer) {
-            this.declairLoser(player, message);
+        if(player.error.length > this.maxErrorsPerPlayer) {
+            this.declairLoser(player, "Reached max amount of errors in one game (" + this.maxErrorsPerPlayer + ")");
         }
-        
-        throw new errors.GameLogicError(message);
+
+        throw error;
+    },
+
+    /**
+     * Throws invalid game logic error
+     *
+     * @see throwErrorOf
+     */
+    throwInvalidGameLogic: function(player, message, data) {
+        return this.throwErrorClass(error.GameLogicError, player, message, data);
     },
 
     /**
