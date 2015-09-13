@@ -28,7 +28,7 @@ var Session = Class(Server, {
     addSocket: function(socket, clientInfo) {
         Server.addSocket.call(this, socket, clientInfo);
 
-        if(this.clients.length === this.game.numberOfPlayers) {
+        if(this.getClientsPlaying().length === this.game.numberOfPlayers) {
             this.start();
         }
     },
@@ -63,7 +63,7 @@ var Session = Class(Server, {
      * Starts the game in this session
      */
     start: function() {
-        this.game.start(this.clients);
+        this.game.start(this.getClientsPlaying()); // note: the game only knows about clients playing, the session will care about spectators sending them deltas a such, so the game never needs to know of their existance
 
         this._checkGameState();
     },
@@ -95,7 +95,7 @@ var Session = Class(Server, {
                 var client = this.clients[i];
 
                 client.send("start", {
-                    playerID: client.player.id,
+                    playerID: client.player && client.player.id,
                 });
             }
         }
@@ -120,7 +120,7 @@ var Session = Class(Server, {
         }
 
         process.send({
-            gamelog: this.game.generateGamelog(this.clients),
+            gamelog: this.game.generateGamelog(),
         });
     },
 

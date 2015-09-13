@@ -92,7 +92,7 @@ var BaseGame = Class(DeltaMergeable, {
     /**
      * Initializes the players based on what clients are connected.
      *
-     * @param {Array.<Client>} clients - all client connected to this game, each will have a corresponding player created for it.
+     * @param {Array.<Client>} clients - all client connected to this game that are playing, each will have a corresponding player created for it.
      */
     _initPlayers: function(clients) {
         for(var i = 0; i < clients.length; i++) {
@@ -362,12 +362,12 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @returns {Object} the gamelog to store somewhere and somehow (GameLogger handles that)
      */
-    generateGamelog: function(clients) {
+    generateGamelog: function() {
         var winners = [];
         var losers = [];
 
-        for(var i = 0; i < clients.length; i++) {
-            var player = clients[i].player;
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
             if(player.won) {
                 winners.push(player.id);
             }

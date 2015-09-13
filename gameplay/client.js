@@ -27,8 +27,10 @@ var Client = Class({
      * @param {Object} should contain this client's 'name' and 'type'
      */
     setInfo: function(data) {
-        this.name = String(data && data.name ? data.name : "No Name");
-        this.type = String(data && data.type ? data.type : "Unknown");
+        data = data || {};
+        this.name = String(data.hasOwnProperty("name") ? data.name : "No Name");
+        this.type = String(data.hasOwnProperty("type") ? data.type : "Unknown");
+        this.spectating = Boolean(data.spectating);
     },
 
     /**
@@ -150,7 +152,14 @@ var Client = Class({
         );
     },
 
-
+    /**
+     * Check if the client is playing (on wants to play) on whatever server it's connected to.
+     *
+     * @returns {boolean} if the player is not a spectator
+     */
+    isPlaying: function() {
+        return !this.spectating;
+    },
 
     /////////////////////////////////////////////////////////
     // Timeouts. Timer should be started/paused by Session //

@@ -182,7 +182,8 @@ var Lobby = Class(Server, {
         var gameClass = this.gameClasses[gameName];
         if(gameClass) {
             var gameSession = this.gameSessions[gameName][sessionID];
-            return (gameSession !== undefined && !gameSession.worker && gameSession.clients.length < gameClass.numberOfPlayers);
+            var numberOfPlayers = this.getClientsPlaying(gameSession.clients).length;
+            return (gameSession !== undefined && !gameSession.worker && numberOfPlayers < gameClass.numberOfPlayers);
         }
     },
 
@@ -210,6 +211,7 @@ var Lobby = Class(Server, {
                 client.setInfo({
                     name: data.playerName,
                     type: data.clientType,
+                    spectating: data.spectating,
                 });
 
                 gameSession.clients.push(client);
@@ -220,7 +222,7 @@ var Lobby = Class(Server, {
                     constants: constants.shared,
                 });
 
-                if(gameSession.clients.length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
+                if(self.getClientsPlaying(gameSession.clients).length === gameSession.numberOfPlayers) { // then it is ready to start! so spin it off in a neat worker thread
                     self._threadGameSession(gameSession);
                 }
             },
@@ -242,8 +244,10 @@ var Lobby = Class(Server, {
         for(var i = 0; i < gameSession.clients.length; i++) {
             var client = gameSession.clients[i];
             clientInfos.push({
+                index: i,
                 name: client.name,
                 type: client.type,
+                spectating: client.spectating,
             });
         }
 

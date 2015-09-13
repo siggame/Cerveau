@@ -35,6 +35,24 @@ var Server = Class({
     },
 
     /**
+     * Gets the number of playing of clients (not spectating)
+     *
+     * @param {Array.<Client>} [clients] - clients to check from that are playing. defautls to this.clients
+     * @returns {number} Number of playing clients currently connected that are/want to play (not spectate)
+     */
+    getClientsPlaying: function(clients) {
+        clients = clients || this.clients;
+        var playingClients = [];
+        for(var i = 0; i < clients.length; i++) {
+            var client = clients[i];
+            if(client.isPlaying()) {
+                playingClients.push(client)
+            }
+        }
+        return playingClients;
+    },
+
+    /**
      * When the client sends data via socket connection, invoked by Clients.
      *
      * @param {Client} client - client that sent the data. This SHOULD be an event to be handled by the inheriting Server Class
