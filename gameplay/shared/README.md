@@ -1,4 +1,4 @@
-# /gameplay/shared/
+# gameplay/shared/
 
 This folder is where you can predefine gameplay logic that is shared between games in the `games/` folder.
 

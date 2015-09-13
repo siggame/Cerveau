@@ -1,4 +1,4 @@
-# Games
+# games/
 
 This directory should never be added to directly. Instead [Creer](https://github.com/JacobFischer/Creer) will create the basics of a game in it's appropriate directory here.
 

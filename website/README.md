@@ -1,4 +1,4 @@
-# Website
+# website/
 
 This should contain all the code and files needed for the Cerveau website (web interface) to work. In a tradditional NodeJS project this all might be considered the 'app', but given Cerveau servces web browsers and game clients we have cleared up the differences between this website/ directory and the gameplay/ directory.
 

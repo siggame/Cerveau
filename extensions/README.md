@@ -1,4 +1,4 @@
-# Extensions
+# extensions/
 
 This folder should only be used to extend JavaScript's built in Prototypes.
 
