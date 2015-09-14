@@ -368,12 +368,12 @@ var BaseGame = Class(DeltaMergeable, {
 
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
-            if(player.won) {
-                winners.push(player.id);
-            }
-            else {
-                losers.push(player.id);
-            }
+
+            (player.won ? winners : losers).push({
+                index: i,
+                id: player.id,
+                name: player.name,
+            });
         }
 
         return {
@@ -394,12 +394,13 @@ var BaseGame = Class(DeltaMergeable, {
     /////////////////////////
 
     /**
-     * Checks if a game is over
+     * Checks if a game is over, or sets if a game is over
      * 
-     * @returns {boolean} representing if this game is over
+     * @param {boolean} [isOver] - if you pass in true this sets the game to over
+     * @returns {boolean} true if this game is over, false otherwise
      */
     isOver: function(isOver) {
-        if(isOver) {
+        if(isOver === true) {
             this._over = true;
         }
 
