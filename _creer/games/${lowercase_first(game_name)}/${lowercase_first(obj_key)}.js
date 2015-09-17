@@ -3,6 +3,7 @@
 <%include file="functions.noCreer" />
 var Class = require(__basedir + "/utilities/class");
 var serializer = require(__basedir + "/gameplay/serializer");
+var log = require(__basedir + "/gameplay/log");
 % for parent_class in obj['serverParentClasses']:
 var ${parent_class} = require(__basedir + "/gameplay/shared/${lowercase_first(parent_class)}");
 % endfor
