@@ -1,4 +1,4 @@
-# profiles/
+# output/profiles/
 
 This is the directory profiles will be generated in if you run the profiler.
 

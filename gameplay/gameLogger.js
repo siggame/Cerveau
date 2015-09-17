@@ -3,18 +3,19 @@ var Class = utilities.Class;
 var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
+var log = require("./log");
 
 /**
  * @class GameLogger: a simple manager that attaches to a directory and logs games (creates gamelogs) into that folder, as well as retrieves them from.
  */
 var GameLogger = Class({
     /**
-     * @param {string} dir: path to directory to log games into, and to read them from
-     * @param {Array.<string>} gameNames: strings of all games that could be logged
+     * @param {Array.<string>} gameNames - strings of all games that could be logged
+     * @param {string} [dir] - path to directory to log games into, and to read them from
      */
-    init: function(dir, gameNames) {
+    init: function(gameNames, dir) {
         this.gamelogExtension = ".joue";
-        this.gamelogDirectory = dir || 'gamelogs/';
+        this.gamelogDirectory = dir || 'output/gamelogs/';
         this.gamelogs = []; // simple array of gamelogs, not indexed by gameName, sessionID, epoch like this.gamelogFor
 
         this.gamelogFor = {};
@@ -47,7 +48,7 @@ var GameLogger = Class({
     /**
      * Creates a gamelog for the game in the directory set during init
      *
-     * @param {Object} the gamelog which should be serializable to json representation of the gamelog
+     * @param {Object} gamelog - the gamelog which should be serializable to json representation of the gamelog
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
@@ -60,7 +61,7 @@ var GameLogger = Class({
 
         fs.writeFile(this.gamelogDirectory + filename + this.gamelogExtension, serialized, function(err) {
             if(err) {
-                console.error("Gamelog Write Error:", err);
+                log.error("Gamelog Write Error:", err);
             }
         }); 
     },
@@ -78,9 +79,9 @@ var GameLogger = Class({
     /**
      * Gets the first game log matching the gameName, sessionID, and (optional) epoch
      *
-     * @param {string} name of the game you want a log for
-     * @param {string} id of the session that for the game
-     * @param {number} (optional) epoch for the specific game ran of session id
+     * @param {string} gameName - name of the game you want a log for
+     * @param {string} sessionID - id of the session that for the game
+     * @param {number} [epoch] - the epoch for the specific game ran of session id
      * @returns {Object|undefined} gamelog matching passed in parameters, or undefined if doesn't exist
      */
     getLog: function(gameName, sessionID, epoch) {

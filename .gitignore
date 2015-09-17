@@ -27,5 +27,6 @@ build/Release
 node_modules
 
 # directories where logs are stored
-gamelogs
-profiles
+output/gamelogs
+output/profiles
+output/logs

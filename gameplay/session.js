@@ -5,6 +5,7 @@ var Server = require("./server");
 var constants = require("./constants");
 var moment = require('moment');
 var fs = require('fs');
+var log = require("./log");
 
 /**
  * @class Session: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
@@ -71,6 +72,7 @@ var Session = Class(Server, {
      * Starts the game in this session
      */
     start: function() {
+        log("Game is starting.");
         this.game.start(this.getClientsPlaying()); // note: the game only knows about clients playing, the session will care about spectators sending them deltas a such, so the game never needs to know of their existance
 
         if(this._profiler) {
@@ -87,7 +89,7 @@ var Session = Class(Server, {
         if(this._profiler) {
             var profile = this._profiler.stopProfiling();
             profile.export(function(error, result) {
-                fs.writeFileSync('profiles/profile-' + this.game.name + '-' + this.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
+                fs.writeFileSync('output/profiles/profile-' + this.game.name + '-' + this.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
                 profile.delete();
                 process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
             });
@@ -146,7 +148,7 @@ var Session = Class(Server, {
      */
     _gameOver: function() {
         this._sentOver = true;
-        console.log(this.name + ": Game is over.");
+        log("Game is over.");
 
         this._updateDeltas("over");
 

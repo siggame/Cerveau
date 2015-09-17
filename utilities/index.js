@@ -1,5 +1,6 @@
 var fs = require("fs");
 var path = require("path");
+var moment = require("moment");
 
 /**
  * This is a collection of static utility functions. They are to encourage DRY principles. If you find code being re-used and no natural place to put it consider placing it here.
@@ -28,6 +29,16 @@ module.exports = {
         return fs.readdirSync(srcpath).filter(function(file) {
             return fs.statSync(path.join(srcpath, file)).isFile();
         });
+    },
+
+    /**
+     * Returns a string formatted with a time via moment
+     *
+     * @param {number} [epoch] - optional epoch to init time to
+     * @returns {string} time formatted to a string
+     */
+    momentString: function(epoch) {
+        return moment(epoch).format("YYYY.MM.DD.HH.mm.ss.SSS");
     },
 
     Class: require("./class"),

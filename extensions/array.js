@@ -33,6 +33,10 @@ var ArrayExtensions = {
     clone: function() {
         return this.slice();
     },
+
+    randomElement: function() {
+        return this[Math.floor(Math.random() * this.length)];
+    },
 };
 
 for(var extension in ArrayExtensions) {

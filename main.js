@@ -10,6 +10,8 @@ parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '
 parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'noTimeout', help: '(debugging) clients cannot time out'});
 parser.addArgument(['--authenticate'], {action: 'storeTrue', dest: 'authenticate', help: 'forces clients to authenticate against the authentication server'});
 parser.addArgument(['--profile'], {action: 'storeTrue', dest: 'profile', help: 'run the v8 profilers against threaded game sessions.'});
+parser.addArgument(['--log'], {action: 'storeTrue', dest: 'log', help: 'store all logged strings to text files in output/logs/'});
+parser.addArgument(['--silent'], {action: 'storeTrue', dest: 'silent', help: 'log will not print anything to the console'});
 var args = parser.parseArgs();
 
 if(args.profile) {
@@ -26,11 +28,12 @@ if(args.profile) {
 
 var Lobby = require("./gameplay/lobby");
 var lobby = new Lobby(args); // the game server for clients to connect to
+var log = require("./gameplay/log");
 
 var app = require("./website/app");
 var http = require('http').Server(app);
 http.listen(args.port + 80, function(){
-    console.log('--- Webserver @ ' + process.pid + ' running on ' + args.host + ':' + (args.port+80) + ' ---');
+    log('--- Webserver running on ' + args.host + ':' + (args.port+80) + ' ---');
 });
 
 require("./website/")({

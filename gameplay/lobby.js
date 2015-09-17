@@ -1,10 +1,12 @@
 var utilities = require(__basedir + "/utilities/");
 var constants = require("./constants");
+var extend = require("extend");
 var errors = require("./errors");
 var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
 var Server = require("./server");
 var Authenticator = require("./authenticator");
+var log = require("./log");
 
 var net = require("net");
 var cluster = require("cluster");
@@ -31,7 +33,7 @@ var Lobby = Class(Server, {
 
         this._initializeGames();
 
-        this.gameLogger = new GameLogger('gamelogs/', this.gameNames);
+        this.gameLogger = new GameLogger(this.gameNames);
 
         cluster.setupMaster({
             exec: __basedir + '/gameplay/worker.js',
@@ -48,7 +50,7 @@ var Lobby = Class(Server, {
         });
 
         this.netServer.listen(this.port, this.host, function() {
-            console.log("--- Lobby @ " + process.pid + " listening on "+ self.host + ":" + self.port + " ---");
+            log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
         });
     },
 
@@ -65,7 +67,7 @@ var Lobby = Class(Server, {
             this.gameClasses[gameName] = require(path);
             this.gameNames.push(gameName);
             this.gameSessions[gameName] = {};
-            console.log(this.name + ": found game '" + gameName + "'");
+            log("Found game '" + gameName + "'.");
         }
     },
 
@@ -253,16 +255,14 @@ var Lobby = Class(Server, {
         }
 
         gameSession.worker = cluster.fork({
-            workerGameSessionData: JSON.stringify({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
+            workerGameSessionData: JSON.stringify(extend({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
                 __basedir: __basedir,
                 _mainDebugPort: process._debugPort,
                 gameSession: gameSession.id,
                 gameName: gameSession.gameName,
                 clientInfos: clientInfos,
-                printIO: this.printIO,
-                noTimeout: this.noTimeout,
                 profile: this._profile,
-            })
+            }, this._initArgs)),
         });
 
         var self = this;
@@ -300,7 +300,7 @@ var Lobby = Class(Server, {
      * @param {Object} the gameSession that ended.
      */
     _gameSessionExited: function(gameSession) {
-        console.log(this.name + ": Game Session @", gameSession.worker.process.pid, "exited");
+        log("Game Session @", gameSession.worker.process.pid, "exited");
 
         gameSession.running = false;
         gameSession.over = true;

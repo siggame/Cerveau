@@ -1,5 +1,6 @@
 var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to signify the string we sent is the end of a transmition and to parse the json string before it, because some socket APIs for clients will concat what we send
 var Class = require(__basedir + "/utilities/class");
+var log = require("./log");
 
 /*
  * @class Client - the basic implimentation of a connection to the server via a TCP socket
@@ -42,7 +43,7 @@ var Client = Class({
         var buffer = "";
         var socketListenerOnData = function(str) {
             if(self.server.printIO) {
-                console.log(self.server.name + ": from client " + this.name + " <--", str, '\n--');
+                log("< From client " + this.name + " <--", str, '\n--');
             }
 
             buffer += str;
@@ -131,7 +132,7 @@ var Client = Class({
      */
     _sendRaw: function(str) {
         if(this.server.printIO) {
-            console.log(this.server.name + ": to client " + this.name + " -->", str, "\n---");
+            log("> to client " + this.name + " -->", str, "\n---");
         }
         this.socket.write(str);
     },
@@ -209,7 +210,7 @@ var Client = Class({
      */
     _timedOut: function() {
         this.pauseTicking();
-        console.log(this.server.name + ": client", this.name, "timed out");
+        log("Client", this.name, "timed out");
         this.server.clientTimedOut(this);
     },
 });

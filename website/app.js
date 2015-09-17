@@ -21,6 +21,6 @@ app.set('views', __basedir + '/website/views');
 
 // GET /static/style.css etc.
 app.use('/styles', express.static(__basedir + '/website/styles'));
-app.use('/gamelogs', express.static(__basedir + '/gamelogs'));
+app.use('/gamelogs', express.static(__basedir + '/output/gamelogs'));
 
 module.exports = app;

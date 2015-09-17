@@ -5,20 +5,17 @@ global.__basedir = data.__basedir;
 require(__basedir + "/extensions/"); // because we are a new thread, and have not extended our base prototypes
 var cluster = require("cluster");
 var Session = require("./session");
+var log = require("./log");
+var extend = require("extend");
 
 if(cluster.isMaster) {
-    console.error("ERROR: worker running on master thread");
+    log.error("ERROR: worker running on master thread");
 }
 else {
-    console.log("profile", data.profile);
-    var session = new Session({
-        gameName: data.gameName,
-        gameSession: data.gameSession,
+    var session = new Session(extend({
         gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
-        printIO: data.printIO,
-        noTimeout: data.noTimeout,
         profiler: data.profile && require('v8-profiler'),
-    });
+    }, data));
 
     var portOffset = parseInt(data.gameSession) || process.pid;
     process._debugPort = (data._mainDebugPort || 5858) + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid

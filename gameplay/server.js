@@ -2,9 +2,11 @@ var Class = require(__basedir + "/utilities/class");
 var Client = require("./client");
 var GameLogger = require("./gameLogger");
 
+var extend = require("extend");
 var errors = require("./errors");
 var constants = require("./constants");
 var serializer = require("./serializer");
+var log = require("./log");
 
 /**
  * @abstract
@@ -16,7 +18,13 @@ var Server = Class({
 
         this.noTimeout = Boolean(options.noTimeout);
         this.printIO = Boolean(options.printIO);
+        this.silent = Boolean(options.silent);
+        this.logging = Boolean(options.log);
         this.name = options.name || "Server";
+
+        this._initArgs = extend({}, options);
+
+        process._gameplayServer = this; // there should only be one per thread, so we hack it in here
     },
 
     /**
@@ -27,7 +35,7 @@ var Server = Class({
      * @returns {Client} newly created client for the passed in socket
      */
     addSocket: function(socket, clientInfo) {
-        console.log(this.name + ": received new connection!");
+        log("Received new connection!");
         var client = new Client(socket, this, clientInfo);
         this.clients.push(client);
 
@@ -82,7 +90,7 @@ var Server = Class({
      * @returns {Client} the same client that disconnected
      */
     clientDisconnected: function(client, reason) {
-        console.log(this.name + ": Client " + client.name + " disconnected");
+        log("Client " + client.name + " disconnected");
 
         this.clients.removeElement(client);
 
@@ -96,7 +104,7 @@ var Server = Class({
      * @param {string} [reason] - human readable string why the client timed out (probably just contains how long it waited before timing out).
      */
     clientTimedOut: function(client, reason) {
-        console.log(this.name + ": Client " + client.name + " timed out");
+        log("Client " + client.name + " timed out");
 
         this.clientDisconnected(client, reason);
     },
