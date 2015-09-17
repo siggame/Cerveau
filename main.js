@@ -9,7 +9,20 @@ parser.addArgument(['-H', '--host'], {action: 'store', dest: 'host', defaultValu
 parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) print IO through the TCP socket to the terminal'});
 parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'noTimeout', help: '(debugging) clients cannot time out'});
 parser.addArgument(['--authenticate'], {action: 'storeTrue', dest: 'authenticate', help: 'forces clients to authenticate against the authentication server'});
+parser.addArgument(['--profile'], {action: 'storeTrue', dest: 'profile', help: 'run the v8 profilers against threaded game sessions.'});
 var args = parser.parseArgs();
+
+if(args.profile) {
+    try {
+        if(!require('v8-profiler')) {
+            throw new Error("profiler empty");
+        }
+    }
+    catch(e) {
+        console.error("Error: Module 'v8-profiler' not found and is needed for profiling. Please use 'npm install v8-profiler', which will require node-gyp to compile its C++ addons.");
+        process.exit(1);
+    }
+}
 
 var Lobby = require("./gameplay/lobby");
 var lobby = new Lobby(args); // the game server for clients to connect to

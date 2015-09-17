@@ -2,6 +2,9 @@ var serializer = require("./serializer");
 var errors = require("./errors");
 var Class = require(__basedir + "/utilities/class");
 var Server = require("./server");
+var constants = require("./constants");
+var moment = require('moment');
+var fs = require('fs');
 
 /**
  * @class Session: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
@@ -12,10 +15,13 @@ var Session = Class(Server, {
 
         this._needToSendStart = true;
         this._sentOver = false;
+        this._deltas = []; // A record of all deltas generated and sent, to store in the gamelog
 
         this.game = new args.gameClass({
             session: args.gameSession,
         });
+
+        this._profiler = args.profiler;
 
         this.name = this.game.name + " - " + this.game.session + " @ " + process.pid;
     },
@@ -52,7 +58,9 @@ var Session = Class(Server, {
 
         this.game.playerDisconnected(client.player, reason);
 
-        this._checkGameState();
+        this._updateDeltas("disconnect", {
+            player: client.player,
+        });
 
         if(this.game.isOver() && this.clients.length === 0) {
             this.end();
@@ -65,29 +73,54 @@ var Session = Class(Server, {
     start: function() {
         this.game.start(this.getClientsPlaying()); // note: the game only knows about clients playing, the session will care about spectators sending them deltas a such, so the game never needs to know of their existance
 
-        this._checkGameState();
+        if(this._profiler) {
+            this._profiler.startProfiling();
+        }
+
+        this._updateDeltas("start");
     },
 
     /**
      * Called when the game ends, so that this thread "ends"
      */
     end: function() {
-        process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
+        if(this._profiler) {
+            var profile = this._profiler.stopProfiling();
+            profile.export(function(error, result) {
+                fs.writeFileSync('profiles/profile-' + this.game.name + '-' + this.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
+                profile.delete();
+                process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
+            });
+        }
+        else {
+            process.exit(0);
+        }
     },
 
     /**
      * when the game state changes the clients need to know, and we need to check if that game ended when its state changed.
+     *
+     * @param {string} type - the type of delta that occured
+     * @param {Object} [data] - any additional data about what caused the delta
      */
-    _checkGameState: function() {
-        if(this.game.hasStateChanged) {
-            this.game.hasStateChanged = false;
-
-            // send the delta state to all clients
-            for(var i = 0; i < this.clients.length; i++) {
-                var client = this.clients[i];
-                client.send("delta", this.game.getSerializableDeltaStateFor(client));
-            }
+    _updateDeltas: function(type, data) {
+        for(var i = 0; i < this.clients.length; i++) {
+            var client = this.clients[i];
+            client.send("delta", this.game.getDeltaFor(client.player));
         }
+
+        if(data && data.player) {
+            data.player = serializer.serialize(data.player, this.game);
+        }
+
+        var delta = this.game.getTrueDelta();
+        this._deltas.push({
+            type: type,
+            data: data,
+            game: delta,
+        });
+
+        this.game.flushDelta();
 
         if(this._needToSendStart) {
             this._needToSendStart = false;
@@ -103,7 +136,7 @@ var Session = Class(Server, {
         if(this.game.isOver() && !this._sentOver) {
             this._gameOver();
         }
-        else { // game is still in progress, so send requests to players
+        else { // game is still in progress, so send requests to players. Note we always do that after sending delta states so they have updated state info
             this._sendGameOrders();
         }
     },
@@ -115,12 +148,14 @@ var Session = Class(Server, {
         this._sentOver = true;
         console.log(this.name + ": Game is over.");
 
+        this._updateDeltas("over");
+
         for(var i = 0; i < this.clients.length; i++) {
             this.clients[i].send("over"); // TODO: send link to gamelog, or something like that.
         }
 
         process.send({
-            gamelog: this.game.generateGamelog(),
+            gamelog: this.generateGamelog(),
         });
     },
 
@@ -128,7 +163,7 @@ var Session = Class(Server, {
      * Sends to all the clients in the game, that the game has orders they need to execute, depleating the orders stack
      */
     _sendGameOrders: function() {
-        var orders = this.game.popOrders();
+        var orders = this.game.getNewOrders();
 
         for(var i = 0; i < orders.length; i++) {
             var order = orders[i];
@@ -178,9 +213,14 @@ var Session = Class(Server, {
         var self = this;
         this.game.aiRun(client.player, run) // this is a Promise, the game server is promising that eventually it will run the logic, we do this because the game server may need to get info asyncronously (such as from other AIs) before it can resolve this run command
             .then(function(returned) {
-                self._checkGameState();
+                var serializedReturned = serializer.serialize(returned, self.game);
+                self._updateDeltas("ran", {
+                    player: client.player,
+                    data: run,
+                    returned: serializedReturned,
+                });
 
-                client.send("ran", serializer.serialize(returned, self.game));
+                client.send("ran", serializedReturned);
             })
             .catch(function(error) {
                 if(!Class.isInstance(error, errors.CerveauError)) {
@@ -203,8 +243,9 @@ var Session = Class(Server, {
             return;
         }
 
+        var finished = null;
         try {
-            this.game.aiFinished(client.player, data.orderIndex, data.returned);
+            finished = this.game.aiFinished(client.player, data.orderIndex, data.returned);
         }
         catch(error)
         {
@@ -214,7 +255,41 @@ var Session = Class(Server, {
             client.send("invalid", error);
         }
 
-        this._checkGameState();
+        this._updateDeltas("finished", {
+            player: client.player,
+            order: finished,
+            returned: data.returned,
+        });
+    },
+
+    /**
+     * Generates the game log from all the events that happened in this game.
+     *
+     * @returns {Object} the gamelog to store somewhere and somehow (GameLogger handles that)
+     */
+    generateGamelog: function() {
+        var winners = [];
+        var losers = [];
+
+        for(var i = 0; i < this.game.players.length; i++) {
+            var player = this.game.players[i];
+
+            (player.won ? winners : losers).push({
+                index: i,
+                id: player.id,
+                name: player.name,
+            });
+        }
+
+        return {
+            gameName: this.game.name,
+            gameSession: this.game.session,
+            deltas: this._deltas,
+            constants: constants.shared,
+            epoch: moment().valueOf(),
+            winners: winners,
+            losers: losers,
+        };
     },
 });
 

@@ -10,12 +10,14 @@ if(cluster.isMaster) {
     console.error("ERROR: worker running on master thread");
 }
 else {
+    console.log("profile", data.profile);
     var session = new Session({
         gameName: data.gameName,
         gameSession: data.gameSession,
         gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
         printIO: data.printIO,
         noTimeout: data.noTimeout,
+        profiler: data.profile && require('v8-profiler'),
     });
 
     var portOffset = parseInt(data.gameSession) || process.pid;

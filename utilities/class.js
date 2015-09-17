@@ -18,13 +18,13 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 
     var newClass = function() {
         this.__proto__.init.apply(this, arguments); // arguments of the newClass function, not of this Class() function
-    }
+    };
 
     // copy all the functions from the parent class(es) to the new class's prototype, if two parents share the same function the first parent listed will be the one that the new child class's method defaults to
     for(var i = 0; i < parentClasses.length; i++) {
         var parentClass = parentClasses[i];
         for(var property in parentClass.prototype) {
-            if(prototype[property] === undefined) {
+            if(!prototype.hasOwnProperty(property)) {
                 prototype[property] = parentClass.prototype[property];
             }
         }
@@ -39,6 +39,12 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
     for(var property in prototype) { // also assign the properties of the prototype to this class so we can call super methods via SuperClass.SuperFunction.call(this, ...);
         newClass[property] = prototype[property];
     }
+
+    // this create an instance of newClass, but does NOT call the init() fuction. it is expected you plan to call this later
+    // simple put, creates an object with the prototype set to this newClass
+    newClass.uninitialized = function() {
+        return Object.create(prototype);
+    };
 
     return newClass;
 }
@@ -56,12 +62,16 @@ Class.isClass = function(klass) {
 /**
  * checks if a passed in variable is an instance of a Class (or that class's parent Classes)
  *
- * @param {Object} obj to check if it is an instance of isClass
- * @param {function} constructor made with Class method to check if the passed in object is an instance of, or an instance of one of it's parent classes.
+ * @param {Object} obj - object to check if it is an instance of isClass
+ * @param {function} [isClass] - constructor made with Class method to check if the passed in object is an instance of, or an instance of one of it's parent classes. If not passed in then just checks if obj is a class made instance
  */
 Class.isInstance = function(obj, isClass) {
     if(obj === null || typeof(obj) !== "object" || !obj._isClass) {
         return false;
+    }
+
+    if(isClass === undefined && obj._isClass) {
+        return true;
     }
 
     var classes = [ obj._mainClass ];

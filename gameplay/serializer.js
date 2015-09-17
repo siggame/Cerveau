@@ -1,5 +1,4 @@
 var constants = require("./constants");
-var extend = require("extend");
 var Class = require(__basedir + "/utilities/class");
 var BaseGameObject = require("./shared/baseGameObject");
 
@@ -27,11 +26,11 @@ var serializer = {
     },
 
     defaultString: function(s) {
-        return String(s) || "";
+        return (s === undefined ? "" : String(s));
     },
 
     defaultArray: function(a) {
-        return (Array.prototype.isArray.call(a) ? a : []);
+        return (Array.isArray(a) ? a : []);
     },
 
     defaultObject: function(o) {
@@ -39,7 +38,11 @@ var serializer = {
     },
 
     defaultGameObject: function(o) {
-        return (Class.isInstance(o, BaseGameObject) ? o : null)
+        return (Class.isInstance(o, BaseGameObject) ? o : null);
+    },
+
+    defaultType: function(typeName, o) {
+        return serializer[typeName.toLowerCase().upperFirst()](o);
     },
 
     isEmpty: function(obj){
@@ -66,7 +69,7 @@ var serializer = {
         return (serializer.isObject(a) && a[constants.shared.DELTA_LIST_LENGTH] !== undefined);
     },
 
-        /**
+    /**
      * serializes something about a game so it is safe to send over a socket. This is required to avoid cycles and send lists correctly.
      *
      * @param {*} state - The variable you want to serialize. Anything in the game should be serializeable, numberss, strings, BaseGameObjects, dicts, lists, nulls, etc.
@@ -101,41 +104,6 @@ var serializer = {
             }
         }
         return serialized;
-    },
-
-    // first and second should be serialized states from serializer.serialze
-    getDelta: function(first, second) {
-        var result = {};
-
-        for (var key in first) {
-            if(first.hasOwnProperty(key)){
-                if(this.isObject(first[key]) && this.isObject(second[key])) {
-                    result[key] = serializer.getDelta(first[key], second[key]);
-                    if (result[key] === undefined) { // then the object was empty, there was no change (this with removed values will have the constant strings set)
-                        delete result[key];
-                    }
-                    else if(result[key][constants.shared.DELTA_LIST_LENGTH] !== undefined) {
-                        var len = constants.shared.DELTA_LIST_LENGTH;
-                        if(serializer.isEmptyExceptFor(result[key], len) && first[key][len] === second[key][len]) { // then this is an array that did not change in size or any elements, so delete it.
-                            delete result[key];
-                        }
-                    }
-                }
-                else if(first[key] !== second[key]) {
-                    result[key] = (second[key] === undefined ? constants.shared.DELTA_REMOVED : second[key]);
-                }
-            }
-        }
-
-        for(var key in second) {
-            if(second.hasOwnProperty(key)) {
-                if(first[key] === undefined) {
-                    result[key] = second[key];
-                }
-            }
-        }
-
-        return serializer.isEmpty(result) ? undefined : result;
     },
 
     deserialize: function(data, game, dataTypeConverter) {

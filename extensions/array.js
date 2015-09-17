@@ -17,7 +17,7 @@ var ArrayExtensions = {
     },
 
     isArray: function() {
-        return (Object.prototype.toString.call(this) === '[object Array]');
+        return Array.isArray(this);
     },
 
     contains: function(element) {
@@ -31,12 +31,7 @@ var ArrayExtensions = {
     },
 
     clone: function() {
-        var cloned = [];
-        for(var i = 0; i < this.length; i++) {
-            cloned[i] = this[i];
-        }
-
-        return cloned;
+        return this.slice();
     },
 };
 

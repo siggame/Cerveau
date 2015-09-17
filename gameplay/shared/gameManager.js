@@ -10,13 +10,13 @@ var GameManager = Class({
         this._gameObjectClasses = {};
         for(var key in this._gameStructure) {
             if(this._gameStructure.hasOwnProperty(key) && key !== "Game" && key !== "AI") {
-                this._gameObjectClasses[key] = require(__basedir + "/games/" + this._gameStructure.Game.name + "/" + key.lowercaseFirst());
+                this._gameObjectClasses[key] = require(__basedir + "/games/" + this._gameStructure.Game.name.lowercaseFirst() + "/" + key.lowercaseFirst());
             }
         }
     },
 
-    createGameObject: function(gameObjectName, data) {
-        return new this._gameObjectClasses[gameObjectName](data);
+    createUninitializedGameObject: function(gameObjectName) {
+        return new this._gameObjectClasses[gameObjectName].uninitialized;
     },
 
     _sanitizeArgs: function(argsStructure, untreatedArgs) {

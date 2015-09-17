@@ -20,6 +20,7 @@ var Lobby = Class(Server, {
         this.host = args.host;
         this.port = args.port;
         this.authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
+        this._profile = (args.profile === true);
         this.gameNames = [];
         this.gameSessions = {};
         this.gameClasses = [];
@@ -260,6 +261,7 @@ var Lobby = Class(Server, {
                 clientInfos: clientInfos,
                 printIO: this.printIO,
                 noTimeout: this.noTimeout,
+                profile: this._profile,
             })
         });
 

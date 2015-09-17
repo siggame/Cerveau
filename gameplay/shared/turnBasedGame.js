@@ -10,11 +10,9 @@ var TurnBasedGame = Class(BaseGame, {
     init: function() {
         BaseGame.init.apply(this, arguments);
 
-        this.currentTurn = 0;
-        this.maxTurns = 100; // real class should override this during init
-        this.currentPlayer = null;
-
-        this._addSerializableKeys(["currentTurn", "maxTurns", "currentPlayer"]);
+        this._addProperty("currentTurn", 0);
+        this._addProperty("maxTurns", 100); // real class should override this during init
+        this._addProperty("currentPlayer", null);
     },
 
     /**

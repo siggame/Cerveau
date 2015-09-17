@@ -18,8 +18,8 @@
   "engines": {
     "node": ">= 4.0.0"
   },
-  "scripts": {
+  "scripts": [
     "node main.js"
-  },
+  ],
   "license": "MIT"
 }

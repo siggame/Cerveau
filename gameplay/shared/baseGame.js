@@ -1,9 +1,9 @@
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
+var DeltaMergeableArray = require("./deltaMergeableArray");
 var errors = require("../errors");
 var serializer = require("../serializer");
 var constants = require("../constants");
-var moment = require('moment');
 
 /**
  * @abstract
@@ -11,12 +11,14 @@ var moment = require('moment');
  */
 var BaseGame = Class(DeltaMergeable, {
     init: function(data) {
+        this._delta = {}; // the current delta we are recoding
+
         DeltaMergeable.init.call(this);
 
-        // serializable member variables
-        this.players = [];
-        this.gameObjects = {};
-        this.session = (data.session === undefined ? "Unknown" : data.session);
+        this._addProperty("players", []);
+        this._addProperty("gameObjects", {});
+        this._addProperty("session", (data.session === undefined ? "Unknown" : data.session));
+        this._addProperty("name", this.name);
 
         this._orders = [];
         this._newOrdersToPopIndex = 0;
@@ -24,14 +26,8 @@ var BaseGame = Class(DeltaMergeable, {
         this._started = false;
         this._over = false;
         this._nextGameObjectID = 0;
-        this._lastSerializableState = null;
-        this._currentSerializableState = null;
-        this._serializableDeltaState = null;
-        this._deltas = []; // record of all delta states, for the game log generation
 
         this._initGameManager();
-
-        this._addSerializableKeys(["players", "gameObjects", "session", "name"]);
     },
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
@@ -58,9 +54,8 @@ var BaseGame = Class(DeltaMergeable, {
     start: function(clients) {
         this._initPlayers(clients);
 
-        var startData = this.begin();
+        this.begin();
 
-        this._updateSerializableStates("start", startData);
         this._started = true;
     },
 
@@ -166,11 +161,16 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {BaseGameObject} the game object that was created, now being tracked by this game
      */
     create: function(gameObjectName, data) {
+        var gameObject = this._gameManager.createUninitializedGameObject(gameObjectName);
+
         data = data || {};
         data.id = this._generateNextGameObjectID();
         data.game = this;
-        var gameObject = this._gameManager.createGameObject(gameObjectName, data);
-        this.gameObjects[gameObject.id] = gameObject;
+
+        this.gameObjects.add(data.id, gameObject);
+
+        gameObject.init(data); // we delay the actul init so that it can already be in gameObjects during it's init function
+
         return gameObject;
     },
 
@@ -187,7 +187,7 @@ var BaseGame = Class(DeltaMergeable, {
      * @param {Player} the player this ai controls
      * @param {number} orderIndex - the index of the order that finished
      * @param {Object} [data] - serialized data returned from the ai executing that order
-     * @returns {Object|undefined} if an error was encountered an invalid object will be returned, undefined if everything went correctly.
+     * @returns {string} the name of the order that was finished
      */
     aiFinished: function(player, orderIndex, data) {
         var order = this._orders[orderIndex];
@@ -213,11 +213,7 @@ var BaseGame = Class(DeltaMergeable, {
             }
 
             if(hadCallback) {
-                this._updateSerializableStates("finished", {
-                    player: serializer.serialize(player, this),
-                    order: finished,
-                    returned: data,
-                });
+                return finished;
             }
             else {
                 this.throwErrorClass(errors.EventDataError, "No callback for finshed order '" + finished + "'.");
@@ -248,15 +244,9 @@ var BaseGame = Class(DeltaMergeable, {
         var sanitizeRan = function(returned) {
             return self._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, returned);
         }
-
         return new Promise(function(resolve, reject) {
             try {
                 var ranReturned = runCallback.apply(run.caller, argsArray);
-
-                self._updateSerializableStates("run", {
-                    player: serializer.serialize(player, self),
-                    data: data,
-                });
 
                 if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
                     asyncReturnWrapper.callback = function(asyncReturnValue) {
@@ -268,6 +258,7 @@ var BaseGame = Class(DeltaMergeable, {
                 }
             }
             catch(e) {
+                console.log("oh no shit fuck", e, e.stack);
                 reject(e);
             }
         });
@@ -301,11 +292,11 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Called from the session to send this order to the ais (clients). Pops all orders added since the last time this was called
+     * Called from the session to send this order to the ais (clients). Gets all new orders since the last time this was called
      *
      * @returns {Array.<Object>} array of orders to send
      */
-    popOrders: function() {
+    getNewOrders: function() {
         var orders = [];
         for(var i = this._newOrdersToPopIndex; i < this._orders.length; i++) {
             orders.push(this._orders[i]);
@@ -321,70 +312,54 @@ var BaseGame = Class(DeltaMergeable, {
     ///////////////////////////
 
     /**
+     * Gets the true delta state of the game, with nothing hidden
+     *
+     * @returns {Object} delta formatted object representing the true delta state of the game, with nothing hidden
+     */
+    getTrueDelta: function() {
+        return this._delta;
+    },
+
+    /**
      * Returns the difference between the last and current state for the given player.
      *
      * @param {Player} player (for inheritance) if the state differs between players inherited games can send different states (such as to hide data from certain players).
      * @returns {Object} the serializable state as the passed in player should see it
      */
-    getSerializableDeltaStateFor: function(player) {
-        return this._serializableDeltaState;
+    getDeltaFor: function(player) {
+        return this.getTrueDelta();
     },
 
     /**
-     * Updates all the private states used to generate delta states and game logs.
+     * Called by all DeltaMergeables in this game whenever a property of theirs is updated
      *
-     * @param {string} deltaType - the type of delta that occured (the reason why the state changed)
-     * @param {Object} [deltaData] - data about the delta, such as parameters sent that changed it
+     * @param {Array} basePath - the path of keys to where this property's object is
+     * @param {string} propertyKey - they key of the property at the end of the basePath
+     * @param {boolean} [wasDeleted] - true if the value was removed (delted)
      */
-    _updateSerializableStates: function(deltaType, deltaData) {
-        this.hasStateChanged = false;
+    updateDelta: function(basePath, propertyKey, wasDeleted) {
+        var currentReal = this;
+        var currentDelta = this._delta;
+        for(var i = 0; i < basePath.length; i++) {
+            var pathKey = basePath[i];
+            currentReal = currentReal[pathKey];
 
-        var last = this._currentSerializableState || {};
-        var current = serializer.serialize(this);
-        var delta = serializer.getDelta(last, current);
-
-        if(delta && !serializer.isEmpty(delta)) { // then there is an actual difference between the last and current state
-            this.hasStateChanged = true;
-            this._lastSerializableState = last;
-            this._currentSerializableState = current;
-            this._serializableDeltaState = delta;
+            currentDelta[pathKey] = currentDelta[pathKey] || {};
+            currentDelta = currentDelta[pathKey];
+            if(currentReal.isArray) {
+                currentDelta[constants.shared.DELTA_LIST_LENGTH] = currentReal.length;
+                delete currentDelta.length;
+            }
         }
-
-        this._deltas.push({
-            type: deltaType,
-            data: deltaData,
-            game: delta,
-        });
+        // now we have traversed the path and are ready to set the value that was updated
+        currentDelta[propertyKey] = wasDeleted ? constants.shared.DELTA_REMOVED : serializer.serialize(currentReal[propertyKey], this);
     },
 
     /**
-     * Generates the game log from all the events that happened in this game.
-     *
-     * @returns {Object} the gamelog to store somewhere and somehow (GameLogger handles that)
+     * Clears the current delta data. Should be called by the session once it's done with the current delta of this game
      */
-    generateGamelog: function() {
-        var winners = [];
-        var losers = [];
-
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-
-            (player.won ? winners : losers).push({
-                index: i,
-                id: player.id,
-                name: player.name,
-            });
-        }
-
-        return {
-            gameName: this.name,
-            gameSession: this.session,
-            deltas: this._deltas,
-            constants: constants.shared,
-            epoch: moment().valueOf(),
-            winners: winners,
-            losers: losers,
-        };
+    flushDelta: function() {
+        this._delta = {};
     },
 
 
@@ -419,7 +394,7 @@ var BaseGame = Class(DeltaMergeable, {
         var error = new errorClass(message, data);
         player.errors.push(error);
 
-        if(player.error.length > this.maxErrorsPerPlayer) {
+        if(player.errors.length > this.maxErrorsPerPlayer) {
             this.declairLoser(player, "Reached max amount of errors in one game (" + this.maxErrorsPerPlayer + ")");
         }
 
@@ -432,7 +407,7 @@ var BaseGame = Class(DeltaMergeable, {
      * @see throwErrorOf
      */
     throwInvalidGameLogic: function(player, message, data) {
-        return this.throwErrorClass(error.GameLogicError, player, message, data);
+        return this.throwErrorClass(errors.GameLogicError, player, message, data);
     },
 
     /**

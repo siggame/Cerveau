@@ -36,18 +36,9 @@ var ${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else 
          *
          * @type {${shared['cerveau']['type'](attr_parms['type'])}}
          */
-        this.${attr_name} = ${shared['cerveau']['cast'](attr_parms['type'])}(data.${attr_name});
+        this._addProperty("${attr_name}", ${shared['cerveau']['cast'](attr_parms['type'])}(data.${attr_name}));
 
 % endfor
-<%
-serializable_keys = []
-for attr_name in obj['attribute_names']:
-    attr_parms = obj['attributes'][attr_name]
-    if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
-        continue
-    else:
-        serializable_keys.append('"' + attr_name + '"')
-%>        this._addSerializableKeys([${", ".join(serializable_keys)}]);
 
 ${merge("        //", "init",
 """
@@ -67,7 +58,9 @@ ${merge("        //", "init",
      * This is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet..
      */
     begin: function() {
-        Generated${obj_key}.begin.apply(this, arguments);
+% for parent_class in reversed(parent_classes):
+        ${parent_class}.begin.apply(this, arguments);
+% endfor
 
 ${merge("        //", "begin", "        // any logic after init can be put here")}
     },
