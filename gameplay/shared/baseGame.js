@@ -117,6 +117,23 @@ var BaseGame = Class(DeltaMergeable, {
         }
     },
 
+    /**
+     * Gets all the players in the game except the passed in player. Something you'll want to know often in games
+     *
+     * @param {Player} player - the player you want to exclude
+     * @returns {Array.<Player>} all the other players besides the one passed in
+     */
+    getOtherPlayers: function(player) {
+        var otherPlayers = [];
+        for(var i = 0; i < this.players.length; i++) {
+            if(this.players[i] !== player) {
+                otherPlayers.push(this.players[i]);
+            }
+        }
+
+        return otherPlayers;
+    },
+
 
 
     //////////////////
@@ -126,22 +143,11 @@ var BaseGame = Class(DeltaMergeable, {
     /**
      * Checks and returns the game object with given id, undefined otherwise.
      *
+     * @param {string} id - the id of the BaseGameObject you want.
      * @returns {BaseGameObject} with the given id
      */
-    getGameObject: function(id) { // TO INHERIT
-        id = parseInt(id);
-        if(id !== NaN) {
-            return this.gameObjects[id];
-        }
-    },
-
-    /**
-     * Checks if the given object represents a game object in this game instance.
-     *
-     * @returns {boolean} representing if the passed in obj is a tracked game object in this game
-     */
-    isGameObject: function(obj) {
-        return (serializer.isObject(obj) && obj.id !== undefined && this.getGameObject(obj.id) === obj);
+    getGameObject: function(id) {
+        return this.gameObjects[id];
     },
 
     /**
@@ -258,7 +264,6 @@ var BaseGame = Class(DeltaMergeable, {
                 }
             }
             catch(e) {
-                console.log("oh no shit fuck", e, e.stack);
                 reject(e);
             }
         });

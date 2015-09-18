@@ -9,7 +9,7 @@ var BaseGameObject = Class(DeltaMergeable, {
     init: function(data) {
         DeltaMergeable.init.call(this, data.game, ["gameObjects", data.id]);
 
-        if(!data.game.isGameObject(this)) { // then this is a fresh init of an untracked game object (game objects that inherit multiple child game objects classes will try to init this class multiple times)
+        if(this.id === undefined) { // then this is a fresh init of an untracked game object (game objects that inherit multiple child game objects classes will try to init this class multiple times)
             this.game = data.game;
 
             this._addProperty("id", data.id);

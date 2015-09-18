@@ -74,14 +74,13 @@ var serializer = {
      *
      * @param {*} state - The variable you want to serialize. Anything in the game should be serializeable, numberss, strings, BaseGameObjects, dicts, lists, nulls, etc.
      * @param {BaseGame} game - the game you are serializing things for
-     * @param {boolean} _forceSerialize - internal flag used during recursion. Never send directly.
      * @returns {*} state, serialized. It will never be the same Object if it is an Object ({} or [])
      */
-    serialize: function(state, game, _forceSerialize) {
+    serialize: function(state, game) {
         if(!serializer.isObject(state)) {
             return state;
         }
-        else if(!_forceSerialize && Class.isInstance(state, BaseGameObject)) { // no need to serialize this whole thing
+        else if(Class.isInstance(state, BaseGameObject)) { // no need to serialize this whole thing
             return { id: state.id };
         }
 
@@ -96,7 +95,7 @@ var serializer = {
             if(serializer.isSerializable(state, key)) {
                 var value = state[key];
                 if(serializer.isObject(value)) {
-                    serialized[key] = serializer.serialize(value, game, state === game.gameObjects);
+                    serialized[key] = serializer.serialize(value, game);
                 }
                 else {
                     serialized[key] = value;

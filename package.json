@@ -8,13 +8,14 @@
   },
   "private": true,
   "dependencies": {
+    "argparse": "1.0.2",
+    "clone": "1.0.0",
+    "colors": "1.1.2",
     "express": "4.10.2",
     "express-handlebars": "2.0.0",
-    "argparse": "1.0.2",
     "extend": "2.0.0",
-    "clone": "1.0.0",
     "moment": "2.9.0",
-    "colors": "1.1.2"
+    "uuid": "2.0.1"
   },
   "engines": {
     "node": ">= 4.0.0"

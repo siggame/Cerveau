@@ -7,14 +7,14 @@ var FogOfWarGameObject = Class(BaseGameObject, {
     init: function(data) {
         BaseGameObject.init.apply(this, arguments);
 
-        this.playersVisibleTo = [];
-
-        this._serializableKeys = {
-            "playersVisibleTo": true;
-        };
+        this._addProperty("playersVisibleTo", []);
     },
 
-    // @returns boolean representing if this game object is visible to the passed in player
+    /**
+     * Checks if this game object is visible to a player
+     *
+     * @returns boolean representing if this game object is visible to the passed in player
+     */
     isVisibleToPlayer: function(player) {
         for(var i = 0; i < this.playersVisibleTo.length; i++) {
             if(this.playersVisibleTo[i] === player) {
@@ -25,24 +25,31 @@ var FogOfWarGameObject = Class(BaseGameObject, {
         return false;
     },
 
-    /// makes the game object visible to the passed in player
-    makeVisibleToPlayer: function(player) {
-        this.playersVisibleTo.insertIfAbsent(player);
-    },
-
-    makeVisibleToPlayers: function(players) {
-        for(var i = 0; i < players.length; i++) {
-            this.makeVisibleToPlayer(players[i]);
+    /**
+     * makes the game object visible to the passed in player(s)
+     *
+     * @param {Player|Array.<Player>} the player or players you want to make this visible to
+     */
+    makeVisibleTo: function(players) {
+        if(players.isArray) {
+            this.playersVisibleTo.pushIfAbsent.apply(this.playersVisibleTo, players);
+        }
+        else { // players is actually a single player, not an array of players
+            this.playersVisibleTo.pushIfAbsent(players);
         }
     },
 
-    makeHiddenToPlayer: function(player) {
-        this.playersVisibleTo.removeIfPresent(player);
-    },
-
-    makeHiddenToPlayers: function(players) {
+    /**
+     * makes the game hidden to the passed in player(s)
+     *
+     * @param {Player|Array.<Player>} the player or players you want to make this hidden to
+     */
+    makeHiddenTo: function(players) {
+        if(!players.isArray) {
+            players = [players];
+        }
         for(var i = 0; i < players.length; i++) {
-            this.makeHiddenToPlayer(players[i]);
+            this.playersVisibleTo.removeElement(players[i]);
         }
     },
 });

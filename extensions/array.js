@@ -42,6 +42,17 @@ var ArrayExtensions = {
         for(var j, x, i = this.length; i; j = Math.floor(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
         return this;
     },
+
+    pushIfAbsent: function(/* ... */) {
+        var pushing = [];
+        for(var i = 0; i < arguments.length; i++) {
+            if(!this.contains(arguments[i])) {
+                pushing.push(arguments[i]);
+            }
+        }
+
+        return this.push.apply(this, pushing);
+    },
 };
 
 for(var extension in ArrayExtensions) {

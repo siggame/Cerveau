@@ -56,12 +56,12 @@ _obj.log = function(argsArray, colorFunction) {
             if(!_obj.nameColor) { // color for the name
                 var bgColor = "White";
                 var color = "Black";
-                var colorsArray = ["Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"];
+                var colorsArray = ["Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"];
                 colorsArray.shuffle();
 
                 if(!cluster.isMaster) { // make the color random
                     bgColor = colorsArray.pop();
-                    colorsArray.push("White");
+                    colorsArray.push("White", "Black");
                     colorsArray.shuffle();
 
                     switch(bgColor) {
