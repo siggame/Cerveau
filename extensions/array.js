@@ -37,6 +37,11 @@ var ArrayExtensions = {
     randomElement: function() {
         return this[Math.floor(Math.random() * this.length)];
     },
+
+    shuffle: function() { // from http://stackoverflow.com/a/6274381/944727
+        for(var j, x, i = this.length; i; j = Math.floor(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
+        return this;
+    },
 };
 
 for(var extension in ArrayExtensions) {

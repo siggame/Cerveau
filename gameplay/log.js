@@ -33,11 +33,30 @@ _obj.log = function(colorFunction, argsArray) {
         }
         if(_obj.server) {
             if(!_obj.nameColor) {
-                var bgColor = "bgWhite";
+                var bgColor = "White";
+                var color = "Black";
+                var colorsArray = ["Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"];
+                colorsArray.shuffle();
+
                 if(!cluster.isMaster) {
-                    bgColor = "bg" + ["Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"].randomElement()
+                    bgColor = colorsArray.pop();
+                    colorsArray.push("White");
+                    colorsArray.shuffle();
+
+                    switch(bgColor) {
+                        case "Magenta":
+                            colorsArray.removeElement("Red");
+                            break;
+                        case "Red":
+                            colorsArray.removeElement("Magenta");
+                    }
+                    color = colorsArray.pop();
                 }
-                _obj.nameColor = colors.black[bgColor];
+                _obj.nameColor = colors[color.toLowerCase()]["bg" + bgColor];
+
+                if(!cluster.isMaster && Math.floor(Math.random() * 2)) {
+                    _obj.nameColor =  _obj.nameColor.bold;
+                }
             }
             str = _obj.nameColor(_obj.server.name) + " " + str;
         }
