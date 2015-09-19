@@ -1,3 +1,4 @@
+var log = require("../log");
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
 var DeltaMergeableArray = require("./deltaMergeableArray");
@@ -11,6 +12,11 @@ var constants = require("../constants");
  */
 var BaseGame = Class(DeltaMergeable, {
     init: function(data) {
+        if(this._baseGameInitialized) { // semi-shitty way to avoid the diamond inheritance problem
+            return;
+        }
+
+        this._baseGameInitialized = true;
         this._delta = {}; // the current delta we are recoding
 
         DeltaMergeable.init.call(this);
@@ -36,6 +42,9 @@ var BaseGame = Class(DeltaMergeable, {
     maxInvalidsPerPlayer: 10,
     _orderFlag: {isOrderFlag: true},
 
+    /**
+     * initializes this games game manager, which is a creer generated class that handles code that is re-used between games but could not be moved down to a base class as they are too game specific, such as creating game objects by name
+     */
     _initGameManager: function() {
         this._gameManager = require(__basedir + "/games/" + this.name.lowercaseFirst() + "/gameManager");
     },
@@ -342,11 +351,12 @@ var BaseGame = Class(DeltaMergeable, {
      * @param {string} propertyKey - they key of the property at the end of the basePath
      * @param {boolean} [wasDeleted] - true if the value was removed (delted)
      */
-    updateDelta: function(basePath, propertyKey, wasDeleted) {
+    updateDelta: function(property, wasDeleted) {
+        var path = property.path;
         var currentReal = this;
         var currentDelta = this._delta;
-        for(var i = 0; i < basePath.length; i++) {
-            var pathKey = basePath[i];
+        for(var i = 0; i < path.length-1; i++) {
+            var pathKey = path[i];
             currentReal = currentReal[pathKey];
 
             currentDelta[pathKey] = currentDelta[pathKey] || {};
@@ -357,6 +367,7 @@ var BaseGame = Class(DeltaMergeable, {
             }
         }
         // now we have traversed the path and are ready to set the value that was updated
+        var propertyKey = path.last();
         currentDelta[propertyKey] = wasDeleted ? constants.shared.DELTA_REMOVED : serializer.serialize(currentReal[propertyKey], this);
     },
 

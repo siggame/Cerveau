@@ -1,3 +1,4 @@
+var log = require("../log");
 var Class = require(__basedir + "/utilities/class");
 
 /**
@@ -6,14 +7,14 @@ var Class = require(__basedir + "/utilities/class");
  */
 var DeltaMergeable = Class({
     /**
-     * Creates something that is DeltaMergeable, that is will only serialize certain keys
+     * Creates something that is DeltaMergeable, that is will only serialize certain keys. Can be re-initialized multiple times and will not overwrite values
      *
      * @contructor
      */
     init: function(baseGame, pathInBaseGame) {
         this._baseGame = baseGame || this;
         this._pathInBaseGame = pathInBaseGame || [];
-        this._properties = {};
+        this._properties = this._properties || {};
     },
 
     /**
@@ -24,34 +25,52 @@ var DeltaMergeable = Class({
      * @param {function} [setter] - a function that takes in what is trying to be assigned to, and will return a different value, probably for santization
      * @param {string} [deltaKey] - what the key for the delta, defaults to the passed in key
      */
-    _addProperty: function(key, value, setter, deltaKey) {
+    _addProperty: function(key, value, options) {
         if(Array.isArray(value)) {
-            return this._createNestedArray(key, value, setter);
+            return this._createNestedArray(key, value, options);
         }
         else if(value !== null && typeof(value) === "object" && !Class.isInstance(value)) {
-            return this._createNestedDictionary(key, value, setter);
+            return this._createNestedDictionary(key, value, options);
         }
 
         if(!this._hasProperty(key)) {
-            var self = this;
-            //self._properties[key] = serializer.defaultType.;
-
-            Object.defineProperty(self, key, {
-                configurable: true,
-                enumerable: true,
-                get: function() {
-                    return self._properties[key];
-                },
-                set: function(newValue) {
-                    self._properties[key] = (setter ? setter(newValue) : newValue);
-                    self._baseGame.updateDelta(self._pathInBaseGame, deltaKey !== undefined ? deltaKey : key);
-                },
-            });
+            this._setupProperty(key, options);
         }
 
         if(value !== undefined) {
             this[key] = value;
         }
+    },
+
+    /**
+     * initialized a property internally
+     *
+     * @param {string} key - the index
+     * @param {Object} [options] - can contain the deltaKey override, and setter function to apply
+     */
+    _setupProperty: function(key, options) {
+        options = options || {};
+        var propertyPath = this._pathInBaseGame.clone();
+
+        propertyPath.push(options.hasOwnProperty("deltaKey") ? options.deltaKey : key);
+        this._properties[key] = {
+            value: undefined,
+            path: propertyPath,
+        };
+
+        var self = this;
+        Object.defineProperty(self, key, {
+            configurable: true,
+            enumerable: true,
+            get: function() {
+                return this._properties[key].value;
+            },
+            set: function(newValue) {
+                var property = this._properties[key];
+                property.value = (options.setter ? options.setter(newValue) : newValue);
+                this._baseGame.updateDelta(property);
+            },
+        });
     },
 
     /**
@@ -62,8 +81,8 @@ var DeltaMergeable = Class({
      */
     _removeProperty: function(key) {
         var removed = this[key];
+        this._baseGame.updateDelta(this._properties[key], true);
         delete this._properties[key];
-        this._baseGame.updateDelta(this._pathInBaseGame, key, true);
         return removed;
     },
 

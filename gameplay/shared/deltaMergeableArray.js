@@ -1,14 +1,19 @@
+var log = require("../log");
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
+var constants = require("../constants");
 
 var prototype = {
     init: function(baseGame, pathInBaseGame, copyFrom) {
         DeltaMergeable.init.apply(this, arguments);
 
         var self = this;
-        self._addProperty("length", 0, function(newValue) {
-            return self._resize(newValue);
-        }, true);
+        self._addProperty("length", 0, {
+            deltaKey: true,
+            setter: function(newValue) {
+                return self._resize(newValue);
+            },
+        });
 
         if(copyFrom) {
             this.push.apply(this, copyFrom);

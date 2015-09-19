@@ -1,5 +1,6 @@
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
+var log = require("../log");
 
 /**
  * @abstract

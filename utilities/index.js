@@ -41,5 +41,25 @@ module.exports = {
         return moment(epoch).format("YYYY.MM.DD.HH.mm.ss.SSS");
     },
 
+    /**
+     * traverses down nested objects given keys
+     *
+     * @param {Object} obj - multi-dimensional object to traverse down
+     * @param {Array.<string>} keys - list of keys in order to look for a traverse down
+     * @returns {*} whatever is all the way at the end of the traversal
+     */
+    traverse: function(obj, keys) {
+        var o = obj;
+        for(var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            if(o === null || typeof(o) !== "object" || !o.hasOwnProperty(key)) {
+                break;
+            }
+            o = o[key];
+        }
+
+        return obj;
+    },
+
     Class: require("./class"),
 };
