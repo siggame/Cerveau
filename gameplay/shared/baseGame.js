@@ -99,18 +99,20 @@ var BaseGame = Class(DeltaMergeable, {
      * @param {Array.<Client>} clients - all client connected to this game that are playing, each will have a corresponding player created for it.
      */
     _initPlayers: function(clients) {
-        for(var i = 0; i < clients.length; i++) {
-            var client = clients[i];
-            var player = this.create("Player", { // this method should be implimented in GeneratedGame
-                name: client.name || ("Player " + i),
-                clientType: client.type || "Unknown",
-            });
+        if(this.players.length === 0) {
+            for(var i = 0; i < clients.length; i++) {
+                var client = clients[i];
+                var player = this.create("Player", { // this method should be implimented in GeneratedGame
+                    name: client.name || ("Player " + i),
+                    clientType: client.type || "Unknown",
+                });
 
-            player.errors = [];
-            player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
-            player.client = client;
-            client.setGameData(this, player);
-            this.players.push(player);
+                player.errors = [];
+                player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
+                player.client = client;
+                client.setGameData(this, player);
+                this.players.push(player);
+            }
         }
     },
 

@@ -6,8 +6,8 @@ var serializer = require("../serializer");
 var clone = require("clone");
 var uuid = require("uuid");
 
-// @class FogOfWarGame: a base game that can hide game objects from players, that is to say thier game states will be able to hide (send null) for certain game objects on the fly
-var FogOfWarGame = Class(BaseGame, ObscuredDeltaMergeable, {
+// @class ObscuredGame - a game where all values in it can be obscured in it and it's game objects
+var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     init: function() {
         BaseGame.init.apply(this, arguments);
 
@@ -28,7 +28,7 @@ var FogOfWarGame = Class(BaseGame, ObscuredDeltaMergeable, {
         for(var i = 0; i < this.players.length; i++) {
             this._obscuredDeltas[this.players[i].id] = clone(this._delta);
         }
-    }
+    },
 
     /**
      * @override generates a UUID (Universally unique identifier) V4, because with game data being obscued we don't want competitors potentially learning hidden data based of id generation.
@@ -115,4 +115,4 @@ var FogOfWarGame = Class(BaseGame, ObscuredDeltaMergeable, {
     },
 });
 
-module.exports = FogOfWarGame;
+module.exports = ObscuredGame;
