@@ -1,6 +1,7 @@
 var utilities = require(__basedir + "/utilities/");
 var Class = utilities.Class;
 var fs = require('fs');
+var zlib = require('zlib');
 var path = require('path');
 var moment = require('moment');
 var log = require("./log");
@@ -15,6 +16,7 @@ var GameLogger = Class({
      */
     init: function(gameNames, dir) {
         this.gamelogExtension = ".joue";
+        this.usingCompression = true;
         this.gamelogDirectory = dir || 'output/gamelogs/';
         this.gamelogs = []; // simple array of gamelogs, not indexed by gameName, sessionID, epoch like this.gamelogFor
 
@@ -28,18 +30,18 @@ var GameLogger = Class({
             var filename = filenames[i];
             if(filename.endsWith(this.gamelogExtension)) {
                 (function(self, filename) {
-                    fs.readFile(self.gamelogDirectory + filename, 'utf8', function (err, data) {
-                        if (err) {
-                            throw err;
-                        }
-                        var name = filename.substring(0, filename.length - self.gamelogExtension.length);
-                        var gamelog = JSON.parse(data);
+                    var path = self.gamelogDirectory + filename;
 
-                        self.gamelogFor[gamelog.gameName] = self.gamelogFor[gamelog.gameName] || {}; // for gamelogs that had their plugin removed.
-                        self.gamelogFor[gamelog.gameName][gamelog.gameSession] = self.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
-                        self.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
-                        self.gamelogs.push(gamelog);
-                    });
+                    var strings = [];
+                    var readStream = fs.createReadStream(path)
+                        .pipe(zlib.createGunzip()) // Un-Gzip
+                        .on("data", function(buffer) {
+                            strings.push(buffer.toString('utf8'));
+                        })
+                        .on("end", function() {
+                            var gamelog = JSON.parse(strings.join(''));
+                            self._memorizeGamelog(gamelog);
+                        });
                 })(this, filename);
             }
         }
@@ -52,18 +54,33 @@ var GameLogger = Class({
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
-        var filename = moment(gamelog.epoch).format("YYYY.MM.DD.HH.mm.ss.SSS") + "-" + gamelog.gameName + "-" + gamelog.gameSession;
+        var filename = utilities.momentString(gamelog.epoch) + "-" + gamelog.gameName + "-" + gamelog.gameSession;
 
-        // store it in memory, no need to read the file back in and deserialize it.
-        this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
-        this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
-        this.gamelogs.push(gamelog);
+        this._memorizeGamelog(gamelog);
 
-        fs.writeFile(this.gamelogDirectory + filename + this.gamelogExtension, serialized, function(err) {
+        var path = (this.gamelogDirectory + filename + this.gamelogExtension);
+        var writeSteam = fs.createWriteStream(path, 'utf8');
+        var gzip = zlib.createGzip();
+
+        gzip.pipe(writeSteam);
+        gzip.write(serialized);
+        gzip.end();
+
+        /*fs.writeFile(, serialized, function(err) {
             if(err) {
                 log.error("Gamelog Write Error:", err);
             }
-        }); 
+        });*/ 
+    },
+
+    /**
+     * takes a parsed gamelog and stores it in memory
+     */
+    _memorizeGamelog: function(gamelog) {
+        this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};
+        this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
+        this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
+        this.gamelogs.push(gamelog);
     },
 
     /**
