@@ -3,10 +3,13 @@ var Class = require(__basedir + "/utilities/class");
 var ObscuredDeltaMergeable = require("./obscuredDeltaMergeable");
 var BaseGame = require("./baseGame");
 var serializer = require("../serializer");
+var constants = require("../constants");
 var clone = require("clone");
 var uuid = require("uuid");
 
-// @class ObscuredGame - a game where all values in it can be obscured in it and it's game objects
+/**
+ * @class ObscuredGame - a game where all values in it can be obscured in it and it's game objects
+ */
 var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     init: function() {
         BaseGame.init.apply(this, arguments);
@@ -60,11 +63,14 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
      *
      * @override
      */
-    deltaUpdate: function(property, wasDeleted) {
-        BaseGame.deltaUpdate.call(this, property, wasDeleted);
+    updateDelta: function(property, wasDeleted) {
+        BaseGame.updateDelta.call(this, property, wasDeleted);
 
-        for(var i = 0; i < this.players; i++) {
-            this.obscuredDeltaUpdate(property, this.players[i], wasDeleted);
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            if(player) {
+                this.obscuredDeltaUpdate(property, this.players[i], wasDeleted);
+            }
         }
     },
 
@@ -78,6 +84,7 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     obscuredDeltaUpdate: function(property, player, wasDeleted) {
         var path = property.path;
         var currentReal = this;
+        this._obscuredDeltas[player.id] = this._obscuredDeltas[player.id] || {};
         var currentDelta = this._obscuredDeltas[player.id];
         for(var i = 0; i < path.length-1; i++) {
             var pathKey = path[i];

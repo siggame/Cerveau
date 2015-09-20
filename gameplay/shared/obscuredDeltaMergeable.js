@@ -13,13 +13,14 @@ var ObscuredDeltaMergeable = Class(DeltaMergeable, {
     /**
      * Manipulates the obscuring of a key for some players, while checking where needed
      *
-     * @param {Player|Array.<Player>} forPlayers - a single player, or array of players to obscure to some value
      * @param {string} key - the key you are obscuring
      * @param {*} value - what the obscured value will be
-     * @param {boolean} true if worked, false if there is no property present to obscure
+     * @param {Player|Array.<Player>} forPlayers - a single player, or array of players to obscure to some value
+     * @returns {boolean} true if worked, false if there is no property present to obscure
      */
-    obscure: function(forPlayers, key, value) {
+    obscure: function(key, value, forPlayers) {
         return this._obscure(forPlayers, key, function(property, player) {
+            property.obscured[player.id] = property.obscured[player.id] || {};
             property.obscured[player.id] = value;
         });
     },
@@ -27,11 +28,11 @@ var ObscuredDeltaMergeable = Class(DeltaMergeable, {
     /**
      * Manipulates the obscuring of a key for some players, while checking where needed
      *
-     * @param {Player|Array.<Player>} forPlayers - a single player, or array of players to unobscure to the real value
      * @param {string} key - the key you are unobscuring
-     * @param {boolean} true if worked, false if there is no property present to unobscure
+     * @param {Player|Array.<Player>} forPlayers - a single player, or array of players to unobscure to the real value
+     * @returns {boolean} true if worked, false if there is no property present to unobscure
      */
-    unobscure: function(forPlayers, key) {
+    unobscure: function(key, forPlayers) {
         return this._obscure(forPlayers, key, function(property, player) {
             delete property.obscured[player.id];
         });
@@ -58,9 +59,8 @@ var ObscuredDeltaMergeable = Class(DeltaMergeable, {
             var player = forPlayers[i];
 
             callback(property, player);
-            this.obscuredDeltaUpdate(property, player);
+            this._baseGame.obscuredDeltaUpdate(property, player);
         }
-
         return true;
     },
 
@@ -83,7 +83,7 @@ var ObscuredDeltaMergeable = Class(DeltaMergeable, {
      * @returns {boolean} true if that property is obscured to that player, false otherwise.
      */
     isObscured: function(key, forPlayer) {
-        return (this._hasProperty(key) && this._properties[key].obscured.hasOwnProperty(forPlayer.id));
+        return (this._hasProperty(key) && this._properties[key].obscured && this._properties[key].obscured.hasOwnProperty(forPlayer.id));
     },
 
     // TODO: delta updating... ugh
