@@ -15,7 +15,7 @@ var GameLogger = Class({
      * @param {string} [dir] - path to directory to log games into, and to read them from
      */
     init: function(gameNames, dir) {
-        this.gamelogExtension = ".joue";
+        this.gamelogExtension = ".json.gz";
         this.usingCompression = true;
         this.gamelogDirectory = dir || 'output/gamelogs/';
         this.gamelogs = []; // simple array of gamelogs, not indexed by gameName, sessionID, epoch like this.gamelogFor
