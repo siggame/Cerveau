@@ -106,22 +106,32 @@ var Session = Class(Server, {
      * @param {Object} [data] - any additional data about what caused the delta
      */
     _updateDeltas: function(type, data) {
-        for(var i = 0; i < this.clients.length; i++) {
-            var client = this.clients[i];
-            client.send("delta", this.game.getDeltaFor(client.player));
-        }
+        var trueDelta = this.game.getTrueDelta();
+        var playerDeltas = {};
 
         if(data && data.player) {
-            data.player = serializer.serialize(data.player, this.game);
+            data.player = serializer.serialize(data.player, this.game); // because so many datas include a player sending them, it's easier to serialize them all here
         }
 
-        var delta = this.game.getTrueDelta();
-        this._deltas.push({
+        var delta = {
             type: type,
             data: data,
-            game: delta,
-        });
+            game: trueDelta,
+        };
 
+        for(var i = 0; i < this.clients.length; i++) {
+            var client = this.clients[i];
+            var deltaToSend = client.player ? this.game.getDeltaFor(client.player) : trueDelta;
+
+            if(client.player && deltaToSend !== trueDelta) { // then this player got a different game state that the "true" one (it was probably obscured), so record that in the gamelog too
+                delta.gameToPlayer = delta.gameToPlayer || {};
+                delta.gameToPlayer[client.player.id] = deltaToSend;
+            }
+
+            client.send("delta", deltaToSend);
+        }
+
+        this._deltas.push(delta);
         this.game.flushDelta();
 
         if(this._needToSendStart) {
