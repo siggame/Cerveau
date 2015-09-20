@@ -276,6 +276,7 @@ var BaseGame = Class(DeltaMergeable, {
                 }
             }
             catch(e) {
+                log.error(e);
                 reject(e);
             }
         });
