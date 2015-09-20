@@ -100,16 +100,8 @@ var Checker = Class(GameObject, {
             game.throwInvalidGameLogic(player, "tried to move onto another checker");
         }
 
-        var yOffset = 0;
-        var yKing = 0;
-        if(this.owner.id == 0) { // then first player, moves down
-            yOffset = 1;
-            yKing = game.boardHeight - 1;
-        }
-        else {
-            yOffset = -1;
-            yKing = 0;
-        }
+        var yOffset = this.owner.yDirection;
+        var yKing = (yOffset === 1 ? (game.boardHeight - 1) : 0);
 
         var dy = y - this.y
         var dx = x - this.x

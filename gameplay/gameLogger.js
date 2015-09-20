@@ -62,19 +62,19 @@ var GameLogger = Class({
         var writeSteam = fs.createWriteStream(path, 'utf8');
         var gzip = zlib.createGzip();
 
+        gzip.on("error", function(err) {
+            log.error("Could not save gamelog '" + gamelog.gameName + "' - '" + gamelog.gameSession + "'.", err);
+        });
+
         gzip.pipe(writeSteam);
         gzip.write(serialized);
         gzip.end();
-
-        /*fs.writeFile(, serialized, function(err) {
-            if(err) {
-                log.error("Gamelog Write Error:", err);
-            }
-        });*/ 
     },
 
     /**
-     * takes a parsed gamelog and stores it in memory
+     * Takes a parsed gamelog and stores it in memory
+     *
+     * @param {Object} gamelog - parsed gamelog to store in memory and in various lookup dictionaries
      */
     _memorizeGamelog: function(gamelog) {
         this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};

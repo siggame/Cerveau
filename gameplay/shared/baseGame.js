@@ -260,7 +260,8 @@ var BaseGame = Class(DeltaMergeable, {
         var self = this;
         var sanitizeRan = function(returned) {
             return self._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, returned);
-        }
+        };
+
         return new Promise(function(resolve, reject) {
             try {
                 var ranReturned = runCallback.apply(run.caller, argsArray);
