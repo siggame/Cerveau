@@ -12,7 +12,7 @@ var constants = require("../constants");
  */
 var BaseGame = Class(DeltaMergeable, {
     init: function(data) {
-        if(this._baseGameInitialized) { // semi-shitty way to avoid the diamond inheritance problem
+        if(this._baseGameInitialized) { // semi-shitty way to avoid multiplayer sub classes, re-initializing BaseGame
             return;
         }
 
@@ -37,7 +37,7 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
-    name: "Base Game", // should be overwritten by the child game class inheriting this
+    name: "Base Game", // should be overwritten by the child game class's prototype inheriting this
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: 10,
     _orderFlag: {isOrderFlag: true},

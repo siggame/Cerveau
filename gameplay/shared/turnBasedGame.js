@@ -4,7 +4,7 @@ var extend = require("extend");
 var serializer = require("../serializer");
 
 /**
- * @class TurnBasedGame: a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
+ * @class TurnBasedGame - a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
  */
 var TurnBasedGame = Class(BaseGame, {
     init: function() {

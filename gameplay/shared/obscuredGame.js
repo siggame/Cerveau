@@ -74,6 +74,12 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
         }
     },
 
+
+
+    //////////////////////////////
+    // Obscuring only functions //
+    //////////////////////////////
+
     /**
      * When a property is obscured or unobscured that specific player's delta must be updated too
      *

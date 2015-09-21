@@ -79,7 +79,7 @@ var prototype = {
      */
     unshift: function(/* element1, element2, ..., elementN */) {
         var clone = this.slice();
-        this.empty();
+        this.length = 0;
         this.push.apply(this, arguments);
         this.push.apply(this, clone);
 
