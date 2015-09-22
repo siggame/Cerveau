@@ -105,8 +105,8 @@ ${merge("        // ", function_name, (
         return {2};
 
 """
-).format(obj_key, function_name, shared['cerveau']['default'](function_parms['returns']['type'])))
-}
+).format(obj_key, function_name, shared['cerveau']['default'](function_parms['returns']['type']) if function_parms['returns'] else "undefined")
+)}
     },
 % endfor
 % endfor
