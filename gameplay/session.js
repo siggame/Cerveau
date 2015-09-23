@@ -18,11 +18,10 @@ var Session = Class(Server, {
         this._sentOver = false;
         this._deltas = []; // A record of all deltas generated and sent, to store in the gamelog
 
+        this.name = args.gameName + " - " + args.gameSession + " @ " + process.pid;
         this.game = new args.gameClass(args.gameSettings);
 
         this._profiler = args.profiler;
-
-        this.name = this.game.name + " - " + this.game.session + " @ " + process.pid;
     },
 
     /**
@@ -297,6 +296,7 @@ var Session = Class(Server, {
             deltas: this._deltas,
             constants: constants.shared,
             epoch: moment().valueOf(),
+            randomSeed: this._initArgs.gameSettings.randomSeed,
             winners: winners,
             losers: losers,
         };
