@@ -9,6 +9,7 @@ parser.addArgument(['-H', '--host'], {action: 'store', dest: 'host', defaultValu
 parser.addArgument(['--printIO'], {action: 'storeTrue', dest: 'printIO', help: '(debugging) print IO through the TCP socket to the terminal'});
 parser.addArgument(['--noTimeout'], {action: 'storeTrue', dest: 'noTimeout', help: '(debugging) clients cannot time out'});
 parser.addArgument(['--authenticate'], {action: 'storeTrue', dest: 'authenticate', help: 'forces clients to authenticate against the authentication server'});
+parser.addArgument(['--noGameSettings'], {action: 'storeTrue', dest: 'noGameSettings', help: 'ignores any requested game settings from clients'});
 parser.addArgument(['--profile'], {action: 'storeTrue', dest: 'profile', help: 'run the v8 profilers against threaded game sessions.'});
 parser.addArgument(['--log'], {action: 'storeTrue', dest: 'log', help: 'store all logged strings to text files in output/logs/'});
 parser.addArgument(['--silent'], {action: 'storeTrue', dest: 'silent', help: 'log will not print anything to the console'});

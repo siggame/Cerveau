@@ -15,6 +15,7 @@ if(cluster.isMaster) {
     log.error("ERROR: worker running on master thread");
 }
 else {
+    data.gameSettings.session = data.gameSession;
     var session = new Session(extend({
         gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
         profiler: data.profile && require('v8-profiler'),

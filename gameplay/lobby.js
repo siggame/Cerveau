@@ -1,6 +1,7 @@
 var utilities = require(__basedir + "/utilities/");
 var constants = require("./constants");
 var extend = require("extend");
+var url = require("url");
 var errors = require("./errors");
 var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
@@ -12,7 +13,7 @@ var net = require("net");
 var cluster = require("cluster");
 
 /**
- * @class Lobby: The server clients initially connect to before being moved to their game session
+ * @class Lobby: The server clients initially connect to before being moved to their game session. Basically creates and manages game sessions.
  */
 var Lobby = Class(Server, {
     init: function(args) {
@@ -22,6 +23,7 @@ var Lobby = Class(Server, {
         this.host = args.host;
         this.port = args.port;
         this.authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
+        this.noGameSettings = (args.noGameSettings === true);
         this._profile = (args.profile === true);
         this.gameNames = [];
         this.gameSessions = {};
@@ -98,6 +100,7 @@ var Lobby = Class(Server, {
                 gameName: gameName,
                 clients: [],
                 numberOfPlayers: this.gameClasses[gameName].numberOfPlayers,
+                gameSettings: {},
             };
 
             this.gameSessions[gameName][sessionID] = gameSession;
@@ -137,7 +140,7 @@ var Lobby = Class(Server, {
                         over: true,
                         winners: gamelog.winners,
                         losers: gamelog.losers,
-                    }
+                    };
                 }
                 else {
                     return {
@@ -151,7 +154,7 @@ var Lobby = Class(Server, {
             return {
                 error: "game name is not valid",
                 gameName: gameName,
-            }
+            };
         }
     },
 
@@ -218,6 +221,25 @@ var Lobby = Class(Server, {
                 });
 
                 gameSession.clients.push(client);
+                if(data.gameSettings && !this.noGameSettings) {
+                    try {
+                        var settings = url.parse("urlparms?" + data.gameSettings, true).query;
+                        for(var key in settings) {
+                            if(settings.hasOwnProperty(key) && !gameSession.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
+                                var value = settings[key];
+                                // sanitize booleans
+                                if(value.toLowerCase() ===  "true") {
+                                    value = true;
+                                }
+                                gameSession.gameSettings[key] = value;
+                            }
+                        }
+                    }
+                    catch(err) {
+                        // their game settings in the form of url parameters are formatted incorrectly
+                        // TODO: tell client they can't play now
+                    }
+                }
 
                 client.send("lobbied", {
                     gameName: gameSession.gameName,
@@ -259,6 +281,7 @@ var Lobby = Class(Server, {
                 __basedir: __basedir,
                 _mainDebugPort: process._debugPort,
                 gameSession: gameSession.id,
+                gameSettings: gameSession.gameSettings,
                 gameName: gameSession.gameName,
                 clientInfos: clientInfos,
                 profile: this._profile,

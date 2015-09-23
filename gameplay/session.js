@@ -18,9 +18,7 @@ var Session = Class(Server, {
         this._sentOver = false;
         this._deltas = []; // A record of all deltas generated and sent, to store in the gamelog
 
-        this.game = new args.gameClass({
-            session: args.gameSession,
-        });
+        this.game = new args.gameClass(args.gameSettings);
 
         this._profiler = args.profiler;
 
