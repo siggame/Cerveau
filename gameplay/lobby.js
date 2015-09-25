@@ -54,6 +54,10 @@ var Lobby = Class(Server, {
         this.netServer.listen(this.port, this.host, function() {
             log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
         });
+
+        this.netServer.on("error", function(err) {
+            self._socketError(err);
+        });
     },
 
     /**
@@ -71,6 +75,17 @@ var Lobby = Class(Server, {
             this.gameSessions[gameName] = {};
             log("Found game '" + gameName + "'.");
         }
+    },
+
+    /**
+     *
+     *
+     * @param {Error} err - the error the TCP socket threw
+     */
+    _socketError: function(err) {
+        log.error(err.code !== 'EADDRINUSE' ? err : "Lobby cannot listen on port " + this.host + ":" + this.port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
+
+        process.exit(1);
     },
 
     /**
