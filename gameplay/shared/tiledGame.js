@@ -41,7 +41,7 @@ var TiledGame = Class(BaseGame, {
                 tile.tileLeft = this._getTile(x - 1, y);
             }
         }
-    }
+    },
 
     /**
      * gets the tile at (x, y), or null if the co-ordinates are off-map
@@ -56,7 +56,7 @@ var TiledGame = Class(BaseGame, {
         }
 
         return null;
-    }
+    },
 
     /**
      * Exposed so sub classes can override this to add any initialization data as needed.
