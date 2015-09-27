@@ -21,8 +21,7 @@ var DeltaMergeable = Class({
      * Adds a value as a property, which hooks it up so it registers deltas with the game. Afterwards it acts like a normal variable, e.g. this[key] = value;
      *
      * @param {string} key - the index in side this you want to "set"
-     * @param {*} [value] - the value you want to set this property to, defaults to undefined
-     * @param {function} [setter] - a function that takes in what is trying to be assigned to, and will return a different value, probably for santization
+     * @param {*} value - the value you want to set this property to
      * @param {string} [deltaKey] - what the key for the delta, defaults to the passed in key
      */
     _addProperty: function(key, value, options) {
@@ -34,11 +33,7 @@ var DeltaMergeable = Class({
         }
 
         if(!this._hasProperty(key)) {
-            this._setupProperty(key, options);
-        }
-
-        if(value !== undefined) {
-            this[key] = value;
+            this._setupProperty(key, value, options);
         }
     },
 
@@ -46,16 +41,18 @@ var DeltaMergeable = Class({
      * initialized a property internally
      *
      * @param {string} key - the index
-     * @param {Object} [options] - can contain the deltaKey override, and setter function to apply
+     * @param {*} value - the value of the property
+     * @param {Object} [options] - can contain the deltaKey override, and an additional setter function to apply
      */
-    _setupProperty: function(key, options) {
+    _setupProperty: function(key, value, options) {
         options = options || {};
         var propertyPath = this._pathInBaseGame.clone();
 
         propertyPath.push(options.hasOwnProperty("deltaKey") ? options.deltaKey : key);
         this._properties[key] = {
-            value: undefined,
+            value: value,
             path: propertyPath,
+            setter: options.setter,
         };
 
         var self = this;
@@ -63,14 +60,30 @@ var DeltaMergeable = Class({
             configurable: true,
             enumerable: true,
             get: function() {
-                return this._properties[key].value;
+                return self._properties[key].value;
             },
             set: function(newValue) {
-                var property = this._properties[key];
-                property.value = (options.setter ? options.setter(newValue) : newValue);
-                this._baseGame.updateDelta(property);
+                self._set(key, newValue);
             },
         });
+
+        this._set(key, value, true); // this will force a delta update, so the game knows we set a new property
+    },
+
+    /**
+     * the raw setter for a property
+     *
+     * @param {string} key - the index
+     * @param {*} newValue - the new value of the property
+     * @param {boolean} [forceSet] - true if you want to force the set (and thus updateDelta), otherwise if the new and old values are the same the set won't occur
+     */
+    _set: function(key, newValue, forceSet) {
+        var property = this._properties[key];
+        var setValue = (property.setter ? property.setter(newValue) : newValue);
+        if(setValue !== property.value || forceSet) { // prevents doing a updateDelta if you are setting the value to the same value over and over
+            property.value = setValue;
+            this._baseGame.updateDelta(property);
+        }
     },
 
     /**
