@@ -31,6 +31,7 @@ var Client = Class({
         data = data || {};
         this.name = String(data.hasOwnProperty("name") ? data.name : "No Name");
         this.type = String(data.hasOwnProperty("type") ? data.type : "Unknown");
+        this.gameSession = data.gameSession; // when in lobby
         this.spectating = Boolean(data.spectating);
     },
 

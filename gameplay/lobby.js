@@ -233,6 +233,7 @@ var Lobby = Class(Server, {
                     name: data.playerName,
                     type: data.clientType,
                     spectating: data.spectating,
+                    gameSession: gameSession,
                 });
 
                 gameSession.clients.push(client);
@@ -276,6 +277,15 @@ var Lobby = Class(Server, {
                 client.disconnect();
             },
         });
+    },
+
+    /**
+     * @override
+     */
+    clientDisconnected: function(client /* ... */) {
+        client.gameSession.clients.removeElement(client);
+
+        return Server.clientDisconnected.apply(this, arguments);
     },
 
     /**
