@@ -222,20 +222,33 @@ var Session = Class(Server, {
         var self = this;
         this.game.aiRun(client.player, run) // this is a Promise, the game server is promising that eventually it will run the logic, we do this because the game server may need to get info asyncronously (such as from other AIs) before it can resolve this run command
             .then(function(returned) {
+                var invalid = undefined;
+                if(serializer.isObject(returned) && returned.isGameLogicError) {
+                    invalid = {
+                        message: returned.invalidMessage,
+                        data: returned.invalidData
+                    };
+
+                    client.send("invalid", invalid);
+
+                    returned = returned.returnValue;
+                }
+
                 var serializedReturned = serializer.serialize(returned, self.game);
                 self._updateDeltas("ran", {
                     player: client.player,
-                    data: run,
+                    run: run,
+                    invalid: invalid,
                     returned: serializedReturned,
                 });
 
                 client.send("ran", serializedReturned);
             })
             .catch(function(error) {
-                if(!Class.isInstance(error, errors.CerveauError)) {
+                if(!Class.isInstance(error, errors.CerveauError)) { // probably a coding error
                     throw error;
                 }
-                client.send("invalid", error);
+                client.send("fatal", error);
             });
     },
 
@@ -261,7 +274,7 @@ var Session = Class(Server, {
             if(!Class.isInstance(error, errors.CerveauError)) {
                 throw error;
             }
-            client.send("invalid", error);
+            client.send("fatal", error);
         }
 
         this._updateDeltas("finished", {

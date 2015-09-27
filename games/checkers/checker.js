@@ -84,20 +84,20 @@ var Checker = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         game = this.game;
         if(this.owner !== player) {
-            game.throwInvalidGameLogic(player, "tried to move a checker they didn't own");
+            return game.logicError(null, "tried to move a checker they didn't own");
         }
 
         if(game.checkerMoved) {
             if(game.checkerMoved !== this) {
-                game.throwInvalidGameLogic(player, "tried to move a diferent checker than the already moved one");
+                return game.logicError(null, "tried to move a diferent checker than the already moved one");
             }
             else if(!game.checkerMovedJumped) {
-                game.throwInvalidGameLogic(player, "tried to move again after not jumping another checker.");
+                return game.logicError(null, "tried to move again after not jumping another checker.");
             }
         }
 
         if(game.getCheckerAt(x, y)) {
-            game.throwInvalidGameLogic(player, "tried to move onto another checker");
+            return game.logicError(null, "tried to move onto another checker");
         }
 
         var yOffset = this.owner.yDirection;
@@ -109,7 +109,7 @@ var Checker = Class(GameObject, {
         var fromString = "(" + this.x + ", " + this.y + ") -> (" + x + ", " + y + ")"; 
         if(!this.kinged) { // then check if they are moving the right direction via dy when not kinged
             if((yOffset == 1 && dy < 1) || (yOffset == -1 && dy > -1)) {
-                game.throwInvalidGameLogic(player, "moved in the wrong vertical direction " + fromString);
+                return game.logicError(null, "moved in the wrong vertical direction " + fromString);
             }
         }
 
@@ -118,20 +118,20 @@ var Checker = Class(GameObject, {
             jumped = game.getCheckerAt(this.x + dx/2, this.y + dy/2);
 
             if(!jumped) {
-                game.throwInvalidGameLogic(player, "tried to jump nothing " + fromString);
+                return game.logicError(null, "tried to jump nothing " + fromString);
             }
             else if(jumped.owner.id === this.owner.id) {
-                game.throwInvalidGameLogic(player, "tried to jump own checker " + fromString);
+                return game.logicError(null, "tried to jump own checker " + fromString);
             }
         }
         else if(Math.abs(dx) === 1 && Math.abs(dy) === 1) { // then they are just moving 1 tile diagonally
             if(game.checkerMovedJumped) {
-                game.throwInvalidGameLogic(player, "current checker must jump again, not move diagonally one tile " + fromString);
+                return game.logicError(null, "current checker must jump again, not move diagonally one tile " + fromString);
             }
             // else valid as normal move
         }
         else {
-            game.throwInvalidGameLogic(player, "can't move there " + fromString);
+            return game.logicError(null, "can't move there " + fromString);
         }
 
         // if we got here all the checks passed! the checker moves
@@ -162,14 +162,7 @@ var Checker = Class(GameObject, {
                 }
 
                 if(checkersOwnerWon) {
-                    var otherPlayer = undefined;
-                    for(var i = 0; i < game.players.length; i++) {
-                        otherPlayer = game.players[i];
-                        if(otherPlayer !== this.owner) {
-                            break; // because we found the other player
-                        }
-                    }
-                    game.declairLoser(otherPlayer, "No checkers remaining", {dontCheckForWinner: true});
+                    game.declairLoser(this.game.getOtherPlayers(this.owner)[0], "No checkers remaining", { dontCheckForWinner: true });
                     game.declairWinner(this.owner, "All enemy checkers jumped");
                 }
             }

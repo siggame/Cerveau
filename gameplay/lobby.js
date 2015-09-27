@@ -216,7 +216,7 @@ var Lobby = Class(Server, {
      */
     _clientSentPlay: function(client, data) {
         if(!data || !this.gameClasses[data.gameName]) {
-            client.send("invalid", new errors.CerveauError("Game of name '" + (data && data.gameName) + "' not found on this server."));
+            client.send("fatal", new errors.CerveauError("Game of name '" + (data && data.gameName) + "' not found on this server."));
             client.disconnect(); // no need to keep them connected, they want to play something we don't have
             return;
         }
@@ -267,7 +267,12 @@ var Lobby = Class(Server, {
                 }
             },
             failure: function() {
-                client.send("unauthenticated");
+                client.send("fatal", {
+                    message: "Unauthorized to play in this lobby with given name/password.",
+                    data: {
+                        unauthorized: true
+                    },
+                });
                 client.disconnect();
             },
         });

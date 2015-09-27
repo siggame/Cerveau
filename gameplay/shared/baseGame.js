@@ -107,9 +107,11 @@ var BaseGame = Class(DeltaMergeable, {
                     clientType: client.type || "Unknown",
                 });
 
-                player.errors = [];
+                // while these are "public", they are not properties of players sent to clients.
+                player.invalids = [];
                 player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
                 player.client = client;
+
                 client.setGameData(this, player);
                 this.players.push(player);
             }
@@ -258,21 +260,17 @@ var BaseGame = Class(DeltaMergeable, {
         argsArray.push(asyncReturn);
 
         var self = this;
-        var sanitizeRan = function(returned) {
-            return self._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, returned);
-        };
-
         return new Promise(function(resolve, reject) {
             try {
                 var ranReturned = runCallback.apply(run.caller, argsArray);
 
                 if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
                     asyncReturnWrapper.callback = function(asyncReturnValue) {
-                        resolve(sanitizeRan(asyncReturnValue));
+                        resolve(self._aiRan(run, player, asyncReturnValue));
                     };
                 }
                 else {
-                    resolve(sanitizeRan(ranReturned));
+                    resolve(self._aiRan(run, player, ranReturned));
                 }
             }
             catch(e) {
@@ -280,6 +278,28 @@ var BaseGame = Class(DeltaMergeable, {
                 reject(e);
             }
         });
+    },
+
+    _aiRan: function(run, player, returned) {
+        var returnedValue = this._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, (returned.isGameLogicError ? returned.returned : returned));
+
+        if(returned.isGameLogicError) {
+            returned.returned = returnedValue;
+
+            player.invalids.push({
+                message: returned.message,
+                data: returned.data,
+            });
+
+            if(player.invalids.length > this.maxInvalidsPerPlayer) {
+                this.declairLoser(player, "Exceeded max amount of invalids in one game (" + this.maxInvalidsPerPlayer + ").");
+            }
+        }
+        else {
+            returned = returnedValue;
+        }
+
+        return returned;
     },
 
     /**
@@ -403,39 +423,29 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Throws an error of specified type while checking to see if that player lost
+     * creates a container for the Session to give players an invalid message
      *
-     * @param {CerveaError} errorClass - the CerveauError class or subclass this error is of type
-     * @param {Player} player - player that did something invalid
-     * @param {string} reason - the human readable message why the logic is invalid
-     * @param {Object} [data] - any additional info about why the game logic is invalid
+     * @param {*} returnValue - What you want to return from the run function this is being used in
+     * @param {string} invalidMessage - the reason why they are getting an invalid message
+     * @param {Object} [invalidData] - more data about why it is invalid
+     * @returns {Object} a special container Sessions can look for to know that clients need an invalid event sent to them
      */
-    throwErrorClass: function(errorClass, player, message, data) {
-        var error = new errorClass(message, data);
-        player.errors.push(error);
-
-        if(player.errors.length > this.maxErrorsPerPlayer) {
-            this.declairLoser(player, "Reached max amount of errors in one game (" + this.maxErrorsPerPlayer + ")");
-        }
-
-        throw error;
-    },
-
-    /**
-     * Throws invalid game logic error
-     *
-     * @see throwErrorOf
-     */
-    throwInvalidGameLogic: function(player, message, data) {
-        return this.throwErrorClass(errors.GameLogicError, player, message, data);
+    logicError: function(returnValue, invalidMessage, invalidData) {
+        return {
+            isGameLogicError: true,
+            returnValue: returnValue,
+            invalidMessage: invalidMessage,
+            invalidData: invalidData,
+        };
     },
 
     /**
      * Declairs a player as having lost, and assumes when a player looses the rest could still be competing to win.
      *
-     * @param {Player} the player that lost the game
-     * @param {string} (optional) human readable string that is the lose reason
-     * @param {Object} (optional) flags: 'dontCheckForWinner' key to set to not check for winner
+     * @param {Player} loser - the player that lost the game
+     * @param {string} [reason] - human readable string that is the lose reason
+     * @param {Object} [flags]
+     * @param   {boolean} [flags.dontCheckForWinner] - skips checking for a winner after declairing a loser
      */
     declairLoser: function(loser, reason, flags) {
         loser.lost = true;
@@ -443,16 +453,16 @@ var BaseGame = Class(DeltaMergeable, {
         loser.won = false;
         loser.reasonWon = "";
 
-        if(!flags || !flags.dontCheckForWinner) {
-            this.checkForWinner();
+        if(!flags || !flags.dontCheckForWinner) { // then as someone lost check and see if all other players lost which means the last player won.
+            this.basicCheckForWinner();
         }
     },
 
     /**
      * Declairs the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
      *
-     * @param {Player} the player that won the game, the rest loose if not already won
-     * @param {string} (optional) the human readable string why they won the game
+     * @param {Player} winner - the player that won the game, the rest loose if not already won
+     * @param {string} [reason] - the human readable string why they won the game
      */
     declairWinner: function(winner, reason) {
         winner.won = true;
@@ -472,11 +482,11 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Checks if this game is over because there is a winner (all other players have lost).
+     * Does a basic check if this game is over because there is a winner (all other players have lost). For game logic related winner checking you should write your own checkForWinner() function on the sub class.
      *
      * @returns {boolean} boolean represnting if the game is over
      */
-    checkForWinner: function() {
+    basicCheckForWinner: function() {
         var winner;
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];

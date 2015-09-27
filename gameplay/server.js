@@ -74,11 +74,11 @@ var Server = Class({
                 callback.call(this, client, data.data);
             }
             else {
-                client.send("invalid", new errors.EventDataError("Server cannot handle event '" + data.event + "'"));
+                client.send("fatal", new errors.EventDataError("Server cannot handle event '" + data.event + "'."));
             }
         }
         else {
-            client.send("invalid", new errors.EventDataError("did not send event"));
+            client.send("fatal", new errors.EventDataError("Did not send event."));
         }
     },
 
