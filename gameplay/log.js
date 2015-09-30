@@ -1,5 +1,5 @@
 var colors = require("colors");
-//var utilities = require(__basedir + "/utilities");
+var utilities = require(__basedir + "/utilities");
 var server = process._gameplayServer;
 var fs = require("fs");
 var os = require("os");
