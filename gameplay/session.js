@@ -59,10 +59,6 @@ var Session = Class(Server, {
         this._updateDeltas("disconnect", {
             player: client.player,
         });
-
-        if(this.game.isOver() && this.clients.length === 0) {
-            this.end();
-        }
     },
 
     /**
@@ -160,11 +156,16 @@ var Session = Class(Server, {
         this._updateDeltas("over");
 
         for(var i = 0; i < this.clients.length; i++) {
-            this.clients[i].send("over"); // TODO: send link to gamelog, or something like that.
+            this.clients[i].send("over");
         }
 
-        process.send({
-            gamelog: this.generateGamelog(),
+        var self = this;
+        process.send({ gamelog: this.generateGamelog() }, undefined, function(err) {
+            if(err) {
+                log.error("Error sending the gamelog from game session thread to master lobby thread...");
+                log.error(err);
+            }
+            self.end();
         });
     },
 
