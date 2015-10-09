@@ -9,13 +9,16 @@ table, th, td {border: 1px solid black;}
 td { padding: 0.25em; width: 34px; height: 34px; vertical-align: middle; text-align: center; }
 #playerInfo {background: #121212; padding: 0.5em; font-size: 1.5em; line-height: 1.25em}
 #deltaInfo {background: #363036; padding: 0.5em; font-size: 0.75em; line-height: 1.25em; color: #eaefea; font-family: monospace;}
+#selectedCell {background: #ededdd; padding: 0.5em;}
 .legend {background: #fff; color: #777;}
 .horizontal-legend {padding-bottom: 1em;}
 .vertical-legend {padding-right: 1em;}
+.gameCell {cursor: pointer;}
+.selected {box-shadow: inset 0px 0px 0px 3px #000;}
 .valid {background: #D6AD33;}
 .invalid {background: #80681F;}
-.owner-0 { color: white; }
-.owner-1 { color: red; }
+.owner-0 { color: green; }
+.owner-1 { color: blue; }
 </style>
 
 <div id="visualizer">
@@ -29,6 +32,8 @@ td { padding: 0.25em; width: 34px; height: 34px; vertical-align: middle; text-al
 		<button id="playButton">&#9658;</button>
 		<button id="nextButton">&raquo;</button>
 	</div>
+	<pre id="selectedCell">
+	</pre>
 </div>
 
 <script type="text/javascript">
@@ -42,13 +47,16 @@ var $stateNumber = $("label[for=stateSlider]");
 var $prevButton = $("#prevButton");
 var $playButton = $("#playButton");
 var $nextButton = $("#nextButton");
+var $selectedCell = $("#selectedCell");
 
 var playString = "&#9658;";
 
 var gamelog = undefined;
 var initialState = undefined;
 var states = [];
+var table = $("<table>").appendTo($gameBoard);
 var tableCells = [];
+var selectedCell = null;
 
 function clone(obj) {
 	return $.extend(true, {}, obj);
@@ -115,75 +123,75 @@ function mergeDelta(state, delta) {
 	return state;
 };
 
-var initGameBoard = function(data) {
-	var table = $("<table>").appendTo($gameBoard);
+var selectCell = function(cell, dontPause) {
+	if(!dontPause) {
+		pause();
+	}
 
-	for(var y = 0; y < data.boardHeight + 1; y++) {
+	if(selectedCell) {
+		selectedCell.removeClass("selected");
+	}
+
+	if(cell && selectedCell !== cell) {
+		cell.addClass("selected");
+		selectedCell = cell;
+
+		var str = "";
+		if(selectedCell._jsonifyThis) {
+			str = JSON.stringify(selectedCell._jsonifyThis, undefined, 4);
+		}
+		$selectedCell.html(str);
+	}
+	else {
+		selectedCell = null;
+		$selectedCell.html("");
+	}
+};
+
+var makeTable = function(width, height) {
+	for(var y = -1; y < height; y++) {
 		var row = $("<tr>").appendTo(table);
-		for(var x = 0; x < data.boardWidth + 1; x++) {
+		for(var x = -1; x < width; x++) {
 			tableCells[x] = tableCells[x] || [];
 			var cell = $("<td>").appendTo(row);
 
-			if(x > 0 && y > 0) {
-				tableCells[x-1][y-1] = cell;
+			if(x >= 0 && y >= 0) {
+				tableCells[x][y] = cell;
+				cell.addClass("gameCell");
+				(function(cell) {
+					cell.on("click", function() {
+						selectCell(cell);
+					});
+				})(cell);
 			}
-			else if(x === 0 && y === 0) {
+			else if(x === -1 && y === -1) {
 				cell.addClass("legend").html("&nbsp;");
 			}
-			else if(x === 0) {
-				cell.addClass("vertical-legend legend").html(y-1);
+			else if(x === -1) {
+				cell.addClass("vertical-legend legend").html(y);
 			}
-			else if(y == 0) {
-				cell.addClass("horizontal-legend legend").html(x-1);
-			}
-
-			if(!cell.hasClass("legend")) {
-				if((x + y)%2 == 1) {
-					cell.addClass("valid");
-				}
-				else {
-					cell.addClass("invalid");
-				}
+			else if(y == -1) {
+				cell.addClass("horizontal-legend legend").html(x);
 			}
 		}
+	}
+};
+
+gameBoard = {};
+
+var initBoard = function(data) {
+	if(gameBoard.init) {
+		gameBoard.init(data);
 	}
 };
 
 function updateBoard(gameNumber) {
 	var state = states[gameNumber];
 	var game = state.game;
-	var locations = [];
-	for(var x = 0; x < game.boardWidth; x++) {
-		locations[x] = [];
+
+	if(gameBoard.update) {
+		gameBoard.update(game, state);
 	}
-
-	for(var i = 0; i < game.checkers.length; i++) {
-		var checker = game.gameObjects[game.checkers[i].id];
-		locations[checker.x][checker.y] = checker;
-	}
-
-	for(var x = 0; x < game.boardWidth; x++) {
-		for(var y = 0; y < game.boardHeight; y++) {
-			var cell = tableCells[x][y];
-			var checker = locations[x][y];
-			var val = "&nbsp;";
-			if(checker) {
-				if(checker.kinged) {
-					val = "{" + checker.id + "}";
-				}
-				else {
-					val = "(" + checker.id + ")";
-				}
-				cell.addClass("owner-" + checker.owner.id);
-			}
-			else {
-				cell.removeClass("owner-0 owner-1");
-			}
-
-			cell.html(val);
-		}
-	}
-
 
 	// update player info
 
@@ -276,6 +284,7 @@ function play() {
 		}
 	}, 133);
 
+	selectCell(null, true);
 	$playButton.html("||");
 };
 
@@ -303,7 +312,7 @@ function init() {
 
 	buildStates();
 
-	initGameBoard(initialState);
+	initBoard(initialState);
 	initSlider();
 	initButtons();
 
@@ -328,5 +337,95 @@ $.ajax({url: "/gamelog/" + gameName + "/" + gameSession + "/" + requestedEpoch})
 		alert("ERROR: " + data.error);
 	}
 });
+
+switch(gameName) {
+	case "Checkers":
+		gameBoard.init = function(data) {
+			makeTable(data.boardWidth, data.boardHeight);
+
+			for(var y = 0; y < data.boardHeight; y++) {
+				for(var x = 0; x < data.boardWidth; x++) {
+					var cell = tableCells[x][y];
+
+					if(!cell.hasClass("legend")) {
+						if((x + y)%2 == 1) {
+							cell.addClass("valid");
+						}
+						else {
+							cell.addClass("invalid");
+						}
+					}
+				}
+			}
+		};
+
+		gameBoard.update = function(game, state) {
+			var locations = [];
+			for(var x = 0; x < game.boardWidth; x++) {
+				locations[x] = [];
+			}
+
+			for(var i = 0; i < game.checkers.length; i++) {
+				var checker = game.gameObjects[game.checkers[i].id];
+				locations[checker.x][checker.y] = checker;
+			}
+
+			for(var x = 0; x < game.boardWidth; x++) {
+				for(var y = 0; y < game.boardHeight; y++) {
+					var cell = tableCells[x][y];
+					var checker = locations[x][y];
+					var val = "&nbsp;";
+					if(checker) {
+						if(checker.kinged) {
+							val = "{" + checker.id + "}";
+						}
+						else {
+							val = "(" + checker.id + ")";
+						}
+						cell.addClass("owner-" + checker.owner.id);
+					}
+					else {
+						cell.removeClass("owner-0 owner-1");
+					}
+
+					cell.html(val);
+					cell._jsonifyThis = checker;
+				}
+			}
+		};
+		break;
+	case "Anarchy":
+		$("#main").css("max-width", "1400px");
+		gameBoard.init = function(data) {
+			makeTable(data.mapWidth, data.mapHeight);
+		};
+
+		gameBoard.update = function(game, state) {
+			for(var i = 0; i < game.buildings.length; i++) {
+				var building = game.gameObjects[game.buildings[i].id];
+				if(building) {
+					var name = building.gameObjectName;
+					if(name == "Warehouse") {
+						name = "A";
+					}
+
+					var gb = Math.round(255 - (building.fire / 20)*255);
+
+					cell = tableCells[building.x][building.y];
+					cell
+						.html(name[0])
+						.addClass("owner-" + building.owner.id)
+						.css("background-color", "rgb(255, " + gb + ", " + gb + ")")
+						._jsonifyThis = building;
+				}
+			}
+		};
+
+		break;
+	default:
+		window.alert("Game '" + gameName + "' does not have ShitVis support");
+}
+
+
 
 </script>
