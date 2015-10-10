@@ -1,0 +1,1746 @@
+{
+    "AI": {
+        "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
+        "function_names": [
+            "runTurn"
+        ],
+        "functions": {
+            "runTurn": {
+                "altersState": true,
+                "argument_names": [],
+                "arguments": [],
+                "description": "This is called every time the AI is asked to respond with a command during their turn",
+                "returns": {
+                    "default": true,
+                    "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "serverPredefined": true
+            }
+        },
+        "serverParentClasses": []
+    },
+    "Game": {
+        "attribute_names": [
+            "baseBribesPerTurn",
+            "buildings",
+            "currentForecast",
+            "currentPlayer",
+            "currentTurn",
+            "forecasts",
+            "gameObjects",
+            "mapHeight",
+            "mapWidth",
+            "maxFire",
+            "maxTurns",
+            "nextForecast",
+            "players",
+            "session"
+        ],
+        "attributes": {
+            "baseBribesPerTurn": {
+                "default": null,
+                "description": "How many bribes players get at the beginning of their turn, not counting their burned down Buildings.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "buildings": {
+                "default": null,
+                "description": "All the buildings in the game.",
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                }
+            },
+            "currentForecast": {
+                "default": null,
+                "description": "The current Forecast, which will be applied at the end of the turn.",
+                "type": {
+                    "keyType": null,
+                    "name": "Forecast",
+                    "valueType": null
+                }
+            },
+            "currentPlayer": {
+                "default": null,
+                "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "Player",
+                    "valueType": null
+                }
+            },
+            "currentTurn": {
+                "default": 0,
+                "description": "The current turn number, starting at 0 for the first player's turn",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "forecasts": {
+                "default": null,
+                "description": "All the forecasts in the game, indexed by turn number.",
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Forecast",
+                        "valueType": null
+                    }
+                }
+            },
+            "gameObjects": {
+                "default": null,
+                "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    },
+                    "name": "dictionary",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "GameObject",
+                        "valueType": null
+                    }
+                }
+            },
+            "mapHeight": {
+                "default": null,
+                "description": "The width of the entire map along the vertical (y) axis.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "mapWidth": {
+                "default": null,
+                "description": "The width of the entire map along the horizontal (x) axis.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "maxFire": {
+                "default": null,
+                "description": "The maximum amount of fire value for any Building.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "maxTurns": {
+                "default": 100,
+                "description": "The maximum number of turns before the game will automatically end.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "nextForecast": {
+                "default": null,
+                "description": "The next Forecast, which will be applied at the end of your opponent's turn. This is also the Forecast WeatherStations can control this turn.",
+                "type": {
+                    "keyType": null,
+                    "name": "Forecast",
+                    "valueType": null
+                }
+            },
+            "players": {
+                "default": null,
+                "description": "List of all the players in the game.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                }
+            },
+            "session": {
+                "default": null,
+                "description": "A unique identifier for the game instance that is being played.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "string",
+                    "valueType": null
+                }
+            }
+        },
+        "description": "Two player grid based game where each player tries to burn down the other player's buildings. Let it burn!",
+        "function_names": [],
+        "functions": {},
+        "inheritedAttributes": {},
+        "inheritedFunctions": {},
+        "maxInvalidsPerPlayer": 10,
+        "name": "Anarchy",
+        "numberOfPlayers": 2,
+        "parentClasses": [],
+        "serverParentClasses": [
+            "TurnBasedGame"
+        ]
+    },
+    "gameObjects": {
+        "Building": {
+            "attribute_names": [
+                "bribed",
+                "buildingEast",
+                "buildingNorth",
+                "buildingSouth",
+                "buildingWest",
+                "fire",
+                "health",
+                "isHeadquarters",
+                "owner",
+                "x",
+                "y"
+            ],
+            "attributes": {
+                "bribed": {
+                    "default": null,
+                    "description": "when true this building has already been bribed this turn and cannot be bribed again this turn.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "buildingEast": {
+                    "default": null,
+                    "description": "The Building directly to the east of this building, or null if not present.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingNorth": {
+                    "default": null,
+                    "description": "The Building directly to the north of this building, or null if not present.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingSouth": {
+                    "default": null,
+                    "description": "The Building directly to the south of this building, or null if not present.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingWest": {
+                    "default": null,
+                    "description": "The Building directly to the west of this building, or null if not present.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "fire": {
+                    "default": null,
+                    "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this building currently has. When this reaches 0 the Building has been burned down",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "isHeadquarters": {
+                    "default": null,
+                    "description": "true if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The location of the Building along the x-axis",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The location of the Building along the y-axis",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A basic building. It does nothing besides burn down. Other Buildings inherit from this class.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "FireDepartment": {
+            "attribute_names": [],
+            "attributes": {},
+            "description": "Can put out fires completely.",
+            "function_names": [
+                "extinguish"
+            ],
+            "functions": {
+                "extinguish": {
+                    "altersState": true,
+                    "argument_names": [
+                        "building"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Building you want to extinguish.",
+                            "name": "building",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "Building",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Bribes this FireDepartment to extinguish the fire in a building.",
+                    "returns": {
+                        "default": null,
+                        "description": "true if the bribe worked, false otherwise",
+                        "type": {
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttributes": {
+                "bribed": {
+                    "default": null,
+                    "description": "when true this building has already been bribed this turn and cannot be bribed again this turn.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "buildingEast": {
+                    "default": null,
+                    "description": "The Building directly to the east of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingNorth": {
+                    "default": null,
+                    "description": "The Building directly to the north of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingSouth": {
+                    "default": null,
+                    "description": "The Building directly to the south of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingWest": {
+                    "default": null,
+                    "description": "The Building directly to the west of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "fire": {
+                    "default": null,
+                    "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this building currently has. When this reaches 0 the Building has been burned down",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "isHeadquarters": {
+                    "default": null,
+                    "description": "true if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The location of the Building along the x-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The location of the Building along the y-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "Building"
+            ],
+            "serverParentClasses": []
+        },
+        "Forecast": {
+            "attribute_names": [
+                "controllingPlayer",
+                "direction",
+                "intensity"
+            ],
+            "attributes": {
+                "controllingPlayer": {
+                    "default": null,
+                    "description": "The Player that can use WeatherStations to control this Forecast when its the nextForecast.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "direction": {
+                    "default": null,
+                    "description": "The direction the wind will blow fires in. Can be 'north', 'east', 'south', or 'west'",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "intensity": {
+                    "default": null,
+                    "description": "How much of a Building's fire that can be blown in the direction of this Forecast. Fire is duplicated (copied), not moved (transfered).",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "The weather effect that will be applied at the end of a turn, which causes fires to spread.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "GameObject": {
+            "attribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "attributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
+            "function_names": [
+                "log"
+            ],
+            "functions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "inheritedAttributes": {},
+            "inheritedFunctions": {},
+            "parentClasses": [],
+            "serverParentClasses": [
+                "BaseGameObject"
+            ]
+        },
+        "Player": {
+            "attribute_names": [
+                "bribesRemaining",
+                "buildings",
+                "clientType",
+                "fireDepartments",
+                "headquarters",
+                "lost",
+                "name",
+                "policeDepartments",
+                "reasonLost",
+                "reasonWon",
+                "timeRemaining",
+                "warehouses",
+                "weatherStations",
+                "won"
+            ],
+            "attributes": {
+                "bribesRemaining": {
+                    "default": null,
+                    "description": "How many bribes this player has remaining to use during their turn. Each action a Building does costs 1 bribe. Any unused bribes are lost at the end of the player's turn.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "buildings": {
+                    "default": null,
+                    "description": "All the buildings owned by this player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "Building",
+                            "valueType": null
+                        }
+                    }
+                },
+                "clientType": {
+                    "default": null,
+                    "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "fireDepartments": {
+                    "default": null,
+                    "description": "All the FireDepartments owned by this player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "FireDepartments",
+                            "valueType": null
+                        }
+                    }
+                },
+                "headquarters": {
+                    "default": null,
+                    "description": "The Warehouse that serves as this player's headquarters and has extra health. If this gets destroyed they lose.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Warehouse",
+                        "valueType": null
+                    }
+                },
+                "lost": {
+                    "default": false,
+                    "description": "if the player lost the game or not",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "name": {
+                    "default": "Anonymous",
+                    "description": "The name of the player",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "policeDepartments": {
+                    "default": null,
+                    "description": "All the PoliceDepartments owned by this player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "PoliceDepartment",
+                            "valueType": null
+                        }
+                    }
+                },
+                "reasonLost": {
+                    "default": null,
+                    "description": "the reason why the player lost the game",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "reasonWon": {
+                    "default": null,
+                    "description": "the reason why the player won the game",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "timeRemaining": {
+                    "default": null,
+                    "description": "The amount of time (in ns) remaining for this AI to send commands.",
+                    "type": {
+                        "keyType": null,
+                        "name": "float",
+                        "valueType": null
+                    }
+                },
+                "warehouses": {
+                    "default": null,
+                    "description": "All the warehouses owned by this player. Includes the Headquarters.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "Warehouse",
+                            "valueType": null
+                        }
+                    }
+                },
+                "weatherStations": {
+                    "default": null,
+                    "description": "All the WeatherStations owned by this player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "WeatherStation",
+                            "valueType": null
+                        }
+                    }
+                },
+                "won": {
+                    "default": false,
+                    "description": "if the player won the game or not",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A player in this game. Every AI controls one player.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "PoliceDepartment": {
+            "attribute_names": [],
+            "attributes": {},
+            "description": "Used to keep cities under control and raid Warehouses.",
+            "function_names": [
+                "raid"
+            ],
+            "functions": {
+                "raid": {
+                    "altersState": true,
+                    "argument_names": [
+                        "warehouse"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The warehouse you want to raid.",
+                            "name": "warehouse",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "Warehouse",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Bribe the police to raid a Warehouse, dealing damage equal based on the Warehouse's current exposure, and then resetting it to 0.",
+                    "returns": {
+                        "default": null,
+                        "description": "The amount of damage dealt to the warehouse, or -1 if there was an error.",
+                        "type": {
+                            "keyType": null,
+                            "name": "int",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttributes": {
+                "bribed": {
+                    "default": null,
+                    "description": "when true this building has already been bribed this turn and cannot be bribed again this turn.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "buildingEast": {
+                    "default": null,
+                    "description": "The Building directly to the east of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingNorth": {
+                    "default": null,
+                    "description": "The Building directly to the north of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingSouth": {
+                    "default": null,
+                    "description": "The Building directly to the south of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingWest": {
+                    "default": null,
+                    "description": "The Building directly to the west of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "fire": {
+                    "default": null,
+                    "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this building currently has. When this reaches 0 the Building has been burned down",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "isHeadquarters": {
+                    "default": null,
+                    "description": "true if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The location of the Building along the x-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The location of the Building along the y-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "Building"
+            ],
+            "serverParentClasses": []
+        },
+        "Warehouse": {
+            "attribute_names": [
+                "exposure",
+                "fireAdded"
+            ],
+            "attributes": {
+                "exposure": {
+                    "default": null,
+                    "description": "How exposed the anarchists in this warehouse are to PoliceStations. Raises when bribed to ignite buildings, and drops each turn if not bribed.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "fireAdded": {
+                    "default": null,
+                    "description": "The amount of fire added to buildings when bribed to ignite a building. Headquarters add more fire than normal Warehouses.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.",
+            "function_names": [
+                "ignite"
+            ],
+            "functions": {
+                "ignite": {
+                    "altersState": true,
+                    "argument_names": [
+                        "building"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Building you want to light on fire.",
+                            "name": "building",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "Building",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Bribes the Warehouse to light a Building on fire. This adds this building's fireAdded to their fire, and then this building's exposure is increased based on the Manhatten distance between the two buildings.",
+                    "returns": {
+                        "default": null,
+                        "description": "The exposure added to this Building's exposure. -1 is returned if there was an error.",
+                        "type": {
+                            "keyType": null,
+                            "name": "int",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttributes": {
+                "bribed": {
+                    "default": null,
+                    "description": "when true this building has already been bribed this turn and cannot be bribed again this turn.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "buildingEast": {
+                    "default": null,
+                    "description": "The Building directly to the east of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingNorth": {
+                    "default": null,
+                    "description": "The Building directly to the north of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingSouth": {
+                    "default": null,
+                    "description": "The Building directly to the south of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingWest": {
+                    "default": null,
+                    "description": "The Building directly to the west of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "fire": {
+                    "default": null,
+                    "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this building currently has. When this reaches 0 the Building has been burned down",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "isHeadquarters": {
+                    "default": null,
+                    "description": "true if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The location of the Building along the x-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The location of the Building along the y-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "Building"
+            ],
+            "serverParentClasses": []
+        },
+        "WeatherStation": {
+            "attribute_names": [],
+            "attributes": {},
+            "description": "Can be bribed to change the next Forecast in some way.",
+            "function_names": [
+                "intensify",
+                "rotate"
+            ],
+            "functions": {
+                "intensify": {
+                    "altersState": true,
+                    "argument_names": [
+                        "negative"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "By default the intensity will be increased by 1, setting this to true decreases the intensity by 1.",
+                            "name": "negative",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "boolean",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Bribe the weathermen to intensity the next Forecast by 1 or -1",
+                    "returns": {
+                        "default": null,
+                        "description": "true if the intensity was changed, false otherwise",
+                        "type": {
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "rotate": {
+                    "altersState": true,
+                    "argument_names": [
+                        "counterclockwise"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "By default the direction will be rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.",
+                            "name": "counterclockwise",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "boolean",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Bribe the weathermen to change the direction of the next Forecast by rotating it clockwise or counterclockwise.",
+                    "returns": {
+                        "default": null,
+                        "description": "true if the rotation worked, false otherwise.",
+                        "type": {
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttributes": {
+                "bribed": {
+                    "default": null,
+                    "description": "when true this building has already been bribed this turn and cannot be bribed again this turn.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "buildingEast": {
+                    "default": null,
+                    "description": "The Building directly to the east of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingNorth": {
+                    "default": null,
+                    "description": "The Building directly to the north of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingSouth": {
+                    "default": null,
+                    "description": "The Building directly to the south of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "buildingWest": {
+                    "default": null,
+                    "description": "The Building directly to the west of this building, or null if not present.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Building",
+                        "valueType": null
+                    }
+                },
+                "fire": {
+                    "default": null,
+                    "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this building currently has. When this reaches 0 the Building has been burned down",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "isHeadquarters": {
+                    "default": null,
+                    "description": "true if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The location of the Building along the x-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The location of the Building along the y-axis",
+                    "inheritedFrom": "Building",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "Building"
+            ],
+            "serverParentClasses": []
+        }
+    }
+}
