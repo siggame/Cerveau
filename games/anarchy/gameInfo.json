@@ -855,7 +855,7 @@
                         "name": "list",
                         "valueType": {
                             "keyType": null,
-                            "name": "FireDepartments",
+                            "name": "FireDepartment",
                             "valueType": null
                         }
                     }
