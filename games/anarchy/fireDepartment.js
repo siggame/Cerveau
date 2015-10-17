@@ -44,23 +44,23 @@ var FireDepartment = Class(Building, {
         // <<-- Creer-Merge: extinguish -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Check that player owns FireDepartment
-        if(this.owner !== player){
+        if(this.owner !== player) {
             return game.logicError(false, "tried to use an enemy's FireDepartment.extinguish");
         }
         // Check that player has bribes remaining
-        if(player.bribesRemaining <= 0){
+        if(player.bribesRemaining <= 0) {
             return game.logicError(false, "tried to extinguish with no bribes remaining");
         }
         // Check that this FireDepartment is still alive
-        if(this.health <= 0){
+        if(this.health <= 0) {
             return game.logicError(false, "tried to extinguish using a dead FireDepartment");
         }
         // Check if this building has already been bribed
-        if(this.bribed){
+        if(this.bribed) {
             return game.logicError(false, "tried to extinguish with an already bribed FireDepartment");
         }
         // Check that building is valid
-        if(building === null){
+        if(building === null) {
             return game.logicError(false, "tried to extinguish a null building");
         }
         // Set fire on building to 0
