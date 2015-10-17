@@ -59,8 +59,41 @@ var WeatherStation = Class(Building, {
      */
     rotate: function(player, counterclockwise, asyncReturn) {
         // <<-- Creer-Merge: rotate -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        game = this.game;
+        if (this.health <= 0)
+            return game.logicError(false, "tried to bribe a burned down WeatherStation")
+        if (this.owner !== player)
+            return game.logicError(false, "tried to use an enemy's WeatherStation.rotate")
+        if (this.owner.bribesRemaining <= 0)
+            return game.logicError(false, "tried to bribe with no bribesRemaining") 
+        if (this.bribed)
+            return game.logicError(false, "this building has already been bribed")
 
-        // Developer: Put your game logic for the WeatherStation's rotate function here
+        this.bribed = true;
+        this.owner.bribesRemaining--;
+        if (game.nextForecast.direction === "north")
+        {
+            if (counterclockwise) game.nextForecast.direction = "west";
+            else game.nextForecast.direction = "east";
+        }
+        else if (game.nextForecast.direction == "east")
+        {
+            if (counterclockwise) game.nextForecast.direction = "north";
+            else game.nextForecast.direction = "south";
+
+        }
+        else if (game.nextForecast.direction == "south")
+        {
+            if (counterclockwise) game.nextForecast.direction = "east";
+            else game.nextForecast.direction = "west";
+
+        }
+        else if (game.nextForecast.direction == "west")
+        {
+            if (counterclockwise) game.nextForecast.direction = "south";
+            else game.nextForecast.direction = "north";
+        }
+
         return false;
 
         // <<-- /Creer-Merge: rotate -->>
