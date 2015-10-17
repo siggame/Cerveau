@@ -99,7 +99,7 @@ var WeatherStation = Class(Building, {
             else game.nextForecast.direction = "north";
         }
 
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: rotate -->>
     },
