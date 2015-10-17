@@ -90,9 +90,47 @@ var WeatherStation = Class(Building, {
      */
     rotate: function(player, counterclockwise, asyncReturn) {
         // <<-- Creer-Merge: rotate -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        game = this.game;
 
-        // Developer: Put your game logic for the WeatherStation's rotate function here
-        return false;
+        // check if the weatherstation is alive
+        if (this.health <= 0)
+            return game.logicError(false, "tried to bribe a burned down WeatherStation")
+        // check if the player owns the building
+        if (this.owner !== player)
+            return game.logicError(false, "tried to use an enemy's WeatherStation.rotate")
+        // check if the player has enough bribes remaining
+        if (this.owner.bribesRemaining <= 0)
+            return game.logicError(false, "tried to bribe with no bribesRemaining") 
+        // check if the building has already been bribed
+        if (this.bribed)
+            return game.logicError(false, "this building has already been bribed")
+
+        this.bribed = true;
+        this.owner.bribesRemaining--;
+        if (game.nextForecast.direction === "north")
+        {
+            if (counterclockwise) game.nextForecast.direction = "west";
+            else game.nextForecast.direction = "east";
+        }
+        else if (game.nextForecast.direction == "east")
+        {
+            if (counterclockwise) game.nextForecast.direction = "north";
+            else game.nextForecast.direction = "south";
+
+        }
+        else if (game.nextForecast.direction == "south")
+        {
+            if (counterclockwise) game.nextForecast.direction = "east";
+            else game.nextForecast.direction = "west";
+
+        }
+        else if (game.nextForecast.direction == "west")
+        {
+            if (counterclockwise) game.nextForecast.direction = "south";
+            else game.nextForecast.direction = "north";
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: rotate -->>
     },
