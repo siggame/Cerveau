@@ -108,8 +108,8 @@ var Game = Class(TurnBasedGame, {
             var player = this.players[i];
 
             if(player.headquarters.health <= 0) {
-                game.declairLoser(player, "Your Headquarters burned down!");
-                game.declairWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");
+                game.declareLoser(player, "Your Headquarters burned down!");
+                game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");
             }
         }
         return TurnBasedGame.nextTurn.apply(this, arguments);
@@ -122,8 +122,8 @@ var Game = Class(TurnBasedGame, {
             var  player = this.players[i];
 
             if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
-                game.declairLoser(player, "Your Headquarters has less health than the opponents.");
-                game.declairWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
+                game.declareLoser(player, "Your Headquarters has less health than the opponents.");
+                game.declareWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
             }
         }
    },
