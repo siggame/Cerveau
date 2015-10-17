@@ -57,8 +57,30 @@ var Warehouse = Class(Building, {
     ignite: function(player, building, asyncReturn) {
         // <<-- Creer-Merge: ignite -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Warehouse's ignite function here
-        return 0;
+        if(player.bribesRemaining <= 0){
+            return game.logicError(-1, "Player has no bribes remaining.");
+        }
+
+        if(this.health <= 0){
+            return game.logicError(-1, "Warehouse has no hp.");   
+        }
+
+        if(this.bribed){
+            return game.logicError(-1, "Warehouse has already been bribed.");   
+        }
+
+        if(this.owner !== player){
+            return game.logicError(-1, "You do not control this Warehouse.");
+        }
+
+        var newFire = building.fire + this.fireAdded;
+        var exposure = Math.abs(this.x - building.x) + Math.abs(this.y - building.y);
+
+        this.exposure += exposure; //Do we want a cap on this?
+        this.bribed = true;
+        building.fire = Math.min(newFire, this.game.maxFire);
+        player.bribesRemaining--;
+        return exposure;
 
         // <<-- /Creer-Merge: ignite -->>
     },
