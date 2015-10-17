@@ -125,7 +125,7 @@ var WeatherStation = Class(Building, {
                 game.nextForecast.direction = "east";
             }
         }
-        else if (game.nextForecast.direction == "east") {
+        else if (game.nextForecast.direction === "east") {
             if (counterclockwise) {
                 game.nextForecast.direction = "north";
             }
@@ -133,7 +133,7 @@ var WeatherStation = Class(Building, {
                 game.nextForecast.direction = "south";
             }
         }
-        else if (game.nextForecast.direction == "south") {
+        else if (game.nextForecast.direction === "south") {
             if (counterclockwise) {
                 game.nextForecast.direction = "east";
             }
@@ -141,7 +141,7 @@ var WeatherStation = Class(Building, {
                 game.nextForecast.direction = "west";
             }
         }
-        else if (game.nextForecast.direction == "west") {
+        else if (game.nextForecast.direction === "west") {
             if (counterclockwise) {
                 game.nextForecast.direction = "south";
             }
