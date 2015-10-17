@@ -60,12 +60,17 @@ var WeatherStation = Class(Building, {
     rotate: function(player, counterclockwise, asyncReturn) {
         // <<-- Creer-Merge: rotate -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         game = this.game;
+
+        // check if the weatherstation is alive
         if (this.health <= 0)
             return game.logicError(false, "tried to bribe a burned down WeatherStation")
+        // check if the player owns the building
         if (this.owner !== player)
             return game.logicError(false, "tried to use an enemy's WeatherStation.rotate")
+        // check if the player has enough bribes remaining
         if (this.owner.bribesRemaining <= 0)
             return game.logicError(false, "tried to bribe with no bribesRemaining") 
+        // check if the building has already been bribed
         if (this.bribed)
             return game.logicError(false, "this building has already been bribed")
 
