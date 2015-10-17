@@ -126,7 +126,7 @@ var BaseGame = Class(DeltaMergeable, {
      */
     playerDisconnected: function(player, reason) {
         if(player && this.hasStarted() && !this.isOver()) {
-            this.declairLoser(player, reason || "Disconnected during gameplay.");
+            this.declareLoser(player, reason || "Disconnected during gameplay.");
         }
     },
 
@@ -292,7 +292,7 @@ var BaseGame = Class(DeltaMergeable, {
             });
 
             if(player.invalids.length > this.maxInvalidsPerPlayer) {
-                this.declairLoser(player, "Exceeded max amount of invalids in one game (" + this.maxInvalidsPerPlayer + ").");
+                this.declareLoser(player, "Exceeded max amount of invalids in one game (" + this.maxInvalidsPerPlayer + ").");
             }
         }
         else {
@@ -440,14 +440,14 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Declairs a player as having lost, and assumes when a player looses the rest could still be competing to win.
+     * Declares a player as having lost, and assumes when a player looses the rest could still be competing to win.
      *
      * @param {Player} loser - the player that lost the game
      * @param {string} [reason] - human readable string that is the lose reason
      * @param {Object} [flags]
-     * @param   {boolean} [flags.dontCheckForWinner] - skips checking for a winner after declairing a loser
+     * @param   {boolean} [flags.dontCheckForWinner] - skips checking for a winner after declareing a loser
      */
-    declairLoser: function(loser, reason, flags) {
+    declareLoser: function(loser, reason, flags) {
         loser.lost = true;
         loser.reasonLost = reason || "Lost";
         loser.won = false;
@@ -459,12 +459,12 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Declairs the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
+     * Declares the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
      *
      * @param {Player} winner - the player that won the game, the rest loose if not already won
      * @param {string} [reason] - the human readable string why they won the game
      */
-    declairWinner: function(winner, reason) {
+    declareWinner: function(winner, reason) {
         winner.won = true;
         winner.reasonWon = reason || "Won";
         winner.lost = false;
@@ -474,7 +474,7 @@ var BaseGame = Class(DeltaMergeable, {
             var player = this.players[i];
 
             if(player !== winner && !player.won && !player.lost) { // then this player has not lost yet and now looses because someone else won
-                this.declairLoser(player, "Other player won", {dontCheckForWinner: true});
+                this.declareLoser(player, "Other player won", {dontCheckForWinner: true});
             }
         }
 
@@ -502,7 +502,7 @@ var BaseGame = Class(DeltaMergeable, {
         }
 
         if(winner) {
-            this.declairWinner(winner, "All other players lost.");
+            this.declareWinner(winner, "All other players lost.");
             return true;
         }
     },
