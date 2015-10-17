@@ -42,9 +42,40 @@ var WeatherStation = Class(Building, {
      */
     intensify: function(player, negative, asyncReturn) {
         // <<-- Creer-Merge: intensify -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the WeatherStation's intensify function here
-        return false;
+		//checks that the player is using one of their own weather stations
+		if(this.owner !== player){
+			return game.logicError(false, "tried to use an enemy's weather station");
+		}
+		//checks that the weather station is not dead
+		if(this.health <= 0){
+			return game.logicError(false, "tried to bribe a dead weather station");
+		}
+		//checks if the player has any remaining bribes
+		if(player.bribesRemaining <= 0){
+			return game.logicError(false, "player has no remaining bribes");
+		}
+		//checks if the weather station has already been bribed this turn
+		if(this.bribed){
+			return game.logicError(false, "weather station is has already been bribed this turn")
+		}
+		//checks if the intensity is already at max if trying to increase
+		if(!negative && game.nextForecast.intensity >= 20){ //TODO: read max intensity from config
+			return game.logicError(false, "next forecast's intensitysity cannot be increased further");
+		}
+		//checks if the intensity is at minimum if trying to decrease
+		if(negative && game.nextForecast.intensity <= 0){ //TODO: read minimum intensity from config
+			return game.logicError(false, "next forecast's intensity cannot be negative");
+		}
+		
+		if(!negative){
+			game.nextForecast.intensity++;
+		}
+		else{
+			game.nextForeCast.intesity--;
+		}
+		this.bribed = true;
+		player.bribesRemaining--;
+		return true;
 
         // <<-- /Creer-Merge: intensify -->>
     },
