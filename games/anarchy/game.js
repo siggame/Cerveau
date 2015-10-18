@@ -104,6 +104,49 @@ var Game = Class(TurnBasedGame, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+    nextTurn: function() {
+        var directions = {
+            north: "buildingNorth",
+            east: "buildingEast",
+            south: "buildingSouth",
+            west: "buildingWest"
+        };
+
+        //locations where fire will spread
+        var locations = [];
+
+        //handle fire damage
+        this.buildings.forEach(function(building){
+            if(building.fire > 0){
+                building.burn()
+
+                //building fire will spread to
+                var location = building[directions[this.currentForecast.direction]];
+                locations.push({
+                    building: location,
+                    fire: building.fire
+                });
+            }
+
+            if(building.exposure && !building.bribed){
+                building.exposure -= 1; //this.exposureCooldown?
+            }
+        });
+
+        //spread fire
+        locations.forEach(function(location){
+            var building = location.building;
+            var fireSpread = this.currentForecast.intensity;
+            if(fireSpread < building.fire){
+                fireSpread = building.fire;
+            }
+
+            var newFire = building.fire + fireSpread;
+            building.fire = Math.min(this.maxFire, newFire);
+        })
+
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 

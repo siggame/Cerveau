@@ -112,6 +112,11 @@ var Building = Class(GameObject, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+    burn: function(){
+        var newHealth = this.health - this.fire;
+        this.health = Math.max(0, newHealth); //prevent negative hp
+        this.fire -= 1; // this.game.fireReduction?
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 
