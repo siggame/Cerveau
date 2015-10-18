@@ -162,8 +162,8 @@ var Checker = Class(GameObject, {
                 }
 
                 if(checkersOwnerWon) {
-                    game.declairLoser(this.game.getOtherPlayers(this.owner)[0], "No checkers remaining", { dontCheckForWinner: true });
-                    game.declairWinner(this.owner, "All enemy checkers jumped");
+                    game.declareLoser(this.game.getOtherPlayers(this.owner)[0], "No checkers remaining", { dontCheckForWinner: true });
+                    game.declareWinner(this.owner, "All enemy checkers jumped");
                 }
             }
 

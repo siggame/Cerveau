@@ -96,13 +96,37 @@ var Game = Class(TurnBasedGame, {
         TurnBasedGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic after init can be put here
+
         //<<-- /Creer-Merge: begin -->>
     },
 
-
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    //This function will deal with the next turn logic and win conditons
+    nextTurn: function() {
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+
+            if(player.headquarters.health <= 0) {
+                game.declareLoser(player, "Your Headquarters burned down!");
+                game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");
+            }
+        }
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+   },
+
+   _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
+        TurnBasedGame._maxTurnsReached.apply(this, arguments);
+
+        for(var i = 0; i < this.players.length; i++) {
+            var  player = this.players[i];
+
+            if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
+                game.declareLoser(player, "Your Headquarters has less health than the opponents.");
+                game.declareWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
+            }
+        }
+   },
     // You can add additional functions here. These functions will not be directly callable by client AIs
     nextTurn: function() {
         var directions = {

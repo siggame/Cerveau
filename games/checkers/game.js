@@ -169,7 +169,7 @@ var Game = Class(TurnBasedGame, {
         }
 
         if(winner) {
-            return this.declairWinner(winner, "Turn limit reached; has the most remaining checkers or kinged checkers");
+            return this.declareWinner(winner, "Turn limit reached; has the most remaining checkers or kinged checkers");
         }
     },
 
