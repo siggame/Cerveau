@@ -90,6 +90,50 @@ var ArrayExtensions = {
 
         return this.push.apply(this, pushing);
     },
+
+    /**
+     * gets an element in the array wrapping around (both ways), so -1 would be the last element, and length would warp to 0.
+     *
+     * @oaram {number} index - index to get in this array, if it is out of bounds (index < 0 or index >= this.length), we will "wrap" that index around to be in range
+     * @returns {*} element at the index, wrapped around when out of range
+     */
+    getWrapAroundAt: function(index) {
+        return this[Math.wrapAround(index, this.length)];
+    },
+
+    /**
+     * returns the next element in the array by some offset,, wrapping around if it would walk off the array
+     *
+     * @param {*} element - element in the array to find the index of
+     * @param {number} offset - from the element's position where to move, up or down and will wrap around
+     * @returns {*|undefined} undefined if the element was not in this array, or the element at the offset from the passed in element in the array, wrapping around
+     */
+    getWrapAround: function(element, offset) {
+        var index = this.indexOf(element);
+        if(index < 0) {
+            return;
+        }
+
+        return this.getWrapAroundAt(index + (offset || 0));
+    },
+
+    /**
+     * convenience function to get the next element in this array after some element, wrapping around if it would walk off the array
+     *
+     * @see Array.getWrapAround
+     */
+     nextWrapAround: function(element) {
+        return this.getWrapAround(element, 1);
+     },
+
+     /**
+     * convenience function to get the previous element in this array after some element, wrapping around if it would walk off the array
+     *
+     * @see Array.getWrapAround
+     */
+     previousWrapAround: function(element) {
+        return this.getWrapAround(element, -1);
+     },
 };
 
 for(var extension in ArrayExtensions) {

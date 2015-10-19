@@ -49,14 +49,7 @@ var TurnBasedGame = Class(BaseGame, {
         }
 
         this.currentTurn++;
-        var index = Math.max(0, this.players.indexOf(this.currentPlayer)); // turn based games will only ever have one current player
-        index++;
-
-        if(index >= this.players.length) {
-            index = 0;
-        }
-
-        this.currentPlayer = this.players[index];
+        this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
     },
 
     /**
