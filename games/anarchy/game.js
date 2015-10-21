@@ -79,9 +79,30 @@ var Game = Class(TurnBasedGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
         this.forecastIndex = 0;
+
+        this.maxTurns = 300;
+        this.mapWidth = 40;
+        this.mapHeight = 20;
+
+        this.directions = [ "north", "east", "south", "west" ]; // TODO: expose to AIs?
+        this.directionalOffset = {
+            north: {x: 0, y: -1},
+            east: {x: 1, y: 0},
+            south: {x: 0, y: 1},
+            west: {x: -1, y: 0},
+        };
+
+        this.baseBribesPerTurn = 10;
+
+        this.buildingStartingHealth = 100;
+        this.headquartersStartingHealth = 1000;
+
+        this.maxFire = 20;
+        this.headquartersFireAdded = 20;
+        this.warehouseFireAdded = 10;
+
+        this.maxForecastIntensity = 10;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -98,47 +119,70 @@ var Game = Class(TurnBasedGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var mapGrid = [];
-        var buildings = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"];
-        var hqPlaced1 = false;
-        var hqPlaced2 = false;
-        var tempPlayer;
-        var mirroredPlayer;
-        var buildingType;
+        this._buildingsGrid = [];
+        var originalBuildings = [];
+        var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; // TODO: should we weigh these so some are generated more often?
 
-        for (var x = 0; x < this.players.mapWidth/2; x++) {
-            mapGrid[x] = [];
-            for (var y = 0; y < this.players.mapHeight; y++) {
-                if(Math.random() > 0.5) {
-                    tempPlayer = this.players.randomElement();
-                    if(tempPlayer === this.players[0])
-                        mirroredPlayer = this.players[1];
-                    else
-                        mirroredPlayer = this.players[0];
-                    buildingType = this.buildings.randomElement();                  //predetermined to allow mirror
-                    var newBuilding = this.create(buildingType, {
-                        x: x,
-                        y: y,
-                        owner: tempPlayer,
-                    });
-                    if(hqPlaced1 === false && buildingType === "Warehouse") {
-                        this.buildings.headquarters = true;
-                        hqPlaced1 = true;
+        // TODO: make actual map generation algorithm that makes sure each player has a "fair" number of buildings, and the map is "interesting"
+        for(var x = 0; x < this.mapWidth; x++) {
+            this._buildingsGrid[x] = [];
+            if(x < this.mapWidth/2) {
+                for(var y = 0; y < this.mapHeight; y++) {
+                    if(Math.random() > 0.5) {
+                        originalBuildings.push(this._createBuilding(buildingTypes.randomElement(), {
+                            x: x,
+                            y: y,
+                            owner: this.players.randomElement(), // TODO: random percent on each side?
+                        }));
                     }
-                    this.buildings.push(newBuilding);
-                    var newBuilding = this.create(buildingType, {                   //diagonal mirror building type
-                        x: this.players.mapWidth - 1 - x,                           //diagonal mirror position
-                        y: this.players.mapHeight - 1 - y,                          //diagonal mirror position
-                        owner: mirroredPlayer,                                      //diagonal mirror player
-                    });
-                    if(hqPlaced1 === false && buildingType === "Warehouse") {         //diagonal mirror headquarters
-                        this.buildings.headquarters = true;
-                        hqPlaced2 = true;
-                    }
-                    this.buildings.push(newBuilding);
                 }
             }
         }
+
+        // TODO: yes this could break if somehow no warehouses are randomly generated. That should be fixed with a real map generation algorithm
+        this.players[0].warehouses.randomElement().makeHeadquarters();
+
+        // mirror the map
+        for(var i = 0; i < originalBuildings.length; i++) {
+            var originalBuilding = originalBuildings[i];
+            this._createBuilding(originalBuilding.gameObjectName, {
+                x: this.mapWidth - originalBuilding.x - 1,
+                y: originalBuilding.y,
+                owner: this.getOtherPlayers(originalBuilding.owner)[0],
+                isHeadquarters: originalBuilding.isHeadquarters,
+            });
+        }
+
+        // now all the buildings on the map should be created, so hook up the north/east/south/west pointers
+        for(var i = 0; i < this.buildings.length; i++) {
+            var building = this.buildings[i];
+            for(var direction in this.directionalOffset) {
+                if(this.directionalOffset.hasOwnProperty(direction)) {
+                    var offset = this.directionalOffset[direction];
+                    building["building" + direction.upcaseFirst()] = this._getBuildingAt(building.x + offset.x, building.y + offset.y);
+                }
+            }
+            log("building:", building.gameObjectName, building.x, building.y, building.health);
+            if(building.isHeadquarters) {
+                log("-->", building.health, building.owner.headquarters);
+            }
+        }
+
+        // create the forecasts, each "set" of turns (e.g. 0 and 1, 100 and 101, 264 and 265, etc) are the same initial states for each player.
+        for(var i = 0; i < this.maxTurns; i += 2) {
+            var direction = this.directions.randomElement();
+            var intensity = Math.randomInt(0, this.maxForecastIntensity);
+
+            for(var j = 0; j < 2; j++) {
+                this.forecasts.push(this.create("Forecast", {
+                    direction: direction,
+                    intensity: intensity,
+                    controllingPlayer: this.players[j],
+                }));
+            }
+        }
+        this.currentForecast = this.forecasts[0];
+        this.nextForecast = this.forecasts[1];
 
         //<<-- /Creer-Merge: begin -->>
     },
@@ -149,7 +193,7 @@ var Game = Class(TurnBasedGame, {
         TurnBasedGame._maxTurnsReached.apply(this, arguments);
 
         for(var i = 0; i < this.players.length; i++) {
-            var  player = this.players[i];
+            var player = this.players[i];
 
             if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
                 game.declareLoser(player, "Your Headquarters has less health than the opponents.");
@@ -186,7 +230,7 @@ var Game = Class(TurnBasedGame, {
                 if(previousHP > 0 && building.health <= 0){
                     var player = building.owner;
                     player.burnedBuildings++;
-                    if(building.isHeadquarters()){
+                    if(building.isHeadquarters) {
                         game.declareLoser(player, "Your Headquarters burned down!");
                         game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");                        
                     }
@@ -223,7 +267,39 @@ var Game = Class(TurnBasedGame, {
         this.currentForecast = this.forecasts[this.forecastIndex++];
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
-    }
+    },
+
+    /**
+     * creates a Building of the class type, and adds it to the necessary lists.
+     *
+     * @param {string} buildingType - the class name of the Building sub class
+     * @param {object} data - initialization data for new building. Must have an owner set
+     * @returns {Building} the newly created and hooked up building
+     */
+    _createBuilding: function(buildingType, data) {
+        var newBuilding = this.create(buildingType, data);
+
+        this._buildingsGrid[newBuilding.x][newBuilding.y] = newBuilding;
+        this.buildings.push(newBuilding);
+        newBuilding.owner[buildingType.lowercaseFirst() + "s"].push(newBuilding); // adds the new building to it's owner list of that building type
+
+        return newBuilding;
+    },
+
+    /**
+     * tries to get the building at a given (x, y), or null if there is none. O(1) lookup time
+     *
+     * @param {number} x - x position
+     * @param {number} y - y position
+     * @returns {Building|null} the building at (x, y) if there is one, null otherwise
+     */
+    _getBuildingAt: function(x, y) {
+        if(x >= 0 && x < this.mapWidth && y >= 0 && y < this.mapHeight) {
+            return this._buildingsGrid[x][y] || null;
+        }
+
+        return null;
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

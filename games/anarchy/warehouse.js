@@ -37,8 +37,7 @@ var Warehouse = Class(Building, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.fireAdded = this.fireAdded || this.game.warehouseFireAdded; // makeHeadquarters might have been called and set fireAdded to the headquarters amount
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -87,7 +86,13 @@ var Warehouse = Class(Building, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * @override
+     */
+    makeHeadquarters: function(/* ... */) {
+        this.fireAdded = this.game.headquartersFireAdded;
+        return Building.makeHeadquarters.apply(this, arguments);
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 

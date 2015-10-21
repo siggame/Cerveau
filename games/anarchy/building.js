@@ -100,8 +100,10 @@ var Building = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.health = this.game.buildingStartingHealth;
+        if(this.isHeadquarters) {
+            this.makeHeadquarters();
+        }
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -116,7 +118,16 @@ var Building = Class(GameObject, {
         var newHealth = this.health - this.fire;
         this.health = Math.max(0, newHealth); //prevent negative hp
         this.fire -= 1; // this.game.fireReduction?
-    }
+    },
+
+    /**
+     * sets this building as the headquarters for its owner. This should only be called once per player, and only during game initialization
+     */
+    makeHeadquarters: function() {
+        this.isHeadquarters = true;
+        this.owner.headquarters = this;
+        this.health = this.game.headquartersStartingHealth;
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
