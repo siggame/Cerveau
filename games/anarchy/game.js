@@ -79,12 +79,14 @@ var Game = Class(TurnBasedGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.forecastIndex = 0;
-
+        // properties
         this.maxTurns = 300;
         this.mapWidth = 40;
         this.mapHeight = 20;
+        this.maxFire = 20;
+        this.baseBribesPerTurn = 10;
 
+        // server only variables
         this.directions = [ "north", "east", "south", "west" ]; // TODO: expose to AIs?
         this.directionalOffset = {
             north: {x: 0, y: -1},
@@ -93,16 +95,10 @@ var Game = Class(TurnBasedGame, {
             west: {x: -1, y: 0},
         };
 
-        this.baseBribesPerTurn = 10;
-
-        this.buildingStartingHealth = 100;
-        this.headquartersStartingHealth = 1000;
-
-        this.maxFire = 20;
-        this.headquartersFireAdded = 20;
-        this.warehouseFireAdded = 10;
-
+        this.headquartersHealthScalar = 10;
         this.maxForecastIntensity = 10;
+        this.firePerTurnReduction = 1;
+        this.exposurePerTurnReduction = 10;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -162,10 +158,6 @@ var Game = Class(TurnBasedGame, {
                     building["building" + direction.upcaseFirst()] = this._getBuildingAt(building.x + offset.x, building.y + offset.y);
                 }
             }
-            log("building:", building.gameObjectName, building.x, building.y, building.health);
-            if(building.isHeadquarters) {
-                log("-->", building.health, building.owner.headquarters);
-            }
         }
 
         // create the forecasts, each "set" of turns (e.g. 0 and 1, 100 and 101, 264 and 265, etc) are the same initial states for each player.
@@ -181,6 +173,7 @@ var Game = Class(TurnBasedGame, {
                 }));
             }
         }
+
         this.currentForecast = this.forecasts[0];
         this.nextForecast = this.forecasts[1];
 
@@ -189,82 +182,89 @@ var Game = Class(TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    /**
+     * @override
+     */
    _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
-        TurnBasedGame._maxTurnsReached.apply(this, arguments);
+        var returned = TurnBasedGame._maxTurnsReached.apply(this, arguments);
 
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
+        this._secondaryWinConditions();
 
-            if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
-                game.declareLoser(player, "Your Headquarters has less health than the opponents.");
-                game.declareWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
-            }
-        }
+        return returned;
    },
-    // You can add additional functions here. These functions will not be directly callable by client AIs
 
-    //This function will deal with the next turn logic and win conditons
+    /**
+     * @override
+     */
     nextTurn: function() {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
             player.bribesRemaining = this.baseBribesPerTurn + player.burnedBuildings;
         }
 
-       var directions = {
-            north: "buildingNorth",
-            east: "buildingEast",
-            south: "buildingSouth",
-            west: "buildingWest"
-        };
-
-        //locations where fire will spread
-        var locations = [];
+        var playersBurnedDownBuildings = {};
+        var fireSpreads = [];
 
         for(var i = 0; i < this.buildings.length; i++){
             var building = this.buildings[i];
-            if(building.fire > 0){
-                var previousHP = building.health;
-                building.burn()
 
-                //make sure building wasnt already dead
-                if(previousHP > 0 && building.health <= 0){
-                    var player = building.owner;
-                    player.burnedBuildings++;
-                    if(building.isHeadquarters) {
-                        game.declareLoser(player, "Your Headquarters burned down!");
-                        game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");                        
+            if(building.fire > 0) {
+                building.health = Math.max(0, building.health - building.fire); // it takes fire damage
+
+                if(building.health <= 0) {
+                    playersBurnedDownBuildings[building.owner.id] = (playersBurnedDownBuildings[building.owner.id] || 0) + 1;
+                }
+                // try to spread the fire
+                if(this.currentForecast.intensity > 0) {
+                    var buildingSpreadingTo = building["building" + this.currentForecast.direction.upcaseFirst()];
+                    if(buildingSpreadingTo) {
+                        fireSpreads.push({
+                            building: buildingSpreadingTo,
+                            fire: Math.min(building.fire, this.currentForecast.intensity),
+                        });
                     }
                 }
 
-                //location the fire will spread to
-                var location = building[directions[this.currentForecast.direction]];
-                locations.push({
-                    building: location,
-                    fire: building.fire
-                });
+                building.fire = Math.max(0, building.fire - this.firePerTurnReduction); // it dies down after dealing damage
             }
 
-            if(building.exposure && !building.bribed){
-                building.exposure -= 1; //this.exposureCooldown?
+            if(building.exposure && !building.bribed) { // then they didn't act, so their exposure drops
+                building.exposure -= Math.max(this.exposurePerTurnReduction);
             }
 
             building.bribed = false;
         }
 
-        //spread fire
-        for(var i = 0; i < locations.length; i++){
-            var location = locations[i];
-            var building = location.building;
-            var fireSpread = this.currentForecast.intensity;
-            if(fireSpread < building.fire){
-                fireSpread = building.fire;
+        // now that every building has been damaged, check for winner via burning down Headquarters
+        var loser;
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            if(player.headquarters.health <= 0) { // then it burned down, and they have lost
+                if(loser) { // someone else already lost this turn... so they both lost their headquarters this turn, so check secondary win conditions (and the game is over)
+                    this._secondaryWinConditions();
+                }
+                loser = player;
             }
-
-            var newFire = building.fire + fireSpread;
-            building.fire = Math.min(this.maxFire, newFire);
         }
 
-        this.currentForecast = this.forecasts[this.forecastIndex++];
+        if(loser) {
+            this.declareLoser(loser, "Headquarters burned down.");
+            this.declareWinner(this.getOtherPlayers(loser)[0], "Burned down enemy's headquarters.");
+        }
+
+        // spread fire, now that everything has taken fire damage
+        for(var i = 0; i < fireSpreads.length; i++) {
+            var fireSpread = fireSpreads[i];
+            fireSpread.building.fire = Math.min(fireSpread.building.fire + fireSpread.fire, this.maxFire);
+        }
+
+        this.currentForecast = this.nextForecast;
+        this.nextForecast = this.forecasts[this.currentTurn + 1];
+
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.bribesRemaining = this.baseBribesPerTurn + (playersBurnedDownBuildings[player.id] || 0);
+        }
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
@@ -281,6 +281,7 @@ var Game = Class(TurnBasedGame, {
 
         this._buildingsGrid[newBuilding.x][newBuilding.y] = newBuilding;
         this.buildings.push(newBuilding);
+        newBuilding.owner.buildings.push(newBuilding);
         newBuilding.owner[buildingType.lowercaseFirst() + "s"].push(newBuilding); // adds the new building to it's owner list of that building type
 
         return newBuilding;
@@ -300,6 +301,32 @@ var Game = Class(TurnBasedGame, {
 
         return null;
     },
+
+
+    _secondaryWinConditions: function() {
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+
+            if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
+                this.declareLoser(player, "Your Headquarters has less health than the opponents.");
+                this.declareWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
+                return returned;
+            }
+        }
+
+        // TODO: more
+
+        // win via coin flip
+        var winnerIndex = Math.randomInt(this.players.length);
+        for(var i = 0; i < this.players.length; i++) {
+            if(i === winnerIndex) {
+                this.declareWinner(this.players[i], "Won via coin flip.");
+            }
+            else {
+                this.declareLoser(this.players[i], "Lost via coin flip.");
+            }
+        }
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 

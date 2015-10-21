@@ -37,7 +37,12 @@ var Warehouse = Class(Building, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.fireAdded = this.fireAdded || this.game.warehouseFireAdded; // makeHeadquarters might have been called and set fireAdded to the headquarters amount
+        if(this.owner.headquarters === this) {
+            this.fireAdded = this.game.maxFire;
+        }
+        else {
+            this.fireAdded = Math.floor(this.game.maxFire/2);
+        }
 
         //<<-- /Creer-Merge: init -->>
     },
