@@ -98,7 +98,7 @@ var Game = Class(TurnBasedGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        /*var mapGrid = [this.players.mapWidth][this.players.mapHeight];
+        var mapGrid = [];
         var buildings = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"];
         var hqPlaced1 = false;
         var hqPlaced2 = false;
@@ -106,11 +106,12 @@ var Game = Class(TurnBasedGame, {
         var mirroredPlayer;
         var buildingType;
 
-        for (var x = 0; x < this.players.mapWidth / 2; x++) {
+        for (var x = 0; x < this.players.mapWidth/2; x++) {
+            mapGrid[x] = [];
             for (var y = 0; y < this.players.mapHeight; y++) {
                 if(Math.random() > 0.5) {
                     tempPlayer = this.players.randomElement();
-                    if(tempPlayer == this.players[0])
+                    if(tempPlayer === this.players[0])
                         mirroredPlayer = this.players[1];
                     else
                         mirroredPlayer = this.players[0];
@@ -120,7 +121,7 @@ var Game = Class(TurnBasedGame, {
                         y: y,
                         owner: tempPlayer,
                     });
-                    if(hqPlaced1 == false && buildingType == "Warehouse") {
+                    if(hqPlaced1 === false && buildingType === "Warehouse") {
                         this.buildings.headquarters = true;
                         hqPlaced1 = true;
                     }
@@ -130,14 +131,14 @@ var Game = Class(TurnBasedGame, {
                         y: this.players.mapHeight - 1 - y,                          //diagonal mirror position
                         owner: mirroredPlayer,                                      //diagonal mirror player
                     });
-                    if(hqPlaced1 == false && buildingType == "Warehouse") {         //diagonal mirror headquarters
+                    if(hqPlaced1 === false && buildingType === "Warehouse") {         //diagonal mirror headquarters
                         this.buildings.headquarters = true;
                         hqPlaced2 = true;
                     }
                     this.buildings.push(newBuilding);
+                }
             }
         }
-        */          //Commented all of my code because I'm not sure if this will work
 
         //<<-- /Creer-Merge: begin -->>
     },
