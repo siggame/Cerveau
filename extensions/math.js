@@ -83,7 +83,21 @@ var mathExtensions = {
      average: function(numbers) {
         var length = (Array.isArray(numbers) ? numbers : arguments).length;
         return Math.sum.apply(Math, arguments)/length;
-     }
+     },
+
+    /**
+     * returns a random integer within the range of upper to lower (inclusive). lower defaults to 0.
+     *
+     * @param {number} upper - the upper range, this number is valid as a random return value
+     * @param {number} [lower] - the lower range, defaults to 0
+     * @returns {number} a random integer within the range lower to upper
+     */
+    randomInt: function(upper, lower) {
+        lower = lower || 0;
+        var max = Math.max(upper, lower);
+        var min = Math.min(upper, lower);
+        return Math.floor(Math.random()*(max - min + 1) + min);
+    },
 };
 
 for(var extension in mathExtensions) {
