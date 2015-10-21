@@ -81,6 +81,7 @@ var Game = Class(TurnBasedGame, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.forecastIndex = 0;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -102,19 +103,6 @@ var Game = Class(TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    //This function will deal with the next turn logic and win conditons
-    nextTurn: function() {
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-
-            if(player.headquarters.health <= 0) {
-                game.declareLoser(player, "Your Headquarters burned down!");
-                game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");
-            }
-        }
-        return TurnBasedGame.nextTurn.apply(this, arguments);
-   },
-
    _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
         TurnBasedGame._maxTurnsReached.apply(this, arguments);
 
@@ -128,8 +116,15 @@ var Game = Class(TurnBasedGame, {
         }
    },
     // You can add additional functions here. These functions will not be directly callable by client AIs
+
+    //This function will deal with the next turn logic and win conditons
     nextTurn: function() {
-        var directions = {
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.bribesRemaining = this.baseBribesPerTurn + player.burnedBuildings;
+        }
+
+       var directions = {
             north: "buildingNorth",
             east: "buildingEast",
             south: "buildingSouth",
@@ -139,12 +134,23 @@ var Game = Class(TurnBasedGame, {
         //locations where fire will spread
         var locations = [];
 
-        //handle fire damage
-        this.buildings.forEach(function(building){
+        for(var i = 0; i < this.buildings.length; i++){
+            var building = this.buildings[i];
             if(building.fire > 0){
+                var previousHP = building.health;
                 building.burn()
 
-                //building fire will spread to
+                //make sure building wasnt already dead
+                if(previousHP > 0 && building.health <= 0){
+                    var player = building.owner;
+                    player.burnedBuildings++;
+                    if(building.isHeadquarters()){
+                        game.declareLoser(player, "Your Headquarters burned down!");
+                        game.declareWinner(this.getOtherPlayers(player)[0], "You burned down the other players Headquarters.");                        
+                    }
+                }
+
+                //location the fire will spread to
                 var location = building[directions[this.currentForecast.direction]];
                 locations.push({
                     building: location,
@@ -155,10 +161,13 @@ var Game = Class(TurnBasedGame, {
             if(building.exposure && !building.bribed){
                 building.exposure -= 1; //this.exposureCooldown?
             }
-        });
+
+            building.bribed = false;
+        }
 
         //spread fire
-        locations.forEach(function(location){
+        for(var i = 0; i < locations.length; i++){
+            var location = locations[i];
             var building = location.building;
             var fireSpread = this.currentForecast.intensity;
             if(fireSpread < building.fire){
@@ -167,7 +176,9 @@ var Game = Class(TurnBasedGame, {
 
             var newFire = building.fire + fireSpread;
             building.fire = Math.min(this.maxFire, newFire);
-        })
+        }
+
+        this.currentForecast = this.forecasts[this.forecastIndex++];
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
     }

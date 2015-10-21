@@ -123,6 +123,7 @@ var Player = Class(GameObject, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.burnedBuildings = 0;
 
         //<<-- /Creer-Merge: init -->>
     },
