@@ -2,7 +2,16 @@ process.title = "Cerveau Game Server"
 global.__basedir = __dirname + '/'; // hackish way to store the base directory we are in now so we don't need require("../../../../whatever") and instead require(__base + "root/path/to/whatever")
 require("./extensions/"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
 
-var ArgumentParser = require('argparse').ArgumentParser;
+var argparse = undefined;
+try {
+    argparse = require('argparse');
+}
+catch(e) {
+    console.error("ERROR: could not find module \"argparse\".\nDid you forget to run 'npm install'?");
+    process.exit(1);
+}
+
+var ArgumentParser = argparse.ArgumentParser;
 var parser = new ArgumentParser({description: 'Run the JavaScript client with options to connect to a game server. Must provide a game name to play.'});
 parser.addArgument(['-p', '--port'], {action: 'store', dest: 'port', defaultValue: 3000, help: 'the port that clients should connect through'});
 parser.addArgument(['-H', '--host'], {action: 'store', dest: 'host', defaultValue: "localhost", help: 'the host that this should run on'});
