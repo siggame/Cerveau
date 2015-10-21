@@ -43,39 +43,26 @@ var WeatherStation = Class(Building, {
     intensify: function(player, negative, asyncReturn) {
         // <<-- Creer-Merge: intensify -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        //checks that the player is using one of their own weather stations
-        if(this.owner !== player) {
-            return this.game.logicError(false, "tried to use an enemy's weather station");
+        var logicError = this._checkIfBribeIsValid(player, false);
+        if(logicError) {
+            return logicError;
         }
-        //checks that the weather station is not dead
-        if(this.health <= 0) {
-            return this.game.logicError(false, "tried to bribe a dead weather station");
+
+        // checks if the intensity is at maximum and trying to increase
+        if(!negative && this.game.nextForecast.intensity >= this.game.maxForecastIntensity) {
+            return this.game.logicError(false, "Forecast's intensity cannot go above " + this.game.maxForecastIntensity + ".");
         }
-        //checks if the player has any remaining bribes
-        if(player.bribesRemaining <= 0) {
-            return this.game.logicError(false, "player has no remaining bribes");
-        }
-        //checks if the weather station has already been bribed this turn
-        if(this.bribed) {
-            return this.game.logicError(false, "weather station is has already been bribed this turn")
-        }
-        //checks if the intensity is already at max if trying to increase
-        if(!negative && this.game.nextForecast.intensity >= 20) { //TODO: read max intensity from config
-            return this.game.logicError(false, "next forecast's intensitysity cannot be increased further");
-        }
-        //checks if the intensity is at minimum if trying to decrease
-        if(negative && this.game.nextForecast.intensity <= 0) { //TODO: read minimum intensity from config
-            return this.game.logicError(false, "next forecast's intensity cannot be negative");
+
+        // checks if the intensity is at minimum and trying to decrease
+        if(negative && this.game.nextForecast.intensity <= 0) {
+            return this.game.logicError(false, "Forecast's intensity cannot be negative.");
         }
         
-        if(!negative) {
-            this.game.nextForecast.intensity++;
-        }
-        else {
-            this.game.nextForeCast.intesity--;
-        }
+        this.game.nextForecast.intensity += (negative ? -1 : 1);
+
         this.bribed = true;
         player.bribesRemaining--;
+
         return true;
 
         // <<-- /Creer-Merge: intensify -->>
@@ -92,63 +79,16 @@ var WeatherStation = Class(Building, {
     rotate: function(player, counterclockwise, asyncReturn) {
         // <<-- Creer-Merge: rotate -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var game = this.game;
-
-        // check if the weatherstation is alive
-        if(this.health <= 0) {
-            return game.logicError(false, "tried to bribe a burned down WeatherStation");
+        var logicError = this._checkIfBribeIsValid(player, false);
+        if(logicError) {
+            return logicError;
         }
 
-        // check if the player owns the building
-        if(this.owner !== player) {
-            return game.logicError(false, "tried to use an enemy's WeatherStation.rotate");
-        }
-
-        // check if the player has enough bribes remaining
-        if(this.owner.bribesRemaining <= 0) {
-
-            return game.logicError(false, "tried to bribe with no bribesRemaining");
-        }
-
-        // check if the building has already been bribed
-        if(this.bribed) {
-            return game.logicError(false, "this building has already been bribed");
-        }
+        this.game.nextForecast.direction = this.game.directions[(counterclockwise ? "previous" : "next") + "WrapAround"](this.game.nextForecast.direction);
 
         this.bribed = true;
         this.owner.bribesRemaining--;
-        if(game.nextForecast.direction === "north") {
-            if(counterclockwise) {
-                game.nextForecast.direction = "west";
-            }
-            else {
-                game.nextForecast.direction = "east";
-            }
-        }
-        else if(game.nextForecast.direction === "east") {
-            if(counterclockwise) {
-                game.nextForecast.direction = "north";
-            }
-            else {
-                game.nextForecast.direction = "south";
-            }
-        }
-        else if(game.nextForecast.direction === "south") {
-            if(counterclockwise) {
-                game.nextForecast.direction = "east";
-            }
-            else {
-                game.nextForecast.direction = "west";
-            }
-        }
-        else if(game.nextForecast.direction === "west") {
-            if(counterclockwise) {
-                game.nextForecast.direction = "south";
-            }
-            else {
-                game.nextForecast.direction = "north";
-            }
-        }
+
         return true;
 
         // <<-- /Creer-Merge: rotate -->>

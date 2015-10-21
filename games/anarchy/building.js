@@ -117,6 +117,33 @@ var Building = Class(GameObject, {
     maxHealth: 100,
 
     /**
+     * does the basic checking that all buildings must meet for valid bribes
+     *
+     * @param {Player} player - the player trying to bribe this building
+     * @param {*} errorValue - the error value to store in the game logic error
+     * @returns {Object|undefined} a game logic error is returned if the bribe is NOT valid, undefined otherwise
+     */
+    _checkIfBribeIsValid: function(player, errorValue) {
+        var reason;
+        if(this.owner !== player) {
+            reason = "Cannot bribe an enemy's building.";
+        }
+        else if(player.bribesRemaining <= 0) {
+            reason = "Player has no bribes remaining to bribe this building with";
+        }
+        else if(this.health <= 0) {
+            reason = "This building has been burned down and cannot be bribed.";
+        }
+        else if(this.bribed) {
+            reason = "This building has already been bribed this turn and cannot be bribed again.";
+        }
+
+        if(reason) {
+            return this.game.logicError(errorValue, reason);
+        }
+    },
+
+    /**
      * sets this building as the headquarters for its owner. This should only be called once per player, and only during game initialization
      */
     makeHeadquarters: function() {
