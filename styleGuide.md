@@ -460,7 +460,7 @@ User.findOne({ name: "foo" }).populate("bar")
 
 Use slashes for both single line and multi line comments. Try to write
 comments that explain higher level mechanisms or clarify difficult
-segments of your code. Don"t use comments to restate trivial things.
+segments of your code. Don't use comments to restate trivial things.
 
 *Right:*
 
