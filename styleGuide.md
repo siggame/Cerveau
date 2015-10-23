@@ -100,7 +100,7 @@ var foo = "bar";
 *Wrong:*
 
 ```js
-var foo = "bar";
+var foo = 'bar';
 ```
 
 ### Opening braces go on the same line
