@@ -188,7 +188,7 @@ var Game = Class(TurnBasedGame, {
    _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
         var returned = TurnBasedGame._maxTurnsReached.apply(this, arguments);
 
-        this._secondaryWinConditions();
+        this._secondaryWinConditions("Max turns reached (" + this.maxTurns + ")");
 
         return returned;
    },
@@ -241,7 +241,7 @@ var Game = Class(TurnBasedGame, {
             var player = this.players[i];
             if(player.headquarters.health <= 0) { // then it burned down, and they have lost
                 if(loser) { // someone else already lost this turn... so they both lost their headquarters this turn, so check secondary win conditions (and the game is over)
-                    this._secondaryWinConditions();
+                    this._secondaryWinConditions("Both headquarters burned down on the same turn");
                 }
                 loser = player;
             }
@@ -302,21 +302,61 @@ var Game = Class(TurnBasedGame, {
         return null;
     },
 
+    /**
+     * Checks and declares winner/losers based on alternative win conditions
+     *
+     * @param {string} reasonWhy - the reason why we have to check for secondary win conditions
+     */
+    _secondaryWinConditions: function(reasonWhy) {
+        var calculations = []; // all the numbers we will need to figure out the secondary win conditions winner
+        var winConditions = [ // the alternative win conditions the are finding calculations for
+            {
+                key: "headquartersHealth",
+                winReason: "Your headquarters had the most health remaining.",
+                loseReason: "Your headquarters had less health remaining than another player."
+            },
+            {
+                key: "buildingsAlive",
+                winReason: "You had the most buildings not burned down.",
+                loseReason: "You had more building burned down than anaother player.",
+            },
+            {
+                key: "buildingsHealthSum",
+                winReason: "You had the highest health sum among your Buildings.",
+                loseReason: "You had a lower health sum than another player.",
+            },
+        ];
 
-    _secondaryWinConditions: function() {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
+            var calculation = {
+                player: player,
+                headquartersHealth: player.headquarters.health,
+            };
 
-            if(player.headquarters.health < this.getOtherPlayers(player)[0]) {
-                this.declareLoser(player, "Your Headquarters has less health than the opponents.");
-                this.declareWinner(this.getOtherPlayers(player)[0], "You did more damage to the other player's Headquarters.");
-                return returned;
+            calculations.buildingsAlive = 0;
+            calculations.buildingsHealthSum = 0;
+            for(var j = 0; j < player.buildings.length; j++) {
+                var building = player.buildings[j];
+                calculations.buildingsAlive += Number(building.health > 0); // alive will be 1, burned down will be 0
+                calculations.buildingsHealthSum += building.health;
+            }
+
+            calculations.push(calculation);
+        }
+
+        // try to find the winner via most Headquarters Health remaining by sorting based on that
+        for(var i = 0; i < winConditions.length; i++) {
+            var winCondition = winConditions[i];
+            calculations.sortDescending(winCondition.key);
+            if(calculations[0][winCondition.key] > calculations[1][winCondition.key]) { // then we have a winner, otherwise two players tied for that win condition
+                this.delcareLosers(this.getOtherPlayers(calculations[0].player), reasonWhy + ": " + winCondition.loseReason);
+                this.declareWinner(calculations[0].player, reasonWhy + ": " + winCondition.winReason);
+                return;
             }
         }
 
-        // TODO: more
-
-        // win via coin flip
+        // Win via coin flip - if we got here no player won via game rules. They probably played identically to each other.
         var winnerIndex = Math.randomInt(this.players.length);
         for(var i = 0; i < this.players.length; i++) {
             if(i === winnerIndex) {
