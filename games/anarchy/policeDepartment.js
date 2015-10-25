@@ -43,8 +43,23 @@ var PoliceDepartment = Class(Building, {
     raid: function(player, warehouse, asyncReturn) {
         // <<-- Creer-Merge: raid -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the PoliceDepartment's raid function here
-        return 0;
+        var logicError = this._checkIfBribeIsValid(player, -1);
+        if(logicError) {
+            return logicError;
+        }
+
+        if(warehouse && warehouse.gameObjectName !== "Warehouse") {
+            return game.logicError(-1, "PoliceDepartments can only raid Warehouses.");
+        }
+
+        var oldHealth = warehouse.oldHealth;
+        warehouse.health = math.max(warehouse.health - warehouse.exposure, 0);
+        warehouse.exposure = 0;
+
+        this.bribed = true;
+        player.bribesRemaining--;
+
+        return oldHealth - warehouse.health;
 
         // <<-- /Creer-Merge: raid -->>
     },
