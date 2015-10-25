@@ -122,22 +122,62 @@ var ArrayExtensions = {
      *
      * @see Array.getWrapAround
      */
-     nextWrapAround: function(element) {
+    nextWrapAround: function(element) {
         return this.getWrapAround(element, 1);
-     },
+    },
 
-     /**
+    /**
      * convenience function to get the previous element in this array after some element, wrapping around if it would walk off the array
      *
      * @see Array.getWrapAround
      */
-     previousWrapAround: function(element) {
+    previousWrapAround: function(element) {
         return this.getWrapAround(element, -1);
-     },
+    },
+
+    /**
+     * sorts the array in ascending order (1, 2, 3, 4, ...) based on an optional key
+     *
+     * @param {string} key - if sorting an array of objects then sort based on this key
+     * @returns {Array} this array, now sorted in place
+     */
+    sortAscending: function(key) {
+        return this.sort(function (a, b) {
+            if(key !== undefined ? (a[key] > b[key]) : a > b) {
+                return 1;
+            }
+
+            if(key !== undefined ? (a[key] < b[key]) : a < b) {
+                return -1;
+            }
+
+            return 0; // a must be equal to b
+        });
+    },
+
+    /**
+     * sorts the array in Descending order (10, 9, 8, 7, ...) based on an optional key
+     *
+     * @param {string} key - if sorting an array of objects then sort based on this key
+     * @returns {Array} this array, now sorted in place
+     */
+    sortDescending: function(key) {
+        return this.sort(function (a, b) {
+            if(key !== undefined ? (a[key] < b[key]) : a < b) {
+                return 1;
+            }
+
+            if(key !== undefined ? (a[key] > b[key]) : a > b) {
+                return -1;
+            }
+
+            return 0; // a must be equal to b
+        });
+    },
 };
 
 for(var extension in ArrayExtensions) {
-    if (typeof(Array.prototype[extension]) !== "function") {
+    if(typeof(Array.prototype[extension]) !== "function") {
         Array.prototype[extension] = ArrayExtensions[extension];
     }
 }

@@ -440,18 +440,34 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Declares a player as having lost, and assumes when a player looses the rest could still be competing to win.
+     * delcares a single player as having lost, and assumes when a player looses the rest could still be competing to win.
      *
      * @param {Player} loser - the player that lost the game
+     * @see BaseGame.declareLosers
+     */
+    declareLoser: function(loser /*...*/) {
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = [ loser ];
+        return this.declareLosers.apply(this, args);
+    },
+
+    /**
+     * Declares players as having lost, and assumes when a player looses the rest could still be competing to win.
+     *
+     * @param {Array.<Player>} losers - the players that lost the game
      * @param {string} [reason] - human readable string that is the lose reason
      * @param {Object} [flags]
      * @param   {boolean} [flags.dontCheckForWinner] - skips checking for a winner after declareing a loser
      */
-    declareLoser: function(loser, reason, flags) {
-        loser.lost = true;
-        loser.reasonLost = reason || "Lost";
-        loser.won = false;
-        loser.reasonWon = "";
+    declareLosers: function(losers, reason, flags) {
+        for(var i = 0; i < losers.length; i++) {
+            var loser = losers[i];
+            log("loser", loser.id);
+            loser.lost = true;
+            loser.reasonLost = reason || "Lost";
+            loser.won = false;
+            loser.reasonWon = "";
+        }
 
         if(!flags || !flags.dontCheckForWinner) { // then as someone lost check and see if all other players lost which means the last player won.
             this.basicCheckForWinner();
@@ -459,25 +475,43 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Declares the player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
+     * delcares a single player as winning, assumes when a player wins the rest lose (unless they've already been set to win)
      *
-     * @param {Player} winner - the player that won the game, the rest loose if not already won
+     * @param {Player} winner - the player that won the game
+     * @see BaseGame.declareWinners
+     */
+    declareWinner: function(winner /*...*/) {
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = [ winner ];
+        return this.declareWinners.apply(this, args);
+    },
+
+    /**
+     * Declares players as winning, assumes when a player wins the rest lose (unless they've already been set to win)
+     *
+     * @param {Array.<Player>} winners - the players that won the game, the rest loose if not already won
      * @param {string} [reason] - the human readable string why they won the game
      */
-    declareWinner: function(winner, reason) {
-        winner.won = true;
-        winner.reasonWon = reason || "Won";
-        winner.lost = false;
-        winner.reasonLost = "";
+    declareWinners: function(winners, reason) {
+        for(var i = 0; i < winners.length; i++) {
+            var winner = winners[i];
+            log("winner", winner.id);
+            winner.won = true;
+            winner.reasonWon = reason || "Won";
+            winner.lost = false;
+            winner.reasonLost = "";
+        }
 
+        var losers = [];
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
 
-            if(player !== winner && !player.won && !player.lost) { // then this player has not lost yet and now looses because someone else won
-                this.declareLoser(player, "Other player won", {dontCheckForWinner: true});
+            if(!winners.contains(player) && !player.won && !player.lost) { // then this player has not lost yet and now looses because someone else won
+                losers.push(player);
             }
         }
 
+        this.declareLosers(losers, "Other player won", {dontCheckForWinner: true});
         this.isOver(true);
     },
 
