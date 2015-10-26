@@ -21,7 +21,8 @@
                 },
                 "serverPredefined": true
             }
-        }
+        },
+        "serverParentClasses": []
     },
     "Game": {
         "attribute_names": [
@@ -172,6 +173,7 @@
         "numberOfPlayers": 2,
         "parentClasses": [],
         "serverParentClasses": [
+            "TwoPlayerGame",
             "TurnBasedGame"
         ]
     },
@@ -439,6 +441,7 @@
                 "clientType",
                 "lost",
                 "name",
+                "otherPlayer",
                 "reasonLost",
                 "reasonWon",
                 "timeRemaining",
@@ -483,6 +486,15 @@
                     "type": {
                         "keyType": null,
                         "name": "string",
+                        "valueType": null
+                    }
+                },
+                "otherPlayer": {
+                    "default": null,
+                    "description": "this player's opponent in the game.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
                         "valueType": null
                     }
                 },

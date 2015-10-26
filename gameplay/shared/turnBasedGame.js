@@ -2,6 +2,7 @@ var Class = require(__basedir + "/utilities/class");
 var BaseGame = require("./baseGame");
 var extend = require("extend");
 var serializer = require("../serializer");
+var log = require("../log");
 
 /**
  * @class TurnBasedGame - a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
@@ -20,8 +21,16 @@ var TurnBasedGame = Class(BaseGame, {
      */
     begin: function() {
         BaseGame.begin.apply(this, arguments);
-        
+
         this.currentPlayer = this.players[0];
+    },
+
+    /**
+     * after the game has started we order the first player to runTurn
+     */
+    _started: function() {
+        BaseGame._started.apply(this, arguments);
+
         this.order(this.currentPlayer, "runTurn");
     },
 
