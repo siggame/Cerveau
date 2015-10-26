@@ -64,6 +64,17 @@ ${merge("        //", "init",
 
 ${merge("        //", "begin", "        // any logic after init can be put here")}
     },
+
+    /**
+     * This is called when the game has started, after all the begin()s. This is a good spot to send orders.
+     */
+    _started: function() {
+% for parent_class in reversed(parent_classes):
+        ${parent_class}._started.apply(this, arguments);
+% endfor
+
+${merge("        //", "_started", "        // any logic for _started can be put here")}
+    },
 % else:
     gameObjectName: "${obj_key}",
 % endif

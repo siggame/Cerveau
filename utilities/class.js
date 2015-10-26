@@ -2,7 +2,7 @@
  * @function Class: a simple class building interface. Pass to it parent classes (built with Class()) then a dictionary of functions. This will assign all to the new classe's prototype object, and return that new class so you can instantiate it like normal javascarip "classes" with var a = new A()
  */
 var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPrototype*/) {
-    var prototype = arguments[arguments.length - 1]
+    var prototype = arguments[arguments.length - 1];
 
     if(prototype === undefined || Class.isClass(prototype)) {
         prototype = {};

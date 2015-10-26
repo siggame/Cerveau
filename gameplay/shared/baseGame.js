@@ -29,7 +29,7 @@ var BaseGame = Class(DeltaMergeable, {
         this._orders = [];
         this._newOrdersToPopIndex = 0;
         this._returnedDataTypeConverter = {};
-        this._started = false;
+        this._hasStarted = false;
         this._over = false;
         this._nextGameObjectID = 0;
 
@@ -65,7 +65,14 @@ var BaseGame = Class(DeltaMergeable, {
 
         this.begin();
 
-        this._started = true;
+        this._started();
+    },
+
+    /**
+     * Called when the game has started, after it and all its subclasses begin()
+     */
+    _started: function() {
+        this._hasStarted = true;
     },
 
     /**
@@ -74,7 +81,7 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {boolean} represents if the game has started yet.
      */
     hasStarted: function() {
-        return this._started;
+        return this._hasStarted;
     },
 
     /**
@@ -462,7 +469,6 @@ var BaseGame = Class(DeltaMergeable, {
     declareLosers: function(losers, reason, flags) {
         for(var i = 0; i < losers.length; i++) {
             var loser = losers[i];
-            log("loser", loser.id);
             loser.lost = true;
             loser.reasonLost = reason || "Lost";
             loser.won = false;
@@ -495,7 +501,6 @@ var BaseGame = Class(DeltaMergeable, {
     declareWinners: function(winners, reason) {
         for(var i = 0; i < winners.length; i++) {
             var winner = winners[i];
-            log("winner", winner.id);
             winner.won = true;
             winner.reasonWon = reason || "Won";
             winner.lost = false;
