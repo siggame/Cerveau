@@ -205,6 +205,7 @@
         "numberOfPlayers": 2,
         "parentClasses": [],
         "serverParentClasses": [
+            "TwoPlayerGame",
             "TurnBasedGame"
         ]
     },
@@ -807,6 +808,7 @@
                 "headquarters",
                 "lost",
                 "name",
+                "otherPlayer",
                 "policeDepartments",
                 "reasonLost",
                 "reasonWon",
@@ -884,6 +886,15 @@
                     "type": {
                         "keyType": null,
                         "name": "string",
+                        "valueType": null
+                    }
+                },
+                "otherPlayer": {
+                    "default": null,
+                    "description": "this player's opponent in the game.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
                         "valueType": null
                     }
                 },
