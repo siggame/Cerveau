@@ -53,7 +53,7 @@ var PoliceDepartment = Class(Building, {
         }
 
         var oldHealth = warehouse.oldHealth;
-        warehouse.health = math.max(warehouse.health - warehouse.exposure, 0);
+        warehouse.health = Math.max(warehouse.health - warehouse.exposure, 0);
         warehouse.exposure = 0;
 
         this.bribed = true;
