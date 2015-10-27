@@ -121,7 +121,7 @@ var Client = Class({
      * Called when disconnected from the remote client this Client represents
      */
     disconnected: function() {
-        this.stopTimer();
+        this.pauseTicking();
         this.server.clientDisconnected(this);
         this.socket.destroy();
     },
@@ -199,6 +199,7 @@ var Client = Class({
         if(this.isTicking()) {
             var timeDiff = process.hrtime(this.timer.startTime);
 
+            clearTimeout(this.timer.timeout);
             this.timer.timeout = undefined;
             this.timer.startTime = undefined;
 
@@ -213,6 +214,7 @@ var Client = Class({
         this.pauseTicking();
         log("Client", this.name, "timed out");
         this.server.clientTimedOut(this);
+        this.disconnect();
     },
 });
 
