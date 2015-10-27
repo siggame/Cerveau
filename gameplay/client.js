@@ -43,7 +43,7 @@ var Client = Class({
 
         var buffer = "";
         var socketListenerOnData = function(str) {
-            if(self.server.printIO) {
+            if(self.server.printTCP) {
                 log("< From client " + this.name + " <--", str, '\n--');
             }
 
@@ -132,7 +132,7 @@ var Client = Class({
      * @param {string} the raw string to send. Should be EOT_CHAR terminated.
      */
     _sendRaw: function(str) {
-        if(this.server.printIO) {
+        if(this.server.printTCP) {
             log("> to client " + this.name + " -->", str, "\n---");
         }
         this.socket.write(str);
@@ -180,7 +180,7 @@ var Client = Class({
      * Starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for orders.
      */
     startTicking: function() {
-        if(this.server.noTimeout) {
+        if(!this.server.timeout) {
             return false;
         }
 

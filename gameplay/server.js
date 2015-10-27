@@ -16,8 +16,8 @@ var Server = Class({
     init: function(options) {
         this.clients = [];
 
-        this.noTimeout = Boolean(options.noTimeout);
-        this.printIO = Boolean(options.printIO);
+        this.timeout = options.timeout || false;
+        this.printTCP = Boolean(options.printTCP);
         this.silent = Boolean(options.silent);
         this.logging = Boolean(options.log);
         this.name = options.name || "Server";
@@ -35,7 +35,6 @@ var Server = Class({
      * @returns {Client} newly created client for the passed in socket
      */
     addSocket: function(socket, clientInfo) {
-        log("Received new connection!");
         var client = new Client(socket, this, clientInfo);
         this.clients.push(client);
 
