@@ -4,6 +4,8 @@ var fs = require('fs');
 var zlib = require('zlib');
 var path = require('path');
 var moment = require('moment');
+var format = require("string-format");
+var extend = require("extend");
 var log = require("./log");
 
 /**
@@ -14,11 +16,16 @@ var GameLogger = Class({
      * @param {Array.<string>} gameNames - strings of all games that could be logged
      * @param {string} [dir] - path to directory to log games into, and to read them from
      */
-    init: function(gameNames, dir) {
+    init: function(gameNames, options) {
         this.gamelogExtension = ".json.gz";
         this.usingCompression = true;
-        this.gamelogDirectory = dir || 'output/gamelogs/';
+        this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
         this.gamelogs = []; // simple array of gamelogs, not indexed by gameName, sessionID, epoch like this.gamelogFor
+
+        this._filenameFormat = "{moment}-{gameName}-{gameSession}";
+        if(options && options.arenaMode) {
+            this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
+        }
 
         this.gamelogFor = {};
         for(var i = 0; i < gameNames.length; i++) {
@@ -54,7 +61,10 @@ var GameLogger = Class({
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
-        var filename = utilities.momentString(gamelog.epoch) + "-" + gamelog.gameName + "-" + gamelog.gameSession;
+        log("game loggin", gamelog.gameName, gamelog.gameSession);
+        var filename = format(this._filenameFormat, extend({
+            moment: utilities.momentString(gamelog.epoch),
+        }, gamelog));
 
         this._memorizeGamelog(gamelog);
 

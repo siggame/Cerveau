@@ -22,20 +22,22 @@ var Lobby = Class(Server, {
         this.name = "Lobby @ " + process.pid;
         this.host = args.host;
         this.port = args.port;
-        this.authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
-        this.noGameSettings = (args.noGameSettings === true);
+        this._authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
+        this._allowGameSettings = (args.gameSettings === true);
         this._profile = (args.profile === true);
         this.gameNames = [];
         this.gameSessions = {};
         this.gameClasses = [];
 
-        this._authenticator = new Authenticator(this.authenticate);
+        this._authenticator = new Authenticator(this._authenticate);
         this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
         this._nextGameNumber = 1;
 
         this._initializeGames();
 
-        this.gameLogger = new GameLogger(this.gameNames);
+        this.gameLogger = new GameLogger(this.gameNames, {
+            arenaMode: Boolean(args.arena),
+        });
 
         cluster.setupMaster({
             exec: __basedir + '/gameplay/worker.js',
@@ -237,7 +239,7 @@ var Lobby = Class(Server, {
                 });
 
                 gameSession.clients.push(client);
-                if(data.gameSettings && !this.noGameSettings) {
+                if(data.gameSettings && this._allowGameSettings) {
                     try {
                         var settings = url.parse("urlparms?" + data.gameSettings, true).query;
                         for(var key in settings) {
@@ -306,16 +308,19 @@ var Lobby = Class(Server, {
             });
         }
 
+        var workerGameSessionData = extend({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
+            __basedir: __basedir,
+            _mainDebugPort: process._debugPort,
+            gameSession: gameSession.id,
+            gameName: gameSession.gameName,
+            clientInfos: clientInfos,
+            profile: this._profile,
+        }, this._initArgs);
+
+        workerGameSessionData.gameSettings = gameSession.gameSettings;
+
         gameSession.worker = cluster.fork({
-            workerGameSessionData: JSON.stringify(extend({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
-                __basedir: __basedir,
-                _mainDebugPort: process._debugPort,
-                gameSession: gameSession.id,
-                gameSettings: gameSession.gameSettings,
-                gameName: gameSession.gameName,
-                clientInfos: clientInfos,
-                profile: this._profile,
-            }, this._initArgs)),
+            workerGameSessionData: JSON.stringify(workerGameSessionData),
         });
 
         var self = this;
