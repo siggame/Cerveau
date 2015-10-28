@@ -2,6 +2,7 @@ process.title = "Cerveau Game Server"
 global.__basedir = __dirname + '/'; // hackish way to store the base directory we are in now so we don't need require("../../../../whatever") and instead require(__base + "root/path/to/whatever")
 require("./extensions/"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
 var args = require("./args");
+var extend = require("extend");
 
 var Lobby = require("./gameplay/lobby");
 var lobby = new Lobby(args); // the game server for clients to connect to
@@ -19,6 +20,6 @@ if(args.api || args.web) {
     });
 }
 
-require("./website/")({
+require("./website/")(extend({
     lobby: lobby,
-});
+}, args));
