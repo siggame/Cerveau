@@ -98,6 +98,18 @@ var mathExtensions = {
         var min = Math.min(upper, lower);
         return Math.floor(Math.random()*(max - min + 1) + min);
     },
+
+    /**
+     * Clamps a number whose value is limited to the given range.
+     *
+     * @param {number} num - the number to clamp in a range from min to max
+     * @param {number} min - The lower boundary of the output range
+     * @param {number} max - The upper boundary of the output range
+     * @returns {number} A number in the range [min, max]
+     */
+    clamp: function(num, min, max) {
+        return Math.min(Math.max(num, min), max);
+    },
 };
 
 for(var extension in mathExtensions) {
