@@ -57,3 +57,5 @@ for(var extension in StringExtensions) {
         String.prototype[extension] = StringExtensions[extension];
     }
 }
+
+require("string-format").extend(String.prototype); // String.format extension.
