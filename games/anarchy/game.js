@@ -429,7 +429,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var winCondition = winConditions[i];
             calculations.sortDescending(winCondition.key);
             if(calculations[0][winCondition.key] > calculations[1][winCondition.key]) { // then we have a winner, otherwise two players tied for that win condition
-                this.delcareLosers(this.getOtherPlayers(calculations[0].player), reasonWhy + ": " + winCondition.loseReason);
+                this.delcareLoser(this.getOtherPlayers(calculations[0].player), reasonWhy + ": " + winCondition.loseReason);
                 this.declareWinner(calculations[0].player, reasonWhy + ": " + winCondition.winReason);
                 return;
             }
