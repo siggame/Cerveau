@@ -129,12 +129,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         var maxEdgePoints = 5;
         
         // Lazy functions
-        var this_ = this;
+        var self = this;
         function randX() {
-            return Math.randomInt(this_.mapWidth / 2 - 1, 0);;
+            return Math.randomInt(self.mapWidth / 2 - 1, 0);;
         }
         function randY() {
-            return Math.randomInt(this_.mapHeight - 1, 0);
+            return Math.randomInt(self.mapHeight - 1, 0);
         }
         
         var points = [];
@@ -413,12 +413,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 headquartersHealth: player.headquarters.health,
             };
 
-            calculations.buildingsAlive = 0;
-            calculations.buildingsHealthSum = 0;
+            calculation.buildingsAlive = 0;
+            calculation.buildingsHealthSum = 0;
             for(var j = 0; j < player.buildings.length; j++) {
                 var building = player.buildings[j];
-                calculations.buildingsAlive += Number(building.health > 0); // alive will be 1, burned down will be 0
-                calculations.buildingsHealthSum += building.health;
+                calculation.buildingsAlive += Number(building.health > 0); // alive will be 1, burned down will be 0
+                calculation.buildingsHealthSum += building.health;
             }
 
             calculations.push(calculation);
@@ -429,7 +429,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var winCondition = winConditions[i];
             calculations.sortDescending(winCondition.key);
             if(calculations[0][winCondition.key] > calculations[1][winCondition.key]) { // then we have a winner, otherwise two players tied for that win condition
-                this.delcareLoser(this.getOtherPlayers(calculations[0].player), reasonWhy + ": " + winCondition.loseReason);
+                this.declareLosers(this.getOtherPlayers(calculations[0].player), reasonWhy + ": " + winCondition.loseReason);
                 this.declareWinner(calculations[0].player, reasonWhy + ": " + winCondition.winReason);
                 return;
             }
