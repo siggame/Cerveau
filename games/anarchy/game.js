@@ -121,21 +121,84 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this._buildingsGrid = [];
         var originalBuildings = [];
         var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; // TODO: should we weigh these so some are generated more often?
+        
+        // Some configuration parameters to change map generation
+        var minNumberOfPoints = 8;
+        var maxNumberOfPoints = 15;
+        var minEdgePoints = 1;
+        var maxEdgePoints = 5;
+        
+        // Lazy functions
+        var this_ = this;
+        function randX() {
+            return Math.randomInt(this_.mapWidth / 2 - 1, 0);;
+        }
+        function randY() {
+            return Math.randomInt(this_.mapHeight - 1, 0);
+        }
+        
+        var points = [];
+        
+        var numberOfPoints = Math.randomInt(maxNumberOfPoints, minNumberOfPoints);
+        var edgePoints = Math.randomInt(maxEdgePoints, minEdgePoints);
+        
+        // add random points
+        for(var i = 0; i < numberOfPoints; i++) {
+            points.pushIfAbsent({x: randX(), y: randY()});
+        }
+        // add edge points
+        for(var i = 0; i < edgePoints; i++) {
+            points.pushIfAbsent({x: this.mapWidth / 2 - 1, y: randY()});
+        }
+        // now connect the points, after shuffling them
+        points.shuffle();
+        var startLength = points.length;
+        for(var i = 0; i < startLength; i++) {
+            var fromX = points[i].x;
+            var fromY = points[i].y;
+            var to = points[i + 1];
+            while(true) {
+                var changes = [];
+                // Is there a better way to do this?
+                if(fromX < to.x) {
+                    changes.push({x:  1, y: 0});
+                } else if(fromX > to.x) {
+                    changes.push({x: -1, y: 0});
+                }
+                if(fromY < to.y) {
+                    changes.push({x: 0, y:  1});
+                } else if(fromY > to.y) {
+                    changes.push({x: 0, y: -1});
+                }
+                // this means that the point has already been reached
+                // so break from the loop
+                if(changes.length === 0) {
+                    break;
+                }
+                // otherwise choose a random direction and add it to the
+                // points
+                var change = changes.randomElement();
+                var newX = fromX + change.x;
+                var newY = fromY + change.y;
+                fromX = newX;
+                fromY = newY;
+                points.pushIfAbsent({x: newX, y:newY});
+            }
+        }
 
-        // TODO: make actual map generation algorithm that makes sure each player has a "fair" number of buildings, and the map is "interesting"
+        // make the grid
         for(var x = 0; x < this.mapWidth; x++) {
             this._buildingsGrid[x] = [];
-            if(x < this.mapWidth/2) {
-                for(var y = 0; y < this.mapHeight; y++) {
-                    if(Math.random() > 0.5) {
-                        originalBuildings.push(this._createBuilding(buildingTypes.randomElement(), {
-                            x: x,
-                            y: y,
-                            owner: this.players.randomElement(), // TODO: random percent on each side?
-                        }));
-                    }
-                }
-            }
+        }
+        
+        for(var i = 0; i < points.length; i++) {
+            // Probably want to have different chances of each building appearing?
+            // Depending on the location maybe?
+            originalBuildings.push(this._createBuilding(buildingTypes.randomElement(), {
+                x: points[i].x,
+                y: points[i].y,
+                owner: this.players.randomElement()
+            }));
         }
 
         // TODO: yes this could break if somehow no warehouses are randomly generated. That should be fixed with a real map generation algorithm
