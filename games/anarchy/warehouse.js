@@ -6,8 +6,7 @@ var log = require(__basedir + "/gameplay/log");
 var Building = require("./building");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-// any additional requires you want can be required here safely between cree runs
+var format = require("string-format");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Warehouse: A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.
@@ -37,12 +36,7 @@ var Warehouse = Class(Building, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(this.owner.headquarters === this) {
-            this.fireAdded = this.game.maxFire;
-        }
-        else {
-            this.fireAdded = Math.floor(this.game.maxFire/2);
-        }
+        this.fireAdded = Math.floor(this.game.maxFire/2);
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -67,10 +61,14 @@ var Warehouse = Class(Building, {
         }
 
         if(!building) {
-            return this.game.logicError(-1, "Warehouse has no targeted building to ignite.");
+            return this.game.logicError(-1, "Warehouse {0} has no targeted building to ignite.".format(this.id));
         }
 
-        building.fire = Math.max(building.fire + this.fireAdded, this.game.maxFire);
+        if(!Class.isInstance(building, Building)) {
+            return this.game.logicError(-1, "Warehouse {0} commanded to ignite building {1}, but that is not a Building, but instead a '{2}'".format(this.id, building.id, building.gameObjectName));
+        }
+
+        building.fire = Math.clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
         var exposure = Math.manhattanDistance(this, building);
         this.exposure += exposure // Do we want a cap on this?
 
@@ -88,9 +86,9 @@ var Warehouse = Class(Building, {
      * @override
      */
     makeHeadquarters: function(/* ... */) {
-        this.fireAdded = this.game.headquartersFireAdded;
+        this.fireAdded = this.game.maxFire;
         return Building.makeHeadquarters.apply(this, arguments);
-    }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
