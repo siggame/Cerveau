@@ -126,20 +126,23 @@ var Building = Class(GameObject, {
     _checkIfBribeIsValid: function(player, errorValue) {
         var reason;
         if(this.owner !== player) {
-            reason = "Cannot bribe an enemy's building.";
+            reason = "Player {{{player.id}}} cannot bribe this Building {{{self.id}}} owned by Player {{{self.owner.id}}}.";
         }
         else if(player.bribesRemaining <= 0) {
-            reason = "Player has no bribes remaining to bribe this building with";
+            reason = "Player {{{player.id}}} has no bribes remaining to bribe Building {{{self.id}}} with.";
         }
         else if(this.health <= 0) {
-            reason = "This building has been burned down and cannot be bribed.";
+            reason = "Building {{{self.id}}} has been burned down and cannot be bribed.";
         }
         else if(this.bribed) {
-            reason = "This building has already been bribed this turn and cannot be bribed again.";
+            reason = "Building {{{self.id}}} has already been bribed this turn and cannot be bribed again.";
         }
 
         if(reason) {
-            return this.game.logicError(errorValue, reason);
+            return this.game.logicError(errorValue, reason.format({
+                self: this,
+                player: player,
+            }));
         }
     },
 

@@ -61,11 +61,15 @@ var Warehouse = Class(Building, {
         }
 
         if(!building) {
-            return this.game.logicError(-1, "Warehouse {0} has no targeted building to ignite.".format(this.id));
+            return this.game.logicError(-1, "Warehouse {{{0}}} sent no targeted building to ignite.".format(this.id));
         }
 
         if(!Class.isInstance(building, Building)) {
-            return this.game.logicError(-1, "Warehouse {0} commanded to ignite building {1}, but that is not a Building, but instead a '{2}'".format(this.id, building.id, building.gameObjectName));
+            return this.game.logicError(-1, "Warehouse {{{0}}} commanded to ignite building {{{1}}}, however that is not a Building, but instead a '{2}'".format(
+                this.id,
+                building.id,
+                building.gameObjectName
+            ));
         }
 
         building.fire = Math.clamp(building.fire + this.fireAdded, 0, this.game.maxFire);

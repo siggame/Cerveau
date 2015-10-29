@@ -50,12 +50,19 @@ var WeatherStation = Class(Building, {
 
         // checks if the intensity is at maximum and trying to increase
         if(!negative && this.game.nextForecast.intensity >= this.game.maxForecastIntensity) {
-            return this.game.logicError(false, "Forecast's intensity cannot go above " + this.game.maxForecastIntensity + ".");
+            return this.game.logicError(false, "WeatherStation {{{0}}} cannot intensify the next Forecast {{{1}}} above {2}.".format(
+                this.id,
+                this.game.nextForecast.id,
+                this.game.maxForecastIntensity
+            ));
         }
 
         // checks if the intensity is at minimum and trying to decrease
         if(negative && this.game.nextForecast.intensity <= 0) {
-            return this.game.logicError(false, "Forecast's intensity cannot be negative.");
+            return this.game.logicError(false, "WeatherStation {{{0}}} cannot intensify the next Forecast {{{1}}} below 0.".format(
+                this.id,
+                this.game.nextForecast.id
+            ));
         }
         
         this.game.nextForecast.intensity += (negative ? -1 : 1);

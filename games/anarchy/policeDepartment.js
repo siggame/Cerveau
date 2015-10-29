@@ -48,8 +48,16 @@ var PoliceDepartment = Class(Building, {
             return logicError;
         }
 
-        if(warehouse && warehouse.gameObjectName !== "Warehouse") {
-            return game.logicError(-1, "PoliceDepartments can only raid Warehouses.");
+        if(!warehouse) {
+            return game.logicError(-1, "PoliceDepartment {{{0}}} sent no Warehouse to raid.".format(this.id));
+        }
+
+        if(warehouse.gameObjectName !== "Warehouse") {
+            return game.logicError(-1, "PoliceDepartment {{{0}}} commanded to raid warehouse {{{1}}}, however that is not a Warehouse, but instead a '{2}'".format(
+                this.id,
+                warehouse.id,
+                warehouse.gameObjectName
+            ));
         }
 
         var oldHealth = warehouse.oldHealth;
