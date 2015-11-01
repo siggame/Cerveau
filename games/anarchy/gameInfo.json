@@ -1542,10 +1542,10 @@
                     ],
                     "arguments": [
                         {
-                            "default": null,
+                            "default": false,
                             "description": "By default the intensity will be increased by 1, setting this to true decreases the intensity by 1.",
                             "name": "negative",
-                            "optional": false,
+                            "optional": true,
                             "type": {
                                 "keyType": null,
                                 "name": "boolean",
@@ -1554,6 +1554,8 @@
                         }
                     ],
                     "description": "Bribe the weathermen to intensity the next Forecast by 1 or -1",
+                    "optionals": 1,
+                    "optionals_start_index": 0,
                     "returns": {
                         "default": null,
                         "description": "true if the intensity was changed, false otherwise",
@@ -1572,10 +1574,10 @@
                     ],
                     "arguments": [
                         {
-                            "default": null,
+                            "default": false,
                             "description": "By default the direction will be rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.",
                             "name": "counterclockwise",
-                            "optional": false,
+                            "optional": true,
                             "type": {
                                 "keyType": null,
                                 "name": "boolean",
@@ -1584,6 +1586,8 @@
                         }
                     ],
                     "description": "Bribe the weathermen to change the direction of the next Forecast by rotating it clockwise or counterclockwise.",
+                    "optionals": 1,
+                    "optionals_start_index": 0,
                     "returns": {
                         "default": null,
                         "description": "true if the rotation worked, false otherwise.",
