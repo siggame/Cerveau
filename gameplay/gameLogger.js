@@ -61,7 +61,6 @@ var GameLogger = Class({
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
-        log("game loggin", gamelog.gameName, gamelog.gameSession);
         var filename = format(this._filenameFormat, extend({
             moment: utilities.momentString(gamelog.epoch),
         }, gamelog));

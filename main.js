@@ -1,3 +1,15 @@
+// Check for npm install first, as many devs forget this pre step
+var fs = require("fs");
+try {
+    if(!fs.lstatSync('./node_modules/').isDirectory()) {
+        throw {};
+    }
+}
+catch (e) {
+    console.error("ERROR: \"node_modules/\" not found.\nDid you forget to run 'npm install'?");
+    process.exit(1);
+}
+
 process.title = "Cerveau Game Server"
 global.__basedir = __dirname + '/'; // hackish way to store the base directory we are in now so we don't need require("../../../../whatever") and instead require(__base + "root/path/to/whatever")
 require("./extensions/"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
