@@ -62,20 +62,30 @@ function clone(obj) {
 	return $.extend(true, {}, obj);
 };
 
+function timeoutDelta(i) {
+	var delta = gamelog.deltas[i];
+	states.push({
+		type: delta.type,
+		data: delta.data,
+		game: mergeDelta(clone(states[i-1].game), gamelog.deltas[i].game)
+	});
+
+	$deltaInfo.html("Parsing Deltas... (" + i + "/" + gamelog.deltas.length + ")");
+
+	if(i < gamelog.deltas.length) {
+		setTimeout(function() {
+			timeoutDelta(i+1);
+		}, 0);
+	}
+};
+
 function buildStates() {
 	var gameObjectState = {
 		game: { gameObjects: initialState.gameObjects }
 	}
 	states.push(mergeDelta(gameObjectState, gamelog.deltas[0])); // ensures there is a previous state (the intial one) for following loop which merges deltas
 
-	for(var i = 1; i < gamelog.deltas.length; i++) {
-		var delta = gamelog.deltas[i];
-		states.push({
-			type: delta.type,
-			data: delta.data,
-			game: mergeDelta(clone(states[i-1].game), gamelog.deltas[i].game)
-		});
-	}
+	timeoutDelta(1);
 };
 
 function isObject(obj) {

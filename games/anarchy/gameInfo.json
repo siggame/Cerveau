@@ -36,6 +36,7 @@
             "mapHeight",
             "mapWidth",
             "maxFire",
+            "maxForecastIntensity",
             "maxTurns",
             "nextForecast",
             "players",
@@ -145,6 +146,15 @@
             "maxFire": {
                 "default": null,
                 "description": "The maximum amount of fire value for any Building.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "maxForecastIntensity": {
+                "default": null,
+                "description": "The maximum amount of intensity value for any Forecast.",
                 "type": {
                     "keyType": null,
                     "name": "int",
@@ -398,8 +408,20 @@
             "serverParentClasses": []
         },
         "FireDepartment": {
-            "attribute_names": [],
-            "attributes": {},
+            "attribute_names": [
+                "fireExtinguished"
+            ],
+            "attributes": {
+                "fireExtinguished": {
+                    "default": null,
+                    "description": "The amount of fire removed from a building when bribed to extinguish a building.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
             "description": "Can put out fires completely.",
             "function_names": [
                 "extinguish"
@@ -423,7 +445,7 @@
                             }
                         }
                     ],
-                    "description": "Bribes this FireDepartment to extinguish the fire in a building.",
+                    "description": "Bribes this FireDepartment to extinguish the some of the fire in a building.",
                     "returns": {
                         "default": null,
                         "description": "true if the bribe worked, false otherwise",
