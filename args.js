@@ -1,13 +1,4 @@
-var argparse = undefined;
-try {
-    argparse = require('argparse');
-}
-catch(e) {
-    console.error("ERROR: could not find module \"argparse\".\nDid you forget to run 'npm install'?");
-    process.exit(1);
-}
-
-var ArgumentParser = argparse.ArgumentParser;
+var ArgumentParser = require('argparse').ArgumentParser;
 var parser = new ArgumentParser({description: "Run the JavaScript client with options to connect to a game server. Must provide a game name to play."});
 var parserArgs = [
     [["-p", "--port"], {action: "store", dest: "port", defaultValue: 3000, help: "the port that clients should connect through"}],

@@ -11,7 +11,8 @@ var ${parent_class} = require("./${lowercase_first(parent_class)}");
 % endfor
 <%parent_classes = obj['parentClasses'] + obj['serverParentClasses']%>
 ${merge("//", "requires", """
-// any additional requires you want can be required here safely between cree runs
+// any additional requires you want can be required here safely between Creer re-runs
+
 """)}
 
 // @class ${obj_key}: ${obj['description']}
@@ -19,7 +20,7 @@ var ${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else 
     /**
      * Initializes ${obj_key}s.
      *
-     * @param {Object} a simple mapping passsed in to the constructor with whatever you sent with it.
+     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
 % for parent_class in reversed(parent_classes):
@@ -51,8 +52,6 @@ ${merge("        //", "init",
 
 % if obj_key == "Game":
     name: "${game_name}",
-    numberOfPlayers: ${obj['numberOfPlayers']},
-    maxInvalidsPerPlayer: ${obj['maxInvalidsPerPlayer']},
 
     /**
      * This is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet..
