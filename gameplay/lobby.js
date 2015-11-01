@@ -285,7 +285,9 @@ var Lobby = Class(Server, {
      * @override
      */
     clientDisconnected: function(client /* ... */) {
-        client.gameSession.clients.removeElement(client);
+        if(client.gameSession) {
+            client.gameSession.clients.removeElement(client);
+        }
 
         return Server.clientDisconnected.apply(this, arguments);
     },
