@@ -35,9 +35,9 @@ var Lobby = Class(Server, {
 
         this._initializeGames();
 
-        this.gameLogger = new GameLogger(this.gameNames, {
+        this.gameLogger = new GameLogger(this.gameNames, extend({
             arenaMode: Boolean(args.arena),
-        });
+        }, args));
 
         cluster.setupMaster({
             exec: __basedir + '/gameplay/worker.js',

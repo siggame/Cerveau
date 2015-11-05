@@ -12,6 +12,7 @@ var parserArgs = [
     [["--timeout"], {action: "store", dest: "timeout", help: "(debugging) override for how long clients have before a timeout occurs", defaultValue: true}],
     [["--no-timeout"], {action: "storeFalse", dest: "timeout", help: "(debugging) clients cannot time out"}],
     [["--no-game-settings"], {action: "storeFalse", dest: "gameSettings", help: "ignores any requested game settings from clients", defaultValue: true,}],
+    [["--no-load-gamelogs"], {action: "storeFalse", dest: "loadGamelogs", help: "gamelogs are not loaded to get the status or view in the web interface.", defaultValue: true,}],
     [["--no-api"], {action: "storeFalse", dest: "api", help: "does not run the hooks for the RESTful API service", defaultValue: true,}],
     [["--no-web"], {action: "storeFalse", dest: "web", help: "does not run web interface.", defaultValue: true,}],
 ];
@@ -39,6 +40,7 @@ if(args.arena) {
     args.gameSettings = false;
     args.web = false;
     args.api = false; // TODO: update arena to use API instead of listening for gamelogs in directories. Until then they don't need the API
+    args.loadGamelogs = false;
 }
 
 module.exports = args;

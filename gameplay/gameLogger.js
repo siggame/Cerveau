@@ -32,24 +32,28 @@ var GameLogger = Class({
             this.gamelogFor[gameNames[i]] = {};
         }
 
-        var filenames = utilities.getFiles(this.gamelogDirectory);
-        for(var i = 0; i < filenames.length; i++) {
-            var filename = filenames[i];
-            if(filename.endsWith(this.gamelogExtension)) {
-                (function(self, filename) {
-                    var path = self.gamelogDirectory + filename;
+        this._loadGamelogs = Boolean(options && options.loadGamelogs);
+        log("game logger init", this._loadGamelogs);
+        if(this._loadGamelogs) {
+            var filenames = utilities.getFiles(this.gamelogDirectory);
+            for(var i = 0; i < filenames.length; i++) {
+                var filename = filenames[i];
+                if(filename.endsWith(this.gamelogExtension)) {
+                    (function(self, filename) {
+                        var path = self.gamelogDirectory + filename;
 
-                    var strings = [];
-                    var readStream = fs.createReadStream(path)
-                        .pipe(zlib.createGunzip()) // Un-Gzip
-                        .on("data", function(buffer) {
-                            strings.push(buffer.toString('utf8'));
-                        })
-                        .on("end", function() {
-                            var gamelog = JSON.parse(strings.join(''));
-                            self._memorizeGamelog(gamelog);
-                        });
-                })(this, filename);
+                        var strings = [];
+                        var readStream = fs.createReadStream(path)
+                            .pipe(zlib.createGunzip()) // Un-Gzip
+                            .on("data", function(buffer) {
+                                strings.push(buffer.toString('utf8'));
+                            })
+                            .on("end", function() {
+                                var gamelog = JSON.parse(strings.join(''));
+                                self._memorizeGamelog(gamelog);
+                            });
+                    })(this, filename);
+                }
             }
         }
     },
@@ -86,10 +90,12 @@ var GameLogger = Class({
      * @param {Object} gamelog - parsed gamelog to store in memory and in various lookup dictionaries
      */
     _memorizeGamelog: function(gamelog) {
-        this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};
-        this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
-        this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
-        this.gamelogs.push(gamelog);
+        if(this._loadGamelogs) {
+            this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};
+            this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
+            this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
+            this.gamelogs.push(gamelog);
+        }
     },
 
     /**
