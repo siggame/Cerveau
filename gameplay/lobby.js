@@ -91,26 +91,30 @@ var Lobby = Class(Server, {
     },
 
     /**
-     * Retrieves, and possibly creates a new, game of gameName in gameSession which is on a completely different thread
+     * Retrieves, or creates a new, game of gameName in gameSession which is on a completely different thread
      *
      * @param {string} gameName - key identifying the name of the game you want. Should exist in games/
      * @param {string} [sessionID] - basically a room id. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one, and "new" will always give you a brand new room even if there are open ones.
      * @returns {BaseGame} the game of gameName and gameSession. If one does not exists a new instance will be created
      */
-    getRequestedGameSession: function(gameName, sessionID) {
+    getOrCreateGameSession: function(gameName, sessionID) {
         var gameSession = undefined; // the session we are trying to get
 
         if(sessionID !== "new") {
             if(sessionID === "*" || sessionID === undefined) { // then they want to join any open game
                 gameSession = this._getOpenGameSession(gameName);
+
+                if(!gameSession) { // then there was no open game session to join, so they get a new session
+                    sessionID = "new";
+                }
             }
             else if(this._isGameSessionOpen(gameName, sessionID)) {
-                gameSession = this.gameSessions(gameName, sessionID);
+                gameSession = this.gameSessions[gameName][sessionID];
             }
         }
 
         if(!gameSession) { // then we couldn't find a game session from the requested session, so they get a new one
-            sessionID = String(this._nextGameNumber++);
+            sessionID = String(sessionID === "new" ? this._nextGameNumber++ : sessionID);
 
             gameSession = {
                 id: sessionID,
@@ -184,11 +188,14 @@ var Lobby = Class(Server, {
     _getOpenGameSession: function(gameName) {
         var gameClass = this.gameClasses[gameName];
         if(gameClass) {
-            for(var session in this.gameSessions[gameName]) {
-                var gameSession = this.gameSessions[gameName][session];
+            var gameSessions = this.gameSessions[gameName];
+            for(var session in gameSessions) {
+                if(gameSessions.hasOwnProperty(session)) {
+                    var gameSession = this.gameSessions[gameName][session];
 
-                if(this._isGameSessionOpen(gameName, session)) {
-                    return gameSession;
+                    if(this._isGameSessionOpen(gameName, session)) {
+                        return gameSession;
+                    }
                 }
             }
         }
@@ -199,14 +206,17 @@ var Lobby = Class(Server, {
      *
      * @param {string} the name of the game to check for
      * @param {string} the if of the session for the game name you want to see if is open
-     * @returns {boolean|undefined} if the name of the game is valid then a boolean if that session exists and is open when true, false when that session is closed or does not exist. undefined if that game name is not valid.
+     * @returns {boolean|undefined} if the name of the game is valid then a boolean if that session exists and is open when true, false when that session is closed or does not exist. undefined if that game name or game session is not valid.
      */
     _isGameSessionOpen: function(gameName, sessionID) {
+        log("_isGameSessionOpen", gameName, sessionID);
         var gameClass = this.gameClasses[gameName];
         if(gameClass) {
             var gameSession = this.gameSessions[gameName][sessionID];
-            var numberOfPlayers = this.getClientsPlaying(gameSession.clients).length;
-            return (gameSession !== undefined && !gameSession.worker && numberOfPlayers < gameClass.numberOfPlayers);
+            if(gameSession) {
+                var numberOfPlayers = this.getClientsPlaying(gameSession.clients).length;
+                return (gameSession !== undefined && !gameSession.worker && numberOfPlayers < gameClass.numberOfPlayers);
+            }
         }
     },
 
@@ -229,7 +239,7 @@ var Lobby = Class(Server, {
             username: data.playerName,
             password: data.password,
             success: function() {
-                var gameSession = self.getRequestedGameSession(data.gameName, data.requestedSession);
+                var gameSession = self.getOrCreateGameSession(data.gameName, data.requestedSession);
 
                 client.setInfo({
                     name: data.playerName,
