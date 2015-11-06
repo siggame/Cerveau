@@ -1,16 +1,3 @@
-<section id="games" class="info-block">
-	<h2>Available Games on this Server</h2>
-	<ul class="game-list">
-	{{#each games}}
-		<li>
-			<span class="game-name">{{this.name}}</span>
-			<span class="game-description">{{this.description}}</span>
-			<span class="game-documentation"><a href="/documentation/{{this.name}}">Documentation</a></span>
-		</li>
-	{{/each}}
-	</ul>
-</section>
-
 <section id="gamelogs" class="info-block">
 	<h2>Game Archieves</h2>
 	<ul class="game-list">
@@ -23,7 +10,12 @@
 		</li>
 	{{/each}}
 	</ul>
-	{{#if moreGamelogs}}
-		<a href="/archives/">More Gamelogs</a>
+	<section class="pagination">
+	{{#if newerUri}}
+		<a class="newer" href="{{newerUri}}">Newer</a>
 	{{/if}}
+	{{#if olderUri}}
+		<a class="older" href="{{olderUri}}">Older</a>
+	{{/if}}
+	</section>
 </section>

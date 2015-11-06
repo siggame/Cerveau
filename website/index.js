@@ -23,9 +23,12 @@ module.exports = function(args) {
                 return a.name.toLowerCase() > b.name.toLowerCase();
             });
 
+            var maxGamelogsOnIndex = 10;
             var logs = lobby.gameLogger.getLogs();
             var gamelogs = [];
-            for(var i = 0; i < logs.length; i++) {
+            var i = logs.length;
+
+            while(i-- && gamelogs.length < maxGamelogsOnIndex) {
                 var log = logs[i];
                 gamelogs.push({
                     game: log.gameName,
@@ -38,11 +41,13 @@ module.exports = function(args) {
             res.render("index", {
                 games: games,
                 gamelogs: gamelogs,
+                moreGamelogs: (gamelogs.length === maxGamelogsOnIndex && logs.length > gamelogs.length),
             });
         });
 
         // TODO: maybe move to /routes and have that auto require files like this?
         require("./documentation")(args);
+        require("./achieves")(args);
     }
 
     if(args.api) {

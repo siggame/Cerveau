@@ -18,7 +18,19 @@ var ArrayExtensions = {
         return false;
     },
 
-    /*
+    /**
+     * inserts elements into the array at a specific index
+     *
+     * @param {number} index - the specific index to start inserting at, pushing existing elements back
+     * @param {*...} elements - the elements to push at a specific index
+     * @returns {Array} this array
+     */
+    insert: function(index /* ... */) {
+        this.splice.apply(this, [index, 0].concat(Array.prototype.slice.call(arguments, 1)));
+        return this;
+    },
+
+    /**
      * returns the last element from the array, e.g. array[array.length - 1], but this is prettier
      *
      * @returns {*} the last element in the array

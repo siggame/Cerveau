@@ -20,7 +20,7 @@ var GameLogger = Class({
         this.gamelogExtension = ".json.gz";
         this.usingCompression = true;
         this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
-        this.gamelogs = []; // simple array of gamelogs, not indexed by gameName, sessionID, epoch like this.gamelogFor
+        this.gamelogs = []; // simple array of all gamelogs (regardless of game), sorted by epoch (time), with newest gamelogs at the end
 
         this._filenameFormat = "{moment}-{gameName}-{gameSession}";
         if(options && options.arenaMode) {
@@ -33,7 +33,7 @@ var GameLogger = Class({
         }
 
         this._loadGamelogs = Boolean(options && options.loadGamelogs);
-        log("game logger init", this._loadGamelogs);
+
         if(this._loadGamelogs) {
             var filenames = utilities.getFiles(this.gamelogDirectory);
             for(var i = 0; i < filenames.length; i++) {
@@ -94,7 +94,14 @@ var GameLogger = Class({
             this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};
             this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
             this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
-            this.gamelogs.push(gamelog);
+
+            var index = 0;
+            for(index; index < this.gamelogs.length; index++) {
+                if(this.gamelogs[index].epoch > gamelog.epoch) { // then the gamelog we are looking at was logged after the current one
+                    break; // this index is where we want to put this new gamelog
+                }
+            }
+            this.gamelogs.insert(index, gamelog);
         }
     },
 
