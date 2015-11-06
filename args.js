@@ -25,7 +25,7 @@ var args = parser.parseArgs();
 
 if(args.profile) {
     try {
-        if(!require('v8-profiler')) {
+        if(!require("v8-profiler")) {
             throw new Error("profiler empty");
         }
     }
