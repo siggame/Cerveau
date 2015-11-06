@@ -125,12 +125,36 @@ h4,
 	margin-bottom: 0em;
 }
 
-.info-block li {
+table.gamelogs {
+	width: 100%;
+}
+
+.info-block li,
+table tr {
 	padding: 0.125em;
 	background-color: #D5DCE8;
 }
 
-.info-block li:nth-child(even) {
+table tr th {
+	font-weight: bold;
+	text-align: left;
+}
+
+table tr td,
+table tr th {
+	padding: 0.125em;
+}
+
+table.gamelogs tr:hover {
+	background-color: #FFE1AA;
+}
+
+table.gamelogs tr:hover:nth-child(even) {
+	background-color:  #D5AF6B;
+}
+
+.info-block li:nth-child(even),
+table tr:nth-child(even) {
 	background-color: #A7B4CB;
 }
 
@@ -145,6 +169,12 @@ h4,
 .info-block li span {
 	display: inline-block;
 	margin: 0 1em;
+}
+
+.pagination {
+	display: block;
+	width: 100%;
+	text-align: center;
 }
 
 

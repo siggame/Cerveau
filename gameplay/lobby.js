@@ -22,12 +22,12 @@ var Lobby = Class(Server, {
         this.name = "Lobby @ " + process.pid;
         this.host = args.host;
         this.port = args.port;
-        this._authenticate = (args.authenticate === true); // flag to see if the lobby should authenticate play requests with web server
-        this._allowGameSettings = (args.gameSettings === true);
-        this._profile = (args.profile === true);
-        this.gameNames = [];
-        this.gameSessions = {};
-        this.gameClasses = [];
+        this._authenticate = Boolean(args.authenticate); // flag to see if the lobby should authenticate play requests with web server
+        this._allowGameSettings = Boolean(args.gameSettings);
+        this._profile = Boolean(args.profile);
+        this._gameSessions = {};
+        this._gameClasses = [];
+        this._gameClassesByAlias = {};
 
         this._authenticator = new Authenticator(this._authenticate);
         this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
@@ -35,9 +35,9 @@ var Lobby = Class(Server, {
 
         this._initializeGames();
 
-        this.gameLogger = new GameLogger(this.gameNames, {
+        this.gameLogger = new GameLogger(Object.keys(this._gameClasses), extend({
             arenaMode: Boolean(args.arena),
-        });
+        }, args));
 
         cluster.setupMaster({
             exec: __basedir + '/gameplay/worker.js',
@@ -49,15 +49,15 @@ var Lobby = Class(Server, {
         });
 
         // create the TCP socket server via node.js's net module
-        this.netServer = net.createServer(function(socket) {
+        this._netServer = net.createServer(function(socket) {
             self.addSocket(socket);
         });
 
-        this.netServer.listen(this.port, this.host, function() {
+        this._netServer.listen(this.port, this.host, function() {
             log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
         });
 
-        this.netServer.on("error", function(err) {
+        this._netServer.on("error", function(err) {
             self._socketError(err);
         });
     },
@@ -71,10 +71,16 @@ var Lobby = Class(Server, {
         for(var i = 0; i < dirs.length; i++) {
             var dir = dirs[i];
             var path = __basedir + "/games/" + dir + "/game";
-            var gameName = dir.upcaseFirst();
-            this.gameClasses[gameName] = require(path);
-            this.gameNames.push(gameName);
-            this.gameSessions[gameName] = {};
+            var gameClass = require(path);
+            var gameName = gameClass.prototype.name;
+
+            this._gameClasses[gameName] = gameClass;
+
+            this._gameClassesByAlias[gameName.toLowerCase()] = gameClass;
+            this._gameClassesByAlias[gameClass.webserverID.toLowerCase()] = gameClass;
+
+            this._gameSessions[gameName] = {};
+
             log("Found game '" + gameName + "'.");
         }
     },
@@ -97,7 +103,7 @@ var Lobby = Class(Server, {
      * @param {string} [sessionID] - basically a room id. Specifying a gameSession can be used to join other players on purpose. "*" will join you to any open session or a new one, and "new" will always give you a brand new room even if there are open ones.
      * @returns {BaseGame} the game of gameName and gameSession. If one does not exists a new instance will be created
      */
-    getOrCreateGameSession: function(gameName, sessionID) {
+    _getOrCreateGameSession: function(gameName, sessionID) {
         var gameSession = undefined; // the session we are trying to get
 
         if(sessionID !== "new") {
@@ -109,7 +115,7 @@ var Lobby = Class(Server, {
                 }
             }
             else if(this._isGameSessionOpen(gameName, sessionID)) {
-                gameSession = this.gameSessions[gameName][sessionID];
+                gameSession = this._gameSessions[gameName][sessionID];
             }
         }
 
@@ -120,27 +126,44 @@ var Lobby = Class(Server, {
                 id: sessionID,
                 gameName: gameName,
                 clients: [],
-                numberOfPlayers: this.gameClasses[gameName].numberOfPlayers,
+                numberOfPlayers: this._gameClasses[gameName].numberOfPlayers,
                 gameSettings: {},
             };
 
-            this.gameSessions[gameName][sessionID] = gameSession;
+            this._gameSessions[gameName][sessionID] = gameSession;
         }
 
         return gameSession;
     },
 
     /**
+     * gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers"
+     *
+     * @param {string} gameAlias - an alias for the game, not case senstive
+     * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
+     */
+    getGameNameForAlias: function(gameAlias) {
+        var gameClass = this._gameClassesByAlias[gameAlias.toLowerCase()];
+        if(gameClass) {
+            return gameClass.prototype.name;
+        }
+    },
+
+    /**
      * Gets the game session info, which is basically all the information about the game running in another thread without bothering the thread itself.
      * 
-     * @param {string} gameName - the name of the game
+     * @param {string} gameAlias - an alias of the game
      * @param {string} sessionID - the session for the game you want the info for
      * @returns {Object} all the data about the game session as last we heard from the game thread.
      */
-    getGameSessionInfo: function(gameName, sessionID) {
-        if(this.gameSessions[gameName]) {
-            var gameSession = (this.gameSessions[gameName] !== undefined && this.gameSessions[gameName][sessionID] !== undefined) ? this.gameSessions[gameName][sessionID] : null;
-            
+    getGameSessionInfo: function(gameAlias, sessionID) {
+        var gameName = this.getGameNameForAlias(gameAlias);
+
+        if(this._gameSessions[gameName]) {
+            var gameSession = null;
+            if(this._gameSessions[gameName] !== undefined && this._gameSessions[gameName][sessionID] !== undefined) {
+                gameSession = this._gameSessions[gameName][sessionID];
+            }
 
             if(gameSession !== null) {
                 return {
@@ -174,7 +197,7 @@ var Lobby = Class(Server, {
         else {
             return {
                 error: "game name is not valid",
-                gameName: gameName,
+                gameName: gameAlias,
             };
         }
     },
@@ -186,12 +209,12 @@ var Lobby = Class(Server, {
      * @returns {Object|undefined} if there is an open game session of the given game name then that session is returned, otherwiese undefined.
      */
     _getOpenGameSession: function(gameName) {
-        var gameClass = this.gameClasses[gameName];
+        var gameClass = this._gameClasses[gameName];
         if(gameClass) {
-            var gameSessions = this.gameSessions[gameName];
+            var gameSessions = this._gameSessions[gameName];
             for(var session in gameSessions) {
                 if(gameSessions.hasOwnProperty(session)) {
-                    var gameSession = this.gameSessions[gameName][session];
+                    var gameSession = this._gameSessions[gameName][session];
 
                     if(this._isGameSessionOpen(gameName, session)) {
                         return gameSession;
@@ -209,10 +232,9 @@ var Lobby = Class(Server, {
      * @returns {boolean|undefined} if the name of the game is valid then a boolean if that session exists and is open when true, false when that session is closed or does not exist. undefined if that game name or game session is not valid.
      */
     _isGameSessionOpen: function(gameName, sessionID) {
-        log("_isGameSessionOpen", gameName, sessionID);
-        var gameClass = this.gameClasses[gameName];
+        var gameClass = this._gameClasses[gameName];
         if(gameClass) {
-            var gameSession = this.gameSessions[gameName][sessionID];
+            var gameSession = this._gameSessions[gameName][sessionID];
             if(gameSession) {
                 var numberOfPlayers = this.getClientsPlaying(gameSession.clients).length;
                 return (gameSession !== undefined && !gameSession.worker && numberOfPlayers < gameClass.numberOfPlayers);
@@ -227,19 +249,22 @@ var Lobby = Class(Server, {
      * @param {Object} data - information about what this client wants to play. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
      */
     _clientSentPlay: function(client, data) {
-        if(!data || !this.gameClasses[data.gameName]) {
-            client.send("fatal", new errors.CerveauError("Game of name '" + (data && data.gameName) + "' not found on this server."));
+        var gameAlias = String(data && data.gameName); // clients can send aliases of what they want to play
+        var gameName = this.getGameNameForAlias(gameAlias);
+
+        if(!data || !gameName) {
+            client.send("fatal", new errors.CerveauError("Game of name '" + gameAlias + "' not found on this server."));
             client.disconnect(); // no need to keep them connected, they want to play something we don't have
             return;
         }
 
         var self = this;
         this._authenticator.authenticate({
-            gameName: data.gameName,
+            gameName: gameName,
             username: data.playerName,
             password: data.password,
             success: function() {
-                var gameSession = self.getOrCreateGameSession(data.gameName, data.requestedSession);
+                var gameSession = self._getOrCreateGameSession(gameName, data.requestedSession);
 
                 client.setInfo({
                     name: data.playerName,
