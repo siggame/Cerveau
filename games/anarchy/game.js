@@ -126,7 +126,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this._buildingsGrid = [];
         var originalBuildings = [];
-        var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; // TODO: should we weigh these so some are generated more often?
         
         // Some configuration parameters to change map generation
         var minNumberOfPoints = 8;
@@ -197,17 +196,35 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             this._buildingsGrid[x] = [];
         }
         
+        var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; // TODO: should we weigh these so some are generated more often?
+        //keep track of numbers created to ensure minimum of at least 2 for each
+        var minimumBuildingsPerType = 2;
+        var numCreated = [0, 0, 0, 0];
+        
         for(var i = 0; i < points.length; i++) {
             // Probably want to have different chances of each building appearing?
+            //use index so that numbers can be tracked
+            var buildingIndex = Math.randomInt(buildingTypes.length - 1);
+            //how many buildings are left to be generated
+            var left = points.length - i;
+            //potential issues if this is true
+            if(left <= buildingTypes.length * minimumBuildingsPerType) {
+              //find if there are any buildings that should be forced to create
+              for(var j = 0; j < numCreated.length; j++) {
+                if(numCreated[j] < minimumBuildingsPerType) {
+                  buildingIndex = j;
+                  break;
+                }
+              }
+            }
+            numCreated[buildingIndex]++;
             // Depending on the location maybe?
-            originalBuildings.push(this._createBuilding(buildingTypes.randomElement(), {
+            originalBuildings.push(this._createBuilding(buildingTypes[buildingIndex], {
                 x: points[i].x,
                 y: points[i].y,
                 owner: this.players.randomElement()
             }));
         }
-
-        // TODO: yes this could break if somehow no warehouses are randomly generated. That should be fixed with a real map generation algorithm
         this.players[0].warehouses.randomElement().makeHeadquarters();
 
         // mirror the map
