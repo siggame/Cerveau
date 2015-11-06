@@ -1,0 +1,16 @@
+<table class="gamelogs">
+	<tr>
+		<th class="gamelog-name">Game</th>
+		<th class="gamelog-session">Session</th>
+		<th class="gamelog-name">Date</th>
+		<th class="gamelog-watch">Visualize</th>
+	</tr>
+{{#each gamelogs}}
+	<tr>
+		<td class="gamelog-name">{{this.game}}</td>
+		<td class="gamelog-session">{{this.session}}</td>
+		<td class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</td>
+		<td class="gamelog-watch"><a href="/visualize/{{this.uri}}">Watch</a></td>
+	</tr>
+{{/each}}
+</table>
