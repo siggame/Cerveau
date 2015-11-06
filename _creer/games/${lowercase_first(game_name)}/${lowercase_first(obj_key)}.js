@@ -52,6 +52,8 @@ ${merge("        //", "init",
 
 % if obj_key == "Game":
     name: "${game_name}",
+    webserverID: "MegaMinerAI-##-${game_name}",
+
 
     /**
      * This is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet..

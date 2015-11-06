@@ -147,6 +147,12 @@ h4,
 	margin: 0 1em;
 }
 
+.pagination {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
 
 
 /* --- Docs --- */
