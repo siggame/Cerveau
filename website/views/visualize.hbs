@@ -72,10 +72,13 @@ function timeoutDelta(i) {
 
 	$deltaInfo.html("Parsing Deltas... (" + i + "/" + gamelog.deltas.length + ")");
 
-	if(i < gamelog.deltas.length) {
+	if(i+1 < gamelog.deltas.length) {
 		setTimeout(function() {
 			timeoutDelta(i+1);
 		}, 0);
+	}
+	else {
+		initSlider();
 	}
 };
 
