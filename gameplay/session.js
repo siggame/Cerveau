@@ -22,6 +22,7 @@ var Session = Class(Server, {
         this.game = new args.gameClass(args.gameSettings);
 
         this._profiler = args.profiler;
+        this._visualizerLink = args.visualizerLink;
     },
 
     /**
@@ -150,17 +151,33 @@ var Session = Class(Server, {
      * Called when the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
      */
     _gameOver: function() {
-        this._sentOver = true;
         log("Game is over.");
-
+        this._sentOver = true;
         this._updateDeltas("over");
 
+        var gamelog = this.generateGamelog();
+        var overData = {};
+
+        if(this._visualizerLink) {
+            var localGamelogLink = encodeURIComponent("http://{0}/gamelog/{1}/{2}/{3}".format(
+                this._initArgs.host,
+                gamelog.gameName,
+                gamelog.gameSession,
+                gamelog.epoch
+            ));
+
+            overData.message = "---\nYour gamelog is viewable at:\n{0}?log={1}\n---".format(
+                this._visualizerLink,
+                localGamelogLink
+            );
+        }
+
         for(var i = 0; i < this.clients.length; i++) {
-            this.clients[i].send("over");
+            this.clients[i].send("over", overData);
         }
 
         var self = this;
-        process.send({ gamelog: this.generateGamelog() }, undefined, function(err) {
+        process.send({ gamelog: gamelog }, undefined, function(err) {
             if(err) {
                 log.error("Error sending the gamelog from game session thread to master lobby thread...");
                 log.error(err);
