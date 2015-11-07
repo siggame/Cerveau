@@ -351,8 +351,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 building.fire = Math.max(0, building.fire - this.firePerTurnReduction); // it dies down after dealing damage
             }
 
-            if(building.exposure && !building.bribed) { // then they didn't act, so their exposure drops
-                building.exposure -= Math.max(this.exposurePerTurnReduction);
+            if(building.exposure > 0 && !building.bribed) { // then they didn't act, so their exposure drops
+                building.exposure = Math.max(building.exposure - this.exposurePerTurnReduction, 0);
             }
 
             building.bribed = false;
