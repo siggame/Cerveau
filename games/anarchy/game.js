@@ -267,6 +267,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.currentForecast = this.forecasts[0];
         this.nextForecast = this.forecasts[1];
+        
+        //ensure players have bribes on the first turn
+        for(var i = 0; i < this.players.length; i++) {
+          this.players[i].bribesRemaining = this.baseBribesPerTurn;
+        }
 
         //<<-- /Creer-Merge: begin -->>
     },
