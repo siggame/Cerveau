@@ -9,7 +9,14 @@ var serializer = {
     defaultBoolean: function(b) {
         switch(typeof(b)) {
             case "string":
-                return b === "true";
+                var lowered = b.toLower();
+                if(lowered === "true") { // they sent some form of "true" as a string, so make it the boolean true
+                    return true;
+                }
+                else if(lowered === "false") { // they sent some form of "false" as a string, so make it the boolean false
+                    return false;
+                }
+                return Boolean(b);
             case "number":
                 return b !== 0;
             default:
