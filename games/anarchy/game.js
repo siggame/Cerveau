@@ -138,7 +138,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         // Lazy functions
         var self = this;
         function randX() {
-            return Math.randomInt(self.mapWidth / 2 - 1, 0);;
+            return Math.randomInt(self.mapWidth / 2 - 1, 0);
         }
         function randY() {
             return Math.randomInt(self.mapHeight - 1, 0);
@@ -149,13 +149,25 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         var numberOfPoints = Math.randomInt(maxNumberOfPoints, minNumberOfPoints);
         var edgePoints = Math.randomInt(maxEdgePoints, minEdgePoints);
         
+        var used = {};
+        
         // add random points
         for(var i = 0; i < numberOfPoints; i++) {
-            points.pushIfAbsent({x: randX(), y: randY()});
+            var x = randX();
+            var y = randY();
+            if(!used[x + "," + y]) {
+                used[x + "," + y] = true;
+                points.push({x: x, y: y});
+            }
         }
         // add edge points
         for(var i = 0; i < edgePoints; i++) {
-            points.pushIfAbsent({x: this.mapWidth / 2 - 1, y: randY()});
+            var x = this.mapWidth / 2 - 1;
+            var y = randY();
+            if(!used[x + "," + y]) {
+                used[x + "," + y] = true;
+                points.push({x: x, y: y});
+            }
         }
         // now connect the points, after shuffling them
         points.shuffle();
@@ -189,7 +201,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 var newY = fromY + change.y;
                 fromX = newX;
                 fromY = newY;
-                points.pushIfAbsent({x: newX, y:newY});
+                if(!used[newX + "," + newY]) {
+                    points.push({x: newX, y:newY});
+                }
             }
         }
 
