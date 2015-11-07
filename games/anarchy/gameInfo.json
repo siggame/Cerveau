@@ -1294,7 +1294,7 @@
             "attributes": {
                 "exposure": {
                     "default": null,
-                    "description": "How exposed the anarchists in this warehouse are to PoliceStations. Raises when bribed to ignite buildings, and drops each turn if not bribed.",
+                    "description": "How exposed the anarchists in this warehouse are to PoliceDepartments. Raises when bribed to ignite buildings, and drops each turn if not bribed.",
                     "type": {
                         "keyType": null,
                         "name": "int",
