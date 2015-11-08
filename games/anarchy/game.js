@@ -320,11 +320,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      * @override
      */
     nextTurn: function() {
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            player.bribesRemaining = this.baseBribesPerTurn + player.burnedBuildings;
-        }
-
         var playersBurnedDownBuildings = {};
         var fireSpreads = [];
 
@@ -365,6 +360,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             if(player.headquarters.health <= 0) { // then it burned down, and they have lost
                 if(loser) { // someone else already lost this turn... so they both lost their headquarters this turn, so check secondary win conditions (and the game is over)
                     this._secondaryWinConditions("Both headquarters burned down on the same turn");
+                    loser = undefined;
+                    break;
                 }
                 loser = player;
             }
