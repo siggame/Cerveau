@@ -441,7 +441,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             {
                 key: "buildingsAlive",
                 winReason: "You had the most buildings not burned down.",
-                loseReason: "You had more building burned down than anaother player.",
+                loseReason: "You had more buildings burned down than another player.",
             },
             {
                 key: "buildingsHealthSum",
