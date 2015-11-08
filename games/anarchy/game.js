@@ -201,6 +201,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 var newY = fromY + change.y;
                 fromX = newX;
                 fromY = newY;
+
                 if(!used[newX + "," + newY]) {
                     points.push({x: newX, y:newY});
                 }
@@ -219,21 +220,23 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         
         for(var i = 0; i < points.length; i++) {
             // Probably want to have different chances of each building appearing?
+
             //use index so that numbers can be tracked
             var buildingIndex = Math.randomInt(buildingTypes.length - 1);
             //how many buildings are left to be generated
             var left = points.length - i;
             //potential issues if this is true
             if(left <= buildingTypes.length * minimumBuildingsPerType) {
-              //find if there are any buildings that should be forced to create
-              for(var j = 0; j < numCreated.length; j++) {
-                if(numCreated[j] < minimumBuildingsPerType) {
-                  buildingIndex = j;
-                  break;
+                //find if there are any buildings that should be forced to create
+                for(var j = 0; j < numCreated.length; j++) {
+                    if(numCreated[j] < minimumBuildingsPerType) {
+                        buildingIndex = j;
+                        break;
+                    }
                 }
-              }
             }
             numCreated[buildingIndex]++;
+
             // Depending on the location maybe?
             originalBuildings.push(this._createBuilding(buildingTypes[buildingIndex], {
                 x: points[i].x,
@@ -282,9 +285,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.currentForecast = this.forecasts[0];
         this.nextForecast = this.forecasts[1];
         
-        //ensure players have bribes on the first turn
+        // ensure players have bribes on the first turn
         for(var i = 0; i < this.players.length; i++) {
-          this.players[i].bribesRemaining = this.baseBribesPerTurn;
+            this.players[i].bribesRemaining = this.baseBribesPerTurn;
         }
 
         //<<-- /Creer-Merge: begin -->>
