@@ -55,11 +55,11 @@ var FireDepartment = Class(Building, {
         }
 
         if(!building) {
-            return game.logicError(false, "FireDepartment {{{0}}} sent no building to extinguish.".format(this.id));
+            return this.game.logicError(false, "FireDepartment {{{0}}} sent no building to extinguish.".format(this.id));
         }
 
         if(!Class.isInstance(building, Building)) {
-            return game.logicError(false, "FireDepartment {{{0}}} commanded to extinguish Building {{{1}}}, however that is not a Building, but instead a '{2}'".format(
+            return this.game.logicError(false, "FireDepartment {{{0}}} commanded to extinguish Building {{{1}}}, however that is not a Building, but instead a '{2}'".format(
                 this.id,
                 building.id,
                 building.gameObjectName
