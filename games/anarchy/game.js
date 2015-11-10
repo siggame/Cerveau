@@ -204,6 +204,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
                 if(!used[newX + "," + newY]) {
                     points.push({x: newX, y:newY});
+                    // mark as used
+                    used[newX + "," + newY] = true;
                 }
             }
         }
