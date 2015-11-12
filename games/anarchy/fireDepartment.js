@@ -65,6 +65,10 @@ var FireDepartment = Class(Building, {
                 building.gameObjectName
             ));
         }
+        
+        if(building.isHeadquarters) {
+            return this.game.logicError(-1, "FireDepartment {{{0}}} commanded to extinguish a warehouse.".format(this.id));
+        }
 
         building.fire = Math.clamp(building.fire - this.fireExtinguished, 0, this.game.maxFire);
 

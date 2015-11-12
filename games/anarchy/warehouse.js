@@ -71,6 +71,10 @@ var Warehouse = Class(Building, {
                 building.gameObjectName
             ));
         }
+        
+        if(building.isHeadquarters) {
+            return this.game.logicError(-1, "Warehouse {{{0}}} commanded to ignite a warehouse.".format(this.id));
+        }
 
         building.fire = Math.clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
         var exposure = Math.manhattanDistance(this, building);
