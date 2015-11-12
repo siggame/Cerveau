@@ -44,7 +44,7 @@ var Client = Class({
         var buffer = "";
         var socketListenerOnData = function(str) {
             if(self.server.printTCP) {
-                log("< From client " + this.name + " <--", str, '\n--');
+                log("< From client " + self.name + " <--", str, '\n--');
             }
 
             buffer += str;

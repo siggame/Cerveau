@@ -55,11 +55,16 @@ var Session = Class(Server, {
     clientDisconnected: function(client, reason) {
         Server.clientDisconnected.call(this, client);
 
+        if(!this.game.isOver()) {
+            log("Client " + client.name + " disconnected unexpectedly.");
+            this._updateDeltas("disconnect", {
+                player: client.player,
+            });
+        }
+
         this.game.playerDisconnected(client.player, reason);
 
-        this._updateDeltas("disconnect", {
-            player: client.player,
-        });
+        return client;
     },
 
     /**
@@ -113,16 +118,18 @@ var Session = Class(Server, {
             game: trueDelta,
         };
 
-        for(var i = 0; i < this.clients.length; i++) {
-            var client = this.clients[i];
-            var deltaToSend = client.player ? this.game.getDeltaFor(client.player) : trueDelta;
+        if(type !== "over" && type !== "disconnect") { // then it's not a gamelog only delta, so tell clients
+            for(var i = 0; i < this.clients.length; i++) {
+                var client = this.clients[i];
+                var deltaToSend = client.player ? this.game.getDeltaFor(client.player) : trueDelta;
 
-            if(client.player && deltaToSend !== trueDelta) { // then this player got a different game state that the "true" one (it was probably obscured), so record that in the gamelog too
-                delta.gameToPlayer = delta.gameToPlayer || {};
-                delta.gameToPlayer[client.player.id] = deltaToSend;
+                if(client.player && deltaToSend !== trueDelta) { // then this player got a different game state that the "true" one (it was probably obscured), so record that in the gamelog too
+                    delta.gameToPlayer = delta.gameToPlayer || {};
+                    delta.gameToPlayer[client.player.id] = deltaToSend;
+                }
+
+                client.send("delta", deltaToSend);
             }
-
-            client.send("delta", deltaToSend);
         }
 
         this._deltas.push(delta);
@@ -139,8 +146,10 @@ var Session = Class(Server, {
             }
         }
 
-        if(this.game.isOver() && !this._sentOver) {
-            this._gameOver();
+        if(this.game.isOver()) {
+            if(!this._sentOver) { // then this is the first time we've seen a delta in which the game was over, so we need to do game over stuff
+                this._gameOver();
+            }
         }
         else { // game is still in progress, so send requests to players. Note we always do that after sending delta states so they have updated state info
             this._sendGameOrders();
@@ -151,9 +160,7 @@ var Session = Class(Server, {
      * Called when the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
      */
     _gameOver: function() {
-        log("Game is over.");
         this._sentOver = true;
-        this._updateDeltas("over");
 
         var gamelog = this.generateGamelog();
         var overData = {};
@@ -176,11 +183,16 @@ var Session = Class(Server, {
             this.clients[i].send("over", overData);
         }
 
+        this._updateDeltas("over");
+
         var self = this;
         process.send({ gamelog: gamelog }, undefined, function(err) {
             if(err) {
                 log.error("Error sending the gamelog from game session thread to master lobby thread...");
                 log.error(err);
+            }
+            else {
+                log("Game is over, exiting.");
             }
             self.end();
         });
