@@ -215,16 +215,26 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             this._buildingsGrid[x] = [];
         }
         
-        var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; // TODO: should we weigh these so some are generated more often?
+        var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; 
         //keep track of numbers created to ensure minimum of at least 2 for each
+        //weights for each building type
+        var weights = [.40, .30, .20, .10];
         var minimumBuildingsPerType = 2;
         var numCreated = [0, 0, 0, 0];
         
         for(var i = 0; i < points.length; i++) {
-            // Probably want to have different chances of each building appearing?
-
             //use index so that numbers can be tracked
-            var buildingIndex = Math.randomInt(buildingTypes.length - 1);
+            var randomNumber = Math.random();
+            var buildingIndex = 0;
+            while(true) {
+              randomNumber -= weights[buildingIndex];
+              if(randomNumber <= 0) {
+                break;
+              }
+              ++buildingIndex;
+              //just to be safe
+              buildingIndex %= 4;
+            }
             //how many buildings are left to be generated
             var left = points.length - i;
             //potential issues if this is true
@@ -237,9 +247,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                     }
                 }
             }
+            
             numCreated[buildingIndex]++;
 
-            // Depending on the location maybe?
             originalBuildings.push(this._createBuilding(buildingTypes[buildingIndex], {
                 x: points[i].x,
                 y: points[i].y,
