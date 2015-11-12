@@ -73,7 +73,7 @@ var Warehouse = Class(Building, {
         }
         
         if(building.isHeadquarters) {
-            return this.game.logicError(-1, "Warehouse {{{0}}} commanded to ignite a warehouse.".format(this.id));
+            return this.game.logicError(-1, "Warehouse {{{0}}} commanded to ignite a headquarters.".format(this.id));
         }
 
         building.fire = Math.clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
