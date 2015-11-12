@@ -89,8 +89,6 @@ var Server = Class({
      * @returns {Client} the same client that disconnected
      */
     clientDisconnected: function(client, reason) {
-        log("Client " + client.name + " disconnected");
-
         this.clients.removeElement(client);
 
         return client;
