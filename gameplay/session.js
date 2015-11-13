@@ -56,13 +56,14 @@ var Session = Class(Server, {
         Server.clientDisconnected.call(this, client);
 
         if(!this.game.isOver()) {
-            log("Client " + client.name + " disconnected unexpectedly.");
-            this._updateDeltas("disconnect", {
-                player: client.player,
-            });
-        }
+            if(client.player) {
+                this.game.playerDisconnected(client.player, reason);
 
-        this.game.playerDisconnected(client.player, reason);
+                this._updateDeltas("disconnect", {
+                    player: client.player,
+                });
+            }
+        }
 
         return client;
     },
@@ -118,7 +119,7 @@ var Session = Class(Server, {
             game: trueDelta,
         };
 
-        if(type !== "over" && type !== "disconnect") { // then it's not a gamelog only delta, so tell clients
+        if(type !== "over") { // then it's not a gamelog only delta, so tell clients
             for(var i = 0; i < this.clients.length; i++) {
                 var client = this.clients[i];
                 var deltaToSend = client.player ? this.game.getDeltaFor(client.player) : trueDelta;
@@ -180,7 +181,9 @@ var Session = Class(Server, {
         }
 
         for(var i = 0; i < this.clients.length; i++) {
-            this.clients[i].send("over", overData);
+            var client = this.clients[i];
+            client.send("over", overData);
+            client.disconnect();
         }
 
         this._updateDeltas("over");
