@@ -531,7 +531,7 @@ var BaseGame = Class(DeltaMergeable, {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
 
-            if(!player.lost) {
+            if(!player.lost && !player.won) {
                 if(winner) {
                     return false;
                 }
@@ -544,6 +544,27 @@ var BaseGame = Class(DeltaMergeable, {
         if(winner) {
             this.declareWinner(winner, "All other players lost.");
             return true;
+        }
+    },
+
+    _endGameViaCoinFlip: function() {
+        // Win via coin flip - if we got here no player won via game rules. They probably played identically to each other.
+        var players = [];
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            if(!player.won && !player.lost) {
+                players.push(player);
+            }
+        }
+
+        var winnerIndex = Math.randomInt(players.length - 1);
+        for(var i = 0; i < players.length; i++) {
+            if(i === winnerIndex) {
+                this.declareWinner(players[i], "Won via coin flip.");
+            }
+            else {
+                this.declareLoser(players[i], "Lost via coin flip.");
+            }
         }
     },
 });

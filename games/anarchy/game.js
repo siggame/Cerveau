@@ -491,16 +491,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             }
         }
 
-        // Win via coin flip - if we got here no player won via game rules. They probably played identically to each other.
-        var winnerIndex = Math.randomInt(this.players.length);
-        for(var i = 0; i < this.players.length; i++) {
-            if(i === winnerIndex) {
-                this.declareWinner(this.players[i], "Won via coin flip.");
-            }
-            else {
-                this.declareLoser(this.players[i], "Lost via coin flip.");
-            }
-        }
+        this._endGameViaCoinFlip();
     }
 
     //<<-- /Creer-Merge: added-functions -->>
