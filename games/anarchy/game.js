@@ -374,7 +374,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var player = this.players[i];
             if(player.headquarters.health <= 0) { // then it burned down, and they have lost
                 if(loser) { // someone else already lost this turn... so they both lost their headquarters this turn, so check secondary win conditions (and the game is over)
-                    this._secondaryWinConditions("Both headquarters burned down on the same turn");
+                    this._secondaryWinConditions("Both headquarters reached zero health on the same turn");
                     loser = undefined;
                     break;
                 }
@@ -383,8 +383,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         if(loser) {
-            this.declareLoser(loser, "Headquarters burned down.");
-            this.declareWinner(this.getOtherPlayers(loser)[0], "Burned down enemy's headquarters.");
+            this.declareLoser(loser, "Headquarters reached zero health.");
+            this.declareWinner(this.getOtherPlayers(loser)[0], "Reduced health of enemy's headquarters to zero.");
         }
 
         // spread fire, now that everything has taken fire damage
