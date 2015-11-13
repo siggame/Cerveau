@@ -105,7 +105,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             west: {x: -1, y: 0},
         };
 
-        this.headquartersHealthScalar = 10;
+        this.headquartersHealthScalar = 3;
         this.maxForecastIntensity = 10;
         this.firePerTurnReduction = 1;
         this.exposurePerTurnReduction = 10;
