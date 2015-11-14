@@ -183,7 +183,6 @@ var Session = Class(Server, {
         for(var i = 0; i < this.clients.length; i++) {
             var client = this.clients[i];
             client.send("over", overData);
-            client.disconnect();
         }
 
         this._updateDeltas("over");
