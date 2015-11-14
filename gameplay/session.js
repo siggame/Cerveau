@@ -167,14 +167,15 @@ var Session = Class(Server, {
         var overData = {};
 
         if(this._visualizerLink) {
-            var localGamelogLink = encodeURIComponent("http://{0}/gamelog/{1}/{2}/{3}".format(
+            var localGamelogLink = encodeURIComponent("http://{0}:{1}/gamelog/{2}/{3}/{4}".format(
                 this._initArgs.host,
+                (this._initArgs.port + 80),
                 gamelog.gameName,
                 gamelog.gameSession,
                 gamelog.epoch
             ));
 
-            overData.message = "---\nYour gamelog is viewable at:\n{0}?log={1}\n---".format(
+            overData.message = "---\nYour gamelog is viewable at:\n{0}?logUrl={1}\n---".format(
                 this._visualizerLink,
                 localGamelogLink
             );
