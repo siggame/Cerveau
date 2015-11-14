@@ -53,8 +53,8 @@ var Lobby = Class(Server, {
             self.addSocket(socket);
         });
 
-        this._netServer.listen(this.port, this.host, function() {
-            log("--- Lobby listening on "+ self.host + ":" + self.port + " ---");
+        this._netServer.listen(this.port, "0.0.0.0", function() {
+            log("--- Lobby listening on port " + self.port + " ---");
         });
 
         this._netServer.on("error", function(err) {

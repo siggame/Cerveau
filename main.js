@@ -23,12 +23,13 @@ var log = require("./gameplay/log");
 var app = require("./website/app");
 if(args.api || args.web) {
     var http = require('http').Server(app);
+    var port = args.port + 80;
     var server = http.listen(args.port + 80, function() {
-        log('--- HTTP server running on ' + args.host + ':' + (args.port+80) + ' ---');
+        log('--- HTTP server running on port ' + port + ' ---');
     });
 
     server.on("error", function(err) {
-        log.error(err.code !== 'EADDRINUSE' ? err : "Webinterface cannot listen on port " + args.host + ":" + (args.port + 80) + ". Address in use.");
+        log.error(err.code !== 'EADDRINUSE' ? err : "Webinterface cannot listen on port " + port + ". Address in use.");
     });
 }
 
