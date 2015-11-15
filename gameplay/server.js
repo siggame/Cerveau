@@ -101,8 +101,6 @@ var Server = Class({
      * @param {string} [reason] - human readable string why the client timed out (probably just contains how long it waited before timing out).
      */
     clientTimedOut: function(client, reason) {
-        log("Client " + client.name + " timed out");
-
         this.clientDisconnected(client, reason);
     },
 });

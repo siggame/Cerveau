@@ -20,41 +20,10 @@ var GameLogger = Class({
         this.gamelogExtension = ".json.gz";
         this.usingCompression = true;
         this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
-        this.gamelogs = []; // simple array of all gamelogs (regardless of game), sorted by epoch (time), with newest gamelogs at the end
 
         this._filenameFormat = "{moment}-{gameName}-{gameSession}";
         if(options && options.arenaMode) {
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
-        }
-
-        this.gamelogFor = {};
-        for(var i = 0; i < gameNames.length; i++) {
-            this.gamelogFor[gameNames[i]] = {};
-        }
-
-        this._loadGamelogs = Boolean(options && options.loadGamelogs);
-
-        if(this._loadGamelogs) {
-            var filenames = utilities.getFiles(this.gamelogDirectory);
-            for(var i = 0; i < filenames.length; i++) {
-                var filename = filenames[i];
-                if(filename.endsWith(this.gamelogExtension)) {
-                    (function(self, filename) {
-                        var path = self.gamelogDirectory + filename;
-
-                        var strings = [];
-                        var readStream = fs.createReadStream(path)
-                            .pipe(zlib.createGunzip()) // Un-Gzip
-                            .on("data", function(buffer) {
-                                strings.push(buffer.toString('utf8'));
-                            })
-                            .on("end", function() {
-                                var gamelog = JSON.parse(strings.join(''));
-                                self._memorizeGamelog(gamelog);
-                            });
-                    })(this, filename);
-                }
-            }
         }
     },
 
@@ -65,13 +34,9 @@ var GameLogger = Class({
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
-        var filename = format(this._filenameFormat, extend({
-            moment: utilities.momentString(gamelog.epoch),
-        }, gamelog));
+        var filename = this._filenameFor(gamelog);
 
-        this._memorizeGamelog(gamelog);
-
-        var path = (this.gamelogDirectory + filename + this.gamelogExtension);
+        var path = (this.gamelogDirectory + filename);
         var writeSteam = fs.createWriteStream(path, 'utf8');
         var gzip = zlib.createGzip();
 
@@ -82,27 +47,8 @@ var GameLogger = Class({
         gzip.pipe(writeSteam);
         gzip.write(serialized);
         gzip.end();
-    },
 
-    /**
-     * Takes a parsed gamelog and stores it in memory
-     *
-     * @param {Object} gamelog - parsed gamelog to store in memory and in various lookup dictionaries
-     */
-    _memorizeGamelog: function(gamelog) {
-        if(this._loadGamelogs) {
-            this.gamelogFor[gamelog.gameName] = this.gamelogFor[gamelog.gameName] || {};
-            this.gamelogFor[gamelog.gameName][gamelog.gameSession] = this.gamelogFor[gamelog.gameName][gamelog.gameSession] || {};
-            this.gamelogFor[gamelog.gameName][gamelog.gameSession][gamelog.epoch] = gamelog;
-
-            var index = 0;
-            for(index; index < this.gamelogs.length; index++) {
-                if(this.gamelogs[index].epoch > gamelog.epoch) { // then the gamelog we are looking at was logged after the current one
-                    break; // this index is where we want to put this new gamelog
-                }
-            }
-            this.gamelogs.insert(index, gamelog);
-        }
+        delete gamelog;
     },
 
     /**
@@ -112,7 +58,25 @@ var GameLogger = Class({
      */
     getLogs: function(filter) {
         // TODO: use the filter in the future
-        return this.gamelogs;
+        return []; // TODO: get back to working?
+    },
+
+    _filenameFor: function(gameName, gameSession, epoch) {
+        var obj = {};
+        if(typeof(gameName) === "object") {
+            extend(obj, gameName);
+        }
+        else {
+            obj.gameName = gameName;
+            obj.gameSession = gameSession;
+            obj.epoch = epoch;
+        }
+
+        if(obj.epoch) {
+            obj.moment = utilities.momentString(obj.epoch)
+        }
+
+        return this._filenameFormat.format(obj) + this.gamelogExtension;
     },
 
     /**
@@ -123,26 +87,31 @@ var GameLogger = Class({
      * @param {number} [epoch] - the epoch for the specific game ran of session id
      * @returns {Object|undefined} gamelog matching passed in parameters, or undefined if doesn't exist
      */
-    getLog: function(gameName, sessionID, epoch) {
-        if(!this.gamelogFor[gameName] || !this.gamelogFor[gameName][sessionID]) {
-            return;
-        }
+    getGamelog: function(gameName, gameSession, epoch, callback) {
+        var filename = this._filenameFor(gameName, gameSession, epoch);
+        var gamelogPath = path.join(this.gamelogDirectory, filename);
 
-        if(!epoch) { // then give them the latest gamelog
-            var maxEpoch = 0;
-            var gamelog = undefined;
-            for(var gamelogEpoch in this.gamelogFor[gameName][sessionID]) {
-                if(gamelogEpoch > maxEpoch) {
-                    gamelog = this.gamelogFor[gameName][sessionID][gamelogEpoch];
+        fs.stat(gamelogPath, function(err, stats) {
+            if(err || !stats.isFile()) {
+                if(callback) {
+                    callback(); // send no gamelog, as we couldn't find it
                 }
+
+                return;
             }
 
-            return gamelog;
-        }
-        else {
-            return this.gamelogFor[gameName][sessionID][epoch];
-        }
-    }
+            var strings = [];
+            var readStream = fs.createReadStream(gamelogPath)
+                .pipe(zlib.createGunzip()) // Un-Gzip
+                .on("data", function(buffer) {
+                    strings.push(buffer.toString('utf8'));
+                })
+                .on("end", function() {
+                    var gamelog = JSON.parse(strings.join(''));
+                    callback(gamelog);
+                });
+        });
+    },
 });
 
 module.exports = GameLogger;

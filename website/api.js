@@ -36,25 +36,30 @@ module.exports = function(args) {
 
     app.get('/gamelog/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
         var response = {}
-        if(!req.params.gameName || !req.params.gameSession) {
-            response.error = "gameName or gameSession not sent!";
-        }
-        else {
-            req.params.requestedEpoch = req.params.requestedEpoch || 0;
-            var gamelog = lobby.gameLogger.getLog(req.params.gameName, req.params.gameSession, req.params.requestedEpoch);
 
-            if(gamelog) {
-                response = gamelog;
-            }
-            else {
-                response.error ="gamelog not found";
-            }
-        }
-
+        // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-        res.json(response);
+        if(!req.params.gameName || !req.params.gameSession) {
+            res.json({
+                error: "gameName or gameSession not sent!",
+            });
+        }
+        else {
+            var epoch = Number(req.params.requestedEpoch) || undefined;
+
+            lobby.gameLogger.getGamelog(req.params.gameName, req.params.gameSession, epoch, function(gamelog) {
+                if(gamelog) {
+                    res.json(gamelog);
+                }
+                else {
+                    res.json({
+                        error: "gamelog not found",
+                    });
+                }
+            });
+        }
     });
 
     app.get('/visualize/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
