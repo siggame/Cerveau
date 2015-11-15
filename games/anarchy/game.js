@@ -394,7 +394,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         this.currentForecast = this.nextForecast;
-        this.nextForecast = this.forecasts[this.currentTurn + 1];
+        // Turn isn't incremented until return statement
+        this.nextForecast = this.forecasts[this.currentTurn + 2];
 
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
