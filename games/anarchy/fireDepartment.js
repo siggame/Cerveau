@@ -67,7 +67,7 @@ var FireDepartment = Class(Building, {
         }
         
         if(building.isHeadquarters) {
-            return this.game.logicError(-1, "FireDepartment {{{0}}} commanded to extinguish a headquarters.".format(this.id));
+            return this.game.logicError(false, "FireDepartment {{{0}}} commanded to extinguish a headquarters.".format(this.id));
         }
 
         building.fire = Math.clamp(building.fire - this.fireExtinguished, 0, this.game.maxFire);
