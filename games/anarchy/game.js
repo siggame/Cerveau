@@ -265,7 +265,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 x: this.mapWidth - originalBuilding.x - 1,
                 y: originalBuilding.y,
                 owner: this.getOtherPlayers(originalBuilding.owner)[0],
-                isHeadquarters: originalBuilding.isHeadquarters,
+                isHeadquarters: originalBuilding.isHeadquarters
             });
         }
 
@@ -301,6 +301,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         for(var i = 0; i < this.players.length; i++) {
             this.players[i].bribesRemaining = this.baseBribesPerTurn;
         }
+        
+        // Fix fireAdded not being set for both headquarters
+        this.players[1].headquarters.makeHeadquarters(); 
 
         //<<-- /Creer-Merge: begin -->>
     },
