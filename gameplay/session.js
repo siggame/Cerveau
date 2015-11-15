@@ -267,6 +267,8 @@ var Session = Class(Server, {
                     returned = returned.returnValue;
                 }
 
+                client.startTicking();
+
                 var serializedReturned = serializer.serialize(returned, self.game);
                 self._updateDeltas("ran", {
                     player: client.player,

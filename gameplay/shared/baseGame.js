@@ -42,7 +42,7 @@ var BaseGame = Class(DeltaMergeable, {
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
-    _playerStartingTime: 1e10, // 10 seconds in nanoseconds
+    _playerStartingTime: 6e10, // 60 seconds in nanoseconds
 
     /**
      * initializes this games game manager, which is a creer generated class that handles code that is re-used between games but could not be moved down to a base class as they are too game specific, such as creating game objects by name
