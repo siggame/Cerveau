@@ -180,8 +180,12 @@ var Client = Class({
      * Starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for orders.
      */
     startTicking: function() {
-        if(!this.server.timeout) {
+        if(!this.server.timeout) { // server is not going to timeout clients
             return false;
+        }
+
+        if(this.isTicking()) {
+            return true;
         }
 
         this.timer.startTime = process.hrtime();
@@ -212,7 +216,6 @@ var Client = Class({
      */
     _timedOut: function() {
         this.pauseTicking();
-        log("Client", this.name, "timed out");
         this.server.clientTimedOut(this);
         this.disconnect();
     },

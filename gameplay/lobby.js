@@ -171,28 +171,15 @@ var Lobby = Class(Server, {
                     sessionID: gameSession.id,
                     running: gameSession.running,
                     over: gameSession.over,
-                    winners: gameSession.gamelog.winners,
-                    losers: gameSession.gamelog.losers,
+                    winners: gameSession.winners,
+                    losers: gameSession.losers,
                 };
             }
-            else { // check if it was already ran
-                var gamelog = this.gameLogger.getLog(gameName, sessionID);
-                if(gamelog) {
-                    return {
-                        gameName: gamelog.gameName,
-                        sessionID: gamelog.gameSession,
-                        over: true,
-                        winners: gamelog.winners,
-                        losers: gamelog.losers,
-                    };
-                }
-                else {
-                    return {
-                        error: "could not find game session with given gameName and sessionID",
-                        sessionID: sessionID,
-                    };
-                }
-            }
+
+            return {
+                error: "could not find game session with given gameName and sessionID",
+                sessionID: sessionID,
+            };
         }
         else {
             return {
@@ -378,7 +365,6 @@ var Lobby = Class(Server, {
                 self.gameLogger.log(data.gamelog);
             }
 
-            gameSession.gamelog = data.gamelog;
             gameSession.winners = data.winners;
             gameSession.losers = data.losers;
         });
