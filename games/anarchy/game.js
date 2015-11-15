@@ -390,7 +390,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         // spread fire, now that everything has taken fire damage
         for(var i = 0; i < fireSpreads.length; i++) {
             var fireSpread = fireSpreads[i];
-            fireSpread.building.fire = Math.min(fireSpread.building.fire + fireSpread.fire, this.maxFire);
+            fireSpread.building.fire = Math.max(fireSpread.building.fire, fireSpread.fire);
         }
 
         this.currentForecast = this.nextForecast;
