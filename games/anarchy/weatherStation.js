@@ -48,6 +48,12 @@ var WeatherStation = Class(Building, {
             return logicError;
         }
 
+        if(!this.game.nextForecast) {
+            return this.game.logicError(false, "WeatherStation {{{0}}} cannot intensify the next Forecast as it is the last turn and there is not next Forecast.".format(
+                this.id
+            ));
+        }
+
         // checks if the intensity is at maximum and trying to increase
         if(!negative && this.game.nextForecast.intensity >= this.game.maxForecastIntensity) {
             return this.game.logicError(false, "WeatherStation {{{0}}} cannot intensify the next Forecast {{{1}}} above {2}.".format(
@@ -89,6 +95,12 @@ var WeatherStation = Class(Building, {
         var logicError = this._checkIfBribeIsValid(player, false);
         if(logicError) {
             return logicError;
+        }
+
+        if(!this.game.nextForecast) {
+            return this.game.logicError(false, "WeatherStation {{{0}}} cannot rotate the next Forecast as it is the last turn and there is not next Forecast.".format(
+                this.id
+            ));
         }
 
         this.game.nextForecast.direction = this.game.directions[(counterclockwise ? "previous" : "next") + "WrapAround"](this.game.nextForecast.direction);
