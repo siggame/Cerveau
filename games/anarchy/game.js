@@ -303,7 +303,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
         
         // Fix fireAdded not being set for both headquarters
-        this.players[1].headquarters.makeHeadquarters(); 
+        this.players[1].headquarters.fireAdded = this.players[0].headquarters.fireAdded;
 
         //<<-- /Creer-Merge: begin -->>
     },
