@@ -286,6 +286,15 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var intensity = Math.randomInt(0, this.maxForecastIntensity);
 
             for(var j = 0; j < 2; j++) {
+                if(j == 1) { // for the second player's forecasts mirrot the directions East/West
+                    if(direction === "east") {
+                        direction = "west";
+                    }
+                    else if(direction === "west") {
+                        direction = "east";
+                    }
+                }
+
                 this.forecasts.push(this.create("Forecast", {
                     direction: direction,
                     intensity: intensity,
