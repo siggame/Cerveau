@@ -16,6 +16,8 @@ var TurnBasedGame = Class(BaseGame, {
         this._addProperty("currentPlayer", null);
     },
 
+    _playerAdditionalTimePerTurn: 1e8, // 100ms in ns
+
     /**
      * begins the turn based game to the first player
      */
@@ -59,6 +61,7 @@ var TurnBasedGame = Class(BaseGame, {
 
         this.currentTurn++;
         this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
+        this.currentPlayer.timeRemaining += this._playerAdditionalTimePerTurn;
     },
 
     /**

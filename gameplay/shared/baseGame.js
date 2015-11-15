@@ -42,6 +42,7 @@ var BaseGame = Class(DeltaMergeable, {
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
+    _playerStartingTime: 1e10, // 10 seconds in nanoseconds
 
     /**
      * initializes this games game manager, which is a creer generated class that handles code that is re-used between games but could not be moved down to a base class as they are too game specific, such as creating game objects by name
@@ -117,7 +118,7 @@ var BaseGame = Class(DeltaMergeable, {
 
                 // while these are "public", they are not properties of players sent to clients.
                 player.invalids = [];
-                player.timeRemaining = player.timeRemaining || 1e10; // 10 seconds in nanoseconds
+                player.timeRemaining = player.timeRemaining || this._playerStartingTime;
                 player.client = client;
 
                 client.setGameData(this, player);
