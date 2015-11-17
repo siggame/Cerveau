@@ -9,6 +9,7 @@ var data = JSON.parse(process.env.workerGameSessionData);
 
 var portOffset = parseInt(data.gameSession) || process.pid;
 process._debugPort = (data._mainDebugPort || 5858) + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid
+process.title = data.gameName + " - " + data.gameSession;
 
 require("seedrandom"); // allows seeding of Math.random()
 data.gameSettings.randomSeed = Math.seedrandom(data.gameSettings.randomSeed || undefined); // use the 'seedrandom' module to seed Math.random() with the requested game setting for it (randomSeed). Either way store it so it can be logged in the gamelog.
