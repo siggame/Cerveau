@@ -47,8 +47,6 @@ var GameLogger = Class({
         gzip.pipe(writeSteam);
         gzip.write(serialized);
         gzip.end();
-
-        delete gamelog;
     },
 
     /**
