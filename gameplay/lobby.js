@@ -11,6 +11,7 @@ var log = require("./log");
 
 var net = require("net");
 var cluster = require("cluster");
+var readline = require("readline");
 
 /**
  * @class Lobby: The server clients initially connect to before being moved to their game session. Basically creates and manages game sessions.
@@ -32,6 +33,7 @@ var Lobby = Class(Server, {
         this._authenticator = new Authenticator(this._authenticate);
         this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
         this._nextGameNumber = 1;
+        this._isShuttingDown = false;
 
         this._initializeGames();
 
@@ -59,6 +61,41 @@ var Lobby = Class(Server, {
 
         this._netServer.on("error", function(err) {
             self._socketError(err);
+        });
+
+        var rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+
+        rl.setPrompt("");
+        rl.on('SIGINT', function() {
+            if(!self._isShuttingDown) {
+                self._isShuttingDown = true;
+                log("Shutting down gracefully...");
+
+                var numCurrentGames = Object.keys(self._threadedGameSessions).length;
+                log("{0} game{1} currently running{2}.".format(numCurrentGames, numCurrentGames === 1 ? "" : "s", numCurrentGames === 0 ? ", so we can shut down immediately" : ""));
+
+                var clients = self.clients.clone();
+                for(var i = 0; i < clients.length; i++) {
+                    var client = clients[i];
+                    client.send("fatal", new errors.CerveauError("Sorry, the server is shutting down."));
+                    client.disconnect();
+                }
+
+                if(numCurrentGames > 0) {
+                    log("Waiting for them to exit before shutting down.");
+                    log("^C again to force shutdown, which force disconnects clients.")
+                }
+                else {
+                    process.exit(0);
+                }
+            }
+            else {
+                log("Force shutting down.");
+                process.exit(1);
+            }
         });
     },
 
@@ -143,9 +180,11 @@ var Lobby = Class(Server, {
      * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
      */
     getGameNameForAlias: function(gameAlias) {
-        var gameClass = this._gameClassesByAlias[gameAlias.toLowerCase()];
-        if(gameClass) {
-            return gameClass.prototype.name;
+        if(gameAlias) {
+            var gameClass = this._gameClassesByAlias[gameAlias.toLowerCase()];
+            if(gameClass) {
+                return gameClass.prototype.name;
+            }
         }
     },
 
@@ -239,8 +278,17 @@ var Lobby = Class(Server, {
         var gameAlias = String(data && data.gameName); // clients can send aliases of what they want to play
         var gameName = this.getGameNameForAlias(gameAlias);
 
+        var fatalMessage;
+        if(this._isShuttingDown) {
+            fatalMessage = "Game server is shutting down and not accepting new clients.";
+        }
+
         if(!data || !gameName) {
-            client.send("fatal", new errors.CerveauError("Game of name '" + gameAlias + "' not found on this server."));
+            fatalMessage = "Game of name '" + gameAlias + "' not found on this server.";
+        }
+
+        if(fatalMessage) {
+            client.send("fatal", new errors.CerveauError(fatalMessage));
             client.disconnect(); // no need to keep them connected, they want to play something we don't have
             return;
         }
@@ -360,7 +408,7 @@ var Lobby = Class(Server, {
             }
         });
 
-        gameSession.worker.on("message", function(data) {
+        gameSession.worker.on("message", function(data) { // this message should only happen once, when the game is over
             if(data.gamelog) {
                 self.gameLogger.log(data.gamelog);
             }
@@ -387,6 +435,11 @@ var Lobby = Class(Server, {
         gameSession.over = true;
 
         delete this._threadedGameSessions[gameSession.worker.process.pid];
+
+        if(this._isShuttingDown && Object.keys(this._threadedGameSessions).length === 0) {
+            log("Final game session exited. Shutdown complete.");
+            process.exit(0);
+        }
     },
 });
 
