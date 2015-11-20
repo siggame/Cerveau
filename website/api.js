@@ -34,35 +34,21 @@ module.exports = function(args) {
         res.json(response);
     });
 
-    app.get('/gamelog/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
+    app.get('/gamelog/:filename', function(req, res) {
         var response = {}
 
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-        if(!req.params.gameName || !req.params.gameSession) {
-            res.json({
-                error: "gameName or gameSession not sent!",
+        lobby.gameLogger.getGamelog(req.params.filename, function(gamelog) {
+            res.json(gamelog || {
+                error: "Gamelog not found.",
             });
-        }
-        else {
-            var epoch = Number(req.params.requestedEpoch) || undefined;
-
-            lobby.gameLogger.getGamelog(req.params.gameName, req.params.gameSession, epoch, function(gamelog) {
-                if(gamelog) {
-                    res.json(gamelog);
-                }
-                else {
-                    res.json({
-                        error: "gamelog not found",
-                    });
-                }
-            });
-        }
+        });
     });
 
-    app.get('/visualize/:gameName/:gameSession/:requestedEpoch?', function(req, res) {
+    app.get('/visualize/:filename', function(req, res) {
         res.render('visualize', req.params);
     });
 };

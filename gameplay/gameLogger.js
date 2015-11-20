@@ -17,15 +17,16 @@ var GameLogger = Class({
      * @param {string} [dir] - path to directory to log games into, and to read them from
      */
     init: function(gameNames, options) {
-        this.gamelogExtension = ".json.gz";
-        this.usingCompression = true;
         this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
 
-        this._filenameFormat = "{moment}-{gameName}-{gameSession}";
         if(options && options.arenaMode) {
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
         }
     },
+
+    gamelogExtension: ".json.gz",
+    usingCompression: true,
+    _filenameFormat: "{moment}-{gameName}-{gameSession}", // default format
 
     /**
      * Creates a gamelog for the game in the directory set during init
@@ -34,9 +35,9 @@ var GameLogger = Class({
      */
     log: function(gamelog) {
         var serialized = JSON.stringify(gamelog);
-        var filename = this._filenameFor(gamelog);
+        var filename = this.filenameFor(gamelog);
 
-        var path = (this.gamelogDirectory + filename);
+        var path = (this.gamelogDirectory + filename + this.gamelogExtension);
         var writeSteam = fs.createWriteStream(path, 'utf8');
         var gzip = zlib.createGzip();
 
@@ -59,7 +60,15 @@ var GameLogger = Class({
         return []; // TODO: get back to working?
     },
 
-    _filenameFor: function(gameName, gameSession, epoch) {
+    /**
+     * Returns the expected filename to gamelog
+     *
+     * @static
+     * @param {string|Object} gameName - name of the game, or an object with these parms as key/values
+     * @param (string) gameSession - name of the session
+     * @param {number} epoch - when thge gamelog was logged
+     */
+    filenameFor: function(gameName, gameSession, epoch) {
         var obj = {};
         if(typeof(gameName) === "object") {
             extend(obj, gameName);
@@ -74,20 +83,17 @@ var GameLogger = Class({
             obj.moment = utilities.momentString(obj.epoch)
         }
 
-        return this._filenameFormat.format(obj) + this.gamelogExtension;
+        return this._filenameFormat.format(obj);
     },
 
     /**
      * Gets the first game log matching the gameName, sessionID, and (optional) epoch
      *
-     * @param {string} gameName - name of the game you want a log for
-     * @param {string} sessionID - id of the session that for the game
-     * @param {number} [epoch] - the epoch for the specific game ran of session id
+     * @param {string} filename - the base filename (without gamelog extension) you want in output/gamelogs/
      * @returns {Object|undefined} gamelog matching passed in parameters, or undefined if doesn't exist
      */
-    getGamelog: function(gameName, gameSession, epoch, callback) {
-        var filename = this._filenameFor(gameName, gameSession, epoch);
-        var gamelogPath = path.join(this.gamelogDirectory, filename);
+    getGamelog: function(filename, callback) {
+        var gamelogPath = path.join(this.gamelogDirectory, filename + this.gamelogExtension);
 
         fs.stat(gamelogPath, function(err, stats) {
             if(err || !stats.isFile()) {
@@ -105,7 +111,15 @@ var GameLogger = Class({
                     strings.push(buffer.toString('utf8'));
                 })
                 .on("end", function() {
-                    var gamelog = JSON.parse(strings.join(''));
+                    try {
+                        var gamelog = JSON.parse(strings.join(''));
+                    }
+                    catch(err) {
+                        return callback({
+                            "error": "Error parsing gamelog."
+                        });
+                    }
+
                     callback(gamelog);
                 });
         });

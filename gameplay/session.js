@@ -2,6 +2,7 @@ var serializer = require("./serializer");
 var errors = require("./errors");
 var Class = require(__basedir + "/utilities/class");
 var Server = require("./server");
+var GameLogger = require("./gameLogger");
 var constants = require("./constants");
 var moment = require('moment');
 var fs = require('fs');
@@ -167,12 +168,10 @@ var Session = Class(Server, {
         var overData = {};
 
         if(this._visualizerLink) {
-            var localGamelogLink = encodeURIComponent("http://{0}:{1}/gamelog/{2}/{3}/{4}".format(
+            var localGamelogLink = encodeURIComponent("http://{0}:{1}/gamelog/{2}".format(
                 this._initArgs.host,
                 (this._initArgs.port + 80),
-                gamelog.gameName,
-                gamelog.gameSession,
-                gamelog.epoch
+                GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer links are irrelevant
             ));
 
             overData.message = "---\nYour gamelog is viewable at:\n{0}?logUrl={1}\n---".format(
