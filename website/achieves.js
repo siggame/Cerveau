@@ -16,38 +16,39 @@ module.exports = function(args) {
         }
 
         var lobby = args.lobby;
-        var logs = lobby.gameLogger.getLogs();
-        var gamelogs = [];
+        lobby.gameLogger.getLogs(function(logs) {
+            var gamelogs = [];
 
-        var startIndex = logs.length - (pageStart * pageCount);
-        var endIndex = startIndex + pageCount;
-        startIndex = Math.max(startIndex, 0);
+            var startIndex = logs.length - (pageStart * pageCount);
+            var endIndex = startIndex + pageCount;
+            startIndex = Math.max(startIndex, 0);
 
-        // because logs (all the gamelogs GameLogger found) is pre-sorted with the newest gamelogs at the END, startIndex starts at the end. We want to first show the NEWEST gamelogs
-        for(var i = endIndex - 1; i >= startIndex; i--) {
-            var log = logs[i];
-            gamelogs.push({
-                game: log.gameName,
-                session: log.gameSession,
-                epoch: log.epoch,
-                uri: log.gameName + "/" + log.gameSession + "/" + log.epoch,
+            // because logs (all the gamelogs GameLogger found) is pre-sorted with the newest gamelogs at the END, startIndex starts at the end. We want to first show the NEWEST gamelogs
+            for(var i = endIndex - 1; i >= startIndex; i--) {
+                var log = logs[i];
+                gamelogs.push({
+                    game: log.gameName,
+                    session: log.gameSession,
+                    epoch: log.epoch,
+                    uri: lobby.gameLogger.filenameFor(log),
+                });
+            }
+
+            var newerUri;
+            if(endIndex < logs.length) {
+                newerUri = "/archives/" + gameName + "/" + (pageStart - 1);
+            }
+
+            var olderUri;
+            if(startIndex > 0) {
+                olderUri = "/archives/" + gameName + "/" + (pageStart + 1);
+            }
+
+            res.render('archives', {
+                gamelogs: gamelogs,
+                newerUri: newerUri,
+                olderUri: olderUri,
             });
-        }
-
-        var newerUri;
-        if(endIndex < logs.length) {
-            newerUri = "/archives/" + gameName + "/" + (pageStart - 1);
-        }
-
-        var olderUri;
-        if(startIndex > 0) {
-            olderUri = "/archives/" + gameName + "/" + (pageStart + 1);
-        }
-
-        res.render('archives', {
-            gamelogs: gamelogs,
-            newerUri: newerUri,
-            olderUri: olderUri,
         });
     });
 };

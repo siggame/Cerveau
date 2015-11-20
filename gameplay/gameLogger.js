@@ -51,13 +51,34 @@ var GameLogger = Class({
     },
 
     /**
-     * Gets all the gamelogs this GameLogger knows of.
-     * 
-     * @returns {Array<Object>} array of gamelogs matching
+     * Gets all the gamelogs in output/gamelogs. The gamelogs are not complete, but rather a "shallow" gamelog.
      */
-    getLogs: function(filter) {
-        // TODO: use the filter in the future
-        return []; // TODO: get back to working?
+    getLogs: function(callback) {
+        var self = this;
+        fs.readdir(this.gamelogDirectory, function(err, files) {
+            if(err) {
+                return callback();
+            }
+
+            var gamelogs = [];
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                if(filename.endsWith(self.gamelogExtension)) { // then it is a gamelog
+                    var split = filename.split("-");
+                    if(split.length === 3) { // then we can figure out what the game is based on file name
+                        var session = split[2];
+                        gamelogs.push({
+                            filename: filename,
+                            epoch: utilities.unMomentString(split[0]),
+                            gameName: split[1],
+                            gameSession: session.substring(0, session.length - self.gamelogExtension.length),
+                        });
+                    }
+                }
+            }
+
+            callback(gamelogs);
+        });
     },
 
     /**

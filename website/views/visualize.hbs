@@ -337,13 +337,15 @@ function init() {
 // Get the gamelog //
 /////////////////////
 
-var gameName = "{{gameName}}";
-var gameSession = "{{gameSession}}";
-var requestedEpoch = {{requestedEpoch}} || undefined;
+var gameName = "";
+var gameSession = "";
+var requestedEpoch = 0; // these will be filled in after gamelog is pulled down, but we want scope above that
+var gameInit =
 
-$.ajax({url: "/gamelog/" + gameName + "/" + gameSession + "/" + requestedEpoch}).done(function(data){
+$.ajax({url: "/gamelog/" + "{{filename}}"}).done(function(data) {
 	if(!data.error) {
 		gamelog = data;
+		gameInit(data.gameName);
 		init();
 	}
 	else {
@@ -351,94 +353,94 @@ $.ajax({url: "/gamelog/" + gameName + "/" + gameSession + "/" + requestedEpoch})
 	}
 });
 
-switch(gameName) {
-	case "Checkers":
-		gameBoard.init = function(data) {
-			makeTable(data.boardWidth, data.boardHeight);
+gameInit = function(gameName) {
+	switch(gameName) {
+		case "Checkers":
+			gameBoard.init = function(data) {
+				makeTable(data.boardWidth, data.boardHeight);
 
-			for(var y = 0; y < data.boardHeight; y++) {
-				for(var x = 0; x < data.boardWidth; x++) {
-					var cell = tableCells[x][y];
+				for(var y = 0; y < data.boardHeight; y++) {
+					for(var x = 0; x < data.boardWidth; x++) {
+						var cell = tableCells[x][y];
 
-					if(!cell.hasClass("legend")) {
-						if((x + y)%2 == 1) {
-							cell.addClass("valid");
+						if(!cell.hasClass("legend")) {
+							if((x + y)%2 == 1) {
+								cell.addClass("valid");
+							}
+							else {
+								cell.addClass("invalid");
+							}
+						}
+					}
+				}
+			};
+
+			gameBoard.update = function(game, state) {
+				var locations = [];
+				for(var x = 0; x < game.boardWidth; x++) {
+					locations[x] = [];
+				}
+
+				for(var i = 0; i < game.checkers.length; i++) {
+					var checker = game.gameObjects[game.checkers[i].id];
+					locations[checker.x][checker.y] = checker;
+				}
+
+				for(var x = 0; x < game.boardWidth; x++) {
+					for(var y = 0; y < game.boardHeight; y++) {
+						var cell = tableCells[x][y];
+						var checker = locations[x][y];
+						var val = "&nbsp;";
+						if(checker) {
+							if(checker.kinged) {
+								val = "{" + checker.id + "}";
+							}
+							else {
+								val = "(" + checker.id + ")";
+							}
+							cell.addClass("owner-" + checker.owner.id);
 						}
 						else {
-							cell.addClass("invalid");
+							cell.removeClass("owner-0 owner-1");
 						}
+
+						cell.html(val);
+						cell._jsonifyThis = checker;
 					}
 				}
-			}
-		};
+			};
+			break;
+		case "Anarchy":
+			$("#main").css("max-width", "1400px");
+			gameBoard.init = function(data) {
+				makeTable(data.mapWidth, data.mapHeight);
+			};
 
-		gameBoard.update = function(game, state) {
-			var locations = [];
-			for(var x = 0; x < game.boardWidth; x++) {
-				locations[x] = [];
-			}
-
-			for(var i = 0; i < game.checkers.length; i++) {
-				var checker = game.gameObjects[game.checkers[i].id];
-				locations[checker.x][checker.y] = checker;
-			}
-
-			for(var x = 0; x < game.boardWidth; x++) {
-				for(var y = 0; y < game.boardHeight; y++) {
-					var cell = tableCells[x][y];
-					var checker = locations[x][y];
-					var val = "&nbsp;";
-					if(checker) {
-						if(checker.kinged) {
-							val = "{" + checker.id + "}";
+			gameBoard.update = function(game, state) {
+				for(var i = 0; i < game.buildings.length; i++) {
+					var building = game.gameObjects[game.buildings[i].id];
+					if(building) {
+						var name = building.gameObjectName;
+						if(name == "Warehouse") {
+							name = "A";
 						}
-						else {
-							val = "(" + checker.id + ")";
-						}
-						cell.addClass("owner-" + checker.owner.id);
-					}
-					else {
-						cell.removeClass("owner-0 owner-1");
-					}
 
-					cell.html(val);
-					cell._jsonifyThis = checker;
+						var gb = Math.round(255 - (building.fire / 20)*255);
+
+						cell = tableCells[building.x][building.y];
+						cell
+							.html(name[0])
+							.addClass("owner-" + building.owner.id)
+							.css("background-color", "rgb(255, " + gb + ", " + gb + ")")
+							._jsonifyThis = building;
+					}
 				}
-			}
-		};
-		break;
-	case "Anarchy":
-		$("#main").css("max-width", "1400px");
-		gameBoard.init = function(data) {
-			makeTable(data.mapWidth, data.mapHeight);
-		};
+			};
 
-		gameBoard.update = function(game, state) {
-			for(var i = 0; i < game.buildings.length; i++) {
-				var building = game.gameObjects[game.buildings[i].id];
-				if(building) {
-					var name = building.gameObjectName;
-					if(name == "Warehouse") {
-						name = "A";
-					}
-
-					var gb = Math.round(255 - (building.fire / 20)*255);
-
-					cell = tableCells[building.x][building.y];
-					cell
-						.html(name[0])
-						.addClass("owner-" + building.owner.id)
-						.css("background-color", "rgb(255, " + gb + ", " + gb + ")")
-						._jsonifyThis = building;
-				}
-			}
-		};
-
-		break;
-	default:
-		window.alert("Game '" + gameName + "' does not have ShitVis support");
-}
-
-
+			break;
+		default:
+			window.alert("Game '" + gameName + "' does not have ShitVis support");
+	}
+};
 
 </script>

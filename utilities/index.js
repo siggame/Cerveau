@@ -31,6 +31,8 @@ module.exports = {
         });
     },
 
+    momentStringFormat: "YYYY.MM.DD.HH.mm.ss.SSS",
+
     /**
      * Returns a string formatted with a time via moment
      *
@@ -38,7 +40,17 @@ module.exports = {
      * @returns {string} time formatted to a string
      */
     momentString: function(epoch) {
-        return moment(epoch).format("YYYY.MM.DD.HH.mm.ss.SSS");
+        return moment(epoch).format(this.momentStringFormat);
+    },
+
+    /**
+     * Takes a string that was made via momentString and transforms it back to an epoch
+     *
+     * @param {string} momentString - a string formatted from momentString
+     * @returns {number} the epoch that was used to create that moment string
+     */
+    unMomentString: function(momentString) {
+        return moment(momentString, this.momentStringFormat);
     },
 
     /**

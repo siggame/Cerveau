@@ -24,24 +24,28 @@ module.exports = function(args) {
             });
 
             var maxGamelogsOnIndex = 10;
-            var logs = lobby.gameLogger.getLogs();
-            var gamelogs = [];
-            var i = logs.length;
+            lobby.gameLogger.getLogs(function(logs) {
+                var error = !logs;
+                logs = logs || [];
 
-            while(i-- && gamelogs.length < maxGamelogsOnIndex) {
-                var log = logs[i];
-                gamelogs.push({
-                    game: log.gameName,
-                    session: log.gameSession,
-                    epoch: log.epoch,
-                    uri: log.gameName + "/" + log.gameSession + "/" + log.epoch,
+                var gamelogs = [];
+                var i = logs.length;
+
+                while(i-- && gamelogs.length < maxGamelogsOnIndex) {
+                    var log = logs[i];
+                    gamelogs.push({
+                        game: log.gameName,
+                        session: log.gameSession,
+                        epoch: log.epoch,
+                        uri: lobby.gameLogger.filenameFor(log),
+                    });
+                }
+
+                res.render("index", {
+                    games: games,
+                    gamelogs: gamelogs,
+                    moreGamelogs: (gamelogs.length === maxGamelogsOnIndex && logs.length > gamelogs.length),
                 });
-            }
-
-            res.render("index", {
-                games: games,
-                gamelogs: gamelogs,
-                moreGamelogs: (gamelogs.length === maxGamelogsOnIndex && logs.length > gamelogs.length),
             });
         });
 
