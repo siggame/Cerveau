@@ -11,8 +11,12 @@ var portOffset = parseInt(data.gameSession) || process.pid;
 process._debugPort = (data._mainDebugPort || 5858) + portOffset; // for debugging the port is node-inspector default (5858) plus the game session if it's a number, or a pid
 process.title = data.gameName + " - " + data.gameSession;
 
+if(!data.gameSettings.randomSeed) {
+    data.gameSettings.randomSeed = data.gameSettings.randomSeed || Math.random().toString(36).substring(2); // this will generate a random number e.g. 0.07568844663910568, and then converts those numbers after 0. to characters. Thus defaulting the random seed to a chars between a-z, A-Z, and 0-9.
+}
 require("seedrandom"); // allows seeding of Math.random()
-data.gameSettings.randomSeed = Math.seedrandom(data.gameSettings.randomSeed || undefined); // use the 'seedrandom' module to seed Math.random() with the requested game setting for it (randomSeed). Either way store it so it can be logged in the gamelog.
+Math.seedrandom(data.gameSettings.randomSeed || undefined); // use the 'seedrandom' module to seed Math.random() with the requested game setting for it (randomSeed). Either way store it so it can be logged in the gamelog.
+
 data.gameSettings.session = data.gameSession;
 
 global.__basedir = data.__basedir;
