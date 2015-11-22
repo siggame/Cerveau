@@ -34,8 +34,9 @@ var socketIndex = 0;
 process.on("message", function(message, handler) {
     if(message === "socket") { // Note: Node js can only send sockets via handler if message === "socket", because passing sockets between threads is sketchy as fuck
         var socket = handler;
+        var info = data.clientInfos[socketIndex];
 
-        session.addSocket(socket, data.clientInfos[socketIndex]);
+        session.addSocket(socket, info.connectionType, info);
 
         socketIndex++;
     }

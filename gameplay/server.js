@@ -1,6 +1,9 @@
 var Class = require(__basedir + "/utilities/class");
-var Client = require("./client");
 var GameLogger = require("./gameLogger");
+var clientClasses = {
+    TCPClient: require("./tcpClient"),
+    WSClient: require("./wsClient"),
+};
 
 var extend = require("extend");
 var errors = require("./errors");
@@ -28,14 +31,18 @@ var Server = Class({
     },
 
     /**
-     * listener function that creates a new Client for the given socket being added
+     * Adds a client to this server, after its been created
      *
-     * @param {net.Socket} socket - socket connecting
-     * @param {Object} [clientInfo] - data about the connecting client
+     * @param {net.Socket|ws.WebSocket} socket - socket connecting
+     * @param {string} connectionType - "TCP" or "WS"
+     * @param {Object} [info] - data about the connecting client
      * @returns {Client} newly created client for the passed in socket
      */
-    addSocket: function(socket, clientInfo) {
-        var client = new Client(socket, this, clientInfo);
+    addSocket: function(socket, connectionType, info) {
+        info = info || {};
+        info.connectionType = connectionType;
+        var clientClass = clientClasses[connectionType + "Client"];
+        var client = new clientClass(socket, this, info);
         this.clients.push(client);
 
         return client;

@@ -1,14 +1,14 @@
-var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to signify the string we sent is the end of a transmition and to parse the json string before it, because some socket APIs for clients will concat what we send
 var Class = require(__basedir + "/utilities/class");
 var log = require("./log");
 
 /*
- * @class Client - the basic implimentation of a connection to the server via a TCP socket
+ * @class
+ * @classdesc the basic implimentation of a connection to the server via some io. Should be inheritired and implimented with that IO. This is just a base class.
+ * @interface
  */
 var Client = Class({
     init: function(socket, server, info) {
         this.socket = socket;
-        this.socket.setEncoding('utf8');
 
         this.setInfo(info);
 
@@ -18,9 +18,26 @@ var Client = Class({
             startTime: undefined,
         };
 
-        this._attached = false;
-        this.attachToSocket();
+        this._listening = false;
+        this._listeners = {};
+        // we need to wrap all the listener functions in closures to not lose reference to 'this', which is this instance of a Client
+        var self = this;
+        self._listeners[self._onDataEventName] = function onSocketData(data) {
+            self._onSocketData(data);
+        };
+        self._listeners[self._onCloseEventName] = function onSocketClose(data) {
+            self._onSocketClose(data);
+        };
+        self._listeners[self._onErrorEventName] = function onSocketError(data) {
+            self._onSocketError(data);
+        };
+
+        this._listenToSocket();
     },
+
+    _onDataEventName: "data",
+    _onCloseEventName: "close",
+    _onErrorEventName: "error",
 
     /**
      * Sets up the clients name and type
@@ -29,6 +46,7 @@ var Client = Class({
      */
     setInfo: function(data) {
         data = data || {};
+        this.connectionType = this.connectionType || data.connectionType;
         this.name = String(data.hasOwnProperty("name") ? data.name : "No Name");
         this.type = String(data.hasOwnProperty("type") ? data.type : "Unknown");
         this.gameSession = data.gameSession; // when in lobby
@@ -38,47 +56,41 @@ var Client = Class({
     /**
      * Sets up the listener functions to listen to the socket this client should have data streaming from.
      */
-    attachToSocket: function() {
-        var self = this;
-
-        var buffer = "";
-        var socketListenerOnData = function(str) {
-            if(self.server.printTCP) {
-                log("< From client " + self.name + " <--", str, '\n--');
+    _listenToSocket: function() {
+        for(var key in this._listeners) {
+            if(this._listeners.hasOwnProperty(key)) {
+                this.socket.on(key, this._listeners[key]);
             }
-
-            buffer += str;
-            var split = buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
-            buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to buffer anyways
-
-            for(var i = 0; i < split.length; i++) {
-                self.server.clientSentData(self, JSON.parse(split[i]));
-            }
-        };
-
-        var socketListenerOnClose = function() {
-            self.server.clientDisconnected(self);
-        };
-
-        var socketListenerOnError = function() {
-            if(this._attached) {
-                self.server.clientDisconnected(self);
-            }
-        };
-
-        this.socket
-            .on("data", socketListenerOnData)
-            .on("close", socketListenerOnClose)
-            .on("error", socketListenerOnError);
-
-        this._attached = true;
-
-        this._detachFromSocket = function() {
-            self.socket
-                .removeListener("data", socketListenerOnData)
-                .removeListener("close", socketListenerOnClose)
-                .removeListener("error", socketListenerOnError);
         }
+
+        this._listening = true;
+    },
+
+    /**
+     * called when the client sends some data. the specific super class should inherit and do stuff to this
+     *
+     * @param {string} data - what the client send via the socket event listener
+     */
+    _onSocketData: function(data) {
+        if(this.server.printTCP) {
+            log("< From client " + this.name + " <--", data, '\n---');
+        }
+
+        // super classes should override and do stuff with data...
+    },
+
+    /**
+     * called when the client closes (disconnects)
+     */
+    _onSocketClose: function() {
+        this.server.clientDisconnected(this);
+    },
+
+    /**
+     * called when the client disconnects unexpectidly
+     */
+    _onSocketError: function() {
+        this.server.clientDisconnected(this);
     },
 
     /**
@@ -86,16 +98,20 @@ var Client = Class({
      *
      * @returns {boolean} representing if the detachment was successful
      */
-    detachFromSocket: function() {
-        this._attached = false;
+    stopListeningToSocket: function() {
+        if(this._listening) {
+            for(var key in this._listeners) {
+                if(this._listeners.hasOwnProperty(key)) {
+                    this.socket.removeListener(key, this._listeners[key]);
+                }
+            }
 
-        if(this._detachFromSocket) {
-            this._detachFromSocket();
-            delete this._detachFromSocket;
+            this._listening = false;
             return true;
         }
-
-        return false;
+        else {
+            return false;
+        }
     },
 
     /**
@@ -122,12 +138,12 @@ var Client = Class({
      */
     disconnected: function() {
         this.pauseTicking();
+        this.stopListeningToSocket();
         this.server.clientDisconnected(this);
-        this.socket.destroy();
     },
 
     /**
-     * Sends a the raw string to the remote client this class represents
+     * Sends a the raw string to the remote client this class represents. Intended to be overridden to actually send through client...
      *
      * @param {string} the raw string to send. Should be EOT_CHAR terminated.
      */
@@ -135,7 +151,6 @@ var Client = Class({
         if(this.server.printTCP) {
             log("> to client " + this.name + " -->", str, "\n---");
         }
-        this.socket.write(str);
     },
 
     /**
@@ -145,13 +160,10 @@ var Client = Class({
      * @param {Object} (optional) object to send about the event being sent
      */
     send: function(event, data) {
-        this._sendRaw(
-            JSON.stringify({
-                event: event,
-                data: data,
-            })
-            + EOT_CHAR // end of text
-        );
+        this._sendRaw(JSON.stringify({
+            event: event,
+            data: data,
+        }));
     },
 
     /**
@@ -162,6 +174,8 @@ var Client = Class({
     isPlaying: function() {
         return !this.spectating;
     },
+
+
 
     /////////////////////////////////////////////////////////
     // Timeouts. Timer should be started/paused by Session //

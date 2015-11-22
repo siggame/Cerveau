@@ -52,7 +52,7 @@ var Lobby = Class(Server, {
 
         // create the TCP socket server via node.js's net module
         this._netServer = net.createServer(function(socket) {
-            self.addSocket(socket);
+            self.addSocket(socket, "TCP");
         });
 
         this._netServer.listen(this.port, "0.0.0.0", function() {
@@ -376,6 +376,7 @@ var Lobby = Class(Server, {
                 index: i,
                 name: client.name,
                 type: client.type,
+                connectionType: client.connectionType,
                 spectating: client.spectating,
             });
         }
@@ -400,7 +401,7 @@ var Lobby = Class(Server, {
             var clients = gameSession.clients.clone();
             for(var i = 0; i < clients.length; i++) {
                 var client = clients[i];
-                client.detachFromSocket(); // we are about to send it, so we don't want this client object listening to it, as we no longer care.
+                client.stopListeningToSocket(); // we are about to send it, so we don't want this client object listening to it, as we no longer care.
                 gameSession.worker.send("socket", client.socket);
 
                 self.clients.removeElement(client); // the client is no longer ours, we sent it (via socket) to the worker thread
