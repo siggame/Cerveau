@@ -1,0 +1,650 @@
+{
+    "AI": {
+        "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
+        "function_names": [
+            "runTurn"
+        ],
+        "functions": {
+            "runTurn": {
+                "altersState": true,
+                "argument_names": [],
+                "arguments": [],
+                "description": "This is called every time the AI is asked to respond with a command during their turn",
+                "returns": {
+                    "default": true,
+                    "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "serverPredefined": true
+            }
+        },
+        "serverParentClasses": []
+    },
+    "Game": {
+        "attribute_names": [
+            "currentPlayer",
+            "currentTurn",
+            "files",
+            "gameObjects",
+            "maxTurns",
+            "moves",
+            "pieces",
+            "players",
+            "ranks",
+            "session",
+            "turnsToStalemate"
+        ],
+        "attributes": {
+            "currentPlayer": {
+                "default": null,
+                "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "Player",
+                    "valueType": null
+                }
+            },
+            "currentTurn": {
+                "default": 0,
+                "description": "The current turn number, starting at 0 for the first player's turn",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "files": {
+                "default": 8,
+                "description": "How many chess tiles vertically there are making columns.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "gameObjects": {
+                "default": null,
+                "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    },
+                    "name": "dictionary",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "GameObject",
+                        "valueType": null
+                    }
+                }
+            },
+            "maxTurns": {
+                "default": 100,
+                "description": "The maximum number of turns before the game will automatically end.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "moves": {
+                "default": null,
+                "description": "Each move made in the game. Indexed by turn number.",
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Move",
+                        "valueType": null
+                    }
+                }
+            },
+            "pieces": {
+                "default": null,
+                "description": "All the pieces in the game.",
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Piece",
+                        "valueType": null
+                    }
+                }
+            },
+            "players": {
+                "default": null,
+                "description": "List of all the players in the game.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                }
+            },
+            "ranks": {
+                "default": 8,
+                "description": "How many chess tiles horizontally there are making rows. Traditionally represented by a letter for humans.",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "session": {
+                "default": null,
+                "description": "A unique identifier for the game instance that is being played.",
+                "serverPredefined": true,
+                "type": {
+                    "keyType": null,
+                    "name": "string",
+                    "valueType": null
+                }
+            },
+            "turnsToStalemate": {
+                "default": null,
+                "description": "How many turns until the game ends because no pawn has moved and no piece has been taken",
+                "type": {
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            }
+        },
+        "description": "The traditional 8x8 chess board with pieces.",
+        "function_names": [],
+        "functions": {},
+        "inheritedAttributes": {},
+        "inheritedFunctions": {},
+        "maxInvalidsPerPlayer": 10,
+        "name": "Chess",
+        "numberOfPlayers": 2,
+        "parentClasses": [],
+        "serverParentClasses": [
+            "TwoPlayerGame",
+            "TurnBasedGame"
+        ]
+    },
+    "gameObjects": {
+        "GameObject": {
+            "attribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "attributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
+            "function_names": [
+                "log"
+            ],
+            "functions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "inheritedAttributes": {},
+            "inheritedFunctions": {},
+            "parentClasses": [],
+            "serverParentClasses": [
+                "BaseGameObject"
+            ]
+        },
+        "Piece": {
+            "attribute_names": [
+                "captured",
+                "file",
+                "hasMoved",
+                "owner",
+                "rank",
+                "type"
+            ],
+            "attributes": {
+                "captured": {
+                    "default": null,
+                    "description": "When the piece has been captured (removed from the board) this is true. Otherwise false.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "file": {
+                    "default": null,
+                    "description": "The file (y) coordinate of the checker.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "hasMoved": {
+                    "arenaInterest": "sum",
+                    "default": null,
+                    "description": "If the piece has moved from its starting position.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The player that controls this chess Piece.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "rank": {
+                    "default": null,
+                    "description": "The rank (x) coordinate of the checker, traditionally represented as a letter.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "type": {
+                    "default": null,
+                    "description": "The type of chess piece this is, either: \"King\", \"Queen\", \"Knight\", \"Rook\", \"Bishop\", or \"Pawn\"",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A chess piece",
+            "function_names": [
+                "move"
+            ],
+            "functions": {
+                "move": {
+                    "altersState": true,
+                    "argument_names": [
+                        "rank",
+                        "file",
+                        "promotionType"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The rank (x) coordinate to move to.",
+                            "name": "rank",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": null,
+                            "description": "The file (y) coordinate to move to.",
+                            "name": "file",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": "",
+                            "description": "If this is a Pawn moving to the end of the board then this parameter is what to promote it to.",
+                            "name": "promotionType",
+                            "optional": true,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Moves the piece from its current location to the given rank and file.",
+                    "optionals": 1,
+                    "optionals_start_index": 2,
+                    "returns": {
+                        "default": null,
+                        "description": "true if the move was valid, false otherwise",
+                        "type": {
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Player": {
+            "attribute_names": [
+                "clientType",
+                "fileDirection",
+                "lost",
+                "madeMove",
+                "name",
+                "otherPlayer",
+                "pieces",
+                "reasonLost",
+                "reasonWon",
+                "timeRemaining",
+                "won"
+            ],
+            "attributes": {
+                "clientType": {
+                    "default": null,
+                    "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "fileDirection": {
+                    "default": null,
+                    "description": "The direction your checkers must go along the file (y) axis until they reach the other side.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "lost": {
+                    "default": false,
+                    "description": "if the player lost the game or not",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "madeMove": {
+                    "arenaInterest": "sum",
+                    "default": null,
+                    "description": "If the Player has made thier move for the turn. true means they can no longer move a piece this turn.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "name": {
+                    "default": "Anonymous",
+                    "description": "The name of the player",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "otherPlayer": {
+                    "default": null,
+                    "description": "this player's opponent in the game.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "pieces": {
+                    "default": null,
+                    "description": "All the chess pieces owned by this player.",
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "Piece",
+                            "valueType": null
+                        }
+                    }
+                },
+                "reasonLost": {
+                    "default": null,
+                    "description": "the reason why the player lost the game",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "reasonWon": {
+                    "default": null,
+                    "description": "the reason why the player won the game",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "timeRemaining": {
+                    "default": null,
+                    "description": "The amount of time (in ns) remaining for this AI to send commands.",
+                    "type": {
+                        "keyType": null,
+                        "name": "float",
+                        "valueType": null
+                    }
+                },
+                "won": {
+                    "default": false,
+                    "description": "if the player won the game or not",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A player in this game. Every AI controls one player.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        }
+    }
+}

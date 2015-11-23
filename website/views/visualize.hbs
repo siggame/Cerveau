@@ -410,6 +410,66 @@ gameInit = function(gameName) {
 				}
 			};
 			break;
+		case "Chess":
+			gameBoard.init = function(data) {
+				makeTable(data.ranks, data.files);
+
+				for(var y = 0; y < data.ranks; y++) {
+					for(var x = 0; x < data.files; x++) {
+						var cell = tableCells[x][y];
+
+						if(!cell.hasClass("legend")) {
+							if((x + y)%2 == 1) {
+								cell.addClass("valid");
+							}
+							else {
+								cell.addClass("invalid");
+							}
+						}
+					}
+				}
+			};
+
+			gameBoard.update = function(game, state) {
+				var chars = {
+					King: "&#9818;",
+					Queen: "&#9819;",
+					Rook: "&#9820;",
+					Bishop: "&#9821;",
+					Knight: "&#9822;",
+					Pawn: "&#9823;"
+				};
+
+				var locations = [];
+				for(var x = 0; x < game.ranks; x++) {
+					locations[x] = [];
+				}
+
+				for(var i = 0; i < game.pieces.length; i++) {
+					var piece = game.gameObjects[game.pieces[i].id];
+					locations[piece.rank][piece.file] = piece;
+				}
+
+				for(var x = 0; x < game.ranks; x++) {
+					for(var y = 0; y < game.files; y++) {
+						var cell = tableCells[x][y];
+						var piece = locations[x][y];
+						var val = "&nbsp;";
+
+						if(piece) {
+							val = chars[piece.type];
+							cell.addClass("owner-" + piece.owner.id);
+						}
+						else {
+							cell.removeClass("owner-0 owner-1");
+						}
+
+						cell.html(val);
+						cell._jsonifyThis = piece;
+					}
+				}
+			};
+			break;
 		case "Anarchy":
 			$("#main").css("max-width", "1400px");
 			gameBoard.init = function(data) {
