@@ -2,7 +2,7 @@ var Class = require(__basedir + "/utilities/class");
 var GameLogger = require("./gameLogger");
 var clientClasses = {
     TCPClient: require("./tcpClient"),
-    WSClient: require("./wsClient"),
+    //WSClient: require("./wsClient"),
 };
 
 var extend = require("extend");
