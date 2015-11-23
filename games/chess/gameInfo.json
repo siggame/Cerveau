@@ -31,7 +31,6 @@
             "files",
             "gameObjects",
             "maxTurns",
-            "moves",
             "pieces",
             "players",
             "ranks",
@@ -94,19 +93,6 @@
                     "keyType": null,
                     "name": "int",
                     "valueType": null
-                }
-            },
-            "moves": {
-                "default": null,
-                "description": "Each move made in the game. Indexed by turn number.",
-                "type": {
-                    "keyType": null,
-                    "name": "list",
-                    "valueType": {
-                        "keyType": null,
-                        "name": "Move",
-                        "valueType": null
-                    }
                 }
             },
             "pieces": {
