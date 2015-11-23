@@ -31,8 +31,8 @@ var Session = Class(Server, {
      *
      * @override
      */
-    addSocket: function(socket, clientInfo) {
-        Server.addSocket.call(this, socket, clientInfo);
+    addSocket: function(/* ... */) {
+        Server.addSocket.apply(this, arguments);
 
         if(this.getClientsPlaying().length === this.game.numberOfPlayers) {
             this.start();

@@ -304,7 +304,7 @@ var Lobby = Class(Server, {
                 client.setInfo({
                     name: data.playerName,
                     type: data.clientType,
-                    spectating: data.spectating,
+                    spectating: Boolean(data.spectating),
                     gameSession: gameSession,
                 });
 

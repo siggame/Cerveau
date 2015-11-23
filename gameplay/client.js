@@ -1,6 +1,8 @@
 var Class = require(__basedir + "/utilities/class");
 var log = require("./log");
 
+var DEFAULT_STR = "Unknown";
+
 /*
  * @class
  * @classdesc the basic implimentation of a connection to the server via some io. Should be inheritired and implimented with that IO. This is just a base class.
@@ -9,6 +11,12 @@ var log = require("./log");
 var Client = Class({
     init: function(socket, server, info) {
         this.socket = socket;
+
+        this.name = DEFAULT_STR;
+        this.type = DEFAULT_STR;
+        this.connectionType = DEFAULT_STR;
+        this.gameSession = undefined;
+        this.spectating = false;
 
         this.setInfo(info);
 
@@ -46,11 +54,11 @@ var Client = Class({
      */
     setInfo: function(data) {
         data = data || {};
-        this.connectionType = this.connectionType || data.connectionType;
-        this.name = String(data.hasOwnProperty("name") ? data.name : "No Name");
-        this.type = String(data.hasOwnProperty("type") ? data.type : "Unknown");
-        this.gameSession = data.gameSession; // when in lobby
-        this.spectating = Boolean(data.spectating);
+        for(var key in data) {
+            if(data.hasOwnProperty(key) && this.hasOwnProperty(key)) {
+                this[key] = data[key];
+            }
+        }
     },
 
     /**
