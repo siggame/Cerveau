@@ -24,7 +24,8 @@ var log = function(/* ... */) {
 log.error = function(/* ... */) {
     if(arguments[0] instanceof Error) {
         var err = arguments[0];
-        arguments[0] = "Error logged: " + os.EOL + err.name + os.EOL + err.message + os.EOL + "---" + os.EOL + err.stack + "---";
+        console.log(err.loc);
+        arguments[0] = "Error logged:\n{name}\n---\n{message}\n---\n{stack}\n---\n{syscall}\n---".format(err);
     }
     _obj.log(arguments, colors.red.bold);
 };
