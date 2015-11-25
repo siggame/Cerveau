@@ -69,6 +69,9 @@ var Piece = Class(GameObject, {
         this.captured = false;
         this.hasMoved = false;
 
+        // not exposed to AIs
+        this.validMoves = [];
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -88,15 +91,342 @@ var Piece = Class(GameObject, {
     move: function(player, rank, file, promotionType, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Piece's move function here
-        return false;
+        var reason;
+        if(this.owner !== player) {
+            reason = "Tried to move {self} which is not owned by you.";
+        }
+        else if(this.game.pieceMovedThisTurn) {
+            reason = "Tried to move another {self} after having already moved a Piece this turn.";
+        }
+        else if(rank < 0 || file < 0 || rank >= this.game.ranks || file >= this.game.files) {
+            reason = "Movement to ({rank}, {file}) is out of bounds of the board.";
+        }
+        else if(rank === this.rank && file === this.file) {
+            reason = "{self} is already on ({rank}, {file}).";
+        }
+        else { // type specific movement
+            reason = this["move" + this.type].apply(this, arguments);
+            if(reason) {
+                reason = "{default} - " + reason;
+            }
+            else if(reason === "") {
+                reason = "{default}";
+            }
+        }
+
+        if(typeof(reason) === "string") {
+            var move = "from ({0}, {1}) to ({2}, {3})".format(this.rank, this.file, rank, file);
+            return game.logicError(false, reason.format({
+                self: this.toString(),
+                move: move,
+                rank: rank,
+                file: file,
+                'default': this.toString() + " cannot move " + move,
+            }));
+        }
+
+        // if we got here it's valid!
+        var captured = this.game.getPieceAt(rank, file);
+
+        if(captured) {
+            captured.captured = true;
+            captured.rank = -1;
+            captured.file = -1;
+        }
+
+        this.game.board[this.rank][this.file] = null;
+
+        this.rank = rank;
+        this.file = file;
+        this.hasMoved = true;
+        this.game.board[rank][file] = this;
 
         // <<-- /Creer-Merge: move -->>
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    toString: function() {
+        return "Piece '{type}' #{id}".format(this);
+    },
+
+    // movePieceType functions should return:
+    //  {string} - if the move was invalid this is the reason why
+    //  {Piece} - if the move captured a piece then return the captured piece
+    //  {false} -- false means to use the default "move not valid" error message
+
+    generateValidMoves: function() {
+        this.validMoves.length = 0;
+        this["_generateValidMovesFor" + this.type].apply(this);
+    },
+
+    _generateValidMovesForRook: function() {
+        this._generateValidMovesForRookStraitLine(this.rank + 1, this.game.ranks, "file"); // move right
+        this._generateValidMovesForRookStraitLine(this.rank - 1, 0, "file"); // move left
+        this._generateValidMovesForRookStraitLine(this.file + 1, this.game.files, "rank"); // move up
+        this._generateValidMovesForRookStraitLine(this.file - 1, 0, "rank"); // move down
+    },
+
+    _generateValidMovesForRookStraitLine: function(start, end, staticKey) {
+        if(start < end) {
+            for(var i = start; i < end; i++) {
+                if(this._generateValidMovesForRookStraitIsValid(i, staticKey)) {
+                    break;
+                }
+            }
+        }
+        else {
+            for(var i = start; i >= end; i--) {
+                if(this._generateValidMovesForRookStraitIsValid(i, staticKey)) {
+                    break;
+                }
+            }
+        }
+    },
+
+    _generateValidMovesForRookStraitIsValid: function(i, staticKey) {
+        var pos = {
+            rank: i,
+            file: i,
+        };
+
+        pos[staticKey] = this[staticKey];
+
+        return this._checkPositionAndContinue(pos);
+    },
+
+    /**
+     * @returns {boolean} true if you should stop looking (because it was a capture or off board), false otherwise
+     */
+    _checkPositionAndContinue: function(pos, cantCapture, mustCapture) {
+        if(!this.game.isInBounds(pos)) {
+            return true;
+        }
+
+        pos.captures = this.game.getPieceAt(pos);
+
+        if((!mustCapture && !pos.captures) || (!cantCapture && pos.captures.owner !== this.owner)) {
+            this.validMoves.push(pos);
+        }
+
+        return !pos.captures;
+    },
+
+    _generateValidMovesForBishop: function() {
+        for(var rankScalar = -1; rankScalar <= 1; rankScalar += 2) {
+            for(var fileScalar = -1; fileScalar <= 1; fileScalar += 2) {
+                for(var i = 1; true; i++) {
+                    var pos = {
+                        rank: this.rank * rankScalar * i,
+                        file: this.file * fileScalar * i,
+                    };
+
+                    if(this._checkPositionAndContinue(pos)) {
+                        break;
+                    }
+                }
+            }
+        }
+    },
+
+    _generateValidMovesForQueen: function() {
+        this._generateValidMovesForRook();
+        this._generateValidMovesForBishop();
+    },
+
+
+    _knightMoves: [
+        [1, 2],
+        [2, 1],
+        [-1, 2],
+        [-2, 1],
+        [1, -2],
+        [2, -1],
+        [-1, -2],
+        [-2, -1]
+    ],
+
+    _generateValidMovesForKnight: function() {
+        for(var i = 0; i < this._knightMoves.length; i++) {
+            var knightMove = this._knightMoves[i];
+            var pos = {
+                rank: this.rank + knightMove[0],
+                file: this.file + knightMove[1],
+            };
+
+            this._checkPositionAndContinue(pos);
+        }
+    },
+
+    _generateValidMovesForPawn: function() {
+        if(this._checkPositionAndContinue({rank: this.rank, file: this.file + this.owner.fileDirection}, true)) { // then they can move up/down one
+            if(!this.hasMoved) { // then check if it can move two spaces up/down
+                this._checkPositionAndContinue({rank: this.rank, file: this.file + this.owner.fileDirection*2}, true);
+            }
+        }
+
+        this._checkPositionAndContinue({rank: this.rank + 1, file: this.file + this.owner.fileDirection}, false, true); // see if it can capture to the right
+        this._checkPositionAndContinue({rank: this.rank - 1, file: this.file + this.owner.fileDirection}, false, true); // -- and to the left
+    },
+
+    _generateValidMovesForKing: function() {
+        for(var rank = -1; rank <= 1; rank++) {
+            for(var file = -1; file <= 1; file++) {
+                if(rank !== 0 && file !== 0) {
+                    var pos = {
+                        rank: this.rank + rank,
+                        file: this.file + file,
+                    };
+
+                    if(!this.game.inCheckBoard[pos.rank][pos.file]) { // then that position would not put the king in check, so it may be valid
+                        this._checkPositionAndContinue(pos);
+                    }
+                }
+            }
+        }
+    },
+
+    /*
+    movePawn: function(player, rank, file, promotionType, asyncReturn) {
+        var forceAdvanceCheck = false;
+        var deltaFile = (file - this.file);
+        var pieceAtPos = this.game.getPieceAt(rank, file);
+        var validPromotion = this.game.pieceTypes.contains(promotionType) && promotionType !== "Pawn" && promotionType !== "King";
+
+        if(player.fileDirection > 0) {
+            if(file === this.game.files - 1 && !validPromotion) {
+                return "Requires a valid promotion type the Pawn but '{0}'' is not valid.".format(promotionType);
+            }
+        }
+
+        if(rank === this.rank && deltaFile === player.fileDirection*2) {
+            if(this.hasMoved) {
+                return "Cannot advance two spaces after having already moved on a previous turn.";
+            }
+
+            if(pieceAtPos) {
+                return "Cannot advance two spaces because " + pieceAtPos.toString() + " is blocking.";
+            }
+
+            forceAdvanceCheck = true;
+        }
+
+        if(forceAdvanceCheck || (rank === this.rank && deltaFile === player.fileDirection)) { // then they are advancing one space
+            return pieceAtPos ? "Cannot advance one space because " + pieceAtPos.toString() + " is blocking." : undefined;
+        }
+
+        if(deltaFile === player.fileDirection && Math.abs(rank - this.rank) === 1) { // then they are trying to capture
+            return  || "cannot capture because there is no Piece to capture at ({rank}, {file}).";
+        }
+
+        return "";
+    },
+
+    moveKnight: function(player, rank, file, promotionType, asyncReturn) {
+        var absDeltaFile = Math.abs(file - this.file);
+        var absDeltaRank = Math.abs(rank - this.rank);
+
+        if((absDeltaFile === 2 && absDeltaRank === 1) || (absDeltaFile === 1 && absDeltaRank === 2)) {
+            return;
+        }
+
+        return "";
+    },
+
+    moveRook: function(player, rank, file, promotionType, asyncReturn) {
+        var args = {
+            rank: rank,
+            file: file,
+        };
+
+        var movingAxis;
+        var staticAxis;
+        if(rank === this.rank && file !== this.file) {
+            staticAxis = "rank";
+            movingAxis = "file";
+        }
+
+        if(rank !== this.rank && file === this.file) {
+            staticAxis = "file";
+            movingAxis = "rank";
+        }
+
+        if(movingAxis && staticAxis) {
+            var min = Math.min(args[movingAxis], this[movingAxis]);
+            var max = Math.max(args[movingAxis], this[movingAxis]);
+
+            for(var i = min+1; i< max-1; i++) {
+                var blocking;
+                var pos = {
+                    rank: rank,
+                    file: file,
+                };
+
+                pos[movingAxis] = i;
+
+                var blocking = this.game.getPieceAt(pos);
+                if(blocking) {
+                    return blocking.toString() + " is blocking at (" + pos.rank + ", " + pos.file + ")";
+                }
+            }
+
+            return;
+        }
+
+        return "";
+    },
+
+    moveBishop: function(player, rank, file, promotionType, asyncReturn) {
+        var deltaFile = file - this.file;
+        var deltaRank = rank - this.rank;
+        var absDeltaFile = Math.abs(deltaFile);
+        var absDeltaRank = Math.abs(deltaRank);
+
+        if(absDeltaFile === absDeltaRank) { // then they are moving diagonally
+            var count = absDeltaRank;
+            var dr = deltaRank/absDeltaRank;
+            var df = deltaFile/absDeltaFile;
+
+            var r = this.rank;
+            var f = this.file;
+            for(var i = 1; i < count - 2; i++) {
+                r += dr;
+                f += df;
+
+                var blocking = this.game.getPieceAt(r, f);
+                if(blocking) {
+                    return blocking.toString() + " is blocking at (" + r + ", " + f + ")";
+                }
+            }
+
+            return;
+        }
+
+        return "";
+    },
+
+    moveQueen: function(player, rank, file, promotionType, asyncReturn) {
+        if(this.rank === rank || this.file === file) { // then it's moving like a rook
+            return this.moveRook.apply(this, arguments);
+        }
+        // else it's moving like a bishop
+        return this.moveBishop.apply(this, arguments);
+    },
+
+    moveKing: function(player, rank, file, promotionType, asyncReturn) {
+        //TODO: castling
+
+        var absDeltaRank = Math.abs(rank - this.rank);
+        var absDeltaFile = Math.abs(file - this.file);
+        var total = absDeltaRank + absDeltaFile;
+
+        if((totalDelta === 1 || totalDelta === 2) && absDeltaRank < 2 && absDeltaFile < 2) {
+            return;
+        }
+
+        return "";
+    },
+    */
 
     //<<-- /Creer-Merge: added-functions -->>
 

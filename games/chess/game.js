@@ -58,6 +58,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.ranks = 8;
         this.maxTurns = 30;
 
+
+        this.pieceTypes = ["Pawn", "Rook", "Bishop", "Knight", "King", "Queen"];
+        this.board = this.emptyBoard();
+        this.inCheckBoard = this.emptyBoard();
+
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -75,11 +81,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // create the initial board
-        this._board = [];
         for(var rank = 0; rank < this.ranks; rank++) {
-            this._board[rank] = [];
             for(var file = 0; file < this.files; file++) {
-
                 var type = null;
                 if(file === 1 || file === 6) { // then create a pawn
                     type = "Pawn";
@@ -117,16 +120,21 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                         rank: rank,
                         file: file,
                     })
-                    : null
+                    : undefined
                 );
 
-                this._board[rank][file] = piece;
                 if(piece) {
+                    if(piece.type === "King") {
+                        piece.owner.king = piece;
+                    }
+
                     this.pieces.push(piece);
                     piece.owner.pieces.push(piece);
                 }
             }
         }
+
+        this.update();
 
         //<<-- /Creer-Merge: begin -->>
     },
@@ -147,6 +155,111 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     maxInvalidsPerPlayer: 0, // If a player sends an invalid move, they lose.
+
+    isInBounds: function(rank, file) {
+        if(typeof(rank) === "object") {
+            file = rank.file;
+            rank = rank.rank;
+        }
+
+        return (rank >= 0 && rank < this.ranks && file >= 0 && file < this.files);
+    },
+
+    getPieceAt: function(rank, file) {
+        if(typeof(rank) === "object") {
+            file = rank.file;
+            rank = rank.rank;
+        }
+
+        if(!this.isInBounds(rank, file)) {
+            return undefined;
+        }
+
+        return this.board[rank][file];
+    },
+
+    emptyBoard: function(board) {
+        board = board || [];
+        for(var rank = 0; rank < this.ranks; rank++) {
+            board[rank] = board[rank] || [];
+            for(var file = 0; file < this.files; file++) {
+                board[rank][file] = undefined;
+            }
+        }
+
+        return board;
+    },
+
+    /**
+     * @override
+     */
+    nextTurn: function() {
+        this.update();
+
+        var checkmated;
+        var stalement;
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.inCheck = Boolean(this.inCheckBoard[player.king.rank][player.king.file]);
+
+            if(player.inCheck && player.king.validMoves.length === 0) {
+                if(!checkmated) {
+                    checkmated = player;
+                }
+                else {
+                    checkmated = false;
+                    stalement = "Both players checkmated at the same time";
+                }
+            }
+        }
+
+        if(checkmated) {
+            this.declareLoser(checkmated, "Checkmated");
+            this.declareWinner(checkmated.otherPlayer, "Checkmate!");
+        }
+        else if(stalement) {
+            this.declareLosers(this.players, stalement);
+        }
+
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    update: function() {
+        this.emptyBoard(this.inCheckBoard);
+        this.emptyBoard(this.board);
+
+        this.updatePieces();
+    },
+
+    updatePieces: function() {
+        for(var i = 0; i < this.pieces.length; i++) {
+            var piece = this.pieces[i];
+            this.board[piece.rank][piece.file] = piece;
+        }
+
+        var kings = [];
+        for(var i = 0; i < this.pieces.length; i++) {
+            var piece = this.pieces[i];
+            if(piece.type === "King") {
+                kings.push(piece); // we generate the kings valid moves last as they depend on in check
+            }
+            else {
+                piece.generateValidMoves();
+
+                for(var j = 0; j < piece.validMoves.length; j++) {
+                    var move = piece.validMoves[j];
+
+                    if(move.captures) {
+                        this.inCheckBoard[move.rank][move.file] = piece;
+                    }
+                }
+            }
+        }
+
+        for(var i = 0; i < kings.length; i++) {
+            kings[i].generateValidMoves();
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
