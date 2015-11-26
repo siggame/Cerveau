@@ -42,6 +42,6 @@ process.on("message", function(message, handler) {
     }
 });
 
-/*process.on("uncaughtException", function (err) {
+process.once("uncaughtException", function (err) {
     session.fatal(err);
-});*/
+});

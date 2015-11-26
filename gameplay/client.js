@@ -14,7 +14,6 @@ var Client = Class({
 
         this.name = DEFAULT_STR;
         this.type = DEFAULT_STR;
-        this.connectionType = DEFAULT_STR;
         this.gameSession = undefined;
         this.spectating = false;
 
@@ -124,7 +123,7 @@ var Client = Class({
 
     /**
      * Sets the data related to the game this client is connected to play
-     * 
+     *
      * @param {BaseGame} the game this client has a player playing in
      * @param {Player} the player this ai controls
      */
@@ -182,6 +181,16 @@ var Client = Class({
     isPlaying: function() {
         return !this.spectating;
     },
+
+
+    /**
+     * returns the raw net.Socket used by this client, probably for thread passing. Use with care
+     *
+     * @returns {net.Socket} the socket
+     */
+     getNetSocket: function() {
+        return this.socket;
+     },
 
 
 
