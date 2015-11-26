@@ -1,9 +1,6 @@
 var Class = require(__basedir + "/utilities/class");
 var GameLogger = require("./gameLogger");
-var clientClasses = {
-    TCPClient: require("./tcpClient"),
-    //WSClient: require("./wsClient"),
-};
+var clientClasses = require("./clients");
 
 var extend = require("extend");
 var errors = require("./errors");
@@ -33,15 +30,14 @@ var Server = Class({
     /**
      * Adds a client to this server, after its been created
      *
-     * @param {net.Socket|ws.WebSocket} socket - socket connecting
+     * @param {net.Socket|ws.Client} socket - socket connecting
      * @param {string} connectionType - "TCP" or "WS"
      * @param {Object} [info] - data about the connecting client
      * @returns {Client} newly created client for the passed in socket
      */
     addSocket: function(socket, connectionType, info) {
         info = info || {};
-        info.connectionType = connectionType;
-        var clientClass = clientClasses[connectionType + "Client"];
+        var clientClass = clientClasses[connectionType];
         var client = new clientClass(socket, this, info);
         this.clients.push(client);
 
@@ -90,7 +86,7 @@ var Server = Class({
 
     /**
      * Called from a Client when it's socket disconnects
-     * 
+     *
      * @param {Client} client - the client that disconnected.
      * @param {string} [reason] - human readable string why it disconnected
      * @returns {Client} the same client that disconnected

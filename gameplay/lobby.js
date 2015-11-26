@@ -9,6 +9,7 @@ var Server = require("./server");
 var Authenticator = require("./authenticator");
 var log = require("./log");
 
+var ws = require("lark-websocket");
 var net = require("net");
 var cluster = require("cluster");
 var readline = require("readline");
@@ -23,6 +24,7 @@ var Lobby = Class(Server, {
         this.name = "Lobby @ " + process.pid;
         this.host = args.host;
         this.port = args.port;
+        this.wsPort = args.wsPort;
         this._authenticate = Boolean(args.authenticate); // flag to see if the lobby should authenticate play requests with web server
         this._allowGameSettings = Boolean(args.gameSettings);
         this._profile = Boolean(args.profile);
@@ -50,18 +52,9 @@ var Lobby = Class(Server, {
             self._gameSessionExited(self._threadedGameSessions[worker.process.pid]);
         });
 
-        // create the TCP socket server via node.js's net module
-        this._netServer = net.createServer(function(socket) {
-            self.addSocket(socket, "TCP");
-        });
-
-        this._netServer.listen(this.port, "0.0.0.0", function() {
-            log("--- Lobby listening on port " + self.port + " ---");
-        });
-
-        this._netServer.on("error", function(err) {
-            self._socketError(err);
-        });
+        this._listenerServer = {};
+        this._initializeListener("TCP", net, this.port);
+        this._initializeListener("WS", ws, this.wsPort);
 
         var rl = readline.createInterface({
             input: process.stdin,
@@ -97,6 +90,31 @@ var Lobby = Class(Server, {
                 process.exit(1);
             }
         });
+    },
+
+    /**
+     * Creates and initializes a server that uses a listener pattern identical to net.Server
+     *
+     * @param {string} key - type of server and what type of clients to expect from it
+     * @param {Object} module - the required module that has a createServer method
+     * @param {number} port - port to listen on for this server
+     */
+    _initializeListener: function(key, module, port) {
+        var self = this;
+
+        var listener = module.createServer(function(socket) {
+            self.addSocket(socket, key);
+        });
+
+        listener.listen(port, "0.0.0.0", function() {
+            log("--- Lobby listening on port {0} for {1} Clients ---".format(port, key));
+        });
+
+        listener.on("error", function(err) {
+            self._socketError(err);
+        });
+
+        this._listenerServer[key] = listener;
     },
 
     /**
@@ -402,7 +420,7 @@ var Lobby = Class(Server, {
             for(var i = 0; i < clients.length; i++) {
                 var client = clients[i];
                 client.stopListeningToSocket(); // we are about to send it, so we don't want this client object listening to it, as we no longer care.
-                gameSession.worker.send("socket", client.socket);
+                gameSession.worker.send("socket", client.getNetSocket());
 
                 self.clients.removeElement(client); // the client is no longer ours, we sent it (via socket) to the worker thread
                 gameSession.clients.removeElement(client);

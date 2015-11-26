@@ -41,3 +41,7 @@ process.on("message", function(message, handler) {
         socketIndex++;
     }
 });
+
+process.once("uncaughtException", function (err) {
+    session.fatal(err);
+});

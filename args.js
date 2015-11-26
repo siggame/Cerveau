@@ -1,7 +1,9 @@
 var ArgumentParser = require('argparse').ArgumentParser;
 var parser = new ArgumentParser({description: "Run the JavaScript client with options to connect to a game server. Must provide a game name to play."});
 var parserArgs = [
-    [["-p", "--port"], {action: "store", dest: "port", defaultValue: 3000, help: "the port that clients should connect through"}],
+    [["-p", "--port"], {action: "store", dest: "port", defaultValue: 3000, help: "the port that TCP clients should connect through."}],
+    [["--http-port"], {action: "store", dest: "httpPort", defaultValue: 3080, help: "the port that the webinterface should be accessed through."}],
+    [["--ws-port"], {action: "store", dest: "wsPort", defaultValue: 3088, help: "the port that WebSocket clients should connect though."}],
     [["-H", "--host"], {action: "store", dest: "host", defaultValue: "0.0.0.0", help: "the host that this should run on"}],
     [["--authenticate"], {action: "storeTrue", dest: "authenticate", help: "forces clients to authenticate against the authentication server"}],
     [["--profile"], {action: "storeTrue", dest: "profile", help: "run the v8 profilers against threaded game sessions."}],

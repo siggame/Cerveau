@@ -18,12 +18,38 @@ var Session = Class(Server, {
         this._needToSendStart = true;
         this._sentOver = false;
         this._deltas = []; // A record of all deltas generated and sent, to store in the gamelog
+        this._fatal = false;
+        this._addedClients = 0;
 
         this.name = args.gameName + " - " + args.gameSession + " @ " + process.pid;
-        this.game = new args.gameClass(args.gameSettings);
+        //try {
+            this.game = new args.gameClass(args.gameSettings);
+        try{}
+        catch(err) {
+            this.fatal(err);
+        }
 
         this._profiler = args.profiler;
         this._visualizerLink = args.visualizerLink;
+    },
+
+    /**
+     * When a fatal (unhandled) error occurs we need to exit and kill all clients. this does that
+     *
+     * @param {Error} err - the unhandled error
+     */
+    fatal: function(err) {
+        log.error(err);
+        this._fatal = true;
+
+        for(var i = 0; i < this.clients.length; i++) {
+            this.clients[i].send("fatal", {message: "An unhandled fatal error occured on the server."});
+        }
+
+        if(this._addedClients === this._initArgs.clientInfos.length) {
+            this.end({ fatal: true });
+        }
+        // else we don't have all our clients to tell them of this terrible event :(
     },
 
     /**
@@ -32,11 +58,23 @@ var Session = Class(Server, {
      * @override
      */
     addSocket: function(/* ... */) {
-        Server.addSocket.apply(this, arguments);
+        var client = Server.addSocket.apply(this, arguments);
+        this._addedClients++;
 
-        if(this.getClientsPlaying().length === this.game.numberOfPlayers) {
-            this.start();
+        if(this._fatal) {
+            client.send("fatal", {message: "An unhandled fatal error occured on the server."});
         }
+
+        if(this._addedClients === this._initArgs.clientInfos.length) {
+            if(this._fatal) {
+                this.end({ fatal: true });
+            }
+            else {
+                this.start();
+            }
+        }
+
+        return client;
     },
 
     /**
@@ -50,13 +88,13 @@ var Session = Class(Server, {
 
     /**
      * Overridden so that when a client disconnects we can check if the game needs to end.
-     * 
+     *
      * @override
      */
     clientDisconnected: function(client, reason) {
         Server.clientDisconnected.call(this, client);
 
-        if(!this.game.isOver()) {
+        if(this.game && !this.game.isOver()) {
             if(client.player) {
                 this.game.playerDisconnected(client.player, reason);
 
@@ -86,18 +124,29 @@ var Session = Class(Server, {
     /**
      * Called when the game ends, so that this thread "ends"
      */
-    end: function() {
-        if(this._profiler) {
-            var profile = this._profiler.stopProfiling();
-            profile.export(function(error, result) {
-                fs.writeFileSync('output/profiles/profile-' + this.game.name + '-' + this.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
-                profile.delete();
-                process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
-            });
-        }
-        else {
-            process.exit(0);
-        }
+    end: function(data) {
+        var self = this;
+        process.send(data || {}, undefined, function(err) {
+            if(err) {
+                log.error("Error sending data from game session thread to master lobby thread...");
+                log.error(err);
+            }
+            else {
+                log(self._fatal ? "Fatal error occured, exiting" : "Game is over, exiting.");
+            }
+
+            if(self._profiler) {
+                var profile = self._profiler.stopProfiling();
+                profile.export(function(error, result) {
+                    fs.writeFileSync('output/profiles/profile-' + self.game.name + '-' + self.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
+                    profile.delete();
+                    process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
+                });
+            }
+            else {
+                process.exit(0);
+            }
+        });
     },
 
     /**
@@ -186,18 +235,7 @@ var Session = Class(Server, {
         }
 
         this._updateDeltas("over");
-
-        var self = this;
-        process.send({ gamelog: gamelog }, undefined, function(err) {
-            if(err) {
-                log.error("Error sending the gamelog from game session thread to master lobby thread...");
-                log.error(err);
-            }
-            else {
-                log("Game is over, exiting.");
-            }
-            self.end();
-        });
+        this.end({ gamelog: gamelog });
     },
 
     /**
