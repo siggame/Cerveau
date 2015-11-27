@@ -58,11 +58,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.ranks = 8;
         this.maxTurns = 30;
 
-
+        // variables not exposed to AIs
+        this.pieceMovedThisTurn = null;
         this.pieceTypes = ["Pawn", "Rook", "Bishop", "Knight", "King", "Queen"];
+        this.validPromotionTypes = ["Rook", "Bishop", "Knight", "Queen"];
         this.board = this.emptyBoard();
-        this.inCheckBoard = this.emptyBoard();
-
+        this.inCheckBoardFor = {}; // mapping of player ids to 2D Arrays (boards)
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -79,6 +80,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+
+        for(var i = 0; i < this.players.length; i++) {
+            this.inCheckBoardFor[this.players[i].id] = this.emptyBoard();
+        }
 
         // create the initial board
         for(var rank = 0; rank < this.ranks; rank++) {
@@ -194,21 +200,43 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      * @override
      */
     nextTurn: function() {
+        if(!this.pieceMovedThisTurn) {
+            this.declareLoser(this.currentPlayer, "Ended turn {0} without moving a Piece.".format(this.currentTurn));
+            this.declareWinner(this.currentPlayer.otherPlayer, "Other player ({0}) ended turn {1} without moving a Piece.".format(this.currentPlayer, this.currentTurn));
+            return;
+        }
+
         this.update();
 
         var checkmated;
         var stalement;
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            player.inCheck = Boolean(this.inCheckBoard[player.king.rank][player.king.file]);
 
-            if(player.inCheck && player.king.validMoves.length === 0) {
-                if(!checkmated) {
-                    checkmated = player;
-                }
-                else {
-                    checkmated = false;
-                    stalement = "Both players checkmated at the same time";
+        // check for stalement via no valid moves
+        var noMoves = true;
+        var nextPlayer = this.currentPlayer.otherPlayer;
+        for(var i = 0; i < nextPlayer.pieces.length; i++) {
+            if(nextPlayer.pieces[i].validMoves.length > 0) {
+                noMoves = false;
+                break;
+            }
+        }
+
+        if(noMoves) {
+            stalement = "Player {0} has no valid moves, but is not in check.";
+        }
+        else { // check for checkmate
+            for(var i = 0; i < this.players.length; i++) {
+                var player = this.players[i];
+                player.inCheck = Boolean(this.inCheckBoardFor[player.id][player.king.rank][player.king.file]);
+
+                if(player.inCheck && player.king.validMoves.length === 0) { // checkmate!
+                    if(!checkmated) {
+                        checkmated = player;
+                    }
+                    else {
+                        checkmated = false;
+                        stalement = "Both players checkmated at the same time";
+                    }
                 }
             }
         }
@@ -216,16 +244,20 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         if(checkmated) {
             this.declareLoser(checkmated, "Checkmated");
             this.declareWinner(checkmated.otherPlayer, "Checkmate!");
+            return;
         }
         else if(stalement) {
-            this.declareLosers(this.players, stalement);
+            this.declareLosers(this.players, "Stalement! - " + stalement);
+            return;
         }
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
 
     update: function() {
-        this.emptyBoard(this.inCheckBoard);
+        for(var i = 0; i < this.players.length; i++) {
+            this.emptyBoard(this.inCheckBoardFor[this.players[i].id]);
+        }
         this.emptyBoard(this.board);
 
         this.updatePieces();
@@ -250,7 +282,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                     var move = piece.validMoves[j];
 
                     if(move.captures) {
-                        this.inCheckBoard[move.rank][move.file] = piece;
+                        this.inCheckBoardFor[move.captures.owner.otherPlayer.id][move.rank][move.file] = piece;
                     }
                 }
             }

@@ -91,72 +91,76 @@ var Piece = Class(GameObject, {
     move: function(player, rank, file, promotionType, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var reason;
+        var reason = "Move {move} is invalid for {self}"; // default reason why this move is invalid
+
         if(this.owner !== player) {
             reason = "Tried to move {self} which is not owned by you.";
         }
         else if(this.game.pieceMovedThisTurn) {
-            reason = "Tried to move another {self} after having already moved a Piece this turn.";
+            reason = "Tried to move {self} after having already moved a Piece this turn.";
         }
-        else if(rank < 0 || file < 0 || rank >= this.game.ranks || file >= this.game.files) {
+        else if(!this.game.isInBounds(file, rank)) {
             reason = "Movement to ({rank}, {file}) is out of bounds of the board.";
         }
         else if(rank === this.rank && file === this.file) {
             reason = "{self} is already on ({rank}, {file}).";
         }
-        else { // type specific movement
-            reason = this["move" + this.type].apply(this, arguments);
-            if(reason) {
-                reason = "{default} - " + reason;
+        else { // let's see if it's valid
+            for(var i = 0; i < this.validMoves.length; i++) {
+                var move = this.validMoves[i];
+                if(rank === move.rank && file === move.file) { // then it's valid!
+                    if(move.promotes) {
+                        if(this.type !== "Pawn" && this.game.validPromotionTypes.contains(promotionType)) {
+                            reason = "PromotionType '{promotionType}' is not valid.";
+                            break;
+                        }
+
+                        this.type = promotionType;
+                    }
+
+                    this.rank = move.rank;
+                    this.file = move.file;
+
+                    var capturedPiece = move.captures;
+                    if(capturedPiece) {
+                        capturedPiece.captured = true;
+                        capturedPiece.rank = -1; // move off board to also signify it has been captured
+                        capturedPiece.file = -1;
+                    }
+
+                    // TODO: castling moves two pieces, and would need to be handled here somehow.
+
+                    return true; // move was valid, and has now been handled.
+                }
             }
-            else if(reason === "") {
-                reason = "{default}";
-            }
         }
 
-        if(typeof(reason) === "string") {
-            var move = "from ({0}, {1}) to ({2}, {3})".format(this.rank, this.file, rank, file);
-            return game.logicError(false, reason.format({
-                self: this.toString(),
-                move: move,
-                rank: rank,
-                file: file,
-                'default': this.toString() + " cannot move " + move,
-            }));
-        }
-
-        // if we got here it's valid!
-        var captured = this.game.getPieceAt(rank, file);
-
-        if(captured) {
-            captured.captured = true;
-            captured.rank = -1;
-            captured.file = -1;
-        }
-
-        this.game.board[this.rank][this.file] = null;
-
-        this.rank = rank;
-        this.file = file;
-        this.hasMoved = true;
-        this.game.board[rank][file] = this;
+        // if we got here the move was invalid for some reason, so format it up.
+        return game.logicError(false, reason.format({
+            self: this.toString(),
+            move: "from ({0}, {1}) to ({2}, {3})".format(this.rank, this.file, rank, file),
+            rank: rank,
+            file: file,
+            promotionType: promotionType,
+        }));
 
         // <<-- /Creer-Merge: move -->>
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    /**
+     * @override
+     */
     toString: function() {
         return "Piece '{type}' #{id}".format(this);
     },
 
-    // movePieceType functions should return:
-    //  {string} - if the move was invalid this is the reason why
-    //  {Piece} - if the move captured a piece then return the captured piece
-    //  {false} -- false means to use the default "move not valid" error message
-
+    /**
+     * Generates all the possible validMoves for this piece
+     */
     generateValidMoves: function() {
-        this.validMoves.length = 0;
+        this.validMoves.length = 0; // empties out the validMoves array, as we will be generating that next
         this["_generateValidMovesFor" + this.type].apply(this);
     },
 
@@ -196,6 +200,11 @@ var Piece = Class(GameObject, {
     },
 
     /**
+     * Checks if a position is valid to be added to this Piece's valid moves, and does so if valid. returns if you should continue looking
+     *
+     * @param {Object} pos - pos.rank and pos.file
+     * @param {boolean} [cantCapture] - override the default behavior because this piece can't capture other pieces at this pos
+     * @param {boolean} [mustCapture] - override the default behavior because this peice MUST capture another piece at this pos
      * @returns {boolean} true if you should stop looking (because it was a capture or off board), false otherwise
      */
     _checkPositionAndContinue: function(pos, cantCapture, mustCapture) {
@@ -267,6 +276,16 @@ var Piece = Class(GameObject, {
 
         this._checkPositionAndContinue({rank: this.rank + 1, file: this.file + this.owner.fileDirection}, false, true); // see if it can capture to the right
         this._checkPositionAndContinue({rank: this.rank - 1, file: this.file + this.owner.fileDirection}, false, true); // -- and to the left
+
+        // TODO: en passant here
+
+        for(var i = 0; i < this.validMoves.length; i++) {
+            var move = this.validMoves[i];
+
+            if((this.owner.fileDirection > 0 && move.file === this.game.files-1) || (this.owner.fileDirection < 0 && move.file === 0)) {
+                move.promotes = true;
+            }
+        }
     },
 
     _generateValidMovesForKing: function() {
@@ -278,155 +297,13 @@ var Piece = Class(GameObject, {
                         file: this.file + file,
                     };
 
-                    if(!this.game.inCheckBoard[pos.rank][pos.file]) { // then that position would not put the king in check, so it may be valid
+                    if(!this.game.inCheckBoardFor[this.owner.id][pos.rank][pos.file]) { // then that position would not put the king in check, so it may be valid
                         this._checkPositionAndContinue(pos);
                     }
                 }
             }
         }
     },
-
-    /*
-    movePawn: function(player, rank, file, promotionType, asyncReturn) {
-        var forceAdvanceCheck = false;
-        var deltaFile = (file - this.file);
-        var pieceAtPos = this.game.getPieceAt(rank, file);
-        var validPromotion = this.game.pieceTypes.contains(promotionType) && promotionType !== "Pawn" && promotionType !== "King";
-
-        if(player.fileDirection > 0) {
-            if(file === this.game.files - 1 && !validPromotion) {
-                return "Requires a valid promotion type the Pawn but '{0}'' is not valid.".format(promotionType);
-            }
-        }
-
-        if(rank === this.rank && deltaFile === player.fileDirection*2) {
-            if(this.hasMoved) {
-                return "Cannot advance two spaces after having already moved on a previous turn.";
-            }
-
-            if(pieceAtPos) {
-                return "Cannot advance two spaces because " + pieceAtPos.toString() + " is blocking.";
-            }
-
-            forceAdvanceCheck = true;
-        }
-
-        if(forceAdvanceCheck || (rank === this.rank && deltaFile === player.fileDirection)) { // then they are advancing one space
-            return pieceAtPos ? "Cannot advance one space because " + pieceAtPos.toString() + " is blocking." : undefined;
-        }
-
-        if(deltaFile === player.fileDirection && Math.abs(rank - this.rank) === 1) { // then they are trying to capture
-            return  || "cannot capture because there is no Piece to capture at ({rank}, {file}).";
-        }
-
-        return "";
-    },
-
-    moveKnight: function(player, rank, file, promotionType, asyncReturn) {
-        var absDeltaFile = Math.abs(file - this.file);
-        var absDeltaRank = Math.abs(rank - this.rank);
-
-        if((absDeltaFile === 2 && absDeltaRank === 1) || (absDeltaFile === 1 && absDeltaRank === 2)) {
-            return;
-        }
-
-        return "";
-    },
-
-    moveRook: function(player, rank, file, promotionType, asyncReturn) {
-        var args = {
-            rank: rank,
-            file: file,
-        };
-
-        var movingAxis;
-        var staticAxis;
-        if(rank === this.rank && file !== this.file) {
-            staticAxis = "rank";
-            movingAxis = "file";
-        }
-
-        if(rank !== this.rank && file === this.file) {
-            staticAxis = "file";
-            movingAxis = "rank";
-        }
-
-        if(movingAxis && staticAxis) {
-            var min = Math.min(args[movingAxis], this[movingAxis]);
-            var max = Math.max(args[movingAxis], this[movingAxis]);
-
-            for(var i = min+1; i< max-1; i++) {
-                var blocking;
-                var pos = {
-                    rank: rank,
-                    file: file,
-                };
-
-                pos[movingAxis] = i;
-
-                var blocking = this.game.getPieceAt(pos);
-                if(blocking) {
-                    return blocking.toString() + " is blocking at (" + pos.rank + ", " + pos.file + ")";
-                }
-            }
-
-            return;
-        }
-
-        return "";
-    },
-
-    moveBishop: function(player, rank, file, promotionType, asyncReturn) {
-        var deltaFile = file - this.file;
-        var deltaRank = rank - this.rank;
-        var absDeltaFile = Math.abs(deltaFile);
-        var absDeltaRank = Math.abs(deltaRank);
-
-        if(absDeltaFile === absDeltaRank) { // then they are moving diagonally
-            var count = absDeltaRank;
-            var dr = deltaRank/absDeltaRank;
-            var df = deltaFile/absDeltaFile;
-
-            var r = this.rank;
-            var f = this.file;
-            for(var i = 1; i < count - 2; i++) {
-                r += dr;
-                f += df;
-
-                var blocking = this.game.getPieceAt(r, f);
-                if(blocking) {
-                    return blocking.toString() + " is blocking at (" + r + ", " + f + ")";
-                }
-            }
-
-            return;
-        }
-
-        return "";
-    },
-
-    moveQueen: function(player, rank, file, promotionType, asyncReturn) {
-        if(this.rank === rank || this.file === file) { // then it's moving like a rook
-            return this.moveRook.apply(this, arguments);
-        }
-        // else it's moving like a bishop
-        return this.moveBishop.apply(this, arguments);
-    },
-
-    moveKing: function(player, rank, file, promotionType, asyncReturn) {
-        //TODO: castling
-
-        var absDeltaRank = Math.abs(rank - this.rank);
-        var absDeltaFile = Math.abs(file - this.file);
-        var total = absDeltaRank + absDeltaFile;
-
-        if((totalDelta === 1 || totalDelta === 2) && absDeltaRank < 2 && absDeltaFile < 2) {
-            return;
-        }
-
-        return "";
-    },
-    */
 
     //<<-- /Creer-Merge: added-functions -->>
 
