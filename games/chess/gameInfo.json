@@ -444,6 +444,7 @@
             "attribute_names": [
                 "clientType",
                 "fileDirection",
+                "inCheck",
                 "lost",
                 "madeMove",
                 "name",
@@ -470,6 +471,15 @@
                     "type": {
                         "keyType": null,
                         "name": "int",
+                        "valueType": null
+                    }
+                },
+                "inCheck": {
+                    "default": null,
+                    "description": "true if this player is currently in check, and must move out of check.",
+                    "type": {
+                        "keyType": null,
+                        "name": "boolean",
                         "valueType": null
                     }
                 },
