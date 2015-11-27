@@ -1,5 +1,5 @@
 // ${header}
-// Note: You should never modify this file.
+// Note: You should never modify this file... probably.
 <%include file="functions.noCreer" />
 var GameManager = require(__basedir + "/gameplay/shared/gameManager");
 var serializer = require(__basedir + "/gameplay/serializer");
@@ -41,6 +41,12 @@ else:
 % endif
         },
 % endfor
+
+${merge("        //", "secret-" + game_obj_name, """
+        // if you want to add a \"secret\" method that clients don't publicly know about, but can call, do so here. Best use case is an easy way for human clients to ask for special game information, otherwise forget this exists.
+
+""")}
+
     },
 % endfor
 });

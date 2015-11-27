@@ -228,7 +228,7 @@ var BaseGame = Class(DeltaMergeable, {
 
             var returned = serializer.deserialize(data, this);
             returned = this._gameManager.sanitizeFinished(order, returned);
-            
+
             var hadCallback = true;
             if(order.callback) {
                 order.callback(returned);
@@ -251,7 +251,7 @@ var BaseGame = Class(DeltaMergeable, {
 
     /**
      * Called when a session gets the "run" event from an ai (client), meaning they want the game to run some game logic.
-     * 
+     *
      * @param {Player} player - the player this ai controls
      * @param {Object} data - serialized data containing what game logic to run.
      * @returns {Promise} A promise that should eventually resolve to whatever the game logic returned from running the 'run' command.
@@ -261,7 +261,23 @@ var BaseGame = Class(DeltaMergeable, {
         var runCallback = run.caller[run.functionName];
         var ran = {};
 
-        var argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
+        var argsArray;
+        var sendError;
+        try {
+            argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
+        }
+        catch(err) {
+            if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
+                return new Promise(function(resolve, reject) {
+                    log.error(err.toString());
+                    reject(err);
+                });
+            }
+            else {
+                throw err;
+            }
+        }
+
         var asyncReturnWrapper = {}; // just an object both asyncReturn and the promise have scope to to pass things to and from.
         var asyncReturn = function(asyncReturnValue) { asyncReturnWrapper.callback(asyncReturnValue); }; // callback function setup below
 

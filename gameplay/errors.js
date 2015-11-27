@@ -11,11 +11,16 @@ var CerveauError = Class({
     init: function(message, data) {
         this.message = message;
         this.data = data;
-    }
+    },
+
+    toString: function() {
+        return "Cerveau Error:\n{0}".format(this.message);
+    },
 })
 
 module.exports = {
     CerveauError: CerveauError,
     GameLogicError: Class(CerveauError),
     EventDataError: Class(CerveauError),
+    GameStructureError: Class(CerveauError),
 };
