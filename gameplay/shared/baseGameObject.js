@@ -28,6 +28,16 @@ var BaseGameObject = Class(DeltaMergeable, {
     log: function(player, message, asyncReturn) {
         this.logs.push(message);
     },
+
+    toString: function() {
+        var str = "{gameObjectName} #{id}";
+
+        if(this.gameObjectName === "Player") { // every game will have a 'Player' game object, but we don't have a BasePlayer object in Cerveau.
+            str = "{gameObjectName} '{name}' #{id}";
+        }
+
+        return str.format(this);
+    },
 });
 
 module.exports = BaseGameObject;
