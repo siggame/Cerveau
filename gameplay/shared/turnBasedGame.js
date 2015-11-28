@@ -38,7 +38,7 @@ var TurnBasedGame = Class(BaseGame, {
 
     /**
      * Called when an AI has finished their turn, if they returned true from that then they want to end their turn.
-     * 
+     *
      * @param {Player} player for the ai that finished a runTurn()
      * @param {boolean} true when they finished their turn, false otherwise (which re-runs their turn)
      */

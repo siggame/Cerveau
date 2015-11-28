@@ -32,6 +32,8 @@ var BaseGame = Class(DeltaMergeable, {
         this._hasStarted = false;
         this._over = false;
         this._nextGameObjectID = 0;
+        this._winners = [];
+        this._losers = [];
 
         this._initGameManager();
     },
@@ -136,6 +138,15 @@ var BaseGame = Class(DeltaMergeable, {
     playerDisconnected: function(player, reason) {
         if(player && this.hasStarted() && !this.isOver()) {
             this.declareLoser(player, reason || "Disconnected during gameplay.");
+
+            if(this._losers.length === this.players.length - 1) { // only one player left in the game, he wins!
+                for(var i = 0; i < this.players.length; i++) {
+                    var player = this.players[i];
+                    if(!player.lost) {
+                        this.declareWinner(player, "All other players lost.");
+                    }
+                }
+            }
         }
     },
 
@@ -264,6 +275,7 @@ var BaseGame = Class(DeltaMergeable, {
         var argsArray;
         var sendError;
         try {
+            data.isSecret = this._gameManager.isSecret(run.caller.gameObjectName, run.functionName);
             argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
         }
         catch(err) {
@@ -316,8 +328,8 @@ var BaseGame = Class(DeltaMergeable, {
                 data: returned.data,
             });
 
-            if(player.invalids.length > this.maxInvalidsPerPlayer) {
-                this.declareLoser(player, "Exceeded max amount of invalids in one game (" + this.maxInvalidsPerPlayer + ").");
+            if(player.invalids.length > this.maxInvalidsPerPlayer && !player.lost) {
+                this.declareLoser(player, "Exceeded max amount of invalids in one game ({0}).".format(this.maxInvalidsPerPlayer));
             }
         }
         else {
@@ -435,7 +447,7 @@ var BaseGame = Class(DeltaMergeable, {
 
     /**
      * Checks if a game is over, or sets if a game is over
-     * 
+     *
      * @param {boolean} [isOver] - if you pass in true this sets the game to over
      * @returns {boolean} true if this game is over, false otherwise
      */
@@ -481,21 +493,29 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Array.<Player>} losers - the players that lost the game
      * @param {string} [reason] - human readable string that is the lose reason
-     * @param {Object} [flags]
-     * @param   {boolean} [flags.dontCheckForWinner] - skips checking for a winner after declareing a loser
      */
-    declareLosers: function(losers, reason, flags) {
+    declareLosers: function(losers, reason) {
         for(var i = 0; i < losers.length; i++) {
-            var loser = losers[i];
-            loser.lost = true;
-            loser.reasonLost = reason || "Lost";
-            loser.won = false;
-            loser.reasonWon = "";
+            this._actuallyMakeLoser(losers[i], reason);
         }
 
-        if(!flags || !flags.dontCheckForWinner) { // then as someone lost check and see if all other players lost which means the last player won.
-            this.basicCheckForWinner();
-        }
+        this._checkForGameOver();
+    },
+
+    /**
+     * Do not call this outside of BaseGame, instead use declareLoser(s).
+     *
+     * @param {Player} loser - the loser
+     * @param {Player} [reason] - the reason why they lost
+     */
+    _actuallyMakeLoser: function(loser, reason) {
+        loser.lost = true;
+        loser.reasonLost = reason || "Lost";
+        loser.won = false;
+        loser.reasonWon = "";
+
+        this._losers.pushIfAbsent(loser);
+        this._winners.removeElement(loser);
     },
 
     /**
@@ -523,19 +543,12 @@ var BaseGame = Class(DeltaMergeable, {
             winner.reasonWon = reason || "Won";
             winner.lost = false;
             winner.reasonLost = "";
+
+            this._winners.pushIfAbsent(winner);
+            this._losers.removeElement(winner);
         }
 
-        var losers = [];
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-
-            if(!winners.contains(player) && !player.won && !player.lost) { // then this player has not lost yet and now looses because someone else won
-                losers.push(player);
-            }
-        }
-
-        this.declareLosers(losers, "Other player won", {dontCheckForWinner: true});
-        this.isOver(true);
+        this._checkForGameOver();
     },
 
     /**
@@ -543,24 +556,19 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @returns {boolean} boolean represnting if the game is over
      */
-    basicCheckForWinner: function() {
-        var winner;
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
+    _checkForGameOver: function() {
+        if(this._winners.length > 0) { // someone has won, so let's end this
+            this.isOver(true);
 
-            if(!player.lost && !player.won) {
-                if(winner) {
-                    return false;
-                }
-                else {
-                    winner = player;
+            for(var i = 0; i < this.players.length; i++) {
+                var player = this.players[i];
+                if(!player.won && !player.lost) { // then they are going to loose
+                    this._actuallyMakeLoser(player);
                 }
             }
         }
-
-        if(winner) {
-            this.declareWinner(winner, "All other players lost.");
-            return true;
+        else if(this._losers.length === this.players.length) { // it is a draw
+            this.isOver(true);
         }
     },
 

@@ -304,17 +304,19 @@ var Session = Class(Server, {
                     returned = returned.returnValue;
                 }
 
-                client.startTicking();
-
                 var serializedReturned = serializer.serialize(returned, self.game);
-                self._updateDeltas("ran", {
-                    player: client.player,
-                    run: run,
-                    invalid: invalid,
-                    returned: serializedReturned,
-                });
+
+                if(!run.isSecret) {
+                    self._updateDeltas("ran", {
+                        player: client.player,
+                        run: run,
+                        invalid: invalid,
+                        returned: serializedReturned,
+                    });
+                }
 
                 client.send("ran", serializedReturned);
+                client.startTicking();
             })
             .catch(function(error) {
                 if(!Class.isInstance(error, errors.CerveauError)) { // probably a coding error
