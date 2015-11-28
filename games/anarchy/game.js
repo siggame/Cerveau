@@ -128,13 +128,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this._buildingsGrid = [];
         var originalBuildings = [];
-        
+
         // Some configuration parameters to change map generation
         var minNumberOfPoints = 8;
         var maxNumberOfPoints = 15;
         var minEdgePoints = 1;
         var maxEdgePoints = 5;
-        
+
         // Lazy functions
         var self = this;
         function randX() {
@@ -143,14 +143,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         function randY() {
             return Math.randomInt(self.mapHeight - 1, 0);
         }
-        
+
         var points = [];
-        
+
         var numberOfPoints = Math.randomInt(maxNumberOfPoints, minNumberOfPoints);
         var edgePoints = Math.randomInt(maxEdgePoints, minEdgePoints);
-        
+
         var used = {};
-        
+
         // add random points
         for(var i = 0; i < numberOfPoints; i++) {
             var x = randX();
@@ -181,12 +181,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 // Is there a better way to do this?
                 if(fromX < to.x) {
                     changes.push({x:  1, y: 0});
-                } else if(fromX > to.x) {
+                }
+                else if(fromX > to.x) {
                     changes.push({x: -1, y: 0});
                 }
                 if(fromY < to.y) {
                     changes.push({x: 0, y:  1});
-                } else if(fromY > to.y) {
+                }
+                else if(fromY > to.y) {
                     changes.push({x: 0, y: -1});
                 }
                 // this means that the point has already been reached
@@ -214,14 +216,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         for(var x = 0; x < this.mapWidth; x++) {
             this._buildingsGrid[x] = [];
         }
-        
+
         var buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"]; 
         //keep track of numbers created to ensure minimum of at least 2 for each
         //weights for each building type
         var weights = [.40, .30, .20, .10];
         var minimumBuildingsPerType = 2;
         var numCreated = [0, 0, 0, 0];
-        
+
         for(var i = 0; i < points.length; i++) {
             //use index so that numbers can be tracked
             var randomNumber = Math.random();
@@ -247,7 +249,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                     }
                 }
             }
-            
+
             numCreated[buildingIndex]++;
 
             originalBuildings.push(this._createBuilding(buildingTypes[buildingIndex], {
@@ -305,12 +307,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.currentForecast = this.forecasts[0];
         this.nextForecast = this.forecasts[1];
-        
+
         // ensure players have bribes on the first turn
         for(var i = 0; i < this.players.length; i++) {
             this.players[i].bribesRemaining = this.baseBribesPerTurn;
         }
-        
+
         // Fix fireAdded not being set for both headquarters
         this.players[1].headquarters.fireAdded = this.players[0].headquarters.fireAdded;
 
@@ -396,7 +398,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         if(loser) {
             this.declareLoser(loser, "Headquarters reached zero health.");
-            this.declareWinner(this.getOtherPlayers(loser)[0], "Reduced health of enemy's headquarters to zero.");
+            this.declareWinner(loser.otherPlayer, "Reduced health of enemy's headquarters to zero.");
         }
 
         // spread fire, now that everything has taken fire damage

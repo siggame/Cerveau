@@ -82,6 +82,11 @@ var GameManager = Class({
             return this._sanitizeValue(orderReturned, structure.returns);
         }
     },
+
+    isSecret: function(gameObjectName, functionName) {
+        var structure = this._getFromStructure(gameObjectName, functionName);
+        return Boolean(structure.isSecret);
+    },
 });
 
 module.exports = GameManager;
