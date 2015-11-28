@@ -119,7 +119,29 @@ var Player = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+        /**
+     * A helper function for human clients to highlight valid moves in the GUI.
+     *
+     * @param {Player} player - the player that called this.
+     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @returns {Object} mapping of Piece IDs to valid moves.
+     */
+    getValidMoves: function(player, asyncReturn) {
+        if(this !== player) {
+            return this.game.logicError(null, "You can only get valid moves for your player");
+        }
+
+        var validMoves = {};
+        for(var i = 0; i < this.pieces.length; i++) {
+            var piece = this.pieces[i];
+            validMoves[piece.id] = [];
+            for(var j = 0; j < piece.validMoves.length; j++) {
+                validMoves[piece.id].push(piece.validMoves[j]);
+            }
+        }
+
+        return validMoves;
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 

@@ -71,6 +71,8 @@ var Piece = Class(GameObject, {
 
         // not exposed to AIs
         this.validMoves = [];
+        this.color = this.owner === this.game.players[0] ? "White" : "Black";
+        this._originalType = this.type;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -110,7 +112,7 @@ var Piece = Class(GameObject, {
                 var move = this.validMoves[i];
                 if(rank === move.rank && file === move.file) { // then it's valid!
                     if(move.promotes) {
-                        if(this.type !== "Pawn" && this.game.validPromotionTypes.contains(promotionType)) {
+                        if(this.type !== "Pawn" || !this.game.validPromotionTypes.contains(promotionType)) {
                             reason = "PromotionType '{promotionType}' is not valid.";
                             break;
                         }
@@ -118,31 +120,50 @@ var Piece = Class(GameObject, {
                         this.type = promotionType;
                     }
 
+                    this.hasMoved = true;
                     this.rank = move.rank;
                     this.file = move.file;
 
                     var capturedPiece = move.captures;
                     if(capturedPiece) {
                         capturedPiece.captured = true;
+                        capturedPiece.owner.pieces.removeElement(capturedPiece);
+                        this.game.pieces.removeElement(capturedPiece);
                         capturedPiece.rank = -1; // move off board to also signify it has been captured
                         capturedPiece.file = -1;
                     }
 
+                    if(capturedPiece || this.type === "Pawn") {
+                        this.game.turnsToStalemate = this.game.maxTurnsToStalement;
+                    }
+                    else {
+                        this.game.turnsToStalemate--;
+                    }
+
                     // TODO: castling moves two pieces, and would need to be handled here somehow.
 
+                    //log("Move {} - {}".format(this, this.game.turnsToStalemate));
+
+                    this.game.pieceMovedThisTurn = this;
                     return true; // move was valid, and has now been handled.
                 }
             }
         }
 
         // if we got here the move was invalid for some reason, so format it up.
-        return game.logicError(false, reason.format({
+        reason = reason.format({
             self: this.toString(),
-            move: "from ({0}, {1}) to ({2}, {3})".format(this.rank, this.file, rank, file),
+            move: "from ({}, {}) to ({}, {})".format(this.rank, this.file, rank, file),
             rank: rank,
             file: file,
             promotionType: promotionType,
-        }));
+        });
+
+        // we don't tolerate invalid moves. Doing so will cause them to loose
+        this.game.declareLoser(player, reason);
+        this.game.declareWinner(player.otherPlayer, "Opponent ({}) sent an invalid move.".format(player));
+
+        return this.game.logicError(false, reason);
 
         // <<-- /Creer-Merge: move -->>
     },
@@ -153,7 +174,7 @@ var Piece = Class(GameObject, {
      * @override
      */
     toString: function() {
-        return "Piece '{type}' #{id}".format(this);
+        return "Piece {color} '{type}' #{id}".format(this);
     },
 
     /**
@@ -174,21 +195,21 @@ var Piece = Class(GameObject, {
     _generateValidMovesForRookStraitLine: function(start, end, staticKey) {
         if(start < end) {
             for(var i = start; i < end; i++) {
-                if(this._generateValidMovesForRookStraitIsValid(i, staticKey)) {
+                if(this._generateValidMovesForRookStraitAndShouldStop(i, staticKey)) {
                     break;
                 }
             }
         }
         else {
             for(var i = start; i >= end; i--) {
-                if(this._generateValidMovesForRookStraitIsValid(i, staticKey)) {
+                if(this._generateValidMovesForRookStraitAndShouldStop(i, staticKey)) {
                     break;
                 }
             }
         }
     },
 
-    _generateValidMovesForRookStraitIsValid: function(i, staticKey) {
+    _generateValidMovesForRookStraitAndShouldStop: function(i, staticKey) {
         var pos = {
             rank: i,
             file: i,
@@ -196,7 +217,16 @@ var Piece = Class(GameObject, {
 
         pos[staticKey] = this[staticKey];
 
-        return this._checkPositionAndContinue(pos);
+        var a = this._validatePositionAndShouldStop(pos);
+
+        /*log("> GENERATING... Rook strait line {self} at ({self.rank}, {self.file}) to ({pos.rank}, {pos.file}) is valid? {valid}".format({
+            self: this,
+            pos: pos,
+            valid: a,
+        }));
+        //*/
+
+        return a;
     },
 
     /**
@@ -207,18 +237,45 @@ var Piece = Class(GameObject, {
      * @param {boolean} [mustCapture] - override the default behavior because this peice MUST capture another piece at this pos
      * @returns {boolean} true if you should stop looking (because it was a capture or off board), false otherwise
      */
-    _checkPositionAndContinue: function(pos, cantCapture, mustCapture) {
+    _validatePositionAndShouldStop: function(pos, cantCapture, mustCapture) {
         if(!this.game.isInBounds(pos)) {
             return true;
         }
 
         pos.captures = this.game.getPieceAt(pos);
 
-        if((!mustCapture && !pos.captures) || (!cantCapture && pos.captures.owner !== this.owner)) {
-            this.validMoves.push(pos);
+        if(mustCapture && !pos.captures) {
+            return true;
         }
 
-        return !pos.captures;
+        if(cantCapture && pos.captures) {
+            return true;
+        }
+
+        if(pos.captures) {
+            if(pos.captures.type === "King") {
+                return true;
+            }
+
+            var nextPlayer = this.game.currentPlayer.otherPlayer;
+            if(nextPlayer === this.owner && pos.captures.owner === this.owner) {
+                return true;
+            } // otherwise we are not the valid player and that position our piece is at could be valid, if that peice were removed by the next player
+        }
+
+        if(pos.captures && pos.captures.type === "King") {
+            return true;
+        }
+
+        this.validMoves.push(pos); // if we got there it's valid!
+
+        /*log("{piece} move from ({piece.rank}, {piece.file}) to ({move.rank}, {move.file}).".format({
+            piece: this,
+            move: pos,
+        }));
+        //*/
+
+        return Boolean(pos.captures);
     },
 
     _generateValidMovesForBishop: function() {
@@ -230,7 +287,7 @@ var Piece = Class(GameObject, {
                         file: this.file * fileScalar * i,
                     };
 
-                    if(this._checkPositionAndContinue(pos)) {
+                    if(this._validatePositionAndShouldStop(pos)) {
                         break;
                     }
                 }
@@ -263,19 +320,19 @@ var Piece = Class(GameObject, {
                 file: this.file + knightMove[1],
             };
 
-            this._checkPositionAndContinue(pos);
+            this._validatePositionAndShouldStop(pos);
         }
     },
 
     _generateValidMovesForPawn: function() {
-        if(this._checkPositionAndContinue({rank: this.rank, file: this.file + this.owner.fileDirection}, true)) { // then they can move up/down one
+        if(!this._validatePositionAndShouldStop({rank: this.rank, file: this.file + this.owner.fileDirection}, true)) { // then they can move up/down one
             if(!this.hasMoved) { // then check if it can move two spaces up/down
-                this._checkPositionAndContinue({rank: this.rank, file: this.file + this.owner.fileDirection*2}, true);
+                this._validatePositionAndShouldStop({rank: this.rank, file: this.file + this.owner.fileDirection*2}, true);
             }
         }
 
-        this._checkPositionAndContinue({rank: this.rank + 1, file: this.file + this.owner.fileDirection}, false, true); // see if it can capture to the right
-        this._checkPositionAndContinue({rank: this.rank - 1, file: this.file + this.owner.fileDirection}, false, true); // -- and to the left
+        this._validatePositionAndShouldStop({rank: this.rank + 1, file: this.file + this.owner.fileDirection}, false, true); // see if it can capture to the right
+        this._validatePositionAndShouldStop({rank: this.rank - 1, file: this.file + this.owner.fileDirection}, false, true); // -- and to the left
 
         // TODO: en passant here
 
@@ -292,14 +349,10 @@ var Piece = Class(GameObject, {
         for(var rank = -1; rank <= 1; rank++) {
             for(var file = -1; file <= 1; file++) {
                 if(rank !== 0 && file !== 0) {
-                    var pos = {
+                    this._validatePositionAndShouldStop({ // kings obviously can't move into check, the chess Game will remove valid moves that put it into check later
                         rank: this.rank + rank,
                         file: this.file + file,
-                    };
-
-                    if(!this.game.inCheckBoardFor[this.owner.id][pos.rank][pos.file]) { // then that position would not put the king in check, so it may be valid
-                        this._checkPositionAndContinue(pos);
-                    }
+                    });
                 }
             }
         }

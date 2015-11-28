@@ -447,7 +447,9 @@ gameInit = function(gameName) {
 
 				for(var i = 0; i < game.pieces.length; i++) {
 					var piece = game.gameObjects[game.pieces[i].id];
-					locations[piece.rank][piece.file] = piece;
+					if(!piece.captured) {
+						locations[piece.rank][piece.file] = piece;
+					}
 				}
 
 				for(var x = 0; x < game.ranks; x++) {
@@ -456,12 +458,11 @@ gameInit = function(gameName) {
 						var piece = locations[x][y];
 						var val = "&nbsp;";
 
+						cell.removeClass("owner-0 owner-1");
+
 						if(piece) {
 							val = chars[piece.type];
 							cell.addClass("owner-" + piece.owner.id);
-						}
-						else {
-							cell.removeClass("owner-0 owner-1");
 						}
 
 						cell.html(val);

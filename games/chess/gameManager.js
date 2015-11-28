@@ -84,7 +84,14 @@ var chessGameManager = new GameManager({
 
         //<<-- Creer-Merge: secret-Player -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // if you want to add a "secret" method that clients don't publicly know about, but can call, do so here. Best use case is an easy way for human clients to ask for special game information, otherwise forget this exists.
+        getValidMoves: {
+            args: [],
+            returns: {
+                converter: serializer.defaultObject,
+                defaultValue: {},
+            },
+            isSecret: true,
+        },
 
         //<<-- /Creer-Merge: secret-Player -->>
 

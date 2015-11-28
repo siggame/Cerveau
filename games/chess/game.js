@@ -56,7 +56,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.files = 8;
         this.ranks = 8;
-        this.maxTurns = 30;
+        this.maxTurns = 6000; // longest possible game without stalemate is 5,950
 
         // variables not exposed to AIs
         this.pieceMovedThisTurn = null;
@@ -64,6 +64,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.validPromotionTypes = ["Rook", "Bishop", "Knight", "Queen"];
         this.board = this.emptyBoard();
         this.inCheckBoardFor = {}; // mapping of player ids to 2D Arrays (boards)
+        this.maxTurnsToStalement = 100; // fifty-move-rule. If after this many turns no pawns advance and no pieces are captured, it is agreed by both players to be a stalement
+        this.turnsToStalemate = this.maxTurnsToStalement;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -81,6 +83,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.players[0].fileDirection = 1;
+        this.players[1].fileDirection = -1;
 
         for(var i = 0; i < this.players.length; i++) {
             this.inCheckBoardFor[this.players[i].id] = this.emptyBoard();
@@ -162,6 +166,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     maxInvalidsPerPlayer: 0, // If a player sends an invalid move, they lose.
 
+    // Utility Functions \\
+
     isInBounds: function(rank, file) {
         if(typeof(rank) === "object") {
             file = rank.file;
@@ -196,20 +202,27 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         return board;
     },
 
+
+
+    // Logic \\
+
     /**
      * @override
      */
     nextTurn: function() {
         if(!this.pieceMovedThisTurn) {
-            this.declareLoser(this.currentPlayer, "Ended turn {0} without moving a Piece.".format(this.currentTurn));
-            this.declareWinner(this.currentPlayer.otherPlayer, "Other player ({0}) ended turn {1} without moving a Piece.".format(this.currentPlayer, this.currentTurn));
+            this.declareLoser(this.currentPlayer, "Ended turn {} without moving a Piece.".format(this.currentTurn));
+            this.declareWinner(this.currentPlayer.otherPlayer, "Other player ({}) ended turn {} without moving a Piece.".format(this.currentPlayer, this.currentTurn));
             return;
         }
 
         this.update();
 
-        var checkmated;
-        var stalement;
+        var stalement; // we will look for a variety of stalemate senarios
+
+        if(this.turnsToStalemate <= 0) {
+            stalement = "{} moves without a capture or pawn advancement.".format(this.maxTurnsToStalement);
+        }
 
         // check for stalement via no valid moves
         var noMoves = true;
@@ -222,33 +235,59 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         if(noMoves) {
-            stalement = "Player {0} has no valid moves, but is not in check.";
+            stalement = "Player {} has no valid moves, but is not in check.";
         }
-        else { // check for checkmate
-            for(var i = 0; i < this.players.length; i++) {
-                var player = this.players[i];
-                player.inCheck = Boolean(this.inCheckBoardFor[player.id][player.king.rank][player.king.file]);
-
-                if(player.inCheck && player.king.validMoves.length === 0) { // checkmate!
-                    if(!checkmated) {
-                        checkmated = player;
-                    }
-                    else {
-                        checkmated = false;
-                        stalement = "Both players checkmated at the same time";
-                    }
+        else if(this.pieces.length === 2) {
+            stalement = "Only Kings left.";
+        }
+        else if(this.pieces.length === 3) { // two kings and one extra piece. if a bishop or knight checkmate is impossible
+            for(var i = 0; i < this.pieces.length; i++) {
+                var pieceType = this.pieces[i].type;
+                if(pieceType === "Knight" || pieceType === "Bishop") {
+                    stalement = "3 Pieces left, King vs King & {}, which is impossible to checkmate with.".format(pieceType);
+                    break;
                 }
             }
         }
+        else { // check for all bishops on the same tile type (light or dark tiles)
+            var tile = undefined;
+            for(var i = 0; i < this.pieces.length; i++) {
+                var uncapturedPiece = this.pieces[i];
+                if(uncapturedPiece.type === "Bishop") {
+                    var bishopsTile = (uncapturedPiece.rank + uncapturedPiece.file)%2;
+                    if(tile === undefined) {
+                        tile = bishopsTile;
+                    }
+                    else if(tile !== bishopsTile) {
+                        break; // they are on different tiles, checkmate is possible
+                    }
+                }
+                else if(uncapturedPiece.type !== "King") {
+                    tile = undefined;
+                    break;
+                }
+            }
 
-        if(checkmated) {
-            this.declareLoser(checkmated, "Checkmated");
-            this.declareWinner(checkmated.otherPlayer, "Checkmate!");
-            return;
+            if(tile !== undefined) {
+                stalement = "With only Kings and Bishops, and with all of the Bishops on the same tile color, Checkmate is impossible";
+            }
         }
-        else if(stalement) {
+
+        if(stalement) {
             this.declareLosers(this.players, "Stalement! - " + stalement);
             return;
+        }
+
+        // check for checkmate. Because players cannot move into checkmate it should be impossible for both players to be in checkmate simultanously
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.inCheck = Boolean(this.inCheckBoardFor[player.id][player.king.rank][player.king.file]);
+
+            if(player.inCheck && player.king.validMoves.length === 0) { // checkmate!
+                this.declareLoser(player, "Checkmated");
+                this.declareWinner(player.otherPlayer, "Checkmate!");
+                return;
+            }
         }
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
@@ -260,6 +299,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
         this.emptyBoard(this.board);
 
+        this.pieceMovedThisTurn = null;
         this.updatePieces();
     },
 
@@ -272,25 +312,34 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         var kings = [];
         for(var i = 0; i < this.pieces.length; i++) {
             var piece = this.pieces[i];
-            if(piece.type === "King") {
-                kings.push(piece); // we generate the kings valid moves last as they depend on in check
-            }
-            else {
-                piece.generateValidMoves();
+            piece.generateValidMoves();
 
-                for(var j = 0; j < piece.validMoves.length; j++) {
-                    var move = piece.validMoves[j];
+            for(var j = 0; j < piece.validMoves.length; j++) {
+                var move = piece.validMoves[j];
 
-                    if(move.captures) {
-                        this.inCheckBoardFor[move.captures.owner.otherPlayer.id][move.rank][move.file] = piece;
-                    }
+                if(move.captures) {
+                    this.inCheckBoardFor[move.captures.owner.otherPlayer.id][move.rank][move.file] = piece;
                 }
             }
         }
 
-        for(var i = 0; i < kings.length; i++) {
-            kings[i].generateValidMoves();
+        // we now have a real this.inCheckBoardFor, so remove validMoves from the king that are invalid
+        for(var i = 0; i < this.players.length; i++) {
+            var king = this.players[i].king;
+            var inCheckBoardFor = this.inCheckBoardFor;
+            king.validMoves.filter(function(move) { // removes moves that are in check, as kings cannot move into check
+                return !inCheckBoardFor[king.owner.id][move.rank][move.file];
+            });
         }
+    },
+
+    /**
+     * @override
+     */
+    _maxTurnsReached: function() {
+        this.declareLosers(this.players, "Stalemate - {} turns reached.".format(this.maxTurns));
+
+        return TurnBasedGame._maxTurnsReached.apply(this, arguments);
     },
 
     //<<-- /Creer-Merge: added-functions -->>
