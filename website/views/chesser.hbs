@@ -1,0 +1,318 @@
+<!-- This is the ShitVis, simply a hack to display checkers so I know the games are valid. Do not take this code seriously -->
+<style>
+#gameBoard {padding: 1em; background: #ccc;}
+#chesser .canvases {width: 800px; height: 800px;}
+#chesser canvas {width: 800px; height: auto; position: absolute;}
+</style>
+
+<div id="chesser">
+    <div class="canvases">
+        <canvas class="background">
+        </canvas>
+        <canvas class="ui">
+        </canvas>
+        <canvas class="pieces">
+        </canvas>
+    </div>
+    <div class="infobox">
+        <form class="connect">
+            <label for="server">Server</label>
+            <input id="server" name="server" type="textbox" value="192.168.1.225"/>
+            <label for="port">Port</label>
+            <input id="port" name="port" type="number" value="3088"/>
+            <label for="spectate">Spectate</label>
+            <input id="spectate" name="spectate" type="checkbox" checked/>
+            <input type="submit" value="Connect"/>
+        </form>
+        <div class="connection"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+};
+
+function clone(obj) {
+    return $.extend(true, {}, obj);
+};
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+function isObject(obj) {
+    return obj !== null && typeof(obj) === "object";
+};
+
+
+
+function HSLColor(h, s, l) {
+    this.h = clamp(Math.round(h), 0, 360);
+    this.s = clamp(Math.round(s * 100), 0, 100);
+    this.l = clamp(Math.round(l * 100), 0, 100);
+};
+
+HSLColor.prototype.toString = function() {
+    return "hsl(" + this.h + ", " + this.s + "%, " + this.l + "%)";
+};
+
+function Color(r, g, b) {
+    this.r = clamp(Math.round(r * 255), 0, 255);
+    this.g = clamp(Math.round(g * 255), 0, 255);
+    this.b = clamp(Math.round(b * 255), 0, 255);
+};
+
+Color.prototype.toString = function() {
+    return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+};
+
+
+
+function CanvasWrapper($canvas, width, height) {
+    this.$element = $canvas;
+    this.context = $canvas[0].getContext("2d");
+
+    this.width = width || 100;
+    this.height = height || 100;
+    this._attrWidth = 1000;
+    this._attrHeight = 1000;
+
+    this._dx = this._attrHeight / this.width;
+    this._dy = this._attrHeight / this.height;
+
+    this.$element.attr("width", this._attrWidth);
+    this.$element.attr("height", this._attrHeight);
+};
+
+CanvasWrapper.prototype.drawRectangle = function(color, x, y, width, height) {
+    width = width || 1;
+    height = height || 1;
+
+    this.context.fillStyle = color.toString();
+    this.context.fillRect(x * this._dx, y * this._dy, width * this._dx, height * this._dy);
+};
+
+CanvasWrapper.prototype.drawText = function(text, color, height, x, y) {
+    this.context.font = "" + Math.floor(height * this._dy) + "px sans-serif";
+    this.context.fillStyle = color.toString();
+    x = x || 0;
+    y = y || 0;
+    this.context.textBaseline = "top";
+    this.context.fillText(text, x * this._dx, y * this._dy);
+};
+
+CanvasWrapper.prototype.clear = function() {
+    this.context.clearRect(0, 0, this._attrWidth, this._attrHeight);
+};
+
+
+
+function Chesser() {
+    var canvases = $("#chesser .canvases").children();
+    this.canvases = {};
+
+    var self = this;
+    this.$connection = $("#chesser .connection");
+    this.$connect = $("#chesser .infobox .connect");
+    this.$connect.submit(function(e) {
+        e.preventDefault();
+        var server = $("#server", this).val();
+        var port = parseInt($("#port", this).val()) || undefined;
+        var spectating = $("#spectate", this).is(":checked");
+        self.connectTo(server, port, spectating);
+        self.$connect.hide();
+    })
+
+    this._playerColorsTop = [
+        new Color(0.4, 0.4, 0.4),
+        new Color(0, 0, 0)
+    ];
+
+    this._playerColorsBottom = [
+        new Color(1, 1, 1),
+        new Color(0.2, 0.2, 0.2)
+    ];
+
+    this._pieceTextTop = {
+        King: String.fromCharCode(9812),
+        Queen: String.fromCharCode(9813),
+        Rook: String.fromCharCode(9814),
+        Bishop: String.fromCharCode(9815),
+        Knight: String.fromCharCode(9816),
+        Pawn: String.fromCharCode(9817),
+    };
+
+    this._pieceTextBottom = {
+        King: String.fromCharCode(9818),
+        Queen: String.fromCharCode(9819),
+        Rook: String.fromCharCode(9820),
+        Bishop: String.fromCharCode(9821),
+        Knight: String.fromCharCode(9822),
+        Pawn: String.fromCharCode(9823),
+    };
+
+    console.log("ahhhh");
+    for(var i = 0; i < canvases.length; i++) {
+        var child = $(canvases[i]);
+        this.canvases[child.attr("class")] = new CanvasWrapper(child, 8, 8);
+    }
+
+    var h = Math.round(Math.random()*360);
+    var light = new HSLColor(h, 0.5, 0.667);
+    var dark = new HSLColor(h, 0.5, 0.333);
+
+    for(var rank = 0; rank < 8; rank++) {
+        for(var file = 0; file < 8; file++) {
+            this.canvases.background.drawRectangle((rank+file)%2 ? dark : light, rank, file);
+        }
+    }
+};
+
+Chesser.prototype.connectTo = function(server, port, spectating) {
+    this._joueur = new Joueur(server, port, spectating);
+
+    var self = this;
+    this._joueur.onDelta = function() {
+        self.updateBoard();
+    };
+
+    this._joueur.onLobbied = function(data) {
+        self.updateConnection("In lobby for game '" + data.gameName + "' in session '" + data.gameSession + "'.")
+    };
+
+    this._joueur.onStart = function(data) {
+        self.updateConnection("Game Started!");
+    };
+
+    this._joueur.onOver = function(data) {
+        self.updateConnection("Game is over.");
+    };
+};
+
+Chesser.prototype.updateConnection = function(str) {
+    this.$connection.html(str);
+}
+
+Chesser.prototype.updateBoard = function() {
+    var gameObjs = this._joueur.currentGameState.gameObjects;
+    this.canvases.pieces.clear();
+    for(var id in gameObjs) {
+        if(gameObjs.hasOwnProperty(id)) {
+            var gameObj = gameObjs[id];
+
+            if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
+                this.drawPiece(gameObj, gameObj.rank, 7 - gameObj.file);
+            }
+        }
+    }
+};
+
+Chesser.prototype.drawPiece = function(piece, rank, file) {
+    var canvas = this.canvases.pieces;
+
+    canvas.drawText(this._pieceTextBottom[piece.type], this._playerColorsBottom[piece.owner.id], 1, rank, file);
+    canvas.drawText(this._pieceTextTop[piece.type], this._playerColorsTop[piece.owner.id], 1, rank, file);
+};
+
+
+
+function Joueur(server, port, spectating) {
+    this.gameStates = [];
+    this.currentGameState = {};
+
+    server = server || "localhost";
+    port = port || 3088;
+    this.ws = new WebSocket("ws://" + server + ":" + port);
+
+    var self = this;
+    this.ws.onopen = function() {
+        var playData = {
+            event: "play",
+            sentTime: (new Date).getTime(),
+            data: {
+                gameName: "Chess",
+                requestedSession: "*",
+                spectating: spectating ? true : undefined,
+                clientType: "JavaScript in Browser",
+                playerName: "In Browser Player",
+            }
+        };
+
+        self.ws.send(JSON.stringify(playData));
+    };
+
+    this.ws.onerror = function(err) {
+        console.log("socket error", err);
+    };
+
+    this.ws.onmessage = function(message) {
+        console.log("message", message.data);
+        self.received(JSON.parse(message.data));
+    };
+
+    this.ws.onclose = function() {
+        console.log("socket closed");
+    };
+};
+
+Joueur.prototype.received = function(data) {
+    var captializedEvent = capitalizeFirstLetter(data.event);
+
+    var funct = this["_autoHandle" + captializedEvent];
+    if(funct) {
+        funct.call(this, data.data);
+    }
+
+    if(this["on" + captializedEvent]) {
+        this["on" + captializedEvent](data.data);
+    }
+};
+
+Joueur.prototype._autoHandleDelta = function(data) {
+    this.currentGameState = this._mergeDelta(clone(this.currentGameState), data);
+    this.gameStates.push(this.currentGameState);
+};
+
+Joueur.prototype._mergeDelta = function(state, delta) {
+    var deltaLength = delta["&LEN"];
+
+    if(deltaLength !== undefined) { // then this part in the state is an array
+        delete delta["&LEN"]; // we don't want to copy this key/value over to the state, it was just to signify it is an array
+        while(state.length > deltaLength) { // pop elements off the array until the array is short enough. an increase in array size will be added below as arrays resize when keys larger are set
+            state.pop();
+        }
+    }
+
+    for(var key in delta) {
+        if(delta.hasOwnProperty(key)) {
+            if(delta[key] === "&RM") {
+                delete state[key];
+            }
+            else if(isObject(delta[key]) && isObject(state[key])) {
+                this._mergeDelta(state[key], delta[key]);
+            }
+            else {
+                if(isObject(delta[key]) && delta[key]["&LEN"] !== undefined) {
+                    newArray = [];
+                    for(var i = 0; i < delta[key]["&LEN"]; i++) {
+                        newArray.push(delta[key][i]);
+                    }
+                    state[key] = newArray;
+                }
+                else {
+                    state[key] = delta[key];
+                }
+            }
+        }
+    }
+
+    return state;
+};
+
+var chesser = new Chesser();
+
+
+
+</script>

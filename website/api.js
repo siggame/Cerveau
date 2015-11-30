@@ -51,4 +51,8 @@ module.exports = function(args) {
     app.get('/visualize/:filename', function(req, res) {
         res.render('visualize', req.params);
     });
+
+    app.get('/chesser/:filename?', function(req, res) {
+        res.render('chesser', req.params);
+    });
 };
