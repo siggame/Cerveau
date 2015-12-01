@@ -43,8 +43,8 @@
                 <div class="no-game">No game.</div>
                 <div class="game">
                     <div>Turn: <span class="currentTurn">###</span></div>
-                    <div class="player-0">Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
-                    <div class="player-1">Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <div class="player-0">White Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <div class="player-1">Black Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
                     <section class="confirm-move">
                         <heading>Confirm Move</heading>
                         <div class="message"></div>
@@ -113,6 +113,26 @@ function capitalizeFirstLetter(string) {
 
 function isObject(obj) {
     return obj !== null && typeof(obj) === "object";
+};
+
+function cleanPos(obj) {
+    var rank;
+    var file;
+    switch(typeof(obj)) {
+        case "string":
+            rank = obj;
+            file = parseInt(obj[1]);
+            break;
+        case "object":
+            rank = obj.rank;
+            file = obj.file;
+            break;
+    }
+
+    return {
+        rank: rank.charCodeAt(0) - "a".charCodeAt(0),
+        file: 8 - file,
+    };
 };
 
 var getUrlParameter = function getUrlParameter(sParam) {
@@ -303,8 +323,8 @@ function Chesser() {
             caller: {id: self._activePiece.id},
             functionName: "move",
             args: {
-                rank: self._activeMove.rank,
-                file: self._activeMove.file,
+                rank: self._activeMove.to[0],
+                file: parseInt(self._activeMove.to[1]),
                 promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
             }
         });
@@ -407,27 +427,19 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
             self._validMoves = null;
             self._joueur.send("run", {
                 caller: {id: self.playerID},
-                functionName: "getValidMoves",
+                functionName: "getMoves",
                 args: {},
             });
         }
 
         this._joueur.onRan = function(data) {
             if(!self._validMoves) {
-                self._validMoves = {};
-                for(var id in data) {
-                    if(data.hasOwnProperty(id)) {
-                        self._validMoves[id] = [];
-
-                        for(var i = 0; i < data[id]["&LEN"]; i++) {
-                            self._validMoves[id][i] = data[id][i];
-                        }
-                    }
-                }
+                delete data["&LEN"];
+                self._validMoves = data;
 
                 self._runTurn();
             }
-            else if(data === true) {
+            else if(data === self._activeMove.san) {
                 self._joueur.send("finished", {
                     orderIndex: self._currentOrder.index,
                     returned: true,
@@ -469,8 +481,10 @@ Chesser.prototype.updateBoard = function() {
         if(gameObjs.hasOwnProperty(id)) {
             var gameObj = gameObjs[id];
             if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
-                this._board[gameObj.rank][gameObj.file] = gameObj;
-                this.drawPiece(gameObj, gameObj.rank, 7 - gameObj.file);
+                var pos = cleanPos(gameObj);
+                this._board[pos.rank][pos.file] = gameObj;
+                var pos = cleanPos(gameObj);
+                this.drawPiece(gameObj, pos.rank, pos.file);
             }
         }
     }
@@ -531,7 +545,7 @@ Chesser.prototype.initPlaying = function() {
 
 Chesser.prototype._onClick = function(x, y) {
     var rank = Math.floor(x);
-    var file = 7 - Math.floor(y); // we flip the visual
+    var file = Math.floor(y);
     if(this._uiUnlocked) {
         var piece = this._board[rank][file];
         if(this.playing) {
@@ -539,7 +553,8 @@ Chesser.prototype._onClick = function(x, y) {
                 // see if they clicked a valid move tile
                 for(var i = 0; i < this._activeValidMoves.length; i++) {
                     var move = this._activeValidMoves[i];
-                    if(move.rank === rank && move.file === file) {
+                    var pos = cleanPos(move.to);
+                    if(pos.rank === rank && pos.file === file) {
                         return this._confirmMove(move);
                     }
                 }
@@ -573,13 +588,17 @@ Chesser.prototype._runTurn = function() {
 };
 
 Chesser.prototype._makeActive = function(piece) {
-    if(!this._validMoves[piece.id]) {
-        console.error("No valid moves for " + piece.id);
-        return;
+    var moves = [];
+    for(var id in this._validMoves) {
+        if(this._validMoves.hasOwnProperty(id)) {
+            var move = this._validMoves[id];
+            if(move.from === (piece.rank + piece.file)) {
+                moves.push(move);
+            }
+        }
     }
-
     this._activePiece = piece;
-    this._activeValidMoves = this._validMoves[this._activePiece.id];;
+    this._activeValidMoves = moves;
 
     this._updateUI();
 };
@@ -588,11 +607,13 @@ Chesser.prototype._updateUI = function() {
     var canvas = this.canvases.ui;
     canvas.clear();
 
-    canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, this._activePiece.rank, 7 - this._activePiece.file, 1, 1, 0.2);
+    var pos = cleanPos(this._activePiece);
+    canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
 
     for(var i = 0; i < this._activeValidMoves.length; i++) {
         var move = this._activeValidMoves[i];
-        canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, move.rank, 7 - move.file, 1, 1, 0.2);
+        var pos = cleanPos(move.to);
+        canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, pos.rank, pos.file, 1, 1, 0.2);
     }
 };
 
@@ -600,7 +621,7 @@ Chesser.prototype._confirmMove = function(move) {
     var piece = this._activePiece;
     this._activeMove = move;
     this.setCurrentTab("status");
-    this.tabs.status.confirmMove.$message.html("Move " + piece.id + "from (" + piece.rank + ", " + piece.file + " to (" + move.rank + ", " + move.file + ")?");
+    this.tabs.status.confirmMove.$message.html("Move " + piece.type + " #" + piece.id + " from " + move.from + " to " + move.to + "?");
 
     if(move.promotes) {
         this.tabs.status.confirmMove.$promotionField.addClass("needed");
