@@ -9,6 +9,7 @@
   "private": true,
   "dependencies": {
     "argparse": "1.0.2",
+    "chess.js": "0.9.2",
     "clone": "1.0.2",
     "colors": "1.1.2",
     "express": "4.13.3",

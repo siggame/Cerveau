@@ -294,7 +294,6 @@ function Chesser() {
     this.setCurrentTab("connection");
 
     var h = Math.round(Math.random()*360);
-    console.log("h", h);
     this._uiHighlightColor = new HSLColor(h, 0.5, 0.5);
     this._uiActiveHightlightColor = new HSLColor((h + 225)%360, 0.5, 0.5);
 

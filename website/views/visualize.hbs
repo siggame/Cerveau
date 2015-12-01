@@ -273,7 +273,7 @@ function prev(dontPause) {
 	if(!dontPause) {
 		pause();
 	}
-	
+
 	$stateSlider.val(Math.max(currentStateNum - 1, 0)).trigger("change");
 };
 
@@ -412,10 +412,10 @@ gameInit = function(gameName) {
 			break;
 		case "Chess":
 			gameBoard.init = function(data) {
-				makeTable(data.ranks, data.files);
+				makeTable(8, 8);
 
-				for(var y = 0; y < data.ranks; y++) {
-					for(var x = 0; x < data.files; x++) {
+				for(var y = 0; y < 8; y++) {
+					for(var x = 0; x < 8; x++) {
 						var cell = tableCells[x][y];
 
 						if(!cell.hasClass("legend")) {
@@ -441,19 +441,19 @@ gameInit = function(gameName) {
 				};
 
 				var locations = [];
-				for(var x = 0; x < game.ranks; x++) {
+				for(var x = 0; x < 8; x++) {
 					locations[x] = [];
 				}
 
 				for(var i = 0; i < game.pieces.length; i++) {
 					var piece = game.gameObjects[game.pieces[i].id];
 					if(!piece.captured) {
-						locations[piece.rank][piece.file] = piece;
+						locations[piece.rank.charCodeAt(0) - "a".charCodeAt(0)][piece.file-1] = piece;
 					}
 				}
 
-				for(var x = 0; x < game.ranks; x++) {
-					for(var y = 0; y < game.files; y++) {
+				for(var x = 0; x < 8; x++) {
+					for(var y = 0; y < 8; y++) {
 						var cell = tableCells[x][y];
 						var piece = locations[x][y];
 						var val = "&nbsp;";

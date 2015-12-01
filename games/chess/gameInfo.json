@@ -28,12 +28,11 @@
         "attribute_names": [
             "currentPlayer",
             "currentTurn",
-            "files",
             "gameObjects",
             "maxTurns",
+            "moves",
             "pieces",
             "players",
-            "ranks",
             "session",
             "turnsToStalemate"
         ],
@@ -52,15 +51,6 @@
                 "default": 0,
                 "description": "The current turn number, starting at 0 for the first player's turn",
                 "serverPredefined": true,
-                "type": {
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
-                }
-            },
-            "files": {
-                "default": 8,
-                "description": "How many chess tiles vertically there are making columns.",
                 "type": {
                     "keyType": null,
                     "name": "int",
@@ -95,9 +85,22 @@
                     "valueType": null
                 }
             },
+            "moves": {
+                "default": null,
+                "description": " The list of moves in standard algebraic notation (SAN).",
+                "type": {
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                }
+            },
             "pieces": {
                 "default": null,
-                "description": "All the pieces in the game.",
+                "description": "All the uncaptured pieces in the game.",
                 "type": {
                     "keyType": null,
                     "name": "list",
@@ -120,15 +123,6 @@
                         "name": "Player",
                         "valueType": null
                     }
-                }
-            },
-            "ranks": {
-                "default": 8,
-                "description": "How many chess tiles horizontally there are making rows. Traditionally represented by a letter for humans.",
-                "type": {
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
                 }
             },
             "session": {
@@ -264,7 +258,7 @@
                 },
                 "file": {
                     "default": null,
-                    "description": "The file (y) coordinate of the checker.",
+                    "description": "The file (y) coordinate of the checker represented as a number [1-8].",
                     "type": {
                         "keyType": null,
                         "name": "int",
@@ -292,16 +286,16 @@
                 },
                 "rank": {
                     "default": null,
-                    "description": "The rank (x) coordinate of the checker, traditionally represented as a letter.",
+                    "description": "The rank (x) coordinate of the checker represented as a letter [a-h].",
                     "type": {
                         "keyType": null,
-                        "name": "int",
+                        "name": "string",
                         "valueType": null
                     }
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of chess piece this is, either: \"King\", \"Queen\", \"Knight\", \"Rook\", \"Bishop\", or \"Pawn\"",
+                    "description": "The type of chess piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -324,18 +318,18 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The rank (x) coordinate to move to.",
+                            "description": "The rank (x) coordinate to move to. Must be [a-h].",
                             "name": "rank",
                             "optional": false,
                             "type": {
                                 "keyType": null,
-                                "name": "int",
+                                "name": "string",
                                 "valueType": null
                             }
                         },
                         {
                             "default": null,
-                            "description": "The file (y) coordinate to move to.",
+                            "description": "The file (y) coordinate to move to. Must be [1-8].",
                             "name": "file",
                             "optional": false,
                             "type": {
@@ -361,10 +355,10 @@
                     "optionals_start_index": 2,
                     "returns": {
                         "default": null,
-                        "description": "true if the move was valid, false otherwise",
+                        "description": "The standard algebraic notation (SAN) representation of the move if successful, empty string otherwise. In addition if you fail your move you lose.",
                         "type": {
                             "keyType": null,
-                            "name": "boolean",
+                            "name": "string",
                             "valueType": null
                         }
                     },
@@ -443,6 +437,7 @@
         "Player": {
             "attribute_names": [
                 "clientType",
+                "color",
                 "fileDirection",
                 "inCheck",
                 "lost",
@@ -462,6 +457,15 @@
                     "type": {
                         "keyType": null,
                         "name": "string",
+                        "valueType": null
+                    }
+                },
+                "color": {
+                    "default": null,
+                    "description": "The color (side) of this player. Either 'White' or 'Black', with the 'White' player having the first move.",
+                    "type": {
+                        "keyType": null,
+                        "name": "String",
                         "valueType": null
                     }
                 },
@@ -493,7 +497,6 @@
                     }
                 },
                 "madeMove": {
-                    "arenaInterest": "sum",
                     "default": null,
                     "description": "If the Player has made thier move for the turn. true means they can no longer move a piece this turn.",
                     "type": {
@@ -522,7 +525,7 @@
                 },
                 "pieces": {
                     "default": null,
-                    "description": "All the chess pieces owned by this player.",
+                    "description": "All the unpcaptured chess pieces owned by this player.",
                     "type": {
                         "keyType": null,
                         "name": "list",
