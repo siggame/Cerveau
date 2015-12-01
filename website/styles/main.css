@@ -88,6 +88,11 @@ h4,
 	padding: 1em;
 }
 
+:disabled {
+	background-color: #cdcdcd;
+	color: #494949;
+}
+
 #site-title {
 	background: #051838;
 	width: 100%;

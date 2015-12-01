@@ -1,8 +1,26 @@
 <!-- This is the ShitVis, simply a hack to display checkers so I know the games are valid. Do not take this code seriously -->
 <style>
-#gameBoard {padding: 1em; background: #ccc;}
-#chesser .canvases {width: 800px; height: 800px;}
-#chesser canvas {width: 800px; height: auto; position: absolute;}
+#chesser {width: 1280px; height: 720px;}
+#chesser .canvases {width: 720px; height: 720px; float: left;}
+#chesser .canvases .ui {opacity:  0.667}
+#chesser canvas {width: 720px; height: auto; position: absolute;}
+
+#chesser .tabs {background: #333; padding: 1em 1em 1em 0.25em;}
+#chesser .tabs-content {margin-top: -0.5em; background: #ccc; padding: 1em 0.5em;}
+#chesser .tabs-content > div {display: none;}
+#chesser .tabs-content > div.current {display: block;}
+#chesser .tabs span.current {background: #ccc; color: #111;}
+#chesser .tabs span {background: #666; padding: 0.5em 0.5em 0.45em 0.5em; margin: -0.4em 0.25em; cursor: pointer; color: #eee;}
+#chesser .status .currentPlayer:before {content:"\25B6"; margin-right: 0.125em;}
+
+#chesser .infobox {float: right; height: 720px; width: 500px; background: #ccc;}
+#chesser .infobox .field {display: block; margin-bottom: 0.5em;}
+#chesser .infobox .field label {display: inline-block; width: 6em;}
+
+#chesser .infobox .confirm-move {margin-top: 1em; display: none;}
+#chesser .infobox .confirm-move.run-turn {display: block;}
+#chesser .infobox .confirm-move .promotion-field {display: none;}
+#chesser .infobox .confirm-move .promotion-field.needed {display: block;}
 </style>
 
 <div id="chesser">
@@ -15,16 +33,67 @@
         </canvas>
     </div>
     <div class="infobox">
-        <form class="connect">
-            <label for="server">Server</label>
-            <input id="server" name="server" type="textbox" value="192.168.1.225"/>
-            <label for="port">Port</label>
-            <input id="port" name="port" type="number" value="3088"/>
-            <label for="spectate">Spectate</label>
-            <input id="spectate" name="spectate" type="checkbox" checked/>
-            <input type="submit" value="Connect"/>
-        </form>
-        <div class="connection"></div>
+        <div class="tabs">
+            <span class="tab-for-status">Status</span>
+            <span class="tab-for-connection">Connection</span>
+            <span class="tab-for-debug">Debug</span>
+        </div>
+        <div class="tabs-content">
+            <div class="status">
+                <div class="no-game">No game.</div>
+                <div class="game">
+                    <div>Turn: <span class="currentTurn">###</span></div>
+                    <div class="player-0">Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <div class="player-1">Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <section class="confirm-move">
+                        <heading>Confirm Move</heading>
+                        <div class="message"></div>
+                        <div class="field promotion-field">
+                            <label for="promotion-type">Promote to:</label>
+                            <select id="promotion-type" name="promotion-type">
+                                <option value="Bishop">Bishop</option>
+                                <option value="Knight">Knight</option>
+                                <option value="Queen" selected="selected">Queen</option>
+                                <option value="Rook">Rook</option>
+                            </select>
+                        </div>
+                        <button class="confirm" disabled>Confirm</button>
+                    </section>
+                </div>
+            </div>
+            <div class="connection">
+                <form class="connect">
+                    <div class="field">
+                        <label for="server">Server</label>
+                        <input id="server" name="server" type="textbox" value="192.168.1.225"/>
+                    </div>
+                    <div class="field">
+                        <label for="port">Port</label>
+                        <input id="port" name="port" type="number" min="80" max="65535" value="3088"/>
+                    </div>
+                    <div class="field">
+                        <label for="session">Session</label>
+                        <input id="session" name="session" type="textbox" value="new"/>
+                    </div>
+                    <div class="field">
+                        <label for="spectate">Spectate</label>
+                        <input id="spectate" name="spectate" type="checkbox" checked/>
+                    </div>
+                    <div class="field">
+                        <label for="player-name">Player Name</label>
+                        <input id="player-name" name="player-name" type="textbox" value="Human" disabled/>
+                    </div>
+                    <div class="field">
+                        <label></label>
+                        <input type="submit" value="Connect"/>
+                    </div>
+                </form>
+                <div class="connected"></div>
+            </div>
+            <div class="debug">
+                TODO: debug tree
+            </div>
+        </div>
     </div>
 </div>
 
@@ -46,6 +115,21 @@ function isObject(obj) {
     return obj !== null && typeof(obj) === "object";
 };
 
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
 
 
 function HSLColor(h, s, l) {
@@ -58,14 +142,16 @@ HSLColor.prototype.toString = function() {
     return "hsl(" + this.h + ", " + this.s + "%, " + this.l + "%)";
 };
 
-function Color(r, g, b) {
+function Color(r, g, b, a) {
+    a = a === undefined ? 1 : a;
     this.r = clamp(Math.round(r * 255), 0, 255);
     this.g = clamp(Math.round(g * 255), 0, 255);
     this.b = clamp(Math.round(b * 255), 0, 255);
+    this.a = clamp(a, 0, 1);
 };
 
 Color.prototype.toString = function() {
-    return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", "+ this.a +")";
 };
 
 
@@ -74,13 +160,16 @@ function CanvasWrapper($canvas, width, height) {
     this.$element = $canvas;
     this.context = $canvas[0].getContext("2d");
 
+    this._fontFamily = ["sans-serif", "Arial", "Tahoma", "serif"];
+    var i = Math.floor(Math.random()*(this._fontFamily.length));
+    this._fontFamily = this._fontFamily[i];
+
     this.width = width || 100;
     this.height = height || 100;
-    this._attrWidth = 1000;
-    this._attrHeight = 1000;
+    this._attrWidth = 720;
+    this._attrHeight = 720;
 
-    this._dx = this._attrHeight / this.width;
-    this._dy = this._attrHeight / this.height;
+    this._d = this._attrHeight / this.height; // assumes height/width are the same scalar diff
 
     this.$element.attr("width", this._attrWidth);
     this.$element.attr("height", this._attrHeight);
@@ -91,16 +180,50 @@ CanvasWrapper.prototype.drawRectangle = function(color, x, y, width, height) {
     height = height || 1;
 
     this.context.fillStyle = color.toString();
-    this.context.fillRect(x * this._dx, y * this._dy, width * this._dx, height * this._dy);
+    this.context.fillRect(x * this._d, y * this._d, width * this._d, height * this._d);
 };
 
 CanvasWrapper.prototype.drawText = function(text, color, height, x, y) {
-    this.context.font = "" + Math.floor(height * this._dy) + "px sans-serif";
+    this.context.font = "" + Math.floor(height * this._d) + "px " + this._fontFamily;
     this.context.fillStyle = color.toString();
     x = x || 0;
     y = y || 0;
     this.context.textBaseline = "top";
-    this.context.fillText(text, x * this._dx, y * this._dy);
+    this.context.fillText(text, x * this._d, y * this._d);
+};
+
+CanvasWrapper.prototype.fillRoundedRectangle = function(color, x, y, width, height, radius) {
+    this._roundedRectangle(x, y, width, height, radius);
+    this.context.fillStyle = color.toString();
+    this.context.fill();
+};
+
+CanvasWrapper.prototype.strokeRoundedRectangle = function(stroke, color, x, y, width, height, radius) {
+    this._roundedRectangle(x, y, width, height, radius);
+    this.context.lineWidth = stroke * this._d;
+    this.context.strokeStyle = color.toString();
+    this.context.stroke();
+};
+
+CanvasWrapper.prototype._roundedRectangle = function(x, y, width, height, radius) {
+    var ctx = this.context;
+
+    x = this._d * x;
+    y = this._d * y;
+    width = this._d * width;
+    height = this._d * height;
+    radius = this._d * radius;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y + radius);
+    ctx.lineTo(x, y + height - radius);
+    ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+    ctx.lineTo(x + width - radius, y + height);
+    ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+    ctx.lineTo(x + width, y + radius);
+    ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+    ctx.lineTo(x + radius, y);
+    ctx.quadraticCurveTo(x, y, x, y + radius);
 };
 
 CanvasWrapper.prototype.clear = function() {
@@ -110,19 +233,82 @@ CanvasWrapper.prototype.clear = function() {
 
 
 function Chesser() {
-    var canvases = $("#chesser .canvases").children();
+    this.$this = $("#chesser");
+    var canvases = $(".canvases", this.$this).children();
     this.canvases = {};
 
     var self = this;
-    this.$connection = $("#chesser .connection");
-    this.$connect = $("#chesser .infobox .connect");
+    this.$connected = $("#chesser .connected");
+    this.$connect = $("#chesser .connect");
     this.$connect.submit(function(e) {
         e.preventDefault();
         var server = $("#server", this).val();
         var port = parseInt($("#port", this).val()) || undefined;
-        var spectating = $("#spectate", this).is(":checked");
-        self.connectTo(server, port, spectating);
+        var spectating = self.$connect.$spectate.is(":checked");
+        self.connectTo(server, port, spectating, {
+            playerName: self.$connect.$playerName.val(),
+            requestedSession: $("#session", this).val(),
+        });
         self.$connect.hide();
+    });
+
+    this.$connect.$playerName = $("#player-name", this.$connect);
+    this.$connect.$spectate = $("#spectate", this.$connect)
+        .on("change", function() {
+            if(this.checked) {
+                self.$connect.$playerName.attr("disabled", true);
+            }
+            else {
+                self.$connect.$playerName.removeAttr("disabled");
+            }
+        })
+        .prop("checked", true);
+
+    this.tabs = {};
+    $(".tabs-content", this.$this).children().each(function() {
+        var $content = $(this);
+        var key = $content.attr("class");
+        var $tab = $(".tab-for-" + key, self.$this);
+        self.tabs[key] = {
+            "$content": $content,
+            "$tab": $tab,
+        };
+
+        $tab.on("click", function(e) {
+            e.preventDefault();
+            self.setCurrentTab(key);
+        });
+    });
+
+    $(".game", this.tabs.status.$content).hide();
+
+    this.tabs.status.$currentTurn = $(".currentTurn", this.tabs.status.$content);
+    this.tabs.status.confirmMove = {
+        "$element": $(".confirm-move", this.tabs.status.$content),
+        "$button": $(".confirm-move button", this.tabs.status.$content),
+        "$message": $(".confirm-move .message", this.tabs.status.$content),
+        "$promotionField": $(".confirm-move .promotion-field", this.tabs.status.$content),
+        "$promotionType": $(".confirm-move .promotion-type", this.tabs.status.$content),
+    };
+
+    this.setCurrentTab("connection");
+
+    var h = Math.round(Math.random()*360);
+    console.log("h", h);
+    this._uiHighlightColor = new HSLColor(h, 0.5, 0.5);
+    this._uiActiveHightlightColor = new HSLColor((h + 225)%360, 0.5, 0.5);
+
+    this.tabs.status.confirmMove.$button.on("click", function(e) {
+        e.preventDefault();
+        self._joueur.send("run", {
+            caller: {id: self._activePiece.id},
+            functionName: "move",
+            args: {
+                rank: self._activeMove.rank,
+                file: self._activeMove.file,
+                promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
+            }
+        });
     })
 
     this._playerColorsTop = [
@@ -153,27 +339,41 @@ function Chesser() {
         Pawn: String.fromCharCode(9823),
     };
 
-    console.log("ahhhh");
     for(var i = 0; i < canvases.length; i++) {
         var child = $(canvases[i]);
         this.canvases[child.attr("class")] = new CanvasWrapper(child, 8, 8);
     }
 
-    var h = Math.round(Math.random()*360);
-    var light = new HSLColor(h, 0.5, 0.667);
-    var dark = new HSLColor(h, 0.5, 0.333);
+    this._drawBackground((h + 135)%360);
 
-    for(var rank = 0; rank < 8; rank++) {
-        for(var file = 0; file < 8; file++) {
-            this.canvases.background.drawRectangle((rank+file)%2 ? dark : light, rank, file);
-        }
-    }
+    this.initPlaying();
 };
 
-Chesser.prototype.connectTo = function(server, port, spectating) {
-    this._joueur = new Joueur(server, port, spectating);
+Chesser.prototype._drawBackground = function(h) {
+    var lightOutter = new HSLColor(h, 0.5, 0.575);
+    var darkOutter = new HSLColor(h, 0.5, 0.425);
+    var lightInner = new HSLColor(h, 0.5, 0.667);
+    var darkInner = new HSLColor(h, 0.5, 0.333);
+    var borderWidth = 0.05;
+    var borderRadius = 0.075;
 
+    var canvas = this.canvases.background;
+    for(var rank = 0; rank < 8; rank++) {
+        for(var file = 0; file < 8; file++) {
+            var dark = (rank+file)%2;
+            canvas.drawRectangle(dark ? darkOutter : lightOutter, rank, file);
+            canvas.fillRoundedRectangle(dark ? darkInner : lightInner, rank + borderWidth, file + borderWidth, 1 - borderWidth*2, 1 - borderWidth*2, borderRadius);
+        }
+    }
+}
+
+Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
     var self = this;
+    this.playing = !spectating;
+    this._joueur = new Joueur(server, port, spectating, optionalArgs, function(err) {
+        self.updateConnection("Error connecting to " + server + ":" + port);
+    });
+
     this._joueur.onDelta = function() {
         self.updateBoard();
     };
@@ -184,27 +384,117 @@ Chesser.prototype.connectTo = function(server, port, spectating) {
 
     this._joueur.onStart = function(data) {
         self.updateConnection("Game Started!");
+        $(".game", self.tabs.status.$content).show();
+        $(".no-game", self.tabs.status.$content).hide();
+        self.playerID = data.playerID;
+        self.setCurrentTab("status");
     };
 
     this._joueur.onOver = function(data) {
         self.updateConnection("Game is over.");
+        self.over = true;
     };
+
+    this._joueur.onClose = function() {
+        if(!self.over) {
+            self.updateConnection("Connection closed unexpectedly...");
+            self.setCurrentTab("connection");
+        }
+    };
+
+    if(this.playing) {
+        this._joueur.onOrder = function(data) {
+            self._currentOrder = data;
+            self._validMoves = null;
+            self._joueur.send("run", {
+                caller: {id: self.playerID},
+                functionName: "getValidMoves",
+                args: {},
+            });
+        }
+
+        this._joueur.onRan = function(data) {
+            if(!self._validMoves) {
+                self._validMoves = {};
+                for(var id in data) {
+                    if(data.hasOwnProperty(id)) {
+                        self._validMoves[id] = [];
+
+                        for(var i = 0; i < data[id]["&LEN"]; i++) {
+                            self._validMoves[id][i] = data[id][i];
+                        }
+                    }
+                }
+
+                self._runTurn();
+            }
+            else if(data === true) {
+                self._joueur.send("finished", {
+                    orderIndex: self._currentOrder.index,
+                    returned: true,
+                });
+
+                this._currentOrder = undefined;
+                self._unselectActive();
+                self._uiUnlocked = false;
+                self.tabs.status.confirmMove.$element.removeClass("run-turn");
+            }
+        }
+    }
 };
 
 Chesser.prototype.updateConnection = function(str) {
-    this.$connection.html(str);
+    this.$connected.html(str);
+};
+
+Chesser.prototype._emptyBoard = function() {
+    this._board = this.board || [];
+    for(var rank = 0; rank < 8; rank++) {
+        this._board[rank] = this._board[rank] || [];
+        for(var file = 0; file < 8; file++) {
+            this._board[rank][file] = null;
+        }
+    }
+
+    return this._board;
 }
 
 Chesser.prototype.updateBoard = function() {
-    var gameObjs = this._joueur.currentGameState.gameObjects;
+    var current = this._joueur.currentGameState;
+    var gameObjs = current.gameObjects;
     this.canvases.pieces.clear();
+
+    this._emptyBoard();
+
     for(var id in gameObjs) {
         if(gameObjs.hasOwnProperty(id)) {
             var gameObj = gameObjs[id];
-
             if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
+                this._board[gameObj.rank][gameObj.file] = gameObj;
                 this.drawPiece(gameObj, gameObj.rank, 7 - gameObj.file);
             }
+        }
+    }
+
+    this.tabs.status.$currentTurn.html(current.currentTurn);
+
+    for(var i = 0; i < current.players.length; i++) {
+        var player = current.gameObjects[current.players[i].id];
+        var $status = $(".player-" + i, this.tabs.status.$content);
+        $(".name", $status).html(player.name);
+        $status
+            .addClass("client-" + player.clientType.toLowerCase())
+            .removeClass("currentPlayer");
+
+        if(current.currentPlayer.id === player.id) {
+            $status.addClass("currentPlayer");
+        }
+
+        if(player.won) {
+            $(".reason", $status).html("Won! - &quot;" + player.reasonWon + "&quot;");
+        }
+        else if(player.lost) {
+            $(".reason", $status).html("Lost - &quot;" + player.reasonLost + "&quot;");
         }
     }
 };
@@ -216,44 +506,152 @@ Chesser.prototype.drawPiece = function(piece, rank, file) {
     canvas.drawText(this._pieceTextTop[piece.type], this._playerColorsTop[piece.owner.id], 1, rank, file);
 };
 
+Chesser.prototype.setCurrentTab = function(currentKey) {
+    for(var key in this.tabs) {
+        if(this.tabs.hasOwnProperty(key)) {
+            var tab = this.tabs[key];
+            tab.$tab.removeClass("current");
+            tab.$content.removeClass("current");
+            if(key === currentKey) {
+                tab.$tab.addClass("current");
+                tab.$content.addClass("current");
+            }
+        }
+    }
+};
+
+Chesser.prototype.initPlaying = function() {
+    var self = this;
+    var canvas = this.canvases.pieces.$element;
+    var canvasWrapper = this.canvases.pieces;
+    canvas.on("mouseup", function(e) {
+        var rect = canvas[0].getBoundingClientRect();
+        self._onClick(canvasWrapper.width*(e.clientX - rect.left)/canvas.width(), canvasWrapper.height*(e.clientY - rect.top)/canvas.height());
+    })
+};
+
+Chesser.prototype._onClick = function(x, y) {
+    var rank = Math.floor(x);
+    var file = 7 - Math.floor(y); // we flip the visual
+    if(this._uiUnlocked) {
+        var piece = this._board[rank][file];
+        if(this.playing) {
+            if(this._activePiece) {
+                // see if they clicked a valid move tile
+                for(var i = 0; i < this._activeValidMoves.length; i++) {
+                    var move = this._activeValidMoves[i];
+                    if(move.rank === rank && move.file === file) {
+                        return this._confirmMove(move);
+                    }
+                }
+
+                // otherwise unselect the active piece
+                this._unselectActive();
+            }
+            else {
+                if(piece.owner.id === this.playerID) {
+                    this._activePiece = piece;
+                    this._makeActive(piece);
+                }
+            }
+        }
+    }
+};
+
+Chesser.prototype._unselectActive = function() {
+    this.canvases.ui.clear();
+    this._activePiece = null;
+    this._activeMove = null;
+    this._activeValidMoves = null;
+    this.tabs.status.confirmMove.$promotionField.removeClass("needed");
+    this.tabs.status.confirmMove.$button.prop("disabled", true);
+};
+
+Chesser.prototype._runTurn = function() {
+    this.tabs.status.confirmMove.$element.addClass("run-turn");
+    this.tabs.status.confirmMove.$message.text("Your Turn...");
+    this._uiUnlocked = true;
+};
+
+Chesser.prototype._makeActive = function(piece) {
+    if(!this._validMoves[piece.id]) {
+        console.error("No valid moves for " + piece.id);
+        return;
+    }
+
+    this._activePiece = piece;
+    this._activeValidMoves = this._validMoves[this._activePiece.id];;
+
+    this._updateUI();
+};
+
+Chesser.prototype._updateUI = function() {
+    var canvas = this.canvases.ui;
+    canvas.clear();
+
+    canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, this._activePiece.rank, 7 - this._activePiece.file, 1, 1, 0.2);
+
+    for(var i = 0; i < this._activeValidMoves.length; i++) {
+        var move = this._activeValidMoves[i];
+        canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, move.rank, 7 - move.file, 1, 1, 0.2);
+    }
+};
+
+Chesser.prototype._confirmMove = function(move) {
+    var piece = this._activePiece;
+    this._activeMove = move;
+    this.setCurrentTab("status");
+    this.tabs.status.confirmMove.$message.html("Move " + piece.id + "from (" + piece.rank + ", " + piece.file + " to (" + move.rank + ", " + move.file + ")?");
+
+    if(move.promotes) {
+        this.tabs.status.confirmMove.$promotionField.addClass("needed");
+    }
+
+    this.tabs.status.confirmMove.$button.prop("disabled", false);
+
+    this._updateUI();
+};
 
 
-function Joueur(server, port, spectating) {
+
+function Joueur(server, port, spectating, optionalArgs, errorCallback) {
+    var self = this;
     this.gameStates = [];
     this.currentGameState = {};
 
     server = server || "localhost";
     port = port || 3088;
-    this.ws = new WebSocket("ws://" + server + ":" + port);
+    try {
+        this.ws = new WebSocket("ws://" + server + ":" + port);
+    }
+    catch(err) {
+        errorCallback && errorCallback(err);
+    }
 
-    var self = this;
     this.ws.onopen = function() {
-        var playData = {
-            event: "play",
-            sentTime: (new Date).getTime(),
-            data: {
-                gameName: "Chess",
-                requestedSession: "*",
-                spectating: spectating ? true : undefined,
-                clientType: "JavaScript in Browser",
-                playerName: "In Browser Player",
-            }
-        };
-
-        self.ws.send(JSON.stringify(playData));
+        self.send("play", {
+            gameName: "Chess",
+            requestedSession: optionalArgs.requestedSession || "*",
+            spectating: spectating ? true : undefined,
+            clientType: "JavaScript in Browser",
+            playerName: optionalArgs.playerName || "In Browser",
+        });
     };
 
     this.ws.onerror = function(err) {
-        console.log("socket error", err);
+        errorCallback && errorCallback(err);
     };
 
     this.ws.onmessage = function(message) {
-        console.log("message", message.data);
+        if(getUrlParameter("printIO")) {
+            console.log("FROM SERVER <-- ", message.data);
+        }
+
         self.received(JSON.parse(message.data));
     };
 
     this.ws.onclose = function() {
-        console.log("socket closed");
+        self.onClose && self.onClose();
     };
 };
 
@@ -311,7 +709,23 @@ Joueur.prototype._mergeDelta = function(state, delta) {
     return state;
 };
 
+Joueur.prototype.send = function(eventName, data) {
+    // NOTE: this does not serialize game objects, so don't be sending cycles like other joueurs
+    var str = JSON.stringify({
+        event: eventName,
+        sentTime: (new Date).getTime(),
+        data: data,
+    });
+
+    if(getUrlParameter("printIO")) {
+        console.log("TO SERVER --> ", str);
+    }
+
+    this.ws.send(str);
+}
+
 var chesser = new Chesser();
+$("#main").css("max-width", "1280px");
 
 
 
