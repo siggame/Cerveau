@@ -165,7 +165,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var file = result.to[1];
             var rook = this._getPieceAt(rank + file);
 
-            var rookRank = result.flags === "q" ? "c" : "g"; // queenside castle ends up at rank "c", kingside at "g"
+            var rookRank = result.flags === "q" ? "d" : "f"; // queenside castle ends up at rank "c", kingside at "g"
             rook.rank = rookRank;
             rook.file = parseInt(file);
             rook.hasMoved = true;
