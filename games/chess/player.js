@@ -131,7 +131,7 @@ var Player = Class(GameObject, {
     },
 
     getMoves: function(player, asyncReturn) {
-        return this.game.moves;
+        return this.game.validMoves;
     },
 
     //<<-- /Creer-Merge: added-functions -->>

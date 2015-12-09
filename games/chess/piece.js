@@ -106,8 +106,8 @@ var Piece = Class(GameObject, {
 
         // try to find the move
         if(!reason) {
-            for(var i = 0; i < this.game.moves.length; i++) {
-                var move = this.game.moves[i];
+            for(var i = 0; i < this.game.validMoves.length; i++) {
+                var move = this.game.validMoves[i];
 
                 var myPos = this.rank + this.file;
                 var toPos = rank + file;

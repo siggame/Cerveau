@@ -134,7 +134,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     _generateMoves: function() {
-        this.moves = this.chess.moves({verbose: true});
+        this.validMoves = this.chess.moves({verbose: true});
     },
 
     /**
@@ -145,11 +145,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      */
     update: function(piece, result) {
         var captured;
-        if(result.flags === "c") { // normal capture
-            captured = this._getPieceAt(result.to);
-        }
-        else if(result.flags === "e") { // en passant capture
+        if(result.flags === "e") { // en passant capture
             captured = this._getPieceAt(result.to[0] + result.from[1]);
+        }
+        else if(result.captured) { // normal capture via moving to captured piece
+            captured = this._getPieceAt(result.to);
         }
 
         if(captured) {
@@ -175,13 +175,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         piece.file = parseInt(result.to[1]);
         piece.hasMoved = true;
         this.moves.push(result.san);
-
-        /*if(piece.type !== "Pawn" && !captured) {
-            this.turnsToStalemate--;
-            if(this.turnsToStalemate <= 0) {
-                this.declareLosers(this.players, "100 turns passed with no pawn advancement or captures, draw.");
-            }
-        }*/
 
         if(result.promotion) {
             piece.type = ({

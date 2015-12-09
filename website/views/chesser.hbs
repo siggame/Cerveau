@@ -11,7 +11,8 @@
 #chesser .tabs-content > div.current {display: block;}
 #chesser .tabs span.current {background: #ccc; color: #111;}
 #chesser .tabs span {background: #666; padding: 0.5em 0.5em 0.45em 0.5em; margin: -0.4em 0.25em; cursor: pointer; color: #eee;}
-#chesser .status .currentPlayer:before {content:"\25B6"; margin-right: 0.125em;}
+#chesser .status .player:before {margin-left: 1em; margin-right: 0.125em; content: "\00a0";}
+#chesser .status .current-player:before {content:"\25B6";}
 
 #chesser .infobox {float: right; height: 720px; width: 500px; background: #ccc;}
 #chesser .infobox .field {display: block; margin-bottom: 0.5em;}
@@ -21,6 +22,18 @@
 #chesser .infobox .confirm-move.run-turn {display: block;}
 #chesser .infobox .confirm-move .promotion-field {display: none;}
 #chesser .infobox .confirm-move .promotion-field.needed {display: block;}
+
+.white-player { background: #fafafa; color: #121212; }
+.black-player { background: #121212; color: #989898; }
+
+.player {padding: 0.25em;}
+
+#chesser .infobox .status .moves { background: #909090; padding: 0.5em; overflow-y: scroll; max-height: 24em; }
+#chesser .infobox .status .moves li span { display: inline-block; width: 4em; text-align: center; padding: 0.25em; }
+#chesser .infobox .status .moves li { margin: 0.3em; list-style-type: decimal; margin-left: 3.5em; }
+
+heading { font-weight: bold; font-size: 1.5em; }
+
 </style>
 
 <div id="chesser">
@@ -43,8 +56,8 @@
                 <div class="no-game">No game.</div>
                 <div class="game">
                     <div>Turn: <span class="currentTurn">###</span></div>
-                    <div class="player-0">White Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
-                    <div class="player-1">Black Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <div class="player player-0 white-player">White Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+                    <div class="player player-1 black-player">Black Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
                     <section class="confirm-move">
                         <heading>Confirm Move</heading>
                         <div class="message"></div>
@@ -58,6 +71,11 @@
                             </select>
                         </div>
                         <button class="confirm" disabled>Confirm</button>
+                    </section>
+                    <section class="moves">
+                        <heading>Moves</heading>
+                        <ol>
+                        </ol>
                     </section>
                 </div>
             </div>
@@ -311,6 +329,8 @@ function Chesser() {
         "$promotionType": $(".confirm-move .promotion-type", this.tabs.status.$content),
     };
 
+    this.tabs.status.$moves = $(".moves ol", this.tabs.status.$content);
+
     this.setCurrentTab("connection");
 
     var h = Math.round(Math.random()*360);
@@ -395,6 +415,11 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 
     this._joueur.onDelta = function() {
         self.updateBoard();
+        var index = self._joueur.gameStates.length - 1;
+        var state = self._joueur.gameStates;
+        if(index >= 1 && state[index].moves.length > state[index - 1].moves.length) {
+            self._recordMove(state[index].moves[state[index].moves.length - 1]);
+        }
     };
 
     this._joueur.onLobbied = function(data) {
@@ -410,7 +435,7 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
     };
 
     this._joueur.onOver = function(data) {
-        self.updateConnection("Game is over.");
+        self.updateConnection("Game is over. Disconnected from server.");
         self.over = true;
     };
 
@@ -497,10 +522,10 @@ Chesser.prototype.updateBoard = function() {
         $(".name", $status).html(player.name);
         $status
             .addClass("client-" + player.clientType.toLowerCase())
-            .removeClass("currentPlayer");
+            .removeClass("current-player");
 
         if(current.currentPlayer.id === player.id) {
-            $status.addClass("currentPlayer");
+            $status.addClass("current-player");
         }
 
         if(player.won) {
@@ -632,6 +657,23 @@ Chesser.prototype._confirmMove = function(move) {
     this._updateUI();
 };
 
+Chesser.prototype._recordMove = function(san) {
+    var span;
+    if(this._recordedWhite) {
+        var li = $("li:last-child", this.tabs.status.$moves);
+        span = $("<span>").addClass("black-player").appendTo(li);
+    }
+    else {
+        li = $("<li>");
+        li.appendTo(this.tabs.status.$moves);
+
+        span = $("<span>").addClass("white-player").appendTo(li);
+    }
+
+    span.html(san);
+    this._recordedWhite = !this._recordedWhite;
+};
+
 
 
 function Joueur(server, port, spectating, optionalArgs, errorCallback) {
@@ -691,6 +733,10 @@ Joueur.prototype.received = function(data) {
 Joueur.prototype._autoHandleDelta = function(data) {
     this.currentGameState = this._mergeDelta(clone(this.currentGameState), data);
     this.gameStates.push(this.currentGameState);
+};
+
+Joueur.prototype._autoHandleOver = function(data) {
+    this.ws.close();
 };
 
 Joueur.prototype._mergeDelta = function(state, delta) {
