@@ -37,757 +37,757 @@ heading { font-weight: bold; font-size: 1.5em; }
 </style>
 
 <div id="chesser">
-    <div class="canvases">
-        <canvas class="background">
-        </canvas>
-        <canvas class="ui">
-        </canvas>
-        <canvas class="pieces">
-        </canvas>
-    </div>
-    <div class="infobox">
-        <div class="tabs">
-            <span class="tab-for-status">Status</span>
-            <span class="tab-for-connection">Connection</span>
-            <span class="tab-for-debug">Debug</span>
-        </div>
-        <div class="tabs-content">
-            <div class="status">
-                <div class="no-game">No game.</div>
-                <div class="game">
-                    <div>Turn: <span class="currentTurn">###</span></div>
-                    <div class="player player-0 white-player">White Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
-                    <div class="player player-1 black-player">Black Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
-                    <section class="confirm-move">
-                        <heading>Confirm Move</heading>
-                        <div class="message"></div>
-                        <div class="field promotion-field">
-                            <label for="promotion-type">Promote to:</label>
-                            <select id="promotion-type" name="promotion-type">
-                                <option value="Bishop">Bishop</option>
-                                <option value="Knight">Knight</option>
-                                <option value="Queen" selected="selected">Queen</option>
-                                <option value="Rook">Rook</option>
-                            </select>
-                        </div>
-                        <button class="confirm" disabled>Confirm</button>
-                    </section>
-                    <section class="moves">
-                        <heading>Moves</heading>
-                        <ol>
-                        </ol>
-                    </section>
-                </div>
-            </div>
-            <div class="connection">
-                <form class="connect">
-                    <div class="field">
-                        <label for="server">Server</label>
-                        <input id="server" name="server" type="textbox" value="192.168.1.225"/>
-                    </div>
-                    <div class="field">
-                        <label for="port">Port</label>
-                        <input id="port" name="port" type="number" min="80" max="65535" value="3088"/>
-                    </div>
-                    <div class="field">
-                        <label for="session">Session</label>
-                        <input id="session" name="session" type="textbox" value="new"/>
-                    </div>
-                    <div class="field">
-                        <label for="spectate">Spectate</label>
-                        <input id="spectate" name="spectate" type="checkbox" checked/>
-                    </div>
-                    <div class="field">
-                        <label for="player-name">Player Name</label>
-                        <input id="player-name" name="player-name" type="textbox" value="Human" disabled/>
-                    </div>
-                    <div class="field">
-                        <label></label>
-                        <input type="submit" value="Connect"/>
-                    </div>
-                </form>
-                <div class="connected"></div>
-            </div>
-            <div class="debug">
-                TODO: debug tree
-            </div>
-        </div>
-    </div>
+	<div class="canvases">
+		<canvas class="background">
+		</canvas>
+		<canvas class="ui">
+		</canvas>
+		<canvas class="pieces">
+		</canvas>
+	</div>
+	<div class="infobox">
+		<div class="tabs">
+			<span class="tab-for-status">Status</span>
+			<span class="tab-for-connection">Connection</span>
+			<span class="tab-for-debug">Debug</span>
+		</div>
+		<div class="tabs-content">
+			<div class="status">
+				<div class="no-game">No game.</div>
+				<div class="game">
+					<div>Turn: <span class="currentTurn">###</span></div>
+					<div class="player player-0 white-player">White Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+					<div class="player player-1 black-player">Black Player &quot;<span class="name">NAME</span>&quot; <span class="reason"></span></div>
+					<section class="confirm-move">
+						<heading>Confirm Move</heading>
+						<div class="message"></div>
+						<div class="field promotion-field">
+							<label for="promotion-type">Promote to:</label>
+							<select id="promotion-type" name="promotion-type">
+								<option value="Bishop">Bishop</option>
+								<option value="Knight">Knight</option>
+								<option value="Queen" selected="selected">Queen</option>
+								<option value="Rook">Rook</option>
+							</select>
+						</div>
+						<button class="confirm" disabled>Confirm</button>
+					</section>
+					<section class="moves">
+						<heading>Moves</heading>
+						<ol>
+						</ol>
+					</section>
+				</div>
+			</div>
+			<div class="connection">
+				<form class="connect">
+					<div class="field">
+						<label for="server">Server</label>
+						<input id="server" name="server" type="textbox" value="192.168.1.225"/>
+					</div>
+					<div class="field">
+						<label for="port">Port</label>
+						<input id="port" name="port" type="number" min="80" max="65535" value="3088"/>
+					</div>
+					<div class="field">
+						<label for="session">Session</label>
+						<input id="session" name="session" type="textbox" value="new"/>
+					</div>
+					<div class="field">
+						<label for="spectate">Spectate</label>
+						<input id="spectate" name="spectate" type="checkbox" checked/>
+					</div>
+					<div class="field">
+						<label for="player-name">Player Name</label>
+						<input id="player-name" name="player-name" type="textbox" value="Human" disabled/>
+					</div>
+					<div class="field">
+						<label></label>
+						<input type="submit" value="Connect"/>
+					</div>
+				</form>
+				<div class="connected"></div>
+			</div>
+			<div class="debug">
+				TODO: debug tree
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
 
 function clamp(num, min, max) {
-    return Math.min(Math.max(num, min), max);
+	return Math.min(Math.max(num, min), max);
 };
 
 function clone(obj) {
-    return $.extend(true, {}, obj);
+	return $.extend(true, {}, obj);
 };
 
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+	return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 function isObject(obj) {
-    return obj !== null && typeof(obj) === "object";
+	return obj !== null && typeof(obj) === "object";
 };
 
 function cleanPos(obj) {
-    var rank;
-    var file;
-    switch(typeof(obj)) {
-        case "string":
-            rank = obj;
-            file = parseInt(obj[1]);
-            break;
-        case "object":
-            rank = obj.rank;
-            file = obj.file;
-            break;
-    }
+	var rank;
+	var file;
+	switch(typeof(obj)) {
+		case "string":
+			rank = obj;
+			file = parseInt(obj[1]);
+			break;
+		case "object":
+			rank = obj.rank;
+			file = obj.file;
+			break;
+	}
 
-    return {
-        rank: rank.charCodeAt(0) - "a".charCodeAt(0),
-        file: 8 - file,
-    };
+	return {
+		rank: rank.charCodeAt(0) - "a".charCodeAt(0),
+		file: 8 - file,
+	};
 };
 
 var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+	var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+		sURLVariables = sPageURL.split('&'),
+		sParameterName,
+		i;
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
+	for (i = 0; i < sURLVariables.length; i++) {
+		sParameterName = sURLVariables[i].split('=');
 
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
+		if (sParameterName[0] === sParam) {
+			return sParameterName[1] === undefined ? true : sParameterName[1];
+		}
+	}
 };
 
 
 
 function HSLColor(h, s, l) {
-    this.h = clamp(Math.round(h), 0, 360);
-    this.s = clamp(Math.round(s * 100), 0, 100);
-    this.l = clamp(Math.round(l * 100), 0, 100);
+	this.h = clamp(Math.round(h), 0, 360);
+	this.s = clamp(Math.round(s * 100), 0, 100);
+	this.l = clamp(Math.round(l * 100), 0, 100);
 };
 
 HSLColor.prototype.toString = function() {
-    return "hsl(" + this.h + ", " + this.s + "%, " + this.l + "%)";
+	return "hsl(" + this.h + ", " + this.s + "%, " + this.l + "%)";
 };
 
 function Color(r, g, b, a) {
-    a = a === undefined ? 1 : a;
-    this.r = clamp(Math.round(r * 255), 0, 255);
-    this.g = clamp(Math.round(g * 255), 0, 255);
-    this.b = clamp(Math.round(b * 255), 0, 255);
-    this.a = clamp(a, 0, 1);
+	a = a === undefined ? 1 : a;
+	this.r = clamp(Math.round(r * 255), 0, 255);
+	this.g = clamp(Math.round(g * 255), 0, 255);
+	this.b = clamp(Math.round(b * 255), 0, 255);
+	this.a = clamp(a, 0, 1);
 };
 
 Color.prototype.toString = function() {
-    return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", "+ this.a +")";
+	return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", "+ this.a +")";
 };
 
 
 
 function CanvasWrapper($canvas, width, height) {
-    this.$element = $canvas;
-    this.context = $canvas[0].getContext("2d");
+	this.$element = $canvas;
+	this.context = $canvas[0].getContext("2d");
 
-    this._fontFamily = ["sans-serif", "Arial", "Tahoma", "serif"];
-    var i = Math.floor(Math.random()*(this._fontFamily.length));
-    this._fontFamily = this._fontFamily[i];
+	this._fontFamily = ["sans-serif", "Arial", "Tahoma", "serif"];
+	var i = Math.floor(Math.random()*(this._fontFamily.length));
+	this._fontFamily = this._fontFamily[i];
 
-    this.width = width || 100;
-    this.height = height || 100;
-    this._attrWidth = 720;
-    this._attrHeight = 720;
+	this.width = width || 100;
+	this.height = height || 100;
+	this._attrWidth = 720;
+	this._attrHeight = 720;
 
-    this._d = this._attrHeight / this.height; // assumes height/width are the same scalar diff
+	this._d = this._attrHeight / this.height; // assumes height/width are the same scalar diff
 
-    this.$element.attr("width", this._attrWidth);
-    this.$element.attr("height", this._attrHeight);
+	this.$element.attr("width", this._attrWidth);
+	this.$element.attr("height", this._attrHeight);
 };
 
 CanvasWrapper.prototype.drawRectangle = function(color, x, y, width, height) {
-    width = width || 1;
-    height = height || 1;
+	width = width || 1;
+	height = height || 1;
 
-    this.context.fillStyle = color.toString();
-    this.context.fillRect(x * this._d, y * this._d, width * this._d, height * this._d);
+	this.context.fillStyle = color.toString();
+	this.context.fillRect(x * this._d, y * this._d, width * this._d, height * this._d);
 };
 
 CanvasWrapper.prototype.drawText = function(text, color, height, x, y) {
-    this.context.font = "" + Math.floor(height * this._d) + "px " + this._fontFamily;
-    this.context.fillStyle = color.toString();
-    x = x || 0;
-    y = y || 0;
-    this.context.textBaseline = "top";
-    this.context.fillText(text, x * this._d, y * this._d);
+	this.context.font = "" + Math.floor(height * this._d) + "px " + this._fontFamily;
+	this.context.fillStyle = color.toString();
+	x = x || 0;
+	y = y || 0;
+	this.context.textBaseline = "top";
+	this.context.fillText(text, x * this._d, y * this._d);
 };
 
 CanvasWrapper.prototype.fillRoundedRectangle = function(color, x, y, width, height, radius) {
-    this._roundedRectangle(x, y, width, height, radius);
-    this.context.fillStyle = color.toString();
-    this.context.fill();
+	this._roundedRectangle(x, y, width, height, radius);
+	this.context.fillStyle = color.toString();
+	this.context.fill();
 };
 
 CanvasWrapper.prototype.strokeRoundedRectangle = function(stroke, color, x, y, width, height, radius) {
-    this._roundedRectangle(x, y, width, height, radius);
-    this.context.lineWidth = stroke * this._d;
-    this.context.strokeStyle = color.toString();
-    this.context.stroke();
+	this._roundedRectangle(x, y, width, height, radius);
+	this.context.lineWidth = stroke * this._d;
+	this.context.strokeStyle = color.toString();
+	this.context.stroke();
 };
 
 CanvasWrapper.prototype._roundedRectangle = function(x, y, width, height, radius) {
-    var ctx = this.context;
+	var ctx = this.context;
 
-    x = this._d * x;
-    y = this._d * y;
-    width = this._d * width;
-    height = this._d * height;
-    radius = this._d * radius;
+	x = this._d * x;
+	y = this._d * y;
+	width = this._d * width;
+	height = this._d * height;
+	radius = this._d * radius;
 
-    ctx.beginPath();
-    ctx.moveTo(x, y + radius);
-    ctx.lineTo(x, y + height - radius);
-    ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-    ctx.lineTo(x + width - radius, y + height);
-    ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-    ctx.lineTo(x + width, y + radius);
-    ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-    ctx.lineTo(x + radius, y);
-    ctx.quadraticCurveTo(x, y, x, y + radius);
+	ctx.beginPath();
+	ctx.moveTo(x, y + radius);
+	ctx.lineTo(x, y + height - radius);
+	ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+	ctx.lineTo(x + width - radius, y + height);
+	ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+	ctx.lineTo(x + width, y + radius);
+	ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+	ctx.lineTo(x + radius, y);
+	ctx.quadraticCurveTo(x, y, x, y + radius);
 };
 
 CanvasWrapper.prototype.clear = function() {
-    this.context.clearRect(0, 0, this._attrWidth, this._attrHeight);
+	this.context.clearRect(0, 0, this._attrWidth, this._attrHeight);
 };
 
 
 
 function Chesser() {
-    this.$this = $("#chesser");
-    var canvases = $(".canvases", this.$this).children();
-    this.canvases = {};
+	this.$this = $("#chesser");
+	var canvases = $(".canvases", this.$this).children();
+	this.canvases = {};
 
-    var self = this;
-    this.$connected = $("#chesser .connected");
-    this.$connect = $("#chesser .connect");
-    this.$connect.submit(function(e) {
-        e.preventDefault();
-        var server = $("#server", this).val();
-        var port = parseInt($("#port", this).val()) || undefined;
-        var spectating = self.$connect.$spectate.is(":checked");
-        self.connectTo(server, port, spectating, {
-            playerName: self.$connect.$playerName.val(),
-            requestedSession: $("#session", this).val(),
-        });
-        self.$connect.hide();
-    });
+	var self = this;
+	this.$connected = $("#chesser .connected");
+	this.$connect = $("#chesser .connect");
+	this.$connect.submit(function(e) {
+		e.preventDefault();
+		var server = $("#server", this).val();
+		var port = parseInt($("#port", this).val()) || undefined;
+		var spectating = self.$connect.$spectate.is(":checked");
+		self.connectTo(server, port, spectating, {
+			playerName: self.$connect.$playerName.val(),
+			requestedSession: $("#session", this).val(),
+		});
+		self.$connect.hide();
+	});
 
-    this.$connect.$playerName = $("#player-name", this.$connect);
-    this.$connect.$spectate = $("#spectate", this.$connect)
-        .on("change", function() {
-            if(this.checked) {
-                self.$connect.$playerName.attr("disabled", true);
-            }
-            else {
-                self.$connect.$playerName.removeAttr("disabled");
-            }
-        })
-        .prop("checked", true);
+	this.$connect.$playerName = $("#player-name", this.$connect);
+	this.$connect.$spectate = $("#spectate", this.$connect)
+		.on("change", function() {
+			if(this.checked) {
+				self.$connect.$playerName.attr("disabled", true);
+			}
+			else {
+				self.$connect.$playerName.removeAttr("disabled");
+			}
+		})
+		.prop("checked", true);
 
-    this.tabs = {};
-    $(".tabs-content", this.$this).children().each(function() {
-        var $content = $(this);
-        var key = $content.attr("class");
-        var $tab = $(".tab-for-" + key, self.$this);
-        self.tabs[key] = {
-            "$content": $content,
-            "$tab": $tab,
-        };
+	this.tabs = {};
+	$(".tabs-content", this.$this).children().each(function() {
+		var $content = $(this);
+		var key = $content.attr("class");
+		var $tab = $(".tab-for-" + key, self.$this);
+		self.tabs[key] = {
+			"$content": $content,
+			"$tab": $tab,
+		};
 
-        $tab.on("click", function(e) {
-            e.preventDefault();
-            self.setCurrentTab(key);
-        });
-    });
+		$tab.on("click", function(e) {
+			e.preventDefault();
+			self.setCurrentTab(key);
+		});
+	});
 
-    $(".game", this.tabs.status.$content).hide();
+	$(".game", this.tabs.status.$content).hide();
 
-    this.tabs.status.$currentTurn = $(".currentTurn", this.tabs.status.$content);
-    this.tabs.status.confirmMove = {
-        "$element": $(".confirm-move", this.tabs.status.$content),
-        "$button": $(".confirm-move button", this.tabs.status.$content),
-        "$message": $(".confirm-move .message", this.tabs.status.$content),
-        "$promotionField": $(".confirm-move .promotion-field", this.tabs.status.$content),
-        "$promotionType": $(".confirm-move .promotion-type", this.tabs.status.$content),
-    };
+	this.tabs.status.$currentTurn = $(".currentTurn", this.tabs.status.$content);
+	this.tabs.status.confirmMove = {
+		"$element": $(".confirm-move", this.tabs.status.$content),
+		"$button": $(".confirm-move button", this.tabs.status.$content),
+		"$message": $(".confirm-move .message", this.tabs.status.$content),
+		"$promotionField": $(".confirm-move .promotion-field", this.tabs.status.$content),
+		"$promotionType": $(".confirm-move .promotion-type", this.tabs.status.$content),
+	};
 
-    this.tabs.status.$moves = $(".moves ol", this.tabs.status.$content);
+	this.tabs.status.$moves = $(".moves ol", this.tabs.status.$content);
 
-    this.setCurrentTab("connection");
+	this.setCurrentTab("connection");
 
-    var h = Math.round(Math.random()*360);
-    this._uiHighlightColor = new HSLColor(h, 0.5, 0.5);
-    this._uiActiveHightlightColor = new HSLColor((h + 225)%360, 0.5, 0.5);
+	var h = Math.round(Math.random()*360);
+	this._uiHighlightColor = new HSLColor(h, 0.5, 0.5);
+	this._uiActiveHightlightColor = new HSLColor((h + 225)%360, 0.5, 0.5);
 
-    this.tabs.status.confirmMove.$button.on("click", function(e) {
-        e.preventDefault();
-        self._joueur.send("run", {
-            caller: {id: self._activePiece.id},
-            functionName: "move",
-            args: {
-                rank: self._activeMove.to[0],
-                file: parseInt(self._activeMove.to[1]),
-                promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
-            }
-        });
-    })
+	this.tabs.status.confirmMove.$button.on("click", function(e) {
+		e.preventDefault();
+		self._joueur.send("run", {
+			caller: {id: self._activePiece.id},
+			functionName: "move",
+			args: {
+				rank: self._activeMove.to[0],
+				file: parseInt(self._activeMove.to[1]),
+				promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
+			}
+		});
+	})
 
-    this._playerColorsTop = [
-        new Color(0.4, 0.4, 0.4),
-        new Color(0, 0, 0)
-    ];
+	this._playerColorsTop = [
+		new Color(0.4, 0.4, 0.4),
+		new Color(0, 0, 0)
+	];
 
-    this._playerColorsBottom = [
-        new Color(1, 1, 1),
-        new Color(0.2, 0.2, 0.2)
-    ];
+	this._playerColorsBottom = [
+		new Color(1, 1, 1),
+		new Color(0.2, 0.2, 0.2)
+	];
 
-    this._pieceTextTop = {
-        King: String.fromCharCode(9812),
-        Queen: String.fromCharCode(9813),
-        Rook: String.fromCharCode(9814),
-        Bishop: String.fromCharCode(9815),
-        Knight: String.fromCharCode(9816),
-        Pawn: String.fromCharCode(9817),
-    };
+	this._pieceTextTop = {
+		King: String.fromCharCode(9812),
+		Queen: String.fromCharCode(9813),
+		Rook: String.fromCharCode(9814),
+		Bishop: String.fromCharCode(9815),
+		Knight: String.fromCharCode(9816),
+		Pawn: String.fromCharCode(9817),
+	};
 
-    this._pieceTextBottom = {
-        King: String.fromCharCode(9818),
-        Queen: String.fromCharCode(9819),
-        Rook: String.fromCharCode(9820),
-        Bishop: String.fromCharCode(9821),
-        Knight: String.fromCharCode(9822),
-        Pawn: String.fromCharCode(9823),
-    };
+	this._pieceTextBottom = {
+		King: String.fromCharCode(9818),
+		Queen: String.fromCharCode(9819),
+		Rook: String.fromCharCode(9820),
+		Bishop: String.fromCharCode(9821),
+		Knight: String.fromCharCode(9822),
+		Pawn: String.fromCharCode(9823),
+	};
 
-    for(var i = 0; i < canvases.length; i++) {
-        var child = $(canvases[i]);
-        this.canvases[child.attr("class")] = new CanvasWrapper(child, 8, 8);
-    }
+	for(var i = 0; i < canvases.length; i++) {
+		var child = $(canvases[i]);
+		this.canvases[child.attr("class")] = new CanvasWrapper(child, 8, 8);
+	}
 
-    this._drawBackground((h + 135)%360);
+	this._drawBackground((h + 135)%360);
 
-    this.initPlaying();
+	this.initPlaying();
 };
 
 Chesser.prototype._drawBackground = function(h) {
-    var lightOutter = new HSLColor(h, 0.5, 0.575);
-    var darkOutter = new HSLColor(h, 0.5, 0.425);
-    var lightInner = new HSLColor(h, 0.5, 0.667);
-    var darkInner = new HSLColor(h, 0.5, 0.333);
-    var borderWidth = 0.05;
-    var borderRadius = 0.075;
+	var lightOutter = new HSLColor(h, 0.5, 0.575);
+	var darkOutter = new HSLColor(h, 0.5, 0.425);
+	var lightInner = new HSLColor(h, 0.5, 0.667);
+	var darkInner = new HSLColor(h, 0.5, 0.333);
+	var borderWidth = 0.05;
+	var borderRadius = 0.075;
 
-    var canvas = this.canvases.background;
-    for(var rank = 0; rank < 8; rank++) {
-        for(var file = 0; file < 8; file++) {
-            var dark = (rank+file)%2;
-            canvas.drawRectangle(dark ? darkOutter : lightOutter, rank, file);
-            canvas.fillRoundedRectangle(dark ? darkInner : lightInner, rank + borderWidth, file + borderWidth, 1 - borderWidth*2, 1 - borderWidth*2, borderRadius);
-        }
-    }
+	var canvas = this.canvases.background;
+	for(var rank = 0; rank < 8; rank++) {
+		for(var file = 0; file < 8; file++) {
+			var dark = (rank+file)%2;
+			canvas.drawRectangle(dark ? darkOutter : lightOutter, rank, file);
+			canvas.fillRoundedRectangle(dark ? darkInner : lightInner, rank + borderWidth, file + borderWidth, 1 - borderWidth*2, 1 - borderWidth*2, borderRadius);
+		}
+	}
 }
 
 Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
-    var self = this;
-    this.playing = !spectating;
-    this._joueur = new Joueur(server, port, spectating, optionalArgs, function(err) {
-        self.updateConnection("Error connecting to " + server + ":" + port);
-    });
+	var self = this;
+	this.playing = !spectating;
+	this._joueur = new Joueur(server, port, spectating, optionalArgs, function(err) {
+		self.updateConnection("Error connecting to " + server + ":" + port);
+	});
 
-    this._joueur.onDelta = function() {
-        self.updateBoard();
-        var index = self._joueur.gameStates.length - 1;
-        var state = self._joueur.gameStates;
-        if(index >= 1 && state[index].moves.length > state[index - 1].moves.length) {
-            self._recordMove(state[index].moves[state[index].moves.length - 1]);
-        }
-    };
+	this._joueur.onDelta = function() {
+		self.updateBoard();
+		var index = self._joueur.gameStates.length - 1;
+		var state = self._joueur.gameStates;
+		if(index >= 1 && state[index].moves.length > state[index - 1].moves.length) {
+			self._recordMove(state[index].moves[state[index].moves.length - 1]);
+		}
+	};
 
-    this._joueur.onLobbied = function(data) {
-        self.updateConnection("In lobby for game '" + data.gameName + "' in session '" + data.gameSession + "'.")
-    };
+	this._joueur.onLobbied = function(data) {
+		self.updateConnection("In lobby for game '" + data.gameName + "' in session '" + data.gameSession + "'.")
+	};
 
-    this._joueur.onStart = function(data) {
-        self.updateConnection("Game Started!");
-        $(".game", self.tabs.status.$content).show();
-        $(".no-game", self.tabs.status.$content).hide();
-        self.playerID = data.playerID;
-        self.setCurrentTab("status");
-    };
+	this._joueur.onStart = function(data) {
+		self.updateConnection("Game Started!");
+		$(".game", self.tabs.status.$content).show();
+		$(".no-game", self.tabs.status.$content).hide();
+		self.playerID = data.playerID;
+		self.setCurrentTab("status");
+	};
 
-    this._joueur.onOver = function(data) {
-        self.updateConnection("Game is over. Disconnected from server.");
-        self.over = true;
-    };
+	this._joueur.onOver = function(data) {
+		self.updateConnection("Game is over. Disconnected from server.");
+		self.over = true;
+	};
 
-    this._joueur.onClose = function() {
-        if(!self.over) {
-            self.updateConnection("Connection closed unexpectedly...");
-            self.setCurrentTab("connection");
-        }
-    };
+	this._joueur.onClose = function() {
+		if(!self.over) {
+			self.updateConnection("Connection closed unexpectedly...");
+			self.setCurrentTab("connection");
+		}
+	};
 
-    if(this.playing) {
-        this._joueur.onOrder = function(data) {
-            self._currentOrder = data;
-            self._validMoves = null;
-            self._joueur.send("run", {
-                caller: {id: self.playerID},
-                functionName: "getMoves",
-                args: {},
-            });
-        }
+	if(this.playing) {
+		this._joueur.onOrder = function(data) {
+			self._currentOrder = data;
+			self._validMoves = null;
+			self._joueur.send("run", {
+				caller: {id: self.playerID},
+				functionName: "getMoves",
+				args: {},
+			});
+		}
 
-        this._joueur.onRan = function(data) {
-            if(!self._validMoves) {
-                delete data["&LEN"];
-                self._validMoves = data;
+		this._joueur.onRan = function(data) {
+			if(!self._validMoves) {
+				delete data["&LEN"];
+				self._validMoves = data;
 
-                self._runTurn();
-            }
-            else if(data === self._activeMove.san) {
-                self._joueur.send("finished", {
-                    orderIndex: self._currentOrder.index,
-                    returned: true,
-                });
+				self._runTurn();
+			}
+			else if(data === self._activeMove.san) {
+				self._joueur.send("finished", {
+					orderIndex: self._currentOrder.index,
+					returned: true,
+				});
 
-                this._currentOrder = undefined;
-                self._unselectActive();
-                self._uiUnlocked = false;
-                self.tabs.status.confirmMove.$element.removeClass("run-turn");
-            }
-        }
-    }
+				this._currentOrder = undefined;
+				self._unselectActive();
+				self._uiUnlocked = false;
+				self.tabs.status.confirmMove.$element.removeClass("run-turn");
+			}
+		}
+	}
 };
 
 Chesser.prototype.updateConnection = function(str) {
-    this.$connected.html(str);
+	this.$connected.html(str);
 };
 
 Chesser.prototype._emptyBoard = function() {
-    this._board = this.board || [];
-    for(var rank = 0; rank < 8; rank++) {
-        this._board[rank] = this._board[rank] || [];
-        for(var file = 0; file < 8; file++) {
-            this._board[rank][file] = null;
-        }
-    }
+	this._board = this.board || [];
+	for(var rank = 0; rank < 8; rank++) {
+		this._board[rank] = this._board[rank] || [];
+		for(var file = 0; file < 8; file++) {
+			this._board[rank][file] = null;
+		}
+	}
 
-    return this._board;
+	return this._board;
 }
 
 Chesser.prototype.updateBoard = function() {
-    var current = this._joueur.currentGameState;
-    var gameObjs = current.gameObjects;
-    this.canvases.pieces.clear();
+	var current = this._joueur.currentGameState;
+	var gameObjs = current.gameObjects;
+	this.canvases.pieces.clear();
 
-    this._emptyBoard();
+	this._emptyBoard();
 
-    for(var id in gameObjs) {
-        if(gameObjs.hasOwnProperty(id)) {
-            var gameObj = gameObjs[id];
-            if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
-                var pos = cleanPos(gameObj);
-                this._board[pos.rank][pos.file] = gameObj;
-                var pos = cleanPos(gameObj);
-                this.drawPiece(gameObj, pos.rank, pos.file);
-            }
-        }
-    }
+	for(var id in gameObjs) {
+		if(gameObjs.hasOwnProperty(id)) {
+			var gameObj = gameObjs[id];
+			if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
+				var pos = cleanPos(gameObj);
+				this._board[pos.rank][pos.file] = gameObj;
+				var pos = cleanPos(gameObj);
+				this.drawPiece(gameObj, pos.rank, pos.file);
+			}
+		}
+	}
 
-    this.tabs.status.$currentTurn.html(current.currentTurn);
+	this.tabs.status.$currentTurn.html(current.currentTurn);
 
-    for(var i = 0; i < current.players.length; i++) {
-        var player = current.gameObjects[current.players[i].id];
-        var $status = $(".player-" + i, this.tabs.status.$content);
-        $(".name", $status).html(player.name);
-        $status
-            .addClass("client-" + player.clientType.toLowerCase())
-            .removeClass("current-player");
+	for(var i = 0; i < current.players.length; i++) {
+		var player = current.gameObjects[current.players[i].id];
+		var $status = $(".player-" + i, this.tabs.status.$content);
+		$(".name", $status).html(player.name);
+		$status
+			.addClass("client-" + player.clientType.toLowerCase())
+			.removeClass("current-player");
 
-        if(current.currentPlayer.id === player.id) {
-            $status.addClass("current-player");
-        }
+		if(current.currentPlayer.id === player.id) {
+			$status.addClass("current-player");
+		}
 
-        if(player.won) {
-            $(".reason", $status).html("Won! - &quot;" + player.reasonWon + "&quot;");
-        }
-        else if(player.lost) {
-            $(".reason", $status).html("Lost - &quot;" + player.reasonLost + "&quot;");
-        }
-    }
+		if(player.won) {
+			$(".reason", $status).html("Won! - &quot;" + player.reasonWon + "&quot;");
+		}
+		else if(player.lost) {
+			$(".reason", $status).html("Lost - &quot;" + player.reasonLost + "&quot;");
+		}
+	}
 };
 
 Chesser.prototype.drawPiece = function(piece, rank, file) {
-    var canvas = this.canvases.pieces;
+	var canvas = this.canvases.pieces;
 
-    canvas.drawText(this._pieceTextBottom[piece.type], this._playerColorsBottom[piece.owner.id], 1, rank, file);
-    canvas.drawText(this._pieceTextTop[piece.type], this._playerColorsTop[piece.owner.id], 1, rank, file);
+	canvas.drawText(this._pieceTextBottom[piece.type], this._playerColorsBottom[piece.owner.id], 1, rank, file);
+	canvas.drawText(this._pieceTextTop[piece.type], this._playerColorsTop[piece.owner.id], 1, rank, file);
 };
 
 Chesser.prototype.setCurrentTab = function(currentKey) {
-    for(var key in this.tabs) {
-        if(this.tabs.hasOwnProperty(key)) {
-            var tab = this.tabs[key];
-            tab.$tab.removeClass("current");
-            tab.$content.removeClass("current");
-            if(key === currentKey) {
-                tab.$tab.addClass("current");
-                tab.$content.addClass("current");
-            }
-        }
-    }
+	for(var key in this.tabs) {
+		if(this.tabs.hasOwnProperty(key)) {
+			var tab = this.tabs[key];
+			tab.$tab.removeClass("current");
+			tab.$content.removeClass("current");
+			if(key === currentKey) {
+				tab.$tab.addClass("current");
+				tab.$content.addClass("current");
+			}
+		}
+	}
 };
 
 Chesser.prototype.initPlaying = function() {
-    var self = this;
-    var canvas = this.canvases.pieces.$element;
-    var canvasWrapper = this.canvases.pieces;
-    canvas.on("mouseup", function(e) {
-        var rect = canvas[0].getBoundingClientRect();
-        self._onClick(canvasWrapper.width*(e.clientX - rect.left)/canvas.width(), canvasWrapper.height*(e.clientY - rect.top)/canvas.height());
-    })
+	var self = this;
+	var canvas = this.canvases.pieces.$element;
+	var canvasWrapper = this.canvases.pieces;
+	canvas.on("mouseup", function(e) {
+		var rect = canvas[0].getBoundingClientRect();
+		self._onClick(canvasWrapper.width*(e.clientX - rect.left)/canvas.width(), canvasWrapper.height*(e.clientY - rect.top)/canvas.height());
+	})
 };
 
 Chesser.prototype._onClick = function(x, y) {
-    var rank = Math.floor(x);
-    var file = Math.floor(y);
-    if(this._uiUnlocked) {
-        var piece = this._board[rank][file];
-        if(this.playing) {
-            if(this._activePiece) {
-                // see if they clicked a valid move tile
-                for(var i = 0; i < this._activeValidMoves.length; i++) {
-                    var move = this._activeValidMoves[i];
-                    var pos = cleanPos(move.to);
-                    if(pos.rank === rank && pos.file === file) {
-                        return this._confirmMove(move);
-                    }
-                }
+	var rank = Math.floor(x);
+	var file = Math.floor(y);
+	if(this._uiUnlocked) {
+		var piece = this._board[rank][file];
+		if(this.playing) {
+			if(this._activePiece) {
+				// see if they clicked a valid move tile
+				for(var i = 0; i < this._activeValidMoves.length; i++) {
+					var move = this._activeValidMoves[i];
+					var pos = cleanPos(move.to);
+					if(pos.rank === rank && pos.file === file) {
+						return this._confirmMove(move);
+					}
+				}
 
-                // otherwise unselect the active piece
-                this._unselectActive();
-            }
-            else {
-                if(piece.owner.id === this.playerID) {
-                    this._activePiece = piece;
-                    this._makeActive(piece);
-                }
-            }
-        }
-    }
+				// otherwise unselect the active piece
+				this._unselectActive();
+			}
+			else {
+				if(piece.owner.id === this.playerID) {
+					this._activePiece = piece;
+					this._makeActive(piece);
+				}
+			}
+		}
+	}
 };
 
 Chesser.prototype._unselectActive = function() {
-    this.canvases.ui.clear();
-    this._activePiece = null;
-    this._activeMove = null;
-    this._activeValidMoves = null;
-    this.tabs.status.confirmMove.$promotionField.removeClass("needed");
-    this.tabs.status.confirmMove.$button.prop("disabled", true);
+	this.canvases.ui.clear();
+	this._activePiece = null;
+	this._activeMove = null;
+	this._activeValidMoves = null;
+	this.tabs.status.confirmMove.$promotionField.removeClass("needed");
+	this.tabs.status.confirmMove.$button.prop("disabled", true);
 };
 
 Chesser.prototype._runTurn = function() {
-    this.tabs.status.confirmMove.$element.addClass("run-turn");
-    this.tabs.status.confirmMove.$message.text("Your Turn...");
-    this._uiUnlocked = true;
+	this.tabs.status.confirmMove.$element.addClass("run-turn");
+	this.tabs.status.confirmMove.$message.text("Your Turn...");
+	this._uiUnlocked = true;
 };
 
 Chesser.prototype._makeActive = function(piece) {
-    var moves = [];
-    for(var id in this._validMoves) {
-        if(this._validMoves.hasOwnProperty(id)) {
-            var move = this._validMoves[id];
-            if(move.from === (piece.rank + piece.file)) {
-                moves.push(move);
-            }
-        }
-    }
-    this._activePiece = piece;
-    this._activeValidMoves = moves;
+	var moves = [];
+	for(var id in this._validMoves) {
+		if(this._validMoves.hasOwnProperty(id)) {
+			var move = this._validMoves[id];
+			if(move.from === (piece.rank + piece.file)) {
+				moves.push(move);
+			}
+		}
+	}
+	this._activePiece = piece;
+	this._activeValidMoves = moves;
 
-    this._updateUI();
+	this._updateUI();
 };
 
 Chesser.prototype._updateUI = function() {
-    var canvas = this.canvases.ui;
-    canvas.clear();
+	var canvas = this.canvases.ui;
+	canvas.clear();
 
-    var pos = cleanPos(this._activePiece);
-    canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
+	var pos = cleanPos(this._activePiece);
+	canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
 
-    for(var i = 0; i < this._activeValidMoves.length; i++) {
-        var move = this._activeValidMoves[i];
-        var pos = cleanPos(move.to);
-        canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, pos.rank, pos.file, 1, 1, 0.2);
-    }
+	for(var i = 0; i < this._activeValidMoves.length; i++) {
+		var move = this._activeValidMoves[i];
+		var pos = cleanPos(move.to);
+		canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, pos.rank, pos.file, 1, 1, 0.2);
+	}
 };
 
 Chesser.prototype._confirmMove = function(move) {
-    var piece = this._activePiece;
-    this._activeMove = move;
-    this.setCurrentTab("status");
-    this.tabs.status.confirmMove.$message.html("Move " + piece.type + " #" + piece.id + " from " + move.from + " to " + move.to + "?");
+	var piece = this._activePiece;
+	this._activeMove = move;
+	this.setCurrentTab("status");
+	this.tabs.status.confirmMove.$message.html("Move " + piece.type + " #" + piece.id + " from " + move.from + " to " + move.to + "?");
 
-    if(move.promotes) {
-        this.tabs.status.confirmMove.$promotionField.addClass("needed");
-    }
+	if(move.promotes) {
+		this.tabs.status.confirmMove.$promotionField.addClass("needed");
+	}
 
-    this.tabs.status.confirmMove.$button.prop("disabled", false);
+	this.tabs.status.confirmMove.$button.prop("disabled", false);
 
-    this._updateUI();
+	this._updateUI();
 };
 
 Chesser.prototype._recordMove = function(san) {
-    var span;
-    if(this._recordedWhite) {
-        var li = $("li:last-child", this.tabs.status.$moves);
-        span = $("<span>").addClass("black-player").appendTo(li);
-    }
-    else {
-        li = $("<li>");
-        li.appendTo(this.tabs.status.$moves);
+	var span;
+	if(this._recordedWhite) {
+		var li = $("li:last-child", this.tabs.status.$moves);
+		span = $("<span>").addClass("black-player").appendTo(li);
+	}
+	else {
+		li = $("<li>");
+		li.appendTo(this.tabs.status.$moves);
 
-        span = $("<span>").addClass("white-player").appendTo(li);
-    }
+		span = $("<span>").addClass("white-player").appendTo(li);
+	}
 
-    span.html(san);
-    this._recordedWhite = !this._recordedWhite;
+	span.html(san);
+	this._recordedWhite = !this._recordedWhite;
 };
 
 
 
 function Joueur(server, port, spectating, optionalArgs, errorCallback) {
-    var self = this;
-    this.gameStates = [];
-    this.currentGameState = {};
+	var self = this;
+	this.gameStates = [];
+	this.currentGameState = {};
 
-    server = server || "localhost";
-    port = port || 3088;
-    try {
-        this.ws = new WebSocket("ws://" + server + ":" + port);
-    }
-    catch(err) {
-        errorCallback && errorCallback(err);
-    }
+	server = server || "localhost";
+	port = port || 3088;
+	try {
+		this.ws = new WebSocket("ws://" + server + ":" + port);
+	}
+	catch(err) {
+		errorCallback && errorCallback(err);
+	}
 
-    this.ws.onopen = function() {
-        self.send("play", {
-            gameName: "Chess",
-            requestedSession: optionalArgs.requestedSession || "*",
-            spectating: spectating ? true : undefined,
-            clientType: "JavaScript in Browser",
-            playerName: optionalArgs.playerName || "In Browser",
-        });
-    };
+	this.ws.onopen = function() {
+		self.send("play", {
+			gameName: "Chess",
+			requestedSession: optionalArgs.requestedSession || "*",
+			spectating: spectating ? true : undefined,
+			clientType: "JavaScript in Browser",
+			playerName: optionalArgs.playerName || "In Browser",
+		});
+	};
 
-    this.ws.onerror = function(err) {
-        errorCallback && errorCallback(err);
-    };
+	this.ws.onerror = function(err) {
+		errorCallback && errorCallback(err);
+	};
 
-    this.ws.onmessage = function(message) {
-        if(getUrlParameter("printIO")) {
-            console.log("FROM SERVER <-- ", message.data);
-        }
+	this.ws.onmessage = function(message) {
+		if(getUrlParameter("printIO")) {
+			console.log("FROM SERVER <-- ", message.data);
+		}
 
-        self.received(JSON.parse(message.data));
-    };
+		self.received(JSON.parse(message.data));
+	};
 
-    this.ws.onclose = function() {
-        self.onClose && self.onClose();
-    };
+	this.ws.onclose = function() {
+		self.onClose && self.onClose();
+	};
 };
 
 Joueur.prototype.received = function(data) {
-    var captializedEvent = capitalizeFirstLetter(data.event);
+	var captializedEvent = capitalizeFirstLetter(data.event);
 
-    var funct = this["_autoHandle" + captializedEvent];
-    if(funct) {
-        funct.call(this, data.data);
-    }
+	var funct = this["_autoHandle" + captializedEvent];
+	if(funct) {
+		funct.call(this, data.data);
+	}
 
-    if(this["on" + captializedEvent]) {
-        this["on" + captializedEvent](data.data);
-    }
+	if(this["on" + captializedEvent]) {
+		this["on" + captializedEvent](data.data);
+	}
 };
 
 Joueur.prototype._autoHandleDelta = function(data) {
-    this.currentGameState = this._mergeDelta(clone(this.currentGameState), data);
-    this.gameStates.push(this.currentGameState);
+	this.currentGameState = this._mergeDelta(clone(this.currentGameState), data);
+	this.gameStates.push(this.currentGameState);
 };
 
 Joueur.prototype._autoHandleOver = function(data) {
-    this.ws.close();
+	this.ws.close();
 };
 
 Joueur.prototype._mergeDelta = function(state, delta) {
-    var deltaLength = delta["&LEN"];
+	var deltaLength = delta["&LEN"];
 
-    if(deltaLength !== undefined) { // then this part in the state is an array
-        delete delta["&LEN"]; // we don't want to copy this key/value over to the state, it was just to signify it is an array
-        while(state.length > deltaLength) { // pop elements off the array until the array is short enough. an increase in array size will be added below as arrays resize when keys larger are set
-            state.pop();
-        }
-    }
+	if(deltaLength !== undefined) { // then this part in the state is an array
+		delete delta["&LEN"]; // we don't want to copy this key/value over to the state, it was just to signify it is an array
+		while(state.length > deltaLength) { // pop elements off the array until the array is short enough. an increase in array size will be added below as arrays resize when keys larger are set
+			state.pop();
+		}
+	}
 
-    for(var key in delta) {
-        if(delta.hasOwnProperty(key)) {
-            if(delta[key] === "&RM") {
-                delete state[key];
-            }
-            else if(isObject(delta[key]) && isObject(state[key])) {
-                this._mergeDelta(state[key], delta[key]);
-            }
-            else {
-                if(isObject(delta[key]) && delta[key]["&LEN"] !== undefined) {
-                    newArray = [];
-                    for(var i = 0; i < delta[key]["&LEN"]; i++) {
-                        newArray.push(delta[key][i]);
-                    }
-                    state[key] = newArray;
-                }
-                else {
-                    state[key] = delta[key];
-                }
-            }
-        }
-    }
+	for(var key in delta) {
+		if(delta.hasOwnProperty(key)) {
+			if(delta[key] === "&RM") {
+				delete state[key];
+			}
+			else if(isObject(delta[key]) && isObject(state[key])) {
+				this._mergeDelta(state[key], delta[key]);
+			}
+			else {
+				if(isObject(delta[key]) && delta[key]["&LEN"] !== undefined) {
+					newArray = [];
+					for(var i = 0; i < delta[key]["&LEN"]; i++) {
+						newArray.push(delta[key][i]);
+					}
+					state[key] = newArray;
+				}
+				else {
+					state[key] = delta[key];
+				}
+			}
+		}
+	}
 
-    return state;
+	return state;
 };
 
 Joueur.prototype.send = function(eventName, data) {
-    // NOTE: this does not serialize game objects, so don't be sending cycles like other joueurs
-    var str = JSON.stringify({
-        event: eventName,
-        sentTime: (new Date).getTime(),
-        data: data,
-    });
+	// NOTE: this does not serialize game objects, so don't be sending cycles like other joueurs
+	var str = JSON.stringify({
+		event: eventName,
+		sentTime: (new Date).getTime(),
+		data: data,
+	});
 
-    if(getUrlParameter("printIO")) {
-        console.log("TO SERVER --> ", str);
-    }
+	if(getUrlParameter("printIO")) {
+		console.log("TO SERVER --> ", str);
+	}
 
-    this.ws.send(str);
+	this.ws.send(str);
 }
 
 var chesser = new Chesser();
