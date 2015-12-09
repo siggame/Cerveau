@@ -137,7 +137,7 @@
             },
             "turnsToStalemate": {
                 "default": null,
-                "description": "How many turns until the game ends because no pawn has moved and no piece has been taken",
+                "description": "How many turns until the game ends because no pawn has moved and no piece has been taken.",
                 "type": {
                     "keyType": null,
                     "name": "int",
@@ -295,7 +295,7 @@
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of chess piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'",
+                    "description": "The type of chess piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -465,7 +465,7 @@
                     "description": "The color (side) of this player. Either 'White' or 'Black', with the 'White' player having the first move.",
                     "type": {
                         "keyType": null,
-                        "name": "String",
+                        "name": "string",
                         "valueType": null
                     }
                 },
