@@ -49,6 +49,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.chess = new Chess();
         this.maxTurns = 6000; // longest possible game without stalemate is 5,950
+        this.turnsToStalemate = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -133,6 +134,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    _playerStartingTime: 9e11, // 15 min in nanoseconds
+    _playerAdditionalTimePerTurn: 0, // they start with 15 min and get no additional time per turn.
+
     _generateMoves: function() {
         this.validMoves = this.chess.moves({verbose: true});
     },
@@ -165,7 +169,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var file = result.to[1];
             var rook = this._getPieceAt(rank + file);
 
-            var rookRank = result.flags === "q" ? "d" : "f"; // queenside castle ends up at rank "c", kingside at "g"
+            var rookRank = result.flags === "q" ? "d" : "f"; // queenside castle ends up at rank "d", kingside at "f"
             rook.rank = rookRank;
             rook.file = parseInt(file);
             rook.hasMoved = true;
@@ -175,6 +179,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         piece.file = parseInt(result.to[1]);
         piece.hasMoved = true;
         this.moves.push(result.san);
+
+        this.turnsToStalemate = (piece.type === "Pawn" || captured) ? 100 : Math.max(this.turnsToStalemate - 1, 0);
 
         if(result.promotion) {
             piece.type = ({
@@ -193,20 +199,21 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             this.declareWinner(this.currentPlayer, "Checkmate!");
             this.declareLoser(this.currentPlayer.otherPlayer, "Checkmated");
         }
-        if(this.chess.insufficient_material()) {
-            this.declareLosers(this.players, "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN)");
+        else if(this.turnsToStalemate <= 0) { // this.chess.in_draw() should be true at the same time, but we are tracking the turns anyways, and chess.in_draw() checks for more than the 50-turn rule anyways so the following checks would never be reached
+            this.declareLosers(this.players, "Draw - 50-move rule: 50 moves completed with no pawn has moved or piece captured.");
         }
-        else if(this.chess.in_draw()) {
-            this.declareLosers(this.players, "Draw - 50-move rule");
+        if(this.chess.insufficient_material()) {
+            this.declareLosers(this.players, "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate.");
         }
         else if(this.chess.in_stalemate()) {
-            this.declareLosers(this.players, "Stalemate - The side to move has been stalemated");
+            this.declareLosers(this.players, "Stalemate - The side to move has been stalemated because they are not in check but have no valid moves.");
         }
         else if(this.chess.in_threefold_repetition()) {
-            this.declareLosers(this.players, "Stalemate - Board position has occurred three or more times");
+            this.declareLosers(this.players, "Stalemate - Board position has occurred three or more times.");
         }
-
-        this._generateMoves();
+        else { // the game is not over
+            this._generateMoves();
+        }
     },
 
     _getPieceAt: function(pos) {
