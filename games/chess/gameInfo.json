@@ -34,7 +34,7 @@
             "pieces",
             "players",
             "session",
-            "turnsToStalemate"
+            "turnsToDraw"
         ],
         "attributes": {
             "currentPlayer": {
@@ -135,7 +135,7 @@
                     "valueType": null
                 }
             },
-            "turnsToStalemate": {
+            "turnsToDraw": {
                 "default": null,
                 "description": "How many turns until the game ends because no pawn has moved and no piece has been taken.",
                 "type": {
@@ -498,7 +498,7 @@
                 },
                 "madeMove": {
                     "default": null,
-                    "description": "If the Player has made thier move for the turn. true means they can no longer move a piece this turn.",
+                    "description": "If the Player has made their move for the turn. true means they can no longer move a piece this turn.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
