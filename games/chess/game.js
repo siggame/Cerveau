@@ -199,8 +199,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             this.declareWinner(this.currentPlayer, "Checkmate!");
             this.declareLoser(this.currentPlayer.otherPlayer, "Checkmated");
         }
-        else if(this.turnsToDraw <= 0) { // this.chess.in_draw() should be true at the same time, but we are tracking the turns anyways, and chess.in_draw() checks for more than the 50-turn rule anyways so the following checks would never be reached
-            this.declareLosers(this.players, "Draw - 50-move rule: 50 moves completed with no pawn has moved or piece captured.");
+        else if(this.turnsToDraw <= 0) { // this.chess.in_draw() should be true at the same time, but we are tracking the turns anyways, and chess.in_draw() checks for more than the 50-turn rule so the checks following this one would never be reached
+            this.declareLosers(this.players, "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.");
         }
         if(this.chess.insufficient_material()) {
             this.declareLosers(this.players, "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate.");
