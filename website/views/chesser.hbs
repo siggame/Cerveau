@@ -16,6 +16,9 @@
 #chesser .tabs span {background: #666; padding: 0.5em 0.5em 0.45em 0.5em; margin: -0.4em 0.25em; cursor: pointer; color: #eee;}
 #chesser .status .player:before {margin-left: 1em; margin-right: 0.125em; content: "\00a0";}
 #chesser .status .current-player:before {content:"\25B6";}
+#chesser .file #download-link {display: block; width: 100%;}
+#chesser #turn-slider {width: 16.5em;}
+#chesser #playback-speed {width: 3em;}
 
 #chesser .infobox {float: right; height: 720px; width: 500px; background: #ccc;}
 #chesser .infobox .field {display: block; margin-bottom: 0.5em;}
@@ -64,7 +67,7 @@ heading { font-weight: bold; font-size: 1.5em; }
 					<div class="turn">Turn:
 						<span class="currentTurn">###</span>
 						<span id="turn-controls">
-							<input type="range" id="turn-slider" min="0" max="1" step="1"/>
+							<input type="range" id="turn-slider" min="0" max="1" step="1" value="0"/>
 							<button id="play-pause">&#9658;</button>
 							<button id="prev-turn">&laquo;</button>
 							<button id="next-turn">&raquo;</button>
@@ -98,6 +101,7 @@ heading { font-weight: bold; font-size: 1.5em; }
 			</div>
 			<div class="file">
 				<div class="no-load" style="display: none;">Cannot load gamelogs when connecting to live a game.</div>
+				<a id="gamelog-download" href="#" style="display: none;" download>Download Gamelog for local playback</a>
 				<input type="file" id="gamelog-file" name="gamelogfile"/>
 				<ul class="messages">
 				</ul>
@@ -118,11 +122,11 @@ heading { font-weight: bold; font-size: 1.5em; }
 					</div>
 					<div class="field">
 						<label for="spectate">Spectate</label>
-						<input id="spectate" name="spectate" type="checkbox" checked/>
+						<input id="spectate" name="spectate" type="checkbox"/>
 					</div>
 					<div class="field">
 						<label for="player-name">Player Name</label>
-						<input id="player-name" name="player-name" type="textbox" value="Human" disabled/>
+						<input id="player-name" name="player-name" type="textbox" value="Human"/>
 					</div>
 					<div class="field">
 						<label></label>
@@ -349,7 +353,6 @@ function Chesser() {
 				self.$connect.$playerName.removeAttr("disabled");
 			}
 		})
-		.prop("checked", true);
 
 	this.tabs = {};
 	$(".tabs-content", this.$this).children().each(function() {
@@ -375,7 +378,7 @@ function Chesser() {
 		"$button": $(".confirm-move button", this.tabs.status.$content),
 		"$message": $(".confirm-move .message", this.tabs.status.$content),
 		"$promotionField": $(".confirm-move .promotion-field", this.tabs.status.$content),
-		"$promotionType": $(".confirm-move .promotion-type", this.tabs.status.$content),
+		"$promotionType": $(".confirm-move #promotion-type", this.tabs.status.$content),
 		"$time": $(".time", this.tabs.status.$content),
 	};
 
@@ -474,7 +477,7 @@ function Chesser() {
 				rank: self._activeMove.to[0],
 				file: parseInt(self._activeMove.to[1]),
 				promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
-			}
+			},
 		});
 	})
 
@@ -514,15 +517,40 @@ function Chesser() {
 	this.initPlaying();
 
 	this._drawBackground();
+
+	var log = getUrlParameter("log") || getUrlParameter("gamelog") || getUrlParameter("logUrl"); // logUrl to be compatible with Wyatt's visualizer url parm
+	if(log) {
+		this.addFileMessage("Fetching remote gamelog at '" + log + "'.");
+		this.linkToGamelog(log);
+		this.tabs.file.$gamelogfile.hide();
+		$.ajax({
+			dataType: "json",
+			url: log,
+			success: function(data) {
+				self.addFileMessage("Remote gamelog fetched.");
+				if(data.error) {
+					self.addFileMessage("Fetched gamelog was an error: '" + data.error + "'.", "error");
+				}
+				else {
+					self._gamelogLoaded(data);
+				}
+			},
+			error: function(data) {
+				self.addFileMessage("Error fetching remote gamelog.", "error");
+			},
+		});
+	}
+};
+
+Chesser.prototype.linkToGamelog = function(link) {
+	$("#gamelog-download").show().attr("href", link);
 };
 
 Chesser.prototype._colorize = function(rand) {
 	var h = Math.round(rand*360);
 	this._uiHighlightColor = new HSLColor(h, 0.5, 0.5);
 	this._uiActiveHightlightColor = new HSLColor((h + 225)%360, 0.5, 0.5);
-	var hh = (h + 135)%360;
-	console.log("updating board to", hh);
-	this._drawBackground(hh);
+	this._drawBackground((h + 135)%360);
 };
 
 Chesser.prototype._drawBackground = function(h) {
@@ -575,12 +603,15 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 		$("#turn-controls", self.tabs.status.$content).hide();
 		$(".no-game", self.tabs.status.$content).hide();
 		self.playerID = data.playerID;
-		self.startTime = self.startTime || self._gameStates[0].gameObjects[self.playerID].timeRemaining;
+		self.startTime = self.playerID ? self._gameStates[0].gameObjects[self.playerID].timeRemaining: -1;
 		self.setCurrentTab("status");
 	};
 
 	this._joueur.onOver = function(data) {
 		self.updateConnection("Game is over. Disconnected from server.");
+		if(data.gamelogLink) {
+			self.linkToGamelog(data.gamelogLink);
+		}
 		self.over = true;
 	};
 
@@ -609,20 +640,25 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 
 				self._runTurn();
 			}
-			else if(data === self._activeMove.san) {
+			else { // we should have just ran a 'move', so finish our turn
 				self._joueur.send("finished", {
 					orderIndex: self._currentOrder.index,
 					returned: true,
 				});
 
-				this._currentOrder = undefined;
-				self._unselectActive();
-				self._uiUnlocked = false;
-				self.pausePlayerTime();
-				self.tabs.status.confirmMove.$element.removeClass("run-turn");
+				delete this._currentOrder;
+				self.playerDone();
 			}
 		}
 	}
+};
+
+Chesser.prototype.playerDone = function() {
+	this._unselectActive();
+	this._uiUnlocked = false;
+	this.pausePlayerTime();
+	this.tabs.status.confirmMove.$element.removeClass("run-turn");
+	console.log("playerDone");
 };
 
 Chesser.prototype.updateConnection = function(str) {
@@ -706,17 +742,21 @@ Chesser.prototype._updateStatus = function() {
 			$status.addClass("current-player");
 		}
 
+		var reason = "";
 		if(player.won) {
-			$(".reason", $status).html("Won! - &quot;" + player.reasonWon + "&quot;");
+			reason = "Won! - &quot;" + player.reasonWon + "&quot;";
 		}
 		else if(player.lost) {
-			$(".reason", $status).html("Lost - &quot;" + player.reasonLost + "&quot;");
+			reason = "Lost - &quot;" + player.reasonLost + "&quot;";
 		}
+		else if(player.inCheck) {
+			reason = " - In Check!";
+		}
+
+		$(".reason", $status).html(reason);
 	}
 
-	this.tabs.status.$playPauseButton.html(this._updateInterval ? "&#10074;&#10074;" : "&#9658;"); // pause characters or play character
-
-	this.tabs.status.$slider
+	this.tabs.status.$playPauseButton.html(this._updateInterval ? "&#10074;&#10074;" : "&#9658;"); // pause characters (two vertical bars) or play character (left arrow)
 
 	this._updateMovesTable();
 };
@@ -779,7 +819,7 @@ Chesser.prototype._onClick = function(x, y) {
 				// otherwise unselect the active piece
 				this._unselectActive();
 			}
-			else {
+			else if(piece) {
 				if(piece.owner.id === this.playerID) {
 					this._activePiece = piece;
 					this._makeActive(piece);
@@ -844,13 +884,29 @@ Chesser.prototype._updateUI = function() {
 	var canvas = this.canvases.ui;
 	canvas.clear();
 
-	var pos = cleanPos(this._activePiece);
-	canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
+	if(this._activePiece) {
+		var pos = cleanPos(this._activePiece);
+		canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
+	}
 
+	// remove duplicate position moves (pawns have 4 moves to end tiles because each move is unqiue due to 4 different promotion types)
+	var moves = {};
 	for(var i = 0; i < this._activeValidMoves.length; i++) {
-		var move = this._activeValidMoves[i];
-		var pos = cleanPos(move.to);
-		canvas.fillRoundedRectangle(move === this._activeMove ? this._uiActiveHightlightColor : this._uiHighlightColor, pos.rank, pos.file, 1, 1, 0.2);
+		var validMove = this._activeValidMoves[i];
+		moves[validMove.to] = moves[validMove.to] || validMove;
+	}
+
+	for(var key in moves) {
+		if(moves.hasOwnProperty(key)) {
+			var move = moves[key];
+			var pos = cleanPos(move.to);
+			var color = this._uiHighlightColor;
+			if(this._activeMove && move.to === this._activeMove.to) {
+				color = this._uiActiveHightlightColor;
+			}
+
+			canvas.fillRoundedRectangle(color, pos.rank, pos.file, 1, 1, 0.2);
+		}
 	}
 };
 
@@ -860,7 +916,7 @@ Chesser.prototype._confirmMove = function(move) {
 	this.setCurrentTab("status");
 	this.tabs.status.confirmMove.$message.html("Move " + piece.type + " #" + piece.id + " from " + move.from + " to " + move.to + "?");
 
-	if(move.promotes) {
+	if(move.flags && move.flags.indexOf("p") >= 0) { // then this move has a promotions
 		this.tabs.status.confirmMove.$promotionField.addClass("needed");
 	}
 

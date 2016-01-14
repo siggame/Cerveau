@@ -216,17 +216,23 @@ var Session = Class(Server, {
         var gamelog = this.generateGamelog();
         var overData = {};
 
-        if(this._visualizerLink) {
-            var localGamelogLink = encodeURIComponent("http://{0}:{1}/gamelog/{2}".format(
-                this._initArgs.host,
-                (this._initArgs.port + 80),
-                GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer links are irrelevant
-            ));
+        var localGamelogLink = "http://{0}:{1}/gamelog/{2}".format(
+            this._initArgs.host,
+            (this._initArgs.port + 80),
+            GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer links are irrelevant
+        );
 
-            overData.message = "---\nYour gamelog is viewable at:\n{0}?logUrl={1}\n---".format(
+        if(this._initArgs.host) { // then they set the host, so we can give meaningful urls to the gamelogs
+            overData.gamelogLink = localGamelogLink;
+        }
+
+        if(this._initArgs.host && this._visualizerLink) {
+            overData.visualizerLink = "{}?logUrl={}".format(
                 this._visualizerLink,
-                localGamelogLink
+                encodeURIComponent(localGamelogLink)
             );
+
+            overData.message = "---\nYour gamelog is viewable at:\n{}\n---".format(overData.visualizerLink);
         }
 
         for(var i = 0; i < this.clients.length; i++) {
