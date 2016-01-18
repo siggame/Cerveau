@@ -2,6 +2,10 @@ var app = require("./app");
 var getGameInfos = require("./getGameInfos");
 
 module.exports = function(args) {
+    app.locals.site = {
+        title: args.title,
+    };
+
     if(args.web) {
         var lobby = args.lobby;
 
@@ -57,4 +61,6 @@ module.exports = function(args) {
     if(args.api) {
         require("./api")(args);
     }
+
+    require("./chesser")(args);
 };

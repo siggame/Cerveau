@@ -40,6 +40,18 @@
 #chesser .infobox .status .moves li span { display: inline-block; width: 4em; text-align: center; padding: 0.25em; }
 #chesser .infobox .status .moves li { margin: 0.3em; list-style-type: decimal; margin-left: 3.5em; }
 
+#chesser #inspect-tree {font-family: monospace; font-size: 1.25em; height: 40em; overflow-y: scroll; overflow-x: hidden;}
+#chesser ul#inspect-tree, #chesser ul#inspect-tree ul {list-style: none;}
+#chesser ul#inspect-tree > li {margin-left: 0;}
+#chesser #inspect-tree li:before { content: "\25AA"; width: 1.25em; display: inline-block; }
+#chesser .inspect-label:after {content: " = ";}
+#chesser #inspect-tree .inspect-type-game-object:before, #chesser #inspect-tree .inspect-type-array:before, #chesser #inspect-tree .inspect-type-dictionary:before {content: "\25B8";}
+#chesser #inspect-tree header {display: inline;}
+#chesser #inspect-tree .inspect-type-game-object.inspecting:before, #chesser #inspect-tree .inspect-type-array.inspecting:before, #chesser #inspect-tree .inspect-type-dictionary.inspecting:before {content: "\25BE";}
+#chesser .inspect-type-game-object > header, #chesser .inspect-type-array > header, #chesser .inspect-type-dictionary > header {cursor: pointer;}
+#chesser #inspect-tree li.inspecting > ul {display: block;}
+#chesser #inspect-tree li:not(.inspecting) > ul {display: none;}
+
 heading { font-weight: bold; font-size: 1.5em; }
 
 </style>
@@ -58,7 +70,8 @@ heading { font-weight: bold; font-size: 1.5em; }
 			<span class="tab-for-status">Status</span>
 			<span class="tab-for-file">File</span>
 			<span class="tab-for-connection">Connection</span>
-			<span class="tab-for-debug">Debug</span>
+			<span class="tab-for-inspect">Inspect</span>
+			<span class="tab-for-help">Help</span>
 		</div>
 		<div class="tabs-content">
 			<div class="status">
@@ -110,11 +123,11 @@ heading { font-weight: bold; font-size: 1.5em; }
 				<form class="connect">
 					<div class="field">
 						<label for="server">Server</label>
-						<input id="server" name="server" type="textbox" value="home.jacobfischer.me"/>
+						<input id="server" name="server" type="textbox" value="{{defaultHost}}"/>
 					</div>
 					<div class="field">
 						<label for="port">Port</label>
-						<input id="port" name="port" type="number" min="80" max="65535" value="3088"/>
+						<input id="port" name="port" type="number" min="80" max="65535" value="{{defaultWSPort}}"/>
 					</div>
 					<div class="field">
 						<label for="session">Session</label>
@@ -136,8 +149,17 @@ heading { font-weight: bold; font-size: 1.5em; }
 				<ul class="connected">
 				</ul>
 			</div>
-			<div class="debug">
-				TODO: debug tree
+			<div class="inspect">
+				<div class="need-game-loaded">Load a game to inspect it.</div>
+				<ul id="inspect-tree">
+				</ul>
+			</div>
+			<div class="help">
+				<p>This page, Chesser, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved game files to inspect what happened throughout the game.<p>
+				<p>If you ever need to load a different game, just reload the page.</p>
+				<hr/>
+				<p>"Chesser" human interface game client/visualizer for MST's <a href="http://blog.megaminerai.com/">ACM SIG-GAME</a> and CS 5400 - Introduction To Artificial Intelligence.</p>
+				<p>By Jacob Fischer. Questions and comments can be sent to <a href="mailto:siggame@mst.edu">SIG-GAME</a>.</p>
 			</div>
 		</div>
 	</div>
@@ -406,7 +428,7 @@ function Chesser() {
 	this.tabs.status.$nextTurnButton = $("#next-turn", this.tabs.status.$content).on("click", function() {
 		self.pause();
 		for(var i = self.renderingTurn + 1; i < self._gameStates.length - 1; i++) {
-			if(self._gameStates[i].notMove) {
+			if(self._gameStates[i]._notMove) {
 				continue;
 			}
 
@@ -419,7 +441,7 @@ function Chesser() {
 	this.tabs.status.$prevTurnButton = $("#prev-turn", this.tabs.status.$content).on("click", function() {
 		self.pause();
 		for(var i = self.renderingTurn - 1; i >= 0; i--) {
-			if(self._gameStates[i].notMove) {
+			if(self._gameStates[i]._notMove) {
 				continue;
 			}
 
@@ -466,7 +488,10 @@ function Chesser() {
 		});
 	}
 
-	this.setCurrentTab("status");
+	this.tabs.inspect.$tree = $("#inspect-tree");
+	this.tabs.inspect.$needGamelog = $(".need-game-loaded", this.tabs.inspect.$content);
+
+	this.setCurrentTab("help");
 
 	this.tabs.status.confirmMove.$button.on("click", function(e) {
 		e.preventDefault();
@@ -602,6 +627,7 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 		$(".game", self.tabs.status.$content).show();
 		$("#turn-controls", self.tabs.status.$content).hide();
 		$(".no-game", self.tabs.status.$content).hide();
+		self.tabs.inspect.$needGamelog.hide();
 		self.playerID = data.playerID;
 		self.startTime = self.playerID ? self._gameStates[0].gameObjects[self.playerID].timeRemaining: -1;
 		self.setCurrentTab("status");
@@ -953,6 +979,7 @@ Chesser.prototype._updateMovesTable = function() {
 Chesser.prototype._gamelogLoaded = function(parsed) {
 	this.updateConnection("Cannot connect to live games while playing back gamelogs.");
 	this.addFileMessage("Parsing gamelog.");
+	this.tabs.inspect.$needGamelog.hide();
 
 	this._rawGamelog = parsed;
 	this._gameStates = [];
@@ -988,8 +1015,8 @@ Chesser.prototype.play = function() {
 	this._updateInterval = window.setInterval(function() {
 		var d = dt * self.playbackSpeed;
 
-		var currentState = self._gameStates[self.renderingTurn];
-		if(currentState.notMove) {
+		var oldTurn = self.renderingTurn;
+		if(self.getCurrentState()._notMove) {
 			d = 1; // advance 1 turn, no need to animate a non-move
 		}
 
@@ -1010,8 +1037,12 @@ Chesser.prototype.play = function() {
 			self.pause();
 		}
 
-		self._update();
+		self._update(oldTurn);
 	}, dt * 1000); // interval from sec to ms
+};
+
+Chesser.prototype.getCurrentState = function() {
+	return this._gameStates[this.renderingTurn];
 };
 
 Chesser.prototype.pause = function() {
@@ -1023,10 +1054,121 @@ Chesser.prototype.pause = function() {
 	}
 };
 
-Chesser.prototype._update = function() {
+Chesser.prototype._update = function(oldTurn) {
 	this._updateBoard();
 	this._updateStatus();
+	if(oldTurn !== this.renderingTurn) {
+		this._updateInspect();
+	}
 };
+
+Chesser.prototype._updateInspect = function() {
+	var current = this.getCurrentState();
+
+	var depth = 1;
+	var $list = this.tabs.inspect.$tree.html("");
+
+	this._updateInspectAt(current, current, depth, $list);
+};
+
+Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
+	var self = this;
+	var keys = [];
+	for(var key in state) {
+		if(state.hasOwnProperty(key) && key.charAt(0) !== "_") {
+			keys.push(key);
+		}
+	}
+
+	if(state !== current.gameObjects && (!Array.isArray || !Array.isArray(state))) {
+		keys.sort();
+	}
+	else {
+		keys.sort(function(idA, idB) {
+			return parseInt(idA) - parseInt(idB);
+		});
+	}
+
+	for(var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		var stateObj = state[key];
+
+		var objStr = stateObj;
+		var objType = typeof(stateObj);
+		switch(objType) {
+			case "string":
+				objStr = "&quot;" + objStr + "&quot;";
+				break;
+			case "object":
+				if(stateObj.id) { // then it's a game object reference
+					objType = "game-object";
+					var gameObj = current.gameObjects[stateObj.id];
+					if(gameObj.gameObjectName === "Player") {
+						objStr = "Player &quot;" + gameObj.name + "&quot;";
+					}
+					else if(gameObj.gameObjectName === "Piece") {
+						objStr = "Piece " + current.gameObjects[gameObj.owner.id].color + " " + gameObj.type;
+					}
+					else {
+						objStr = gameObj.gameObjectName;
+					}
+
+					objStr += " #" + gameObj.id;
+				}
+				else {
+					objStr = "Dictionary[" + (Object.keys ? Object.keys(stateObj).length : "?") + "]";
+					objType = "dictionary";
+				}
+				break;
+			case "boolean":
+				objStr = objStr ? "true" : "false";
+				break;
+		}
+
+		if(Array.isArray && Array.isArray(stateObj)) {
+			objType = "array";
+			objStr = "Array[" + stateObj.length + "]";
+		}
+
+		if(objType === "dictionary" || objType === "array") {
+
+		}
+
+		var $subList = $("<ul>");
+		var $header = $("<header>")
+			.append($("<span>")
+				.addClass("inspect-label")
+				.html(key)
+			)
+			.append($("<span>")
+				.addClass("inspect-value")
+				.html(objStr)
+			);
+
+		var $li = $("<li>")
+			.attr("id", "inspect-tree-depth-" + depth + "-" + key)
+			.addClass("inspect-type-" + objType)
+			.append($header)
+			.append($subList)
+			.appendTo($list);
+
+		if(typeof(stateObj) === "object" && objType !== "game-obj") {
+			(function(current, stateObj, depth, $li, $subList) {
+				$header.on("click", function(e) {
+					e.stopPropagation();
+					$li.toggleClass("inspecting");
+
+					if($li.hasClass("inspecting") && $subList.html() === "") { // then we need to lazy load the sub list
+						self._updateInspectAt(current, stateObj, depth + 1, $subList);
+						if($subList.html() === "") { // it's still empty
+							$subList.html('<li><em class="inspecting-empty">empty</em></li>');
+						}
+					}
+				});
+			})(current, stateObj, depth, $li, $subList);
+		}
+	}
+}
 
 
 
@@ -1094,7 +1236,7 @@ Joueur.prototype._autoHandleDelta = function(data) {
 Joueur.prototype.addDelta = function(states, prev, delta) {
 	prev = prev || {};
 	var newState = Joueur.prototype.mergeDelta(clone(prev), delta);
-	newState.notMove = false;
+	newState._notMove = false;
 
 	// see if a chess piece moved from prev to newState
 	for(var id in newState.gameObjects) {
@@ -1104,7 +1246,7 @@ Joueur.prototype.addDelta = function(states, prev, delta) {
 			}
 
 			if(newState.gameObjects[id].rank !== prev.gameObjects[id].rank || newState.gameObjects[id].file !== prev.gameObjects[id].file) {
-				newState.notMove = true;
+				newState._notMove = true;
 				break;
 			}
 		};
@@ -1124,23 +1266,22 @@ Joueur.prototype.mergeDelta = function(state, delta) {
 	}
 
 	for(var key in delta) {
+		console.log("merging delta...", key);
 		if(delta.hasOwnProperty(key)) {
-			if(delta[key] === "&RM") {
+			var d = delta[key];
+			if(d === "&RM") {
 				delete state[key];
 			}
-			else if(isObject(delta[key]) && isObject(state[key])) {
-				Joueur.prototype.mergeDelta(state[key], delta[key]); // static use incase this function is called statically
+			else if(isObject(d) && isObject(state[key])) {
+				Joueur.prototype.mergeDelta(state[key], d); // static use in case this function is called statically
 			}
 			else {
-				if(isObject(delta[key]) && delta[key]["&LEN"] !== undefined) {
-					newArray = [];
-					for(var i = 0; i < delta[key]["&LEN"]; i++) {
-						newArray.push(delta[key][i]);
-					}
-					state[key] = newArray;
+				if(isObject(d)) {
+					var newState = (d["&LEN"] === undefined ? {} : []);
+					state[key] = Joueur.prototype.mergeDelta(newState, d);
 				}
 				else {
-					state[key] = delta[key];
+					state[key] = d;
 				}
 			}
 		}

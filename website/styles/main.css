@@ -79,6 +79,14 @@ h4,
 	color: #051838;
 }
 
+p {
+	margin: 0 0 1em 0;
+}
+
+p:last-child {
+	margin: 0;
+}
+
 #main {
 	font-size: 1em;
 	background-color: #fcfcfc;
