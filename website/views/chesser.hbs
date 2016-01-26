@@ -123,11 +123,11 @@ heading { font-weight: bold; font-size: 1.5em; }
 				<form class="connect">
 					<div class="field">
 						<label for="server">Server</label>
-						<input id="server" name="server" type="textbox" value="{{defaultHost}}"/>
+						<input id="server" name="server" type="textbox" value="127.0.0.1"/>
 					</div>
 					<div class="field">
 						<label for="port">Port</label>
-						<input id="port" name="port" type="number" min="80" max="65535" value="{{defaultWSPort}}"/>
+						<input id="port" name="port" type="number" min="80" max="65535" value="3088"/>
 					</div>
 					<div class="field">
 						<label for="session">Session</label>
@@ -155,10 +155,10 @@ heading { font-weight: bold; font-size: 1.5em; }
 				</ul>
 			</div>
 			<div class="help">
-				<p>This page, Chesser, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved game files to inspect what happened throughout the game.<p>
+				<p>This page, &quote;Chesser&quote;, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved game files to inspect what happened throughout the game.<p>
 				<p>If you ever need to load a different game, just reload the page.</p>
 				<hr/>
-				<p>"Chesser" human interface game client/visualizer for MST's <a href="http://blog.megaminerai.com/">ACM SIG-GAME</a> and CS 5400 - Introduction To Artificial Intelligence.</p>
+				<p>&quote;Chesser&quote; human interface game client/visualizer for MST's <a href="http://blog.megaminerai.com/">ACM SIG-GAME</a> and CS 5400 - Introduction To Artificial Intelligence.</p>
 				<p>By Jacob Fischer. Questions and comments can be sent to <a href="mailto:siggame@mst.edu">SIG-GAME</a>.</p>
 			</div>
 		</div>
@@ -352,10 +352,11 @@ function Chesser() {
 
 	var self = this;
 	this.$connected = $("#chesser .connected");
+	var serverInput = $("#server").attr("value", window.location.hostname);
 	this.$connect = $("#chesser .connect");
 	this.$connect.submit(function(e) {
 		e.preventDefault();
-		var server = $("#server", this).val();
+		var server = serverInput.val();
 		var port = parseInt($("#port", this).val()) || undefined;
 		var spectating = self.$connect.$spectate.is(":checked");
 		self.connectTo(server, port, spectating, {
