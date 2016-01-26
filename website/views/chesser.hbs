@@ -51,6 +51,7 @@
 #chesser .inspect-type-game-object > header, #chesser .inspect-type-array > header, #chesser .inspect-type-dictionary > header {cursor: pointer;}
 #chesser #inspect-tree li.inspecting > ul {display: block;}
 #chesser #inspect-tree li:not(.inspecting) > ul {display: none;}
+#chesser #file-loading progress {display: inline-block; width: 16em;}
 
 heading { font-weight: bold; font-size: 1.5em; }
 
@@ -116,6 +117,9 @@ heading { font-weight: bold; font-size: 1.5em; }
 				<div class="no-load" style="display: none;">Cannot load gamelogs when connecting to live a game.</div>
 				<a id="gamelog-download" href="#" style="display: none;" download>Download Gamelog for local playback</a>
 				<input type="file" id="gamelog-file" name="gamelogfile"/>
+				<div id="file-loading" style="display: none;">
+					Loading <progress></progress>
+				</div>
 				<ul class="messages">
 				</ul>
 			</div>
@@ -461,6 +465,8 @@ function Chesser() {
 
 	// init File tab
 	this.tabs.file.$messages = $(".messages", this.tabs.file.$content);
+	this.tabs.file.$loading = $("#file-loading");
+	this.tabs.file.$progress = $("progress", this.tabs.file.$loading);
 	if(!window.File || !window.FileReader || !window.FileList || !window.Blob) {
 		this.tabs.file.$messages.append($("<li>").addClass("error").html("Error: The FileRead API is not supported by this browser, and you will not be able to load local gamelogs."));
 	}
@@ -468,6 +474,7 @@ function Chesser() {
 		this.tabs.file.$gamelogfile = $("#gamelog-file", this.tabs.file.$content).on("change", function() {
 			var reader = new FileReader();
 			reader.onloadend = function() {
+				self.tabs.file.$loading.show();
 				self.addFileMessage("File loaded successfully.");
 				try {
 					var parsed = JSON.parse(reader.result);
@@ -546,6 +553,7 @@ function Chesser() {
 
 	var log = getUrlParameter("log") || getUrlParameter("gamelog") || getUrlParameter("logUrl"); // logUrl to be compatible with Wyatt's visualizer url parm
 	if(log) {
+		this.tabs.file.$loading.show();
 		this.addFileMessage("Fetching remote gamelog at '" + log + "'.");
 		this.linkToGamelog(log);
 		this.tabs.file.$gamelogfile.hide();
@@ -685,7 +693,6 @@ Chesser.prototype.playerDone = function() {
 	this._uiUnlocked = false;
 	this.pausePlayerTime();
 	this.tabs.status.confirmMove.$element.removeClass("run-turn");
-	console.log("playerDone");
 };
 
 Chesser.prototype.updateConnection = function(str) {
@@ -981,6 +988,7 @@ Chesser.prototype._gamelogLoaded = function(parsed) {
 	this.updateConnection("Cannot connect to live games while playing back gamelogs.");
 	this.addFileMessage("Parsing gamelog.");
 	this.tabs.inspect.$needGamelog.hide();
+	this.tabs.file.$progress.attr("max", parsed.deltas.length);
 
 	this._rawGamelog = parsed;
 	this._gameStates = [];
@@ -990,20 +998,33 @@ Chesser.prototype._gamelogLoaded = function(parsed) {
 	$(".game", this.tabs.status.$content).show();
 	$(".no-game", this.tabs.status.$content).hide();
 
-	for(var i = 0; i < parsed.deltas.length; i++) {
-		var state = parsed.deltas[i].game;
-		var prev = this._gameStates[i - 1] || {};
-		Joueur.prototype.addDelta(this._gameStates, prev, state);
+	this._asynchParse(0);
+};
+
+Chesser.prototype._asynchParse = function(i) {
+	var state = this._rawGamelog.deltas[i].game;
+	var prev = this._gameStates[i - 1] || {};
+	Joueur.prototype.addDelta(this._gameStates, prev, state);
+	this.tabs.file.$progress.attr("value", i + 1);
+
+	i++;
+	if(i < this._rawGamelog.deltas.length) {
+		var self = this;
+		setTimeout(function() {
+			self._asynchParse(i);
+		}, 0);
 	}
+	else {
+		this.tabs.status.$turnSlider.attr("max", this._gameStates.length - 1);
 
-	this.tabs.status.$turnSlider.attr("max", this._gameStates.length - 1);
+		this._colorize(randomFromString(this._rawGamelog.randomSeed));
 
-	this._colorize(randomFromString(this._rawGamelog.randomSeed));
+		this.setCurrentTab("status");
 
-	this.setCurrentTab("status");
-
-	this.addFileMessage("Gamelog parsed. Playing back.");
-	this.play();
+		this.addFileMessage("Gamelog parsed. Playing back.");
+		this.tabs.file.$loading.hide();
+		this.play();
+	}
 };
 
 Chesser.prototype.isPlaying = function() {
@@ -1267,7 +1288,6 @@ Joueur.prototype.mergeDelta = function(state, delta) {
 	}
 
 	for(var key in delta) {
-		console.log("merging delta...", key);
 		if(delta.hasOwnProperty(key)) {
 			var d = delta[key];
 			if(d === "&RM") {
