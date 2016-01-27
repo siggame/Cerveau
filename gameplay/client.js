@@ -14,6 +14,7 @@ var Client = Class({
 
         this.name = DEFAULT_STR;
         this.type = DEFAULT_STR;
+        this.playerIndex = undefined;
         this.gameSession = undefined;
         this.spectating = false;
 

@@ -136,12 +136,12 @@ var Lobby = Class(Server, {
 
             this._gameSessions[gameName] = {};
 
-            log("Found game '" + gameName + "'.");
+            log("» '" + gameName + "' game found.");
         }
     },
 
     /**
-     *
+     * listener for when a listener socket (that accepts incoming clients) errors out. This will probably only happen if it tries to listen on port already in use.
      *
      * @param {Error} err - the error the TCP socket threw
      */
@@ -177,6 +177,7 @@ var Lobby = Class(Server, {
         if(!gameSession) { // then we couldn't find a game session from the requested session, so they get a new one
             sessionID = String(sessionID === "new" ? this._nextGameNumber++ : sessionID);
 
+            // create a game session container, not a true Session class. That instance is created on a different thread this lobby will spin up.
             gameSession = {
                 id: sessionID,
                 gameName: gameName,
@@ -208,7 +209,7 @@ var Lobby = Class(Server, {
 
     /**
      * Gets the game session info, which is basically all the information about the game running in another thread without bothering the thread itself.
-     * 
+     *
      * @param {string} gameAlias - an alias of the game
      * @param {string} sessionID - the session for the game you want the info for
      * @returns {Object} all the data about the game session as last we heard from the game thread.
@@ -305,6 +306,15 @@ var Lobby = Class(Server, {
             fatalMessage = "Game of name '" + gameAlias + "' not found on this server.";
         }
 
+        if(data.gameSettings && this._allowGameSettings) {
+            try {
+                data.gameSettings = url.parse("urlparms?" + data.gameSettings, true).query;
+            }
+            catch(err) {
+                fatalMessage = "Game settings incorrectly formatted. Must be one string in the url parms format.";
+            }
+        }
+
         if(fatalMessage) {
             client.send("fatal", new errors.CerveauError(fatalMessage));
             client.disconnect(); // no need to keep them connected, they want to play something we don't have
@@ -318,33 +328,40 @@ var Lobby = Class(Server, {
             password: data.password,
             success: function() {
                 var gameSession = self._getOrCreateGameSession(gameName, data.requestedSession);
+                var playerIndex = parseInt(data.playerIndex);
 
                 client.setInfo({
                     name: data.playerName,
+                    playerIndex: isNaN(playerIndex) || playerIndex >= gameSession.numberOfPlayers || playerIndex < 0 ? undefined : playerIndex,
                     type: data.clientType,
                     spectating: Boolean(data.spectating),
                     gameSession: gameSession,
                 });
 
                 gameSession.clients.push(client);
-                if(data.gameSettings && this._allowGameSettings) {
-                    try {
-                        var settings = url.parse("urlparms?" + data.gameSettings, true).query;
-                        for(var key in settings) {
-                            if(settings.hasOwnProperty(key) && !gameSession.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
-                                var value = settings[key];
-                                // sanitize booleans
+                if(data.gameSettings) {
+                    for(var key in data.gameSettings) {
+                            if(data.gameSettings.hasOwnProperty(key) && !gameSession.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
+                                var value = data.gameSettings[key];
+
+                                // try to figure out if the value was a boolean, number, or string
                                 if(value.toLowerCase() ===  "true") {
                                     value = true;
                                 }
+                                else if(value.toLowerCase() === "false") {
+                                    value = false;
+                                }
+                                else {
+                                    var asFloat = parseFloat(value);
+                                    if(!isNaN(asFloat)) {
+                                        value = asFloat;
+                                    }
+                                    // else it's just a string
+                                }
+
                                 gameSession.gameSettings[key] = value;
                             }
                         }
-                    }
-                    catch(err) {
-                        // their game settings in the form of url parameters are formatted incorrectly
-                        // TODO: tell client they can't play now
-                    }
                 }
 
                 client.send("lobbied", {
@@ -387,9 +404,48 @@ var Lobby = Class(Server, {
      */
     _threadGameSession: function(gameSession) {
         // each client sent their info with the 'play' event already, we need to send that to the new thread
-        var clientInfos = [];
+        var clients = [];
+        var unplacedPlayers = [];
+        var numberOfPlayers = 0;
+        var specators = [];
+
+        // place players where they want to be based on playerIndex
         for(var i = 0; i < gameSession.clients.length; i++) {
             var client = gameSession.clients[i];
+
+            if(client.spectating) {
+                specators.push(client);
+            }
+            else {
+                numberOfPlayers++;
+
+                if(client.playerIndex !== undefined && !clients[client.playerIndex]) {
+                    clients[client.playerIndex] = client;
+                }
+                else {
+                    unplacedPlayers.push(client);
+                }
+            }
+        }
+
+        // place clients after all the players, so the clients array will look like: [player1, player2, ..., playerN, spectator1, spectator2, ..., specatorN]
+        for(var i = numberOfPlayers; i < gameSession.clients.length; i++) {
+            clients[i] = specators[i - numberOfPlayers];
+        }
+
+        // finally, find a spot for the unplaced players
+        var nextPlayerIndex = 0;
+        for(var i = 0; i < unplacedPlayers.length; i++) {
+            while(clients[nextPlayerIndex]) {
+                nextPlayerIndex++;
+            }
+
+            clients[nextPlayerIndex] = unplacedPlayers[i];
+        }
+
+        var clientInfos = [];
+        for(var i = 0; i < clients.length; i++) {
+            var client = clients[i];
             clientInfos.push({
                 index: i,
                 name: client.name,
@@ -416,7 +472,6 @@ var Lobby = Class(Server, {
 
         var self = this;
         gameSession.worker.on("online", function() {
-            var clients = gameSession.clients.clone();
             for(var i = 0; i < clients.length; i++) {
                 var client = clients[i];
                 client.stopListeningToSocket(); // we are about to send it, so we don't want this client object listening to it, as we no longer care.
