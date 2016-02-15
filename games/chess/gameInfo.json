@@ -9,10 +9,10 @@
                 "altersState": true,
                 "argument_names": [],
                 "arguments": [],
-                "description": "This is called every time the AI is asked to respond with a command during their turn",
+                "description": "This is called every time it is this AI.player's turn.",
                 "returns": {
                     "default": true,
-                    "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
+                    "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -49,7 +49,7 @@
             },
             "currentTurn": {
                 "default": 0,
-                "description": "The current turn number, starting at 0 for the first player's turn",
+                "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
                     "keyType": null,
@@ -87,13 +87,13 @@
             },
             "moves": {
                 "default": null,
-                "description": " The list of moves in standard algebraic notation (SAN).",
+                "description": " The list of Moves that have occured, in order.",
                 "type": {
                     "keyType": null,
                     "name": "list",
                     "valueType": {
                         "keyType": null,
-                        "name": "string",
+                        "name": "Move",
                         "valueType": null
                     }
                 }
@@ -148,7 +148,9 @@
         "description": "The traditional 8x8 chess board with pieces.",
         "function_names": [],
         "functions": {},
+        "inheritedAttribute_names": [],
         "inheritedAttributes": {},
+        "inheritedFunction_names": [],
         "inheritedFunctions": {},
         "maxInvalidsPerPlayer": 10,
         "name": "Chess",
@@ -225,17 +227,184 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "returns": null,
                     "serverPredefined": true
                 }
             },
+            "inheritedAttribute_names": [],
             "inheritedAttributes": {},
+            "inheritedFunction_names": [],
             "inheritedFunctions": {},
             "parentClasses": [],
             "serverParentClasses": [
                 "BaseGameObject"
             ]
+        },
+        "Move": {
+            "attribute_names": [
+                "captured",
+                "fromFile",
+                "fromRank",
+                "piece",
+                "promotion",
+                "san",
+                "toFile",
+                "toRank"
+            ],
+            "attributes": {
+                "captured": {
+                    "default": null,
+                    "description": "The Piece captured by this Move, null if no capture.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Piece",
+                        "valueType": null
+                    }
+                },
+                "fromFile": {
+                    "default": null,
+                    "description": "The file the Piece moved from.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "fromRank": {
+                    "default": null,
+                    "description": "The rank the Piece moved from.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "piece": {
+                    "default": null,
+                    "description": "The Piece that was moved.",
+                    "type": {
+                        "keyType": null,
+                        "name": "Piece",
+                        "valueType": null
+                    }
+                },
+                "promotion": {
+                    "default": null,
+                    "description": "The Piece type this Move's piece was promoted to from a Pawn, empty string if no promotion occured.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "san": {
+                    "default": null,
+                    "description": "The standard algebraic notation (SAN) representation of the move.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "toFile": {
+                    "default": null,
+                    "description": "The file the Piece moved to.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "toRank": {
+                    "default": null,
+                    "description": "The rank the Piece moved to.",
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "Contains all details about a Piece's move in the game.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
         },
         "Piece": {
             "attribute_names": [
@@ -355,16 +524,21 @@
                     "optionals_start_index": 2,
                     "returns": {
                         "default": null,
-                        "description": "The standard algebraic notation (SAN) representation of the move if successful, empty string otherwise. In addition if you fail your move you lose.",
+                        "description": "The Move you did if successful, otherwise null if invalid. In addition if your move was invalid you will lose.",
                         "type": {
                             "keyType": null,
-                            "name": "string",
+                            "name": "Move",
                             "valueType": null
                         }
                     },
                     "serverPredefined": false
                 }
             },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
             "inheritedAttributes": {
                 "gameObjectName": {
                     "default": null,
@@ -404,6 +578,9 @@
                     }
                 }
             },
+            "inheritedFunction_names": [
+                "log"
+            ],
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
@@ -423,7 +600,7 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "inheritedFrom": "GameObject",
                     "returns": null,
                     "serverPredefined": true
@@ -489,7 +666,7 @@
                 },
                 "lost": {
                     "default": false,
-                    "description": "if the player lost the game or not",
+                    "description": "If the player lost the game or not.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -538,7 +715,7 @@
                 },
                 "reasonLost": {
                     "default": null,
-                    "description": "the reason why the player lost the game",
+                    "description": "The reason why the player lost the game.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -547,7 +724,7 @@
                 },
                 "reasonWon": {
                     "default": null,
-                    "description": "the reason why the player won the game",
+                    "description": "The reason why the player won the game.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -565,7 +742,7 @@
                 },
                 "won": {
                     "default": false,
-                    "description": "if the player won the game or not",
+                    "description": "If the player won the game or not.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -576,6 +753,11 @@
             "description": "A player in this game. Every AI controls one player.",
             "function_names": [],
             "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
             "inheritedAttributes": {
                 "gameObjectName": {
                     "default": null,
@@ -615,6 +797,9 @@
                     }
                 }
             },
+            "inheritedFunction_names": [
+                "log"
+            ],
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
@@ -634,7 +819,7 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "inheritedFrom": "GameObject",
                     "returns": null,
                     "serverPredefined": true

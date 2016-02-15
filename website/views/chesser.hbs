@@ -965,7 +965,7 @@ Chesser.prototype._updateMovesTable = function() {
 
 	this.tabs.status.$moves.html("");
 	for(var i = 0; i < current.moves.length; i++) {
-		var san = current.moves[i];
+		var san = current.gameObjects[current.moves[i].id].san;
 
 		var span;
 		if(recordedWhite) {
