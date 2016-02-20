@@ -499,8 +499,6 @@ function Chesser() {
 	this.tabs.inspect.$tree = $("#inspect-tree");
 	this.tabs.inspect.$needGamelog = $(".need-game-loaded", this.tabs.inspect.$content);
 
-	this.setCurrentTab("help");
-
 	this.tabs.status.confirmMove.$button.on("click", function(e) {
 		e.preventDefault();
 		self._joueur.send("run", {
@@ -574,6 +572,8 @@ function Chesser() {
 			},
 		});
 	}
+
+	this.setCurrentTab(log ? "file" : "help");
 };
 
 Chesser.prototype.linkToGamelog = function(link) {
