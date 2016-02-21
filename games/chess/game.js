@@ -48,7 +48,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.chess = new Chess();
-        this.maxTurns = 6000; // longest possible game without stalemate is 5,950
+        this.maxTurns = 6000; // longest possible know game without stalemate is 5,950
         this.turnsToDraw = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
         //<<-- /Creer-Merge: init -->>
@@ -222,8 +222,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         else if(this.chess.in_stalemate()) {
             this.declareLosers(this.players, "Stalemate - The side to move has been stalemated because they are not in check but have no valid moves.");
         }
-        else if(this.chess.in_threefold_repetition()) {
+        // disabled for Dr. T's CS5400 class
+        /*else if(this.chess.in_threefold_repetition()) {
             this.declareLosers(this.players, "Stalemate - Board position has occurred three or more times.");
+        }*/
+        // instead we'll use his simplified rules
+        else if(this._inSimplifiedThreefoldRepetition()) {
+            this.declareLosers(this.players, "Draw - Simplified threefold repetition occured.");
         }
         else { // the game is not over
             this._generateMoves();
@@ -232,15 +237,64 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         return move;
     },
 
+    /**
+     * Gets the Piece at pos, in format "a1"
+     *
+     * @param {string} pos - the position, with rank and file at [0] and [1] respectively in the string.
+     * @returns {Piece} the piece at pos, if found; undefined otherwise
+     */
     _getPieceAt: function(pos) {
         for(var i = 0; i < this.pieces.length; i++) {
             var piece = this.pieces[i];
-            if(pos === (piece.rank + piece.file)) {
+            if(pos.toLowerCase() === piece.rank + piece.file) {
                 return piece;
             }
         }
     },
 
+    /**
+     * if for the last eight moves no capture, promotions, or pawn movement has happened and moves 0,1,2, and 3 are identical to moves 4, 5, 6, and 7 respectively, then a draw has occurred
+     *
+     * @returns {Boolean} true if so, false otherwise
+     */
+    _inSimplifiedThreefoldRepetition: function() {
+        var moves = this.moves.length;
+
+        if(moves < 8) {
+            return false;
+        }
+
+        for(var i = 0; i < 4; i++) {
+            var move = this.moves[moves + i - 8];
+            var nextMove = this.moves[moves + i - 4];
+
+            // if for the last eight moves a capture, promotions, or pawn movement has happened, then simplified threefold repetition has NOT occured
+            if(!this._isSimplifiedThreefoldRepetitionMove(move) || !this._isSimplifiedThreefoldRepetitionMove(nextMove)) {
+                return false;
+            }
+
+            // if any of the moves 0 and 4, 1 and 5, ..., 3 and 7 are NOT identical, then a draw has NOT occured
+            //    Two moves are identical if the starting position (rank and file) and ending position (rank and file) of the moves are identical.
+            if(move.piece !== nextMove.piece || move.fromRank + move.fromFile !== nextMove.fromRank + nextMove.fromFile || move.toRank + move.toFile !== nextMove.toRank + nextMove.toFile) {
+                return false;
+            }
+        }
+
+        return true; // if we got here we could not find anything about the move that would make it repetitive, so it is in Simplied Threefold Repetition
+    },
+
+    /**
+     * checks if for the had move no capture, promotions, or pawn movement has happened
+     *
+     * @returns {Boolean} true is so, false otherwise
+     */
+    _isSimplifiedThreefoldRepetitionMove: function(move) {
+        return Boolean(move.captured || move.promotion || move.piece.type === "Pawn");
+    },
+
+    /**
+     * @override
+     */
     nextTurn: function(/* ... */) {
         if(!this.currentPlayer.madeMove) {
             this.declareLoser(this.currentPlayer, "Did not make a move on turn number {}".format(this.currentTurn));
