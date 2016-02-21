@@ -22,9 +22,9 @@ var Session = Class(Server, {
         this._addedClients = 0;
 
         this.name = args.gameName + " - " + args.gameSession + " @ " + process.pid;
-        //try {
-            this.game = new args.gameClass(args.gameSettings);
-        try{}
+        try {
+            this.game = new args.gameClass(args.gameSettings, this);
+        }
         catch(err) {
             this.fatal(err);
         }

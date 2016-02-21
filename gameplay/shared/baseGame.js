@@ -11,7 +11,7 @@ var constants = require("../constants");
  * @class BaseGame - the base game plugin new games should inherit from.
  */
 var BaseGame = Class(DeltaMergeable, {
-    init: function(data) {
+    init: function(data, _session) {
         if(this._baseGameInitialized) { // semi-shitty way to avoid multiplayer sub classes, re-initializing BaseGame
             return;
         }
@@ -26,6 +26,7 @@ var BaseGame = Class(DeltaMergeable, {
         this._addProperty("session", (data.session === undefined ? "Unknown" : data.session));
         this._addProperty("name", this.name);
 
+        this._session = _session;
         this._orders = [];
         this._newOrdersToPopIndex = 0;
         this._returnedDataTypeConverter = {};
@@ -274,14 +275,18 @@ var BaseGame = Class(DeltaMergeable, {
 
         var argsArray;
         var sendError;
+
+        var self = this;
         try {
-            data.isSecret = this._gameManager.isSecret(run.caller.gameObjectName, run.functionName);
+            if(this._gameManager.isSecret(run.caller.gameObjectName, run.functionName)) {
+                data.isSecret = true;
+            }
             argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
         }
         catch(err) {
             if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
                 return new Promise(function(resolve, reject) {
-                    log.error(err.toString());
+                    self._session.fatal(err);
                     reject(err);
                 });
             }
@@ -296,7 +301,6 @@ var BaseGame = Class(DeltaMergeable, {
         argsArray.unshift(player);
         argsArray.push(asyncReturn);
 
-        var self = this;
         return new Promise(function(resolve, reject) {
             try {
                 var ranReturned = runCallback.apply(run.caller, argsArray);
@@ -310,9 +314,9 @@ var BaseGame = Class(DeltaMergeable, {
                     resolve(self._aiRan(run, player, ranReturned));
                 }
             }
-            catch(e) {
-                log.error(e);
-                reject(e);
+            catch(err) {
+                self._session.fatal(err);
+                reject(err);
             }
         });
     },
