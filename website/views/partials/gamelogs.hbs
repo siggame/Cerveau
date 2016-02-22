@@ -10,7 +10,7 @@
 		<td class="gamelog-name">{{this.game}}</td>
 		<td class="gamelog-session">{{this.session}}</td>
 		<td class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</td>
-		<td class="gamelog-watch"><a href="/visualize/{{this.uri}}">Watch</a></td>
+		<td class="gamelog-watch"><a href="/{{this.visualizer}}{{this.uri}}">Watch</a></td>
 	</tr>
 {{/each}}
 </table>

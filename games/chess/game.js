@@ -48,7 +48,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.chess = new Chess();
-        this.maxTurns = 6000; // longest possible know game without stalemate is 5,950
+        this.maxTurns = 6000; // longest possible known game without stalemate is 5,950
         this.turnsToDraw = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
         //<<-- /Creer-Merge: init -->>

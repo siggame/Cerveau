@@ -30,7 +30,7 @@ var Session = Class(Server, {
         }
 
         this._profiler = args.profiler;
-        this._visualizerLink = args.visualizerLink;
+        this._visualizerURL = args.visualizerURL;
     },
 
     /**
@@ -216,23 +216,30 @@ var Session = Class(Server, {
         var gamelog = this.generateGamelog();
         var overData = {};
 
-        var localGamelogLink = "http://{0}:{1}/gamelog/{2}".format(
+        var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
+        var gamelogURL = "http://{}:{}/gamelog/{}".format(
             this._initArgs.host,
             (this._initArgs.port + 80),
-            GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer links are irrelevant
+            gamelogFilename
         );
 
         if(this._initArgs.host) { // then they set the host, so we can give meaningful urls to the gamelogs
-            overData.gamelogLink = localGamelogLink;
+            overData.gamelogURL = gamelogURL;
+            overData.gamelogFilename = gamelogFilename;
         }
 
-        if(this._initArgs.host && this._visualizerLink) {
-            overData.visualizerLink = "{}?logUrl={}".format(
-                this._visualizerLink,
-                encodeURIComponent(localGamelogLink)
-            );
+        if(this._initArgs.host && this._visualizerURL) {
+            overData.visualizerURL = this._visualizerURL.format({
+                gamelogFilename: encodeURIComponent(gamelogFilename),
+                gamelogURL: encodeURIComponent(gamelogURL),
+            });
 
-            overData.message = "---\nYour gamelog is viewable at:\n{}\n---".format(overData.visualizerLink);
+            /*"{}?logUrl={}".format(
+                this._visualizerURL,
+                encodeURIComponent(gamelogLink)
+            );*/
+
+            overData.message = "---\nYour gamelog is viewable at:\n{}\n---".format(overData.visualizerURL);
         }
 
         for(var i = 0; i < this.clients.length; i++) {

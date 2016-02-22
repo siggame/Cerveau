@@ -10,7 +10,7 @@ var parserArgs = [
     [["--profile"], {action: "storeTrue", dest: "profile", help: "run the v8 profilers against threaded game sessions."}],
     [["--log"], {action: "storeTrue", dest: "log", help: "store all logged strings to text files in output/logs/"}],
     [["--silent"], {action: "storeTrue", dest: "silent", help: "log will not print anything to the console"}],
-    [["--visualizer-link"], {action: "store", dest: "visualizerLink", help: "the base url the a remote visualizer to send links to", defaultValue: "",}],
+    [["--visualizer-url"], {action: "store", dest: "visualizerURL", help: "the base url the a remote visualizer to send clients to", defaultValue: "",}],
     [["--arena"], {action: "storeTrue", dest: "arena", help: "starts the server in arena mode, where certain functionality is changed", defaultValue: false,}],
     [["--print-tcp"], {action: "storeTrue", dest: "printTCP", help: "(debugging) print IO through the TCP socket to the terminal", defaultValue: false,}],
     [["--timeout"], {action: "store", dest: "timeout", help: "(debugging) override for how long clients have before a timeout occurs", defaultValue: true}],

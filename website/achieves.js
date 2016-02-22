@@ -30,6 +30,7 @@ module.exports = function(args) {
                     game: log.gameName,
                     session: log.gameSession,
                     epoch: log.epoch,
+                    visualizer: log.gameName === "Chess" ? "chesser/?gamelog=" : "visualize/",
                     uri: lobby.gameLogger.filenameFor(log),
                 });
             }

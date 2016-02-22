@@ -61,6 +61,7 @@ var Lobby = Class(Server, {
             output: process.stdout,
         });
 
+        // ReadLine: listens for CTRL+C to kill off child threads gracefully (letting their games complete)
         rl.setPrompt("");
         rl.on('SIGINT', function() {
             if(!self._isShuttingDown) {
