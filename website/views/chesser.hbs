@@ -246,16 +246,6 @@ function getUrlParameter(sParam) {
 	}
 };
 
-function isURL(str) {
-	var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-		'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
-		'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-		'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-		'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-		'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-	return pattern.test(str);
-};
-
 
 
 function HSLColor(h, s, l) {
@@ -559,12 +549,17 @@ function Chesser() {
 
 	this._drawBackground();
 
-	var log = getUrlParameter("log") || getUrlParameter("gamelog") || getUrlParameter("logUrl"); // logUrl to be compatible with Wyatt's visualizer url parm
+	var log;
+
+	var file = getUrlParameter("file");
+	if(file) {
+		log = window.location.origin + "/gamelog/" + file;
+	}
+
+	log = log || getUrlParameter("log") || getUrlParameter("gamelog") || getUrlParameter("logUrl"); // logUrl to be compatible with Wyatt's visualizer url parm
+
 	if(log) {
 		this.tabs.file.$loading.show();
-		if(!isURL(log)) { // then it is a local gamelog link running on this same server, so get it via the RESTful API
-			log = window.location.origin + "/gamelog/" + log;
-		}
 		this.addFileMessage("Fetching remote gamelog at '" + log + "'.");
 		this.linkToGamelog(log);
 		this.tabs.file.$gamelogfile.hide();
