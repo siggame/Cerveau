@@ -1,7 +1,5 @@
 var utilities = require(__basedir + "/utilities/");
 var constants = require("./constants");
-var extend = require("extend");
-var url = require("url");
 var errors = require("./errors");
 var Class = utilities.Class;
 var GameLogger = require("./gameLogger");
@@ -9,7 +7,11 @@ var Server = require("./server");
 var Authenticator = require("./authenticator");
 var log = require("./log");
 
+var check = require("syntax-error");
+var extend = require("extend");
 var ws = require("lark-websocket");
+var fs = require("fs");
+var url = require("url");
 var net = require("net");
 var cluster = require("cluster");
 var readline = require("readline");
@@ -126,8 +128,8 @@ var Lobby = Class(Server, {
 
         for(var i = 0; i < dirs.length; i++) {
             var dir = dirs[i];
-            var path = __basedir + "/games/" + dir + "/game";
-            var gameClass = require(path);
+            var path = __basedir + "/games/" + dir;
+            var gameClass = require(path + "/game");
             var gameName = gameClass.prototype.name;
 
             this._gameClasses[gameName] = gameClass;
@@ -138,6 +140,24 @@ var Lobby = Class(Server, {
             this._gameSessions[gameName] = {};
 
             log("» '" + gameName + "' game found.");
+
+            // check to make sure the game is valid
+            var files = fs.readdirSync(path);
+            for(var j = 0; j < files.length; j++) {
+                var file = files[j];
+                if(!file.endsWith(".js")) {
+                    continue;
+                }
+
+                var filePath = path + "/" + file;
+                var src = fs.readFileSync(filePath);
+
+                var err = check(src, file);
+                if (err) {
+                    log.error("Error in file '{}'' for game '{}':\n{}".format(filePath, gameName, err.annotated));
+                    process.exit(1);
+                }
+            }
         }
     },
 
