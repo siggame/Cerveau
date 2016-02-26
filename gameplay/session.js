@@ -234,11 +234,6 @@ var Session = Class(Server, {
                 gamelogURL: encodeURIComponent(gamelogURL),
             });
 
-            /*"{}?logUrl={}".format(
-                this._visualizerURL,
-                encodeURIComponent(gamelogLink)
-            );*/
-
             overData.message = "---\nYour gamelog is viewable at:\n{}\n---".format(overData.visualizerURL);
         }
 

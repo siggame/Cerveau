@@ -238,34 +238,68 @@ var Lobby = Class(Server, {
     getGameSessionInfo: function(gameAlias, sessionID) {
         var gameName = this.getGameNameForAlias(gameAlias);
 
-        if(this._gameSessions[gameName]) {
-            var gameSession = null;
-            if(this._gameSessions[gameName] !== undefined && this._gameSessions[gameName][sessionID] !== undefined) {
-                gameSession = this._gameSessions[gameName][sessionID];
-            }
-
-            if(gameSession !== null) {
-                return {
-                    gameName: gameSession.gameName,
-                    sessionID: gameSession.id,
-                    running: gameSession.running,
-                    over: gameSession.over,
-                    winners: gameSession.winners,
-                    losers: gameSession.losers,
-                };
-            }
-
-            return {
-                error: "could not find game session with given gameName and sessionID",
-                sessionID: sessionID,
-            };
-        }
-        else {
-            return {
-                error: "game name is not valid",
+        if(!gameName || !this._gameSessions[gameName]) {
+            return  {
+                error: "Game name not valid",
                 gameName: gameAlias,
             };
         }
+
+        var gameSession = null;
+        if(this._gameSessions[gameName] !== undefined && this._gameSessions[gameName][sessionID] !== undefined) {
+            gameSession = this._gameSessions[gameName][sessionID];
+        }
+
+        var info = {
+            gameName: gameName,
+            gameSession: sessionID,
+            numberOfPlayers: this._gameClasses[gameName].numberOfPlayers,
+            clients: [],
+        };
+
+        if(!gameSession) {
+            info.status = "empty"; // empty AND open to anyone
+            return info;
+        }
+
+        // if the game session was found there should be some clients...
+        for(var i = 0; i < gameSession.clients.length; i++) {
+            var client = gameSession.clients[i];
+            info.clients.push({
+                name: client.name,
+                index: client.playerIndex === undefined ? client.index : client.playerIndex,
+                spectating: client.spectating,
+            });
+        }
+
+        if(!gameSession.running && !gameSession.over) {
+            info.status = "open"; // it has clients, but it still open more more before it starts running
+            return info;
+        }
+
+        if(gameSession.running) {
+            info.status = "running"; // on a seperate thread running the game
+            return info;
+        }
+
+        // otherwise that game session should be over
+        if(gameSession.over) {
+            info.status = "over";
+
+            for(var i = 0; i < gameSession.winners.length; i++) {
+                info.clients[gameSession.winners[i].index].won = true;
+            }
+
+            for(var i = 0; i < gameSession.losers.length; i++) {
+                info.clients[gameSession.losers[i].index].lost = true;
+            }
+
+            return info;
+        }
+
+        return {
+            "error": "requested game name and session are in an unexpected state of running while over."
+        };
     },
 
     /**
@@ -351,9 +385,23 @@ var Lobby = Class(Server, {
                 var gameSession = self._getOrCreateGameSession(gameName, data.requestedSession);
                 var playerIndex = parseInt(data.playerIndex);
 
+                if(playerIndex && playerIndex < 0 || playerIndex >= gameSession.numberOfPlayers) { // then the index is out of the range
+                    playerIndex = undefined;
+                }
+
+                if(playerIndex) { // then we need to check to make sure they did not request an already requested player index
+                    for(var i = 0; i < gameSession.clients.length; i++) {
+                        var existingClient = gameSession.clients[i];
+                        if(existingClient.playerIndex === playerIndex) {
+                            playerIndex = undefined;
+                            break;
+                        }
+                    }
+                }
+
                 client.setInfo({
                     name: data.playerName,
-                    playerIndex: isNaN(playerIndex) || playerIndex >= gameSession.numberOfPlayers || playerIndex < 0 ? undefined : playerIndex,
+                    playerIndex: isNaN(playerIndex) ? undefined : playerIndex,
                     type: data.clientType,
                     spectating: Boolean(data.spectating),
                     gameSession: gameSession,
@@ -464,6 +512,14 @@ var Lobby = Class(Server, {
             clients[nextPlayerIndex] = unplacedPlayers[i];
         }
 
+        // update the playerIndexes for all the clients here on the lobby
+        for(var i = 0; i < clients.length; i++) {
+            var client = clients[i];
+            if(!client.spectating) {
+                client.playerIndex = i;
+            }
+        }
+
         var clientInfos = [];
         for(var i = 0; i < clients.length; i++) {
             var client = clients[i];
@@ -501,15 +557,16 @@ var Lobby = Class(Server, {
                 self.clients.removeElement(client); // the client is no longer ours, we sent it (via socket) to the worker thread
                 gameSession.clients.removeElement(client);
             }
+            gameSession.clients = clientInfos;
         });
 
         gameSession.worker.on("message", function(data) { // this message should only happen once, when the game is over
             if(data.gamelog) {
                 self.gameLogger.log(data.gamelog);
-            }
 
-            gameSession.winners = data.winners;
-            gameSession.losers = data.losers;
+                gameSession.winners = data.gamelog.winners;
+                gameSession.losers = data.gamelog.losers;
+            }
         });
 
         this._threadedGameSessions[gameSession.worker.process.pid] = gameSession;

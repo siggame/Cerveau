@@ -64,4 +64,5 @@ module.exports = function(args) {
     }
 
     require("./chesser")(args);
+    require("./visualize")(args);
 };

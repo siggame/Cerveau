@@ -1,0 +1,10 @@
+{
+	"name": "Cerveau API",
+	"version": "1.0.0",
+	"description": "API to Cerveau Game Server",
+	"title": "Cerveau API",
+	"url" : "https://github.com/siggame/Cerveau",
+	"template": {
+		"withCompare": false
+	}
+}
