@@ -31,7 +31,7 @@ module.exports = function(args) {
      *
      * @apiSuccess (Client) {Number} [index]        If the player requested, or was assigned, a player index. When a game session reaches "running" this will be set.
      * @apiSuccess (Client) {String} name           The name of the client
-     * @apiSuccess (Client) {Boolean} spectating    If they client is a spectator (not a playing client).
+     * @apiSuccess (Client) {Boolean} spectating    If the client is a spectator (not a playing client). Spectators will not have indexes.
      * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true
      * @apiSuccess (Client) {Boolean} [lost         If the player lost this will be set, and be true
      *
