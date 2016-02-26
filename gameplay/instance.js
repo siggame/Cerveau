@@ -9,9 +9,9 @@ var fs = require('fs');
 var log = require("./log");
 
 /**
- * @class Session: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
+ * @class Instance: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
  */
-var Session = Class(Server, {
+var Instance = Class(Server, {
     init: function(args) {
         Server.init.call(this, args);
 
@@ -108,11 +108,11 @@ var Session = Class(Server, {
     },
 
     /**
-     * Starts the game in this session
+     * Starts the game in this instance
      */
     start: function() {
         log("Game is starting.");
-        this.game.start(this.getClientsPlaying()); // note: the game only knows about clients playing, the session will care about spectators sending them deltas a such, so the game never needs to know of their existance
+        this.game.start(this.getClientsPlaying()); // note: the game only knows about clients playing, the instance will care about spectators sending them deltas a such, so the game never needs to know of their existance
 
         if(this._profiler) {
             this._profiler.startProfiling();
@@ -128,7 +128,7 @@ var Session = Class(Server, {
         var self = this;
         process.send(data || {}, undefined, function(err) {
             if(err) {
-                log.error("Error sending data from game session thread to master lobby thread...");
+                log.error("Error sending data from game instance thread to master lobby thread...");
                 log.error(err);
             }
             else {
@@ -140,7 +140,7 @@ var Session = Class(Server, {
                 profile.export(function(error, result) {
                     fs.writeFileSync('output/profiles/profile-' + self.game.name + '-' + self.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
                     profile.delete();
-                    process.exit(0); // "returns" to the lobby that this Session thread ended successfully. All players connected, played, then disconnected. So this session is over
+                    process.exit(0); // "returns" to the lobby that this Instance thread ended successfully. All players connected, played, then disconnected. So this instance is over
                 });
             }
             else {
@@ -398,4 +398,4 @@ var Session = Class(Server, {
     },
 });
 
-module.exports = Session;
+module.exports = Instance;

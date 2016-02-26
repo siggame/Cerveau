@@ -11,7 +11,7 @@ var constants = require("../constants");
  * @class BaseGame - the base game plugin new games should inherit from.
  */
 var BaseGame = Class(DeltaMergeable, {
-    init: function(data, _session) {
+    init: function(data, instance) {
         if(this._baseGameInitialized) { // semi-shitty way to avoid multiplayer sub classes, re-initializing BaseGame
             return;
         }
@@ -26,7 +26,7 @@ var BaseGame = Class(DeltaMergeable, {
         this._addProperty("session", (data.session === undefined ? "Unknown" : data.session));
         this._addProperty("name", this.name);
 
-        this._session = _session;
+        this._instance = instance;
         this._orders = [];
         this._newOrdersToPopIndex = 0;
         this._returnedDataTypeConverter = {};
@@ -221,7 +221,7 @@ var BaseGame = Class(DeltaMergeable, {
     /////////////////////////////////
 
     /**
-     * Called when a session gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
+     * Called when an instance gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
      *
      * @throws {CerveauError} - game logic or event errors
      * @param {Player} the player this ai controls
@@ -262,7 +262,7 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Called when a session gets the "run" event from an ai (client), meaning they want the game to run some game logic.
+     * Called when an instance gets the "run" event from an ai (client), meaning they want the game to run some game logic.
      *
      * @param {Player} player - the player this ai controls
      * @param {Object} data - serialized data containing what game logic to run.
@@ -286,7 +286,7 @@ var BaseGame = Class(DeltaMergeable, {
         catch(err) {
             if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
                 return new Promise(function(resolve, reject) {
-                    self._session.fatal(err);
+                    self._instance.fatal(err);
                     reject(err);
                 });
             }
@@ -315,7 +315,7 @@ var BaseGame = Class(DeltaMergeable, {
                 }
             }
             catch(err) {
-                self._session.fatal(err);
+                self._instance.fatal(err);
                 reject(err);
             }
         });
@@ -371,7 +371,7 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Called from the session to send this order to the ais (clients). Gets all new orders since the last time this was called
+     * Called from the instance to send this order to the ais (clients). Gets all new orders since the last time this was called
      *
      * @returns {Array.<Object>} array of orders to send
      */
@@ -437,7 +437,7 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * Clears the current delta data. Should be called by the session once it's done with the current delta of this game
+     * Clears the current delta data. Should be called by the instance once its done with the current delta of this game
      */
     flushDelta: function() {
         this._delta = {};
@@ -464,12 +464,12 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * creates a container for the Session to give players an invalid message
+     * creates a container for the Instance to give players an invalid message
      *
      * @param {*} returnValue - What you want to return from the run function this is being used in
      * @param {string} invalidMessage - the reason why they are getting an invalid message
      * @param {Object} [invalidData] - more data about why it is invalid
-     * @returns {Object} a special container Sessions can look for to know that clients need an invalid event sent to them
+     * @returns {Object} a special container Instances can look for to know that clients need an invalid event sent to them
      */
     logicError: function(returnValue, invalidMessage, invalidData) {
         return {

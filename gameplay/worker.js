@@ -1,4 +1,4 @@
-// This is the script that can be thought of as the 'main.js' for each worker thread that spins up a game session using true multithreading
+// This is the script that can be thought of as the 'main.js' for each worker thread that spins up a game session into an Instance using true multithreading
 var cluster = require("cluster");
 if(cluster.isMaster) {
     log.error("ERROR: worker running on master thread");
@@ -21,11 +21,11 @@ data.gameSettings.session = data.gameSession;
 
 global.__basedir = data.__basedir;
 require(__basedir + "/extensions/"); // because we are a new thread, and have not extended our base prototypes
-var Session = require("./session");
+var Instance = require("./instance");
 var log = require("./log");
 var extend = require("extend");
 
-var session = new Session(extend({
+var instance = new Instance(extend({
     gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
     profiler: data.profile && require('v8-profiler'),
 }, data));
@@ -36,12 +36,12 @@ process.on("message", function(message, handler) {
         var socket = handler;
         var info = data.clientInfos[socketIndex];
 
-        session.addSocket(socket, info.connectionType, info);
+        instance.addSocket(socket, info.connectionType, info);
 
         socketIndex++;
     }
 });
 
 process.once("uncaughtException", function (err) {
-    session.fatal(err);
+    instance.fatal(err);
 });

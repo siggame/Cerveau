@@ -35,7 +35,7 @@ var Lobby = Class(Server, {
         this._gameClassesByAlias = {};
 
         this._authenticator = new Authenticator(this._authenticate);
-        this._threadedGameSessions = {}; // game sessions, regardless of game, currently threaded (running). key is pid
+        this._threadedGameInstances = {}; // game sessions, regardless of game, currently threaded (running). key is pid
         this._nextGameNumber = 1;
         this._isShuttingDown = false;
 
@@ -51,7 +51,7 @@ var Lobby = Class(Server, {
 
         var self = this; // for async reference in passed listener functions below
         cluster.on("exit", function(worker) {
-            self._gameSessionExited(self._threadedGameSessions[worker.process.pid]);
+            self._gameSessionExited(self._threadedGameInstances[worker.process.pid]);
         });
 
         this._listenerServer = {};
@@ -70,7 +70,7 @@ var Lobby = Class(Server, {
                 self._isShuttingDown = true;
                 log("Shutting down gracefully...");
 
-                var numCurrentGames = Object.keys(self._threadedGameSessions).length;
+                var numCurrentGames = Object.keys(self._threadedGameInstances).length;
                 log("{0} game{1} currently running{2}.".format(numCurrentGames, numCurrentGames === 1 ? "" : "s", numCurrentGames === 0 ? ", so we can shut down immediately" : ""));
 
                 var clients = self.clients.clone();
@@ -569,7 +569,7 @@ var Lobby = Class(Server, {
             }
         });
 
-        this._threadedGameSessions[gameSession.worker.process.pid] = gameSession;
+        this._threadedGameInstances[gameSession.worker.process.pid] = gameSession;
 
         gameSession.running = true;
         gameSession.over = false;
@@ -581,14 +581,14 @@ var Lobby = Class(Server, {
      * @param {Object} the gameSession that ended.
      */
     _gameSessionExited: function(gameSession) {
-        log("Game Session @", gameSession.worker.process.pid, "exited");
+        log("Game Instance @", gameSession.worker.process.pid, "exited");
 
         gameSession.running = false;
         gameSession.over = true;
 
-        delete this._threadedGameSessions[gameSession.worker.process.pid];
+        delete this._threadedGameInstances[gameSession.worker.process.pid];
 
-        if(this._isShuttingDown && Object.keys(this._threadedGameSessions).length === 0) {
+        if(this._isShuttingDown && Object.keys(this._threadedGameInstances).length === 0) {
             log("Final game session exited. Shutdown complete.");
             process.exit(0);
         }
