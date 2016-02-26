@@ -1,7 +1,7 @@
 // This is the script that can be thought of as the 'main.js' for each worker thread that spins up a game session into an Instance using true multithreading
 var cluster = require("cluster");
 if(cluster.isMaster) {
-    log.error("ERROR: worker running on master thread");
+    console.error("ERROR: worker running on master thread");
     process.exit(1); // worker threads not intended to run on main thread.
 }
 

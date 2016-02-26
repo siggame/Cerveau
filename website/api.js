@@ -6,6 +6,70 @@ var app = require("./app");
 module.exports = function(args) {
     var lobby = args.lobby;
 
+    function _getSessionInfo(gameName, id) {
+        try {
+            gameName = lobby.getGameNameForAlias(gameName);
+        }
+        catch(err) {
+            return {
+                error: err.message,
+            };
+        }
+
+        var session = lobby.getSession(gameName, id);
+
+        var info = {
+            gameName: gameName,
+            gameSession: id,
+            numberOfPlayers: lobby.getGameClass(gameName).numberOfPlayers,
+            clients: [],
+        };
+
+        if(!session) {
+            info.status = "empty"; // empty AND open to anyone
+            return info;
+        }
+
+        // if the game session was found there should be some clients...
+        for(var i = 0; i < session.clients.length; i++) {
+            var client = session.clients[i];
+            info.clients.push({
+                name: client.name,
+                index: client.playerIndex === undefined ? client.index : client.playerIndex,
+                spectating: client.spectating,
+            });
+        }
+
+        if(!session.isRunning() && !session.isOver()) {
+            info.status = "open"; // it has clients, but it still open more more before it starts running
+            return info;
+        }
+
+        if(session.isRunning()) {
+            info.status = "running"; // on a seperate thread running the game
+            return info;
+        }
+
+        // otherwise that game session should be over
+        if(session.isOver()) {
+            info.status = "over";
+
+            for(var i = 0; i < session.winners.length; i++) {
+                info.clients[session.winners[i].index].won = true;
+            }
+
+            for(var i = 0; i < session.losers.length; i++) {
+                info.clients[session.losers[i].index].lost = true;
+            }
+
+            return info;
+        }
+
+        return {
+            "error": "Requested game name and session are in an unexpected state of running while over."
+        };
+    };
+
     /**
      * @apiGroup API
      */
@@ -14,7 +78,7 @@ module.exports = function(args) {
      * @api {get} /status/:gameName/:gameSession Status
      * @apiName Status
      * @apiGroup API
-     * @apiDescription When given a gameName and gameSession, responds with json data about what is going on in that game session, incuding what clients are connected.
+     * @apiDescription When given a gameName and session id, responds with json data about what is going on in that game session, incuding what clients are connected.
      * @apiParam {String} gameName      The name of the game (or an alias), must be a valid game on the server.
      * @apiParam {String} gameSession   The session id of the game you want to check the status of.
      *
@@ -111,15 +175,19 @@ module.exports = function(args) {
      *  }
      */
     app.get('/status/:gameName/:gameSession', function(req, res) {
+        var gameName = req.params.gameName;
+        var id = req.params.gameSession;
+
         var response;
-        if(req.params.gameName !== undefined && req.params.gameSession !== undefined) {
-            response = lobby.getGameSessionInfo(req.params.gameName, req.params.gameSession);
-        }
-        else {
-            response = { error: "gameName or gameSession not sent." };
+
+        if(gameName && id) {
+            response = _getSessionInfo(gameName, id);
         }
 
+        response = response || { error: "gameName or gameSession not sent." };
+
         if(response.error) {
+            response.status = "error";
             res.status(400); // bad request
         }
 
