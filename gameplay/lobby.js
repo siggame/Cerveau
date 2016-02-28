@@ -223,8 +223,7 @@ var Lobby = Class(Server, {
                 id = "new";
                 session = undefined;
             }
-
-            if(session.isOver()) {
+            else if(session.isOver()) {
                 delete this._sessions[gameName][id]; // we will create a new session below to replace this one
                 session = undefined;
             }
