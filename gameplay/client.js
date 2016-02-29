@@ -211,7 +211,6 @@ var Client = Class({
         }
         catch(err) {
             this.disconnect("Sent malformed JSON.");
-            return;
         }
     },
 
