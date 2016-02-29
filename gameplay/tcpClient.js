@@ -27,7 +27,12 @@ var TCPClient = Class(Client, {
         this._buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to store in the buffer anyways
 
         for(var i = 0; i < split.length; i++) {
-            this.server.clientSentData(this, JSON.parse(split[i]));
+            var parsed = this._parseData(split[i]);
+            if(!parsed) {
+                return; // because we got some invalid data, so we're going to fatally disconnect anyways
+            }
+
+            this.server.clientSentData(this, parsed);
         }
     },
 

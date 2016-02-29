@@ -1,4 +1,5 @@
 var Class = require(__basedir + "/utilities/class");
+var errors = require("./errors");
 var log = require("./log");
 
 var DEFAULT_STR = "Unknown";
@@ -136,8 +137,14 @@ var Client = Class({
 
     /**
      * Disconnects from the socket
+     *
+     * @param {string} [fatalMessage] - If you want to send the client a 'fatal' event with a message, do so here. This is common when the client sends or does something erronous.
      */
-    disconnect: function() {
+    disconnect: function(fatalMessage) {
+        if(fatalMessage) {
+            this.send("fatal", new errors.CerveauError(fatalMessage));
+        }
+
         this.disconnected();
     },
 
@@ -192,6 +199,21 @@ var Client = Class({
      getNetSocket: function() {
         return this.socket;
      },
+
+     /**
+      * Tries to parse json data from the client, and disconnects them fatally if it is malformed.
+      *
+      * @param {string} json string to parse
+      */
+    _parseData: function(json) {
+        try {
+            return JSON.parse(json);
+        }
+        catch(err) {
+            this.disconnect("Sent malformed JSON.");
+            return;
+        }
+    },
 
 
 

@@ -43,7 +43,7 @@ var Instance = Class(Server, {
         this._fatal = true;
 
         for(var i = 0; i < this.clients.length; i++) {
-            this.clients[i].send("fatal", {message: "An unhandled fatal error occured on the server."});
+            this.clients[i].disconnect("An unhandled fatal error occured on the server.");
         }
 
         if(this._addedClients === this._initArgs.clientInfos.length) {
@@ -62,7 +62,7 @@ var Instance = Class(Server, {
         this._addedClients++;
 
         if(this._fatal) {
-            client.send("fatal", {message: "An unhandled fatal error occured on the server."});
+            client.disconnect("An unhandled fatal error occured on the server.");
         }
 
         if(this._addedClients === this._initArgs.clientInfos.length) {
@@ -293,6 +293,11 @@ var Instance = Class(Server, {
     _clientSentRun: function(client, run) {
         client.pauseTicking();
 
+        if(!run) {
+            client.disconnect("Did not send data with 'run' event.");
+            return;
+        }
+
         if(this._checkToIgnoreClient(client)) {
             return; // because they can't run anything right now
         }
@@ -342,6 +347,11 @@ var Instance = Class(Server, {
      */
     _clientSentFinished: function(client, data) {
         client.pauseTicking();
+
+        if(!data) {
+            client.disconnect("Did not send data with 'finished' event.");
+            return;
+        }
 
         if(this._checkToIgnoreClient(client)) {
             return;

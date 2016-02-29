@@ -76,8 +76,7 @@ var Lobby = Class(Server, {
                 var clients = self.clients.clone();
                 for(var i = 0; i < clients.length; i++) {
                     var client = clients[i];
-                    client.send("fatal", new errors.CerveauError("Sorry, the server is shutting down."));
-                    client.disconnect();
+                    client.disconnect("Sorry, the server is shutting down.");
                 }
 
                 if(numCurrentGames > 0) {
@@ -276,29 +275,7 @@ var Lobby = Class(Server, {
      * @param {Object} data - information about what this client wants to play. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
      */
     _clientSentPlay: function(client, data) {
-        var fatalMessage;
-        if(this._isShuttingDown) {
-            fatalMessage = "Game server is shutting down and not accepting new clients.";
-        }
-
-        var gameAlias = String(data && data.gameName); // clients can send aliases of what they want to play
-        var gameName = undefined;
-        try {
-            gameName = this.getGameNameForAlias(gameAlias);
-        }
-        catch(err) {
-            fatalMessage = "Game of name '" + gameAlias + "' not found on this server.";
-        }
-
-        if(data.gameSettings && this._allowGameSettings) {
-            try {
-                data.gameSettings = url.parse("urlparms?" + data.gameSettings, true).query;
-            }
-            catch(err) {
-                fatalMessage = "Game settings incorrectly formatted. Must be one string in the url parms format.";
-            }
-        }
-
+        var fatalMessage = this._validatePlayData(data);
         if(fatalMessage) {
             client.send("fatal", new errors.CerveauError(fatalMessage));
             client.disconnect(); // no need to keep them connected, they want to play something we don't have
@@ -307,11 +284,11 @@ var Lobby = Class(Server, {
 
         var self = this;
         this._authenticator.authenticate({
-            gameName: gameName,
+            gameName: data.gameName,
             username: data.playerName,
             password: data.password,
             success: function() {
-                var session = self._getOrCreateSession(gameName, data.requestedSession);
+                var session = self._getOrCreateSession(data.gameName, data.requestedSession);
                 var playerIndex = parseInt(data.playerIndex);
 
                 if(playerIndex && playerIndex < 0 || playerIndex >= session.numberOfPlayers) { // then the index is out of the range
@@ -342,7 +319,7 @@ var Lobby = Class(Server, {
                 }
 
                 client.send("lobbied", {
-                    gameName: gameName,
+                    gameName: data.gameName,
                     gameSession: session.id,
                     constants: constants.shared,
                 });
@@ -362,6 +339,39 @@ var Lobby = Class(Server, {
                 client.disconnect();
             },
         });
+    },
+
+    /**
+     * Validates that the data sent in a 'play' event from a client is valid
+     *
+     * @param {Object} data - the play event data to validate
+     * @returns {string} human readable text why the data is not valid
+     */
+    _validatePlayData: function(data) {
+        if(!data) {
+            return "Sent 'play' event with no data.";
+        }
+
+        if(this._isShuttingDown) {
+            return "Game server is shutting down and not accepting new clients.";
+        }
+
+        var gameAlias = String(data && data.gameName); // clients can send aliases of what they want to play
+        try {
+            data.gameName = this.getGameNameForAlias(gameAlias);
+        }
+        catch(err) {
+            return "Game of name '" + gameAlias + "' not found on this server.";
+        }
+
+        if(data && data.gameSettings && this._allowGameSettings) {
+            try {
+                data.gameSettings = url.parse("urlparms?" + data.gameSettings, true).query;
+            }
+            catch(err) {
+                return "Game settings incorrectly formatted. Must be one string in the url parms format.";
+            }
+        }
     },
 
     /**

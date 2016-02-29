@@ -26,7 +26,12 @@ var WSClient = Class(Client, {
     _onSocketData: function(data) {
         Client._onSocketData.apply(this, arguments);
 
-        this.server.clientSentData(this, JSON.parse(data));
+        var parsed = this._parseData(data);
+        if(!parsed) {
+            return; // because we got some invalid data, so we're going to fatally disconnect anyways
+        }
+
+        this.server.clientSentData(this, parsed);
     },
 
     /**
