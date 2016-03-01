@@ -1,29 +1,29 @@
 {
   "name": "Cerveau",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/JacobFischer/Cerveau"
+    "url": "git://github.com/siggame/Cerveau"
   },
   "private": true,
   "dependencies": {
-    "argparse": "1.0.2",
-    "chess.js": "0.9.2",
+    "argparse": "1.0.6",
+    "chess.js": "0.9.3",
     "clone": "1.0.2",
     "colors": "1.1.2",
-    "express": "4.13.3",
-    "express-handlebars": "2.0.1",
+    "express": "4.13.4",
+    "express-handlebars": "3.0.0",
     "extend": "3.0.0",
     "lark-websocket": "JacobFischer/lark-websocket",
-    "moment": "2.10.6",
+    "moment": "2.11.2",
     "seedrandom": "2.4.2",
     "string-format": "0.5.0",
     "syntax-error": "1.1.5",
     "uuid": "2.0.1"
   },
   "engines": {
-    "node": ">= 4.1.1"
+    "node": "4.3.1"
   },
   "scripts": [
     "node main.js"

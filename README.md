@@ -32,9 +32,11 @@ All inspiration taken from [MST's SIG-GAME framework](https://github.com/siggame
 * Extra fields present for Arena and Data Mining purposes
 * Optional authentication with seperate web server for "offical" game matches
 
-## How to Run
+## Requirements
 
-Make sure Node.js v4.0 is installed then:
+Node v4.3.1 is the officially supported version of node for this project, though Node V4.2.x should work as well. Cerveau is not thoroughly tested on Node v5, and we do not recommend it.
+
+## How to Run
 
 ```
 npm install
