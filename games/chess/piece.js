@@ -162,7 +162,7 @@ var Piece = Class(GameObject, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     toString: function() {
-        return "Piece {owner.color} {type} #{id} at {rank}{file}".format(this);
+        return "Piece {owner.color} {type} #{id} at {file}{rank}".format(this);
     }
 
     //<<-- /Creer-Merge: added-functions -->>
