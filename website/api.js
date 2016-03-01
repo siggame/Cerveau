@@ -82,22 +82,23 @@ module.exports = function(args) {
      * @apiParam {String} gameName      The name of the game (or an alias), must be a valid game on the server.
      * @apiParam {String} gameSession   The session id of the game you want to check the status of.
      *
-     * @apiSuccess {String} gameName            The actual name of the game, e.g. "chess" -> "Chess"
-     * @apiSuccess {Strong} gameSession         The id of the session in that game
+     * @apiSuccess {String} gameName            The actual name of the game, e.g. "chess" -> "Chess".
+     * @apiSuccess {String} gameSession         The id of the session in that game.
+     * @apiSuccess {String} gamelog             The id of the gamelog. To get the actual gamelog use the /gamelog/:id part of the API.
      * @apiSuccess {String} status              What the status of this game session is:
      *  * "empty" if the game session is valid, but does not exist because no clients have ever connected to it.
      *  * "open" if the game session has had a least 1 client connect, but the game has not started.
      *  * "running" if all players have connected, and the game is actively in progress, but not over.
      *  * "over" if the game session has ran to completion and clients have disconected.
      *  * "error" otherwise, such as if the gameName was invalid.
-     * @apiSuccess {Number} numberOfPlayers     The number of clients that are playing needed to connect to make the game session start running
+     * @apiSuccess {Number} numberOfPlayers     The number of clients that are playing needed to connect to make the game session start running.
      * @apiSuccess {Client[]} clients           An array of clients currently in that game session.
      *
      * @apiSuccess (Client) {Number} [index]        If the player requested, or was assigned, a player index. When a game session reaches "running" this will be set.
-     * @apiSuccess (Client) {String} name           The name of the client
+     * @apiSuccess (Client) {String} name           The name of the client.
      * @apiSuccess (Client) {Boolean} spectating    If the client is a spectator (not a playing client). Spectators will not have indexes.
-     * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true
-     * @apiSuccess (Client) {Boolean} [lost         If the player lost this will be set, and be true
+     * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true.
+     * @apiSuccess (Client) {Boolean} [lost         If the player lost this will be set, and be true.
      *
      * @apiExample {json} Empty
      *  {
@@ -145,6 +146,7 @@ module.exports = function(args) {
      *      status: "over",
      *      gameName: "Chess",
      *      gameSession: "1",
+     *      gamelog: "2016.03.01.11.54.30.868-Chess-1",
      *      numberOfPlayers: 2,
      *      clients: [
      *          {
@@ -197,22 +199,61 @@ module.exports = function(args) {
 
     /**
      * @api {get} /gamelog/:id/ Gamelog
-     * @apiName Gamelog
+     * @apiName Get Gamelog
      * @apiGroup API
      * @apiDescription Simply given the id of a gamelog, responds with the gamelog if found. See [Gamelog formatting documentation](https://github.com/siggame/Cadre/blob/master/gamelog-format.md) for more infomation.
-     * @apiParam {String} id    id of the gamelog, this is sent to clients when a game is over.
+     * @apiParam {String} id    id of the gamelog, this is sent to clients when a game is over, and in status when a game is over.
+     * @apiError (404) error    if the gamelog was not found.
      */
     app.get('/gamelog/:filename', function(req, res) {
-        var response = {}
-
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
         lobby.gameLogger.getGamelog(req.params.filename, function(gamelog) {
-            res.json(gamelog || {
-                error: "Gamelog not found.",
-            });
+            if(!gamelog) {
+                res.status(404); // not found
+                gamelog = {
+                    error: "Gamelog not found.",
+                };
+            }
+
+            res.json(gamelog);
+        });
+    });
+
+    /**
+     * @api {delete} /gamelog/:id/ Gamelog
+     * @apiName Delete Gamelog
+     * @apiGroup API
+     * @apiDescription Simply given the id of a gamelog, tries to delete that gamelog.
+     * @apiParam {String} id    id of the gamelog, this is sent to clients when a game is over, and in status when a game is over.
+     *
+     * @apiSuccess {Boolean} success        If the deletion was a success
+     * @apiError (404) success              false if not found
+     * @apiError (500) success              false if an error in deletion
+     */
+    app.delete('/gamelog/:filename', function(req, res) {
+        // cross origin safety
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
+        lobby.gameLogger.deleteGamelog(req.params.filename, function(found, err) {
+            var response = {
+                success: Boolean(found),
+            };
+
+            if(!found) {
+                res.status(404); // not found
+                response.error = "Gamelog not found.";
+            }
+
+            if(err) {
+                res.status(500); // internal server error
+                response.error = err.message;
+            }
+
+            res.json(response);
         });
     });
 };

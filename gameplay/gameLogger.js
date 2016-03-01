@@ -108,21 +108,29 @@ var GameLogger = Class({
     },
 
     /**
-     * Gets the first game log matching the gameName, sessionID, and (optional) epoch
+     * checks to see if the filename maps to a gamelog
      *
      * @param {string} filename - the base filename (without gamelog extension) you want in output/gamelogs/
-     * @returns {Object|undefined} gamelog matching passed in parameters, or undefined if doesn't exist
+     * @param {function} callback - passes the true path to the file if exists, no args otherwise
      */
-    getGamelog: function(filename, callback) {
+    _checkGamelog: function(filename, callback) {
         var gamelogPath = path.join(this.gamelogDirectory, filename + this.gamelogExtension);
 
         fs.stat(gamelogPath, function(err, stats) {
-            if(err || !stats.isFile()) {
-                if(callback) {
-                    callback(); // send no gamelog, as we couldn't find it
-                }
+            callback(err || !stats.isFile() ? undefined : gamelogPath, err);
+        });
+    },
 
-                return;
+    /**
+     * Gets the first gamelog matching the filename, without the extension
+     *
+     * @param {string} filename - the base filename (without gamelog extension) you want in output/gamelogs/
+     * @param {function} callback - passes the gamelog matching passed in parameters, or undefined if no gamelog. second arg is error.
+     */
+    getGamelog: function(filename, callback) {
+        this._checkGamelog(filename, function gamelogChecked(gamelogPath) {
+            if(!gamelogPath) {
+                return callback();
             }
 
             var strings = [];
@@ -136,13 +144,31 @@ var GameLogger = Class({
                         var gamelog = JSON.parse(strings.join(''));
                     }
                     catch(err) {
-                        return callback({
+                        return callback(undefined, {
                             "error": "Error parsing gamelog."
                         });
                     }
 
                     callback(gamelog);
                 });
+        });
+    },
+
+    /**
+     * Deletes the first gamelog matching the filename, without the extension
+     *
+     * @param {string} filename - the base filename (without gamelog extension) you want in output/gamelogs/
+     * @param {function} callback - passes the a boolean if it was scuessfully deleted, and the error if error happened.
+     */
+    deleteGamelog: function(filename, callback) {
+        this._checkGamelog(filename, function gamelogChecked(gamelogPath) {
+            if(!gamelogPath) {
+                return callback(false);
+            }
+
+            fs.unlink(gamelogPath, function(err) {
+                callback(!err, err);
+            });
         });
     },
 });
