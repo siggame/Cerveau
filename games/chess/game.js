@@ -68,43 +68,43 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.players[0].color = "White";
-        this.players[0].fileDirection = 1;
+        this.players[0].rankDirection = 1;
         this.players[1].color = "Black";
-        this.players[1].fileDirection = -1;
+        this.players[1].rankDirection = -1;
 
-        var backRank = {a: "Rook", b: "Knight", c: "Bishop", d: "Queen", e: "King", f: "Bishop", g: "Knight", h: "Rook"};
+        var backFile = {a: "Rook", b: "Knight", c: "Bishop", d: "Queen", e: "King", f: "Bishop", g: "Knight", h: "Rook"};
 
-        for(var file = 1; file <= 8; file++) {
+        for(var rank = 1; rank <= 8; rank++) {
             var type = undefined;
             var lookupType = false;
             var owner = undefined;
 
-            if(file === 2 || file === 7) {
+            if(rank === 2 || rank === 7) {
                 type = "Pawn";
             }
-            else if(file === 1 || file === 8) {
+            else if(rank === 1 || rank === 8) {
                 lookupType = true;
             }
 
-            if(file <= 2) {
+            if(rank <= 2) {
                 owner = this.players[0];
             }
-            else if(file >= 7) {
+            else if(rank >= 7) {
                 owner = this.players[1];
             }
 
             if((type || lookupType) && owner) {
                 for(var i = 0; i < 8; i++) {
-                    var rank = String.fromCharCode(97 + i); // number to character, so 0 -> 'a', 1 -> 'b', etc.
+                    var file = String.fromCharCode(97 + i); // number to character, so 0 -> 'a', 1 -> 'b', etc.
 
-                    if(lookupType) { // lookup type based on rank
-                        type = backRank[rank];
+                    if(lookupType) { // lookup type based on file
+                        type = backFile[file];
                     }
 
                     var piece = this.create("Piece", {
                         type: type,
-                        rank: rank,
                         file: file,
+                        rank: rank,
                         owner: owner,
                     });
 
@@ -153,8 +153,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         var move = this.create("Move", {
             san: result.san,
             piece: piece,
-            fromRank: piece.rank,
             fromFile: piece.file,
+            fromRank: piece.rank,
         });
 
         if(result.flags === "e") { // en passant capture
@@ -166,30 +166,30 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         if(captured) {
             captured.captured = true;
-            captured.rank = "";
-            captured.file = -1;
+            captured.file = "";
+            captured.rank = -1;
             this.pieces.removeElement(captured);
             captured.owner.pieces.removeElement(captured);
             move.captured = captured;
         }
 
         if(result.flags === "q" || result.flags === "k") { // queen or king side castle
-            var rank = result.flags === "q" ? "a" : "h"; // queenside rook at rank "a", kingside at "h"
-            var file = result.to[1];
-            var rook = this._getPieceAt(rank + file);
+            var file = result.flags === "q" ? "a" : "h"; // queenside rook at file "a", kingside at "h"
+            var rank = result.to[1];
+            var rook = this._getPieceAt(file + rank);
 
-            var rookRank = result.flags === "q" ? "d" : "f"; // queenside castle ends up at rank "d", kingside at "f"
-            rook.rank = rookRank;
-            rook.file = parseInt(file);
+            var rookFile = result.flags === "q" ? "d" : "f"; // queenside castle ends up at file "d", kingside at "f"
+            rook.file = rookFile;
+            rook.rank = parseInt(rank);
             rook.hasMoved = true;
         }
 
-        piece.rank = result.to[0];
-        piece.file = parseInt(result.to[1]);
+        piece.file = result.to[0];
+        piece.rank = parseInt(result.to[1]);
         piece.hasMoved = true;
 
-        move.toRank = piece.rank;
         move.toFile = piece.file;
+        move.toRank = piece.rank;
 
         this.turnsToDraw = (piece.type === "Pawn" || captured) ? 100 : Math.max(this.turnsToDraw - 1, 0);
 
@@ -240,13 +240,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Gets the Piece at pos, in format "a1"
      *
-     * @param {string} pos - the position, with rank and file at [0] and [1] respectively in the string.
+     * @param {string} pos - the position, with file and rank at [0] and [1] respectively in the string.
      * @returns {Piece} the piece at pos, if found; undefined otherwise
      */
     _getPieceAt: function(pos) {
         for(var i = 0; i < this.pieces.length; i++) {
             var piece = this.pieces[i];
-            if(pos.toLowerCase() === piece.rank + piece.file) {
+            if(pos.toLowerCase() === piece.file + piece.rank) {
                 return piece;
             }
         }
@@ -274,8 +274,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             }
 
             // if any of the moves 0 and 4, 1 and 5, ..., 3 and 7 are NOT identical, then a draw has NOT occured
-            //    Two moves are identical if the starting position (rank and file) and ending position (rank and file) of the moves are identical.
-            if(move.piece !== nextMove.piece || move.fromRank + move.fromFile !== nextMove.fromRank + nextMove.fromFile || move.toRank + move.toFile !== nextMove.toRank + nextMove.toFile) {
+            //    Two moves are identical if the starting position (file and rank) and ending position (file and rank) of the moves are identical.
+            if(move.piece !== nextMove.piece || move.fromFile + move.fromRank !== nextMove.fromFile + nextMove.fromRank || move.toFile + move.toRank !== nextMove.toFile + nextMove.toRank) {
                 return false;
             }
         }

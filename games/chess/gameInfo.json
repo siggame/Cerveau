@@ -100,7 +100,7 @@
             },
             "pieces": {
                 "default": null,
-                "description": "All the uncaptured pieces in the game.",
+                "description": "All the uncaptured Pieces in the game.",
                 "type": {
                     "keyType": null,
                     "name": "list",
@@ -137,7 +137,7 @@
             },
             "turnsToDraw": {
                 "default": null,
-                "description": "How many turns until the game ends because no pawn has moved and no piece has been taken.",
+                "description": "How many turns until the game ends because no pawn has moved and no Piece has been taken.",
                 "type": {
                     "keyType": null,
                     "name": "int",
@@ -267,7 +267,7 @@
                     "description": "The file the Piece moved from.",
                     "type": {
                         "keyType": null,
-                        "name": "int",
+                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -276,7 +276,7 @@
                     "description": "The rank the Piece moved from.",
                     "type": {
                         "keyType": null,
-                        "name": "string",
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -291,7 +291,7 @@
                 },
                 "promotion": {
                     "default": null,
-                    "description": "The Piece type this Move's piece was promoted to from a Pawn, empty string if no promotion occured.",
+                    "description": "The Piece type this Move's Piece was promoted to from a Pawn, empty string if no promotion occured.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -312,7 +312,7 @@
                     "description": "The file the Piece moved to.",
                     "type": {
                         "keyType": null,
-                        "name": "int",
+                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -321,7 +321,7 @@
                     "description": "The rank the Piece moved to.",
                     "type": {
                         "keyType": null,
-                        "name": "string",
+                        "name": "int",
                         "valueType": null
                     }
                 }
@@ -418,7 +418,7 @@
             "attributes": {
                 "captured": {
                     "default": null,
-                    "description": "When the piece has been captured (removed from the board) this is true. Otherwise false.",
+                    "description": "When the Piece has been captured (removed from the board) this is true. Otherwise false.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -427,17 +427,17 @@
                 },
                 "file": {
                     "default": null,
-                    "description": "The file (y) coordinate of the checker represented as a number [1-8].",
+                    "description": "The file (column) coordinate of the Piece represented as a letter [a-h], with 'a' starting at the left of the board.",
                     "type": {
                         "keyType": null,
-                        "name": "int",
+                        "name": "string",
                         "valueType": null
                     }
                 },
                 "hasMoved": {
                     "arenaInterest": "sum",
                     "default": null,
-                    "description": "If the piece has moved from its starting position.",
+                    "description": "If the Piece has moved from its starting position.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -455,16 +455,16 @@
                 },
                 "rank": {
                     "default": null,
-                    "description": "The rank (x) coordinate of the checker represented as a letter [a-h].",
+                    "description": "The rank (row) coordinate of the Piece represented as a number [1-8], with 1 starting at the bottom of the board.",
                     "type": {
                         "keyType": null,
-                        "name": "string",
+                        "name": "int",
                         "valueType": null
                     }
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of chess piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
+                    "description": "The type of chess Piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -472,7 +472,7 @@
                     }
                 }
             },
-            "description": "A chess piece",
+            "description": "A chess piece.",
             "function_names": [
                 "move"
             ],
@@ -480,15 +480,15 @@
                 "move": {
                     "altersState": true,
                     "argument_names": [
-                        "rank",
                         "file",
+                        "rank",
                         "promotionType"
                     ],
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The rank (x) coordinate to move to. Must be [a-h].",
-                            "name": "rank",
+                            "description": "The file coordinate to move to. Must be [a-h].",
+                            "name": "file",
                             "optional": false,
                             "type": {
                                 "keyType": null,
@@ -498,8 +498,8 @@
                         },
                         {
                             "default": null,
-                            "description": "The file (y) coordinate to move to. Must be [1-8].",
-                            "name": "file",
+                            "description": "The rank coordinate to move to. Must be [1-8].",
+                            "name": "rank",
                             "optional": false,
                             "type": {
                                 "keyType": null,
@@ -509,7 +509,7 @@
                         },
                         {
                             "default": "",
-                            "description": "If this is a Pawn moving to the end of the board then this parameter is what to promote it to.",
+                            "description": "If this is a Pawn moving to the end of the board then this parameter is what to promote it to. When used must be 'Queen', 'Knight', 'Rook', or 'Bishop'.",
                             "name": "promotionType",
                             "optional": true,
                             "type": {
@@ -519,7 +519,7 @@
                             }
                         }
                     ],
-                    "description": "Moves the piece from its current location to the given rank and file.",
+                    "description": "Moves the Piece from its current location to the given rank and file.",
                     "optionals": 1,
                     "optionals_start_index": 2,
                     "returns": {
@@ -615,13 +615,13 @@
             "attribute_names": [
                 "clientType",
                 "color",
-                "fileDirection",
                 "inCheck",
                 "lost",
                 "madeMove",
                 "name",
                 "otherPlayer",
                 "pieces",
+                "rankDirection",
                 "reasonLost",
                 "reasonWon",
                 "timeRemaining",
@@ -646,18 +646,9 @@
                         "valueType": null
                     }
                 },
-                "fileDirection": {
-                    "default": null,
-                    "description": "The direction your checkers must go along the file (y) axis until they reach the other side.",
-                    "type": {
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
                 "inCheck": {
                     "default": null,
-                    "description": "true if this player is currently in check, and must move out of check.",
+                    "description": "True if this player is currently in check, and must move out of check, false otherwise.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -675,7 +666,7 @@
                 },
                 "madeMove": {
                     "default": null,
-                    "description": "If the Player has made their move for the turn. true means they can no longer move a piece this turn.",
+                    "description": "If the Player has made their move for the turn. true means they can no longer move a Piece this turn.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -684,7 +675,7 @@
                 },
                 "name": {
                     "default": "Anonymous",
-                    "description": "The name of the player",
+                    "description": "The name of the player.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -693,7 +684,7 @@
                 },
                 "otherPlayer": {
                     "default": null,
-                    "description": "this player's opponent in the game.",
+                    "description": "This player's opponent in the game.",
                     "type": {
                         "keyType": null,
                         "name": "Player",
@@ -702,7 +693,7 @@
                 },
                 "pieces": {
                     "default": null,
-                    "description": "All the unpcaptured chess pieces owned by this player.",
+                    "description": "All the unpcaptured chess Pieces owned by this player.",
                     "type": {
                         "keyType": null,
                         "name": "list",
@@ -711,6 +702,15 @@
                             "name": "Piece",
                             "valueType": null
                         }
+                    }
+                },
+                "rankDirection": {
+                    "default": null,
+                    "description": "The direction your Pieces must go along the rank axis until they reach the other side.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
                     }
                 },
                 "reasonLost": {

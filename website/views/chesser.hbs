@@ -159,7 +159,7 @@ heading { font-weight: bold; font-size: 1.5em; }
 				</ul>
 			</div>
 			<div class="help">
-				<p>This page, &quot;Chesser&quot;, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved game files to inspect what happened throughout the game.<p>
+				<p>This page, &quot;Chesser&quot;, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved gamelog files to inspect what happened throughout the game.<p>
 				<p>If you ever need to load a different game, just reload the page.</p>
 				<hr/>
 				<p>&quot;Chesser&quot; human interface game client/visualizer for Missouri S&amp;T's <a href="http://blog.megaminerai.com/">ACM SIG-GAME</a> and CS 5400 - Introduction To Artificial Intelligence.</p>
@@ -188,22 +188,22 @@ function isObject(obj) {
 };
 
 function cleanPos(obj) {
-	var rank;
 	var file;
+	var rank;
 	switch(typeof(obj)) {
 		case "string":
-			rank = obj;
-			file = parseInt(obj[1]);
+			file = obj;
+			rank = parseInt(obj[1]);
 			break;
 		case "object":
-			rank = obj.rank;
 			file = obj.file;
+			rank = obj.rank;
 			break;
 	}
 
 	return {
-		rank: rank.charCodeAt(0) - "a".charCodeAt(0),
-		file: 8 - file,
+		file: file.charCodeAt(0) - "a".charCodeAt(0),
+		rank: 8 - rank,
 	};
 };
 
@@ -505,8 +505,8 @@ function Chesser() {
 			caller: {id: self._activePiece.id},
 			functionName: "move",
 			args: {
-				rank: self._activeMove.to[0],
-				file: parseInt(self._activeMove.to[1]),
+				file: self._activeMove.to[0],
+				rank: parseInt(self._activeMove.to[1]),
 				promotionType: self.tabs.status.confirmMove.$promotionType.val() || "Queen",
 			},
 		});
@@ -604,11 +604,11 @@ Chesser.prototype._drawBackground = function(h) {
 	var borderRadius = 0.075;
 
 	var canvas = this.canvases.background;
-	for(var rank = 0; rank < 8; rank++) {
-		for(var file = 0; file < 8; file++) {
-			var dark = (rank+file)%2;
-			canvas.drawRectangle(dark ? darkOutter : lightOutter, rank, file);
-			canvas.fillRoundedRectangle(dark ? darkInner : lightInner, rank + borderWidth, file + borderWidth, 1 - borderWidth*2, 1 - borderWidth*2, borderRadius);
+	for(var file = 0; file < 8; file++) {
+		for(var rank = 0; rank < 8; rank++) {
+			var dark = (file+rank)%2;
+			canvas.drawRectangle(dark ? darkOutter : lightOutter, file, rank);
+			canvas.fillRoundedRectangle(dark ? darkInner : lightInner, file + borderWidth, rank + borderWidth, 1 - borderWidth*2, 1 - borderWidth*2, borderRadius);
 		}
 	}
 }
@@ -624,7 +624,7 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 		self.updateConnection("Error connecting to " + server + ":" + port);
 	});
 
-	this._gameStates = this._joueur.gameStates; // we have no gamelog file to read gamestates from, instead the joueur client will handle fetching new gamestates as they stream in
+	this._gameStates = this._joueur.gameStates; // we have no gamelog rank to read gamestates from, instead the joueur client will handle fetching new gamestates as they stream in
 
 	this.updateConnection("Attempting to connect to " + server + ":" + port);
 
@@ -718,10 +718,10 @@ Chesser.prototype.addFileMessage = function(str, classes) {
 
 Chesser.prototype._emptyBoard = function() {
 	this._board = this.board || [];
-	for(var rank = 0; rank < 8; rank++) {
-		this._board[rank] = this._board[rank] || [];
-		for(var file = 0; file < 8; file++) {
-			this._board[rank][file] = null;
+	for(var file = 0; file < 8; file++) {
+		this._board[file] = this._board[file] || [];
+		for(var rank = 0; rank < 8; rank++) {
+			this._board[file][rank] = null;
 		}
 	}
 
@@ -744,7 +744,7 @@ Chesser.prototype._updateBoard = function() {
 			var gameObj = gameObjs[id];
 			if(gameObj.gameObjectName === "Piece" && !gameObj.captured) {
 				var pos = cleanPos(gameObj);
-				this._board[pos.rank][pos.file] = gameObj; // for playing as a client (they should not be moving before making moves, chess is not asyncronous)
+				this._board[pos.file][pos.rank] = gameObj; // for playing as a client (they should not be moving before making moves, chess is not asyncronous)
 
 				var fadeOut = false;
 				if(this.renderingTurnDT > 0 && nextGameObjs) {
@@ -757,11 +757,11 @@ Chesser.prototype._updateBoard = function() {
 					}
 
 					pos = {
-						rank: pos.rank + (toPos.rank - pos.rank) * d,
 						file: pos.file + (toPos.file - pos.file) * d,
+						rank: pos.rank + (toPos.rank - pos.rank) * d,
 					};
 				}
-				this.drawPiece(gameObj, pos.rank, pos.file, fadeOut ? 1 - this.renderingTurnDT : 1);
+				this.drawPiece(gameObj, pos.file, pos.rank, fadeOut ? 1 - this.renderingTurnDT : 1);
 			}
 		}
 	}
@@ -803,7 +803,7 @@ Chesser.prototype._updateStatus = function() {
 	this._updateMovesTable();
 };
 
-Chesser.prototype.drawPiece = function(piece, rank, file, alpha) {
+Chesser.prototype.drawPiece = function(piece, file, rank, alpha) {
 	var canvas = this.canvases.pieces;
 
 	var bottom = this._playerColorsBottom[piece.owner.id];
@@ -811,8 +811,8 @@ Chesser.prototype.drawPiece = function(piece, rank, file, alpha) {
 	var top = this._playerColorsTop[piece.owner.id];
 	top.a = alpha;
 
-	canvas.drawText(this._pieceTextBottom[piece.type], bottom, 1, rank, file);
-	canvas.drawText(this._pieceTextTop[piece.type], top, 1, rank, file);
+	canvas.drawText(this._pieceTextBottom[piece.type], bottom, 1, file, rank);
+	canvas.drawText(this._pieceTextTop[piece.type], top, 1, file, rank);
 
 	bottom.a  = 1;
 	top.a = 1;
@@ -843,17 +843,17 @@ Chesser.prototype.initPlaying = function() {
 };
 
 Chesser.prototype._onClick = function(x, y) {
-	var rank = Math.floor(x);
-	var file = Math.floor(y);
+	var file = Math.floor(x);
+	var rank = Math.floor(y);
 	if(this._uiUnlocked) {
-		var piece = this._board[rank][file];
+		var piece = this._board[file][rank];
 		if(this.playing) {
 			if(this._activePiece) {
 				// see if they clicked a valid move tile
 				for(var i = 0; i < this._activeValidMoves.length; i++) {
 					var move = this._activeValidMoves[i];
 					var pos = cleanPos(move.to);
-					if(pos.rank === rank && pos.file === file) {
+					if(pos.file === file && pos.rank === rank) {
 						return this._confirmMove(move);
 					}
 				}
@@ -911,7 +911,7 @@ Chesser.prototype._makeActive = function(piece) {
 	for(var id in this._validMoves) {
 		if(this._validMoves.hasOwnProperty(id)) {
 			var move = this._validMoves[id];
-			if(move.from === (piece.rank + piece.file)) {
+			if(move.from === (piece.file + piece.rank)) {
 				moves.push(move);
 			}
 		}
@@ -928,7 +928,7 @@ Chesser.prototype._updateUI = function() {
 
 	if(this._activePiece) {
 		var pos = cleanPos(this._activePiece);
-		canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.rank, pos.file, 1, 1, 0.2);
+		canvas.strokeRoundedRectangle(0.1, this._uiActiveHightlightColor, pos.file, pos.rank, 1, 1, 0.2);
 	}
 
 	// remove duplicate position moves (pawns have 4 moves to end tiles because each move is unqiue due to 4 different promotion types)
@@ -947,7 +947,7 @@ Chesser.prototype._updateUI = function() {
 				color = this._uiActiveHightlightColor;
 			}
 
-			canvas.fillRoundedRectangle(color, pos.rank, pos.file, 1, 1, 0.2);
+			canvas.fillRoundedRectangle(color, pos.file, pos.rank, 1, 1, 0.2);
 		}
 	}
 };
@@ -1275,7 +1275,7 @@ Joueur.prototype.addDelta = function(states, prev, delta) {
 				continue;
 			}
 
-			if(newState.gameObjects[id].rank !== prev.gameObjects[id].rank || newState.gameObjects[id].file !== prev.gameObjects[id].file) {
+			if(newState.gameObjects[id].file !== prev.gameObjects[id].file || newState.gameObjects[id].rank !== prev.gameObjects[id].rank) {
 				newState._notMove = true;
 				break;
 			}
