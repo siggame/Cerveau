@@ -38,6 +38,10 @@ strong {
 	font-weight: bold;
 }
 
+em {
+	font-style: italic;
+}
+
 a, a:visited {
 	color: #2D4671;
 	text-decoration: underline;

@@ -46,12 +46,23 @@
 #chesser #inspect-tree li:before { content: "\25AA"; width: 1.25em; display: inline-block; }
 #chesser .inspect-label:after {content: " = ";}
 #chesser #inspect-tree .inspect-type-game-object:before, #chesser #inspect-tree .inspect-type-array:before, #chesser #inspect-tree .inspect-type-dictionary:before {content: "\25B8";}
+#chesser #inspect-tree .inspect-type-game-object-reference:before {content: "\25AB";}
 #chesser #inspect-tree header {display: inline;}
 #chesser #inspect-tree .inspect-type-game-object.inspecting:before, #chesser #inspect-tree .inspect-type-array.inspecting:before, #chesser #inspect-tree .inspect-type-dictionary.inspecting:before {content: "\25BE";}
-#chesser .inspect-type-game-object > header, #chesser .inspect-type-array > header, #chesser .inspect-type-dictionary > header {cursor: pointer;}
+#chesser .inspect-type-game-object > header, #chesser .inspect-type-game-object-reference > header, #chesser .inspect-type-array > header, #chesser .inspect-type-dictionary > header {cursor: pointer;}
+#chesser #inspect-tree li.highlight { background: #ffff80; }
 #chesser #inspect-tree li.inspecting > ul {display: block;}
 #chesser #inspect-tree li:not(.inspecting) > ul {display: none;}
 #chesser #file-loading progress {display: inline-block; width: 16em;}
+
+#chesser #inspect-tree .inspect-type-null > header > .inspect-value { font-style: italic; color: #777; }
+#chesser #inspect-tree .inspect-type-string > header > .inspect-value { color: #006600; }
+#chesser #inspect-tree .inspect-type-boolean  > header >.inspect-value { color: #0033cc; }
+#chesser #inspect-tree .inspect-type-number  > header >.inspect-value { color: #cc0000; }
+#chesser #inspect-tree .inspect-type-game-object  > header >.inspect-value { font-weight: bold; color: #333333; }
+#chesser #inspect-tree .inspect-type-game-object-reference > header >.inspect-value { font-weight: bold; color: #333333; text-decoration: underline; }
+#chesser #inspect-tree .inspect-type-array  > header >.inspect-value { color: #997300; }
+#chesser #inspect-tree .inspect-type-dictionary  > header > .inspect-value { color: #b30059; }
 
 heading { font-weight: bold; font-size: 1.5em; }
 
@@ -1095,13 +1106,12 @@ Chesser.prototype._update = function(oldTurn) {
 Chesser.prototype._updateInspect = function() {
 	var current = this.getCurrentState();
 
-	var depth = 1;
 	var $list = this.tabs.inspect.$tree.html("");
 
-	this._updateInspectAt(current, current, depth, $list);
+	this._updateInspectAt(current, current, "", $list);
 };
 
-Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
+Chesser.prototype._updateInspectAt = function(current, state, location, $list) {
 	var self = this;
 	var keys = [];
 	for(var key in state) {
@@ -1130,6 +1140,12 @@ Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
 				objStr = "&quot;" + objStr + "&quot;";
 				break;
 			case "object":
+				if(stateObj === null) {
+					objStr = "null";
+					objType = "null";
+					break;
+				}
+
 				if(stateObj.id) { // then it's a game object reference
 					objType = "game-object";
 					var gameObj = current.gameObjects[stateObj.id];
@@ -1141,6 +1157,10 @@ Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
 					}
 					else {
 						objStr = gameObj.gameObjectName;
+					}
+
+					if(!stateObj.gameObjectName) {
+						objType += "-reference";
 					}
 
 					objStr += " #" + gameObj.id;
@@ -1160,10 +1180,6 @@ Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
 			objStr = "Array[" + stateObj.length + "]";
 		}
 
-		if(objType === "dictionary" || objType === "array") {
-
-		}
-
 		var $subList = $("<ul>");
 		var $header = $("<header>")
 			.append($("<span>")
@@ -1175,30 +1191,66 @@ Chesser.prototype._updateInspectAt = function(current, state, depth, $list) {
 				.html(objStr)
 			);
 
+		var loc = location + (location ? "_" : "") + key;
 		var $li = $("<li>")
-			.attr("id", "inspect-tree-depth-" + depth + "-" + key)
+			.attr("id", "inspect-tree-" + loc)
 			.addClass("inspect-type-" + objType)
 			.append($header)
 			.append($subList)
 			.appendTo($list);
 
-		if(typeof(stateObj) === "object" && objType !== "game-obj") {
-			(function(current, stateObj, depth, $li, $subList) {
+		if(isObject(stateObj)) {
+			(function(current, stateObj, loc, $li, $subList, objType) {
 				$header.on("click", function(e) {
 					e.stopPropagation();
-					$li.toggleClass("inspecting");
 
+					if(objType === "game-object-reference") { // then it is a game object reference with only an id
+						self._inspectGameObject(stateObj.id);
+					}
+					else {
+						$li.toggleClass("inspecting");
+						$li.trigger("chesser-inspect");
+					}
+				});
+
+				$li.on("chesser-inspect", function() {
 					if($li.hasClass("inspecting") && $subList.html() === "") { // then we need to lazy load the sub list
-						self._updateInspectAt(current, stateObj, depth + 1, $subList);
+						self._updateInspectAt(current, stateObj, loc, $subList);
 						if($subList.html() === "") { // it's still empty
 							$subList.html('<li><em class="inspecting-empty">empty</em></li>');
 						}
 					}
 				});
-			})(current, stateObj, depth, $li, $subList);
+			})(current, stateObj, loc, $li, $subList, objType);
 		}
 	}
-}
+};
+
+var _highlightTimeout = undefined;
+Chesser.prototype._inspectGameObject = function(id) {
+	if(_highlightTimeout) {
+		clearTimeout(_highlightTimeout);
+		_highlightTimeout = undefined;
+	}
+
+	$("#chesser #inspect-tree li.highlight").removeClass("highlight"); // remove anything else highlighted
+
+	$("#inspect-tree-gameObjects")
+		.addClass("inspecting")
+		.trigger("chesser-inspect");
+
+	$li = $("#inspect-tree-gameObjects_" + id);
+
+	$li
+		.addClass()
+		.addClass("inspecting highlight")
+		.trigger("chesser-inspect")
+		[0].scrollIntoView();
+
+	_highlightTimeout = setTimeout(function() {
+		$li.removeClass("highlight");
+	}, 3000);
+};
 
 
 
