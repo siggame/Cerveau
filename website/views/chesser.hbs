@@ -3,10 +3,16 @@
 #chesser ul { list-style-type: square; }
 #chesser li { margin-left: 2em; }
 
-#chesser {width: 1280px; height: 720px;}
-#chesser .canvases {width: 720px; height: 720px; float: left;}
+#chesser {width: 1280px; height: 744px;}
+#chesser .canvases {width: 720px; height: 720px; display: inherit;}
 #chesser .canvases .ui {opacity:  0.667}
 #chesser canvas {width: 720px; height: auto; position: absolute;}
+#chesser #rank-file {display: inline-block;}
+#chesser #rank-file tr td {vertical-align: middle; text-align: center; height: 1.4em;}
+#chesser #rank-file tr td#canvases-wrapper {vertical-align: top; text-align: left; margin: 0; padding: 0;}
+#chesser #rank-file tr td:first-child {width: 1.2em;}
+#chesser #rank-file tr td:nth-child(even) {background-color: #A7B4CB;}
+#chesser #rank-file tr td .same-width {display: inline-block; width: 2em;}
 
 #chesser .tabs {background: #333; padding: 1em 1em 1em 0.25em;}
 #chesser .tabs-content {margin-top: -0.5em; background: #ccc; padding: 1em 0.5em;}
@@ -20,7 +26,7 @@
 #chesser #turn-slider {width: 16.5em;}
 #chesser #playback-speed {width: 3em;}
 
-#chesser .infobox {float: right; height: 720px; width: 500px; background: #ccc;}
+#chesser .infobox {float: right; height: 744px; width: 516px; background: #ccc;}
 #chesser .infobox .field {display: block; margin-bottom: 0.5em;}
 #chesser .infobox .field label {display: inline-block; width: 6em;}
 
@@ -69,14 +75,53 @@ heading { font-weight: bold; font-size: 1.5em; }
 </style>
 
 <div id="chesser">
-	<div class="canvases">
-		<canvas class="background">
-		</canvas>
-		<canvas class="ui">
-		</canvas>
-		<canvas class="pieces">
-		</canvas>
-	</div>
+	<table id="rank-file">
+		<tr>
+			<td>8</td>
+			<td colspan="8" rowspan="8" id="canvases-wrapper">
+				<div class="canvases">
+					<canvas class="background">
+					</canvas>
+					<canvas class="ui">
+					</canvas>
+					<canvas class="pieces">
+					</canvas>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>7</td>
+		</tr>
+		<tr>
+			<td>6</td>
+		</tr>
+		<tr>
+			<td>5</td>
+		</tr>
+		<tr>
+			<td>4</td>
+		</tr>
+		<tr>
+			<td>3</td>
+		</tr>
+		<tr>
+			<td>2</td>
+		</tr>
+		<tr>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><span class="same-width">a</span></td>
+			<td><span class="same-width">b</span></td>
+			<td><span class="same-width">c</span></td>
+			<td><span class="same-width">d</span></td>
+			<td><span class="same-width">e</span></td>
+			<td><span class="same-width">f</span></td>
+			<td><span class="same-width">g</span></td>
+			<td><span class="same-width">h</span></td>
+		</tr>
+	</table>
 	<div class="infobox">
 		<div class="tabs">
 			<span class="tab-for-status">Status</span>
