@@ -36,6 +36,9 @@
 #chesser .infobox .confirm-move .promotion-field.needed {display: block;}
 #chesser .infobox .confirm-move .time { font-family: monospace; width: 100%; text-align: right; }
 #chesser .infobox .confirm-move .confirm {margin: 0.5em 0 1em 0;}
+#chesser .infobox .help h2 { font-size: 1.5em; margin: 1.5em 0 0.5em 0; }
+#chesser .infobox .help h2:first-child {margin-top: 0;}
+#chesser .infobox .help hr {border: none; border-bottom: 2px solid #dedede;}
 
 .white-player { background: #fafafa; color: #121212; }
 .black-player { background: #121212; color: #989898; }
@@ -215,9 +218,19 @@ heading { font-weight: bold; font-size: 1.5em; }
 				</ul>
 			</div>
 			<div class="help">
-				<p>This page, &quot;Chesser&quot;, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved gamelog files to inspect what happened throughout the game.<p>
+				<h2>Help</h2>
+				<p>This page, &quot;Chesser&quot;, is designed to allow you to visually see Chess games. You can choose to either connect to live games to watch or play, or playback saved gamelog files to inspect what happened throughout the game.</p>
 				<p>If you ever need to load a different game, just reload the page.</p>
 				<hr/>
+				<h2>Controls</h2>
+				<p>
+					<ul>
+						<li><strong>Left Click</strong>: When playing, selects a Piece to move, or selects a move. Otherwise inspects the Piece.</li>
+						<li><strong>Right Click</strong>: Inspects the Piece, regardless of mode.</li>
+					</ul>
+				</p>
+				<hr/>
+				<h2>Help</h2>
 				<p>&quot;Chesser&quot; human interface game client/visualizer for Missouri S&amp;T's <a href="http://blog.megaminerai.com/">ACM SIG-GAME</a> and CS 5400 - Introduction To Artificial Intelligence.</p>
 				<p>Questions and comments can be posted in the <a href="https://groups.google.com/a/mst.edu/d/forum/cs5400-sp2016-grp">Google Group</a>.</p>
 			</div>
@@ -331,6 +344,9 @@ Color.prototype.toString = function() {
 function CanvasWrapper($canvas, width, height) {
 	this.$element = $canvas;
 	this.context = $canvas[0].getContext("2d");
+	$canvas.bind('contextmenu', function(e){
+		return false;
+	});
 
 	this._fontFamily = "sans-serif";
 
@@ -690,12 +706,14 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 		}
 	};
 
+	var _startData = {};
 	this._joueur.onLobbied = function(data) {
+		_startData.session = data.gameSession;
 		self.updateConnection("In lobby for game '" + data.gameName + "' in session '" + data.gameSession + "'.");
 	};
 
 	this._joueur.onStart = function(data) {
-		self._colorize(Math.random());
+		self._colorize(randomFromString(_startData.session));
 		self.updateConnection("Game Started!");
 		$(".game", self.tabs.status.$content).show();
 		$("#turn-controls", self.tabs.status.$content).hide();
@@ -712,6 +730,7 @@ Chesser.prototype.connectTo = function(server, port, spectating, optionalArgs) {
 			self.linkToGamelog(data.gamelogURL);
 		}
 		self.over = true;
+		self.setCurrentTab("connection");
 	};
 
 	this._joueur.onClose = function() {
@@ -888,21 +907,23 @@ Chesser.prototype.setCurrentTab = function(currentKey) {
 	}
 };
 
+var _buttons = ["left", "middle", "right"];
 Chesser.prototype.initPlaying = function() {
 	var self = this;
 	var canvas = this.canvases.pieces.$element;
 	var canvasWrapper = this.canvases.pieces;
 	canvas.on("mouseup", function(e) {
 		var rect = canvas[0].getBoundingClientRect();
-		self._onClick(canvasWrapper.width*(e.clientX - rect.left)/canvas.width(), canvasWrapper.height*(e.clientY - rect.top)/canvas.height());
+		self._onClick(canvasWrapper.width*(e.clientX - rect.left)/canvas.width(), canvasWrapper.height*(e.clientY - rect.top)/canvas.height(), _buttons[e.button]);
 	})
 };
 
-Chesser.prototype._onClick = function(x, y) {
+Chesser.prototype._onClick = function(x, y, button) {
 	var file = Math.floor(x);
 	var rank = Math.floor(y);
-	if(this._uiUnlocked) {
-		var piece = this._board[file][rank];
+	var piece = this._board && this._board[file][rank];
+
+	if(this._uiUnlocked && button === "left") {
 		if(this.playing) {
 			if(this._activePiece) {
 				// see if they clicked a valid move tile
@@ -925,6 +946,16 @@ Chesser.prototype._onClick = function(x, y) {
 			}
 		}
 	}
+
+	if(button === "left" && this.playing) {
+		return; // because while playing left should ONLY be used for move selection.
+	}
+
+	if(this._canInspectCanvas && piece) {
+		this.pause();
+		this.setCurrentTab("inspect");
+		this._inspectGameObject(piece);
+	}
 };
 
 Chesser.prototype._unselectActive = function() {
@@ -940,6 +971,7 @@ Chesser.prototype._unselectActive = function() {
 Chesser.prototype._runTurn = function() {
 	this.tabs.status.confirmMove.$element.addClass("run-turn");
 	this.tabs.status.confirmMove.$message.text("Select a piece to move.");
+	this.setCurrentTab("status");
 	this.tickPlayerTime();
 	this._uiUnlocked = true;
 };
@@ -1097,6 +1129,7 @@ Chesser.prototype.isPlaying = function() {
 
 Chesser.prototype.play = function() {
 	var self = this;
+	this._canInspectCanvas = true;
 	var dt = 1/60 // update 60 times every 1 second
 	this._updateInterval = window.setInterval(function() {
 		var d = dt * self.playbackSpeed;
@@ -1222,7 +1255,7 @@ Chesser.prototype._updateInspectAt = function(current, state, location, $list) {
 
 		if(Array.isArray && Array.isArray(stateObj)) {
 			objType = "array";
-			objStr = "Array[" + stateObj.length + "]";
+			objStr = "List[" + stateObj.length + "]";
 		}
 
 		var $subList = $("<ul>");
@@ -1250,7 +1283,7 @@ Chesser.prototype._updateInspectAt = function(current, state, location, $list) {
 					e.stopPropagation();
 
 					if(objType === "game-object-reference") { // then it is a game object reference with only an id
-						self._inspectGameObject(stateObj.id);
+						self._inspectGameObject(stateObj);
 					}
 					else {
 						$li.toggleClass("inspecting");
@@ -1272,7 +1305,7 @@ Chesser.prototype._updateInspectAt = function(current, state, location, $list) {
 };
 
 var _highlightTimeout = undefined;
-Chesser.prototype._inspectGameObject = function(id) {
+Chesser.prototype._inspectGameObject = function(obj) {
 	if(_highlightTimeout) {
 		clearTimeout(_highlightTimeout);
 		_highlightTimeout = undefined;
@@ -1284,7 +1317,7 @@ Chesser.prototype._inspectGameObject = function(id) {
 		.addClass("inspecting")
 		.trigger("chesser-inspect");
 
-	$li = $("#inspect-tree-gameObjects_" + id);
+	$li = $("#inspect-tree-gameObjects_" + obj.id);
 
 	$li
 		.addClass()
