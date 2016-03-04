@@ -1,5 +1,6 @@
 var app = require("./app");
 var getGameInfos = require("./getGameInfos");
+var formatGamelogs = require("./formatGamelogs");
 
 module.exports = function(args) {
     app.get('/archives/:gameName?/:pageStart?/:pageCount?', function(req, res) {
@@ -25,14 +26,7 @@ module.exports = function(args) {
 
             // because logs (all the gamelogs GameLogger found) is pre-sorted with the newest gamelogs at the END, startIndex starts at the end. We want to first show the NEWEST gamelogs
             for(var i = endIndex - 1; i >= startIndex; i--) {
-                var log = logs[i];
-                gamelogs.push({
-                    game: log.gameName,
-                    session: log.gameSession,
-                    epoch: log.epoch,
-                    visualizer: log.gameName === "Chess" ? "chesser/?file=" : "visualize/",
-                    uri: lobby.gameLogger.filenameFor(log),
-                });
+                gamelogs.push(logs[i]);
             }
 
             var newerUri;
@@ -46,7 +40,7 @@ module.exports = function(args) {
             }
 
             res.render('archives', {
-                gamelogs: gamelogs,
+                gamelogs: formatGamelogs(gamelogs),
                 newerUri: newerUri,
                 olderUri: olderUri,
             });
