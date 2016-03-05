@@ -134,7 +134,7 @@ var Piece = Class(GameObject, {
                     });
 
                     if(!result) {
-                        log.error("Error this was not valid: {} from {} to {}".format(this, myPos, toPos));
+                        log.error("Error this was not valid: {} from {} to {}.".format(this, myPos, toPos));
                     }
                     else { // it's valid! update the game to get the Move
                         return this.game.update(this, result);
@@ -143,12 +143,13 @@ var Piece = Class(GameObject, {
             }
         }
 
-        reason = (reason || "{this} can not Move from {this.file}{this.rank} to {file}{rank}").format({
+        reason = (reason || "{this} can not Move from {this.file}{this.rank} to {file}{rank}{inCheck}.").format({
             this: this,
             player: player,
             file: file,
             rank: rank,
             promotionType: promotionType,
+            inCheck: player.inCheck ? " while in check" : "",
         });
 
         this.game.declareWinner(player.otherPlayer, "Opponent made an invalid move.");

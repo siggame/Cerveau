@@ -131,22 +131,28 @@ var Instance = Class(Server, {
                 log.error("Error sending data from game instance thread to master lobby thread...");
                 log.error(err);
             }
-            else {
-                log(self._fatal ? "Fatal error occured, exiting" : "Game is over, exiting.");
-            }
 
             if(self._profiler) {
                 var profile = self._profiler.stopProfiling();
                 profile.export(function(error, result) {
                     fs.writeFileSync('output/profiles/profile-' + self.game.name + '-' + self.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
                     profile.delete();
-                    process.exit(0); // "returns" to the lobby that this Instance thread ended successfully. All players connected, played, then disconnected. So this instance is over
+                    self._exit();
                 });
             }
             else {
-                process.exit(0);
+                self._exit();
             }
         });
+    },
+
+    _exit: function(timeout) {
+        var code = this._fatal ? 1 : 0;
+
+        setTimeout(function() { // TODO: find a way to make this timeout un-needed. As it stands without it some clients won't get the last event "over" and sit and listen forever.
+            log("Game is over, exiting.");
+            process.exit(code);
+        }, timeout || 1000); // default 1 second delay to exit, to allow clients to disconnect.
     },
 
     /**

@@ -1,5 +1,6 @@
 var app = require("./app");
 var getGameInfos = require("./getGameInfos");
+var formatGamelogs = require("./formatGamelogs");
 
 module.exports = function(args) {
     app.locals.site = {
@@ -8,6 +9,7 @@ module.exports = function(args) {
 
     if(args.web) {
         var lobby = args.lobby;
+        formatGamelogs.init(lobby, args.host);
 
         app.get('/', function(req, res){
             var gameInfos = getGameInfos();
@@ -36,19 +38,12 @@ module.exports = function(args) {
                 var i = logs.length;
 
                 while(i-- && gamelogs.length < maxGamelogsOnIndex) {
-                    var log = logs[i];
-                    gamelogs.push({
-                        game: log.gameName,
-                        session: log.gameSession,
-                        epoch: log.epoch,
-                        visualizer: log.gameName === "Chess" ? "chesser/?file=" : "visualize/",
-                        uri: lobby.gameLogger.filenameFor(log),
-                    });
+                    gamelogs.push(logs[i]);
                 }
 
                 res.render("index", {
                     games: games,
-                    gamelogs: gamelogs,
+                    gamelogs: formatGamelogs(gamelogs),
                     moreGamelogs: (gamelogs.length === maxGamelogsOnIndex && logs.length > gamelogs.length),
                 });
             });
@@ -63,6 +58,5 @@ module.exports = function(args) {
         require("./api")(args);
     }
 
-    require("./chesser")(args);
     require("./visualize")(args);
 };
