@@ -49,10 +49,21 @@ var Cutter = Class(Spiderling, {
      * @returns {boolean} True if the cut was successfully started, false otherwise.
      */
     cut: function(player, web, asyncReturn) {
-        // <<-- Creer-Merge: cut -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // <<-- Creer-Merge: cut -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        if(this.owner !== player){
+          return this.game.logicError(false, "You do not own this cutter.");
+        }
+        if(this.nest !== web.nestA && this.nest !== web.nestB){
+          return this.game.logicError(false, "You can only cut webs connected to this nest.");
+        }
+        if(this.isDead){
+          return this.game.logicError(false, "You cannot control a died spider.");
+        }
+
+        web.snap();
         // Developer: Put your game logic for the Cutter's cut function here
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: cut -->>
     },

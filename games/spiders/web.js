@@ -69,6 +69,17 @@ var Web = Class(GameObject, {
 
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    /**
+     * Snaps the web, killing all spiders on it.
+     */
+    snap : function(){
+      for(var i = 0; i < this.spider.length; i++){
+        this.spider[i].kill();
+      }
+      this.nestA = NULL;
+      this.nestB = NULL;
+    }
+
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
