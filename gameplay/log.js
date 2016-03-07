@@ -1,4 +1,5 @@
 var colors = require("colors");
+var moment = require("moment");
 var utilities = require(__basedir + "/utilities");
 var server = process._gameplayServer;
 var fs = require("fs");
@@ -6,6 +7,30 @@ var os = require("os");
 var util = require("util");
 var cluster = require("cluster");
 var _obj = {};
+
+/**
+ * Pairs of colors that cannot be foreground/backgrounsd together because it's too hard to read
+ *
+ * @type {Array.<Array<string>>} every element is a pair of two strings representing two colors that should never be paired for Instance color pairs, as they are too hard to read.
+ */
+var _disallowedColorsPairs = [
+    [ "Magenta",  "Red" ],
+    [ "Magenta", "Red Bold" ],
+    [ "Magenta", "Blue Bold" ],
+    [ "Yellow",  "White" ],
+    [ "Green", "Yellow" ],
+    [ "Green", "Cyan" ],
+    [ "Blue", "Magenta" ],
+    [ "Blue", "Black" ],
+    [ "Green", "White" ],
+    [ "Cyan", "White" ],
+    [ "Yellow", "White" ],
+    [ "Blue", "Black Bold" ],
+    [ "Magenta", "Black Bold" ],
+    [ "Red", "Black Bold" ],
+    [ "White", "Black" ], // Because that's the Lobby's color
+    [ "White", "Black Bold" ] // and this is too similar to above
+];
 
 /**
  * logs variables, replaces console.log() -> log()
@@ -60,40 +85,53 @@ _obj.log = function(argsArray, colorFunction) {
                 str = colorFunction(str);
             }
 
-            if(_obj.server) {
-                if(!_obj.nameColor) { // color for the name
-                    var bgColor = "White";
-                    var color = "Black";
-                    var colorsArray = ["Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"];
+            if(_obj.server && !_obj.nameColor) { // we need to color the name!
+                var bgColor = "White";
+                var fgColor = "Black"; // default color for the Lobby
+
+                if(!cluster.isMaster) { // then we are a child thread (Instance), so make the color a random pair
+                    var colorsArray = ["Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White"];
                     colorsArray.shuffle();
 
-                    if(!cluster.isMaster) { // make the color random
-                        bgColor = colorsArray.pop();
-                        colorsArray.push("White", "Black");
-                        colorsArray.shuffle();
+                    bgColor = colorsArray.pop();
 
-                        switch(bgColor) {
-                            case "Magenta":
-                                colorsArray.removeElement("Red");
-                                break;
-                            case "Red":
-                                colorsArray.removeElement("Magenta");
-                                break;
+                    // now find the foreground color
+                    colorsArray.push("Black");
+                    var n = colorsArray.length;
+                    for(var i = 0; i < n; i++) {
+                        colorsArray.push(colorsArray[i] + " Bold");
+                    }
+
+                    // remove disallowed color combinations
+                    for(var i = 0; i < _disallowedColorsPairs.length; i++) {
+                        var pair = _disallowedColorsPairs[i];
+
+                        var index = pair.indexOf(bgColor);
+                        if(index > -1) { // then one of the pairs is the bgColor, so remove the other so it can't be a foreground color
+                            colorsArray.removeElement(pair[1 - index]); // 1 - 0 == 1 and 1 - 1 === 0, so we basically flip the index to the other pair's index
                         }
-                        color = colorsArray.pop();
                     }
-                    _obj.nameColor = colors[color.toLowerCase()]["bg" + bgColor];
 
-                    if(!cluster.isMaster && Math.floor(Math.random() * 2)) {
-                        _obj.nameColor =  _obj.nameColor.bold;
-                    }
+                    colorsArray.shuffle();
+
+                    fgColor = colorsArray.pop();
                 }
-                str = _obj.nameColor(_obj.server.name) + " " + str;
+                var fgSplit = fgColor.split(" ");
+                _obj.nameColor = colors[fgSplit[0].toLowerCase()]["bg" + bgColor];
+
+                if(fgSplit[1] === "Bold") {
+                    _obj.nameColor =  _obj.nameColor.bold;
+                }
             }
-            console.log(str);
+
+            console.log("[{time}] {colored} {str}".format({
+                time: colors.green(moment().format("HH:mm:ss.SSS")),
+                colored: _obj.nameColor ? _obj.nameColor(" " + _obj.server.name + " ") : "???",
+                str: str,
+            }));
         }
     }
-    else {
+    else { // they are using log before the server has been initialized
         console.log.apply(console, argsArray);
     }
 }
