@@ -141,12 +141,19 @@ var BaseGame = Class(DeltaMergeable, {
             this.declareLoser(player, reason || "Disconnected during gameplay.");
 
             if(this._losers.length === this.players.length - 1) { // only one player left in the game, he wins!
+                var winner;
+                var allDisconnected = true;
                 for(var i = 0; i < this.players.length; i++) {
                     var player = this.players[i];
                     if(!player.lost) {
-                        this.declareWinner(player, "All other players lost.");
+                        winner = player;
+                    }
+                    else {
+                        allDisconnected = allDisconnected && player.client.hasDisconnected();
                     }
                 }
+
+                this.declareWinner(player, allDisconnected ? "All other players disconnected." : "All other players lost.");
             }
         }
     },

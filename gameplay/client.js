@@ -92,14 +92,14 @@ var Client = Class({
      * called when the client closes (disconnects)
      */
     _onSocketClose: function() {
-        this.server.clientDisconnected(this);
+        this.disconnected();
     },
 
     /**
      * called when the client disconnects unexpectidly
      */
     _onSocketError: function() {
-        this.server.clientDisconnected(this);
+        this.disconnected();
     },
 
     /**
@@ -149,9 +149,19 @@ var Client = Class({
     },
 
     /**
+     * Returns if the player has disconnected
+     *
+     * @returns {boolean} True if this client has disconnected from the server, false otherwise
+     */
+    hasDisconnected: function() {
+        return Boolean(this._hasDisconnected);
+    },
+
+    /**
      * Called when disconnected from the remote client this Client represents
      */
     disconnected: function() {
+        this._hasDisconnected = true;
         this.pauseTicking();
         this.stopListeningToSocket();
         this.server.clientDisconnected(this);
