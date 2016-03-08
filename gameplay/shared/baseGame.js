@@ -153,7 +153,7 @@ var BaseGame = Class(DeltaMergeable, {
                     }
                 }
 
-                this.declareWinner(player, allDisconnected ? "All other players disconnected." : "All other players lost.");
+                this.declareWinner(winner, allDisconnected ? "All other players disconnected." : "All other players lost.");
             }
         }
     },
