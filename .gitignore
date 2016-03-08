@@ -30,3 +30,6 @@ node_modules
 output/gamelogs
 output/profiles
 output/logs
+
+# generated docs via apidoc or jsdoc
+docs

@@ -102,7 +102,8 @@ module.exports = function(args) {
      * @apiSuccess (Client) {String} name           The name of the client.
      * @apiSuccess (Client) {Boolean} spectating    If the client is a spectator (not a playing client). Spectators will not have indexes.
      * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true.
-     * @apiSuccess (Client) {Boolean} [lost         If the player lost this will be set, and be true.
+     * @apiSuccess (Client) {Boolean} [lost]        If the player lost this will be set, and be true.
+     * @apiSuccess (Client) {String} [reason]       If the player won or lost this will be the human readable reason why they did so.
      *
      * @apiExample {json} Empty
      *  {
