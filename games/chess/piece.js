@@ -95,6 +95,10 @@ var Piece = Class(GameObject, {
             reason = "{player} it is not your turn to make a Move!";
         }
 
+        if(player.madeMove) {
+            reason = "{player} has already made their Move this turn.";
+        }
+
         if(this.captured) {
             reason = "{this} has been captured and cannot Move.";
         }
