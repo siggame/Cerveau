@@ -55,11 +55,15 @@ module.exports = function(args) {
             info.status = "over";
 
             for(var i = 0; i < session.winners.length; i++) {
-                info.clients[session.winners[i].index].won = true;
+                var client = info.clients[session.winners[i].index];
+                client.won = true;
+                client.reason = session.winners[i].reason;
             }
 
             for(var i = 0; i < session.losers.length; i++) {
-                info.clients[session.losers[i].index].lost = true;
+                var client = info.clients[session.losers[i].index];
+                client.lost = true;
+                client.reason = session.losers[i].reason;
             }
 
             return info;
@@ -153,13 +157,15 @@ module.exports = function(args) {
      *              name: "Chess Lua Player",
      *              index: 0,
      *              spectating: false,
-     *              won: true
+     *              won: true,
+     *              reason: "Checkmate!"
      *          },
      *          {
      *              name: "Chess Python Player",
      *              index: 1,
      *              spectating: false,
-     *              lost: true
+     *              lost: true,
+     *              reason: "Checkmated."
      *          }
      *      ]
      *  }
