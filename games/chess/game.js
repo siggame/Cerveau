@@ -269,7 +269,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var nextMove = this.moves[moves + i - 4];
 
             // if for the last eight moves a capture, promotions, or pawn movement has happened, then simplified threefold repetition has NOT occured
-            if(!this._isSimplifiedThreefoldRepetitionMove(move) || !this._isSimplifiedThreefoldRepetitionMove(nextMove)) {
+            if(this._moveHasCapturePromotionOrPawnAdvancement(move) || this._moveHasCapturePromotionOrPawnAdvancement(nextMove)) {
                 return false;
             }
 
@@ -284,11 +284,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     },
 
     /**
-     * checks if for the had move no capture, promotions, or pawn movement has happened
+     * checks if the move a capture, promotion, or pawn movement
      *
      * @returns {Boolean} true is so, false otherwise
      */
-    _isSimplifiedThreefoldRepetitionMove: function(move) {
+    _moveHasCapturePromotionOrPawnAdvancement: function(move) {
         return Boolean(move.captured || move.promotion || move.piece.type === "Pawn");
     },
 
