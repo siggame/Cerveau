@@ -3,9 +3,9 @@
 	<ul class="game-list">
 	{{#each games}}
 		<li>
-			<span class="game-name">{{this.name}}</span>
-			<span class="game-description">{{this.description}}</span>
-			<span class="game-documentation"><a href="/documentation/{{this.name}}">Documentation</a></span>
+			<h3 class="game-name">{{this.name}}</h3>
+			<div class="game-description">{{this.description}}</div>
+			<div class="game-documentation"><a href="/documentation/{{this.name}}">Documentation</a></div>
 		</li>
 	{{/each}}
 	</ul>
