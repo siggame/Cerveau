@@ -100,6 +100,7 @@ var Instance = Class(Server, {
 
                 this._updateDeltas("disconnect", {
                     player: client.player,
+                    timeout: true,
                 });
             }
         }

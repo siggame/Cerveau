@@ -278,9 +278,19 @@ var Client = Class({
      * called when this Client runs out of time om it's timer. Probably because it infinte looped, broke, or is just very slow.
      */
     _timedOut: function() {
+        this._hasTimedOut = true;
         this.pauseTicking();
         this.server.clientTimedOut(this);
-        this.disconnect();
+        this.disconnect("Your client has run out of time, and has been timedout.");
+    },
+
+    /**
+     * If this client has timed out
+     *
+     * @returns {boolean} True if they have timed out, false otherwiese
+     */
+    hasTimedOut: function() {
+        return Boolean(this._hasTimedOut);
     },
 });
 

@@ -12,7 +12,7 @@ var constants = require("../constants");
  */
 var BaseGame = Class(DeltaMergeable, {
     init: function(data, instance) {
-        if(this._baseGameInitialized) { // semi-shitty way to avoid multiplayer sub classes, re-initializing BaseGame
+        if(this._baseGameInitialized) { // semi-shitty way to avoid multiD sub classes, re-initializing BaseGame
             return;
         }
 
@@ -143,6 +143,7 @@ var BaseGame = Class(DeltaMergeable, {
             if(this._losers.length === this.players.length - 1) { // only one player left in the game, he wins!
                 var winner;
                 var allDisconnected = true;
+                var allTimedOut = true;
                 for(var i = 0; i < this.players.length; i++) {
                     var player = this.players[i];
                     if(!player.lost) {
@@ -150,10 +151,19 @@ var BaseGame = Class(DeltaMergeable, {
                     }
                     else {
                         allDisconnected = allDisconnected && player.client.hasDisconnected();
+                        allTimedOut = allTimedOut && player.client.hasTimedOut();
                     }
                 }
 
-                this.declareWinner(winner, allDisconnected ? "All other players disconnected." : "All other players lost.");
+                var reasonWon = "All other players lost.";
+                if(allDisconnected) {
+                    reasonWon = "All other players disconnected.";
+                }
+                if(allTimedOut) {
+                    reasonWon = "All other players timed out."
+                }
+
+                this.declareWinner(winner, reasonWon);
             }
         }
     },
