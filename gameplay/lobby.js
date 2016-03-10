@@ -397,7 +397,18 @@ var Lobby = Class(Server, {
      */
     clientDisconnected: function(client /* ... */) {
         if(client.session) {
-            client.session.removeClient(client);
+            var session = client.session;
+
+            session.removeClient(client);
+
+            if(session.clients.length === 0) { // that session is empty, no need to keep it around
+                delete this._sessions[session.gameName][session.id];
+                delete client.session;
+
+                if(parseInt(session.id) + 1 === this._nextGameNumber) { // then the next game number was never used, so reuse it
+                    this._nextGameNumber--;
+                }
+            }
         }
 
         return Server.clientDisconnected.apply(this, arguments);
