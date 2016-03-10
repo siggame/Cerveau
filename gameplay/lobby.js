@@ -132,9 +132,10 @@ var Lobby = Class(Server, {
             var gameName = gameClass.prototype.name;
 
             // hook up all the ways to get index the game class by
-            this._gameClasses[gameName] = gameClass;
-            this._gameClasses[gameName.toLowerCase()] = gameClass;
-            this._gameClasses[gameClass.webserverID.toLowerCase()] = gameClass;
+            var aliases = gameClass.aliases.concat(gameName);
+            for(var i = 0; i < aliases.length; i++) {
+                this._gameClasses[aliases[i].toLowerCase()] = gameClass;
+            }
 
             this._sessions[gameName] = {};
 
@@ -233,7 +234,7 @@ var Lobby = Class(Server, {
                 id = String(this._nextGameNumber++);
             }
 
-            session = new Session(id, this._gameClasses[gameName], this);
+            session = new Session(id, this.getGameClass(gameName), this);
 
             this._sessions[gameName][id] = session;
         }
@@ -248,14 +249,7 @@ var Lobby = Class(Server, {
      * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
      */
     getGameNameForAlias: function(gameAlias) {
-        if(gameAlias) {
-            var gameClass = this._gameClasses[gameAlias.toLowerCase()];
-            if(gameClass) {
-                return gameClass.prototype.name;
-            }
-        }
-
-        throw new Error("String '{}' is no alias for any known games".format(gameAlias));
+        return this.getGameClass(gameAlias).prototype.name;
     },
 
     /**
@@ -265,7 +259,14 @@ var Lobby = Class(Server, {
      * @returns {Class} the game class constructor, if found
      */
     getGameClass: function(gameAlias) {
-        return this._gameClasses[this.getGameNameForAlias(gameAlias)];
+        if(gameAlias) {
+            var gameClass = this._gameClasses[gameAlias.toLowerCase()]; // don't use gameGameCLass() as that calls this function
+            if(gameClass) {
+                return gameClass;
+            }
+        }
+
+        throw new Error("String '{}' is no alias for any known games".format(gameAlias));
     },
 
     /**
@@ -332,13 +333,30 @@ var Lobby = Class(Server, {
             failure: function() {
                 client.send("fatal", {
                     message: "Unauthorized to play in this lobby with given name/password.",
-                    data: {
-                        unauthorized: true
-                    },
+                    unauthorized: true,
                 });
                 client.disconnect();
             },
         });
+    },
+
+    /**
+     * When a client sends the 'alias' event, which tells use they want to know what this game alias really is
+     *
+     * @param {Client} client - the client that send the 'play'
+     * @param {string} alias - the alias they want named
+     */
+    _clientSentAlias: function(client, alias) {
+        var gameName;
+        try {
+            gameName = this.getGameNameForAlias(alias);
+        }
+        catch(err) {
+            client.disconnect("'{}' is no known alias for any game.".format(alias));
+            return;
+        }
+
+        client.send("named", gameName);
     },
 
     /**

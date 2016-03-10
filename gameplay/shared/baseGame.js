@@ -41,7 +41,7 @@ var BaseGame = Class(DeltaMergeable, {
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
     name: "Base Game", // should be overwritten by the child game class's prototype inheriting this
-    webserverID: "Base-Game", // likewise should be overwritten
+    aliases: [], // should be overwitten as well, and populated with strings like the web server id. aliases are NOT case sensitive
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
