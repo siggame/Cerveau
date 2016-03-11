@@ -9,7 +9,7 @@ function initGameInfos() {
     for(var i = 0; i < gameFolders.length; i++) {
         var gameFolder = gameFolders[i];
         if(!gameFolder.startsWith("_")) {
-            gameInfos[gameFolder] = gameInfos[gameFolder] || require(__basedir + '/games/' + gameFolder + "/gameInfo.json");
+            gameInfos[gameFolder.upcaseFirst()] = gameInfos[gameFolder] || require(__basedir + '/games/' + gameFolder + "/gameInfo.json");
         }
     }
 };

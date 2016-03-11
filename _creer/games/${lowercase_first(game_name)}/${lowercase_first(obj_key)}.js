@@ -44,15 +44,18 @@ var ${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else 
 ${merge("        //", "init",
 """
         // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
-
-"""
+{}
+""".format("        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'\n" if obj_key == "Game" else "")
 )}
     },
 
 % if obj_key == "Game":
     name: "${game_name}",
-    webserverID: "MegaMinerAI-##-${game_name}",
+
+    aliases: [
+${merge("        //", "aliases", '        "MegaMinerAI-##-{}",'.format(game_name))}
+    ],
+
 
 
     /**

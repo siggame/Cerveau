@@ -6,6 +6,7 @@ var path = require('path');
 var moment = require('moment');
 var format = require("string-format");
 var extend = require("extend");
+var sanitize = require("sanitize-filename");
 var log = require("./log");
 
 /**
@@ -104,7 +105,7 @@ var GameLogger = Class({
             obj.moment = utilities.momentString(obj.epoch)
         }
 
-        return this._filenameFormat.format(obj);
+        return sanitize(this._filenameFormat.format(obj));
     },
 
     /**
