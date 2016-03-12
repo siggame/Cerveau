@@ -40,8 +40,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.maxTurns = 300;
+
+        // used for map generation
+        this._mapSize = 5000;
+        this._maxNests = 60; // per side, as are the folling
+        this._minNests = 10;
+        this._maxWebs = 30;
+        this._minWebs = 0;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -58,7 +64,66 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic after init can be put here
+
+        // genreate Nests on the left
+        var numNests = Math.randomInt(this._maxNests, this._minNests);
+        for(var i = 0; i < numNests; i++) {
+            this.nests.push(this.create("Nest", {
+                x: Math.randomInt(this._mapSize/2),
+                y: Math.randomInt(this._mapSize),
+            }));
+        }
+
+        // geneate Webs on the left
+        var numWebs = Math.randomInt(this._maxWebs, this._minWebs);
+        for(var i = 0; i < numWebs; i++) {
+            var nestA = this.nests.randomElement();
+            var nestB = nestA;
+            while(nestB !== nestA) {
+                nestB = this.nests.randomElement();
+            }
+
+            this.webs.push(this.create("Web", {
+                nestA: nestA,
+                nestB: nestB,
+            }));
+        }
+
+        // create the BroodMother
+        this.players[0].broodMother = this.create("BroodMother", {
+            nest: this.nests.randomElement(),
+        });
+
+        // now mirror it
+
+        // mirror the Nests
+        var mirroredNests = {};
+        for(var i = 0; i < numNests; i++) {
+            var mirroring = this.nests[i];
+            var mirrored = this.create("Nest", {
+                x: this._mapSize - mirroring.x,
+                y: mirroring.y,
+            });
+
+            mirroredNests[mirroring.id] = mirrored;
+            this.nests.push(mirrored);
+        }
+
+        // mirror the Webs
+        for(var i = 0; i < numWebs; i++) {
+            var mirroring = this.webs[i];
+
+            this.webs.push(this.create("Web", {
+                nestA: mirroredNests[mirroring.nestA.id],
+                nestB: mirroredNests[mirroring.nestB.id],
+            }));
+        }
+
+        // mirror the BroodMother
+        this.players[1].broodMother = this.create("BroodMother", {
+            nest: mirroredNests[this.players[0].broodMother.nest.id],
+        });
+
         //<<-- /Creer-Merge: begin -->>
     },
 

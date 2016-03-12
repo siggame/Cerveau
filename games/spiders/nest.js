@@ -65,6 +65,10 @@ var Nest = Class(GameObject, {
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
+    distanceTo: function(otherNest) {
+        return Math.euclideanDistance(this, otherNest);
+    },
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });

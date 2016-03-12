@@ -55,11 +55,15 @@ module.exports = function(args) {
             info.status = "over";
 
             for(var i = 0; i < session.winners.length; i++) {
-                info.clients[session.winners[i].index].won = true;
+                var client = info.clients[session.winners[i].index];
+                client.won = true;
+                client.reason = session.winners[i].reason;
             }
 
             for(var i = 0; i < session.losers.length; i++) {
-                info.clients[session.losers[i].index].lost = true;
+                var client = info.clients[session.losers[i].index];
+                client.lost = true;
+                client.reason = session.losers[i].reason;
             }
 
             return info;
@@ -98,7 +102,8 @@ module.exports = function(args) {
      * @apiSuccess (Client) {String} name           The name of the client.
      * @apiSuccess (Client) {Boolean} spectating    If the client is a spectator (not a playing client). Spectators will not have indexes.
      * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true.
-     * @apiSuccess (Client) {Boolean} [lost         If the player lost this will be set, and be true.
+     * @apiSuccess (Client) {Boolean} [lost]        If the player lost this will be set, and be true.
+     * @apiSuccess (Client) {String} [reason]       If the player won or lost this will be the human readable reason why they did so.
      *
      * @apiExample {json} Empty
      *  {
@@ -153,13 +158,15 @@ module.exports = function(args) {
      *              name: "Chess Lua Player",
      *              index: 0,
      *              spectating: false,
-     *              won: true
+     *              won: true,
+     *              reason: "Checkmate!"
      *          },
      *          {
      *              name: "Chess Python Player",
      *              index: 1,
      *              spectating: false,
-     *              lost: true
+     *              lost: true,
+     *              reason: "Checkmated."
      *          }
      *      ]
      *  }

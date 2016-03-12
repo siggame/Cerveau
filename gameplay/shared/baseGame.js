@@ -12,7 +12,7 @@ var constants = require("../constants");
  */
 var BaseGame = Class(DeltaMergeable, {
     init: function(data, instance) {
-        if(this._baseGameInitialized) { // semi-shitty way to avoid multiplayer sub classes, re-initializing BaseGame
+        if(this._baseGameInitialized) { // semi-shitty way to avoid multiD sub classes, re-initializing BaseGame
             return;
         }
 
@@ -41,7 +41,7 @@ var BaseGame = Class(DeltaMergeable, {
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
     name: "Base Game", // should be overwritten by the child game class's prototype inheriting this
-    webserverID: "Base-Game", // likewise should be overwritten
+    aliases: [], // should be overwitten as well, and populated with strings like the web server id. aliases are NOT case sensitive
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
@@ -141,12 +141,29 @@ var BaseGame = Class(DeltaMergeable, {
             this.declareLoser(player, reason || "Disconnected during gameplay.");
 
             if(this._losers.length === this.players.length - 1) { // only one player left in the game, he wins!
+                var winner;
+                var allDisconnected = true;
+                var allTimedOut = true;
                 for(var i = 0; i < this.players.length; i++) {
                     var player = this.players[i];
                     if(!player.lost) {
-                        this.declareWinner(player, "All other players lost.");
+                        winner = player;
+                    }
+                    else {
+                        allDisconnected = allDisconnected && player.client.hasDisconnected();
+                        allTimedOut = allTimedOut && player.client.hasTimedOut();
                     }
                 }
+
+                var reasonWon = "All other players lost.";
+                if(allDisconnected) {
+                    reasonWon = "All other players disconnected.";
+                }
+                if(allTimedOut) {
+                    reasonWon = "All other players timed out."
+                }
+
+                this.declareWinner(winner, reasonWon);
             }
         }
     },

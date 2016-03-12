@@ -100,6 +100,7 @@ var Instance = Class(Server, {
 
                 this._updateDeltas("disconnect", {
                     player: client.player,
+                    timeout: true,
                 });
             }
         }
@@ -398,6 +399,7 @@ var Instance = Class(Server, {
                 index: i,
                 id: player.id,
                 name: player.name,
+                reason: player.won ? player.reasonWon : player.reasonLost,
             });
         }
 
