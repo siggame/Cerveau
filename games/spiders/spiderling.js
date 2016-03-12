@@ -110,8 +110,40 @@ var Spiderling = Class(Spider, {
     move: function(player, web, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Spiderling's move function here
-        return false;
+        var error = Spiderling._validate.call(this, player, false);
+        if(error) {
+            return error;
+        }
+
+        if(!web) {
+            return this.game.logicError(false, "{web} is not a Web for {this} to move on.".format({
+                this: this,
+                web: web,
+            }));
+        }
+
+        if(!web.isConnectedTo(this.nest)) {
+            return this.game.logicError(false, "{web} is not connected to {this.nest} for {this} to move on.".format({
+                this: this,
+                web: web,
+            }));
+        }
+
+        // if we got here the move is valid
+
+        this.busy = "Moving";
+        this.turnsRemaining = Math.ceil(web.length / this.speed);
+
+        this.movingOnWeb = web;
+        this.movingToNest = web.getOtherNest(this.nest);
+
+        this.nest.spiders.removeElement(this);
+        this.nest = null;
+
+        web.spiderlings.push(this);
+        web.recalculateLoad();
+
+        return true;
 
         // <<-- /Creer-Merge: move -->>
     },

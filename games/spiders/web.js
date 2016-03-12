@@ -73,16 +73,71 @@ var Web = Class(GameObject, {
 
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
     /**
      * Snaps the web, killing all spiders on it.
      */
     snap : function(){
-      for(var i = 0; i < this.spider.length; i++){
-        this.spider[i].kill();
-      }
-      this.nestA = NULL;
-      this.nestB = NULL;
-    }
+        for(var i = 0; i < this.spider.length; i++){
+            this.spider[i].kill();
+        }
+
+        this.nestA.webs.removeElement(this);
+        this.nestA = null;
+
+        this.nestB.webs.removeElement(this);
+        this.nestB = null;
+    },
+
+    /**
+     * Checks if the Web is connected to some Nest
+     *
+     * @param {Nest} nest - nest to check if is connected to at nestA or nestB
+     * @param {Nest} [otherNest] - if passed then checks if nestA and nestB are otherNest and the previous arg nest (in either order)
+     * @returns {boolean|undefined} True if it is connected to that web, false otherwise, undefined if nest is null.
+     */
+    isConnectedTo: function(nest, otherNest) {
+        if(!nest) {
+            return undefined;
+        }
+
+        if(!otherNest) {
+            return this.nestA === nest || this.nestB === nest;
+        }
+        else {
+            return (this.nestA === nest && this.nestB === otherNest) || (this.nestA === otherNest && this.nestB === nest);
+        }
+    },
+
+    /**
+     * Gets the other nest, given one of its nests A or B
+     *
+     * @param {Nest} nest - the nest to get the other one
+     * @returns {Nest|undefined} the other Nest that the passed in nest is not, undefined is nest is not part of this Web.
+     */
+    getOtherNest: function(nest) {
+        if(!this.isConnectedTo(nest)) {
+            return undefined;
+        }
+
+        return this.nestA === nest ? this.nestB : this.nestA;
+    },
+
+    /**
+     * Should be called whenever something changes on the web, so it need to re-calculate its current load and maybe snap.
+     */
+    recalculateLoad: function() {
+        var weight = 0;
+        for(var i = 0; i < this.spiderlings.length; i++) {
+            weight += this.spiderlings[i].weight;
+        }
+
+        this.load = weight;
+
+        if(this.load >= this.strength) {
+            this.snap();
+        }
+    },
 
 
     // You can add additional functions here. These functions will not be directly callable by client AIs

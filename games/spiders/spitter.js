@@ -61,6 +61,17 @@ var Spitter = Class(Spiderling, {
             }));
         }
 
+        for(var i = 0; i < nest.webs.length; i++) {
+            var web = nest.webs[i];
+            if(web.isConnectedTo(this.nest, nest)) {
+                return this.game.logicError(false, "{this} cannot spit a new Web from {this.nest} to {nest} because {web} already exists.".format({
+                    this: this,
+                    nest: nest,
+                    web: web,
+                }));
+            }
+        }
+
         // if we got here, then everything should be ok for the spit to start
 
         this.busy = "Spitting";

@@ -55,9 +55,10 @@ var Cutter = Class(Spiderling, {
             return error;
         }
 
-        if(this.nest !== web.nestA && this.nest !== web.nestB){
-            return this.game.logicError(false, "{this} can only cut Webs connected to the Nest it is on ({this.nest}).".format({
+        if(!web.isConnectedTo(this.nest)) {
+            return this.game.logicError(false, "{this} can only cut Webs connected to the Nest it is on ({this.nest}, {web} is not.).".format({
                 this: this,
+                web: web,
             }));
         }
 
