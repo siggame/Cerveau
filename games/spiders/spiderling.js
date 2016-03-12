@@ -118,7 +118,32 @@ var Spiderling = Class(Spider, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Checks if this spiderling is valid to do something
+     *
+     * @param {Player} player - the player that is trying to command this Spiderling
+     * @param {*} invalidReturnValue - what to return if invalid (in the GameLogicError)
+     * @retuns {GameLogicError} a game logic error if there is something wrong, undefined otherwise
+     */
+    _validate: function(player, invalidReturnValue) {
+        var reason;
+        if(this.owner !== player) {
+            reason = "{player} does not own {this}.";
+        }
+        else if(this.isDead) {
+            reason = "{this} is dead and cannot do anything.";
+        }
+        else if(this.busy) {
+            reason = "{this} is already busy with '{this.busy}'.";
+        }
+
+        if(reason) {
+            return this.game.logicError(invalidReturnValue, reason.format({
+                this: this,
+                player: player,
+            }));
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

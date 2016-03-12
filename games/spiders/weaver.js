@@ -38,8 +38,7 @@ var Weaver = Class(Spiderling, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.weavingSpeed = 10;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -57,37 +56,8 @@ var Weaver = Class(Spiderling, {
      */
     strengthen: function(player, web, asyncReturn) {
         // <<-- Creer-Merge: strengthen -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.owner !== player){
-            return this.game.logicError(false, "{player} does not own {this}.".format({
-                this: this,
-                player: player,
-            }));
-        }
 
-        if(!web){
-            return this.game.logicError(false, "{this} was not sent a Web to strengthen.".format({
-                this: this,
-            }));
-        }
-
-        if(this.nest !== nestA && this.nest !== nestB){
-            return this.game.logicError(false, "{this} can only strengthen Webs connected to {this.nest}.".format({
-                this: this,
-            }));
-        }
-
-        if(this.isDead){
-            return this.game.logicError(false, "{player} cannot control a dead {this}.".format({
-                this: this,
-                player: player,
-            }));
-        }
-
-        web.strengthen();
-
-
-        // Developer: Put your game logic for the Weaver's strengthen function here
-        return true;
+        return this._weave(player, web, "Strengthening");
 
         // <<-- /Creer-Merge: strengthen -->>
     },
@@ -102,41 +72,58 @@ var Weaver = Class(Spiderling, {
      */
     weaken: function(player, web, asyncReturn) {
         // <<-- Creer-Merge: weaken -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.isDead){
-            return this.game.logicError(false, "{player} cannot control a dead {this}.".format({
-                this: this,
-                player: player,
-            }));
-        }
 
-        return this.game.logicError(false, "{this} was not sent a Web to strengthen.".format({
-            this: this,
-        }));
-
-        if(this.owner !== player){
-            return this.game.logicError(false, "{player} does not own {this}.".format({
-                this: this,
-                player: player,
-            }));
-        }
-
-        if(this.nest !== nestA && this.nest !== nestB){
-            return this.game.logicError(false, "{this} can only weaken Webs connect to {this.nest}.".format({
-                this: this,
-            }));
-        }
-
-        web.weaken();
-
-        // Developer: Put your game logic for the Weaver's weaken function here
-        return true;
+        return this._weave(player, web, "Weakening");
 
         // <<-- /Creer-Merge: weaken -->>
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * A generic strengthen/weaken wrapper because both are so similar
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Web} web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
+     * @param {string} weaveType - should be "Strengthening" or "Weakening" as appropriate
+     * @returns {boolean} True if the weaken was successfully started, false otherwise.
+     */
+    _weave: function(player, web, weaveType) {
+        var error = Spiderling._validate.call(this, player, false);
+        if(error) {
+            return error;
+        }
+
+        if(!web) {
+            return this.game.logicError(false, "{web} is not a valid Web to strengthen for {this}.".format({
+                this: this,
+                web: web,
+            }));
+        }
+
+        if(this.nest !== web.nestA && this.nest !== web.nestB){
+            return this.game.logicError(false, "{this} can only strengthen Webs connected to {this.nest}, {web} is not.".format({
+                this: this,
+                web: web,
+            }));
+        }
+
+        if(weaveType === "Weakening" && web.strength <= 1) {
+            return this.game.logicError(false, "{this} cannot weaken {web} as its strength is at the minimum (1).".format({
+                this: this,
+                web: web,
+            }));
+        }
+
+        // if we got here it is valid!
+
+        this.busy = weaveType;
+        this.turnsRemaining = Math.ceil(web.length / this.weavingSpeed);
+        this[weaveType.toLowerCase() + "Web"] = web;
+
+        return true;
+
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

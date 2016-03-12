@@ -31,8 +31,7 @@ var Cutter = Class(Spiderling, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.cuttingSpeed = 10;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -49,28 +48,25 @@ var Cutter = Class(Spiderling, {
      * @returns {boolean} True if the cut was successfully started, false otherwise.
      */
     cut: function(player, web, asyncReturn) {
-
-
         // <<-- Creer-Merge: cut -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.owner !== player){
-            return this.game.logicError(false, "{player} does not own {this}.".format({
-                player: player,
-                this: this,
-            }));
+
+        var error = Spiderling._validate.call(this, player, false);
+        if(error) {
+            return error;
         }
+
         if(this.nest !== web.nestA && this.nest !== web.nestB){
-            return this.game.logicError(false, "{this} can only cut webs connected to the nest it is on ({this.nest}).".format({
+            return this.game.logicError(false, "{this} can only cut Webs connected to the Nest it is on ({this.nest}).".format({
                 this: this,
             }));
         }
-        if(this.isDead){
-            return this.game.logicError(false, "{player} cannot control dead {this}.".format({
-                player: player,
-                this: this,
-            }));
-        }
-        web.snap();
-        // Developer: Put your game logic for the Cutter's cut function here
+
+        // if we got here the cut is valid
+
+        this.busy = "Cutting";
+        this.cuttingWeb = web;
+        this.turnsRemaining = Math.ceil(web.length / this.cuttingSpeed);
+
         return true;
         // <<-- /Creer-Merge: cut -->>
     },

@@ -31,8 +31,7 @@ var Spitter = Class(Spiderling, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.spittingSpeed = 10;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -49,31 +48,25 @@ var Spitter = Class(Spiderling, {
      */
     spit: function(player, asyncReturn) {
         // <<-- Creer-Merge: spit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.isDead){
-            return this.game.logicError(false, "{player} cannot control a dead {this}".format({
-                player: player,
+
+        var error = Spiderling._validate.call(this, player, false);
+        if(error) {
+            return error;
+        }
+
+        if(!nest) {
+            return this.game.logicError(false, "{nest} is not a Nest for {this} to spit at.".format({
                 this: this,
+                nest: nest,
             }));
         }
-        if(this.owner !== player){
-            return this.game.logicError(false, "{player} does not own {this}".format({
-                player: player,
-                this: this,
-            }));
-        }
-        if(this.nest === null){
-            return this.game.logicError(false, "{this} needs to be a nest to spit from.".format({
-                this: this,
-            }));
-        }
-        if(!nest){
-            return this.game.logicError(false, "No nest was passed to spit to.");
-        }
-        // Developer: Put your game logic for the Spitter's spit function here
-        this.game.create("Web", {
-            nestA: this.nest,
-            nestB: nest,
-        })
+
+        // if we got here, then everything should be ok for the spit to start
+
+        this.busy = "Spitting";
+        this.spittingWebToNest = nest;
+        this.turnsRemaining = Math.ceil(this.nest.distanceTo(nest) / this.spittingSpeed);
+
         return true;
 
         // <<-- /Creer-Merge: spit -->>
