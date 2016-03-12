@@ -75,9 +75,32 @@ var BroodMother = Class(Spider, {
      */
     spawn: function(player, spiderlingType, asyncReturn) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        newSpider = null;
 
-        // Developer: Put your game logic for the BroodMother's spawn function here
-        return null;
+        // check if the player owns the broodMother
+        if (this.owner !== player) {
+            return this.game.logicError(null, "Player {player} cannot spawn spiderling from BroodMother {this} owned by Player {owner}");
+        }
+
+        // check if the spiderlingType is valid
+        if (spiderlingType.toLowerCase() === "spitter" || spiderlingType.toLowerCase() == "weaver" || spiderlingType.toLowerCase() == "cutter") {
+            // check if BroodMother has enough eggs to spawn spiderling
+            if (player.eggs > spiderlingCost(spiderlingType)) {
+                newSpider = this.game.create(spiderlingType.toLowerCase()), {
+                    nest: this.nest,
+                    owner: player, 
+                });
+            }
+            else {
+                return this.game.logicError(null, "BroodMother does not have enough eggs to spawn a {spiderlingType}");
+            }
+        }
+
+        else {
+            return this.game.logicError(null, "BroodMother commanded to spawn an invalid spiderlingType {spiderlingType}");
+        }
+
+        return newSpider;
 
         // <<-- /Creer-Merge: spawn -->>
     },
@@ -85,6 +108,18 @@ var BroodMother = Class(Spider, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+    spiderlingCost: function(spiderlingType) {
+        if (spiderlingType.toLowerCase() == "spitter") {
+            return spitter.cost;
+        }
+        else if (spiderlingType.toLowerCase() == "weaver") {
+            return weaver.cost;
+        }
+        else if (spiderlingType.toLowerCase() == "cutter") {
+            return cutter.cost;
+        }
+        return 0; // Invalid spiderling type
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 
