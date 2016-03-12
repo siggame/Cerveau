@@ -80,7 +80,7 @@ var BroodMother = Class(Spider, {
 
         // check if the player owns the broodMother
         if (this.owner !== player) {
-            return this.game.logicError(null, "Player {player} cannot spawn spiderling from BroodMother {this} owned by Player {owner}");
+            return this.game.logicError(null, "{player} cannot spawn spiderling from {this} owned by {owner}");
         }
 
         // check if the spiderlingType is valid
