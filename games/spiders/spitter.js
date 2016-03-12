@@ -49,9 +49,32 @@ var Spitter = Class(Spiderling, {
      */
     spit: function(player, asyncReturn) {
         // <<-- Creer-Merge: spit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        if(this.isDead){
+            return this.game.logicError(false, "{player} cannot control a dead {this}".format({
+                player: player,
+                this: this,
+            }));
+        }
+        if(this.owner !== player){
+            return this.game.logicError(false, "{player} does not own {this}".format({
+                player: player,
+                this: this,
+            }));
+        }
+        if(this.nest === null){
+            return this.game.logicError(false, "{this} needs to be a nest to spit from.".format({
+                this: this,
+            }));
+        }
+        if(!nest){
+            return this.game.logicError(false, "No nest was passed to spit to.");
+        }
         // Developer: Put your game logic for the Spitter's spit function here
-        return false;
+        this.game.create("Web", {
+            nestA: this.nest,
+            nestB: nest,
+        })
+        return true;
 
         // <<-- /Creer-Merge: spit -->>
     },

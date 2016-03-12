@@ -57,9 +57,31 @@ var Weaver = Class(Spiderling, {
      */
     strengthen: function(player, web, asyncReturn) {
         // <<-- Creer-Merge: strengthen -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        if(this.owner !== player){
+            return this.game.logicError(false, "{player} does not own {this}.".format({
+                this: this,
+                player: player,
+            }));
+        }
+        if(!web){
+            return this.game.logicError(false, "You need to pass a web.");
+        }
+        if(this.nest !== nestA && this.nest !== nestB){
+            return this.game.logicError(false, "{this} can only strengthen webs connected to {this.nest}.".format({
+                this: this,
+            }));
+        }
+        if(this.isDead){
+            return.this.game.logicError(false, "{player} cannot control a dead {this}.".format({
+                this: this,
+                player: player,
+            }));
+        }
+        web.strengthen();
+
 
         // Developer: Put your game logic for the Weaver's strengthen function here
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: strengthen -->>
     },
@@ -74,9 +96,30 @@ var Weaver = Class(Spiderling, {
      */
     weaken: function(player, web, asyncReturn) {
         // <<-- Creer-Merge: weaken -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        if(this.isDead){
+            return this.game.logicError(false, "{player} cannot control a dead {this}.".format({
+                this: this,
+                player: player,
+            }));
+        }
+        if(!web){
+            return this.game.logicError(false, "You need to pass a web.");
+        }
+        if(this.owner !== player){
+            return this.game.logicError(false, "{player} does not own {this}.".format({
+                this: this,
+                player: player,
+            }));
+        }
+        if(this.nest !== nestA && this.nest !== nestB){
+            return this.game.logicError(false, "{this} can only weaken webs connect to {this.nest}.".format({
+                this: this,
+            }));
+        }
+        web.weaken();
+        
         // Developer: Put your game logic for the Weaver's weaken function here
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: weaken -->>
     },
