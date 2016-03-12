@@ -133,8 +133,8 @@ var Lobby = Class(Server, {
 
             // hook up all the ways to get index the game class by
             var aliases = gameClass.aliases.concat(gameName);
-            for(var i = 0; i < aliases.length; i++) {
-                this._gameClasses[aliases[i].toLowerCase()] = gameClass;
+            for(var a = 0; a < aliases.length; a++) {
+                this._gameClasses[aliases[a].toLowerCase()] = gameClass;
             }
 
             this._sessions[gameName] = {};
