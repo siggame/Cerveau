@@ -72,7 +72,7 @@ var Weaver = Class(Spiderling, {
             }));
         }
         if(this.isDead){
-            return.this.game.logicError(false, "{player} cannot control a dead {this}.".format({
+            return this.game.logicError(false, "{player} cannot control a dead {this}.".format({
                 this: this,
                 player: player,
             }));
@@ -117,7 +117,7 @@ var Weaver = Class(Spiderling, {
             }));
         }
         web.weaken();
-        
+
         // Developer: Put your game logic for the Weaver's weaken function here
         return true;
 
