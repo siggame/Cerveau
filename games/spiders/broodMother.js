@@ -85,7 +85,7 @@ var BroodMother = Class(Spider, {
         // check if the spiderlingType is valid
         if (spiderlingType.toLowerCase() === "spitter" || spiderlingType.toLowerCase() == "weaver" || spiderlingType.toLowerCase() == "cutter") {
             // check if BroodMother has enough eggs to spawn spiderling
-            if (player.eggs > spiderlingCost(spiderlingType)) {
+            if (player.eggs >= spiderlingCost(spiderlingType)) {
                 newSpider = this.game.create(spiderlingType.toLowerCase()), {
                     nest: this.nest,
                     owner: player, 
