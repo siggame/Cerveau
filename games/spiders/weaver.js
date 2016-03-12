@@ -63,20 +63,26 @@ var Weaver = Class(Spiderling, {
                 player: player,
             }));
         }
+
         if(!web){
-            return this.game.logicError(false, "You need to pass a web.");
-        }
-        if(this.nest !== nestA && this.nest !== nestB){
-            return this.game.logicError(false, "{this} can only strengthen webs connected to {this.nest}.".format({
+            return this.game.logicError(false, "{this} was not sent a Web to strengthen.".format({
                 this: this,
             }));
         }
+
+        if(this.nest !== nestA && this.nest !== nestB){
+            return this.game.logicError(false, "{this} can only strengthen Webs connected to {this.nest}.".format({
+                this: this,
+            }));
+        }
+
         if(this.isDead){
             return this.game.logicError(false, "{player} cannot control a dead {this}.".format({
                 this: this,
                 player: player,
             }));
         }
+
         web.strengthen();
 
 
@@ -102,20 +108,24 @@ var Weaver = Class(Spiderling, {
                 player: player,
             }));
         }
-        if(!web){
-            return this.game.logicError(false, "You need to pass a web.");
-        }
+
+        return this.game.logicError(false, "{this} was not sent a Web to strengthen.".format({
+            this: this,
+        }));
+
         if(this.owner !== player){
             return this.game.logicError(false, "{player} does not own {this}.".format({
                 this: this,
                 player: player,
             }));
         }
+
         if(this.nest !== nestA && this.nest !== nestB){
-            return this.game.logicError(false, "{this} can only weaken webs connect to {this.nest}.".format({
+            return this.game.logicError(false, "{this} can only weaken Webs connect to {this.nest}.".format({
                 this: this,
             }));
         }
+
         web.weaken();
 
         // Developer: Put your game logic for the Weaver's weaken function here
