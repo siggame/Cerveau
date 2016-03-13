@@ -142,7 +142,127 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * @override
+     */
+    nextTurn: function() {
+        var movers = [];
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            for(var j = 0; j < player.spiders.length; j++) {
+                var spider = player.spiders[j];
+
+                if(spider.turnsRemaining) {
+                    spider.turnsRemaining -= 1;
+                }
+
+                if(spider.turnsRemaining === 0) { // then they are done
+                    if(spider.busy === "Moving") {
+                        movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
+                    }
+                    else {
+                        spider.finish();
+                    }
+                }
+            }
+        }
+
+        for(var i = 0; i < movers.length; i++) {
+            movers[i].finish(); // now the spiderling moving can finish, because his Web may have been snapped above
+        }
+
+        if(this._checkPrimaryWin()) {
+            return;
+        }
+
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    /**
+     * Checks if the game is over because the primary win condition was reached (broodmother died), and delcares winners/losers as such
+     *
+     * @param {boolean} True if the game is over, false otherwise
+     */
+    _checkPrimaryWin: function() {
+        var losers = [];
+        var stillPlaying = [];
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+
+            if(player.broodMother.isDead) {
+                losers.push(player);
+            }
+            else {
+                stillPlaying.push(player);
+            }
+        }
+
+        if(losers.length > 0) { // someone lost
+            if(losers.length === this.players.length) {
+                this._secondaryWin("All BroodMothers died on same turn");
+            }
+            else {
+                for(var i = 0; i < losers.length; i++) {
+                    var loser = losers[i];
+                    if(!loser.lost) { // then they JUST lost
+                        loser.declareLoser(loser, "BroodMother died.");
+                    }
+                }
+
+                if(stillPlaying.length === 1) { // they won!
+                    this.declareWinner(stillPlaying[0], "Eliminated enemy BroodMother!");
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    },
+
+    /**
+     * declares winners and losers based on win/loses
+     *
+     * @param {boolean} True if the game is over, false otherwise
+     */
+    _secondaryWin: function(secondaryReason) {
+        var players = this.players.clone();
+        players.sort(function(a, b) {
+            return b.broodMother.health - a.broodMother.health;
+        });
+
+        // check if one player has more health in his broodmother than the rest
+        if(players[0].broodMother.health !== players[1].broodMother.health) {
+            var winner = players.shift();
+            this.declareWinner(winner, "{} - BroodMother has the most remaining health ({}).".format(secondaryReason, winner.broodMother.health));
+            this.declareLosers(players, "{} - BroodMother has less health remaining that winner.".format(secondaryReason));
+            return;
+        }
+
+        // else check if one player has more spiders than the other
+        players.sort(function(a, b) {
+            return b.spiders.length - a.spiders.length;
+        });
+
+        if(players[0].spiders.length !== players[1].spiders.length) {
+            var winner = players.shift();
+            this.declareWinner(winner, "{} - Player has the most Spiders ({}).".format(secondaryReason, winner.spiders.length));
+            this.declareLosers(players, "{} - Player has less Spiders alive than winner.".format(secondaryReason));
+            return;
+        }
+
+        this._endGameViaCoinFlip();
+    },
+
+    /**
+     * @override
+     */
+   _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
+        var returned = TurnBasedGame._maxTurnsReached.apply(this, arguments);
+
+        this._secondaryWinConditions("Max turns reached (" + this.maxTurns + ")");
+
+        return returned;
+   },
 
     //<<-- /Creer-Merge: added-functions -->>
 

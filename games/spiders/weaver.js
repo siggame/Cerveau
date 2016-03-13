@@ -125,6 +125,32 @@ var Weaver = Class(Spiderling, {
 
     },
 
+    /**
+     * @override
+     */
+    kill: function() {
+        Spiderling.kill.appy(this, arguments);
+
+        this.strengtheningWeb = null;
+        this.weakeningWeb = null;
+    },
+
+     /**
+     * @override
+     */
+    finish: function() {
+        var weaveType = this.busy.toLowerCase();
+
+        if(Spiderling.finish.apply(this, arguments)) {
+            return; // because they finished moving or something the base Spiderling class can handle
+        }
+
+        // if we got here they finished weaving
+
+        this.weakeningWeb.addStrength(weaveType === "weakening" ? -1 : 1);
+        this[weaveType + "Web"] = null;
+    },
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });

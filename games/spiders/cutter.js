@@ -56,7 +56,7 @@ var Cutter = Class(Spiderling, {
         }
 
         if(!web.isConnectedTo(this.nest)) {
-            return this.game.logicError(false, "{this} can only cut Webs connected to the Nest it is on ({this.nest}, {web} is not.).".format({
+            return this.game.logicError(false, "{this} can only cut Webs connected to the Nest it is on ({this.nest}), {web} is not.".format({
                 this: this,
                 web: web,
             }));
@@ -74,7 +74,27 @@ var Cutter = Class(Spiderling, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * @inheritied
+     */
+    kill: function() {
+        Spiderling.kill.appy(this, arguments);
+
+        this.cuttingWeb = null;
+    },
+
+    /**
+     * @override
+     */
+    finish: function() {
+        if(Spiderling.finish.apply(this, arguments)) {
+            return; // because they finished moving or something the base Spiderling class can handle
+        }
+
+        // if we got here they finished cutting
+        this.cuttingWeb.snap();
+        this.cuttingWeb = null;
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

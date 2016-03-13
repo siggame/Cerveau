@@ -141,7 +141,7 @@ var Spiderling = Class(Spider, {
         this.nest = null;
 
         web.spiderlings.push(this);
-        web.recalculateLoad();
+        web.addLoad(this.weight);
 
         return true;
 
@@ -149,6 +149,22 @@ var Spiderling = Class(Spider, {
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+    /**
+     * @override
+     */
+    kill: function() {
+        Spider.kill.appy(this, arguments);
+
+        this.busy = "";
+        this.turnsRemaining = -1;
+        this.movingToNest = null;
+
+        if(this.movingOnWeb) {
+            this.movingOnWeb.spiderlings.removeElement(this);
+            this.movingOnWeb = null;
+        }
+    },
 
     /**
      * Checks if this spiderling is valid to do something
@@ -175,6 +191,31 @@ var Spiderling = Class(Spider, {
                 player: player,
             }));
         }
+    },
+
+    /**
+     * @override
+     */
+    finish: function() {
+        this.busy = "";
+
+        if(!this.movingOnWeb) {
+            return false;
+        }
+
+        // if we got here they finished moving on a web
+        this.nest = this.movingToNest;
+        this.movingToNest = null;
+        this.movingOnWeb = null;
+        this.web.addLoad(-this.weight);
+
+        var enemyBroodMother = this.owner.otherPlayer.broodMother;
+        if(this.nest === enemyBroodMother.nest) { // then we reached the enemy's BroodMother! Kamikaze into her!
+            enemyBroodMother.heath = Math.max(enemyBroodMother.health - this.damage, 0);
+            this.kill();
+        }
+
+        return true;
     },
 
     //<<-- /Creer-Merge: added-functions -->>

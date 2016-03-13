@@ -59,7 +59,19 @@ var Spider = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * @override
+     */
+    kill: function() {
+        this.isDead = true;
+
+        if(this.nest) {
+            this.nest.spiders.removeElement(this);
+            this.nest = null;
+        }
+
+        this.owner.spiders.removeElement(this);
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

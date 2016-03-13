@@ -61,10 +61,12 @@ var Web = Class(GameObject, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
 
+        this.game.webs.push(this);
         this.nestA.webs.push(this);
         this.nestB.webs.push(this);
         this.length = this.nestA.distanceTo(this.nestB);
         this.strength = 100;
+        this._maxStrength = Infinity;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -77,10 +79,15 @@ var Web = Class(GameObject, {
     /**
      * Snaps the web, killing all spiders on it.
      */
-    snap : function(){
-        for(var i = 0; i < this.spider.length; i++){
-            this.spider[i].kill();
+    snap : function() {
+        var spiderlings = this.spiderlings.clone();
+        for(var i = spiderlings.length - 1; i >= 0; i--) { // reverse order as they will remove themselves from the end of the list, so we don't have to shift everything n times
+            spiderlings[i].kill();
         }
+
+        this.strength = -1;
+
+        this.game.webs.removeElement(this);
 
         this.nestA.webs.removeElement(this);
         this.nestA = null;
@@ -125,14 +132,24 @@ var Web = Class(GameObject, {
 
     /**
      * Should be called whenever something changes on the web, so it need to re-calculate its current load and maybe snap.
+     *
+     * @param {number} num - the load (weight) of a spiderling to add
      */
-    recalculateLoad: function() {
-        var weight = 0;
-        for(var i = 0; i < this.spiderlings.length; i++) {
-            weight += this.spiderlings[i].weight;
-        }
+    addLoad: function(num) {
+        this.load = Math.Max(this.load + num, 0);
 
-        this.load = weight;
+        if(this.load >= this.strength) {
+            this.snap();
+        }
+    },
+
+    /**
+     * Adds some number to this web's strength, and might snap it
+     *
+     * @param {number} num - number to add to this Web's strength
+     */
+    addStrength: function(num) {
+        this.strength = Math.clamp(this.strength + num, 1, this._maxStrength);
 
         if(this.load >= this.strength) {
             this.snap();
