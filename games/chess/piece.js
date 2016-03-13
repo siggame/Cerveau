@@ -92,19 +92,23 @@ var Piece = Class(GameObject, {
 
         var reason;
         if(player !== this.game.currentPlayer) {
-            reason = "{player} it is not your turn to make a Move!";
+            reason = "Tried to move {this} during opponent's turn.";
         }
 
         if(player.madeMove) {
-            reason = "{player} has already made their Move this turn.";
+            reason = "Tried to do a second Move during their turn.";
+        }
+
+        if(this.owner !== player) {
+            reason = "Tried to Move {this}, which is not owned by them.";
         }
 
         if(this.captured) {
-            reason = "{this} has been captured and cannot Move.";
+            reason = "Tried to Move the already captured {this}.";
         }
 
         if(file < "a" || file > "h" || rank < 1 || rank > 8) {
-            reason = "The position {file}{rank} is not within (a1 to h8).";
+            reason = "Tried to Move {this} to the out of bounds position {file}{rank}.";
         }
 
         // try to find the move from chess.js's valid moves
@@ -125,7 +129,7 @@ var Piece = Class(GameObject, {
                         var promotion = promotion[0];
 
                         if(!["n", "b", "r", "q"].contains(promotion)) { // Knight, Bishop, Rook, and Queen are the only valid promotions. These chars are their char representations
-                            reason = "'{promotionType}' is not a valid promotion type.";
+                            reason = "Move requires a valid promotion type, '{promotionType}' is not valid.";
                             break;
                         }
                     }
@@ -147,7 +151,7 @@ var Piece = Class(GameObject, {
             }
         }
 
-        reason = (reason || "{this} can not Move from {this.file}{this.rank} to {file}{rank}{inCheck}.").format({
+        reason = (reason || "Tried to Move {this} to {file}{rank}{inCheck}.").format({
             this: this,
             player: player,
             file: file,
