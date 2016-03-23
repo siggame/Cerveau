@@ -7,7 +7,7 @@ var Spider = require("./spider");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-// any additional requires you want can be required here safely between Creer re-runs
+var Spiderling = require("./spiderling");
 
 //<<-- /Creer-Merge: requires -->>
 
@@ -59,8 +59,37 @@ var BroodMother = Class(Spider, {
     consume: function(player, spiderling, asyncReturn) {
         // <<-- Creer-Merge: consume -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the BroodMother's consume function here
-        return false;
+        var error = Spider._validate.apply(this, player, false);
+        if(error) {
+            return error;
+        }
+
+        var reason;
+
+        if(!Class.isInstance(spiderling, Spiderling)) {
+            reason = "{this} cannot consume because '{spiderling}' is not a Spiderling.";
+        }
+
+        if(spiderling.nest !== this.nest) {
+            reason = "{this} cannot consume because '{spiderling}' is not on the same Nest as itself.";
+        }
+
+        if(spiderling.isDead) {
+            reason = "{this} cannot consume because'{spiderling}' is dead.";
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason.format({
+                this,
+                spiderling,
+            }));
+        }
+
+        // if we got here the consume is valid!
+
+        spiderling.kill();
+        this.eggs++;
+        return true;
 
         // <<-- /Creer-Merge: consume -->>
     },
@@ -93,11 +122,13 @@ var BroodMother = Class(Spider, {
         }
 
         if(reason) {
-            this.game.logicError(null, reason.format({
+            return this.game.logicError(null, reason.format({
                 this,
                 spiderlingType,
             }));
         }
+
+        // if we got here the spawn is valid!
 
         return this.game.create(spiderlingType.upcaseFirst(), {
             nest: this.nest,
