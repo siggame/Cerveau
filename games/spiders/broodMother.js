@@ -75,32 +75,34 @@ var BroodMother = Class(Spider, {
      */
     spawn: function(player, spiderlingType, asyncReturn) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        var spiderlingTypes = {"spitter" : Spitter, "weaver" : Weaver, "cutter" : Cutter};
+
+        var error = Spider._validate.apply(this, player, null);
+        if(error) {
+            return error;
+        }
+
+        var reason;
+
         spiderlingType = spiderlingType.toLowerCase();
-
-        // check if the player owns the broodMother
-        if (this.owner !== player) {
-            return this.game.logicError(null, "{player} cannot spawn spiderling from {this} owned by {owner}");
+        if(!["cutter", "spitter", "weaver"].contains("spiderlingType")) {
+            reason = "'{spiderlingType}' is not a valid Spiderling type to spawn.";
         }
 
-        // check if the spiderlingType is valid
-        if (spiderlingType in spiderlingTypes) {
-            // check if BroodMother has enough eggs to spawn spiderling
-            if (player.eggs >= spiderlingTypes[spiderlingType].cost) {
-                return this.game.create(spiderlingType, {
-                    nest: this.nest,
-                    owner: player, 
-                });
-            }
-            else {
-                return this.game.logicError(null, "BroodMother does not have enough eggs to spawn a {spiderlingType}");
-            }
-        }
-        else {
-            return this.game.logicError(null, "BroodMother commanded to spawn an invalid spiderlingType {spiderlingType}");
+        if(this.eggs <= 0) {
+            reason = "{this} does not have enough eggs to spawn a '{spiderlingType}'";
         }
 
-        return null;
+        if(reason) {
+            this.game.logicError(null, reason.format({
+                this,
+                spiderlingType,
+            }));
+        }
+
+        return this.game.create(spiderlingType.upcaseFirst(), {
+            nest: this.nest,
+            owner: this.owner,
+        });
 
         // <<-- /Creer-Merge: spawn -->>
     },

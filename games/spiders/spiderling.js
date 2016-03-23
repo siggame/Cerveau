@@ -74,9 +74,9 @@ var Spiderling = Class(Spider, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+
         this.cost = 1;
-        
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -155,7 +155,7 @@ var Spiderling = Class(Spider, {
      * @override
      */
     kill: function() {
-        Spider.kill.appy(this, arguments);
+        Spider.kill.apply(this, arguments);
 
         this.busy = "";
         this.turnsRemaining = -1;
@@ -168,28 +168,17 @@ var Spiderling = Class(Spider, {
     },
 
     /**
-     * Checks if this spiderling is valid to do something
-     *
-     * @param {Player} player - the player that is trying to command this Spiderling
-     * @param {*} invalidReturnValue - what to return if invalid (in the GameLogicError)
-     * @retuns {GameLogicError} a game logic error if there is something wrong, undefined otherwise
+     * @override
      */
     _validate: function(player, invalidReturnValue) {
-        var reason;
-        if(this.owner !== player) {
-            reason = "{player} does not own {this}.";
-        }
-        else if(this.isDead) {
-            reason = "{this} is dead and cannot do anything.";
-        }
-        else if(this.busy) {
-            reason = "{this} is already busy with '{this.busy}'.";
+        var error = Spider._validate.apply(this, arguments);
+        if(error) {
+            return error;
         }
 
-        if(reason) {
-            return this.game.logicError(invalidReturnValue, reason.format({
+        if(this.busy) {
+            return this.game.logicError(invalidReturnValue, "{this} is already busy with '{this.busy}'.".format({
                 this: this,
-                player: player,
             }));
         }
     },
