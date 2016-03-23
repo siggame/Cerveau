@@ -171,7 +171,7 @@ var Session = Class({
     },
 
     /**
-     * Generates the info of the clients in playerIndex order for thread safe passing
+     * Generates the info of the clients in playerIndex order for thread safe passing, also re-sorts this.clients
      *
      * @returns Array.<Object> array of client like objects that can be passed to a thread via json, then turned back to a client on that thread
      */
@@ -227,6 +227,8 @@ var Session = Class({
         var clientInfos = [];
         for(var i = 0; i < clients.length; i++) {
             var client = clients[i];
+            this.clients[i] = client;
+
             clientInfos.push({
                 index: i,
                 name: client.name,
