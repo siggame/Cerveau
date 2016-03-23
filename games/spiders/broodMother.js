@@ -75,8 +75,31 @@ var BroodMother = Class(Spider, {
      */
     spawn: function(player, spiderlingType, asyncReturn) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        var spiderlingTypes = {"spitter" : Spitter, "weaver" : Weaver, "cutter" : Cutter};
+        spiderlingType = spiderlingType.toLowerCase();
 
-        // Developer: Put your game logic for the BroodMother's spawn function here
+        // check if the player owns the broodMother
+        if (this.owner !== player) {
+            return this.game.logicError(null, "{player} cannot spawn spiderling from {this} owned by {owner}");
+        }
+
+        // check if the spiderlingType is valid
+        if (spiderlingType in spiderlingTypes) {
+            // check if BroodMother has enough eggs to spawn spiderling
+            if (player.eggs >= spiderlingTypes[spiderlingType].cost) {
+                return this.game.create(spiderlingType, {
+                    nest: this.nest,
+                    owner: player, 
+                });
+            }
+            else {
+                return this.game.logicError(null, "BroodMother does not have enough eggs to spawn a {spiderlingType}");
+            }
+        }
+        else {
+            return this.game.logicError(null, "BroodMother commanded to spawn an invalid spiderlingType {spiderlingType}");
+        }
+
         return null;
 
         // <<-- /Creer-Merge: spawn -->>

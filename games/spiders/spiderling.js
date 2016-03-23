@@ -75,7 +75,8 @@ var Spiderling = Class(Spider, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
-
+        this.cost = 1;
+        
         //<<-- /Creer-Merge: init -->>
     },
 

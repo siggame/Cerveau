@@ -49,7 +49,7 @@ var Spider = Class(GameObject, {
 
         this.isDead = false;
         this.nest.spiders.push(this);
-        //this.owner.spiders.push(this);
+        this.owner.spiders.push(this);
 
         //<<-- /Creer-Merge: init -->>
     },
