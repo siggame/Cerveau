@@ -95,7 +95,61 @@ var Spiderling = Class(Spider, {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Spiderling's attack function here
-        return false;
+
+        var error = Spiderling._validate.call(this, player, false);
+        if(error) {
+            return error;
+        }
+
+        var reason;
+
+        if(!Class.isInstance(spiderling, Spiderling)) {
+            reason = "{this} cannot attack because '{spiderling}' is not a Spiderling.";
+        }
+
+        if(spiderling.nest !== this.nest) {
+            reason = "{this} cannot attack because '{spiderling}' is not on the same Nest as itself.";
+        }
+
+        if(spiderling.isDead) {
+            reason = "{this} cannot attack because'{spiderling}' is dead.";
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason.format({
+                this,
+                spiderling,
+            }));
+        }
+
+        // if we got here the attack is valid!
+
+        // Rock Paper Scissors
+        // Cutter > Weaver > Spitter > Cutter
+        // Ties, both die
+
+        if(this.gameObjectName === spiderling.gameObjectName) { // they are the same type, so
+            this.kill();
+            spiderling.kill();
+        }
+
+        if(
+            (this.gameObjectName === "Cutter" && spiderling.gameObjectName === "Weaver") ||
+            (this.gameObjectName === "Weaver" && spiderling.gameObjectName === "Spitter") ||
+            (this.gameObjectName === "Spitter" && spiderling.gameObjectName === "Cutter")
+        ) {
+            spiderling.kill();
+        }
+
+        if(
+            (spiderling.gameObjectName === "Cutter" && this.gameObjectName === "Weaver") ||
+            (spiderling.gameObjectName === "Weaver" && this.gameObjectName === "Spitter") ||
+            (spiderling.gameObjectName === "Spitter" && this.gameObjectName === "Cutter")
+        ) {
+            this.kill();
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: attack -->>
     },
