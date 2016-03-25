@@ -48,4 +48,8 @@ if(args.arena) {
     args.loadGamelogs = false;
 }
 
+if(args.chesser) {
+    args.visualizerURL = args.chesser + "?file={gamelogFilename}";
+}
+
 module.exports = args;
