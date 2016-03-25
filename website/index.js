@@ -9,7 +9,7 @@ module.exports = function(args) {
 
     if(args.web) {
         var lobby = args.lobby;
-        formatGamelogs.init(lobby, args.host);
+        formatGamelogs.init(lobby, args);
 
         app.get('/', function(req, res){
             var gameInfos = getGameInfos();

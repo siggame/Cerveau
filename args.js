@@ -19,6 +19,7 @@ var parserArgs = [
     [["--no-load-gamelogs"], {action: "storeFalse", dest: "loadGamelogs", help: "gamelogs are not loaded to get the status or view in the web interface.", defaultValue: true,}],
     [["--no-api"], {action: "storeFalse", dest: "api", help: "does not run the hooks for the RESTful API service", defaultValue: true,}],
     [["--no-web"], {action: "storeFalse", dest: "web", help: "does not run web interface.", defaultValue: true,}],
+    [["--chesser"], {action: "store", dest: "chesser", help: "the base url to where the Chesser visualizer is.", defaultValue: "",}],
 ];
 
 for(var i = 0; i < parserArgs.length; i++) {

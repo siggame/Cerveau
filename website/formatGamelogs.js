@@ -8,16 +8,16 @@ var formatGamelogs = function(logs, args) {
             game: log.gameName,
             session: log.gameSession,
             epoch: log.epoch,
-            visualizer: log.gameName === "Chess" && _init.host ? "http://" + _init.host + ":5400/?file=" : "/visualize/",
+            visualizer: log.gameName === "Chess" && _init.args.chesser ? _init.args.chesser + "?file=" : "/visualize/",
             uri: _init.lobby.gameLogger.filenameFor(log),
         });
     }
     return gamelogs;
 };
 
-formatGamelogs.init = function(lobby, host) {
+formatGamelogs.init = function(lobby, args) {
     _init.lobby = lobby;
-    _init.host = host === "0.0.0.0" ? undefined : host;
+    _init.args = args;
 };
 
 module.exports = formatGamelogs;
