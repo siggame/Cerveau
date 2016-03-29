@@ -151,16 +151,17 @@ var Piece = Class(GameObject, {
             }
         }
 
+        var inCheck = player.inCheck ? " while in check" : "";
         reason = (reason || "Tried to Move {this} to {file}{rank}{inCheck}.").format({
             this: this,
-            player: player,
-            file: file,
-            rank: rank,
-            promotionType: promotionType,
-            inCheck: player.inCheck ? " while in check" : "",
+            player,
+            file,
+            rank,
+            promotionType,
+            inCheck,
         });
 
-        this.game.declareWinner(player.otherPlayer, "Opponent made an invalid move.");
+        this.game.declareWinner(player.otherPlayer, "Opponent made an invalid move{}.".format(inCheck));
         this.game.declareLoser(player, "Invalid - " + reason);
 
         return this.game.logicError(null, reason);
