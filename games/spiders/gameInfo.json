@@ -1446,13 +1446,20 @@
             "functions": {
                 "spit": {
                     "altersState": true,
-                    "argument_names": [],
-                    "arguments": [],
-                    "attributes": [
+                    "argument_names": [
+                        "nest"
+                    ],
+                    "arguments": [
                         {
+                            "default": null,
                             "description": "The Nest you want to spit a Web to, thus connecting that Nest and the one the Spitter is on.",
                             "name": "nest",
-                            "type": "Nest"
+                            "optional": false,
+                            "type": {
+                                "keyType": null,
+                                "name": "Nest",
+                                "valueType": null
+                            }
                         }
                     ],
                     "description": "Creates and spits a new Web from the Nest the Spitter is on to another Nest, connecting them.",
@@ -2065,6 +2072,7 @@
         "Web": {
             "attribute_names": [
                 "length",
+                "load",
                 "nestA",
                 "nestB",
                 "spiderlings",
@@ -2077,6 +2085,15 @@
                     "type": {
                         "keyType": null,
                         "name": "float",
+                        "valueType": null
+                    }
+                },
+                "load": {
+                    "default": null,
+                    "description": "How much weight this Web currently has on it, which is the sum of all its Spiderlings weight.",
+                    "type": {
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
