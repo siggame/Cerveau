@@ -101,7 +101,7 @@ var Weaver = Class(Spiderling, {
             }));
         }
 
-        if(this.nest !== web.nestA && this.nest !== web.nestB){
+        if(this.nest !== web.nestA && this.nest !== web.nestB) {
             return this.game.logicError(false, "{this} can only strengthen Webs connected to {this.nest}, {web} is not.".format({
                 this: this,
                 web: web,

@@ -56,7 +56,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     aliases: [
         //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-##-Spiders",
+        "MegaMinerAI-17-Spiders",
         //<<-- /Creer-Merge: aliases -->>
     ],
 
@@ -85,7 +85,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         for(var i = 0; i < numWebs; i++) {
             var nestA = this.nests.randomElement();
             var nestB = nestA;
-            while(nestB !== nestA) {
+            while(nestB === nestA) {
                 nestB = this.nests.randomElement();
             }
 
@@ -97,6 +97,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         // create the BroodMother
         this.players[0].broodMother = this.create("BroodMother", {
+            owner: this.players[0],
             nest: this.nests.randomElement(),
         });
 
@@ -127,6 +128,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         // mirror the BroodMother
         this.players[1].broodMother = this.create("BroodMother", {
+            owner: this.players[1],
             nest: mirroredNests[this.players[0].broodMother.nest.id],
         });
 
@@ -265,7 +267,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
    _maxTurnsReached: function(){TurnBasedGame._maxTurnsReached.apply(this, arguments);
         var returned = TurnBasedGame._maxTurnsReached.apply(this, arguments);
 
-        this._secondaryWinConditions("Max turns reached (" + this.maxTurns + ")");
+        this._secondaryWin("Max turns reached (" + this.maxTurns + ")");
 
         return returned;
    },

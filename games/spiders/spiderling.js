@@ -117,7 +117,7 @@ var Spiderling = Class(Spider, {
 
         if(reason) {
             return this.game.logicError(false, reason.format({
-                this,
+                this: this,
                 spiderling,
             }));
         }
