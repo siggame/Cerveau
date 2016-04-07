@@ -129,7 +129,7 @@ var Weaver = Class(Spiderling, {
      * @override
      */
     kill: function() {
-        Spiderling.kill.appy(this, arguments);
+        Spiderling.kill.apply(this, arguments);
 
         this.strengtheningWeb = null;
         this.weakeningWeb = null;

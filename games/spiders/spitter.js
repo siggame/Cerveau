@@ -90,7 +90,7 @@ var Spitter = Class(Spiderling, {
      * @override
      */
     kill: function() {
-        Spiderling.kill.appy(this, arguments);
+        Spiderling.kill.apply(this, arguments);
 
         this.spittingWebToNest = null;
     },

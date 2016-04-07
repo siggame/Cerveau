@@ -78,7 +78,7 @@ var Cutter = Class(Spiderling, {
      * @inheritied
      */
     kill: function() {
-        Spiderling.kill.appy(this, arguments);
+        Spiderling.kill.apply(this, arguments);
 
         this.cuttingWeb = null;
     },

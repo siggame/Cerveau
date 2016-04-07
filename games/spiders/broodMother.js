@@ -59,7 +59,7 @@ var BroodMother = Class(Spider, {
     consume: function(player, spiderling, asyncReturn) {
         // <<-- Creer-Merge: consume -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var error = Spider._validate.apply(this, player, false);
+        var error = Spider._validate.call(this, player, false);
         if(error) {
             return error;
         }
@@ -105,15 +105,15 @@ var BroodMother = Class(Spider, {
     spawn: function(player, spiderlingType, asyncReturn) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var error = Spider._validate.apply(this, player, null);
+        var error = Spider._validate.call(this, player, null);
         if(error) {
             return error;
         }
 
         var reason;
 
-        spiderlingType = spiderlingType.toLowerCase();
-        if(!["cutter", "spitter", "weaver"].contains("spiderlingType")) {
+        var lowereSpiderlingType = spiderlingType.toLowerCase();
+        if(!["cutter", "spitter", "weaver"].contains(lowereSpiderlingType)) {
             reason = "'{spiderlingType}' is not a valid Spiderling type to spawn.";
         }
 
@@ -130,7 +130,7 @@ var BroodMother = Class(Spider, {
 
         // if we got here the spawn is valid!
 
-        return this.game.create(spiderlingType.upcaseFirst(), {
+        return this.game.create(lowereSpiderlingType.upcaseFirst(), {
             nest: this.nest,
             owner: this.owner,
         });

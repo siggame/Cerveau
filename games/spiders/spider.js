@@ -89,9 +89,12 @@ var Spider = Class(GameObject, {
         else if(this.isDead) {
             reason = "{this} is dead and cannot do anything.";
         }
+        else if(this.busy) {
+            reason = "{this} is already busy with '{this.busy}'.";
+        }
 
         if(reason) {
-            return this.game.logicError(invalidReturnValue, "{this} is already busy with '{this.busy}'.".format({
+            return this.game.logicError(invalidReturnValue, reason.format({
                 this: this,
                 player: player,
             }));

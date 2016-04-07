@@ -175,16 +175,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             for(var j = 0; j < player.spiders.length; j++) {
                 var spider = player.spiders[j];
 
-                if(spider.turnsRemaining) {
+                if(spider.turnsRemaining > 0) {
                     spider.turnsRemaining -= 1;
-                }
 
-                if(spider.turnsRemaining === 0) { // then they are done
-                    if(spider.busy === "Moving") {
-                        movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
-                    }
-                    else {
-                        spider.finish();
+                    if(spider.turnsRemaining === 0) { // then they are done
+                        if(spider.busy === "Moving") {
+                            movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
+                        }
+                        else {
+                            spider.finish();
+                        }
                     }
                 }
             }
