@@ -153,6 +153,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    /**
+     * Calculates, and gives eggs to all the BroodMothers.
+     */
     _giveEggs: function() {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
