@@ -9,10 +9,10 @@
                 "altersState": true,
                 "argument_names": [],
                 "arguments": [],
-                "description": "This is called every time the AI is asked to respond with a command during their turn",
+                "description": "This is called every time it is this AI.player's turn.",
                 "returns": {
                     "default": true,
-                    "description": "represents if you want to end your turn. true means end the turn, false means to keep your turn going and re-call runTurn()",
+                    "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -102,7 +102,7 @@
             },
             "currentTurn": {
                 "default": 0,
-                "description": "The current turn number, starting at 0 for the first player's turn",
+                "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
                     "keyType": null,
@@ -163,10 +163,12 @@
                 }
             }
         },
-        "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged. Very simple.",
+        "description": "The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.",
         "function_names": [],
         "functions": {},
+        "inheritedAttribute_names": [],
         "inheritedAttributes": {},
+        "inheritedFunction_names": [],
         "inheritedFunctions": {},
         "maxInvalidsPerPlayer": 10,
         "name": "Checkers",
@@ -234,10 +236,10 @@
                     "altersState": false,
                     "argument_names": [],
                     "arguments": [],
-                    "description": "returns if the checker is owned by your player or not",
+                    "description": "Returns if the checker is owned by your player or not.",
                     "returns": {
                         "default": null,
-                        "description": "true if it is yours, false if it is not yours",
+                        "description": "True if it is yours, false if it is not yours.",
                         "type": {
                             "keyType": null,
                             "name": "boolean",
@@ -289,6 +291,11 @@
                     "serverPredefined": false
                 }
             },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
             "inheritedAttributes": {
                 "gameObjectName": {
                     "default": null,
@@ -314,7 +321,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
@@ -328,6 +335,9 @@
                     }
                 }
             },
+            "inheritedFunction_names": [
+                "log"
+            ],
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
@@ -347,7 +357,7 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "inheritedFrom": "GameObject",
                     "returns": null,
                     "serverPredefined": true
@@ -387,7 +397,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
                         "keyType": null,
@@ -423,12 +433,14 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "returns": null,
                     "serverPredefined": true
                 }
             },
+            "inheritedAttribute_names": [],
             "inheritedAttributes": {},
+            "inheritedFunction_names": [],
             "inheritedFunctions": {},
             "parentClasses": [],
             "serverParentClasses": [
@@ -451,7 +463,7 @@
             "attributes": {
                 "checkers": {
                     "default": null,
-                    "description": "All the checkers currently in the game owned by this player",
+                    "description": "All the checkers currently in the game owned by this player.",
                     "type": {
                         "keyType": null,
                         "name": "list",
@@ -473,7 +485,7 @@
                 },
                 "lost": {
                     "default": false,
-                    "description": "if the player lost the game or not",
+                    "description": "If the player lost the game or not.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -482,7 +494,7 @@
                 },
                 "name": {
                     "default": "Anonymous",
-                    "description": "The name of the player",
+                    "description": "The name of the player.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -491,7 +503,7 @@
                 },
                 "otherPlayer": {
                     "default": null,
-                    "description": "this player's opponent in the game.",
+                    "description": "This player's opponent in the game.",
                     "type": {
                         "keyType": null,
                         "name": "Player",
@@ -500,7 +512,7 @@
                 },
                 "reasonLost": {
                     "default": null,
-                    "description": "the reason why the player lost the game",
+                    "description": "The reason why the player lost the game.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -509,7 +521,7 @@
                 },
                 "reasonWon": {
                     "default": null,
-                    "description": "the reason why the player won the game",
+                    "description": "The reason why the player won the game.",
                     "type": {
                         "keyType": null,
                         "name": "string",
@@ -527,7 +539,7 @@
                 },
                 "won": {
                     "default": false,
-                    "description": "if the player won the game or not",
+                    "description": "If the player won the game or not.",
                     "type": {
                         "keyType": null,
                         "name": "boolean",
@@ -536,7 +548,7 @@
                 },
                 "yDirection": {
                     "default": null,
-                    "description": "The direction your checkers must go along the y-axis until kinged",
+                    "description": "The direction your checkers must go along the y-axis until kinged.",
                     "type": {
                         "keyType": null,
                         "name": "int",
@@ -547,6 +559,11 @@
             "description": "A player in this game. Every AI controls one player.",
             "function_names": [],
             "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
             "inheritedAttributes": {
                 "gameObjectName": {
                     "default": null,
@@ -572,7 +589,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
@@ -586,6 +603,9 @@
                     }
                 }
             },
+            "inheritedFunction_names": [
+                "log"
+            ],
             "inheritedFunctions": {
                 "log": {
                     "altersState": true,
@@ -605,7 +625,7 @@
                             }
                         }
                     ],
-                    "description": "adds a message to this game object's log. Intended for debugging purposes.",
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
                     "inheritedFrom": "GameObject",
                     "returns": null,
                     "serverPredefined": true

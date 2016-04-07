@@ -191,7 +191,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
                         "keyType": null,
@@ -359,7 +359,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
@@ -564,7 +564,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
@@ -783,7 +783,7 @@
                 },
                 "logs": {
                     "default": null,
-                    "description": "Any strings logged will be stored here when this game object logs the strings. Intended for debugging.",
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {

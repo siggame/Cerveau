@@ -8,7 +8,6 @@ var Session = require("./session");
 var Authenticator = require("./authenticator");
 var log = require("./log");
 
-var check = require("syntax-error");
 var extend = require("extend");
 var ws = require("lark-websocket");
 var fs = require("fs");
@@ -127,8 +126,11 @@ var Lobby = Class(Server, {
 
         for(var i = 0; i < dirs.length; i++) {
             var dir = dirs[i];
+
+            log("» '" + dir.upcaseFirst() + "' game found.");
+
             var path = __basedir + "/games/" + dir;
-            var gameClass = require(path + "/game");
+            var gameClass = require(path + "/");
             var gameName = gameClass.prototype.name;
 
             // hook up all the ways to get index the game class by
@@ -139,25 +141,6 @@ var Lobby = Class(Server, {
 
             this._sessions[gameName] = {};
 
-            log("» '" + gameName + "' game found.");
-
-            // check to make sure the game is valid
-            var files = fs.readdirSync(path);
-            for(var j = 0; j < files.length; j++) {
-                var file = files[j];
-                if(!file.endsWith(".js")) {
-                    continue;
-                }
-
-                var filePath = path + "/" + file;
-                var src = fs.readFileSync(filePath);
-
-                var err = check(src, file);
-                if (err) {
-                    log.error("Error in file '{}'' for game '{}':\n{}".format(filePath, gameName, err.annotated));
-                    process.exit(1);
-                }
-            }
         }
     },
 

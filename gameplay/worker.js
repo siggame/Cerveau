@@ -26,7 +26,7 @@ var log = require("./log");
 var extend = require("extend");
 
 var instance = new Instance(extend({
-    gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/game"),
+    gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/"),
     profiler: data.profile && require('v8-profiler'),
 }, data));
 
