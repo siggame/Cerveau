@@ -106,12 +106,10 @@ var Spiderling = Class(Spider, {
         if(!Class.isInstance(spiderling, Spiderling)) {
             reason = "{this} cannot attack because '{spiderling}' is not a Spiderling.";
         }
-
-        if(spiderling.nest !== this.nest) {
+        else if(spiderling.nest !== this.nest) {
             reason = "{this} cannot attack because '{spiderling}' is not on the same Nest as itself.";
         }
-
-        if(spiderling.isDead) {
+        else if(spiderling.isDead) {
             reason = "{this} cannot attack because'{spiderling}' is dead.";
         }
 
@@ -170,15 +168,17 @@ var Spiderling = Class(Spider, {
             return error;
         }
 
+        var reason;
+
         if(!web) {
-            return this.game.logicError(false, "{web} is not a Web for {this} to move on.".format({
-                this: this,
-                web: web,
-            }));
+            reason = "{web} is not a Web for {this} to move on.";
+        }
+        else if(!web.isConnectedTo(this.nest)) {
+            reason = "{web} is not connected to {this.nest} for {this} to move on.";
         }
 
-        if(!web.isConnectedTo(this.nest)) {
-            return this.game.logicError(false, "{web} is not connected to {this.nest} for {this} to move on.".format({
+        if(reason) {
+            return this.game.logicError(false, reason.format({
                 this: this,
                 web: web,
             }));

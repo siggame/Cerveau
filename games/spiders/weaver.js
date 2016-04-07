@@ -94,22 +94,19 @@ var Weaver = Class(Spiderling, {
             return error;
         }
 
+        var reason;
         if(!web) {
-            return this.game.logicError(false, "{web} is not a valid Web to strengthen for {this}.".format({
-                this: this,
-                web: web,
-            }));
+            reason = "{web} is not a valid Web to strengthen for {this}.";
+        }
+        else if(this.nest !== web.nestA && this.nest !== web.nestB) {
+            reason = "{this} can only strengthen Webs connected to {this.nest}, {web} is not.";
+        }
+        else if(weaveType === "Weakening" && web.strength <= 1) {
+            reason = "{this} cannot weaken {web} as its strength is at the minimum (1).";
         }
 
-        if(this.nest !== web.nestA && this.nest !== web.nestB) {
-            return this.game.logicError(false, "{this} can only strengthen Webs connected to {this.nest}, {web} is not.".format({
-                this: this,
-                web: web,
-            }));
-        }
-
-        if(weaveType === "Weakening" && web.strength <= 1) {
-            return this.game.logicError(false, "{this} cannot weaken {web} as its strength is at the minimum (1).".format({
+        if(reason) {
+            return this.game.logicError(false, reason.format({
                 this: this,
                 web: web,
             }));

@@ -69,12 +69,10 @@ var BroodMother = Class(Spider, {
         if(!Class.isInstance(spiderling, Spiderling)) {
             reason = "{this} cannot consume because '{spiderling}' is not a Spiderling.";
         }
-
-        if(spiderling.nest !== this.nest) {
+        else if(spiderling.nest !== this.nest) {
             reason = "{this} cannot consume because '{spiderling}' is not on the same Nest as itself.";
         }
-
-        if(spiderling.isDead) {
+        else if(spiderling.isDead) {
             reason = "{this} cannot consume because'{spiderling}' is dead.";
         }
 
@@ -116,8 +114,7 @@ var BroodMother = Class(Spider, {
         if(!["cutter", "spitter", "weaver"].contains(lowereSpiderlingType)) {
             reason = "'{spiderlingType}' is not a valid Spiderling type to spawn.";
         }
-
-        if(this.eggs <= 0) {
+        else if(this.eggs <= 0) {
             reason = "{this} does not have enough eggs to spawn a '{spiderlingType}'";
         }
 
