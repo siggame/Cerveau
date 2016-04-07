@@ -2,6 +2,7 @@ var log = require("../log");
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
 var DeltaMergeableArray = require("./deltaMergeableArray");
+var GameManager = require("./gameManager");
 var errors = require("../errors");
 var serializer = require("../serializer");
 var constants = require("../constants");
@@ -26,6 +27,8 @@ var BaseGame = Class(DeltaMergeable, {
         this._addProperty("session", (data.session === undefined ? "Unknown" : data.session));
         this._addProperty("name", this.name);
 
+        this._dir = __basedir + "/games/" + this.name.lowercaseFirst() + "/";
+        this._gameManager = new GameManager(this);
         this._instance = instance;
         this._orders = [];
         this._newOrdersToPopIndex = 0;
@@ -35,8 +38,6 @@ var BaseGame = Class(DeltaMergeable, {
         this._nextGameObjectID = 0;
         this._winners = [];
         this._losers = [];
-
-        this._initGameManager();
     },
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
@@ -46,13 +47,6 @@ var BaseGame = Class(DeltaMergeable, {
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
     _playerStartingTime: 6e10, // 60 seconds in nanoseconds
-
-    /**
-     * initializes this games game manager, which is a creer generated class that handles code that is re-used between games but could not be moved down to a base class as they are too game specific, such as creating game objects by name
-     */
-    _initGameManager: function() {
-        this._gameManager = require(__basedir + "/games/" + this.name.lowercaseFirst() + "/gameManager");
-    },
 
 
 
@@ -218,7 +212,7 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {BaseGameObject} the game object that was created, now being tracked by this game
      */
     create: function(gameObjectName, data) {
-        var gameObject = this._gameManager.createUninitializedGameObject(gameObjectName);
+        var gameObject = new this.classes[gameObjectName].uninitialized; // don't call init, we need to hook up some stuff first
 
         data = data || {};
         data.id = this._generateNextGameObjectID();
@@ -286,19 +280,26 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {Promise} A promise that should eventually resolve to whatever the game logic returned from running the 'run' command.
      */
     aiRun: function(player, data) {
+        var self = this;
         var run = serializer.deserialize(data, this);
         var runCallback = run.caller[run.functionName];
+
+        if(!runCallback || !runCallback.cerveau) { // then the run callback is invalid
+            return new Promise(function(resolve, reject) {
+                reject(new errors.CerveauError("'{}'' is not a valid function name in {}".format(run.functionName, run.caller)));
+            });
+        }
+
         var ran = {};
 
         var argsArray;
         var sendError;
 
-        var self = this;
         try {
-            if(this._gameManager.isSecret(run.caller.gameObjectName, run.functionName)) {
+            if(this._gameManager.isSecret(runCallback)) {
                 data.isSecret = true;
             }
-            argsArray = this._gameManager.sanitizeRun(run.caller.gameObjectName, run.functionName, run.args || {});
+            argsArray = this._gameManager.sanitizeRun(runCallback, run.args || {});
         }
         catch(err) {
             if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
@@ -324,11 +325,11 @@ var BaseGame = Class(DeltaMergeable, {
 
                 if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
                     asyncReturnWrapper.callback = function(asyncReturnValue) {
-                        resolve(self._aiRan(run, player, asyncReturnValue));
+                        resolve(self._finishRun(runCallback, player, asyncReturnValue));
                     };
                 }
                 else {
-                    resolve(self._aiRan(run, player, ranReturned));
+                    resolve(self._finishRun(runCallback, player, ranReturned));
                 }
             }
             catch(err) {
@@ -338,8 +339,11 @@ var BaseGame = Class(DeltaMergeable, {
         });
     },
 
-    _aiRan: function(run, player, returned) {
-        var returnedValue = this._gameManager.sanitizeRan(run.caller.gameObjectName, run.functionName, (returned.isGameLogicError ? returned.returned : returned));
+    /**
+     * After we run game logic, santatize the ran data and send it back
+     */
+    _finishRun: function(runCallback, player, returned) {
+        var returnedValue = this._gameManager.sanitizeRan(runCallback, (returned.isGameLogicError ? returned.returned : returned));
 
         if(returned.isGameLogicError) {
             returned.returned = returnedValue;
