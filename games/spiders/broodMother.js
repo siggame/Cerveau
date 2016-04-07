@@ -80,7 +80,7 @@ var BroodMother = Class(Spider, {
 
         if(reason) {
             return this.game.logicError(false, reason.format({
-                'this': this,
+                this: this,
                 spiderling,
             }));
         }

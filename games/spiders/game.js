@@ -41,6 +41,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.maxTurns = 300;
+        this.maxSpiderlings = 100;
 
         // used for map generation
         this._mapSize = 5000;
@@ -132,6 +133,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             nest: mirroredNests[this.players[0].broodMother.nest.id],
         });
 
+        this._giveEggs();
+
         //<<-- /Creer-Merge: begin -->>
     },
 
@@ -150,10 +153,19 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    _giveEggs: function() {
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.broodMother.eggs = Math.ceil((this.maxSpiderlings - player.spiders.length - 1) / 10); // -1 for the BroodMother in player.spiders that is not a Spiderling
+        }
+    },
+
     /**
      * @override
      */
     nextTurn: function() {
+        this._giveEggs();
+
         var movers = [];
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
@@ -185,6 +197,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
+
 
     /**
      * Checks if the game is over because the primary win condition was reached (broodmother died), and delcares winners/losers as such
