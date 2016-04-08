@@ -364,7 +364,7 @@
                     "description": "The Web that this Cutter is trying to cut. Null if not cutting.",
                     "type": {
                         "keyType": null,
-                        "name": "Nest",
+                        "name": "Web",
                         "valueType": null
                     }
                 }
