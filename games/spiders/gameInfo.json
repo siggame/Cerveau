@@ -427,7 +427,7 @@
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "keyType": null,
-                        "name": "boolean",
+                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -1188,7 +1188,7 @@
                     "description": "When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.",
                     "type": {
                         "keyType": null,
-                        "name": "boolean",
+                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -1497,7 +1497,7 @@
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "keyType": null,
-                        "name": "boolean",
+                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -1840,7 +1840,7 @@
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "keyType": null,
-                        "name": "boolean",
+                        "name": "string",
                         "valueType": null
                     }
                 },
