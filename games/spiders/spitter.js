@@ -56,7 +56,7 @@ var Spitter = Class(Spiderling, {
         }
 
         if(!nest) {
-            return this.game.logicError(false, "{nest} is not a Nest for {this} to spit at.".format({
+            return this.game.logicError(false, "'{nest}' is not a Nest for {this} to spit at.".format({
                 this: this,
                 nest: nest,
             }));

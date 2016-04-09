@@ -75,6 +75,7 @@ var Spiderling = Class(Spider, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
 
+        this.speed = 1;
         this.cost = 1;
 
         //<<-- /Creer-Merge: init -->>
