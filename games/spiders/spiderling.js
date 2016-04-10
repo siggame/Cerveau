@@ -250,9 +250,9 @@ var Spiderling = Class(Spider, {
 
         // if we got here they finished moving on a web
         this.nest = this.movingToNest;
+        this.movingOnWeb.addLoad(-this.weight);
         this.movingToNest = null;
         this.movingOnWeb = null;
-        this.web.addLoad(-this.weight);
 
         var enemyBroodMother = this.owner.otherPlayer.broodMother;
         if(this.nest === enemyBroodMother.nest) { // then we reached the enemy's BroodMother! Kamikaze into her!
