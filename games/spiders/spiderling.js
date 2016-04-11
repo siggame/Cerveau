@@ -256,7 +256,7 @@ var Spiderling = Class(Spider, {
 
         var enemyBroodMother = this.owner.otherPlayer.broodMother;
         if(this.nest === enemyBroodMother.nest) { // then we reached the enemy's BroodMother! Kamikaze into her!
-            enemyBroodMother.heath = Math.max(enemyBroodMother.health - this.damage, 0);
+            enemyBroodMother.health = Math.max(enemyBroodMother.health - this.damage, 0);
             this.kill();
         }
 
