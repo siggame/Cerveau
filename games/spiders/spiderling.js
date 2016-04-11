@@ -249,7 +249,10 @@ var Spiderling = Class(Spider, {
         }
 
         // if we got here they finished moving on a web
+        
         this.nest = this.movingToNest;
+        this.nest.spiders.push(this);
+        this.movingOnWeb.spiderlings.removeElement(this);
         this.movingOnWeb.addLoad(-this.weight);
         this.movingToNest = null;
         this.movingOnWeb = null;
