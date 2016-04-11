@@ -98,7 +98,7 @@ var Web = Class(GameObject, {
 
         this.strength = -1; // has now snapped
 
-        var sideSpiders = this.nestA.spiders.concat(this.nestB.spiders);
+        var sideSpiders = this.nestA.spiders.concat(this.nestB.spiders);;
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
             if(spider.cuttingWeb === this || spider.strengtheningWeb === this || spider.weakeningWeb === this) { // then they may be busy with this
@@ -177,8 +177,10 @@ var Web = Class(GameObject, {
      * @param {number} num - number to add to this Web's strength
      */
     addStrength: function(num) {
+        console.log("Adding STRENGTH {} to {}".format(num, this.strength));
+        console.log(this.strength + num);
         this.strength = Math.clamp(this.strength + num, 1, this._maxStrength);
-
+        console.log("New strength: {}".format(this.strength));
         if(this.load >= this.strength) {
             this.snap();
         }
