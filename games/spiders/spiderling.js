@@ -245,6 +245,7 @@ var Spiderling = Class(Spider, {
      */
     finish: function() {
         this.busy = "";
+        this.turnsRemaining = 0;
 
         if(!this.movingOnWeb) {
             return false;
