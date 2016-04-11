@@ -103,13 +103,39 @@ var Spitter = Class(Spiderling, {
             return; // because they finished moving or something the base Spiderling class can handle
         }
 
+        if (this.spittingWebToNest == null) {
+            return;
+        }
+
         // if we got here they finished spitting
         this.game.create("Web", {
             nestA: this.nest,
             nestB: this.spittingWebToNest,
         });
 
-        this.spittingWebToNest = null;
+        // cancel spitters on the current nest to the destination
+        for (si in this.nest.spiders){
+            spider = this.nest.spiders[si];
+            if (spider.busy == "Spitting") {
+                if (spider.spittingWebToNest == this.spittingWebToNest) {
+                    spider.spittingWebToNest = null;
+                    spider.turnsRemaining = 0;
+                    spider.busy = "";
+                }
+            }
+        }
+
+        // cancel spitters from the destination nest to the current nest
+        for (si in this.spittingWebToNest.spiders){
+            spider = this.spittingWebToNest.spiders[si];
+            if (spider.busy == "Spitting") {
+                if (spider.spittingWebToNest == this.nest) {
+                    spider.spittingWebToNest = null;
+                    spider.turnsRemaining = 0;
+                    spider.busy = "";
+                }
+            }
+        }
     },
 
     //<<-- /Creer-Merge: added-functions -->>
