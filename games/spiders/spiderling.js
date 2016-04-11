@@ -77,6 +77,8 @@ var Spiderling = Class(Spider, {
 
         this.speed = 1;
         this.cost = 1;
+        this.damage = 1;
+        this.weight = 1;
 
         //<<-- /Creer-Merge: init -->>
     },
