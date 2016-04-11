@@ -177,10 +177,7 @@ var Web = Class(GameObject, {
      * @param {number} num - number to add to this Web's strength
      */
     addStrength: function(num) {
-        console.log("Adding STRENGTH {} to {}".format(num, this.strength));
-        console.log(this.strength + num);
         this.strength = Math.clamp(this.strength + num, 1, this._maxStrength);
-        console.log("New strength: {}".format(this.strength));
         if(this.load >= this.strength) {
             this.snap();
         }
