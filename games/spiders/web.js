@@ -99,7 +99,7 @@ var Web = Class(GameObject, {
         this.strength = -1; // has now snapped
 
         // if any Spiderlings are doing something with this web on nestA or B, tell them to finish
-        var sideSpiders = this.nestA.spiders.concat(this.nestB.spiders);
+        var sideSpiders = this.getSideSpiders();
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
             if(spider.cuttingWeb === this || spider.strengtheningWeb === this || spider.weakeningWeb === this) { // then they may be busy with this
@@ -123,6 +123,15 @@ var Web = Class(GameObject, {
      */
     hasSnapped: function() {
         return this.strength === -1;
+    },
+
+    /**
+     * Gets a new array containing all the spiders on this Web's nestA & B.
+     *
+     * @returns {Array.<Spider>} an array of Spiders in nest A and B (the sides of this web).
+     */
+    getSideSpiders: function() {
+        return this.nestA.spiders.concat(this.nestB.spiders);
     },
 
     /**

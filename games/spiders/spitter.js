@@ -103,37 +103,25 @@ var Spitter = Class(Spiderling, {
             return; // because they finished moving or something the base Spiderling class can handle
         }
 
-        if (this.spittingWebToNest == null) {
+        if(this.spittingWebToNest === null) { // then we got here because we got forced to finish early
             return;
         }
 
         // if we got here they finished spitting
-        this.game.create("Web", {
+        var newWeb = this.game.create("Web", {
             nestA: this.nest,
             nestB: this.spittingWebToNest,
         });
 
-        // cancel spitters on the current nest to the destination
-        for (si in this.nest.spiders){
-            spider = this.nest.spiders[si];
-            if (spider.busy == "Spitting") {
-                if (spider.spittingWebToNest == this.spittingWebToNest) {
-                    spider.spittingWebToNest = null;
-                    spider.turnsRemaining = 0;
-                    spider.busy = "";
-                }
-            }
-        }
+        this.game.webs.push(newWeb);
 
-        // cancel spitters from the destination nest to the current nest
-        for (si in this.spittingWebToNest.spiders){
-            spider = this.spittingWebToNest.spiders[si];
-            if (spider.busy == "Spitting") {
-                if (spider.spittingWebToNest == this.nest) {
-                    spider.spittingWebToNest = null;
-                    spider.turnsRemaining = 0;
-                    spider.busy = "";
-                }
+        // cancel spitters on the current nest to the destination
+        var sideSpiders = newWeb.getSideSpiders();
+        for(var i = 0; i < sideSpiders.length; i++) {
+            var spider = sideSpiders[i];
+            if(spider.spittingWebToNest === this.spittingWebToNest) {
+                spider.spittingWebToNest = null; // so they know they are finishing early
+                spider.finish();
             }
         }
     },
