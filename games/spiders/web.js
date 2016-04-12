@@ -86,7 +86,7 @@ var Web = Class(GameObject, {
     /**
      * Snaps the web, killing all spiders on it.
      */
-    snap : function() {
+    snap: function() {
         if(this.hasSnapped()) {
             return; // as it's snapping more than once at the end of the turn
         }
@@ -98,7 +98,8 @@ var Web = Class(GameObject, {
 
         this.strength = -1; // has now snapped
 
-        var sideSpiders = this.nestA.spiders.concat(this.nestB.spiders);;
+        // if any Spiderlings are doing something with this web on nestA or B, tell them to finish
+        var sideSpiders = this.nestA.spiders.concat(this.nestB.spiders);
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
             if(spider.cuttingWeb === this || spider.strengtheningWeb === this || spider.weakeningWeb === this) { // then they may be busy with this
