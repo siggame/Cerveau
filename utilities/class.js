@@ -42,11 +42,11 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 
     // this creates an instance of newClass, but does NOT call the init() fuction. it is expected you plan to call this later
     // simply put, creates an object with the prototype set to this newClass
-    newClass.uninitialized = () => {
+    newClass.uninitialized = function() {
         return Object.create(prototype);
     };
 
-    newClass.isInstance = (obj) => {
+    newClass.isInstance = function(obj) {
         return Class.isInstance(obj, newClass);
     };
 
