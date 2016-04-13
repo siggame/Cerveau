@@ -119,11 +119,13 @@ var Spitter = Class(Spiderling, {
         var sideSpiders = newWeb.getSideSpiders();
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
-            if(spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest) {
+            if (spider !== this && (spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest)) {
                 spider.spittingWebToNest = null; // so they know they are finishing early
                 spider.finish();
             }
         }
+
+        this.spittingWebToNest = null;
     },
 
     //<<-- /Creer-Merge: added-functions -->>
