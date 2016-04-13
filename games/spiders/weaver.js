@@ -141,7 +141,7 @@ var Weaver = Class(Spiderling, {
         if(Spiderling.finish.apply(this, arguments)) {
             return; // because they finished moving or something the base Spiderling class can handle
         }
-        
+
         var web = this[weaveType + "Web"];
         this[weaveType + "Web"] = null;
 
