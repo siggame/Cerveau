@@ -42,8 +42,12 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 
     // this creates an instance of newClass, but does NOT call the init() fuction. it is expected you plan to call this later
     // simply put, creates an object with the prototype set to this newClass
-    newClass.uninitialized = function() {
+    newClass.uninitialized = () => {
         return Object.create(prototype);
+    };
+
+    newClass.isInstance = (obj) => {
+        return Class.isInstance(obj, newClass);
     };
 
     return newClass;
@@ -52,7 +56,7 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 /**
  * Tests if the passed in variable is a class built with the above Class method
  *
- * @param can be any type, but to return true it will need to be a class created with the above Class method
+ * @param {*} klass - can be any type, but to return true it will need to be a class created with the above Class method
  * @returns {boolean} represents if the passed in variable is a class constructor made with the Class method
  */
 Class.isClass = function(klass) {
@@ -64,6 +68,7 @@ Class.isClass = function(klass) {
  *
  * @param {Object} obj - object to check if it is an instance of isClass
  * @param {function} [isClass] - constructor made with Class method to check if the passed in object is an instance of, or an instance of one of it's parent classes. If not passed in then just checks if obj is a class made instance
+ * @returns {boolean} true if the obj is an instance of Class, false otherwise
  */
 Class.isInstance = function(obj, isClass) {
     if(obj === null || typeof(obj) !== "object" || !obj._isClass) {
@@ -86,6 +91,8 @@ Class.isInstance = function(obj, isClass) {
             classes.push(theClass._parentClasses[i]);
         }
     }
+
+    return false;
 };
 
 module.exports = Class;
