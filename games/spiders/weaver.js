@@ -141,11 +141,11 @@ var Weaver = Class(Spiderling, {
         if(Spiderling.finish.apply(this, arguments)) {
             return; // because they finished moving or something the base Spiderling class can handle
         }
-
+        
         var web = this[weaveType + "Web"];
         this[weaveType + "Web"] = null;
 
-        if(!web.hasSnapped()) { // then they are finishing a weave, not being forced to finish because the web snapped
+        if(web && !web.hasSnapped()) { // then they are finishing a weave, not being forced to finish because the web snapped
             web.addStrength(weaveType === "weakening" ? -1 : 1);
         }
     },

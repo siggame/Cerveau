@@ -99,7 +99,7 @@ var Cutter = Class(Spiderling, {
             return; // because they finished moving or something the base Spiderling class can handle
         }
 
-        if(!this.cuttingWeb.hasSnapped()) {
+        if(this.cuttingWeb && !this.cuttingWeb.hasSnapped()) {
             this.cuttingWeb.snap();
         }
 

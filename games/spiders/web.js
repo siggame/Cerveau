@@ -131,7 +131,11 @@ var Web = Class(GameObject, {
      * @returns {Array.<Spider>} an array of Spiders in nest A and B (the sides of this web).
      */
     getSideSpiders: function() {
-        return this.nestA.spiders.concat(this.nestB.spiders);
+        var spiders = this.nestA.spiders.slice();
+        for(var i = 0; i < this.nestB.spiders.length; i++) {
+            spiders.push(this.nestB.spiders[i]);
+        }
+        return spiders;
     },
 
     /**
