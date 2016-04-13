@@ -7,7 +7,7 @@ var Spider = require("./spider");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-// any additional requires you want can be required here safely between Creer re-runs
+var Web = require("./web");
 
 //<<-- /Creer-Merge: requires -->>
 
@@ -106,7 +106,7 @@ var Spiderling = Class(Spider, {
 
         var reason;
 
-        if(!Class.isInstance(spiderling, Spiderling)) {
+        if(!Spiderling.isInstance(spiderling)) {
             reason = "{this} cannot attack because '{spiderling}' is not a Spiderling.";
         }
         else if(spiderling.nest !== this.nest) {
@@ -173,7 +173,7 @@ var Spiderling = Class(Spider, {
 
         var reason;
 
-        if(!web) {
+        if(!web || !Web.isInstance(web)) {
             reason = "{web} is not a Web for {this} to move on.";
         }
         else if(!web.isConnectedTo(this.nest)) {
@@ -252,7 +252,7 @@ var Spiderling = Class(Spider, {
         }
 
         // if we got here they finished moving on a web
-        
+
         this.nest = this.movingToNest;
         this.nest.spiders.push(this);
         this.movingOnWeb.spiderlings.removeElement(this);
