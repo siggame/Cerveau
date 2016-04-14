@@ -14,6 +14,7 @@
                     "default": true,
                     "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -41,6 +42,7 @@
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Player",
                     "valueType": null
@@ -51,6 +53,7 @@
                 "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -61,13 +64,16 @@
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     },
                     "name": "dictionary",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "GameObject",
                         "valueType": null
@@ -79,6 +85,7 @@
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -88,9 +95,11 @@
                 "default": null,
                 "description": "Every Nest in the game.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -102,9 +111,11 @@
                 "description": "List of all the players in the game.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -116,6 +127,7 @@
                 "description": "A unique identifier for the game instance that is being played.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "string",
                     "valueType": null
@@ -125,9 +137,11 @@
                 "default": null,
                 "description": "Every Web in the game.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -162,6 +176,7 @@
                     "default": null,
                     "description": "How many eggs the BroodMother has to spawn Spiderlings this turn.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -171,6 +186,7 @@
                     "default": null,
                     "description": "How much health this BroodMother has left. When it reaches 0, she dies and her owner loses.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -195,6 +211,7 @@
                             "name": "spiderling",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Spiderling",
                                 "valueType": null
@@ -206,6 +223,7 @@
                         "default": null,
                         "description": "True if the Spiderling was consumed. False otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -225,6 +243,7 @@
                             "name": "spiderlingType",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -236,6 +255,7 @@
                         "default": null,
                         "description": "The newly spwaned Spiderling if successful. Null otherwise.",
                         "type": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Spiderling",
                             "valueType": null
@@ -259,6 +279,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -270,6 +291,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -280,6 +302,7 @@
                     "description": "If this Spider is dead and has been removed from the game.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -291,9 +314,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -305,6 +330,7 @@
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -315,6 +341,7 @@
                     "description": "The Player that owns this Spider, and can command it.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -337,6 +364,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -363,6 +391,7 @@
                     "default": null,
                     "description": "The Web that this Cutter is trying to cut. Null if not cutting.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -386,6 +415,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -397,6 +427,7 @@
                         "default": null,
                         "description": "True if the cut was successfully started, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -426,6 +457,7 @@
                     "description": "When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -436,6 +468,7 @@
                     "description": "How much damage this Spiderling does to the BroodMother.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -447,6 +480,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -458,6 +492,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -468,6 +503,7 @@
                     "description": "If this Spider is dead and has been removed from the game.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -479,9 +515,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -493,6 +531,7 @@
                     "description": "The Web this Spiderling is using to move. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -503,6 +542,7 @@
                     "description": "The Nest this Spiderling is moving to. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -513,6 +553,7 @@
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -523,6 +564,7 @@
                     "description": "The Player that owns this Spider, and can command it.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -533,6 +575,7 @@
                     "description": "How much distance this Spiderling covers per turn when moving across Webs.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -543,6 +586,7 @@
                     "description": "The number of turns remaining for this Spiderling's current task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -553,6 +597,7 @@
                     "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -577,6 +622,7 @@
                             "name": "spiderling",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Spiderling",
                                 "valueType": null
@@ -589,6 +635,7 @@
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -608,6 +655,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -631,6 +679,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -643,6 +692,7 @@
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -668,6 +718,7 @@
                     "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -678,6 +729,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -688,9 +740,11 @@
                     "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -715,6 +769,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -747,9 +802,11 @@
                     "default": null,
                     "description": "All the Spiders currently located on this Nest.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Spider",
                             "valueType": null
@@ -760,9 +817,11 @@
                     "default": null,
                     "description": "Webs that connect to this Nest.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Web",
                             "valueType": null
@@ -773,6 +832,7 @@
                     "default": null,
                     "description": "The X coordinate of the Nest. Used for distance calculations.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -782,6 +842,7 @@
                     "default": null,
                     "description": "The Y coordinate of the Nest. Used for distance calculations.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -803,6 +864,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -814,6 +876,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -825,9 +888,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -851,6 +916,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -886,6 +952,7 @@
                     "default": null,
                     "description": "This player's BroodMother. If it dies they lose the game.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "BroodMother",
                         "valueType": null
@@ -895,6 +962,7 @@
                     "default": null,
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -904,6 +972,7 @@
                     "default": false,
                     "description": "If the player lost the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -913,6 +982,7 @@
                     "default": "Anonymous",
                     "description": "The name of the player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -922,6 +992,7 @@
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -931,6 +1002,7 @@
                     "default": null,
                     "description": "The reason why the player lost the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -940,6 +1012,7 @@
                     "default": null,
                     "description": "The reason why the player won the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -949,9 +1022,11 @@
                     "default": null,
                     "description": "All the Spiders owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Spider",
                             "valueType": null
@@ -962,6 +1037,7 @@
                     "default": null,
                     "description": "The amount of time (in ns) remaining for this AI to send commands.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -971,6 +1047,7 @@
                     "default": false,
                     "description": "If the player won the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -992,6 +1069,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1003,6 +1081,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1014,9 +1093,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1040,6 +1121,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1068,6 +1150,7 @@
                     "default": null,
                     "description": "If this Spider is dead and has been removed from the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1077,6 +1160,7 @@
                     "default": null,
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1086,6 +1170,7 @@
                     "default": null,
                     "description": "The Player that owns this Spider, and can command it.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1107,6 +1192,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1118,6 +1204,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1129,9 +1216,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1155,6 +1244,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1187,6 +1277,7 @@
                     "default": null,
                     "description": "When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1196,6 +1287,7 @@
                     "default": null,
                     "description": "How much damage this Spiderling does to the BroodMother.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1205,6 +1297,7 @@
                     "default": null,
                     "description": "The Web this Spiderling is using to move. Null if it is not moving.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -1214,6 +1307,7 @@
                     "default": null,
                     "description": "The Nest this Spiderling is moving to. Null if it is not moving.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1223,6 +1317,7 @@
                     "default": null,
                     "description": "How much distance this Spiderling covers per turn when moving across Webs.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -1232,6 +1327,7 @@
                     "default": null,
                     "description": "The number of turns remaining for this Spiderling's current task.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1241,6 +1337,7 @@
                     "default": null,
                     "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1265,6 +1362,7 @@
                             "name": "spiderling",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Spiderling",
                                 "valueType": null
@@ -1276,6 +1374,7 @@
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1295,6 +1394,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -1306,6 +1406,7 @@
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1329,6 +1430,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1340,6 +1442,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1350,6 +1453,7 @@
                     "description": "If this Spider is dead and has been removed from the game.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1361,9 +1465,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1375,6 +1481,7 @@
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1385,6 +1492,7 @@
                     "description": "The Player that owns this Spider, and can command it.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1407,6 +1515,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1433,6 +1542,7 @@
                     "default": null,
                     "description": "The Nest that this Spitter is creating a Web to spit at, thus connecting them. Null if not spitting.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1456,6 +1566,7 @@
                             "name": "nest",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Nest",
                                 "valueType": null
@@ -1467,6 +1578,7 @@
                         "default": null,
                         "description": "True if the spit was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1496,6 +1608,7 @@
                     "description": "When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1506,6 +1619,7 @@
                     "description": "How much damage this Spiderling does to the BroodMother.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1517,6 +1631,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1528,6 +1643,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1538,6 +1654,7 @@
                     "description": "If this Spider is dead and has been removed from the game.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1549,9 +1666,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1563,6 +1682,7 @@
                     "description": "The Web this Spiderling is using to move. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -1573,6 +1693,7 @@
                     "description": "The Nest this Spiderling is moving to. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1583,6 +1704,7 @@
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1593,6 +1715,7 @@
                     "description": "The Player that owns this Spider, and can command it.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1603,6 +1726,7 @@
                     "description": "How much distance this Spiderling covers per turn when moving across Webs.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -1613,6 +1737,7 @@
                     "description": "The number of turns remaining for this Spiderling's current task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1623,6 +1748,7 @@
                     "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1647,6 +1773,7 @@
                             "name": "spiderling",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Spiderling",
                                 "valueType": null
@@ -1659,6 +1786,7 @@
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1678,6 +1806,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1701,6 +1830,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -1713,6 +1843,7 @@
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1736,6 +1867,7 @@
                     "default": null,
                     "description": "The Web that this Weaver is strengthening. Null if not strengthening.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -1745,6 +1877,7 @@
                     "default": null,
                     "description": "The Web that this Weaver is weakening. Null if not weakening.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -1769,6 +1902,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -1780,6 +1914,7 @@
                         "default": null,
                         "description": "True if the strengthen was successfully started, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1799,6 +1934,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -1810,6 +1946,7 @@
                         "default": null,
                         "description": "True if the weaken was successfully started, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1839,6 +1976,7 @@
                     "description": "When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1849,6 +1987,7 @@
                     "description": "How much damage this Spiderling does to the BroodMother.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1860,6 +1999,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1871,6 +2011,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1881,6 +2022,7 @@
                     "description": "If this Spider is dead and has been removed from the game.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1892,9 +2034,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1906,6 +2050,7 @@
                     "description": "The Web this Spiderling is using to move. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Web",
                         "valueType": null
@@ -1916,6 +2061,7 @@
                     "description": "The Nest this Spiderling is moving to. Null if it is not moving.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1926,6 +2072,7 @@
                     "description": "The Nest that this Spider is currently on. Null when moving on a Web.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -1936,6 +2083,7 @@
                     "description": "The Player that owns this Spider, and can command it.",
                     "inheritedFrom": "Spider",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1946,6 +2094,7 @@
                     "description": "How much distance this Spiderling covers per turn when moving across Webs.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -1956,6 +2105,7 @@
                     "description": "The number of turns remaining for this Spiderling's current task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1966,6 +2116,7 @@
                     "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
                     "inheritedFrom": "Spiderling",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1990,6 +2141,7 @@
                             "name": "spiderling",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Spiderling",
                                 "valueType": null
@@ -2002,6 +2154,7 @@
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -2021,6 +2174,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -2044,6 +2198,7 @@
                             "name": "web",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Web",
                                 "valueType": null
@@ -2056,6 +2211,7 @@
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -2083,6 +2239,7 @@
                     "default": null,
                     "description": "How long this Web is, i.e., the distance between its nestA and nestB.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -2092,6 +2249,7 @@
                     "default": null,
                     "description": "How much weight this Web currently has on it, which is the sum of all its Spiderlings weight.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -2101,6 +2259,7 @@
                     "default": null,
                     "description": "The first Nest this Web is connected to.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -2110,6 +2269,7 @@
                     "default": null,
                     "description": "The second Nest this Web is connected to.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
                         "valueType": null
@@ -2119,9 +2279,11 @@
                     "default": null,
                     "description": "All the Spiderlings currently moving along this Web.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Spiderling",
                             "valueType": null
@@ -2132,6 +2294,7 @@
                     "default": null,
                     "description": "How much weight this Web can take before snapping and destroying itself and all the Spiders on it.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -2153,6 +2316,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -2164,6 +2328,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -2175,9 +2340,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -2201,6 +2368,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
