@@ -11,10 +11,20 @@ var DeltaMergeable = Class({
      *
      * @contructor
      */
-    init: function(baseGame, pathInBaseGame) {
+    init: function(baseGame, pathInBaseGame, values) {
         this._baseGame = baseGame || this;
         this._pathInBaseGame = pathInBaseGame || [];
         this._properties = this._properties || {};
+
+        var classes = [ this._class ];
+        while(classes.length > 0) {
+            var myClass = classes.shift();
+            if(myClass._deltaMergeableProperties) {
+                this._addProperties(myClass._deltaMergeableProperties, values);
+            }
+
+            classes.push.apply(classes, myClass._parentClasses);
+        }
     },
 
     /**
@@ -38,6 +48,27 @@ var DeltaMergeable = Class({
     },
 
     /**
+     * Adds multiple properties at once with optinal values
+     *
+     * @see _addProperty
+     * @param {Object} properties - keys to properties, with the value being the property options
+     * @param {Object} [values] - keys to property values
+     */
+    _addProperties: function(properties, values) {
+        for(var key in properties) {
+            if(properties.hasOwnProperty(key)) {
+                var property = properties[key];
+                var value = property.defaultValue;
+                if(values && values.hasOwnProperty(key)) {
+                    value = values[key];
+                }
+
+                this._addProperty(key, value, property);
+            }
+        }
+    },
+
+    /**
      * initialized a property internally
      *
      * @param {string} key - the index
@@ -53,6 +84,7 @@ var DeltaMergeable = Class({
             value: value,
             path: propertyPath,
             setter: options.setter,
+            type: options.type,
         };
 
         var self = this;
@@ -80,6 +112,11 @@ var DeltaMergeable = Class({
     _set: function(key, newValue, forceSet) {
         var property = this._properties[key];
         var setValue = (property.setter ? property.setter(newValue) : newValue);
+
+        if(property.type) {
+            setValue = this._baseGame.gameManager.sanitizeType(property.type.name, setValue);
+        }
+
         if(setValue !== property.value || forceSet) { // prevents doing a updateDelta if you are setting the value to the same value over and over
             property.value = setValue;
             this._baseGame.updateDelta(property);
@@ -120,10 +157,11 @@ var DeltaMergeable = Class({
      *
      * @param {string} key - the key this array will be stored in
      * @param {Array} [copyFrom] - copies these values during init if present
+     * @param {Object} [options] - options for the new nested array
      * @returns {DeltaMergeableArray} what is now nested in this[key]
      */
-    _createNestedArray: function(key, copyFrom) {
-        return this._createNested("Array", key, copyFrom);
+    _createNestedArray: function(key, copyFrom, options) {
+        return this._createNested("Array", key, copyFrom, options);
     },
 
     /**
@@ -131,10 +169,11 @@ var DeltaMergeable = Class({
      *
      * @param {string} key - the key this object will be stored in
      * @param {Object} [copyFrom] - copies these values during init if present
+     * @param {Object} [options] - options for the new dictionary
      * @returns {DeltaMergeableDictionary} what is now nested in this[key]
      */
-    _createNestedDictionary: function(key, copyFrom) {
-        return this._createNested("Dictionary", key, copyFrom);
+    _createNestedDictionary: function(key, copyFrom, options) {
+        return this._createNested("Dictionary", key, copyFrom, options);
     },
 
     /**
@@ -143,15 +182,16 @@ var DeltaMergeable = Class({
      * @param {string} type - "Array" or "Dictionary" based on class type
      * @param {string} key - the key this array or object will be stored in
      * @param {Object} [copyFrom] - copies these values during init if present
+     * @param {Object} [options] - options for the new structure
      * @returns {DeltaMergeable} what is now nested in this[key]
      */
-    _createNested: function(type, key, copyFrom) {
+    _createNested: function(type, key, copyFrom, options) {
         var DeltaMergeableType = require("./deltaMergeable" + type);
         var newPath = this._pathInBaseGame.clone();
         newPath.push(key);
         var nested = new DeltaMergeableType.uninitialized();
         this._addProperty(key, nested);
-        nested.init(this._baseGame, newPath, copyFrom);
+        nested.init(this._baseGame, newPath, copyFrom, options);
         return nested;
     },
 });

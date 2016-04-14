@@ -5,8 +5,11 @@ var DeltaMergeable = require("./deltaMergeable");
  * @class DeltaMergeableDictionary - A dictionary that manages its own delta states. Do not use the raw [] to add or remove items, as those have no hooks in JS to run code so we can delta update.
  */
 var DeltaMergeableDictionary = Class(DeltaMergeable, {
-    init: function(baseGame, pathInBaseGame, copyFrom) {
+    init: function(baseGame, pathInBaseGame, copyFrom, options) {
         DeltaMergeable.init.call(this, baseGame, pathInBaseGame);
+
+        this._keyType = options.keyType;
+        this._valueType = options.valueType;
 
         if(copyFrom) {
             this.extend(copyFrom);
@@ -20,7 +23,8 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
      * @param {*} value - value you are adding
      */
     add: function(key, value) {
-        return this._addProperty(key, value);
+        // TODO: keyType use
+        return this._addProperty(key, value, { type: this._valueType });
     },
 
     /**

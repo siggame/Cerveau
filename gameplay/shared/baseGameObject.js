@@ -1,5 +1,6 @@
 var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
+var extend = require("extend");
 var log = require("../log");
 
 /**
@@ -8,15 +9,10 @@ var log = require("../log");
  */
 var BaseGameObject = Class(DeltaMergeable, {
     init: function(data) {
-        DeltaMergeable.init.call(this, data.game, ["gameObjects", data.id]);
+        DeltaMergeable.init.call(this, data.game, ["gameObjects", data.id], data);
 
-        if(this.id === undefined) { // then this is a fresh init of an untracked game object (game objects that inherit multiple child game objects classes will try to init this class multiple times)
-            this.game = data.game;
-
-            this._addProperty("id", data.id);
-            this._addProperty("gameObjectName", this.gameObjectName);
-            this._addProperty("logs", []);
-        }
+        this.game = data.game;
+        this.gameObjectName = this._class.gameObjectName;
     },
 
     /**

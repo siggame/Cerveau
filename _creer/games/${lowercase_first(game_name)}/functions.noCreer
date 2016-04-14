@@ -22,6 +22,8 @@ if not 'cerveau' in shared:
                 return '"' + default + '"'
             elif base_type == "boolean":
                 return str(default).lower()
+            else:
+                return default
     shared['cerveau']['default'] = cerveau_default
 
 

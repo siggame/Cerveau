@@ -1,6 +1,10 @@
 var fs = require("fs");
 var Class = require(__basedir + "/utilities/class");
 var Errors = require(__basedir + "/gameplay/errors");
+var log = require(__basedir + "gameplay/log");
+var serializer = require(__basedir + "gameplay/serializer");
+var DeltaMergeableArray = require(__basedir + "gameplay/shared/deltaMergeableArray");
+var DeltaMergeableDictionary = require(__basedir + "gameplay/shared/deltaMergeableDictionary");
 
 /**
  * A collection of static functions to sanitize inputs from AI clients for the ${game_name} Game.
@@ -8,6 +12,41 @@ var Errors = require(__basedir + "/gameplay/errors");
 var GameManager = Class({
     init: function(game) {
         this._game = game;
+    },
+
+    /**
+     * Sanitizes a variable to some type
+     * @param {string} type - what type to turn sanitizing into
+     * @param {*} sanitizing - what to cast from
+     * @returns {*} sanitizing converted to type
+     */
+    sanitizeType: function(type, sanitizing) {
+        switch(type) {
+            case "int":
+                return serializer.defaultInteger(sanitizing);
+            case "float":
+                return serializer.defaultNumber(sanitizing);
+            case "boolean":
+                return serializer.defaultBoolean(sanitizing);
+            case "string":
+                return serializer.defaultString(sanitizing);
+            case "array":
+                if(DeltaMergeableArray.isInstance(sanitizing)) {
+                    return sanitizing;
+                }
+                return serializer.defaultArray(sanitizing);
+            case "dictionary":
+                if(DeltaMergeableDictionary.isInstance(sanitizing)) {
+                    return sanitizing;
+                }
+                return serializer.defaultObject(sanitizing);
+            default:
+                if(type[0] === type[0].toUpperCase()) { // then it is a GameObject
+                    var gameObjectClass = this._game.classes[type];
+                    return gameObjectClass.isInstance(sanitizing) ? sanitizing : null;
+                }
+                return null;
+        }
     },
 
     _sanitizeArgs: function(argsStructure, untreatedArgs) {
@@ -23,7 +62,7 @@ var GameManager = Class({
     },
 
     _sanitizeValue: function(val, arg) {
-        return arg.converter(val === undefined ? arg.defaultValue : val);
+        return this.sanitizeType(arg.type.name, val === undefined ? arg.defaultValue : val);
     },
 
     /**
