@@ -32,7 +32,7 @@ var Class = function(/*parentClass1, parentClass2, ..., parentClassN, newClassPr
 
     prototype.init = prototype.init || function() {};
     prototype._isClass = true;
-    prototype._mainClass = newClass;
+    prototype._class = newClass;
     prototype._parentClasses = parentClasses;
     newClass.prototype = prototype;
 
@@ -79,7 +79,7 @@ Class.isInstance = function(obj, isClass) {
         return true;
     }
 
-    var classes = [ obj._mainClass ];
+    var classes = [ obj._class ];
     while(classes.length > 0) {
         var theClass = classes.pop();
 

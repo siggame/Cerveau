@@ -8,14 +8,6 @@ var log = require("../log");
  * @class TurnBasedGame - a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
  */
 var TurnBasedGame = Class(BaseGame, {
-    init: function() {
-        BaseGame.init.apply(this, arguments);
-
-        this._addProperty("currentTurn", 0);
-        this._addProperty("maxTurns", 100); // real class should override this during init
-        this._addProperty("currentPlayer", null);
-    },
-
     _playerAdditionalTimePerTurn: 1e8, // 100ms in ns
 
     /**

@@ -27,20 +27,6 @@ var ${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else 
         ${parent_class}.init.apply(this, arguments);
 % endfor
 
-% for attr_name in obj['attribute_names']:
-<%
-    attr_parms = obj['attributes'][attr_name]
-    if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
-        continue
-%>        /**
-         * ${attr_parms['description']}
-         *
-         * @type {${shared['cerveau']['type'](attr_parms['type'])}}
-         */
-        this._addProperty("${attr_name}", ${shared['cerveau']['cast'](attr_parms['type'])}(data.${attr_name}));
-
-% endfor
-
 ${merge("        //", "init",
 """
         // put any initialization logic here. the base variables should be set from 'data' above

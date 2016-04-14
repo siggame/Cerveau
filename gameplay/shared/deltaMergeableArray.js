@@ -4,8 +4,10 @@ var DeltaMergeable = require("./deltaMergeable");
 var constants = require("../constants");
 
 var prototype = {
-    init: function(baseGame, pathInBaseGame, copyFrom) {
+    init: function(baseGame, pathInBaseGame, copyFrom, options) {
         DeltaMergeable.init.apply(this, arguments);
+
+        this._valueType = options.valueType;
 
         var self = this;
         self._addProperty("length", 0, {
@@ -35,7 +37,7 @@ var prototype = {
         }
 
         while(currentLength < newlength) {
-            this._addProperty(currentLength++, undefined);
+            this._addProperty(currentLength++, undefined, { type: this._valueType });
         }
 
         return newLength;
@@ -101,6 +103,25 @@ var prototype = {
             this.pop();
             return first;
         }
+    },
+
+    /**
+     * re-implimentation of Array.concat to also consider DeltaMergeable as arrays (and not a single object)
+     *
+     * @see Array.concat
+     * @returns {Array} the new concated Array (not DeltaMergeableArray)
+     */
+    concat: function(/* ... */) {
+        for(var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            if(DeltaMergeable.isInstance(arg)) { // then we need to convert it to an array
+                arg = arg.slice();
+            }
+            arguments[i] = arg;
+        }
+
+        var thisAsArray = this.slice();
+        return thisAsArray.concat.apply(thisAsArray, arguments);
     },
 };
 

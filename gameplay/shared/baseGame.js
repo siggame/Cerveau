@@ -17,18 +17,16 @@ var BaseGame = Class(DeltaMergeable, {
             return;
         }
 
+        this.gameManager = new GameManager(this);
         this._baseGameInitialized = true;
         this._delta = {}; // the current delta we are recoding
 
-        DeltaMergeable.init.call(this);
-
-        this._addProperty("players", []);
-        this._addProperty("gameObjects", {});
-        this._addProperty("session", (data.session === undefined ? "Unknown" : data.session));
-        this._addProperty("name", this.name);
+        DeltaMergeable.init.call(this, undefined, undefined, {
+            session: data.session,
+            name: this._class.prototype.name,
+        });
 
         this._dir = __basedir + "/games/" + this.name.lowercaseFirst() + "/";
-        this._gameManager = new GameManager(this);
         this._instance = instance;
         this._orders = [];
         this._newOrdersToPopIndex = 0;
@@ -212,15 +210,17 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {BaseGameObject} the game object that was created, now being tracked by this game
      */
     create: function(gameObjectName, data) {
-        var gameObject = new this.classes[gameObjectName].uninitialized; // don't call init, we need to hook up some stuff first
+        var gameObjectClass = this.classes[gameObjectName];
+        var gameObject = new gameObjectClass.uninitialized; // don't call init, we need to hook up some stuff first
 
         data = data || {};
         data.id = this._generateNextGameObjectID();
         data.game = this;
+        data.gameObjectName = gameObjectClass.gameObjectName;
 
-        this.gameObjects.add(data.id, gameObject);
+        this.gameObjects.add(data.id, gameObject); // DeltaMergeableDictionary requires add() to add new keys, [] has no setter hooks for us :(
 
-        gameObject.init(data); // we delay the actul init so that it can already be in gameObjects during it's init function
+        gameObject.init(data); // we delay the actual init so that it can already be in gameObjects during it's init function, that way deltas it creates are registered in game.gameObjects for clients to see
 
         return gameObject;
     },
@@ -250,7 +250,7 @@ var BaseGame = Class(DeltaMergeable, {
             var defaultCallback = this["aiFinished_" + finished];
 
             var returned = serializer.deserialize(data, this);
-            returned = this._gameManager.sanitizeFinished(order, returned);
+            returned = this.gameManager.sanitizeFinished(order, returned);
 
             var hadCallback = true;
             if(order.callback) {
@@ -296,10 +296,10 @@ var BaseGame = Class(DeltaMergeable, {
         var sendError;
 
         try {
-            if(this._gameManager.isSecret(runCallback)) {
+            if(this.gameManager.isSecret(runCallback)) {
                 data.isSecret = true;
             }
-            argsArray = this._gameManager.sanitizeRun(runCallback, run.args || {});
+            argsArray = this.gameManager.sanitizeRun(runCallback, run.args || {});
         }
         catch(err) {
             if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
@@ -343,7 +343,7 @@ var BaseGame = Class(DeltaMergeable, {
      * After we run game logic, santatize the ran data and send it back
      */
     _finishRun: function(runCallback, player, returned) {
-        var returnedValue = this._gameManager.sanitizeRan(runCallback, (returned.isGameLogicError ? returned.returned : returned));
+        var returnedValue = this.gameManager.sanitizeRan(runCallback, (returned.isGameLogicError ? returned.returned : returned));
 
         if(returned.isGameLogicError) {
             returned.returned = returnedValue;
@@ -384,7 +384,7 @@ var BaseGame = Class(DeltaMergeable, {
             args: args || [],
             callback: callback,
         };
-        this._gameManager.sanitizeOrder(order);
+        this.gameManager.sanitizeOrder(order);
 
         this._orders.push(order);
 
