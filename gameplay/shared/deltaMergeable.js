@@ -81,6 +81,7 @@ var DeltaMergeable = Class({
 
         propertyPath.push(options.hasOwnProperty("deltaKey") ? options.deltaKey : key);
         this._properties[key] = {
+            key: key,
             value: value,
             path: propertyPath,
             setter: options.setter,

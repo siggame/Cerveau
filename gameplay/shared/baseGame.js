@@ -435,26 +435,31 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Array} basePath - the path of keys to where this property's object is
      * @param {string} propertyKey - they key of the property at the end of the basePath
-     * @param {boolean} [wasDeleted] - true if the value was removed (delted)
+     * @param {boolean} [wasDeleted] - true if the value was removed (deleted)
      */
     updateDelta: function(property, wasDeleted) {
         var path = property.path;
         var currentReal = this;
         var currentDelta = this._delta;
-        for(var i = 0; i < path.length-1; i++) {
+        for(var i = 0; i < path.length; i++) {
             var pathKey = path[i];
-            currentReal = currentReal[pathKey];
 
-            currentDelta[pathKey] = currentDelta[pathKey] || {};
+            currentReal = currentReal[i === path.length-1 ? property.key : pathKey]; // the last part of the path for the real object can be different for the delta key (DELTA_LIST_LENGTH), so use the real key
+
+            if(i === path.length-1) {
+                currentDelta[pathKey] = wasDeleted ? constants.shared.DELTA_REMOVED : serializer.serialize(currentReal, this);
+            }
+            else {
+                currentDelta[pathKey] = currentDelta[pathKey] || {};
+            }
+
             currentDelta = currentDelta[pathKey];
-            if(currentReal.isArray) {
+
+            if(serializer.isObject(currentReal) && currentReal.isArray) { // then we need to include it's DELTA_LIST_LENGTH to indicate this is an array
                 currentDelta[constants.shared.DELTA_LIST_LENGTH] = currentReal.length;
                 delete currentDelta.length;
             }
         }
-        // now we have traversed the path and are ready to set the value that was updated
-        var propertyKey = path.last();
-        currentDelta[propertyKey] = wasDeleted ? constants.shared.DELTA_REMOVED : serializer.serialize(currentReal[propertyKey], this);
     },
 
     /**
