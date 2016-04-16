@@ -195,14 +195,14 @@ var Spiderling = Class(Spider, {
      */
     finish: function() {
         this.busy = "";
-        this.turnsRemaining = 0;
+        this.workRemaining = 0;
 
         if(!this.movingOnWeb) {
+            this.coworkers.length = 0;
             return false;
         }
 
         // if we got here they finished moving on a web
-
         this.nest = this.movingToNest;
         this.nest.spiders.push(this);
         this.movingOnWeb.spiderlings.removeElement(this);
