@@ -77,7 +77,18 @@ var Spitter = Class(Spiderling, {
 
         this.busy = "Spitting";
         this.spittingWebToNest = nest;
-        this.turnsRemaining = Math.ceil(this.nest.distanceTo(nest) / this.spittingSpeed);
+
+        // find coworkers
+        var sideSpiders = this.nest.spiders.concat(nest.spiders);
+        for(var i = 0; i < sideSpiders.length; i++) {
+            var spider = sideSpiders[i];
+            if(spider !== this && (spider.spittingWebToNest === nest || spider.spittingWebToNest === this.nest)) {
+                this.coworkers.push(spider);
+                spider.coworkers.push(this);
+            }
+        }
+
+        this.workRemaining = Math.ceil(this.nest.distanceTo(nest) / this.game.spitSpeed);
 
         return true;
 
@@ -98,12 +109,13 @@ var Spitter = Class(Spiderling, {
     /**
      * @override
      */
-    finish: function() {
+    finish: function(forceFinish) {
         if(Spiderling.finish.apply(this, arguments)) {
             return; // because they finished moving or something the base Spiderling class can handle
         }
 
-        if(this.spittingWebToNest === null) { // then we got here because we got forced to finish early
+        if(forceFinish) {
+            this.spittingWebToNest = null;
             return;
         }
 

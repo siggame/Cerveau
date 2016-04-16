@@ -66,8 +66,19 @@ var Cutter = Class(Spiderling, {
 
         this.busy = "Cutting";
         this.cuttingWeb = web;
-        // This is 5 * strength ^ 2 / (cutterSpeed * sqrt(distance))
-        this.workRemaining = Math.ceil(5 * web.strength * web.strength / (self.game.cutSpeed * Math.sqrt(web.length)));
+
+        // find coworkers
+        var sideSpiders = web.getSideSpiders();
+        for(var i = 0; i < sideSpiders.length; i++) {
+            var spider = sideSpiders[i];
+            if(spider !== this && spider.cuttingWeb === web) {
+                this.coworkers.push(spider);
+                spider.coworkers.push(this);
+            }
+        }
+
+        // workRemaining =  5 * strength^2 / (cutterSpeed * sqrt(distance))
+        this.workRemaining = Math.ceil(5 * web.strength * web.strength / (this.game.cutSpeed * Math.sqrt(web.length)));
 
         return true;
         // <<-- /Creer-Merge: cut -->>
@@ -87,12 +98,12 @@ var Cutter = Class(Spiderling, {
     /**
      * @override
      */
-    finish: function() {
+    finish: function(forceFinish) {
         if(Spiderling.finish.apply(this, arguments)) {
             return; // because they finished moving or something the base Spiderling class can handle
         }
 
-        if(this.cuttingWeb && !this.cuttingWeb.hasSnapped()) {
+        if(!forceFinish && this.cuttingWeb && !this.cuttingWeb.hasSnapped()) {
             this.cuttingWeb.snap();
         }
 

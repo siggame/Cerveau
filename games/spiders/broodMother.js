@@ -111,7 +111,7 @@ var BroodMother = Class(Spider, {
         }
 
         // if we got here the spawn is valid!
-        this.eggs -= 1
+        this.eggs -= 1;
         return this.game.create(lowereSpiderlingType.upcaseFirst(), {
             nest: this.nest,
             owner: this.owner,

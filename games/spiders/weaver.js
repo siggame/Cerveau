@@ -100,9 +100,22 @@ var Weaver = Class(Spiderling, {
         // if we got here it is valid!
 
         this.busy = weaveType;
-        // This is distance * sqrt(strength) / speed
-        this.turnsRemaining = Math.ceil(web.length * Math.sqrt(web.strength) / this.weaveSpeed);
-        this[weaveType.toLowerCase() + "Web"] = web;
+
+        var webField = weaveType.toLowerCase() + "Web";
+        this[webField] = web;
+
+        // TworkReminaing = distance * sqrt(strength) / speed
+        this.workRemaining = Math.ceil(web.length * Math.sqrt(web.strength) / this.weaveSpeed);
+
+        // find coworkers
+        var sideSpiders = web.getSideSpiders();
+        for(var i = 0; i < sideSpiders.length; i++) {
+            var spider = sideSpiders[i];
+            if(spider !== this && spider[webField] === web) {
+                this.coworkers.push(spider);
+                spider.coworkers.push(this);
+            }
+        }
 
         return true;
 
@@ -121,7 +134,7 @@ var Weaver = Class(Spiderling, {
      /**
      * @override
      */
-    finish: function() {
+    finish: function(forceFinish) {
         var weaveType = this.busy.toLowerCase();
 
         if(Spiderling.finish.apply(this, arguments)) {
@@ -131,8 +144,8 @@ var Weaver = Class(Spiderling, {
         var web = this[weaveType + "Web"];
         this[weaveType + "Web"] = null;
 
-        if(web && !web.hasSnapped()) { // then they are finishing a weave, not being forced to finish because the web snapped
-            web.addStrength(weaveType === "weakening" ? -1 : 1);
+        if(!forceFinish && web && !web.hasSnapped()) { // then they are finishing a weave, not being forced to finish because the web snapped
+            web.addStrength((weaveType === "weakening" ? -1 : 1) * this.game.weavePower);
         }
     },
 

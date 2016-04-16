@@ -29,7 +29,7 @@ var Web = Class(GameObject, {
         this.nestA.webs.push(this);
         this.nestB.webs.push(this);
         this.length = this.nestA.distanceTo(this.nestB);
-        this.strength = 100;
+        this.strength = this.game.initialWebStrength;
         this._maxStrength = Infinity;
 
         //<<-- /Creer-Merge: init -->>

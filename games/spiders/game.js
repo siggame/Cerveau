@@ -166,18 +166,18 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             for(var j = 0; j < player.spiders.length; j++) {
                 var spider = player.spiders[j];
 
-                //TODO: Rework this for work remaining
                 if(spider.workRemaining > 0) {
-                    spider.workRemaining -= Math.sqrt(this.coworkers.length + 1);
+                    spider.workRemaining -= Math.sqrt(spider.coworkers.length + 1); // + 1 for the spiderling itself
 
-                    if(spider.turnsRemaining <= 0) { // then they are done
+                    if(spider.workRemaining <= 0) { // then they are done
                         if(spider.busy === "Moving") {
                             movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
                         }
-                        else {
-                            spider.coworkers.forEach(function(to_finish) {
-                                to_finish.finish();
-                            });
+                        else { // they finish now
+                            for(var i = 0; i < spider.coworkers.length; i++) { // all the co-workers are done too
+                                spider.coworkers[i].finish(true); // force finish them
+                            }
+
                             spider.finish();
                         }
                     }

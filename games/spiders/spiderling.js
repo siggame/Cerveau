@@ -25,11 +25,6 @@ var Spiderling = Class(Spider, {
 
         // put any initialization logic here. the base variables should be set from 'data' above
 
-        this.speed = 1;
-        this.cost = 1;
-        this.damage = 1;
-        this.weight = 1;
-
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -140,7 +135,7 @@ var Spiderling = Class(Spider, {
         // if we got here the move is valid
 
         this.busy = "Moving";
-        this.turnsRemaining = Math.ceil(web.length / this.speed);
+        this.workRemaining = Math.ceil(web.length / this.game.movementSpeed);
 
         this.movingOnWeb = web;
         this.movingToNest = web.getOtherNest(this.nest);
@@ -165,8 +160,15 @@ var Spiderling = Class(Spider, {
         Spider.kill.apply(this, arguments);
 
         this.busy = "";
-        this.turnsRemaining = -1;
+        this.workRemaining = -1;
         this.movingToNest = null;
+
+        for(var i = 0; i < this.coworkers.length; i++) {
+            var coworker = this.coworkers[i];
+            coworker.coworkers.removeElement(this);
+        }
+
+        this.coworkers.length = 0;
 
         if(this.movingOnWeb) {
             this.movingOnWeb.spiderlings.removeElement(this);
@@ -191,13 +193,16 @@ var Spiderling = Class(Spider, {
     },
 
     /**
-     * @override
+     * Tells the Spiderling to finish what it is doing (moving, cutting, spitting, weaving)
+     *   Note: coworkers are finished in the Game class, not here
+     *
+     * @param {boolean} forceFinish - True if the task was not finished by THIS spiderling
      */
-    finish: function() {
+    finish: function(forceFinish) {
         this.busy = "";
         this.workRemaining = 0;
 
-        if(!this.movingOnWeb) {
+        if(!this.movingOnWeb) { // then they finished doing a different action (cut, weave, spit)
             this.coworkers.length = 0;
             return false;
         }
