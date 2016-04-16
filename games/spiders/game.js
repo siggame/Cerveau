@@ -27,10 +27,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.maxTurns = 300;
         this.movementSpeed = 10;
-        this.cutSpeed = 1;
-        this.spitSpeed = 12;
-        this.weaveSpeed = 8;
-        this.initialWebStrength = 10;
+        this.cutSpeed = 2;
+        this.spitSpeed = 24;
+        this.weaveSpeed = 16;
+        this.initialWebStrength = 20;
         this.weavePower = 1;
 
 
