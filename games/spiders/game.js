@@ -220,7 +220,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 for(var i = 0; i < losers.length; i++) {
                     var loser = losers[i];
                     if(!loser.lost) { // then they JUST lost
-                        loser.declareLoser(loser, "BroodMother died.");
+                        this.declareLoser(loser, "BroodMother died.");
                     }
                 }
 
