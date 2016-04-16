@@ -29,11 +29,17 @@
         "attribute_names": [
             "currentPlayer",
             "currentTurn",
+            "cutSpeed",
             "gameObjects",
+            "initialWebStrength",
             "maxTurns",
+            "movementSpeed",
             "nests",
             "players",
             "session",
+            "spitSpeed",
+            "weavePower",
+            "weaveSpeed",
             "webs"
         ],
         "attributes": {
@@ -52,6 +58,16 @@
                 "default": 0,
                 "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "cutSpeed": {
+                "default": null,
+                "description": "The speed at which Cutters work to do cut Webs.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -80,10 +96,30 @@
                     }
                 }
             },
+            "initialWebStrength": {
+                "default": null,
+                "description": "The starting strength for Webs.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "maxTurns": {
                 "default": 100,
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "movementSpeed": {
+                "default": null,
+                "description": "The speed at which Spiderlings move on Webs.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -130,6 +166,36 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "string",
+                    "valueType": null
+                }
+            },
+            "spitSpeed": {
+                "default": null,
+                "description": "The speed at which Spitters work to spit new Webs.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "weavePower": {
+                "default": null,
+                "description": "How much web strength is added or removed from Webs when they are weaved.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "weaveSpeed": {
+                "default": null,
+                "description": "The speed at which Weavers work to do strengthens and weakens on Webs.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
                     "valueType": null
                 }
             },
@@ -438,7 +504,7 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "damage",
+                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -447,9 +513,7 @@
                 "movingToNest",
                 "nest",
                 "owner",
-                "speed",
-                "turnsRemaining",
-                "weight"
+                "workRemaining"
             ],
             "inheritedAttributes": {
                 "busy": {
@@ -463,15 +527,20 @@
                         "valueType": null
                     }
                 },
-                "damage": {
+                "coworkers": {
                     "default": null,
-                    "description": "How much damage this Spiderling does to the BroodMother.",
+                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Spiderling",
+                            "valueType": null
+                        }
                     }
                 },
                 "gameObjectName": {
@@ -570,31 +639,9 @@
                         "valueType": null
                     }
                 },
-                "speed": {
+                "workRemaining": {
                     "default": null,
-                    "description": "How much distance this Spiderling covers per turn when moving across Webs.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "float",
-                        "valueType": null
-                    }
-                },
-                "turnsRemaining": {
-                    "default": null,
-                    "description": "The number of turns remaining for this Spiderling's current task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "weight": {
-                    "default": null,
-                    "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
+                    "description": "How much work needs to be done for this Spiderling to finish being busy. See docs for the Work forumla.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
@@ -939,6 +986,7 @@
                 "broodMother",
                 "clientType",
                 "lost",
+                "maxSpiderlings",
                 "name",
                 "otherPlayer",
                 "reasonLost",
@@ -975,6 +1023,16 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "maxSpiderlings": {
+                    "default": null,
+                    "description": "The max number of Spiderlings players can spawn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -1265,12 +1323,10 @@
         "Spiderling": {
             "attribute_names": [
                 "busy",
-                "damage",
+                "coworkers",
                 "movingOnWeb",
                 "movingToNest",
-                "speed",
-                "turnsRemaining",
-                "weight"
+                "workRemaining"
             ],
             "attributes": {
                 "busy": {
@@ -1283,14 +1339,19 @@
                         "valueType": null
                     }
                 },
-                "damage": {
+                "coworkers": {
                     "default": null,
-                    "description": "How much damage this Spiderling does to the BroodMother.",
+                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Spiderling",
+                            "valueType": null
+                        }
                     }
                 },
                 "movingOnWeb": {
@@ -1313,29 +1374,9 @@
                         "valueType": null
                     }
                 },
-                "speed": {
+                "workRemaining": {
                     "default": null,
-                    "description": "How much distance this Spiderling covers per turn when moving across Webs.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "float",
-                        "valueType": null
-                    }
-                },
-                "turnsRemaining": {
-                    "default": null,
-                    "description": "The number of turns remaining for this Spiderling's current task.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "weight": {
-                    "default": null,
-                    "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
+                    "description": "How much work needs to be done for this Spiderling to finish being busy. See docs for the Work forumla.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1589,7 +1630,7 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "damage",
+                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -1598,9 +1639,7 @@
                 "movingToNest",
                 "nest",
                 "owner",
-                "speed",
-                "turnsRemaining",
-                "weight"
+                "workRemaining"
             ],
             "inheritedAttributes": {
                 "busy": {
@@ -1614,15 +1653,20 @@
                         "valueType": null
                     }
                 },
-                "damage": {
+                "coworkers": {
                     "default": null,
-                    "description": "How much damage this Spiderling does to the BroodMother.",
+                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Spiderling",
+                            "valueType": null
+                        }
                     }
                 },
                 "gameObjectName": {
@@ -1721,31 +1765,9 @@
                         "valueType": null
                     }
                 },
-                "speed": {
+                "workRemaining": {
                     "default": null,
-                    "description": "How much distance this Spiderling covers per turn when moving across Webs.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "float",
-                        "valueType": null
-                    }
-                },
-                "turnsRemaining": {
-                    "default": null,
-                    "description": "The number of turns remaining for this Spiderling's current task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "weight": {
-                    "default": null,
-                    "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
+                    "description": "How much work needs to be done for this Spiderling to finish being busy. See docs for the Work forumla.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
@@ -1957,7 +1979,7 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "damage",
+                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -1966,9 +1988,7 @@
                 "movingToNest",
                 "nest",
                 "owner",
-                "speed",
-                "turnsRemaining",
-                "weight"
+                "workRemaining"
             ],
             "inheritedAttributes": {
                 "busy": {
@@ -1982,15 +2002,20 @@
                         "valueType": null
                     }
                 },
-                "damage": {
+                "coworkers": {
                     "default": null,
-                    "description": "How much damage this Spiderling does to the BroodMother.",
+                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Spiderling",
+                            "valueType": null
+                        }
                     }
                 },
                 "gameObjectName": {
@@ -2089,31 +2114,9 @@
                         "valueType": null
                     }
                 },
-                "speed": {
+                "workRemaining": {
                     "default": null,
-                    "description": "How much distance this Spiderling covers per turn when moving across Webs.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "float",
-                        "valueType": null
-                    }
-                },
-                "turnsRemaining": {
-                    "default": null,
-                    "description": "The number of turns remaining for this Spiderling's current task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "weight": {
-                    "default": null,
-                    "description": "How heavy this spider is. Webs it moves across must have enough strength to support it in addition to existing Spiderlings.",
+                    "description": "How much work needs to be done for this Spiderling to finish being busy. See docs for the Work forumla.",
                     "inheritedFrom": "Spiderling",
                     "type": {
                         "is_game_object": false,
