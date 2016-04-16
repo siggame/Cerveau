@@ -100,7 +100,8 @@ var Weaver = Class(Spiderling, {
         // if we got here it is valid!
 
         this.busy = weaveType;
-        this.turnsRemaining = Math.ceil(web.length / this.weavingSpeed);
+        // This is distance * sqrt(strength) / speed
+        this.turnsRemaining = Math.ceil(web.length * Math.sqrt(web.strength) / this.weaveSpeed);
         this[weaveType.toLowerCase() + "Web"] = web;
 
         return true;

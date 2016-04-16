@@ -66,7 +66,8 @@ var Cutter = Class(Spiderling, {
 
         this.busy = "Cutting";
         this.cuttingWeb = web;
-        this.turnsRemaining = Math.ceil(web.length / this.cuttingSpeed);
+        // This is 5 * strength ^ 2 / (cutterSpeed * sqrt(distance))
+        this.workRemaining = Math.ceil(5 * web.strength * web.strength / (self.game.cutSpeed * Math.sqrt(web.length)));
 
         return true;
         // <<-- /Creer-Merge: cut -->>
