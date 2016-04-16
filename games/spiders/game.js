@@ -26,10 +26,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.maxTurns = 300;
-        this.maxSpiderlings = 100;
+        this.movementSpeed = 10;
+        this.cutSpeed = 1;
+        this.spitSpeed = 12;
+        this.weaveSpeed = 8;
+        this.initialWebStrength = 10;
+        this.weavePower = 1;
+
 
         // used for map generation
-        this._mapSize = 50;
+        this._mapSize = 200;
         this._maxNests = 60; // per side, as are the folling
         this._minNests = 10;
         this._maxWebs = 30;
@@ -144,7 +150,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     _giveEggs: function() {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
-            player.broodMother.eggs = Math.ceil((this.maxSpiderlings - player.spiders.length - 1) / 10); // -1 for the BroodMother in player.spiders that is not a Spiderling
+            player.broodMother.eggs = Math.ceil((player.maxSpiderlings - player.spiders.length - 1) / 10); // -1 for the BroodMother in player.spiders that is not a Spiderling
         }
     },
 
