@@ -44,7 +44,6 @@ if(args.arena) {
     args.log = true;
     args.gameSettings = false;
     args.web = false;
-    args.api = false; // TODO: update arena to use API instead of listening for gamelogs in directories. Until then they don't need the API
     args.loadGamelogs = false;
 }
 
