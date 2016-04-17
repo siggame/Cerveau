@@ -61,9 +61,13 @@ module.exports = function(args) {
             }
 
             for(var i = 0; i < session.losers.length; i++) {
-                var client = info.clients[session.losers[i].index];
+                var loser = session.losers[i]
+                var client = info.clients[loser.index];
+
                 client.lost = true;
-                client.reason = session.losers[i].reason;
+                client.reason = loser.reason;
+                client.disconnected = loser.disconnected;
+                client.timedOut = loser.timedOut;
             }
 
             return info;
@@ -98,12 +102,14 @@ module.exports = function(args) {
      * @apiSuccess {Number} numberOfPlayers     The number of clients that are playing needed to connect to make the game session start running.
      * @apiSuccess {Client[]} clients           An array of clients currently in that game session.
      *
-     * @apiSuccess (Client) {Number} [index]        If the player requested, or was assigned, a player index. When a game session reaches "running" this will be set.
-     * @apiSuccess (Client) {String} name           The name of the client.
-     * @apiSuccess (Client) {Boolean} spectating    If the client is a spectator (not a playing client). Spectators will not have indexes.
-     * @apiSuccess (Client) {Boolean} [won]         If the player won this will be set, and be true.
-     * @apiSuccess (Client) {Boolean} [lost]        If the player lost this will be set, and be true.
-     * @apiSuccess (Client) {String} [reason]       If the player won or lost this will be the human readable reason why they did so.
+     * @apiSuccess (Client) {Number} [index]            If the player requested, or was assigned, a player index. When a game session reaches "running" this will be set.
+     * @apiSuccess (Client) {String} name               The name of the client.
+     * @apiSuccess (Client) {Boolean} spectating        If the client is a spectator (not a playing client). Spectators will not have indexes.
+     * @apiSuccess (Client) {Boolean} [disconnected]    If the client disconnected unexpectedly during the game.
+     * @apiSuccess (Client) {Boolean} [timedOut]          If the client timedOut and we were forced to disconnect them during the game.
+     * @apiSuccess (Client) {Boolean} [won]             If the player won this will be set, and be true.
+     * @apiSuccess (Client) {Boolean} [lost]            If the player lost this will be set, and be true.
+     * @apiSuccess (Client) {String} [reason]           If the player won or lost this will be the human readable reason why they did so.
      *
      * @apiExample {json} Empty
      *  {
