@@ -95,6 +95,7 @@ var Instance = Class(Server, {
         Server.clientDisconnected.call(this, client);
 
         if(this.game && !this.game.isOver()) {
+            client.disconnectedUnexpectedly = true;
             if(client.player) {
                 this.game.playerDisconnected(client.player, reason);
 
@@ -400,6 +401,8 @@ var Instance = Class(Server, {
                 id: player.id,
                 name: player.name,
                 reason: player.won ? player.reasonWon : player.reasonLost,
+                disconnected: Boolean(player.client.disconnectedUnexpectedly && !player.client.hasTimedOut()), // then they lost because they disconnected
+                timedOut: player.client.hasTimedOut(), // then they lost because the timed out
             });
         }
 

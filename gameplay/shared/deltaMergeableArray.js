@@ -11,7 +11,7 @@ var prototype = {
 
         var self = this;
         self._addProperty("length", 0, {
-            deltaKey: true,
+            deltaKey: constants.shared.DELTA_LIST_LENGTH,
             setter: function(newValue) {
                 return self._resize(newValue);
             },
