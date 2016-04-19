@@ -253,7 +253,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         if(players[0].broodMother.health !== players[1].broodMother.health) {
             var winner = players.shift();
             this.declareWinner(winner, "{} - BroodMother has the most remaining health ({}).".format(secondaryReason, winner.broodMother.health));
-            this.declareLosers(players, "{} - BroodMother has less health remaining that winner.".format(secondaryReason));
+            this.declareLosers(players, "{} - BroodMother has less health remaining than winner.".format(secondaryReason));
             return;
         }
 
