@@ -60,7 +60,7 @@ var Web = Class(GameObject, {
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
             if(spider.cuttingWeb === this || spider.strengtheningWeb === this || spider.weakeningWeb === this) { // then they may be busy with this
-                spider.finish();
+                spider.finish(true);
             }
         }
 

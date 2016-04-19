@@ -125,15 +125,12 @@ var Spitter = Class(Spiderling, {
             nestB: this.spittingWebToNest,
         });
 
-        this.game.webs.push(newWeb);
-
         // cancel spitters on the current nest to the destination
         var sideSpiders = newWeb.getSideSpiders();
         for(var i = 0; i < sideSpiders.length; i++) {
             var spider = sideSpiders[i];
             if(spider !== this && (spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest)) {
-                spider.spittingWebToNest = null; // so they know they are finishing early
-                spider.finish();
+                spider.finish(true);
             }
         }
 
