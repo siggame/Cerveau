@@ -23,8 +23,7 @@ var Nest = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.game.nests.push(this);
 
         //<<-- /Creer-Merge: init -->>
     },

@@ -35,9 +35,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
 
         // used for map generation
-        this._mapSize = 200;
-        this._maxNests = 60; // per side, as are the folling
-        this._minNests = 10;
+        this._mapWidth = 400;
+        this._mapHeight = 200;
+        this._deadzone = 25;
+        this._maxNests = 48; // per side, as are the folling
+        this._minNests = 8;
         this._maxWebs = 30;
         this._minWebs = 0;
 
@@ -66,10 +68,24 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         // genreate Nests on the left
         var numNests = Math.randomInt(this._maxNests, this._minNests);
         for(var i = 0; i < numNests; i++) {
-            this.nests.push(this.create("Nest", {
-                x: Math.randomInt(this._mapSize/2),
-                y: Math.randomInt(this._mapSize),
-            }));
+            while(true) {
+                var point = {
+                    x: Math.randomInt(this._mapWidth/2 - this._deadzone/2),
+                    y: Math.randomInt(this._mapHeight),
+                };
+
+                for(var i = 0; i < this.nests.length; i++) {
+                    if(Math.euclideanDistance(this.nests[i], point) <= this._deadzone) {
+                        point = null;
+                        break;
+                    }
+                }
+
+                if(point) {
+                    this.create("Nest", point);
+                    break; // out of while(true), as the point was valid
+                }
+            }
         }
 
         // geneate Webs on the left
@@ -81,10 +97,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 nestB = this.nests.randomElement();
             }
 
-            this.webs.push(this.create("Web", {
+            this.create("Web", {
                 nestA: nestA,
                 nestB: nestB,
-            }));
+            });
         }
 
         // create the BroodMother
@@ -100,22 +116,21 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         for(var i = 0; i < numNests; i++) {
             var mirroring = this.nests[i];
             var mirrored = this.create("Nest", {
-                x: this._mapSize - mirroring.x,
+                x: this._mapWidth - mirroring.x,
                 y: mirroring.y,
             });
 
             mirroredNests[mirroring.id] = mirrored;
-            this.nests.push(mirrored);
         }
 
         // mirror the Webs
         for(var i = 0; i < numWebs; i++) {
             var mirroring = this.webs[i];
 
-            this.webs.push(this.create("Web", {
+            this.create("Web", {
                 nestA: mirroredNests[mirroring.nestA.id],
                 nestB: mirroredNests[mirroring.nestB.id],
-            }));
+            });
         }
 
         // mirror the BroodMother
