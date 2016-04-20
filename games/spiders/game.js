@@ -30,7 +30,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.cutSpeed = 2;
         this.spitSpeed = 24;
         this.weaveSpeed = 16;
-        this.initialWebStrength = 20;
+        this.initialWebStrength = 5;
         this.weavePower = 1;
         this.eggsScalar = 0.10;
 
@@ -41,8 +41,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this._deadzone = 25;
         this._maxNests = 48; // per side, as are the folling
         this._minNests = 8;
-        this._maxWebs = 30;
+        this._maxWebs = 20;
         this._minWebs = 0;
+        this._minCrossWebs = 0;
+        this._maxCrossWebs = 4;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -114,7 +116,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         // now mirror it
 
         // mirror the Nests
-        var mirroredNests = {};
         for(var i = 0; i < numNests; i++) {
             var mirroring = this.nests[i];
             var mirrored = this.create("Nest", {
@@ -122,7 +123,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 y: mirroring.y,
             });
 
-            mirroredNests[mirroring.id] = mirrored;
+            // these are not exposed to competitors
+            mirroring.mirrorNest = mirrored;
+            mirrored.mirrorNest = mirroring;
         }
 
         // mirror the Webs
@@ -130,15 +133,35 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             var mirroring = this.webs[i];
 
             this.create("Web", {
-                nestA: mirroredNests[mirroring.nestA.id],
-                nestB: mirroredNests[mirroring.nestB.id],
+                nestA: mirroring.nestA.mirrorNest,
+                nestB: mirroring.nestB.mirrorNest,
             });
+        }
+
+        // webs that cross the middle of the game
+        var numCrossWebs = Math.randomInt(this._minCrossWebs, this._maxCrossWebs);
+        for(var i = 0; i < numCrossWebs; i++) {
+            var nestA = this.nests[Math.randomInt(0, numNests-1)]; // the first half the the array has the nests on player 0's side
+            var nestB = this.nests[Math.randomInt(numNests, numNests*2 - 1)]; // and the other half has playe 1's
+
+            this.create("Web", {
+                nestA: nestA,
+                nestB: nestB,
+            });
+
+            if(nestA.mirrorNest !== nestB) {
+                // this is the mirror of the web created above, so long as the nests don't mirror each other already
+                this.create("Web", {
+                    nestA: nestA.mirrorNest,
+                    nestB: nestB.mirrorNest,
+                });
+            }
         }
 
         // mirror the BroodMother
         this.players[1].broodMother = this.create("BroodMother", {
             owner: this.players[1],
-            nest: mirroredNests[this.players[0].broodMother.nest.id],
+            nest:this.players[0].broodMother.nest.mirrorNest,
         });
 
         this._giveEggs();
