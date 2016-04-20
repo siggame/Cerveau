@@ -95,6 +95,11 @@ var Spiderling = Class(Spider, {
             this.kill();
         }
 
+        if(!this.isDead) {
+            this.busy = "Attacked"; // so they cannot attack again
+            this.workRemaining = 1;
+        }
+
         return true;
 
         // <<-- /Creer-Merge: attack -->>
@@ -199,32 +204,36 @@ var Spiderling = Class(Spider, {
      * @param {boolean} forceFinish - True if the task was not finished by THIS spiderling
      */
     finish: function(forceFinish) {
+        var finishing = this.busy;
         this.busy = "";
         this.workRemaining = 0;
 
-        if(!this.movingOnWeb) { // then they finished doing a different action (cut, weave, spit)
+        if(finishing === "Moving") {
+            this.nest = this.movingToNest;
+            this.nest.spiders.push(this);
+            this.movingOnWeb.spiderlings.removeElement(this);
+            this.movingOnWeb.addLoad(-this.weight);
+            this.movingToNest = null;
+            this.movingOnWeb = null;
+
+            var enemyBroodMother = this.owner.otherPlayer.broodMother;
+            if(this.nest === enemyBroodMother.nest) { // then we reached the enemy's BroodMother! Kamikaze into her!
+                enemyBroodMother.health = Math.max(enemyBroodMother.health - 1, 0);
+                if(enemyBroodMother.health === 0) {
+                    enemyBroodMother.isDead = true;
+                }
+                this.kill();
+            }
+
+            return true;
+        }
+        else if(finishing === "Attacked") {
+            return true;
+        }
+        else { // they finished doing a different action (cut, weave, spit)
             this.coworkers.length = 0;
             return false;
         }
-
-        // if we got here they finished moving on a web
-        this.nest = this.movingToNest;
-        this.nest.spiders.push(this);
-        this.movingOnWeb.spiderlings.removeElement(this);
-        this.movingOnWeb.addLoad(-this.weight);
-        this.movingToNest = null;
-        this.movingOnWeb = null;
-
-        var enemyBroodMother = this.owner.otherPlayer.broodMother;
-        if(this.nest === enemyBroodMother.nest) { // then we reached the enemy's BroodMother! Kamikaze into her!
-            enemyBroodMother.health = Math.max(enemyBroodMother.health - 1, 0);
-            if(enemyBroodMother.health === 0) {
-                enemyBroodMother.isDead = true;
-            }
-            this.kill();
-        }
-
-        return true;
     },
 
     //<<-- /Creer-Merge: added-functions -->>

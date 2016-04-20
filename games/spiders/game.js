@@ -32,6 +32,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.weaveSpeed = 16;
         this.initialWebStrength = 20;
         this.weavePower = 1;
+        this.eggsScalar = 0.10;
 
 
         // used for map generation
@@ -67,8 +68,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         // genreate Nests on the left
         var numNests = Math.randomInt(this._maxNests, this._minNests);
+        var retries = 1000; // try to place nests this many times before giving up because the map is probably too congested
         for(var i = 0; i < numNests; i++) {
-            while(true) {
+            while(--retries > 0) {
                 var point = {
                     x: Math.randomInt(this._mapWidth/2 - this._deadzone/2),
                     y: Math.randomInt(this._mapHeight),
@@ -165,7 +167,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     _giveEggs: function() {
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
-            player.broodMother.eggs = Math.ceil((player.maxSpiderlings - player.spiders.length - 1) / 10); // -1 for the BroodMother in player.spiders that is not a Spiderling
+            player.broodMother.eggs = Math.ceil((player.maxSpiderlings - player.spiders.length - 1) * this.eggsScalar); // -1 for the BroodMother in player.spiders that is not a Spiderling
         }
     },
 
@@ -175,26 +177,25 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     nextTurn: function() {
         this._giveEggs();
 
+        // before we go to the next player's turn, have all the spiders that are busy do stuff.
+        // This ensures spiders finish work on the OPPONENT'S turn, so opponents have at least 1 turn to react.
         var movers = [];
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            for(var j = 0; j < player.spiders.length; j++) {
-                var spider = player.spiders[j];
+        for(var j = 0; j < this.currentPlayer.spiders.length; j++) {
+            var spider = this.currentPlayer.spiders[j];
 
-                if(spider.workRemaining > 0) {
-                    spider.workRemaining -= Math.sqrt(spider.coworkers.length + 1); // + 1 for the spiderling itself
+            if(spider.workRemaining > 0) {
+                spider.workRemaining -= Math.sqrt(spider.coworkers.length + 1); // + 1 for the spiderling itself
 
-                    if(spider.workRemaining <= 0) { // then they are done
-                        if(spider.busy === "Moving") {
-                            movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
+                if(spider.workRemaining <= 0) { // then they are done
+                    if(spider.busy === "Moving") {
+                        movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
+                    }
+                    else { // they finish now
+                        for(var i = 0; i < spider.coworkers.length; i++) { // all the co-workers are done too
+                            spider.coworkers[i].finish(true); // force finish them
                         }
-                        else { // they finish now
-                            for(var i = 0; i < spider.coworkers.length; i++) { // all the co-workers are done too
-                                spider.coworkers[i].finish(true); // force finish them
-                            }
 
-                            spider.finish();
-                        }
+                        spider.finish();
                     }
                 }
             }
