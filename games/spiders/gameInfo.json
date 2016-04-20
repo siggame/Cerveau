@@ -30,6 +30,7 @@
             "currentPlayer",
             "currentTurn",
             "cutSpeed",
+            "eggsScalar",
             "gameObjects",
             "initialWebStrength",
             "maxTurns",
@@ -72,6 +73,16 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "int",
+                    "valueType": null
+                }
+            },
+            "eggsScalar": {
+                "default": null,
+                "description": "Constant used to calculate how many eggs BroodMothers get on their owner's turns.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
                     "valueType": null
                 }
             },
@@ -646,7 +657,7 @@
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
+                        "name": "float",
                         "valueType": null
                     }
                 }
@@ -1380,7 +1391,7 @@
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
+                        "name": "float",
                         "valueType": null
                     }
                 }
@@ -1772,7 +1783,7 @@
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
+                        "name": "float",
                         "valueType": null
                     }
                 }
@@ -2121,7 +2132,7 @@
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
+                        "name": "float",
                         "valueType": null
                     }
                 }
