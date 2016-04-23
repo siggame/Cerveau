@@ -343,10 +343,10 @@ var BaseGame = Class(DeltaMergeable, {
      * After we run game logic, santatize the ran data and send it back
      */
     _finishRun: function(runCallback, player, returned) {
-        var returnedValue = this.gameManager.sanitizeRan(runCallback, (returned.isGameLogicError ? returned.returned : returned));
+        var returnedValue = returned;
 
-        if(returned.isGameLogicError) {
-            returned.returned = returnedValue;
+        if(typeof(returned) === "object" && returned.isGameLogicError) {
+            returnedValue = returned.returned;
 
             player.invalids.push({
                 message: returned.message,
@@ -357,11 +357,8 @@ var BaseGame = Class(DeltaMergeable, {
                 this.declareLoser(player, "Exceeded max amount of invalids in one game ({0}).".format(this.maxInvalidsPerPlayer));
             }
         }
-        else {
-            returned = returnedValue;
-        }
 
-        return returned;
+        return returnedValue;
     },
 
     /**
