@@ -164,8 +164,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             nest:this.players[0].broodMother.nest.mirrorNest,
         });
 
-        this._giveEggs();
-
         //<<-- /Creer-Merge: begin -->>
     },
 
@@ -186,19 +184,20 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     /**
      * Calculates, and gives eggs to all the BroodMothers.
+     *
+     * @param {Player} player - the player to give their broodmother eggs
      */
-    _giveEggs: function() {
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            player.broodMother.eggs = Math.ceil((player.maxSpiderlings - player.spiders.length - 1) * this.eggsScalar); // -1 for the BroodMother in player.spiders that is not a Spiderling
-        }
+    _giveEggs: function(player) {
+        player.broodMother.eggs = Math.ceil((player.maxSpiderlings - player.spiders.length - 1) * this.eggsScalar); // -1 for the BroodMother in player.spiders that is not a Spiderling
     },
 
     /**
      * @override
      */
     nextTurn: function() {
-        this._giveEggs();
+        var returned = TurnBasedGame.nextTurn.apply(this, arguments);
+
+        this._giveEggs(this.currentPlayer);
 
         // before we go to the next player's turn, have all the spiders that are busy do stuff.
         // This ensures spiders finish work on the OPPONENT'S turn, so opponents have at least 1 turn to react.
@@ -229,10 +228,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         if(this._checkPrimaryWin()) {
-            return;
+            return returned; // just incase we add code after this check, as if the primary win condition happens we need to exit the game immediately
         }
 
-        return TurnBasedGame.nextTurn.apply(this, arguments);
+        return returned;
     },
 
 
