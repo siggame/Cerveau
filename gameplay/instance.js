@@ -31,6 +31,9 @@ var Instance = Class(Server, {
 
         this._profiler = args.profiler;
         this._visualizerURL = args.visualizerURL;
+        if(args.gameName.toLowerCase() === "chess" && args.chesser) {
+            this._visualizerURL = args.chesser;
+        }
     },
 
     /**
