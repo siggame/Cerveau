@@ -102,6 +102,9 @@ var BroodMother = Class(Spider, {
         else if(this.eggs <= 0) {
             reason = "{this} does not have enough eggs to spawn a '{spiderlingType}'";
         }
+        else if(this.owner.spiders.length - 1 === this.owner.maxSpiderlings) { // - 1 for the BroodMother that is not a Spiderling
+            reason = "{this} can not spawn another Spiderling, maxSpiderlings reached ({this.owner.maxSpiderlings}).'";
+        }
 
         if(reason) {
             return this.game.logicError(null, reason.format({

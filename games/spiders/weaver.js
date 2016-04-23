@@ -105,7 +105,7 @@ var Weaver = Class(Spiderling, {
         this[webField] = web;
 
         // TworkReminaing = distance * sqrt(strength) / speed
-        this.workRemaining = Math.ceil(web.length * Math.sqrt(web.strength) / this.weaveSpeed);
+        this.workRemaining = web.length * Math.sqrt(web.strength) / this.weaveSpeed;
 
         // find coworkers
         var sideSpiders = web.getSideSpiders();

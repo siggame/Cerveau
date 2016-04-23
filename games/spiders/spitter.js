@@ -88,7 +88,7 @@ var Spitter = Class(Spiderling, {
             }
         }
 
-        this.workRemaining = Math.ceil(this.nest.distanceTo(nest) / this.game.spitSpeed);
+        this.workRemaining = this.nest.distanceTo(nest) / this.game.spitSpeed;
 
         return true;
 

@@ -198,8 +198,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     nextTurn: function() {
         var returned = TurnBasedGame.nextTurn.apply(this, arguments);
 
-        this._giveEggs(this.currentPlayer);
-
         // before we go to the next player's turn, have all the spiders that are busy do stuff.
         // This ensures spiders finish work on the OPPONENT'S turn, so opponents have at least 1 turn to react.
         var movers = [];
@@ -225,8 +223,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         for(var i = 0; i < movers.length; i++) {
-            movers[i].finish(); // now the spiderling moving can finish, because his Web may have been snapped above
+            var mover = movers[i];
+            if(!mover.isDead) { // they may have died because of an action above (e.g. cut)
+                movers[i].finish(); // now the spiderling moving can finish, because his Web may have been snapped above
+            }
         }
+
+        this._giveEggs(this.currentPlayer);
 
         if(this._checkPrimaryWin()) {
             return returned; // just incase we add code after this check, as if the primary win condition happens we need to exit the game immediately
