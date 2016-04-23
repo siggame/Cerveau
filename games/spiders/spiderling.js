@@ -96,7 +96,7 @@ var Spiderling = Class(Spider, {
         }
 
         if(!this.isDead) {
-            this.busy = "Attacked"; // so they cannot attack again
+            this.busy = "Attacking"; // so they cannot attack again
             this.workRemaining = 1;
         }
 
@@ -227,7 +227,7 @@ var Spiderling = Class(Spider, {
 
             return true;
         }
-        else if(finishing === "Attacked") {
+        else if(finishing === "Attacking") {
             return true;
         }
         else { // they finished doing a different action (cut, weave, spit)
