@@ -149,7 +149,7 @@ var Spiderling = Class(Spider, {
         this.nest = null;
 
         web.spiderlings.push(this);
-        web.addLoad(this.weight);
+        web.addLoad(1);
 
         return true;
 
@@ -212,7 +212,7 @@ var Spiderling = Class(Spider, {
             this.nest = this.movingToNest;
             this.nest.spiders.push(this);
             this.movingOnWeb.spiderlings.removeElement(this);
-            this.movingOnWeb.addLoad(-this.weight);
+            this.movingOnWeb.addLoad(-1);
             this.movingToNest = null;
             this.movingOnWeb = null;
 
