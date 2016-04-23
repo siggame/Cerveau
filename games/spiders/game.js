@@ -183,6 +183,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    _playerStartingTime: 9e10, // 90 seconds in nanoseconds
+
     /**
      * Calculates, and gives eggs to all the BroodMothers.
      *

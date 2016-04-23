@@ -137,7 +137,7 @@ var Web = Class(GameObject, {
     addLoad: function(num) {
         this.load = Math.max(this.load + num, 0);
 
-        if(this.load >= this.strength) {
+        if(this.load > this.strength) {
             this.snap();
         }
     },
