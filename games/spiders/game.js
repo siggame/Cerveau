@@ -92,6 +92,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             }
         }
 
+        numNests = this.nests.length;
+
         // geneate Webs on the left
         var numWebs = Math.randomInt(this._maxWebs, this._minWebs);
         for(var i = 0; i < numWebs; i++) {
@@ -143,7 +145,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         for(var i = 0; i < numCrossWebs; i++) {
             var nestA = this.nests[Math.randomInt(0, numNests-1)]; // the first half the the array has the nests on player 0's side
             var nestB = this.nests[Math.randomInt(numNests, numNests*2 - 1)]; // and the other half has playe 1's
-
             this.create("Web", {
                 nestA: nestA,
                 nestB: nestB,
