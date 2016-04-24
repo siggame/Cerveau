@@ -23,8 +23,6 @@ var Weaver = Class(Spiderling, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.weavingSpeed = 10;
-
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -105,7 +103,7 @@ var Weaver = Class(Spiderling, {
         this[webField] = web;
 
         // TworkReminaing = distance * sqrt(strength) / speed
-        this.workRemaining = web.length * Math.sqrt(web.strength) / this.weaveSpeed;
+        this.workRemaining = web.length * Math.sqrt(web.strength) / this.game.weaveSpeed;
 
         // find coworkers
         var sideSpiders = web.getSideSpiders();
