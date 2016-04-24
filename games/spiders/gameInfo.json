@@ -515,7 +515,6 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -523,6 +522,7 @@
                 "movingOnWeb",
                 "movingToNest",
                 "nest",
+                "numberOfCoworkers",
                 "owner",
                 "workRemaining"
             ],
@@ -536,22 +536,6 @@
                         "keyType": null,
                         "name": "string",
                         "valueType": null
-                    }
-                },
-                "coworkers": {
-                    "default": null,
-                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Spiderling",
-                            "valueType": null
-                        }
                     }
                 },
                 "gameObjectName": {
@@ -636,6 +620,17 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
+                        "valueType": null
+                    }
+                },
+                "numberOfCoworkers": {
+                    "default": null,
+                    "description": "The number of Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
+                    "inheritedFrom": "Spiderling",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -1334,9 +1329,9 @@
         "Spiderling": {
             "attribute_names": [
                 "busy",
-                "coworkers",
                 "movingOnWeb",
                 "movingToNest",
+                "numberOfCoworkers",
                 "workRemaining"
             ],
             "attributes": {
@@ -1348,21 +1343,6 @@
                         "keyType": null,
                         "name": "string",
                         "valueType": null
-                    }
-                },
-                "coworkers": {
-                    "default": null,
-                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Spiderling",
-                            "valueType": null
-                        }
                     }
                 },
                 "movingOnWeb": {
@@ -1382,6 +1362,16 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
+                        "valueType": null
+                    }
+                },
+                "numberOfCoworkers": {
+                    "default": null,
+                    "description": "The number of Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -1641,7 +1631,6 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -1649,6 +1638,7 @@
                 "movingOnWeb",
                 "movingToNest",
                 "nest",
+                "numberOfCoworkers",
                 "owner",
                 "workRemaining"
             ],
@@ -1662,22 +1652,6 @@
                         "keyType": null,
                         "name": "string",
                         "valueType": null
-                    }
-                },
-                "coworkers": {
-                    "default": null,
-                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Spiderling",
-                            "valueType": null
-                        }
                     }
                 },
                 "gameObjectName": {
@@ -1762,6 +1736,17 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
+                        "valueType": null
+                    }
+                },
+                "numberOfCoworkers": {
+                    "default": null,
+                    "description": "The number of Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
+                    "inheritedFrom": "Spiderling",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -1990,7 +1975,6 @@
             },
             "inheritedAttribute_names": [
                 "busy",
-                "coworkers",
                 "gameObjectName",
                 "id",
                 "isDead",
@@ -1998,6 +1982,7 @@
                 "movingOnWeb",
                 "movingToNest",
                 "nest",
+                "numberOfCoworkers",
                 "owner",
                 "workRemaining"
             ],
@@ -2011,22 +1996,6 @@
                         "keyType": null,
                         "name": "string",
                         "valueType": null
-                    }
-                },
-                "coworkers": {
-                    "default": null,
-                    "description": "All the Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
-                    "inheritedFrom": "Spiderling",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Spiderling",
-                            "valueType": null
-                        }
                     }
                 },
                 "gameObjectName": {
@@ -2111,6 +2080,17 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Nest",
+                        "valueType": null
+                    }
+                },
+                "numberOfCoworkers": {
+                    "default": null,
+                    "description": "The number of Spiderlings busy with the same work this Spiderling is doing, speeding up the task.",
+                    "inheritedFrom": "Spiderling",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
