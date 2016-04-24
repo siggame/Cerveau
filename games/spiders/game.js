@@ -306,6 +306,18 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         // check if one player "controls" more Nests than the other player
         // A Nest is controlled if one player owns more Spiderlings than the other player on it
+        var areas_owned = [0, 0];
+        for(var i = 0; i < this.nests.length; i++) {
+            var counts = [0, 0];
+            for(var j = 0; j < nests[i].spiders.length; j++) {
+                counts[nests[i].spiders[j]]++;
+            }
+            if(counts[0] > counts[1]) {
+                areas_owned[0]++;
+            } else {
+                areas_owned[1]++;
+            }
+        }
         var ownedNests = [];
         for(var i = 0; i < this.players.length; i++) {
             var player = this.players[i];
@@ -315,36 +327,22 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             };
         }
 
-        for(var i = 0; i < this.nests.length; i++) {
-            var nest = this.nests[i];
+        var winner = null;
+        var loser = null;
+        var winner_count = 0;
 
-            var spiderlingsByOwner = [];
-            for(var j = 0; j < this.players.length; j++) {
-                var player = this.players[j];
-
-                spiderlingsByOwner[player.id] = {
-                    player: player,
-                    count: 0,
-                };
-            }
-
-            for(var j = 0; j < nest.spiders.length; j++) {
-                var spider = nest.spiders[j];
-                spiderlingsByOwner[spider.owner.id].count++;
-            }
-
-            spiderlingsByOwner.sortDescending("count");
-
-            if(spiderlingsByOwner[0].count !== spiderlingsByOwner[1].count) { // then 0 owns the nest
-                ownedNests[spiderlingsByOwner[0].player.id].count++;
-            }
+        if(areas_owned[0] > areas_owned[1]) {
+            winner = ownedNests[0];
+            loser = ownedNests[1];
+            winner_count = areas_owned[0];
+        } else {
+            winner = ownedNests[1];
+            loser = ownedNests[0];
+            winner_count = areas_owned[1];
         }
 
-        ownedNests.sortDescending("count");
-        if(ownedNests[0].count !== ownedNests[1].count) {
-            this.declareWinner(ownedNests[0].player, "{} - Player has the most Spiderlings on different Nests ({}).".format(secondaryReason, ownedNests[0].count));
-            this.declareLosers(ownedNests.slice(1), "{} - Has less Spiderlings on different Nests.".format(secondaryReason));
-        }
+        this.declareWinner(winner, "{} - Player has the most Spiderlings on different Nests ({}).".format(secondaryReason, winner_count));
+        this.declareLosers(loser, "{} - Has less Spiderlings on different Nests.".format(secondaryReason));
 
         // else check if one player has more spiders than the other
         players.sort(function(a, b) {
