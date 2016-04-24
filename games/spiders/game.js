@@ -304,6 +304,48 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             return;
         }
 
+        // check if one player "controls" more Nests than the other player
+        // A Nest is controlled if one player owns more Spiderlings than the other player on it
+        var ownedNests = [];
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
+            ownedNests[player.id] = {
+                player: player,
+                count: 0,
+            };
+        }
+
+        for(var i = 0; i < this.nests.length; i++) {
+            var nest = this.nests[i];
+
+            var spiderlingsByOwner = [];
+            for(var j = 0; j < this.players.length; j++) {
+                var player = this.players[j];
+
+                spiderlingsByOwner[player.id] = {
+                    player: player,
+                    count: 0,
+                };
+            }
+
+            for(var j = 0; j < nest.spiders.length; j++) {
+                var spider = nest.spiders[j];
+                spiderlingsByOwner[spider.owner.id].count++;
+            }
+
+            spiderlingsByOwner.sortDescending("count");
+
+            if(spiderlingsByOwner[0].count !== spiderlingsByOwner[1].count) { // then 0 owns the nest
+                ownedNests[spiderlingsByOwner[0].player.id].count++;
+            }
+        }
+
+        ownedNests.sortDescending("count");
+        if(ownedNests[0].count !== ownedNests[1].count) {
+            this.declareWinner(ownedNests[0].player, "{} - Player has the most Spiderlings on different Nests ({}).".format(secondaryReason, ownedNests[0].count));
+            this.declareLosers(ownedNests.slice(1), "{} - Has less Spiderlings on different Nests.".format(secondaryReason));
+        }
+
         // else check if one player has more spiders than the other
         players.sort(function(a, b) {
             return b.spiders.length - a.spiders.length;
