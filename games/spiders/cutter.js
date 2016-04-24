@@ -82,6 +82,8 @@ var Cutter = Class(Spiderling, {
         // workRemaining =  5 * strength^2 / (cutterSpeed * sqrt(distance))
         this.workRemaining = 5 * web.strength * web.strength / (this.game.cutSpeed * Math.sqrt(web.length));
 
+        this.game.csHack();
+
         return true;
         // <<-- /Creer-Merge: cut -->>
     },

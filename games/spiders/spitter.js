@@ -92,6 +92,8 @@ var Spitter = Class(Spiderling, {
 
         this.workRemaining = this.nest.distanceTo(nest) / this.game.spitSpeed;
 
+        this.game.csHack();
+
         return true;
 
         // <<-- /Creer-Merge: spit -->>

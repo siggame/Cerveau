@@ -367,6 +367,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         return returned;
    },
 
+   // a HACK to give C# players time back for calls to server. will be removed when c# client is fixed
+   csHack: function() {
+        if(this.currentPlayer.clientType === "#C") {
+            this.currentPlayer.timeRemaining += 2e8;
+        }
+   }
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });

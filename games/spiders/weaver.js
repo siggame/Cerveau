@@ -117,6 +117,8 @@ var Weaver = Class(Spiderling, {
             }
         }
 
+        this.game.csHack();
+
         return true;
 
     },

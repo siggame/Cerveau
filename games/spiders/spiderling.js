@@ -103,6 +103,8 @@ var Spiderling = Class(Spider, {
             this.workRemaining = 1;
         }
 
+        this.game.csHack();
+
         return true;
 
         // <<-- /Creer-Merge: attack -->>
@@ -153,6 +155,8 @@ var Spiderling = Class(Spider, {
 
         web.spiderlings.push(this);
         web.addLoad(1);
+
+        this.game.csHack();
 
         return true;
 
