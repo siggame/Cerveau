@@ -8,6 +8,17 @@ var log = require("../log");
  * @class TurnBasedGame - a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
  */
 var TurnBasedGame = Class(BaseGame, {
+    init: function(data /* ... */) {
+        if(data.turnTimeAdded) {
+            var num = Number(data.turnTimeAdded);
+            if(!isNaN(num)) {
+                this._playerAdditionalTimePerTurn = num * 1e10;
+            }
+        }
+
+        return BaseGame.init.apply(this, arguments);
+    },
+
     _playerAdditionalTimePerTurn: 1e9, // 1 sec in ns
 
     /**
