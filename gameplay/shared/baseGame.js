@@ -21,6 +21,13 @@ var BaseGame = Class(DeltaMergeable, {
         this._baseGameInitialized = true;
         this._delta = {}; // the current delta we are recoding
 
+        if(data.startTime) {
+            var num = Number(data.startTime);
+            if(!isNaN(num)) {
+                this._playerAdditionalTimePerTurn = num * 1e10;
+            }
+        }
+
         DeltaMergeable.init.call(this, undefined, undefined, {
             session: data.session,
             name: this._class.prototype.name,
