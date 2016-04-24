@@ -57,6 +57,9 @@ var Spiderling = Class(Spider, {
         else if(spiderling.nest !== this.nest) {
             reason = "{this} cannot attack because '{spiderling}' is not on the same Nest as itself.";
         }
+        else if(this === Spiderling) {
+            reason = "{this} cannot attack itself.";
+        }
         else if(spiderling.isDead) {
             reason = "{this} cannot attack because'{spiderling}' is dead.";
         }
