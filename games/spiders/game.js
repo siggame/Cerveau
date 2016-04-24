@@ -165,6 +165,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             nest:this.players[0].broodMother.nest.mirrorNest,
         });
 
+        this._giveEggs(this.players[0]);
+
+
         //<<-- /Creer-Merge: begin -->>
     },
 
