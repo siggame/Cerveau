@@ -312,9 +312,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             for(var j = 0; j < this.nests[i].spiders.length; j++) {
                 counts[this.nests[i].spiders[j].owner.id]++;
             }
+
             if(counts[0] > counts[1]) {
                 areas_owned[0]++;
-            } else {
+            }
+            else if(counts[0] < counts[1]) {
                 areas_owned[1]++;
             }
         }
