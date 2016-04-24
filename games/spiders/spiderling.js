@@ -23,7 +23,7 @@ var Spiderling = Class(Spider, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.coworkers = [];
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -174,9 +174,11 @@ var Spiderling = Class(Spider, {
         for(var i = 0; i < this.coworkers.length; i++) {
             var coworker = this.coworkers[i];
             coworker.coworkers.removeElement(this);
+            coworker.numberOfCoworkers = coworker.coworkers.length;
         }
 
         this.coworkers.length = 0;
+        this.numberOfCoworkers = this.coworkers.length;
 
         if(this.movingOnWeb) {
             this.movingOnWeb.spiderlings.removeElement(this);
@@ -235,6 +237,7 @@ var Spiderling = Class(Spider, {
         }
         else { // they finished doing a different action (cut, weave, spit)
             this.coworkers.length = 0;
+            this.numberOfCoworkers = this.coworkers.length;
             return false;
         }
     },

@@ -73,7 +73,9 @@ var Cutter = Class(Spiderling, {
             var spider = sideSpiders[i];
             if(spider !== this && spider.cuttingWeb === web) {
                 this.coworkers.push(spider);
+                this.numberOfCoworkers = this.coworkers.length;
                 spider.coworkers.push(this);
+                spider.numberOfCoworkers = spider.coworkers.length;
             }
         }
 

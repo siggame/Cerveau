@@ -84,7 +84,9 @@ var Spitter = Class(Spiderling, {
             var spider = sideSpiders[i];
             if(spider !== this && (spider.spittingWebToNest === nest || spider.spittingWebToNest === this.nest)) {
                 this.coworkers.push(spider);
+                this.numberOfCoworkers = this.coworkers.length;
                 spider.coworkers.push(this);
+                spider.numberOfCoworkers = spider.coworkers.length;
             }
         }
 
