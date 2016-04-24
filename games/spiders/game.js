@@ -186,7 +186,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    _playerStartingTime: 9e10, // 90 seconds in nanoseconds
+    _playerStartingTime: 12e10, // 120 seconds in nanoseconds
 
     /**
      * Calculates, and gives eggs to all the BroodMothers.
@@ -309,8 +309,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         var areas_owned = [0, 0];
         for(var i = 0; i < this.nests.length; i++) {
             var counts = [0, 0];
-            for(var j = 0; j < nests[i].spiders.length; j++) {
-                counts[nests[i].spiders[j]]++;
+            for(var j = 0; j < this.nests[i].spiders.length; j++) {
+                counts[this.nests[i].spiders[j].owner.id]++;
             }
             if(counts[0] > counts[1]) {
                 areas_owned[0]++;
@@ -318,31 +318,26 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 areas_owned[1]++;
             }
         }
-        var ownedNests = [];
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            ownedNests[player.id] = {
-                player: player,
-                count: 0,
-            };
-        }
 
         var winner = null;
         var loser = null;
         var winner_count = 0;
 
         if(areas_owned[0] > areas_owned[1]) {
-            winner = ownedNests[0];
-            loser = ownedNests[1];
+            winner = this.players[0];
+            loser = this.players[1];
             winner_count = areas_owned[0];
-        } else {
-            winner = ownedNests[1];
-            loser = ownedNests[0];
+        } else if (areas_owned[1] > areas_owned[0]) {
+            winner = this.players[1];
+            loser = this.players[0];
             winner_count = areas_owned[1];
         }
 
-        this.declareWinner(winner, "{} - Player has the most Spiderlings on different Nests ({}).".format(secondaryReason, winner_count));
-        this.declareLosers(loser, "{} - Has less Spiderlings on different Nests.".format(secondaryReason));
+        if(winner) {
+            this.declareWinner(winner, "{} - Player has the most Spiderlings on different Nests ({}).".format(secondaryReason, winner_count));
+            this.declareLoser(loser, "{} - Has less Spiderlings on different Nests.".format(secondaryReason));
+            return;
+        }
 
         // else check if one player has more spiders than the other
         players.sort(function(a, b) {
