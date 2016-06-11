@@ -14,13 +14,16 @@ process.title = data.gameName + " - " + data.gameSession;
 if(!data.gameSettings.randomSeed) {
     data.gameSettings.randomSeed = data.gameSettings.randomSeed || Math.random().toString(36).substring(2); // this will generate a random number e.g. 0.07568844663910568, and then converts those numbers after 0. to characters. Thus defaulting the random seed to a chars between a-z, A-Z, and 0-9.
 }
+
 require("seedrandom"); // allows seeding of Math.random()
 Math.seedrandom(data.gameSettings.randomSeed || undefined); // use the 'seedrandom' module to seed Math.random() with the requested game setting for it (randomSeed). Either way store it so it can be logged in the gamelog.
 
 data.gameSettings.session = data.gameSession;
 
 global.__basedir = data.__basedir;
-require(__basedir + "/extensions/"); // because we are a new thread, and have not extended our base prototypes
+
+require("cadre-js-extensions"); // because we are a new thread, and have not extended our base prototypes
+
 var Instance = require("./instance");
 var log = require("./log");
 var extend = require("extend");

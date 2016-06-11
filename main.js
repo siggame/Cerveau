@@ -12,7 +12,9 @@ catch (e) {
 
 process.title = "Cerveau Game Server";
 global.__basedir = __dirname + '/'; // hackish way to store the base directory we are in now so we don't need require("../../../../whatever") and instead require(__base + "root/path/to/whatever")
-require("./extensions/"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
+
+require("cadre-js-extensions"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
+
 var args = require("./args");
 var extend = require("extend");
 
