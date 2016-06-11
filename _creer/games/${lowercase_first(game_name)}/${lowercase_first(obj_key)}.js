@@ -1,4 +1,4 @@
-// ${header}
+// ${obj_key}: ${obj['description']}
 <%include file="functions.noCreer" />
 var Class = require(__basedir + "/utilities/class");
 var serializer = require(__basedir + "/gameplay/serializer");

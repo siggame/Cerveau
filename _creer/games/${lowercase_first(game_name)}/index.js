@@ -1,4 +1,3 @@
-// ${header}
 // Note: You should never modify this file... probably.
 <%include file="functions.noCreer" />
 var serializer = require(__basedir + "/gameplay/serializer");
