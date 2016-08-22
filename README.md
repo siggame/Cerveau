@@ -34,7 +34,7 @@ All inspiration taken from [MST's SIG-GAME framework](https://github.com/siggame
 
 ## Requirements
 
-Node v4.3.1 is the officially supported version of node for this project, though Node V4.2.x should work as well. Cerveau is not thoroughly tested on Node v5, and we do not recommend it.
+Node v6.4.0 is the supported version. may run on older/newer versions, but we do not support them officially.
 
 ## How to Run
 

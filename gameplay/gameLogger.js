@@ -4,7 +4,6 @@ var fs = require('fs');
 var zlib = require('zlib');
 var path = require('path');
 var moment = require('moment');
-var format = require("string-format");
 var extend = require("extend");
 var sanitize = require("sanitize-filename");
 var log = require("./log");
