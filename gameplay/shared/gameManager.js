@@ -87,7 +87,7 @@ var GameManager = Class({
      */
     sanitizeOrder: function(order) {
         var structure = this._game['aiFinished_' + order.name].cerveau;
-        return this._sanitizeArgs(order.args, structure.args);
+        order.args = this._sanitizeArgs(structure.args, order.args);
     },
 
     /**

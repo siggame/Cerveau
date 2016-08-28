@@ -227,7 +227,7 @@ var Instance = Class(Server, {
         var gamelog = this.generateGamelog();
         var overData = {};
 
-        var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch) // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
+        var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch); // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
         var gamelogURL = "http://{}:{}/gamelog/{}".format(
             this._initArgs.host,
             (this._initArgs.port + 80),
@@ -265,10 +265,16 @@ var Instance = Class(Server, {
 
         for(var i = 0; i < orders.length; i++) {
             var order = orders[i];
+
+            var serializedArgs = [];
+            for(j = 0; j < order.args.length; j++) {
+                serializedArgs.push(serializer.serialize(order.args[j]));
+            }
+
             order.player.client.send("order", {
                 name: order.name,
                 index: order.index,
-                args: order.args,
+                args: serializedArgs,
             });
 
             order.player.client.startTicking();
@@ -316,7 +322,7 @@ var Instance = Class(Server, {
         var self = this;
         this.game.aiRun(client.player, run) // this is a Promise, the game server is promising that eventually it will run the logic, we do this because the game server may need to get info asyncronously (such as from other AIs) before it can resolve this run command
             .then(function(returned) {
-                var invalid = undefined;
+                var invalid;
                 if(serializer.isObject(returned) && returned.isGameLogicError) {
                     invalid = {
                         message: returned.invalidMessage,

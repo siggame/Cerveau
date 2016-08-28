@@ -2,9 +2,34 @@
     "AI": {
         "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
         "function_names": [
+            "gotCaptured",
             "runTurn"
         ],
         "functions": {
+            "gotCaptured": {
+                "altersState": true,
+                "argument_names": [
+                    "checker"
+                ],
+                "arguments": [
+                    {
+                        "//": "this argument exists mostly as a template for creer templates for an AI function with arguments, and that returns nothing",
+                        "default": null,
+                        "description": "The checker that was captured.",
+                        "name": "checker",
+                        "optional": false,
+                        "type": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Checker",
+                            "valueType": null
+                        }
+                    }
+                ],
+                "description": "This is called whenever your checker gets captured (during an opponent's turn).",
+                "returns": null,
+                "serverPredefined": false
+            },
             "runTurn": {
                 "altersState": true,
                 "argument_names": [],
@@ -14,6 +39,7 @@
                     "default": true,
                     "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -43,6 +69,7 @@
                 "default": 8,
                 "description": "The height of the board for the Y component of a checker.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -52,6 +79,7 @@
                 "default": 8,
                 "description": "The width of the board for X component of a checker.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -62,6 +90,7 @@
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
                 "k-means": "sum",
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Checker",
                     "valueType": null
@@ -72,6 +101,7 @@
                 "description": "If the last checker that moved jumped, meaning it can move again.",
                 "k-means": "sum",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "boolean",
                     "valueType": null
@@ -81,9 +111,11 @@
                 "default": null,
                 "description": "All the checkers currently in the game.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Checker",
                         "valueType": null
@@ -95,6 +127,7 @@
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Player",
                     "valueType": null
@@ -105,6 +138,7 @@
                 "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -115,13 +149,16 @@
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     },
                     "name": "dictionary",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "GameObject",
                         "valueType": null
@@ -133,6 +170,7 @@
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -143,9 +181,11 @@
                 "description": "List of all the players in the game.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -157,6 +197,7 @@
                 "description": "A unique identifier for the game instance that is being played.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "string",
                     "valueType": null
@@ -193,6 +234,7 @@
                     "description": "If the checker has been kinged and can move backwards.",
                     "k-means": "sum",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -202,6 +244,7 @@
                     "default": null,
                     "description": "The player that controls this Checker.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -211,6 +254,7 @@
                     "default": null,
                     "description": "The x coordinate of the checker.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -220,6 +264,7 @@
                     "default": null,
                     "description": "The y coordinate of the checker.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -241,6 +286,7 @@
                         "default": null,
                         "description": "True if it is yours, false if it is not yours.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -261,6 +307,7 @@
                             "name": "x",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "int",
                                 "valueType": null
@@ -272,6 +319,7 @@
                             "name": "y",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "int",
                                 "valueType": null
@@ -283,6 +331,7 @@
                         "default": null,
                         "description": "Returns the same checker that moved if the move was successful. null otherwise.",
                         "type": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Checker",
                             "valueType": null
@@ -303,6 +352,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -314,6 +364,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -325,9 +376,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -351,6 +404,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -380,6 +434,7 @@
                     "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -390,6 +445,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -400,9 +456,11 @@
                     "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -427,6 +485,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -465,9 +524,11 @@
                     "default": null,
                     "description": "All the checkers currently in the game owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Checker",
                             "valueType": null
@@ -478,6 +539,7 @@
                     "default": null,
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -487,6 +549,7 @@
                     "default": false,
                     "description": "If the player lost the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -496,6 +559,7 @@
                     "default": "Anonymous",
                     "description": "The name of the player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -505,6 +569,7 @@
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -514,6 +579,7 @@
                     "default": null,
                     "description": "The reason why the player lost the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -523,6 +589,7 @@
                     "default": null,
                     "description": "The reason why the player won the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -532,6 +599,7 @@
                     "default": null,
                     "description": "The amount of time (in ns) remaining for this AI to send commands.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -541,6 +609,7 @@
                     "default": false,
                     "description": "If the player won the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -550,6 +619,7 @@
                     "default": null,
                     "description": "The direction your checkers must go along the y-axis until kinged.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -571,6 +641,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -582,6 +653,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -593,9 +665,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -619,6 +693,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null

@@ -392,6 +392,7 @@ var BaseGame = Class(DeltaMergeable, {
             args: args || [],
             callback: callback,
         };
+
         this.gameManager.sanitizeOrder(order);
 
         this._orders.push(order);
