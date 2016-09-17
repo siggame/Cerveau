@@ -19,10 +19,15 @@ var GameLogger = Class({
     init: function(gameNames, options) {
         this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
 
-        if(options && options.arenaMode) {
+        if(options.arena) {
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
         }
+
+        this._host = options.host;
+        this._port = options.port;
+        this._visualizerURL = options.visualizerURL;
     },
+
 
     gamelogExtension: ".json.gz",
     usingCompression: true,
@@ -101,7 +106,7 @@ var GameLogger = Class({
         }
 
         if(obj.epoch) {
-            obj.moment = utilities.momentString(obj.epoch)
+            obj.moment = utilities.momentString(obj.epoch);
         }
 
         return sanitize(this._filenameFormat.format(obj));
@@ -140,8 +145,9 @@ var GameLogger = Class({
                     strings.push(buffer.toString('utf8'));
                 })
                 .on("end", function() {
+                    var gamelog;
                     try {
-                        var gamelog = JSON.parse(strings.join(''));
+                        gamelog = JSON.parse(strings.join(''));
                     }
                     catch(err) {
                         return callback(undefined, {
@@ -170,6 +176,35 @@ var GameLogger = Class({
                 callback(!err, err);
             });
         });
+    },
+
+    /**
+     * Returns a url string to the gamelog
+     * @param {string} filename - filename of the url, or the gamelog itself
+     */
+    getURL: function(filename) {
+        if(typeof(filename) === "object") {
+            filname = this.filenameFor(filename);
+        }
+
+        return "http://{}:{}/gamelog/{}".format(
+            this._host,
+            (this._port + 80), // + 80 because the default port is TCP listener, HTTP listener is +80
+            filename
+        );
+    },
+
+    /**
+     * Returns a url to the visualizer for said gamelog
+     * @param {tring|Object} gamelog - string gamelog filename or the gamelog itself
+     * @returns {string|undefined} undefined if no visualizer, url to the gamelog in visualizer otherwise
+     */
+    getVisualizerURL: function(gamelog) {
+        if(this._visualizerURL) {
+            var url = this.getURL(gamelog);
+
+            return this._visualizerURL + "?log=" + encodeURIComponent(url);
+        }
     },
 });
 

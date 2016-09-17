@@ -4,7 +4,7 @@ var parserArgs = [
     [["-p", "--port"], {action: "store", dest: "port", defaultValue: 3000, help: "the port that TCP clients should connect through."}],
     [["--http-port"], {action: "store", dest: "httpPort", defaultValue: 3080, help: "the port that the webinterface should be accessed through."}],
     [["--ws-port"], {action: "store", dest: "wsPort", defaultValue: 3088, help: "the port that WebSocket clients should connect though."}],
-    [["-H", "--host"], {action: "store", dest: "host", defaultValue: "0.0.0.0", help: "the host that this should run on"}],
+    [["-H", "--host"], {action: "store", dest: "host", defaultValue: "127.0.0.1", help: "the host that this should run on"}],
     [["-t", "--title"], {action: "store", dest: "title", defaultValue: "Cerveau", help: "the title of this game sever for the web interface"}],
     [["--authenticate"], {action: "storeTrue", dest: "authenticate", help: "forces clients to authenticate against the authentication server"}],
     [["--profile"], {action: "storeTrue", dest: "profile", help: "run the v8 profilers against threaded game sessions."}],
@@ -19,7 +19,6 @@ var parserArgs = [
     [["--no-load-gamelogs"], {action: "storeFalse", dest: "loadGamelogs", help: "gamelogs are not loaded to get the status or view in the web interface.", defaultValue: true,}],
     [["--no-api"], {action: "storeFalse", dest: "api", help: "does not run the hooks for the RESTful API service", defaultValue: true,}],
     [["--no-web"], {action: "storeFalse", dest: "web", help: "does not run web interface.", defaultValue: true,}],
-    [["--chesser"], {action: "store", dest: "chesser", help: "the base url to where the Chesser visualizer is.", defaultValue: "",}],
 ];
 
 for(var i = 0; i < parserArgs.length; i++) {

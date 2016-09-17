@@ -1,15 +1,24 @@
 var _init = {};
 
-var formatGamelogs = function(logs, args) {
+/**
+ * A ulitily function for the website to format a list of gamelogs into view appropriate data
+ * @param {Array.<Object>} logs - array of gamelogs
+ * @returns {Array.<Object>} array of lighter weight object gamelogs for the view(s)
+ */
+var formatGamelogs = function(logs) {
     var gamelogs = [];
+    var gameLogger = _init.lobby.gameLogger;
     for(var i = 0; i < logs.length; i++) {
         var log = logs[i];
+
+        var filename = gameLogger.filenameFor(log);
+        var visualizerLink = gameLogger.getVisualizerURL(filename);
+
         gamelogs.push({
             game: log.gameName,
             session: log.gameSession,
             epoch: log.epoch,
-            visualizer: log.gameName === "Chess" && _init.args.chesser ? _init.args.chesser + "?file=" : "/visualize/",
-            uri: _init.lobby.gameLogger.filenameFor(log),
+            url: visualizerLink || "gamelog/" + filename,
         });
     }
     return gamelogs;

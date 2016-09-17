@@ -40,9 +40,7 @@ var Lobby = Class(Server, {
 
         this._initializeGames();
 
-        this.gameLogger = new GameLogger(Object.keys(this._gameClasses), extend({
-            arenaMode: Boolean(args.arena),
-        }, args));
+        this.gameLogger = new GameLogger(Object.keys(this._gameClasses), args);
 
         cluster.setupMaster({
             exec: __basedir + '/gameplay/worker.js',
@@ -80,7 +78,7 @@ var Lobby = Class(Server, {
 
                 if(numCurrentGames > 0) {
                     log("Waiting for them to exit before shutting down.");
-                    log("^C again to force shutdown, which force disconnects clients.")
+                    log("^C again to force shutdown, which force disconnects clients.");
                 }
                 else {
                     process.exit(0);
@@ -177,7 +175,7 @@ var Lobby = Class(Server, {
      * @returns {Session} the game of gameName and id. If one does not exists a new instance will be created
      */
     _getOrCreateSession: function(gameName, id) {
-        var session = undefined; // the session we are trying to get
+        var session; // the session we are trying to get
 
         if(id !== "new") {
             if(id === "*" || id === undefined) { // then they want to join any open game

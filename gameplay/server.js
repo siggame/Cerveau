@@ -56,7 +56,7 @@ var Server = Class({
         for(var i = 0; i < clients.length; i++) {
             var client = clients[i];
             if(client.isPlaying()) {
-                playingClients.push(client)
+                playingClients.push(client);
             }
         }
         return playingClients;

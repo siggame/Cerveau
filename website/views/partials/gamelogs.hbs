@@ -3,14 +3,14 @@
 		<th class="gamelog-name">Game</th>
 		<th class="gamelog-session">Session</th>
 		<th class="gamelog-name">Date</th>
-		<th class="gamelog-watch">Visualize</th>
+		<th class="gamelog-link">Gamelog</th>
 	</tr>
 {{#each gamelogs}}
 	<tr>
 		<td class="gamelog-name">{{this.game}}</td>
 		<td class="gamelog-session">{{this.session}}</td>
 		<td class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</td>
-		<td class="gamelog-watch"><a href="{{this.visualizer}}{{this.uri}}">Watch</a></td>
+		<td class="gamelog-link"><a href="{{this.url}}">View</a></td>
 	</tr>
 {{/each}}
 </table>

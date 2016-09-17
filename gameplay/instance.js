@@ -31,9 +31,6 @@ var Instance = Class(Server, {
 
         this._profiler = args.profiler;
         this._visualizerURL = args.visualizerURL;
-        if(args.gameName.toLowerCase() === "chess" && args.chesser) {
-            this._visualizerURL = args.chesser;
-        }
     },
 
     /**
@@ -86,7 +83,7 @@ var Instance = Class(Server, {
      * @override
      */
     clientTimedOut: function(client) {
-        Server.clientTimedOut.call(this, client, "Timed out during gameplay.")
+        Server.clientTimedOut.call(this, client, "Timed out during gameplay.");
     },
 
     /**
@@ -180,9 +177,10 @@ var Instance = Class(Server, {
             game: trueDelta,
         };
 
+        var client;
         if(type !== "over") { // then it's not a gamelog only delta, so tell clients
             for(var i = 0; i < this.clients.length; i++) {
-                var client = this.clients[i];
+                client = this.clients[i];
                 var deltaToSend = client.player ? this.game.getDeltaFor(client.player) : trueDelta;
 
                 if(client.player && deltaToSend !== trueDelta) { // then this player got a different game state that the "true" one (it was probably obscured), so record that in the gamelog too
@@ -199,8 +197,8 @@ var Instance = Class(Server, {
 
         if(this._needToSendStart) {
             this._needToSendStart = false;
-            for(var i = 0; i < this.clients.length; i++) {
-                var client = this.clients[i];
+            for(var c = 0; c < this.clients.length; c++) {
+                client = this.clients[c];
 
                 client.send("start", {
                     playerID: client.player && client.player.id,
@@ -228,22 +226,13 @@ var Instance = Class(Server, {
         var overData = {};
 
         var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch); // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
-        var gamelogURL = "http://{}:{}/gamelog/{}".format(
-            this._initArgs.host,
-            (this._initArgs.port + 80),
-            gamelogFilename
-        );
+        var gamelogURL = GameLogger.getGamelogURL(gamelogFilename);
 
-        if(this._initArgs.host) { // then they set the host, so we can give meaningful urls to the gamelogs
-            overData.gamelogURL = gamelogURL;
-            overData.gamelogFilename = gamelogFilename;
-        }
+        overData.gamelogURL = gamelogURL;
 
-        if(this._initArgs.host && this._visualizerURL) {
-            overData.visualizerURL = this._visualizerURL.format({
-                gamelogFilename: encodeURIComponent(gamelogFilename),
-                gamelogURL: encodeURIComponent(gamelogURL),
-            });
+        var visualizerURL = GameLogger.getVisualizerURL(gamelogFilename);
+        if(visualizerURL) {
+            overData.visualizerURL = visualizerURL;
 
             overData.message = "---\nYour gamelog is viewable at:\n{}\n---".format(overData.visualizerURL);
         }
