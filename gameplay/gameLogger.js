@@ -24,7 +24,7 @@ var GameLogger = Class({
         }
 
         this._host = options.host;
-        this._port = options.port;
+        this._port = options.httpPort;
         this._visualizerURL = options.visualizerURL;
     },
 
@@ -189,7 +189,7 @@ var GameLogger = Class({
 
         return "http://{}:{}/gamelog/{}".format(
             this._host,
-            (this._port + 80), // + 80 because the default port is TCP listener, HTTP listener is +80
+            this._port,
             filename
         );
     },

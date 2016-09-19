@@ -12,8 +12,13 @@ var TwoPlayerGame = Class(BaseGame, {
     begin: function() {
         BaseGame.begin.apply(this, arguments);
 
+        // these are depreciated. `otherPlayer` was renamed to `opponent`, but without re-running Creer against all old games and their AIs, it would break.
         this.players[0].otherPlayer = this.players[1];
         this.players[1].otherPlayer = this.players[0];
+
+        // correct attribute to set
+        this.players[0].opponent = this.players[1];
+        this.players[1].opponent = this.players[0];
     },
 });
 
