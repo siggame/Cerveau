@@ -226,11 +226,11 @@ var Instance = Class(Server, {
         var overData = {};
 
         var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch); // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
-        var gamelogURL = GameLogger.getGamelogURL(gamelogFilename);
+        var gamelogURL = GameLogger.getURL(gamelogFilename);
 
         overData.gamelogURL = gamelogURL;
 
-        var visualizerURL = GameLogger.getVisualizerURL(gamelogFilename);
+        var visualizerURL = GameLogger.getVisualizerURL(gamelogFilename, this._visualizerURL);
         if(visualizerURL) {
             overData.visualizerURL = visualizerURL;
 

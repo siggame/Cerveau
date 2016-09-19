@@ -14,6 +14,7 @@
                     "default": true,
                     "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -42,6 +43,7 @@
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Player",
                     "valueType": null
@@ -52,6 +54,7 @@
                 "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -62,13 +65,16 @@
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     },
                     "name": "dictionary",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "GameObject",
                         "valueType": null
@@ -80,6 +86,7 @@
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -89,9 +96,11 @@
                 "default": null,
                 "description": " The list of Moves that have occured, in order.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Move",
                         "valueType": null
@@ -102,9 +111,11 @@
                 "default": null,
                 "description": "All the uncaptured Pieces in the game.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Piece",
                         "valueType": null
@@ -116,9 +127,11 @@
                 "description": "List of all the players in the game.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -130,6 +143,7 @@
                 "description": "A unique identifier for the game instance that is being played.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "string",
                     "valueType": null
@@ -139,6 +153,7 @@
                 "default": null,
                 "description": "How many turns until the game ends because no pawn has moved and no Piece has been taken.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -174,6 +189,7 @@
                     "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -184,6 +200,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -194,9 +211,11 @@
                     "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -221,6 +240,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -257,6 +277,7 @@
                     "default": null,
                     "description": "The Piece captured by this Move, null if no capture.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Piece",
                         "valueType": null
@@ -266,6 +287,7 @@
                     "default": null,
                     "description": "The file the Piece moved from.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -275,6 +297,7 @@
                     "default": null,
                     "description": "The rank the Piece moved from.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -284,6 +307,7 @@
                     "default": null,
                     "description": "The Piece that was moved.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Piece",
                         "valueType": null
@@ -293,6 +317,7 @@
                     "default": null,
                     "description": "The Piece type this Move's Piece was promoted to from a Pawn, empty string if no promotion occured.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -302,6 +327,7 @@
                     "default": null,
                     "description": "The standard algebraic notation (SAN) representation of the move.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -311,6 +337,7 @@
                     "default": null,
                     "description": "The file the Piece moved to.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -320,6 +347,7 @@
                     "default": null,
                     "description": "The rank the Piece moved to.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -341,6 +369,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -352,6 +381,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -363,9 +393,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -389,6 +421,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -420,6 +453,7 @@
                     "default": null,
                     "description": "When the Piece has been captured (removed from the board) this is true. Otherwise false.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -429,6 +463,7 @@
                     "default": null,
                     "description": "The file (column) coordinate of the Piece represented as a letter [a-h], with 'a' starting at the left of the board.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -439,6 +474,7 @@
                     "default": null,
                     "description": "If the Piece has moved from its starting position.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -448,6 +484,7 @@
                     "default": null,
                     "description": "The player that controls this chess Piece.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -457,6 +494,7 @@
                     "default": null,
                     "description": "The rank (row) coordinate of the Piece represented as a number [1-8], with 1 starting at the bottom of the board.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -466,6 +504,7 @@
                     "default": null,
                     "description": "The type of chess Piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -491,6 +530,7 @@
                             "name": "file",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -502,6 +542,7 @@
                             "name": "rank",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "int",
                                 "valueType": null
@@ -513,6 +554,7 @@
                             "name": "promotionType",
                             "optional": true,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -526,6 +568,7 @@
                         "default": null,
                         "description": "The Move you did if successful, otherwise null if invalid. In addition if your move was invalid you will lose.",
                         "type": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Move",
                             "valueType": null
@@ -546,6 +589,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -557,6 +601,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -568,9 +613,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -594,6 +641,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -619,7 +667,7 @@
                 "lost",
                 "madeMove",
                 "name",
-                "otherPlayer",
+                "opponent",
                 "pieces",
                 "rankDirection",
                 "reasonLost",
@@ -632,6 +680,7 @@
                     "default": null,
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -641,6 +690,7 @@
                     "default": null,
                     "description": "The color (side) of this player. Either 'White' or 'Black', with the 'White' player having the first move.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -650,6 +700,7 @@
                     "default": null,
                     "description": "True if this player is currently in check, and must move out of check, false otherwise.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -659,6 +710,7 @@
                     "default": false,
                     "description": "If the player lost the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -668,6 +720,7 @@
                     "default": null,
                     "description": "If the Player has made their move for the turn. true means they can no longer move a Piece this turn.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -677,15 +730,17 @@
                     "default": "Anonymous",
                     "description": "The name of the player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     }
                 },
-                "otherPlayer": {
+                "opponent": {
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -695,9 +750,11 @@
                     "default": null,
                     "description": "All the unpcaptured chess Pieces owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Piece",
                             "valueType": null
@@ -708,6 +765,7 @@
                     "default": null,
                     "description": "The direction your Pieces must go along the rank axis until they reach the other side.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -717,6 +775,7 @@
                     "default": null,
                     "description": "The reason why the player lost the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -726,6 +785,7 @@
                     "default": null,
                     "description": "The reason why the player won the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -735,6 +795,7 @@
                     "default": null,
                     "description": "The amount of time (in ns) remaining for this AI to send commands.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -744,6 +805,7 @@
                     "default": false,
                     "description": "If the player won the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -765,6 +827,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -776,6 +839,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -787,9 +851,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -813,6 +879,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null

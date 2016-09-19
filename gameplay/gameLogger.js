@@ -196,14 +196,16 @@ var GameLogger = Class({
 
     /**
      * Returns a url to the visualizer for said gamelog
-     * @param {tring|Object} gamelog - string gamelog filename or the gamelog itself
+     * @param {string|Object} gamelog - string gamelog filename or the gamelog itself
+     * @param {string} [visualizerURL] - url to visualizer, if calling statically
      * @returns {string|undefined} undefined if no visualizer, url to the gamelog in visualizer otherwise
      */
-    getVisualizerURL: function(gamelog) {
-        if(this._visualizerURL) {
+    getVisualizerURL: function(gamelog, visualizerURL) {
+        visualizerURL = visualizerURL || this._visualizerURL;
+        if(visualizerURL) {
             var url = this.getURL(gamelog);
 
-            return this._visualizerURL + "?log=" + encodeURIComponent(url);
+            return visualizerURL + "?log=" + encodeURIComponent(url);
         }
     },
 });
