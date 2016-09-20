@@ -13,24 +13,22 @@ var log = require("./log");
  */
 var GameLogger = Class({
     /**
-     * @param {Array.<string>} gameNames - strings of all games that could be logged
-     * @param {string} [dir] - path to directory to log games into, and to read them from
+     * @param {Object} args - initialization args, from args.js, plus `directory` override
      */
-    init: function(gameNames, options) {
-        this.gamelogDirectory = (options && options.directory) || 'output/gamelogs/';
+    init: function(args) {
+        this.gamelogDirectory = (args && args.directory) || 'output/gamelogs/';
 
-        if(options.arena) {
+        if(args.arena) {
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
         }
 
-        this._host = options.host;
-        this._port = options.httpPort;
-        this._visualizerURL = options.visualizerURL;
+        this._host = args.host;
+        this._port = args.httpPort;
+        this._visualizerURL = args.visualizerURL;
     },
 
 
     gamelogExtension: ".json.gz",
-    usingCompression: true,
     _filenameFormat: "{moment}-{gameName}-{gameSession}", // default format
 
     /**
@@ -181,15 +179,17 @@ var GameLogger = Class({
     /**
      * Returns a url string to the gamelog
      * @param {string} filename - filename of the url, or the gamelog itself
+     * @param {string} [host] - host name override
+     * @param {number} [port] - port override
      */
-    getURL: function(filename) {
+    getURL: function(filename, host, port) {
         if(typeof(filename) === "object") {
             filname = this.filenameFor(filename);
         }
 
         return "http://{}:{}/gamelog/{}".format(
-            this._host,
-            this._port,
+            host || this._host,
+            port || this._port,
             filename
         );
     },

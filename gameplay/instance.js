@@ -30,7 +30,7 @@ var Instance = Class(Server, {
         }
 
         this._profiler = args.profiler;
-        this._visualizerURL = args.visualizerURL;
+        this.gameLogger = new GameLogger(args);
     },
 
     /**
@@ -225,12 +225,12 @@ var Instance = Class(Server, {
         var gamelog = this.generateGamelog();
         var overData = {};
 
-        var gamelogFilename = GameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch); // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
-        var gamelogURL = GameLogger.getURL(gamelogFilename);
+        var gamelogFilename = this.gameLogger.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch); // note: if in arena mode this static function will return the wrong expected filename, but when the game server is in arena mode these visualizer urls are irrelevant
+        var gamelogURL = this.gameLogger.getURL(gamelogFilename);
 
         overData.gamelogURL = gamelogURL;
 
-        var visualizerURL = GameLogger.getVisualizerURL(gamelogFilename, this._visualizerURL);
+        var visualizerURL = this.gameLogger.getVisualizerURL(gamelogFilename);
         if(visualizerURL) {
             overData.visualizerURL = visualizerURL;
 
@@ -385,7 +385,7 @@ var Instance = Class(Server, {
     /**
      * Generates the game log from all the events that happened in this game.
      *
-     * @returns {Object} the gamelog to store somewhere and somehow (GameLogger handles that)
+     * @returns {Object} the gamelog to store somewhere and somehow (GameLogger on main thread, session.js, handles that)
      */
     generateGamelog: function() {
         var winners = [];
