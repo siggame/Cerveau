@@ -17,6 +17,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    fen: {
+        type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
+        defaultValue: "",
+    },
+
     gameObjects: {
         type: {"is_game_object": false, "keyType": {"is_game_object": false, "keyType": null, "name": "string", "valueType": null}, "name": "dictionary", "valueType": {"is_game_object": true, "keyType": null, "name": "GameObject", "valueType": null}},
         defaultValue: {},
@@ -307,7 +312,7 @@ classes.Player.getMoves.cerveau = {
         defaultValue: {},
     },
     isSecret: true,
-},
+};
 
 //<<-- /Creer-Merge: secret-Player -->>
 

@@ -100,24 +100,7 @@ var Session = Class({
     addGameSettings: function(settings) {
         for(var key in settings) {
             if(settings.hasOwnProperty(key) && !this.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
-                var value = settings[key];
-
-                // try to figure out if the value was a boolean, number, or string
-                if(value.toLowerCase() ===  "true") {
-                    value = true;
-                }
-                else if(value.toLowerCase() === "false") {
-                    value = false;
-                }
-                else {
-                    var asFloat = parseFloat(value);
-                    if(!isNaN(asFloat)) {
-                        value = asFloat;
-                    }
-                    // else it's just a string
-                }
-
-                this.gameSettings[key] = value;
+                this.gameSettings[key] = utilities.unstringify(settings[key]);
             }
         }
     },

@@ -29,6 +29,7 @@
         "attribute_names": [
             "currentPlayer",
             "currentTurn",
+            "fen",
             "gameObjects",
             "maxTurns",
             "moves",
@@ -57,6 +58,16 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "int",
+                    "valueType": null
+                }
+            },
+            "fen": {
+                "default": null,
+                "description": "Forsyth\u2013Edwards Notation, a notation that describes the game board.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "string",
                     "valueType": null
                 }
             },

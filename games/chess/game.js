@@ -26,6 +26,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.chess = new Chess();
+
+        if(data.fen && this.chess.validate_fen(data.fen)) {
+            this.chess.load(data.fen);
+        }
+
         this.maxTurns = 6000; // longest possible known game without stalemate is 5,950
         this.turnsToDraw = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
@@ -53,50 +58,44 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.fen = this.chess.fen();
+
         this.players[0].color = "White";
         this.players[0].rankDirection = 1;
         this.players[1].color = "Black";
         this.players[1].rankDirection = -1;
 
-        var backFile = {a: "Rook", b: "Knight", c: "Bishop", d: "Queen", e: "King", f: "Bishop", g: "Knight", h: "Rook"};
+        var owners = {
+            w: this.players[0],
+            b: this.players[1],
+        };
 
-        for(var rank = 1; rank <= 8; rank++) {
-            var type = undefined;
-            var lookupType = false;
-            var owner = undefined;
+        this.currentPlayer = owners[this.chess.turn()];
 
-            if(rank === 2 || rank === 7) {
-                type = "Pawn";
-            }
-            else if(rank === 1 || rank === 8) {
-                lookupType = true;
-            }
+        var types = {
+            p: "Pawn",
+            r: "Rook",
+            b: "Bishop",
+            n: "Knight",
+            q: "Queen",
+            k: "King"
+        };
 
-            if(rank <= 2) {
-                owner = this.players[0];
-            }
-            else if(rank >= 7) {
-                owner = this.players[1];
-            }
+        for(var i = 0; i < this.chess.SQUARES.length; i++) {
+            var square = this.chess.SQUARES[i];
 
-            if((type || lookupType) && owner) {
-                for(var i = 0; i < 8; i++) {
-                    var file = String.fromCharCode(97 + i); // number to character, so 0 -> 'a', 1 -> 'b', etc.
+            var info = this.chess.get(square);
 
-                    if(lookupType) { // lookup type based on file
-                        type = backFile[file];
-                    }
+            if(info) { // then there is a piece at that location
+                var piece = this.create("Piece", {
+                    type: types[info.type],
+                    file: square[0],
+                    rank: parseInt(square[1]),
+                    owner: owners[info.color],
+                });
 
-                    var piece = this.create("Piece", {
-                        type: type,
-                        file: file,
-                        rank: rank,
-                        owner: owner,
-                    });
-
-                    this.pieces.push(piece);
-                    piece.owner.pieces.push(piece);
-                }
+                this.pieces.push(piece);
+                piece.owner.pieces.push(piece);
             }
         }
 
@@ -135,6 +134,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      * @returns {Move} the move that was made in a Move object+
      */
     update: function(piece, result) {
+        this.fen = this.chess.fen();
+
         var captured;
         var move = this.create("Move", {
             san: result.san,

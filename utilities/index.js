@@ -73,5 +73,29 @@ module.exports = {
         return obj;
     },
 
+    /**
+     * Takes a string and tries to convert it to the primitive it looks like
+     *
+     * @param {string} str - string to try to convert
+     * @returns {[type]} [description]
+     */
+    unstringify: function(str) {
+        switch(str.toUpperCase()) { // check for bools
+            case "TRUE":
+                return true;
+            case "FALSE":
+                return false;
+            case "NULL":
+                return null;
+        }
+
+        // check if number
+        if(!isNaN(str)) {
+            return parseFloat(num);
+        }
+
+        return str; // looks like a string after all
+    },
+
     Class: require("./class"),
 };
