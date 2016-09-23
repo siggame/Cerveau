@@ -6,7 +6,7 @@ var log = require(__basedir + "/gameplay/log");
 var Building = require("./building");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-var format = require("string-format");
+// pass
 //<<-- /Creer-Merge: requires -->>
 
 // @class Warehouse: A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.
@@ -56,14 +56,14 @@ var Warehouse = Class(Building, {
                 building.gameObjectName
             ));
         }
-        
+
         if(building.isHeadquarters) {
             return this.game.logicError(-1, "Warehouse {{{0}}} commanded to ignite a headquarters.".format(this.id));
         }
 
         building.fire = Math.clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
         var exposure = Math.manhattanDistance(this, building);
-        this.exposure += exposure // Do we want a cap on this?
+        this.exposure += exposure; // Do we want a cap on this?
 
         this.bribed = true;
         player.bribesRemaining--;
