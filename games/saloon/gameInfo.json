@@ -1,0 +1,1387 @@
+{
+    "AI": {
+        "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
+        "function_names": [
+            "runTurn"
+        ],
+        "functions": {
+            "runTurn": {
+                "altersState": true,
+                "argument_names": [],
+                "arguments": [],
+                "description": "This is called every time it is this AI.player's turn.",
+                "returns": {
+                    "default": true,
+                    "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "serverPredefined": true
+            }
+        },
+        "serverParentClasses": []
+    },
+    "Game": {
+        "attribute_names": [
+            "bottles",
+            "cowboys",
+            "currentPlayer",
+            "currentTurn",
+            "furnishings",
+            "gameObjects",
+            "jobs",
+            "maxCowboys",
+            "maxTurns",
+            "players",
+            "rowdynessToSiesta",
+            "session"
+        ],
+        "attributes": {
+            "bottles": {
+                "default": null,
+                "description": "All the beer Bottles currently flying across the saloon in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Bottle",
+                        "valueType": null
+                    }
+                }
+            },
+            "cowboys": {
+                "default": null,
+                "description": "Every Cowboy in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Cowboy",
+                        "valueType": null
+                    }
+                }
+            },
+            "currentPlayer": {
+                "default": null,
+                "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": true,
+                    "keyType": null,
+                    "name": "Player",
+                    "valueType": null
+                }
+            },
+            "currentTurn": {
+                "default": 0,
+                "description": "The current turn number, starting at 0 for the first player's turn.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "furnishings": {
+                "default": null,
+                "description": "Every furnishing in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Furnishing",
+                        "valueType": null
+                    }
+                }
+            },
+            "gameObjects": {
+                "default": null,
+                "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    },
+                    "name": "dictionary",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "GameObject",
+                        "valueType": null
+                    }
+                }
+            },
+            "jobs": {
+                "default": null,
+                "description": "All the jobs that Cowboys can be assigned within the saloon.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                }
+            },
+            "maxCowboys": {
+                "default": null,
+                "description": "The maximum number of Cowboys a Player can bring into the saloon.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "maxTurns": {
+                "default": 100,
+                "description": "The maximum number of turns before the game will automatically end.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "players": {
+                "default": null,
+                "description": "List of all the players in the game.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                }
+            },
+            "rowdynessToSiesta": {
+                "default": null,
+                "description": "When a player's rowdyness reaches or exceeds this number their Cowboys take a collective siesta.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "session": {
+                "default": null,
+                "description": "A unique identifier for the game instance that is being played.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "string",
+                    "valueType": null
+                }
+            }
+        },
+        "description": "Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Coyboys.",
+        "function_names": [],
+        "functions": {},
+        "inheritedAttribute_names": [],
+        "inheritedAttributes": {},
+        "inheritedFunction_names": [],
+        "inheritedFunctions": {},
+        "mapHeight": {
+            "description": "The number of Tiles in the map along the y (vertical) axis.",
+            "type": "int"
+        },
+        "mapWidth": {
+            "description": "The number of Tiles in the map along the x (horizontal) axis.",
+            "type": "int"
+        },
+        "maxInvalidsPerPlayer": 10,
+        "name": "Saloon",
+        "numberOfPlayers": 2,
+        "parentClasses": [],
+        "serverParentClasses": [
+            "TwoPlayerGame",
+            "TurnBasedGame",
+            "TiledGame"
+        ],
+        "tiles": {
+            "description": "All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.",
+            "type": {
+                "name": "list",
+                "valueType": "Tile"
+            }
+        }
+    },
+    "gameObjects": {
+        "Bottle": {
+            "attribute_names": [
+                "drunkDirection",
+                "isDestroyed",
+                "location",
+                "nextLocation"
+            ],
+            "attributes": {
+                "drunkDirection": {
+                    "default": null,
+                    "description": "The direction any Cowboys hit by this will move, can be 'North', 'East', 'South', 'West'.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "isDestroyed": {
+                    "default": null,
+                    "description": "True if this Bottle has impacted and has been destroyed (removed from the Game). False if still in the game flying through the saloon.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "location": {
+                    "default": null,
+                    "description": "The Tile this bottle is currently flying over.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "nextLocation": {
+                    "default": null,
+                    "description": "The Tile this Bottle will fly to next turn, if it does not impact anything on it's path.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A bottle thrown by a bartender at a Tile.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Cowboy": {
+            "attribute_names": [
+                "canMove",
+                "drunkDirection",
+                "focus",
+                "health",
+                "isDead",
+                "isDrunk",
+                "job",
+                "owner",
+                "siesta",
+                "tile",
+                "tolerance"
+            ],
+            "attributes": {
+                "canMove": {
+                    "default": null,
+                    "description": "If the Cowboy can be moved this turn via its owner.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "drunkDirection": {
+                    "default": null,
+                    "description": "The direction this Cowboy is moving, can be 'North', 'East', 'South', 'West'.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "focus": {
+                    "default": null,
+                    "description": "How much focus this Cowboy has. Different Jobs do different things with their Cowboy's focus.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this Cowboy currently has.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "isDead": {
+                    "default": null,
+                    "description": "If this Cowboy is dead and has been removed from the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "isDrunk": {
+                    "default": null,
+                    "description": "If this Cowboy is drunk, and will automatically walk.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "job": {
+                    "default": null,
+                    "description": "The job that this Cowboy does, and dictates how they fight and interact within the Saloon.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The Player that owns and can control this Cowboy.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "siesta": {
+                    "default": null,
+                    "description": "How many turns this unit has remaining for their siesta. 0 means they are awake, and can act.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "tile": {
+                    "default": null,
+                    "description": "The Tile that this Cowboy is located on.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tolerance": {
+                    "default": null,
+                    "description": "How many times this unit has been drunk before taking their siesta and reseting this to 0.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A person on the map that can move around and interact within the saloon.",
+            "function_names": [
+                "act",
+                "move",
+                "play"
+            ],
+            "functions": {
+                "act": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile",
+                        "drunkDirection"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile you want this Cowboy to act on.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": "",
+                            "description": "The direction the bottle will cause drunk cowboys to be in, can be 'North', 'East', 'South', 'West'.",
+                            "name": "drunkDirection",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Does their job's action on a Tile.",
+                    "optionals": 1,
+                    "optionals_start_index": 1,
+                    "returns": {
+                        "default": null,
+                        "description": "True if the act worked, false otherwise.",
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "move": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile you want to move this Cowboy to.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Moves this Cowboy from its current Tile to an adjacent Tile.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if the move worked, false otherwise.",
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "play": {
+                    "altersState": true,
+                    "argument_names": [
+                        "piano"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Furnishing that is a piano you want to play.",
+                            "name": "piano",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Furnishing",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Sits down and plays a piano.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if the play worked, false otherwise.",
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Furnishing": {
+            "attribute_names": [
+                "health",
+                "isPiano",
+                "tile"
+            ],
+            "attributes": {
+                "health": {
+                    "default": null,
+                    "description": "How much health this Furnishing currently has.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "isPiano": {
+                    "default": null,
+                    "description": "True if this Furnishing is a piano and can be played, False otherwise.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "tile": {
+                    "default": null,
+                    "description": "The Tile that this Furnishing is located on.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "An furnishing in the Saloon that must be pathed around, or destroyed.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "GameObject": {
+            "attribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "attributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
+            "function_names": [
+                "log"
+            ],
+            "functions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "inheritedAttribute_names": [],
+            "inheritedAttributes": {},
+            "inheritedFunction_names": [],
+            "inheritedFunctions": {},
+            "parentClasses": [],
+            "serverParentClasses": [
+                "BaseGameObject"
+            ]
+        },
+        "Player": {
+            "attribute_names": [
+                "clientType",
+                "cowboys",
+                "kills",
+                "lost",
+                "name",
+                "opponent",
+                "reasonLost",
+                "reasonWon",
+                "rowdyness",
+                "score",
+                "timeRemaining",
+                "won"
+            ],
+            "attributes": {
+                "clientType": {
+                    "default": null,
+                    "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "cowboys": {
+                    "default": null,
+                    "description": "Every Cowboy owned by this Player.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Cowboy",
+                            "valueType": null
+                        }
+                    }
+                },
+                "kills": {
+                    "default": null,
+                    "description": "How many enemy Cowboys this player's team has killed.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "lost": {
+                    "default": false,
+                    "description": "If the player lost the game or not.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "name": {
+                    "default": "Anonymous",
+                    "description": "The name of the player.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "opponent": {
+                    "default": null,
+                    "description": "This player's opponent in the game.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "reasonLost": {
+                    "default": null,
+                    "description": "The reason why the player lost the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "reasonWon": {
+                    "default": null,
+                    "description": "The reason why the player won the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "rowdyness": {
+                    "default": null,
+                    "description": "How rowdy their team is. When it gets too high their team takes a collective siesta.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "score": {
+                    "default": null,
+                    "description": "How many times their team has played a piano.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "timeRemaining": {
+                    "default": null,
+                    "description": "The amount of time (in ns) remaining for this AI to send commands.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "float",
+                        "valueType": null
+                    }
+                },
+                "won": {
+                    "default": false,
+                    "description": "If the player won the game or not.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A player in this game. Every AI controls one player.",
+            "function_names": [
+                "returns",
+                "sendIn"
+            ],
+            "functions": {
+                "returns": {
+                    "altersState": true,
+                    "argument_names": [],
+                    "arguments": [],
+                    "description": "The Cowboy that was previously a 'Young Gun', and has now been promoted to a different job if successful, null otherwise.",
+                    "returns": null,
+                    "serverPredefined": false,
+                    "type": "Cowboy"
+                },
+                "sendIn": {
+                    "altersState": true,
+                    "argument_names": [
+                        "job"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The job you want the Young Gun being brought in to be called in to do, changing their job to it.",
+                            "name": "job",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Sends in the Young Gun to the nearest Tile into the Saloon, and promotes them to a new job.",
+                    "returns": null,
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Tile": {
+            "attribute_names": [
+                "bottles",
+                "cowboy",
+                "furnishing",
+                "hasHazard",
+                "isWall",
+                "tileAbove",
+                "tileBelow",
+                "tileLeft",
+                "tileRight",
+                "x",
+                "y"
+            ],
+            "attributes": {
+                "bottles": {
+                    "default": null,
+                    "description": "All the beer Bottles currently flying over this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Bottle",
+                            "valueType": null
+                        }
+                    }
+                },
+                "cowboy": {
+                    "default": null,
+                    "description": "The Cowboy that is on this Tile, or null if empty.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Cowboy",
+                        "valueType": null
+                    }
+                },
+                "furnishing": {
+                    "default": null,
+                    "description": "The furnishing that is on this Tile, or null if empty.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Furnishing",
+                        "valueType": null
+                    }
+                },
+                "hasHazard": {
+                    "default": null,
+                    "description": "If this Tile is pathable, but has a hazard that damages Cowboys that path through it.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "isWall": {
+                    "default": null,
+                    "description": "If this Tile is a wall of the Saloon, and can never be pathed through.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "tileAbove": {
+                    "default": null,
+                    "description": "The Tile above this one (x, y-1). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileBelow": {
+                    "default": null,
+                    "description": "The Tile below this one (x, y+1). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileLeft": {
+                    "default": null,
+                    "description": "The Tile to the left of this one (x-1, y). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileRight": {
+                    "default": null,
+                    "description": "The Tile to the right of this one (x+1, y). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The x (horizontal) position of this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The y (vertical) position of this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A Tile in the game that makes up the 2D map grid.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        }
+    }
+}
