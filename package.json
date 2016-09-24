@@ -23,8 +23,11 @@
     "seedrandom": "2.4.2",
     "uuid": "2.0.1"
   },
+  "optionalDependencies": {
+    "forever": "0.15.2"
+  },
   "engines": {
-    "node": "4.3.1"
+    "node": "6.6.0"
   },
   "scripts": [
     "node main.js"
