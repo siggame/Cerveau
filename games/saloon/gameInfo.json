@@ -34,11 +34,14 @@
             "furnishings",
             "gameObjects",
             "jobs",
+            "mapHeight",
+            "mapWidth",
             "maxCowboys",
             "maxTurns",
             "players",
             "rowdynessToSiesta",
-            "session"
+            "session",
+            "tiles"
         ],
         "attributes": {
             "bottles": {
@@ -144,6 +147,26 @@
                     }
                 }
             },
+            "mapHeight": {
+                "default": null,
+                "description": "The number of Tiles in the map along the y (vertical) axis.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "mapWidth": {
+                "default": null,
+                "description": "The number of Tiles in the map along the x (horizontal) axis.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "maxCowboys": {
                 "default": null,
                 "description": "The maximum number of Cowboys a Player can bring into the saloon.",
@@ -201,6 +224,21 @@
                     "name": "string",
                     "valueType": null
                 }
+            },
+            "tiles": {
+                "default": null,
+                "description": "All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
             }
         },
         "description": "Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Coyboys.",
@@ -210,14 +248,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "mapHeight": {
-            "description": "The number of Tiles in the map along the y (vertical) axis.",
-            "type": "int"
-        },
-        "mapWidth": {
-            "description": "The number of Tiles in the map along the x (horizontal) axis.",
-            "type": "int"
-        },
         "maxInvalidsPerPlayer": 10,
         "name": "Saloon",
         "numberOfPlayers": 2,
@@ -226,14 +256,7 @@
             "TwoPlayerGame",
             "TurnBasedGame",
             "TiledGame"
-        ],
-        "tiles": {
-            "description": "All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.",
-            "type": {
-                "name": "list",
-                "valueType": "Tile"
-            }
-        }
+        ]
     },
     "gameObjects": {
         "Bottle": {
@@ -246,7 +269,7 @@
             "attributes": {
                 "drunkDirection": {
                     "default": null,
-                    "description": "The direction any Cowboys hit by this will move, can be 'North', 'East', 'South', 'West'.",
+                    "description": "The direction any Cowboys hit by this will move, can be 'North', 'East', 'South', or 'West'.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -276,7 +299,7 @@
                 },
                 "nextLocation": {
                     "default": null,
-                    "description": "The Tile this Bottle will fly to next turn, if it does not impact anything on it's path.",
+                    "description": "The Tile this Bottle will fly to next turn, if it does not impact anything on its path between the two.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -397,7 +420,7 @@
                 },
                 "drunkDirection": {
                     "default": null,
-                    "description": "The direction this Cowboy is moving, can be 'North', 'East', 'South', 'West'.",
+                    "description": "The direction this Cowboy is moving while drunk. Will be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string) when not drunk.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -524,7 +547,7 @@
                         },
                         {
                             "default": "",
-                            "description": "The direction the bottle will cause drunk cowboys to be in, can be 'North', 'East', 'South', 'West'.",
+                            "description": "The direction the bottle will cause drunk cowboys to be in, can be 'North', 'East', 'South', or 'West'.",
                             "name": "drunkDirection",
                             "optional": true,
                             "type": {

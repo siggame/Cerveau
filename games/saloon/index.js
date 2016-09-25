@@ -42,6 +42,16 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
+    mapHeight: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    mapWidth: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     maxCowboys: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -65,6 +75,11 @@ classes.Game._deltaMergeableProperties = {
     session: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
+    },
+
+    tiles: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null}},
+        defaultValue: [],
     },
 
 };
