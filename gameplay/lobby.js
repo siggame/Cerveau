@@ -25,7 +25,7 @@ var Lobby = Class(Server, {
 
         this.name = "Lobby @ " + process.pid;
         this.host = args.host;
-        this.port = args.port;
+        this.tcpPort = args.tcpPort;
         this.wsPort = args.wsPort;
         this._authenticate = Boolean(args.authenticate); // flag to see if the lobby should authenticate play requests with web server
         this._allowGameSettings = Boolean(args.gameSettings);
@@ -52,7 +52,7 @@ var Lobby = Class(Server, {
         });
 
         this._listenerServer = {};
-        this._initializeListener("TCP", net, this.port);
+        this._initializeListener("TCP", net, this.tcpPort);
         this._initializeListener("WS", ws, this.wsPort);
 
         var rl = readline.createInterface({
@@ -110,7 +110,7 @@ var Lobby = Class(Server, {
         });
 
         listener.on("error", function(err) {
-            self._socketError(err);
+            self._socketError(err, port);
         });
 
         this._listenerServer[key] = listener;
@@ -146,9 +146,10 @@ var Lobby = Class(Server, {
      * listener for when a listener socket (that accepts incoming clients) errors out. This will probably only happen if it tries to listen on port already in use.
      *
      * @param {Error} err - the error the TCP socket threw
+     * @param {number} port - port errored on
      */
-    _socketError: function(err) {
-        log.error(err.code !== 'EADDRINUSE' ? err : "Lobby cannot listen on port " + this.host + ":" + this.port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
+    _socketError: function(err, port) {
+        log.error(err.code !== 'EADDRINUSE' ? err : "Lobby cannot listen on port " + this.host + ":" + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
 
         process.exit(1);
     },
