@@ -32,32 +32,18 @@ var Player = Class(GameObject, {
 
 
     /**
-     * The Cowboy that was previously a 'Young Gun', and has now been promoted to a different job if successful, null otherwise.
-     *
-     * @param {Player} player - the player that called this.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
-     */
-    returns: function(player, asyncReturn) {
-        // <<-- Creer-Merge: returns -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Player's returns function here
-        return undefined;
-
-        // <<-- /Creer-Merge: returns -->>
-    },
-
-    /**
      * Sends in the Young Gun to the nearest Tile into the Saloon, and promotes them to a new job.
      *
      * @param {Player} player - the player that called this.
      * @param {string} job - The job you want the Young Gun being brought in to be called in to do, changing their job to it.
      * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @returns {Cowboy} The Cowboy that was previously a 'Young Gun', and has now been promoted to a different job if successful, null otherwise.
      */
     sendIn: function(player, job, asyncReturn) {
         // <<-- Creer-Merge: sendIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Player's sendIn function here
-        return undefined;
+        return null;
 
         // <<-- /Creer-Merge: sendIn -->>
     },

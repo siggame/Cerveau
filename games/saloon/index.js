@@ -378,12 +378,6 @@ classes.Player._deltaMergeableProperties = {
 };
 
 
-classes.Player.returns.cerveau = {
-    args: [
-    ],
-    returns: undefined,
-};
-
 classes.Player.sendIn.cerveau = {
     args: [
         {
@@ -391,7 +385,10 @@ classes.Player.sendIn.cerveau = {
             type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         },
     ],
-    returns: undefined,
+    returns: {
+        type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
+        defaultValue: null,
+    },
 };
 
 //<<-- Creer-Merge: secret-Player -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

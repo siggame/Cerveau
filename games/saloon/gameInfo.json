@@ -1071,19 +1071,9 @@
             },
             "description": "A player in this game. Every AI controls one player.",
             "function_names": [
-                "returns",
                 "sendIn"
             ],
             "functions": {
-                "returns": {
-                    "altersState": true,
-                    "argument_names": [],
-                    "arguments": [],
-                    "description": "The Cowboy that was previously a 'Young Gun', and has now been promoted to a different job if successful, null otherwise.",
-                    "returns": null,
-                    "serverPredefined": false,
-                    "type": "Cowboy"
-                },
                 "sendIn": {
                     "altersState": true,
                     "argument_names": [
@@ -1104,7 +1094,16 @@
                         }
                     ],
                     "description": "Sends in the Young Gun to the nearest Tile into the Saloon, and promotes them to a new job.",
-                    "returns": null,
+                    "returns": {
+                        "default": null,
+                        "description": "The Cowboy that was previously a 'Young Gun', and has now been promoted to a different job if successful, null otherwise.",
+                        "type": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Cowboy",
+                            "valueType": null
+                        }
+                    },
                     "serverPredefined": false
                 }
             },
