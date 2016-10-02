@@ -77,6 +77,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: "",
     },
 
+    siestaLength: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     tiles: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null}},
         defaultValue: [],
@@ -104,6 +109,11 @@ classes.Game.aiFinished_runTurn.cerveau = {
 classes.Bottle = require("./bottle");
 
 classes.Bottle._deltaMergeableProperties = {
+    direction: {
+        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        defaultValue: null,
+    },
+
     drunkDirection: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
@@ -114,12 +124,7 @@ classes.Bottle._deltaMergeableProperties = {
         defaultValue: false,
     },
 
-    location: {
-        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
-        defaultValue: null,
-    },
-
-    nextLocation: {
+    tile: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },
@@ -177,17 +182,17 @@ classes.Cowboy._deltaMergeableProperties = {
         defaultValue: null,
     },
 
-    siesta: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     tile: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },
 
     tolerance: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    turnsBusy: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -252,6 +257,11 @@ classes.Furnishing._deltaMergeableProperties = {
     health: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
+    },
+
+    isDestroyed: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
     },
 
     isPiano: {
@@ -365,6 +375,11 @@ classes.Player._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    siesta: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     timeRemaining: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
@@ -373,6 +388,11 @@ classes.Player._deltaMergeableProperties = {
     won: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
+    },
+
+    youngGun: {
+        type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
+        defaultValue: null,
     },
 
 };
@@ -401,9 +421,9 @@ classes.Player.sendIn.cerveau = {
 classes.Tile = require("./tile");
 
 classes.Tile._deltaMergeableProperties = {
-    bottles: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Bottle", "valueType": null}},
-        defaultValue: [],
+    bottle: {
+        type: {"is_game_object": true, "keyType": null, "name": "Bottle", "valueType": null},
+        defaultValue: null,
     },
 
     cowboy: {
@@ -426,22 +446,22 @@ classes.Tile._deltaMergeableProperties = {
         defaultValue: false,
     },
 
-    tileAbove: {
+    tileEast: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },
 
-    tileBelow: {
+    tileNorth: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },
 
-    tileLeft: {
+    tileSouth: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },
 
-    tileRight: {
+    tileWest: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
     },

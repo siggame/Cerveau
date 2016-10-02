@@ -41,6 +41,7 @@
             "players",
             "rowdynessToSiesta",
             "session",
+            "siestaLength",
             "tiles"
         ],
         "attributes": {
@@ -225,6 +226,16 @@
                     "valueType": null
                 }
             },
+            "siestaLength": {
+                "default": null,
+                "description": "How long siestas are for a player's team.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "tiles": {
                 "default": null,
                 "description": "All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.",
@@ -261,12 +272,22 @@
     "gameObjects": {
         "Bottle": {
             "attribute_names": [
+                "direction",
                 "drunkDirection",
                 "isDestroyed",
-                "location",
-                "nextLocation"
+                "tile"
             ],
             "attributes": {
+                "direction": {
+                    "default": null,
+                    "description": "The Direction this Bottle is flying and will move to between turns, can be 'North', 'East', 'South', or 'West'.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
                 "drunkDirection": {
                     "default": null,
                     "description": "The direction any Cowboys hit by this will move, can be 'North', 'East', 'South', or 'West'.",
@@ -287,19 +308,9 @@
                         "valueType": null
                     }
                 },
-                "location": {
+                "tile": {
                     "default": null,
                     "description": "The Tile this bottle is currently flying over.",
-                    "type": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Tile",
-                        "valueType": null
-                    }
-                },
-                "nextLocation": {
-                    "default": null,
-                    "description": "The Tile this Bottle will fly to next turn, if it does not impact anything on its path between the two.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -403,9 +414,9 @@
                 "isDrunk",
                 "job",
                 "owner",
-                "siesta",
                 "tile",
-                "tolerance"
+                "tolerance",
+                "turnsBusy"
             ],
             "attributes": {
                 "canMove": {
@@ -488,16 +499,6 @@
                         "valueType": null
                     }
                 },
-                "siesta": {
-                    "default": null,
-                    "description": "How many turns this unit has remaining for their siesta. 0 means they are awake, and can act.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
                 "tile": {
                     "default": null,
                     "description": "The Tile that this Cowboy is located on.",
@@ -511,6 +512,16 @@
                 "tolerance": {
                     "default": null,
                     "description": "How many times this unit has been drunk before taking their siesta and reseting this to 0.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "turnsBusy": {
+                    "default": null,
+                    "description": "How many turns this unit has remaining before it is no longer busy and can `act()` or `play()` again.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -723,6 +734,7 @@
         "Furnishing": {
             "attribute_names": [
                 "health",
+                "isDestroyed",
                 "isPiano",
                 "tile"
             ],
@@ -734,6 +746,16 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "int",
+                        "valueType": null
+                    }
+                },
+                "isDestroyed": {
+                    "default": null,
+                    "description": "If this Furnishing has been destroyed, and has been removed from the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
                         "valueType": null
                     }
                 },
@@ -939,8 +961,10 @@
                 "reasonWon",
                 "rowdyness",
                 "score",
+                "siesta",
                 "timeRemaining",
-                "won"
+                "won",
+                "youngGun"
             ],
             "attributes": {
                 "clientType": {
@@ -1048,6 +1072,16 @@
                         "valueType": null
                     }
                 },
+                "siesta": {
+                    "default": null,
+                    "description": "0 when not having a team siesta. When greater than 0 represents how many turns left for the team siesta to complete.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
                 "timeRemaining": {
                     "default": null,
                     "description": "The amount of time (in ns) remaining for this AI to send commands.",
@@ -1065,6 +1099,16 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "youngGun": {
+                    "default": null,
+                    "description": "The only 'Yong Gun' Cowboy this player owns, or null if they called in their young gun during their turn.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Cowboy",
                         "valueType": null
                     }
                 }
@@ -1191,32 +1235,27 @@
         },
         "Tile": {
             "attribute_names": [
-                "bottles",
+                "bottle",
                 "cowboy",
                 "furnishing",
                 "hasHazard",
                 "isWall",
-                "tileAbove",
-                "tileBelow",
-                "tileLeft",
-                "tileRight",
+                "tileEast",
+                "tileNorth",
+                "tileSouth",
+                "tileWest",
                 "x",
                 "y"
             ],
             "attributes": {
-                "bottles": {
+                "bottle": {
                     "default": null,
-                    "description": "All the beer Bottles currently flying over this Tile.",
+                    "description": "The beer Bottle currently flying over this Tile.",
                     "type": {
-                        "is_game_object": false,
+                        "is_game_object": true,
                         "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Bottle",
-                            "valueType": null
-                        }
+                        "name": "Bottle",
+                        "valueType": null
                     }
                 },
                 "cowboy": {
@@ -1259,9 +1298,9 @@
                         "valueType": null
                     }
                 },
-                "tileAbove": {
+                "tileEast": {
                     "default": null,
-                    "description": "The Tile above this one (x, y-1). Null if out of bounds of the map.",
+                    "description": "The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1269,9 +1308,9 @@
                         "valueType": null
                     }
                 },
-                "tileBelow": {
+                "tileNorth": {
                     "default": null,
-                    "description": "The Tile below this one (x, y+1). Null if out of bounds of the map.",
+                    "description": "The Tile to the 'North' of this one (x, y-1). Null if out of bounds of the map.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1279,9 +1318,9 @@
                         "valueType": null
                     }
                 },
-                "tileLeft": {
+                "tileSouth": {
                     "default": null,
-                    "description": "The Tile to the left of this one (x-1, y). Null if out of bounds of the map.",
+                    "description": "The Tile to the 'South' of this one (x, y+1). Null if out of bounds of the map.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1289,9 +1328,9 @@
                         "valueType": null
                     }
                 },
-                "tileRight": {
+                "tileWest": {
                     "default": null,
-                    "description": "The Tile to the right of this one (x+1, y). Null if out of bounds of the map.",
+                    "description": "The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the map.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1403,7 +1442,9 @@
             "parentClasses": [
                 "GameObject"
             ],
-            "serverParentClasses": []
+            "serverParentClasses": [
+                "TiledTile"
+            ]
         }
     }
 }

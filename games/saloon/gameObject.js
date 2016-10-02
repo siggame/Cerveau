@@ -1,7 +1,6 @@
 // GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var BaseGameObject = require(__basedir + "/gameplay/shared/baseGameObject");
 
@@ -19,7 +18,6 @@ var GameObject = Class(BaseGameObject, {
      * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
-        BaseGameObject.init.apply(this, arguments);
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

@@ -1,7 +1,6 @@
 // Player: A player in this game. Every AI controls one player.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var GameObject = require("./gameObject");
 
@@ -42,15 +41,103 @@ var Player = Class(GameObject, {
     sendIn: function(player, job, asyncReturn) {
         // <<-- Creer-Merge: sendIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Player's sendIn function here
-        return null;
+        var reason;
+
+        if(player !== this.game.currentPlayer) {
+            reason = "{player} it is not your turn.";
+        }
+        else if(!player.youngGun) {
+            reason = "You have no 'Young Gun' to call in.";
+        }
+
+        var actualJob; // make sure the job is valid
+        for(var i = 0; i < this.game.jobs.length; i++) {
+            var j = this.game.jobs[i];
+            if(job.toLowerCase() === j.toLowerCase()) {
+                actualJob = j;
+                break;
+            }
+        }
+
+        if(!actualJob) {
+            reason = "{job} is not a valid job to call in.";
+        }
+
+        if(reason) {
+            return this.game.logicError(null, reason.format({
+                this: this,
+                job,
+                player,
+            }));
+        }
+
+        // if we got here, it was valid!
+
+        // do a quick BFS to find an open tile to spawn him on
+        var tiles = [ this.youngGun.tile ];
+        var openTile;
+        while(tiles.length > 0) {
+            var tile = tiles.shift();
+
+            if(tile.isWall) {
+                tiles = tiles.concat(tile.getNeighbors());
+            }
+            else {
+                openTile = tile;
+                break;
+            }
+        }
+
+        // clear the open tile before moving the young gun to it
+        if(openTile.cowboy) {
+            openTile.cowboy.damage(Infinity);
+        }
+
+        if(openTile.furnishing) {
+            openTile.furnishing.damage(Infinity);
+        }
+
+        var cowbow = player.youngGun;
+        player.youngGunTile = cowboy.tile;
+        player.youngGun = null;
+
+        cowboy.job = actualJob;
+        cowboy.tile.cowboy = null;
+        cowboy.tile = openTile;
+        cowboy.hasMoved = true;
+        openTile.cowboy = cowboy;
+
+        return cowboy;
 
         // <<-- /Creer-Merge: sendIn -->>
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    addRowdyness: function(num) {
+        this.rowdyness += num;
+
+        if(this.rowdyness >= this.game.rowdynessToSiesta) {
+            this.rowdyness = 0;
+            // siesta!
+            for(var i = 0; i < this.cowboys.length; i++) {
+                var cowboy = this.cowboys[i];
+
+                if(cowboy.isDead || cowboy.job === "Young Gun") {
+                    continue;
+                }
+
+                cowboy.siesta = true;
+                cowboy.turnsBusy = this.game.siestaLength;
+                cowboy.hasMoved = true;
+                cowboy.focus = 0;
+            }
+
+            return true; // siesta'd!
+        }
+
+        return false; // no siesta
+    }
 
     //<<-- /Creer-Merge: added-functions -->>
 

@@ -1,7 +1,6 @@
 // Furnishing: An furnishing in the Saloon that must be pathed around, or destroyed.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var GameObject = require("./gameObject");
 
@@ -23,7 +22,7 @@ var Furnishing = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.health = this.isPiano ? 200 : 20;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -33,7 +32,19 @@ var Furnishing = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Damages this Furnishing for some amount of damage, setting isDestroyed if it dies
+     *
+     * @param {number} damage - how much damage to do to this
+     */
+    damage: function(damage) {
+        this.health = Math.max(0, this.health - damage);
+        if(this.health === 0) {
+            this.isDestroyed = true;
+            this.tile.furnishing = null;
+            this.tile = null;
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

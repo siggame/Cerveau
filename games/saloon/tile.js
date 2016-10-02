@@ -1,8 +1,8 @@
 // Tile: A Tile in the game that makes up the 2D map grid.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
+var TiledTile = require(__basedir + "/gameplay/shared/tiledTile");
 var GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -12,7 +12,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Tile: A Tile in the game that makes up the 2D map grid.
-var Tile = Class(GameObject, {
+var Tile = Class(GameObject, TiledTile, {
     /**
      * Initializes Tiles.
      *
