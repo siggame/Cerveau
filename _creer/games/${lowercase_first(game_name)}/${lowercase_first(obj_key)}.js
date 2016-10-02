@@ -1,7 +1,6 @@
 // ${obj_key}: ${obj['description']}
 <%include file="functions.noCreer" />
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 % for parent_class in obj['serverParentClasses']:
 var ${parent_class} = require(__basedir + "/gameplay/shared/${lowercase_first(parent_class)}");
@@ -54,17 +53,6 @@ ${merge("        //", "aliases", '        "MegaMinerAI-##-{}",'.format(game_name
 % endfor
 
 ${merge("        //", "begin", "        // any logic after init can be put here")}
-    },
-
-    /**
-     * This is called when the game has started, after all the begin()s. This is a good spot to send orders.
-     */
-    _started: function() {
-% for parent_class in reversed(parent_classes):
-        ${parent_class}._started.apply(this, arguments);
-% endfor
-
-${merge("        //", "_started", "        // any logic for _started can be put here")}
     },
 % else:
     gameObjectName: "${obj_key}",
