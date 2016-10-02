@@ -9,14 +9,15 @@ var ${parent_class} = require(__basedir + "/gameplay/shared/${lowercase_first(pa
 % for parent_class in obj['parentClasses']:
 var ${parent_class} = require("./${lowercase_first(parent_class)}");
 % endfor
-<%parent_classes = obj['parentClasses'] + obj['serverParentClasses']%>
+<%parent_classes = obj['parentClasses']
+all_parent_classes = obj['parentClasses'] + obj['serverParentClasses']%>
 ${merge("//", "requires", """
 // any additional requires you want can be required here safely between Creer re-runs
 
 """)}
 
 // @class ${obj_key}: ${obj['description']}
-var ${obj_key} = Class(${", ".join(parent_classes) + "," if parent_classes else ""} {
+var ${obj_key} = Class(${", ".join(all_parent_classes) + "," if parent_classes else ""} {
     /**
      * Initializes ${obj_key}s.
      *
