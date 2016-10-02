@@ -25,13 +25,21 @@ var TiledGame = Class(BaseGame, {
             for(var y = 0; y < this.mapHeight; y++) {
                 var tile = this.getTile(x, y);
 
-                tile.tileAbove = this.getTile(x, y - 1);
-                tile.tileRight = this.getTile(x + 1, y);
-                tile.tileBelow = this.getTile(x, y + 1);
-                tile.tileLeft = this.getTile(x - 1, y);
+                tile.tileNorth = this.getTile(x, y - 1);
+                tile.tileEast = this.getTile(x + 1, y);
+                tile.tileSouth = this.getTile(x, y + 1);
+                tile.tileWest = this.getTile(x - 1, y);
             }
         }
     },
+
+    /**
+     * Valid adjacent directions for Tiles.
+     *
+     * @static
+     * @type {Array.<string>}
+     */
+    tileDirections: ["North", "East", "South", "West"],
 
     /**
      * Gets the tile at (x, y), or null if the co-ordinates are off-map
