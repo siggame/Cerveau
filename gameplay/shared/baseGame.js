@@ -1,5 +1,5 @@
 var log = require("../log");
-var Class = require(__basedir + "/utilities/class");
+var Class = require("classe");
 var DeltaMergeable = require("./deltaMergeable");
 var DeltaMergeableArray = require("./deltaMergeableArray");
 var GameManager = require("./gameManager");
@@ -30,7 +30,7 @@ var BaseGame = Class(DeltaMergeable, {
 
         DeltaMergeable.init.call(this, undefined, undefined, {
             session: data.session,
-            name: this._class.prototype.name,
+            name: this._classe.prototype.name,
         });
 
         this._dir = __basedir + "/games/" + this.name.lowercaseFirst() + "/";
