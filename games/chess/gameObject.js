@@ -1,7 +1,6 @@
 // GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var BaseGameObject = require(__basedir + "/gameplay/shared/baseGameObject");
 

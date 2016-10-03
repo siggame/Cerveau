@@ -1,7 +1,6 @@
 // Move: Contains all details about a Piece's move in the game.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var GameObject = require("./gameObject");
 

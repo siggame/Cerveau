@@ -10,8 +10,8 @@ var ${parent_class} = require("./${lowercase_first(parent_class)}");
 % endfor
 <%parent_classes = obj['parentClasses']
 all_parent_classes = obj['parentClasses'] + obj['serverParentClasses']
-if obj_key == "Game":
-    parent_class = all_parent_classes
+if obj_key == "Game" or obj_key == "GameObject":
+    parent_classes = all_parent_classes
 %>
 ${merge("//", "requires", """
 // any additional requires you want can be required here safely between Creer re-runs
@@ -56,6 +56,17 @@ ${merge("        //", "aliases", '        "MegaMinerAI-##-{}",'.format(game_name
 % endfor
 
 ${merge("        //", "begin", "        // any logic after init can be put here")}
+    },
+
+    /**
+     * This is called when the game has started, after all the begin()s. This is a good spot to send orders.
+     */
+    _started: function() {
+% for parent_class in reversed(parent_classes):
+        ${parent_class}._started.apply(this, arguments);
+% endfor
+
+${merge("        //", "_started", "        // any logic for _started can be put here")}
     },
 % else:
     gameObjectName: "${obj_key}",

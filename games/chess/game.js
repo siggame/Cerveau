@@ -1,7 +1,6 @@
 // Game: The traditional 8x8 chess board with pieces.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
 var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
