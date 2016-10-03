@@ -18,6 +18,7 @@ var GameObject = Class(BaseGameObject, {
      * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
+        BaseGameObject.init.apply(this, arguments);
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
