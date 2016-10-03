@@ -1,5 +1,5 @@
 var log = require("../log");
-var Class = require(__basedir + "/utilities/class");
+var Class = require("classe");
 
 /**
  * @abstract
@@ -16,14 +16,14 @@ var DeltaMergeable = Class({
         this._pathInBaseGame = pathInBaseGame || [];
         this._properties = this._properties || {};
 
-        var classes = [ this._class ];
+        var classes = [ this._classe ];
         while(classes.length > 0) {
             var myClass = classes.shift();
             if(myClass._deltaMergeableProperties) {
                 this._addProperties(myClass._deltaMergeableProperties, values);
             }
 
-            classes.push.apply(classes, myClass._parentClasses);
+            classes.push.apply(classes, myClass._parentClassees);
         }
     },
 

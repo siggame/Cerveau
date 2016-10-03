@@ -1,4 +1,4 @@
-var Class = require(__basedir + "/utilities/class");
+var Class = require("classe");
 var DeltaMergeable = require("./deltaMergeable");
 var extend = require("extend");
 var log = require("../log");
@@ -12,7 +12,7 @@ var BaseGameObject = Class(DeltaMergeable, {
         DeltaMergeable.init.call(this, data.game, ["gameObjects", data.id], data);
 
         this.game = data.game;
-        this.gameObjectName = this._class.gameObjectName;
+        this.gameObjectName = this._classe.gameObjectName;
     },
 
     /**
