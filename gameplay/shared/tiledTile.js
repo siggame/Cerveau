@@ -54,3 +54,5 @@ var TiledTile = Class({
         return "{gameObjectName} ({x}, {y}) #{id}".format(this);
     },
 });
+
+module.exports = TiledTile;
