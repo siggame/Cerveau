@@ -270,7 +270,7 @@ var Cowboy = Class(GameObject, {
         return "{this} cannot act because they are a 'Brawler'.";
     },
 
-        /**
+    /**
      * @see Cowboy#act
      */
     actYoungGun: function() {

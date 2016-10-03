@@ -22,7 +22,9 @@ var Furnishing = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.game.furnishings.push(this);
         this.health = this.isPiano ? 200 : 20;
+        this.tile.furnishing = this;
 
         //<<-- /Creer-Merge: init -->>
     },

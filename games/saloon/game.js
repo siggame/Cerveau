@@ -38,7 +38,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxCowboys = 6;
 
         this.jobs.push(
-            "Young Gun",
             "Sharpshooter",
             "Bartender",
             "Brawler"
@@ -84,8 +83,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // spawn some random furnishings
         var numFurnishings = Math.randomInt(this._maxFurnishings, this._minFurnishings);
         var numPianos = Math.randomInt(this._maxPianos, this._minPianos);
-        for(var i = 0; i < numPianos+numPianos; i++) {
-            var x, y;
+        for(var i = 0; i < numPianos+numFurnishings; i++) {
             while(true) {
                 x = Math.randomInt(this.mapWidth/2 - 1, 1);
                 y = Math.randomInt(this.mapHeight - 2, 1);
@@ -100,19 +98,22 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     x = this.mapWidth - x - 1;
                 }
 
+                var isPiano = i <= numPianos;
                 this.create("Furnishing", {
                     tile: this.getTile(x, y),
-                    isPiano: i <= numPianos,
+                    isPiano: isPiano,
                 });
             }
         }
 
         // create the players' Young Guns
         this.players[0].youngGunPrevTile = this.getTile(0, 1);
-        this.players[0].youngGunTile = this.getTile(0, 0);
-        this.players[1].youngGunTile = this.getTile(this.mapWidth-1, this.mapHeight-1);
-        this.players[1].youngGunTile = this.getTile(this.mapWidth-1, this.mapHeight-2);
-        this._doYoungGun();
+        this.players[0].youngGunCurrentTile = this.getTile(0, 0);
+        this._doYoungGun(this.players[0]);
+
+        this.players[1].youngGunPrevTile = this.getTile(this.mapWidth-1, this.mapHeight-2);
+        this.players[1].youngGunCurrentTile = this.getTile(this.mapWidth-1, this.mapHeight-1);
+        this._doYoungGun(this.players[1]);
 
         //<<-- /Creer-Merge: begin -->>
     },
@@ -139,17 +140,15 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
 
-        this._updateCowboys();
-
-        this._advanceBottles();
-
-        this._damagePianos();
-
         this._cleanupArray("cowboys");
         this._cleanupArray("furnishings");
         this._cleanupArray("bottles");
 
-        this._doYoungGun();
+        this._updateCowboys();
+        this._advanceBottles();
+        this._damagePianos();
+
+        this._doYoungGun(this.currentPlayer);
 
         if(this._checkForWinner()) {
             return;
@@ -158,6 +157,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
 
+    /**
+     * Updates all Cowboys (for the current player) between turns, reset variables and such
+     */
     _updateCowboys: function() {
         for(var i = 0; i < this.currentPlayer.cowboys.length; i++) {
             var cowboy = this.currentPlayer.cowboys[i];
@@ -199,6 +201,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
+    /**
+     * Moves all bottles currenly in the game
+     */
     _advanceBottles: function() {
         for(var i = 0; i < this.bottles.length; i++) {
             var bottle = this.bottles[i];
@@ -210,6 +215,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
+    /**
+     * Damages all pianos 1 damage, accelerating the game
+     */
     _damagePianos: function() {
         for(var i = 0; i < this.furnishings.length; i++) {
             var furnishing = this.furnishings[i];
@@ -222,6 +230,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
+    /**
+     * Cleans up an array of dead game objects, done between turns so AIs don't have arrays resizing too much during gameplay
+     *
+     * @param {string} arrayKey - key to the array in this game instance
+     */
     _cleanupArray: function(arrayKey) {
         var list = this[arrayKey];
         var clone = list.clone();
@@ -237,42 +250,64 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    _doYoungGun: function() {
-        for(var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
+    /**
+     * Does Young Gun related logic, spawning and moving them clockwise
+     *
+     * @param {Player} player - the player to apply Young Gun logic to
+     */
+    _doYoungGun: function(player) {
+        player.youngGun = player.youngGun || this.create("Cowboy", {
+            owner: player,
+            job: "Young Gun",
+            tile: player.youngGunCurrentTile,
+        });
 
-            player.youngGun = player.youngGun || this.create("Cowboy", {
-                owner: player,
-                job: "Young Gun",
-                tile: player.youngGunTile,
-            });
+        var tiles = player.youngGunCurrentTile.getNeighbors();
+        for(var t = 0; t < tiles.length; t++) {
+            var tile = tiles[t];
 
-            var tiles = player.youngGun.tile.getNeighbors();
-            for(var t = 0; t < tiles.length; t++) {
-                var tile = tiles[t];
+            if(tile.isWall && player.youngGunPrevTile !== tile) { // this is the tile the young gun needs to talk to
+                player.youngGunPrevTile = player.youngGunCurrentTile;
+                player.youngGunCurrentTile = tile;
 
-                if(tile.isWall && player.youngGunPrevTile !== tile) { // this is the tile the young gun needs to talk to
-                    player.youngGunPrevTile = player.youngGun.tile;
+                if(player.youngGun) { // move them
+                    player.youngGun.tile.cowboy = null;
                     player.youngGun.tile = tile;
-                    break;
+                    tile.cowboy = player.youngGun;
                 }
+
+                break;
             }
         }
     },
 
+    /**
+     * Checks if someone won, and if so declares a winner
+     *
+     * @returns {boolean} true if there was a winner and the game is over, false otherwise
+     */
     _checkForWinner: function() {
-        var pianos = 0;
+        var numberOfPianos = 0;
         for(var i = 0; i < this.furnishings.length; i++) {
             if(this.furnishings[i].isPiano) {
-                pianos++;
+                numberOfPianos++;
             }
         }
 
-        if(pianos === 0) { // game over
+        if(numberOfPianos === 0) { // game over
             this._makeSomeoneWin("all pianos destroyed.");
+            return true;
         }
+
+        return false;
     },
 
+    /**
+     * Makes someone win the game, and the rest lose
+     *
+     * @param {string} reason - reason we are making someone win the game
+     * @returns {boolean} true if victory by game conditions, false otherwise (random winner)
+     */
     _makeSomeoneWin: function(reason) {
         var players = this.players.clone();
         if(players[0].score !== players[1].score) { // someone won with a higher score
@@ -298,11 +333,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      * @override
      */
     _maxTurnsReached: function() {
-        var returned = TurnBasedGame._maxTurnsReached.apply(this, arguments);
-
         this._makeSomeoneWin("max turns reached ({})".format(this.maxTurns));
 
-        return returned;
+        return TurnBasedGame._maxTurnsReached.apply(this, arguments);
     },
 
     //<<-- /Creer-Merge: added-functions -->>
