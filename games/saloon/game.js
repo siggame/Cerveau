@@ -27,9 +27,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this._minFurnishings = 0;
-        this._maxFurnishings = 20;
+        this._maxFurnishings = 10;
         this._minPianos = 2;
-        this._maxPianos = 10;
+        this._maxPianos = 8;
 
         this.mapWidth = 21;
         this.mapHeight = 11;
@@ -83,7 +83,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // spawn some random furnishings
         var numFurnishings = Math.randomInt(this._maxFurnishings, this._minFurnishings);
         var numPianos = Math.randomInt(this._maxPianos, this._minPianos);
-        for(var i = 0; i < numPianos+numFurnishings; i++) {
+        for(var i = 0; i < numPianos+numFurnishings/2; i++) {
             while(true) {
                 x = Math.randomInt(this.mapWidth/2 - 1, 1);
                 y = Math.randomInt(this.mapHeight - 2, 1);

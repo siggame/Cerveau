@@ -84,6 +84,17 @@ var Cowboy = Class(GameObject, {
         if(!this.canMove) {
             reason = "{this} has already moved.";
         }
+        else if(tile) { // check if blocked
+            if(tile.isWall) {
+                reason = "{tile} is a wall and cannot be moved into.";
+            }
+            else if(tile.cowboy) {
+                reason = "{tile} is blocked by {tile.cowboy} and cannot be moved into.";
+            }
+            else if(tile.furnishing) {
+                reason = "{tile} is blocked by {tile.furnishing} and cannot be moved into.";
+            }
+        }
 
         if(reason) {
             return this.game.logicError(false, reason.format({
