@@ -100,7 +100,7 @@ var Player = Class(GameObject, {
             openTile.furnishing.damage(Infinity);
         }
 
-        var cowbow = player.youngGun;
+        var cowboy = player.youngGun;
         player.youngGun = null;
 
         cowboy.job = actualJob;

@@ -31,8 +31,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this._minPianos = 2;
         this._maxPianos = 10;
 
-        this.mapWidth = 40;
-        this.mapHeight = 20;
+        this.mapWidth = 21;
+        this.mapHeight = 11;
 
         this.rowdynessToSiesta = 20;
         this.maxCowboys = 6;
@@ -174,14 +174,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 cowboy.tile = next;
 
                 cowboy.isDrunk = (cowboy.turnsBusy === 0);
-                cowboy.hasMoved = !cowboy.isDrunk;
+                cowboy.canMove = !cowboy.isDrunk;
             }
             else {
-                if(cowboy.job === "Sharpshooter" && !cowboy.hasMoved) {
+                if(cowboy.job === "Sharpshooter" && cowboy.canMove) { // then the sharpshooter didn't move, so increase his focus
                     cowboy.focus++;
                 }
 
-                cowboy.hasMoved = false;
+                cowboy.canMove = (cowboy.job !== "Young Gun");
             }
 
             cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
@@ -260,6 +260,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             owner: player,
             job: "Young Gun",
             tile: player.youngGunCurrentTile,
+            canMove: false,
         });
 
         var tiles = player.youngGunCurrentTile.getNeighbors();

@@ -22,6 +22,7 @@ var Cowboy = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.canMove = true;
         this.health = 10;
         this.game.cowboys.push(this);
         this.owner.cowboys.push(this);
@@ -80,7 +81,7 @@ var Cowboy = Class(GameObject, {
 
         var reason = this._check(player, tile);
 
-        if(this.hasMoved) {
+        if(!this.canMove) {
             reason = "{this} has already moved.";
         }
 
@@ -96,7 +97,7 @@ var Cowboy = Class(GameObject, {
         this.tile.cowboy = null; // remove me from the tile I was on
         tile.cowboy = this;
         this.tile = tile; // and move me to the new tile
-        this.hasMoved = true; // and mark me as having moved this turn
+        this.canMove = false; // and mark me as having moved this turn
 
         if(this.job === "Sharpshooter") {
             this.focus = 0;
@@ -131,7 +132,6 @@ var Cowboy = Class(GameObject, {
             return this.game.logicError(false, reason.format({
                 this: this,
                 player,
-                tile,
                 piano,
             }));
         }
@@ -139,7 +139,7 @@ var Cowboy = Class(GameObject, {
         // if we got here the play() was valid. play that piano!
 
         this.isBusy = true;
-        this.player.score++;
+        this.owner.score++;
         piano.damage(1);
 
         return true;
@@ -156,8 +156,8 @@ var Cowboy = Class(GameObject, {
      * @returns {string|undefined} the reason this is invalid (still in need of formatting), undefined if valid
      */
     _check: function(player, tile) {
-        if(!player || player !== this.currentPlayer) {
-            return "{player} does not own {this}";
+        if(!player || player !== this.game.currentPlayer) {
+            return "You do not own {this}";
         }
         else if(this.isDead) {
             return "{this} is dead.";
@@ -169,7 +169,7 @@ var Cowboy = Class(GameObject, {
             return "{this} is asleep because of their siesta and cannot be controlled by you.";
         }
         else if(!tile) {
-            return "{Tile} is not a valid Tile.";
+            return "{tile} is not a valid Tile.";
         }
     },
 

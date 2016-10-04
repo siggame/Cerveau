@@ -425,7 +425,7 @@
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
-                        "name": "int",
+                        "name": "boolean",
                         "valueType": null
                     }
                 },

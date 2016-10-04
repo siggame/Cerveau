@@ -143,8 +143,8 @@ classes.Cowboy = require("./cowboy");
 
 classes.Cowboy._deltaMergeableProperties = {
     canMove: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
     },
 
     drunkDirection: {
