@@ -26,17 +26,23 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // these settings are all per side
         this._minFurnishings = 0;
-        this._maxFurnishings = 10;
+        this._maxFurnishings = 5;
         this._minPianos = 2;
-        this._maxPianos = 8;
+        this._maxPianos = 5;
+        this._minHazards = 0;
+        this._maxHazards = 6;
 
-        this.mapWidth = 21;
-        this.mapHeight = 11;
+        // map dimensions used for tile generation
+        this.mapWidth = 22;
+        this.mapHeight = 12;
 
+        // game constants
         this.rowdynessToSiesta = 20;
         this.maxCowboys = 6;
 
+        // Note: "Young Gun" is not in here as you don't send them in
         this.jobs.push(
             "Sharpshooter",
             "Bartender",
@@ -80,11 +86,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             this.getTile(this.mapWidth - 1, y).isWall = true;
         }
 
-        // spawn some random furnishings
-        var numFurnishings = Math.randomInt(this._maxFurnishings, this._minFurnishings);
-        var numPianos = Math.randomInt(this._maxPianos, this._minPianos);
-        for(var i = 0; i < numPianos+numFurnishings/2; i++) {
-            while(true) {
+        // spawn some random furnishings in quadrants
+        var numFurnishings = Math.randomInt(this._maxFurnishings, this._minFurnishings)*2; // *2 for each side
+        var numPianos = Math.randomInt(this._maxPianos, this._minPianos)*2;
+        var numHazards = Math.randomInt(this._maxHazards, this._minHazards)*2;
+        while(numFurnishings > 0 || numPianos > 0 || numHazards > 0) { // while there is stuff to spawn
+            while(true) { // get a random tile on this side that is empty
                 x = Math.randomInt(this.mapWidth/2 - 1, 1);
                 y = Math.randomInt(this.mapHeight - 2, 1);
 
@@ -93,27 +100,40 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 }
             }
 
-            for(var side = 0; side < 2; side++) {
-                if(side === 1) {
+            for(var side = 0; side < 2; side++) { // for each side (left and right)
+                if(side === 1) { // if the right side, invert the x, y coordinate
                     x = this.mapWidth - x - 1;
+                    y = this.mapHeight - y - 1;
                 }
 
-                var isPiano = i <= numPianos;
-                this.create("Furnishing", {
-                    tile: this.getTile(x, y),
-                    isPiano: isPiano,
-                });
+                if(numHazards > 0) { // if there are hazards to spawn
+                    numHazards--;
+                    this.getTile(x, y).hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
+                }
+                else { // need to spawn a furnishing
+                    this.create("Furnishing", {
+                        tile: this.getTile(x, y),
+                        isPiano: numPianos > 0, // if there are pianos to spawn make it one, else false and thus it is not a piano
+                    });
+
+                    if(numPianos > 0) { // decrement whatever we spawned
+                        numPianos--;
+                    }
+                    else {
+                        numFurnishings--;
+                    }
+                }
             }
         }
 
         // create the players' Young Guns
-        this.players[0].youngGunPrevTile = this.getTile(0, 1);
-        this.players[0].youngGunCurrentTile = this.getTile(0, 0);
-        this._doYoungGun(this.players[0]);
+        this.players[0].youngGunPrevTile = this.getTile(0, 2);
+        this.players[0].youngGunCurrentTile = this.getTile(0, 1);
+        this._doYoungGun(this.players[0]); // this will advance the young gun to (0, 0)
 
-        this.players[1].youngGunPrevTile = this.getTile(this.mapWidth-1, this.mapHeight-2);
-        this.players[1].youngGunCurrentTile = this.getTile(this.mapWidth-1, this.mapHeight-1);
-        this._doYoungGun(this.players[1]);
+        this.players[1].youngGunPrevTile = this.getTile(this.mapWidth-1, this.mapHeight-3);
+        this.players[1].youngGunCurrentTile = this.getTile(this.mapWidth-1, this.mapHeight-2);
+        this._doYoungGun(this.players[1]); // this will advance the young gun to (mapWidth-1, mapHeight-1)
 
         //<<-- /Creer-Merge: begin -->>
     },
@@ -165,7 +185,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             var cowboy = this.currentPlayer.cowboys[i];
 
             if(cowboy.isDead) {
-                continue;
+                continue; // don't update dead dudes, they won't come back
             }
 
             if(cowboy.isDrunk) { // move him!
@@ -176,7 +196,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 cowboy.isDrunk = (cowboy.turnsBusy === 0);
                 cowboy.canMove = !cowboy.isDrunk;
             }
-            else {
+            else { // they are not drunk, so update them for use next turn
                 if(cowboy.job === "Sharpshooter" && cowboy.canMove) { // then the sharpshooter didn't move, so increase his focus
                     cowboy.focus++;
                 }
@@ -188,12 +208,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             if(cowboy.job === "Brawler") { // damage surroundings
                 var neighbors = cowboy.tile.getNeighbors();
-                for(var j = 0; j < neighbors.length; j++) {
+                for(var j = 0; j < neighbors.length; j++) { // for each neighbor
                     var neighbor = neighbors[j];
-                    if(neighbor.cowboy) {
+                    if(neighbor.cowboy) { // if there is a cowboy, damage them
                         neighbor.cowboy.damage(1);
                     }
-                    if(neighbor.furnishing) {
+                    if(neighbor.furnishing) { // if there is a furnishing, damage it
                         neighbor.furnishing.damage(1);
                     }
                 }
@@ -225,7 +245,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             if(furnishing.isDestroyed || !furnishing.isPiano) {
                 continue;
             }
-
+            // else it's a non destroyed piano, so damage it
             furnishing.damage(1);
         }
     },
@@ -319,7 +339,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             return true;
         }
 
-        if(players[0].kills > players[1].kills) {
+        if(players[0].kills > players[1].kills) { // someone won with a higher kill count
             players.sortDescending("kills");
 
             this.declareWinner(players.shift(), "Has most kills after " + reason);
@@ -327,13 +347,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             return true;
         }
 
-        return this._endGameViaCoinFlip();
+        return this._endGameViaCoinFlip(); // if we got here primary and secondary win conditions failed, so win via coin flip
     },
 
     /**
      * @override
      */
     _maxTurnsReached: function() {
+        // When max turns are reached invoke primary/secondary win conditions
         this._makeSomeoneWin("max turns reached ({})".format(this.maxTurns));
 
         return TurnBasedGame._maxTurnsReached.apply(this, arguments);
