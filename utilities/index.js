@@ -91,7 +91,7 @@ module.exports = {
 
         // check if number
         if(!isNaN(str)) {
-            return parseFloat(num);
+            return parseFloat(str);
         }
 
         return str; // looks like a string after all
