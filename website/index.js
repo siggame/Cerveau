@@ -57,6 +57,4 @@ module.exports = function(args) {
     if(args.api) {
         require("./api")(args);
     }
-
-    require("./visualize")(args);
 };
