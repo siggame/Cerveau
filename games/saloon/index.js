@@ -90,7 +90,7 @@ classes.Game._deltaMergeableProperties = {
 };
 
 
-classes.Game.aiFinished_runTurn.cerveau = {
+classes.Game.aiFinishedRunTurn.cerveau = {
     args: [
     ],
     returns: {

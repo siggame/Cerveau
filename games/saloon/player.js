@@ -139,7 +139,7 @@ var Player = Class(GameObject, {
         }
 
         return false; // no siesta
-    }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

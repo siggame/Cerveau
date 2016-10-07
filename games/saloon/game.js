@@ -155,7 +155,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     /**
+     * Invoked when the current player ends their turn. Perform in between game logic here
+     *
      * @override
+     * @returns {*} passes through the default return value
      */
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
@@ -351,7 +354,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     /**
+     * Invoked when the maximum number of turns is reached, and a winner must be declared
+     *
      * @override
+     * @returns {*} passes through the default return value
      */
     _maxTurnsReached: function() {
         // When max turns are reached invoke primary/secondary win conditions

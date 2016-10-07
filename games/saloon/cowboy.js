@@ -199,9 +199,14 @@ var Cowboy = Class(GameObject, {
     },
 
     /**
+     * makes a Sharpshooter cowboy act
+     *
      * @see Cowboy#act
+     * @param {Player} player - the player making the cowboy act
+     * @param {Tile} tile - the tile the cowboy wants to act on
+     * @returns {string|undefined} the invalid reason if invalid (format not invoked against it), undefined if valid
      */
-    actSharpshooter: function(player, tile, drunkDirection, asyncReturn) {
+    actSharpshooter: function(player, tile) {
         if(this.focus < 1) {
             return "{this} needs focus to act. Currently has {this.focus} focus.";
         }
@@ -237,9 +242,15 @@ var Cowboy = Class(GameObject, {
     },
 
     /**
+     * makes a Bartender cowboy act
+     *
      * @see Cowboy#act
+     * @param {Player} player - the player making the cowboy act
+     * @param {Tile} tile - the tile the cowboy wants to act on
+     * @param {string} drunkDirection - the direction the player wants drunks hit by the bottle to go
+     * @returns {string|undefined} the invalid reason if invalid (format not invoked against it), undefined if valid
      */
-    actBartender: function(player, tile, drunkDirection, asyncReturn) {
+    actBartender: function(player, tile, drunkDirection) {
         var validDrunkDirection = false;
         var simple = drunkDirection.toLowerCase()[0];
         for(var i = 0; i < this.game.tileDirections.length; i++) {
@@ -275,21 +286,29 @@ var Cowboy = Class(GameObject, {
     },
 
     /**
+     * Called when a brawler wants to act
+     *
      * @see Cowboy#act
+     * @returns {string} invalid reason string
      */
     actBrawler: function() {
         return "{this} cannot act because they are a 'Brawler'.";
     },
 
     /**
+     * Called when a young gun wants to act
+     *
      * @see Cowboy#act
+     * @returns {string} invalid reason string
      */
     actYoungGun: function() {
         return "{this} cannot act because they are a 'Young Gun'.";
     },
 
     /**
+     * string coercian override
      * @override
+     * @returns {string} string stating what this cowboy is
      */
     toString: function() {
         return "'{job}' {gameObjectName} #{id}".format(this);
