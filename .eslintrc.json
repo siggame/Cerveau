@@ -1,0 +1,78 @@
+{
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "globals": {
+        "__basedir": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "block-spacing": [ "error", "always" ],
+        "brace-style": [ "error", "stroustrup" ],
+        "camelcase": "error",
+        "comma-dangle": [ "error", "always-multiline" ],
+        "comma-style": [ "error", "last" ],
+        "curly": [ "error", "all" ],
+        "eol-last": [ "error", "always" ],
+        "eqeqeq": [ "error", "always" ],
+        "guard-for-in": "error",
+        "indent": [ "error", 4, {
+            "SwitchCase": 1
+        }],
+        "keyword-spacing": [ "error", {
+            "after": true,
+            "overrides": {
+                "if": { "after": false },
+                "catch": { "after": false },
+                "while": { "after": false },
+                "for": { "after": false },
+                "switch": { "after": false }
+            }
+        }],
+        "linebreak-style": [ "error", "unix" ],
+        "new-parens": "error",
+        "no-cond-assign": "error",
+        "no-constant-condition": [ "error", {
+            "checkLoops": false
+        }],
+        "no-dupe-args": "error",
+        "no-dupe-keys": "error",
+        "no-floating-decimal": "error",
+        "no-implied-eval": "error",
+        "no-irregular-whitespace": "error",
+        "no-multi-spaces": "error",
+        "no-trailing-spaces": "error",
+        "no-undef": "error",
+        "no-unneeded-ternary": "error",
+        "no-unsafe-negation": "error",
+        "no-unused-expressions": "error",
+        "no-unused-vars": "off",
+        "no-use-before-define": "error",
+        "no-whitespace-before-property": "error",
+        "quotes": [ "error", "double" ],
+        "require-jsdoc": [ "error", {
+            "require": {
+                "FunctionDeclaration": true,
+                "MethodDefinition": true,
+                "ClassDeclaration": true
+            }
+        }],
+        "semi": [ "error", "always" ],
+        "space-before-blocks": "error",
+        "space-before-function-paren": [ "error", "never" ],
+        "spaced-comment": [ "error", "always", {
+            "line": {
+                "markers": [ "<<--", "//---", "//--", " <<--" ]
+            }
+        }],
+        "valid-jsdoc": [ "error", {
+            "requireReturn": false,
+            "requireReturnType": true,
+            "matchDescription": ".+",
+            "requireParamDescription": true,
+            "requireReturnDescription": true
+        }],
+        "valid-typeof": "error"
+    }
+}

@@ -42,10 +42,10 @@ var TurnBasedGame = Class(BaseGame, {
     /**
      * Called when an AI has finished their turn, if they returned true from that then they want to end their turn.
      *
-     * @param {Player} player for the ai that finished a runTurn()
-     * @param {boolean} true when they finished their turn, false otherwise (which re-runs their turn)
+     * @param {Player} player - the player for the ai that finished a runTurn()
+     * @param {boolean} data - true when they finished their turn, false otherwise (which re-runs their turn)
      */
-    aiFinished_runTurn: function(player, data) {
+    aiFinishedRunTurn: function(player, data) {
         if(data === true) { // ais that return true from runTurn() mean they ran their turn, and are done with it
             this.nextTurn();
         }

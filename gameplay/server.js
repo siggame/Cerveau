@@ -70,7 +70,7 @@ var Server = Class({
      */
     clientSentData: function(client, data) {
         if(data && data.event) {
-            var callback = this['_clientSent' + data.event.upcaseFirst()]; // should be in the inherited class
+            var callback = this["_clientSent" + data.event.upcaseFirst()]; // should be in the inherited class
 
             if(callback) {
                 callback.call(this, client, data.data);

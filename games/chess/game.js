@@ -77,7 +77,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             b: "Bishop",
             n: "Knight",
             q: "Queen",
-            k: "King"
+            k: "King",
         };
 
         for(var i = 0; i < this.chess.SQUARES.length; i++) {
@@ -209,7 +209,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             this.declareLosers(this.players, "Stalemate - The side to move has been stalemated because they are not in check but have no valid moves.");
         }
         // disabled for Dr. T's CS5400 class
-        /*else if(this.chess.in_threefold_repetition()) {
+        /* else if(this.chess.in_threefold_repetition()) {
             this.declareLosers(this.players, "Stalemate - Board position has occurred three or more times.");
         }*/
         // instead we'll use his simplified rules
@@ -272,6 +272,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * checks if the move a capture, promotion, or pawn movement
      *
+     * @param {Move} move - the move to check against
      * @returns {Boolean} true is so, false otherwise
      */
     _moveHasCapturePromotionOrPawnAdvancement: function(move) {
@@ -279,6 +280,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     },
 
     /**
+     * Invoked when the turn needs to transition to the next player
+     *
      * @override
      */
     nextTurn: function(/* ... */) {
@@ -293,7 +296,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }
 
         return TurnBasedGame.nextTurn.apply(this, arguments);
-    }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

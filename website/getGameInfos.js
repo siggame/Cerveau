@@ -4,17 +4,21 @@
 var utilties = require(__basedir + "/utilities/");
 
 var gameInfos = {};
-function initGameInfos() {
+
+/**
+ * Gets the gets the information about all the games on this Cerveau
+ */
+function _initGameInfos() {
     var gameFolders = utilties.getDirs(__basedir + "/games/");
     for(var i = 0; i < gameFolders.length; i++) {
         var gameFolder = gameFolders[i];
         if(!gameFolder.startsWith("_")) {
-            gameInfos[gameFolder.upcaseFirst()] = gameInfos[gameFolder] || require(__basedir + '/games/' + gameFolder + "/gameInfo.json");
+            gameInfos[gameFolder.upcaseFirst()] = gameInfos[gameFolder] || require(__basedir + "/games/" + gameFolder + "/gameInfo.json");
         }
     }
-};
+}
 
 module.exports = function() {
-    initGameInfos();
+    _initGameInfos();
     return gameInfos;
 };

@@ -65,7 +65,7 @@ classes.Game._deltaMergeableProperties = {
 };
 
 
-classes.Game.aiFinished_gotCaptured.cerveau = {
+classes.Game.aiFinishedGotCaptured.cerveau = {
     args: [
         {
             name: "checker",
@@ -75,7 +75,7 @@ classes.Game.aiFinished_gotCaptured.cerveau = {
     returns: undefined,
 };
 
-classes.Game.aiFinished_runTurn.cerveau = {
+classes.Game.aiFinishedRunTurn.cerveau = {
     args: [
     ],
     returns: {
@@ -211,7 +211,7 @@ classes.Player._deltaMergeableProperties = {
         defaultValue: "Anonymous",
     },
 
-    otherPlayer: {
+    opponent: {
         type: {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null},
         defaultValue: null,
     },

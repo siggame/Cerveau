@@ -9,14 +9,16 @@ var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to 
  * @extends Client
  */
 var TCPClient = Class(Client, {
-    init: function(socket /*,  ... */) {
+    init: function(socket /* ,  ... */) {
         this._buffer= ""; // TCP clients may send their json in parts, delimited by the EOT_CHAR. We buffer it here.
-        socket.setEncoding('utf8');
+        socket.setEncoding("utf8");
 
         Client.init.apply(this, arguments);
     },
 
     /**
+     * Invoked when the tcp socket gets data
+     *
      * @override
      */
     _onSocketData: function(data) {
@@ -37,6 +39,8 @@ var TCPClient = Class(Client, {
     },
 
     /**
+     * Sends a raw string through the socket
+     *
      * @override
      */
     _sendRaw: function(str) {
@@ -46,6 +50,8 @@ var TCPClient = Class(Client, {
     },
 
     /**
+     * Invoked when the other end of this socket disconnects
+     *
      * @override
      */
     disconnected: function() {

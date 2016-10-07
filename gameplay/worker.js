@@ -1,7 +1,9 @@
 // This is the script that can be thought of as the 'main.js' for each worker thread that spins up a game session into an Instance using true multithreading
 var cluster = require("cluster");
 if(cluster.isMaster) {
+    /* eslint-disable no-console */
     console.error("ERROR: worker running on master thread");
+    /* eslint-enable no-console */
     process.exit(1); // worker threads not intended to run on main thread.
 }
 
@@ -30,7 +32,7 @@ var extend = require("extend");
 
 var instance = new Instance(extend({
     gameClass: require(__basedir + "/games/" + data.gameName.lowercaseFirst() + "/"),
-    profiler: data.profile && require('v8-profiler'),
+    profiler: data.profile && require("v8-profiler"),
 }, data));
 
 var socketIndex = 0;
@@ -45,6 +47,6 @@ process.on("message", function(message, handler) {
     }
 });
 
-process.once("uncaughtException", function (err) {
+process.once("uncaughtException", function(err) {
     instance.fatal(err);
 });

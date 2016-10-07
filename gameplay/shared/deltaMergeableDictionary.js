@@ -21,6 +21,7 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
      *
      * @param {string} key - key you are adding
      * @param {*} value - value you are adding
+     * @returns {*} value that was added
      */
     add: function(key, value) {
         // TODO: keyType use
@@ -29,6 +30,8 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
 
     /**
      * Removed a key from being a property. Use this instead of the traditiona 'delete this[key];'
+     *
+     * @param {string} key - key in this object
      */
     remove: function(key) {
         this._removeProperty(key);
@@ -37,7 +40,7 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
     /**
      * Convienence function like a traditional dictionary extend
      *
-     * @param copyFrom - other object to copy properties from
+     * @param {Object|DeltaMergeableDictionary} copyFrom - other object to copy properties from
      */
     extend: function(copyFrom) {
         for(var key in copyFrom) {

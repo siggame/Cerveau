@@ -10,7 +10,7 @@ var ws = require("lark-websocket");
  * @extends Client
  */
 var WSClient = Class(Client, {
-    init: function(socket /*, ... */) {
+    init: function(socket /* , ... */) {
         if(socket instanceof net.Socket) { // then we need to create a websocket interface wrapped around this net.Socket
             socket = ws.createClient(socket);
         }
@@ -21,7 +21,10 @@ var WSClient = Class(Client, {
     _onDataEventName: "message",
 
     /**
+     * Invoked when the websocket gets data
+     *
      * @override
+     * @param {Object} data - unparsed data from socket
      */
     _onSocketData: function(data) {
         Client._onSocketData.apply(this, arguments);
@@ -35,7 +38,10 @@ var WSClient = Class(Client, {
     },
 
     /**
+     * Sends a raw string through the socket
+     *
      * @override
+     * @param {string} str - string to send
      */
     _sendRaw: function(str) {
         Client._sendRaw.apply(this, arguments);
@@ -44,6 +50,8 @@ var WSClient = Class(Client, {
     },
 
     /**
+     * Invoked when the other end of this socket disconnects
+     *
      * @override
      */
     disconnected: function() {
@@ -54,20 +62,24 @@ var WSClient = Class(Client, {
     },
 
     /**
+     * Gets the net module member of this socket for passing between threads
+     *
      * @override
      */
-     getNetSocket: function() {
+    getNetSocket: function() {
         return this.socket._socket; // hackish, as we are grabbing a private socket out of the lark-websockets client, but works.
-     },
+    },
 
      /**
+      * Stops listening to the current socket, for passing to another thread
+      *
       * @override
       */
-     stopListeningToSocket: function() {
+    stopListeningToSocket: function() {
         Client.stopListeningToSocket.apply(this, arguments);
 
         this.socket.pause();
-     },
+    },
 });
 
 module.exports = WSClient;

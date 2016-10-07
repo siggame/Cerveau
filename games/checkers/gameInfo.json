@@ -512,7 +512,7 @@
                 "clientType",
                 "lost",
                 "name",
-                "otherPlayer",
+                "opponent",
                 "reasonLost",
                 "reasonWon",
                 "timeRemaining",
@@ -565,7 +565,7 @@
                         "valueType": null
                     }
                 },
-                "otherPlayer": {
+                "opponent": {
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {

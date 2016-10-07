@@ -10,6 +10,9 @@ var DeltaMergeable = Class({
      * Creates something that is DeltaMergeable, that is will only serialize certain keys. Can be re-initialized multiple times and will not overwrite values
      *
      * @contructor
+     * @param {BaseGame} baseGame - the game this is in
+     * @param {Array.<string>} pathInBaseGame - path to this item from the root (game)
+     * @param {Object} values - key value pairs of values to set
      */
     init: function(baseGame, pathInBaseGame, values) {
         this._baseGame = baseGame || this;
@@ -32,7 +35,8 @@ var DeltaMergeable = Class({
      *
      * @param {string} key - the index in side this you want to "set"
      * @param {*} value - the value you want to set this property to
-     * @param {string} [deltaKey] - what the key for the delta, defaults to the passed in key
+     * @param {string} options - options about the property to add
+     * @returns {DeltaMergeableArray|DeltaMergeableDictionary} - if a nested property is created, returns the nested delta mergeable container
      */
     _addProperty: function(key, value, options) {
         if(Array.isArray(value)) {
@@ -149,9 +153,9 @@ var DeltaMergeable = Class({
 
 
 
-    ////////////////////////////////
+    // //////////////////////////////
     // Creating Nested Structures //
-    ////////////////////////////////
+    // //////////////////////////////
 
     /**
      * When you add a [] it will need to be "converted" to a DeltaMergeableArray to register changes inside it, this creates that nested inside this DeltaMergeable

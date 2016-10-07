@@ -16,7 +16,7 @@ var CerveauError = Class({
     toString: function() {
         return "Cerveau Error:\n{0}".format(this.message);
     },
-})
+});
 
 module.exports = {
     CerveauError: CerveauError,

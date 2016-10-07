@@ -11,8 +11,10 @@ var TiledGame = Class(BaseGame, {
     _initMap: function() {
         this.tiles.length = this.mapWidth * this.mapHeight; // indexed row-major order
 
-        for(var x = 0; x < this.mapWidth; x++) {
-            for(var y = 0; y < this.mapHeight; y++) {
+        var x, y;
+
+        for(x = 0; x < this.mapWidth; x++) {
+            for(y = 0; y < this.mapHeight; y++) {
                 this.tiles[x + y*this.mapWidth] = this._createTile({
                     x: x,
                     y: y,
@@ -21,8 +23,8 @@ var TiledGame = Class(BaseGame, {
         }
 
         // now all the tiles are created, so hook up their neighbors. Ideally neightbors never change so a delta is never sent after the initial state so this doesn't impact performance much, but it super handy for competitors.
-        for(var x = 0; x < this.mapWidth; x++) {
-            for(var y = 0; y < this.mapHeight; y++) {
+        for(x = 0; x < this.mapWidth; x++) {
+            for(y = 0; y < this.mapHeight; y++) {
                 var tile = this.getTile(x, y);
 
                 tile.tileNorth = this.getTile(x, y - 1);

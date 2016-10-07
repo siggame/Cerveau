@@ -99,9 +99,11 @@ else:
 % endif
 % if function_parms['returns']:
      * @returns {${shared['cerveau']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
+% else:
+    * @returns {undefined} nothing is expected to be returned.
 % endif
      */
-    ${"aiFinished_" if 'order' in function_holder else ""}${function_name}: function(player${", ".join([""] + function_parms["argument_names"])}, asyncReturn) {
+    ${("aiFinished" + upcase_first(function_name)) if 'order' in function_holder else function_name}: function(player${", ".join([""] + function_parms["argument_names"])}${", asyncReturn" if not 'order' in function_holder else ""}) {
 ${merge("        // ", function_name, (
 """
         // Developer: Put your game logic for the {0}'s {1} function here

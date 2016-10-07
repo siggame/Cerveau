@@ -43,7 +43,7 @@ var Lobby = Class(Server, {
         this.gameLogger = new GameLogger(args);
 
         cluster.setupMaster({
-            exec: __basedir + '/gameplay/worker.js',
+            exec: __basedir + "/gameplay/worker.js",
         });
 
         var self = this; // for async reference in passed listener functions below
@@ -62,7 +62,7 @@ var Lobby = Class(Server, {
 
         // ReadLine: listens for CTRL+C to kill off child threads gracefully (letting their games complete)
         rl.setPrompt("");
-        rl.on('SIGINT', function() {
+        rl.on("SIGINT", function() {
             if(!self._isShuttingDown) {
                 self._isShuttingDown = true;
                 log("Shutting down gracefully...");
@@ -149,7 +149,7 @@ var Lobby = Class(Server, {
      * @param {number} port - port errored on
      */
     _socketError: function(err, port) {
-        log.error(err.code !== 'EADDRINUSE' ? err : "Lobby cannot listen on port " + this.host + ":" + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
+        log.error(err.code !== "EADDRINUSE" ? err : "Lobby cannot listen on port " + this.host + ":" + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
 
         process.exit(1);
     },
@@ -375,7 +375,10 @@ var Lobby = Class(Server, {
     },
 
     /**
+     * Invoked when a client disconnects from the lobby
+     *
      * @override
+     * @param {Client} client - the client that disconnected
      */
     clientDisconnected: function(client /* ... */) {
         if(client.session) {
@@ -399,7 +402,7 @@ var Lobby = Class(Server, {
     /**
      * Called when a session is over. This should only occur when a game ends
      *
-     * @param {Session} the session that ended.
+     * @param {Session} session - the session that ended.
      */
     _sessionOver: function(session) {
         delete this._runningSessions[session.gameName + session.id];

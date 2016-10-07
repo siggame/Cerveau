@@ -1,7 +1,6 @@
 // Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
 var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
@@ -68,8 +67,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      *
      * @param {Player} player - the player that called this.
      * @param {Checker} checker - The checker that was captured.
+    * @returns {undefined} nothing is expected to be returned.
      */
-    aiFinished_gotCaptured: function(player, checker, asyncReturn) {
+    aiFinishedGotCaptured: function(player, checker) {
         // <<-- Creer-Merge: gotCaptured -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Game's gotCaptured function here
@@ -88,7 +88,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this.players[1].yDirection = -1; // they are on bottom, and move up the board until kinged
     },
 
-    /// initializes the checker game objects for this game
+    // / initializes the checker game objects for this game
     _initCheckerPieces: function() {
         for(var y = 0; y < this.boardHeight; y++) {
             for(var x = 0; x < this.boardWidth; x++) {
@@ -120,14 +120,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     },
 
     isValidTile: function(x, y) {
-        return (x + y)%2 == 1;
+        return (x + y)%2 === 1;
     },
 
     getCheckerAt: function(x, y) {
         for(var i = 0; i < this.checkers.length; i++) {
             var checker = this.checkers[i];
 
-            if(checker.x == x && checker.y == y) {
+            if(checker.x === x && checker.y === y) {
                 return checker;
             }
         }
@@ -135,9 +135,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
 
 
-    ///////////////////////////////
+    // /////////////////////////////
     // Turn Based Game mechanics //
-    ///////////////////////////////
+    // /////////////////////////////
 
     nextTurn: function() {
         this.checkerMoved = null;
@@ -158,7 +158,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         // TODO: handle draw
         var winner;
-        for(var i = 0; i < this.players.length; i++) {
+        for(i = 0; i < this.players.length; i++) {
             var player = this.players[i];
             winner = winner || player;
 

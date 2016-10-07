@@ -9,7 +9,7 @@ var ObscuredDeltaMergeable = require("./obscuredDeltaMergeable");
 var ObscuredGameObject = Class(ObscuredDeltaMergeable, BaseGameObject, {
     init: function(data) {
         BaseGameObject.init.apply(this, arguments);
-        //ObscuredDeltaMergeable.init.apply(this, arguments); // No need to call, BaseGameObject will setup the delta mergeable stuff, ObscuredDeltaMergeable doesn't init anything new
+        // ObscuredDeltaMergeable.init.apply(this, arguments); // No need to call, BaseGameObject will setup the delta mergeable stuff, ObscuredDeltaMergeable doesn't init anything new
     },
 });
 

@@ -994,7 +994,7 @@
                 "lost",
                 "maxSpiderlings",
                 "name",
-                "otherPlayer",
+                "opponent",
                 "reasonLost",
                 "reasonWon",
                 "spiders",
@@ -1052,7 +1052,7 @@
                         "valueType": null
                     }
                 },
-                "otherPlayer": {
+                "opponent": {
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {

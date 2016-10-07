@@ -49,6 +49,13 @@ var GameManager = Class({
         }
     },
 
+    /**
+     * Sanitized the arguments for an order/run command
+     *
+     * @param {Array.<Object>} argsStructure - array of args information
+     * @param {Array} untreatedArgs - args as sent that have not been sanitized
+     * @returns {Array} a new array of sanitized args
+     */
     _sanitizeArgs: function(argsStructure, untreatedArgs) {
         var sanitized = [];
         for(var i = 0; i < argsStructure.length; i++) {
@@ -61,19 +68,34 @@ var GameManager = Class({
         return sanitized;
     },
 
+    /**
+     * Sanitizes a single value
+     *
+     * @param {*} val - unsanitized value
+     * @param {Object} arg - information about what the value should look like
+     * @returns {*} val, sanitized
+     */
     _sanitizeValue: function(val, arg) {
         return this.sanitizeType(arg.type.name, val === undefined ? arg.defaultValue : val);
     },
 
     /**
      * Sanatizes an AI's incoming arguments to a run event
+     *
+     * @param {Function} runFunction - the ai run function
+     * @param {Object} kwargs - key word formatted args (not array in order)
+     * @returns {Array} sanitized args for the run
      */
     sanitizeRun: function(runFunction, kwargs) {
         return this._sanitizeArgs(runFunction.cerveau.args, kwargs);
     },
 
     /**
-     * Sanatizes the servers return value from running game logic in response to an AI's run  event
+     * Sanatizes the servers return value from running game logic in response to an AI's run event
+     *
+     * @param {Function} ranFunction - the server-side (this) ran function callback
+     * @param {*} runReturned - unsanitized value from the server it returned from the run, to be sent to the ai
+     * @returns {*} santized return value from the ran
      */
     sanitizeRan: function(ranFunction, runReturned) {
         var returns = ranFunction.cerveau.returns;
@@ -84,22 +106,34 @@ var GameManager = Class({
 
     /**
      * Sanatizes the arguments the server will be sending to an order for the upcoming AI's order event
+     *
+     * @param {Object} order - the order to sanitize
      */
     sanitizeOrder: function(order) {
-        var structure = this._game['aiFinished_' + order.name].cerveau;
+        var structure = this._game["aiFinished" + order.name.upcaseFirst()].cerveau;
         order.args = this._sanitizeArgs(structure.args, order.args);
     },
 
     /**
-     * Sanatizes what the AI returned from their order
+     * Sanitizes what the AI returned from their order
+     *
+     * @param {Object} order - the order the ai finished
+     * @param {*} orderReturned - the return value from the ai of what it returned from the order
+     * @returns {*} sanitized version of orderReturned
      */
     sanitizeFinished: function(order, orderReturned) {
-        var structure = this._game['aiFinished_' + order.name].cerveau;
+        var structure = this._game["aiFinished" + order.name.upcaseFirst()].cerveau;
         if(structure.returns !== undefined) {
             return this._sanitizeValue(orderReturned, structure.returns);
         }
     },
 
+    /**
+     * Checks if a cerveau callback is a secret (not codegened)
+     *
+     * @param {Function} callback - callback to check (not invoke)
+     * @returns {Boolean} true if it is a secret, false otherwise
+     */
     isSecret: function(callback) {
         return Boolean(callback.cerveau.isSecret);
     },

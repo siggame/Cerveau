@@ -14,7 +14,7 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     init: function() {
         BaseGame.init.apply(this, arguments);
 
-        //ObscuredDeltaMergeable.init.apply(this, arguments); // No need to call, BaseGameObject will setup the delta mergeable stuff, ObscuredDeltaMergeable doesn't init anything new
+        // ObscuredDeltaMergeable.init.apply(this, arguments); // No need to call, BaseGameObject will setup the delta mergeable stuff, ObscuredDeltaMergeable doesn't init anything new
 
         this._obscuredDeltas = {};
     },
@@ -34,13 +34,16 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     },
 
     /**
-     * @override generates a UUID (Universally unique identifier) V4, because with game data being obscued we don't want competitors potentially learning hidden data based of id generation.
+     * generates a UUID (Universally unique identifier) V4, because with game data being obscued we don't want competitors potentially learning hidden data based of id generation.
+     *
+     * @override
      */
     _generateNextGameObjectID: function() {
         return uuid.v4();
     },
 
     /**
+     * Gets a delta for a specific player, obscured to them
      * @override
      */
     getDeltaFor: function(player) {
@@ -48,6 +51,8 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
     },
 
     /**
+     * Removes all obscured deltas for all players
+     *
      * @override
      */
     flushDelta: function() {
@@ -62,6 +67,8 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
      * when a property is updated the player's may need to know too
      *
      * @override
+     * @param {string} property - the property in the delta to update
+     * @param {boolean} wasDeleted - if the property was deleted from the delta (e.g. array indexes when shrinking)
      */
     updateDelta: function(property, wasDeleted) {
         BaseGame.updateDelta.call(this, property, wasDeleted);
@@ -76,9 +83,9 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
 
 
 
-    //////////////////////////////
+    // //////////////////////// //
     // Obscuring only functions //
-    //////////////////////////////
+    // //////////////////////// //
 
     /**
      * When a property is obscured or unobscured that specific player's delta must be updated too
@@ -110,18 +117,19 @@ var ObscuredGame = Class(BaseGame, ObscuredDeltaMergeable, {
                 return;
             }
         }
-        
+
         // if we got here they did not obscure part of the path
         var propertyKey = path.last();
         currentDelta[propertyKey] = wasDeleted ? constants.shared.DELTA_REMOVED : serializer.serialize(this._getObscuredValue(currentReal, propertyKey, player), this);
     },
 
     /**
-     * shortcut to get check to get obscured values from objects
+     * Shortcut to get check to get obscured values from objects
      *
      * @param {Object} real - obj to try to get key in, can be ObscuredDeltaMergeable or any other object
      * @param {string} key - key in real to try to get
      * @param {Player} player - the player you want to try to get the obscured value as it appears to them
+     * @returns {*} the obscrued value for some player in a real delta structure
      */
     _getObscuredValue: function(real, key, player) {
         return Class.isInstance(real, ObscuredDeltaMergeable) ? real.getObscured(key, player) : real[key];

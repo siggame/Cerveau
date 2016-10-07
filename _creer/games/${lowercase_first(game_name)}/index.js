@@ -5,7 +5,6 @@ var serializer = require(__basedir + "/gameplay/serializer");
 var classes = {};
 % for game_obj_name in (['Game'] + game_obj_names):
 <% game_obj = None
-function_prefix = ""
 if game_obj_name == 'Game':
     game_obj = game
 else:
@@ -29,12 +28,15 @@ classes.${game_obj_name}._deltaMergeableProperties = {
 <%
 if game_obj_name == 'Game': # because they have no functions, but the AI does
     game_obj = ai
-    function_prefix = "aiFinished_"
+    function_prefix = "aiFinished"
 %>
 % for function_name in game_obj['function_names']:
 <% function_parms = game_obj['functions'][function_name]
+formatted_function_name = function_name
+if game_obj_name == "Game":
+    formatted_function_name = "aiFinished" + upcase_first(function_name)
 %>
-classes.${game_obj_name}.${function_prefix}${function_name}.cerveau = {
+classes.${game_obj_name}.${formatted_function_name}.cerveau = {
     args: [
 % for argument in function_parms['arguments']:
         {

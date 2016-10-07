@@ -52,7 +52,7 @@ var serializer = {
         return serializer[typeName.toLowerCase().upperFirst()](o);
     },
 
-    isEmpty: function(obj){
+    isEmpty: function(obj) {
         return (Object.getOwnPropertyNames(obj).length === 0);
     },
 
@@ -61,11 +61,11 @@ var serializer = {
     },
 
     isGameObjectReference: function(obj) {
-        return serializer.isEmptyExceptFor(obj, 'id');
+        return serializer.isEmptyExceptFor(obj, "id");
     },
 
     isObject: function(obj) {
-        return (typeof(obj) === 'object' && obj !== null);
+        return (typeof(obj) === "object" && obj !== null);
     },
 
     isSerializable: function(obj, key) {
@@ -112,22 +112,32 @@ var serializer = {
         return serialized;
     },
 
+    /**
+     * Deserialized data from a game client
+     *
+     * @param {*} data - data to deserialize
+     * @param {BaseGame} game - game to lookup game objects in for game object references in data
+     * @param {Function} [dataTypeConverter] - function to convert the deserialized value once found
+     * @returns {*} data now deserialized, will create new objects instead of reusing data
+     */
     deserialize: function(data, game, dataTypeConverter) {
         if(serializer.isObject(data) && game) {
             var result = data.isArray ? [] : {};
 
             for(var key in data) {
-                var value = data[key];
-                if(typeof(value) == "object") {
-                    if(serializer.isGameObjectReference(value)) { // it's a tracked game object
-                        result[key] = game.getGameObject(value.id);
+                if(data.hasOwnProperty(key)) {
+                    var value = data[key];
+                    if(typeof(value) === "object") {
+                        if(serializer.isGameObjectReference(value)) { // it's a tracked game object
+                            result[key] = game.getGameObject(value.id);
+                        }
+                        else {
+                            result[key] = serializer.deserialize(value, game);
+                        }
                     }
                     else {
-                        result[key] = serializer.deserialize(value, game);
+                        result[key] = value;
                     }
-                }
-                else {
-                    result[key] = value;
                 }
             }
 
@@ -140,6 +150,6 @@ var serializer = {
 
         return data;
     },
-}
+};
 
 module.exports = serializer;

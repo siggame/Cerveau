@@ -75,7 +75,7 @@ var Piece = Class(GameObject, {
                 var myPos = this.file + this.rank;
                 var toPos = file + rank;
                 var promotion;
-                if(myPos === move.from && toPos == move.to) { // we found the move!
+                if(myPos === move.from && toPos === move.to) { // we found the move!
                     if(move.promotion) { // then we have to make sure their promotion is valid
                         promotion = promotionType.toLowerCase();
                         if(promotion === "knight") {
@@ -129,7 +129,7 @@ var Piece = Class(GameObject, {
 
     toString: function() {
         return "Piece {owner.color} {type} #{id} at {file}{rank}".format(this);
-    }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
