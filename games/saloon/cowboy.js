@@ -197,6 +197,9 @@ var Cowboy = Class(GameObject, {
      * @param {number} damage - how much damage to do to this
      */
     damage: function(damage) {
+        if(this.job == "Young Gun") {
+            return;
+        }
         this.health = Math.max(0, this.health - damage);
         if(this.health === 0) {
             this.isDead = true;
