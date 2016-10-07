@@ -163,13 +163,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
 
-        this._cleanupArray("cowboys");
-        this._cleanupArray("furnishings");
-        this._cleanupArray("bottles");
-
         this._updateCowboys();
         this._advanceBottles();
         this._damagePianos();
+
+        this._cleanupArray("cowboys");
+        this._cleanupArray("furnishings");
+        this._cleanupArray("bottles");
 
         this._doYoungGun(this.currentPlayer);
 
@@ -193,8 +193,22 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             if(cowboy.isDrunk) { // move him!
                 var next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
-                cowboy.tile.cowboy = null;
-                cowboy.tile = next;
+                if(!next || next.isWall || next.cowboy || next.furnishing) { // then something is in the way
+                    if(next) {
+                        if(next.cowboy) {
+                            next.cowboy.focus = 0;
+                        }
+
+                        if(next.isWall || next.furnishing) {
+                            cowboy.damage(1);
+                        }
+                    }
+                }
+                else { // the next tile is valid
+                    cowboy.tile.cowboy = null;
+                    cowboy.tile = next;
+                    next.cowboy = cowboy;
+                }
 
                 cowboy.isDrunk = (cowboy.turnsBusy === 0);
                 cowboy.canMove = !cowboy.isDrunk;

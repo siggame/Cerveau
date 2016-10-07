@@ -96,6 +96,10 @@ var Cowboy = Class(GameObject, {
             }
         }
 
+        if(!this.tile.getNeighbors().contains(tile)) {
+            reason = "{tile} is not adjacent to {this.tile}";
+        }
+
         if(reason) {
             return this.game.logicError(false, reason.format({
                 this: this,
@@ -168,7 +172,10 @@ var Cowboy = Class(GameObject, {
      */
     _check: function(player, tile) {
         if(!player || player !== this.game.currentPlayer) {
-            return "You do not own {this}";
+            return "{player} it is not your turn.";
+        }
+        else if(this.owner !== player) {
+            return "{this} is not owned by you.";
         }
         else if(this.isDead) {
             return "{this} is dead.";
