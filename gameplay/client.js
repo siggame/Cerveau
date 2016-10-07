@@ -51,7 +51,7 @@ var Client = Class({
     /**
      * Sets up the clients name and type
      *
-     * @param {Object} should contain this client's 'name' and 'type'
+     * @param {Object} data - should contain this client's 'name' and 'type'
      */
     setInfo: function(data) {
         data = data || {};
@@ -82,7 +82,7 @@ var Client = Class({
      */
     _onSocketData: function(data) {
         if(this.server.printTCP) {
-            log("< From client " + this.name + " <--", data, '\n---');
+            log("< From client " + this.name + " <--", data, "\n---");
         }
 
         // super classes should override and do stuff with data...
@@ -126,8 +126,8 @@ var Client = Class({
     /**
      * Sets the data related to the game this client is connected to play
      *
-     * @param {BaseGame} the game this client has a player playing in
-     * @param {Player} the player this ai controls
+     * @param {BaseGame} game - the game this client has a player playing in
+     * @param {Player} player - the player this ai controls
      */
     setGameData: function(game, player) {
         this.game = game;
@@ -170,7 +170,7 @@ var Client = Class({
     /**
      * Sends a the raw string to the remote client this class represents. Intended to be overridden to actually send through client...
      *
-     * @param {string} the raw string to send. Should be EOT_CHAR terminated.
+     * @param {string} str - the raw string to send. Should be EOT_CHAR terminated.
      */
     _sendRaw: function(str) {
         if(this.server.printTCP) {
@@ -181,8 +181,8 @@ var Client = Class({
     /**
      * Sends the message of type event to this client as a json string EOT_CHAR terminated.
      *
-     * @param {string} event name
-     * @param {Object} (optional) object to send about the event being sent
+     * @param {string} event - the event name
+     * @param {Object} [data] - the object to send about the event being sent
      */
     send: function(event, data) {
         this._sendRaw(JSON.stringify({
@@ -206,14 +206,15 @@ var Client = Class({
      *
      * @returns {net.Socket} the socket
      */
-     getNetSocket: function() {
+    getNetSocket: function() {
         return this.socket;
-     },
+    },
 
      /**
       * Tries to parse json data from the client, and disconnects them fatally if it is malformed.
       *
-      * @param {string} json string to parse
+      * @param {string} json - the json formatted string to parse
+      * @returns {Object} the parsed json structure, or undefined if malformed json
       */
     _parseData: function(json) {
         try {
@@ -226,9 +227,9 @@ var Client = Class({
 
 
 
-    /////////////////////////////////////////////////////////
-    // Timeouts. Timer should be started/paused by Session //
-    /////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////// //
+    //  Timeouts. Timer should be started/paused by Session  //
+    // ///////////////////////////////////////////////////// //
 
     /**
      * Checks if this client's timer is ticking (we are awaiting them to finish an order)
@@ -241,6 +242,8 @@ var Client = Class({
 
     /**
      * Starts the timeout timer counting down from how much time this client's player has left. Should be called when the client is being timed for orders.
+     *
+     * @returns {boolean} true if ticking, false if timeouts are not enabled
      */
     startTicking: function() {
         if(!this.server.timeout) { // server is not going to timeout clients

@@ -1,4 +1,7 @@
-clientClasses = {
+// All the client protocals we support
+// They should all inherit from the Client base class
+
+var clientClasses = {
     WS: require("./wsClient"),
     TCP: require("./tcpClient"),
 };

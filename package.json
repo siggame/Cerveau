@@ -23,11 +23,22 @@
     "seedrandom": "2.4.2",
     "uuid": "2.0.1"
   },
+  "devDependencies": {
+    "eslint": "3.7.1",
+    "ghooks": "1.3.2"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "./node_modules/.bin/eslint --cache ./",
+      "post-merge": "npm install",
+      "post-rewrite": "npm install"
+    }
+  },
   "engines": {
     "node": "6.6.0"
   },
-  "scripts": [
-    "node main.js"
-  ],
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint --cache ./"
+  },
   "license": "MIT"
 }

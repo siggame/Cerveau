@@ -1,7 +1,6 @@
 // Checker: A checker on the game board.
 
-var Class = require(__basedir + "/utilities/class");
-var serializer = require(__basedir + "/gameplay/serializer");
+var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var GameObject = require("./gameObject");
 
@@ -52,7 +51,7 @@ var Checker = Class(GameObject, {
      */
     move: function(player, x, y, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        game = this.game;
+        var game = this.game;
         if(this.owner !== player) {
             return game.logicError(null, "tried to move a checker they didn't own");
         }
@@ -78,7 +77,7 @@ var Checker = Class(GameObject, {
 
         var fromString = "(" + this.x + ", " + this.y + ") -> (" + x + ", " + y + ")";
         if(!this.kinged) { // then check if they are moving the right direction via dy when not kinged
-            if((yOffset == 1 && dy < 1) || (yOffset == -1 && dy > -1)) {
+            if((yOffset === 1 && dy < 1) || (yOffset === -1 && dy > -1)) {
                 return game.logicError(null, "moved in the wrong vertical direction " + fromString);
             }
         }

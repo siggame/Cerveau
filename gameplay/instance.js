@@ -4,8 +4,8 @@ var Class = require(__basedir + "/utilities/class");
 var Server = require("./server");
 var GameLogger = require("./gameLogger");
 var constants = require("./constants");
-var moment = require('moment');
-var fs = require('fs');
+var moment = require("moment");
+var fs = require("fs");
 var log = require("./log");
 
 /**
@@ -125,6 +125,8 @@ var Instance = Class(Server, {
 
     /**
      * Called when the game ends, so that this thread "ends"
+     *
+     * @param {Object} [data] - data to send back to the main thread
      */
     end: function(data) {
         var self = this;
@@ -137,7 +139,7 @@ var Instance = Class(Server, {
             if(self._profiler) {
                 var profile = self._profiler.stopProfiling();
                 profile.export(function(error, result) {
-                    fs.writeFileSync('output/profiles/profile-' + self.game.name + '-' + self.game.session + '-' + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + '.cpuprofile', result);
+                    fs.writeFileSync("output/profiles/profile-" + self.game.name + "-" + self.game.session + "-" + moment().format("YYYY.MM.DD.HH.mm.ss.SSS") + ".cpuprofile", result);
                     profile.delete();
                     self._exit();
                 });
@@ -256,7 +258,7 @@ var Instance = Class(Server, {
             var order = orders[i];
 
             var serializedArgs = [];
-            for(j = 0; j < order.args.length; j++) {
+            for(var j = 0; j < order.args.length; j++) {
                 serializedArgs.push(serializer.serialize(order.args[j]));
             }
 
@@ -286,9 +288,9 @@ var Instance = Class(Server, {
     },
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Client functions. These should be invoked when a client sends something back to the server //
-    /////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////////////////////////////////////
+    // / Client functions. These should be invoked when a client sends something back to the server //
+    // ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * A client sent a 'run' command, which is a request for the game to run game logic
@@ -315,7 +317,7 @@ var Instance = Class(Server, {
                 if(serializer.isObject(returned) && returned.isGameLogicError) {
                     invalid = {
                         message: returned.invalidMessage,
-                        data: returned.invalidData
+                        data: returned.invalidData,
                     };
 
                     client.send("invalid", invalid);
@@ -367,8 +369,7 @@ var Instance = Class(Server, {
         try {
             finished = this.game.aiFinished(client.player, data.orderIndex, data.returned);
         }
-        catch(error)
-        {
+        catch(error) {
             if(!Class.isInstance(error, errors.CerveauError)) {
                 throw error;
             }

@@ -14,6 +14,7 @@
                     "default": true,
                     "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -47,6 +48,7 @@
                 "default": null,
                 "description": "How many bribes players get at the beginning of their turn, not counting their burned down Buildings.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -56,9 +58,11 @@
                 "default": null,
                 "description": "All the buildings in the game.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -69,6 +73,7 @@
                 "default": null,
                 "description": "The current Forecast, which will be applied at the end of the turn.",
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Forecast",
                     "valueType": null
@@ -79,6 +84,7 @@
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Player",
                     "valueType": null
@@ -89,6 +95,7 @@
                 "description": "The current turn number, starting at 0 for the first player's turn.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -98,9 +105,11 @@
                 "default": null,
                 "description": "All the forecasts in the game, indexed by turn number.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Forecast",
                         "valueType": null
@@ -112,13 +121,16 @@
                 "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     },
                     "name": "dictionary",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "GameObject",
                         "valueType": null
@@ -129,6 +141,7 @@
                 "default": null,
                 "description": "The width of the entire map along the vertical (y) axis.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -138,6 +151,7 @@
                 "default": null,
                 "description": "The width of the entire map along the horizontal (x) axis.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -147,6 +161,7 @@
                 "default": null,
                 "description": "The maximum amount of fire value for any Building.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -156,6 +171,7 @@
                 "default": null,
                 "description": "The maximum amount of intensity value for any Forecast.",
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -166,6 +182,7 @@
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "int",
                     "valueType": null
@@ -175,6 +192,7 @@
                 "default": null,
                 "description": "The next Forecast, which will be applied at the end of your opponent's turn. This is also the Forecast WeatherStations can control this turn.",
                 "type": {
+                    "is_game_object": true,
                     "keyType": null,
                     "name": "Forecast",
                     "valueType": null
@@ -185,9 +203,11 @@
                 "description": "List of all the players in the game.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "list",
                     "valueType": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -199,6 +219,7 @@
                 "description": "A unique identifier for the game instance that is being played.",
                 "serverPredefined": true,
                 "type": {
+                    "is_game_object": false,
                     "keyType": null,
                     "name": "string",
                     "valueType": null
@@ -241,6 +262,7 @@
                     "default": null,
                     "description": "When true this building has already been bribed this turn and cannot be bribed again this turn.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -250,6 +272,7 @@
                     "default": null,
                     "description": "The Building directly to the east of this building, or null if not present.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -259,6 +282,7 @@
                     "default": null,
                     "description": "The Building directly to the north of this building, or null if not present.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -268,6 +292,7 @@
                     "default": null,
                     "description": "The Building directly to the south of this building, or null if not present.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -277,6 +302,7 @@
                     "default": null,
                     "description": "The Building directly to the west of this building, or null if not present.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -286,6 +312,7 @@
                     "default": null,
                     "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -295,6 +322,7 @@
                     "default": null,
                     "description": "How much health this building currently has. When this reaches 0 the Building has been burned down.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -304,6 +332,7 @@
                     "default": null,
                     "description": "True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -313,6 +342,7 @@
                     "default": null,
                     "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -322,6 +352,7 @@
                     "default": null,
                     "description": "The location of the Building along the x-axis.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -331,6 +362,7 @@
                     "default": null,
                     "description": "The location of the Building along the y-axis.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -352,6 +384,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -363,6 +396,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -374,9 +408,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -400,6 +436,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -426,6 +463,7 @@
                     "default": null,
                     "description": "The amount of fire removed from a building when bribed to extinguish a building.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -449,6 +487,7 @@
                             "name": "building",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Building",
                                 "valueType": null
@@ -460,6 +499,7 @@
                         "default": null,
                         "description": "True if the bribe worked, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -490,6 +530,7 @@
                     "description": "When true this building has already been bribed this turn and cannot be bribed again this turn.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -500,6 +541,7 @@
                     "description": "The Building directly to the east of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -510,6 +552,7 @@
                     "description": "The Building directly to the north of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -520,6 +563,7 @@
                     "description": "The Building directly to the south of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -530,6 +574,7 @@
                     "description": "The Building directly to the west of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -540,6 +585,7 @@
                     "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -551,6 +597,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -561,6 +608,7 @@
                     "description": "How much health this building currently has. When this reaches 0 the Building has been burned down.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -572,6 +620,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -582,6 +631,7 @@
                     "description": "True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -593,9 +643,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -607,6 +659,7 @@
                     "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -617,6 +670,7 @@
                     "description": "The location of the Building along the x-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -627,6 +681,7 @@
                     "description": "The location of the Building along the y-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -649,6 +704,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -677,6 +733,7 @@
                     "default": null,
                     "description": "The Player that can use WeatherStations to control this Forecast when its the nextForecast.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -686,6 +743,7 @@
                     "default": null,
                     "description": "The direction the wind will blow fires in. Can be 'north', 'east', 'south', or 'west'.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -695,6 +753,7 @@
                     "default": null,
                     "description": "How much of a Building's fire that can be blown in the direction of this Forecast. Fire is duplicated (copied), not moved (transfered).",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -716,6 +775,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -727,6 +787,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -738,9 +799,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -764,6 +827,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -793,6 +857,7 @@
                     "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -803,6 +868,7 @@
                     "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -813,9 +879,11 @@
                     "description": "Any strings logged will be stored here. Intended for debugging.",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -840,6 +908,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -869,7 +938,7 @@
                 "headquarters",
                 "lost",
                 "name",
-                "otherPlayer",
+                "opponent",
                 "policeDepartments",
                 "reasonLost",
                 "reasonWon",
@@ -883,6 +952,7 @@
                     "default": null,
                     "description": "How many bribes this player has remaining to use during their turn. Each action a Building does costs 1 bribe. Any unused bribes are lost at the end of the player's turn.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -892,9 +962,11 @@
                     "default": null,
                     "description": "All the buildings owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Building",
                             "valueType": null
@@ -905,6 +977,7 @@
                     "default": null,
                     "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -914,9 +987,11 @@
                     "default": null,
                     "description": "All the FireDepartments owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "FireDepartment",
                             "valueType": null
@@ -927,6 +1002,7 @@
                     "default": null,
                     "description": "The Warehouse that serves as this player's headquarters and has extra health. If this gets destroyed they lose.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Warehouse",
                         "valueType": null
@@ -936,6 +1012,7 @@
                     "default": false,
                     "description": "If the player lost the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -945,15 +1022,17 @@
                     "default": "Anonymous",
                     "description": "The name of the player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
                     }
                 },
-                "otherPlayer": {
+                "opponent": {
                     "default": null,
                     "description": "This player's opponent in the game.",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -963,9 +1042,11 @@
                     "default": null,
                     "description": "All the PoliceDepartments owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "PoliceDepartment",
                             "valueType": null
@@ -976,6 +1057,7 @@
                     "default": null,
                     "description": "The reason why the player lost the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -985,6 +1067,7 @@
                     "default": null,
                     "description": "The reason why the player won the game.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -994,6 +1077,7 @@
                     "default": null,
                     "description": "The amount of time (in ns) remaining for this AI to send commands.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "float",
                         "valueType": null
@@ -1003,9 +1087,11 @@
                     "default": null,
                     "description": "All the warehouses owned by this player. Includes the Headquarters.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "Warehouse",
                             "valueType": null
@@ -1016,9 +1102,11 @@
                     "default": null,
                     "description": "All the WeatherStations owned by this player.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": true,
                             "keyType": null,
                             "name": "WeatherStation",
                             "valueType": null
@@ -1029,6 +1117,7 @@
                     "default": false,
                     "description": "If the player won the game or not.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1050,6 +1139,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1061,6 +1151,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1072,9 +1163,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1098,6 +1191,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1135,6 +1229,7 @@
                             "name": "warehouse",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Warehouse",
                                 "valueType": null
@@ -1146,6 +1241,7 @@
                         "default": null,
                         "description": "The amount of damage dealt to the warehouse, or -1 if there was an error.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "int",
                             "valueType": null
@@ -1176,6 +1272,7 @@
                     "description": "When true this building has already been bribed this turn and cannot be bribed again this turn.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1186,6 +1283,7 @@
                     "description": "The Building directly to the east of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1196,6 +1294,7 @@
                     "description": "The Building directly to the north of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1206,6 +1305,7 @@
                     "description": "The Building directly to the south of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1216,6 +1316,7 @@
                     "description": "The Building directly to the west of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1226,6 +1327,7 @@
                     "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1237,6 +1339,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1247,6 +1350,7 @@
                     "description": "How much health this building currently has. When this reaches 0 the Building has been burned down.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1258,6 +1362,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1268,6 +1373,7 @@
                     "description": "True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1279,9 +1385,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1293,6 +1401,7 @@
                     "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1303,6 +1412,7 @@
                     "description": "The location of the Building along the x-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1313,6 +1423,7 @@
                     "description": "The location of the Building along the y-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1335,6 +1446,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1362,6 +1474,7 @@
                     "default": null,
                     "description": "How exposed the anarchists in this warehouse are to PoliceDepartments. Raises when bribed to ignite buildings, and drops each turn if not bribed.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1371,6 +1484,7 @@
                     "default": null,
                     "description": "The amount of fire added to buildings when bribed to ignite a building. Headquarters add more fire than normal Warehouses.",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1394,6 +1508,7 @@
                             "name": "building",
                             "optional": false,
                             "type": {
+                                "is_game_object": true,
                                 "keyType": null,
                                 "name": "Building",
                                 "valueType": null
@@ -1405,6 +1520,7 @@
                         "default": null,
                         "description": "The exposure added to this Building's exposure. -1 is returned if there was an error.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "int",
                             "valueType": null
@@ -1435,6 +1551,7 @@
                     "description": "When true this building has already been bribed this turn and cannot be bribed again this turn.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1445,6 +1562,7 @@
                     "description": "The Building directly to the east of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1455,6 +1573,7 @@
                     "description": "The Building directly to the north of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1465,6 +1584,7 @@
                     "description": "The Building directly to the south of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1475,6 +1595,7 @@
                     "description": "The Building directly to the west of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1485,6 +1606,7 @@
                     "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1496,6 +1618,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1506,6 +1629,7 @@
                     "description": "How much health this building currently has. When this reaches 0 the Building has been burned down.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1517,6 +1641,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1527,6 +1652,7 @@
                     "description": "True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1538,9 +1664,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1552,6 +1680,7 @@
                     "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1562,6 +1691,7 @@
                     "description": "The location of the Building along the x-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1572,6 +1702,7 @@
                     "description": "The location of the Building along the y-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1594,6 +1725,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null
@@ -1632,6 +1764,7 @@
                             "name": "negative",
                             "optional": true,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "boolean",
                                 "valueType": null
@@ -1645,6 +1778,7 @@
                         "default": null,
                         "description": "True if the intensity was changed, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1664,6 +1798,7 @@
                             "name": "counterclockwise",
                             "optional": true,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "boolean",
                                 "valueType": null
@@ -1677,6 +1812,7 @@
                         "default": null,
                         "description": "True if the rotation worked, false otherwise.",
                         "type": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "boolean",
                             "valueType": null
@@ -1707,6 +1843,7 @@
                     "description": "When true this building has already been bribed this turn and cannot be bribed again this turn.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1717,6 +1854,7 @@
                     "description": "The Building directly to the east of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1727,6 +1865,7 @@
                     "description": "The Building directly to the north of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1737,6 +1876,7 @@
                     "description": "The Building directly to the south of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1747,6 +1887,7 @@
                     "description": "The Building directly to the west of this building, or null if not present.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Building",
                         "valueType": null
@@ -1757,6 +1898,7 @@
                     "description": "How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1768,6 +1910,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1778,6 +1921,7 @@
                     "description": "How much health this building currently has. When this reaches 0 the Building has been burned down.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1789,6 +1933,7 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "string",
                         "valueType": null
@@ -1799,6 +1944,7 @@
                     "description": "True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "boolean",
                         "valueType": null
@@ -1810,9 +1956,11 @@
                     "inheritedFrom": "GameObject",
                     "serverPredefined": true,
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "list",
                         "valueType": {
+                            "is_game_object": false,
                             "keyType": null,
                             "name": "string",
                             "valueType": null
@@ -1824,6 +1972,7 @@
                     "description": "The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
                         "valueType": null
@@ -1834,6 +1983,7 @@
                     "description": "The location of the Building along the x-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1844,6 +1994,7 @@
                     "description": "The location of the Building along the y-axis.",
                     "inheritedFrom": "Building",
                     "type": {
+                        "is_game_object": false,
                         "keyType": null,
                         "name": "int",
                         "valueType": null
@@ -1866,6 +2017,7 @@
                             "name": "message",
                             "optional": false,
                             "type": {
+                                "is_game_object": false,
                                 "keyType": null,
                                 "name": "string",
                                 "valueType": null

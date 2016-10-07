@@ -55,9 +55,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    /////////////////////////////
+    // /////////////////////// //
     // Server starting methods //
-    /////////////////////////////
+    // /////////////////////// //
 
     /**
      * Called then the game starts. Do not inherit this method, instead use begin()
@@ -92,7 +92,7 @@ var BaseGame = Class(DeltaMergeable, {
      * Called when the game actually starts and has it's players. Intended to be inherited and extended when the game should be started (e.g. initializing game objects)
      *
      * @inheritable
-     * @returns {*} returns any start data you want stored in the game log, such as the random seed (if any procedural generation is used)
+     * returns {*} returns any start data you want stored in the game log, such as the random seed (if any procedural generation is used)
      */
     begin: function() {
         // This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
@@ -100,9 +100,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    /////////////
+    // ///////////
     // Players //
-    /////////////
+    // ///////////
 
     /**
      * Initializes the players based on what clients are connected.
@@ -144,13 +144,13 @@ var BaseGame = Class(DeltaMergeable, {
                 var allDisconnected = true;
                 var allTimedOut = true;
                 for(var i = 0; i < this.players.length; i++) {
-                    var player = this.players[i];
-                    if(!player.lost) {
-                        winner = player;
+                    var otherPlayer = this.players[i];
+                    if(!otherPlayer.lost) {
+                        winner = otherPlayer;
                     }
                     else {
-                        allDisconnected = allDisconnected && player.client.hasDisconnected();
-                        allTimedOut = allTimedOut && player.client.hasTimedOut();
+                        allDisconnected = allDisconnected && otherPlayer.client.hasDisconnected();
+                        allTimedOut = allTimedOut && otherPlayer.client.hasTimedOut();
                     }
                 }
 
@@ -159,7 +159,7 @@ var BaseGame = Class(DeltaMergeable, {
                     reasonWon = "All other players disconnected.";
                 }
                 if(allTimedOut) {
-                    reasonWon = "All other players timed out."
+                    reasonWon = "All other players timed out.";
                 }
 
                 this.declareWinner(winner, reasonWon);
@@ -186,9 +186,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    //////////////////
+    // ////////////////
     // Game Objects //
-    //////////////////
+    // ////////////////
 
     /**
      * Checks and returns the game object with given id, undefined otherwise.
@@ -218,7 +218,7 @@ var BaseGame = Class(DeltaMergeable, {
      */
     create: function(gameObjectName, data) {
         var gameObjectClass = this.classes[gameObjectName];
-        var gameObject = new gameObjectClass.uninitialized; // don't call init, we need to hook up some stuff first
+        var gameObject = new gameObjectClass.uninitialized(); // don't call init, we need to hook up some stuff first
 
         data = data || {};
         data.id = this._generateNextGameObjectID();
@@ -234,15 +234,15 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    /////////////////////////////////
+    // ///////////////////////////////
     // Client Responses & Requests //
-    /////////////////////////////////
+    // ///////////////////////////////
 
     /**
      * Called when an instance gets the "finished" event from an ai (client), meaning they finished an order we instructed them to do.
      *
      * @throws {CerveauError} - game logic or event errors
-     * @param {Player} the player this ai controls
+     * @param {Player} player - the player this ai controls
      * @param {number} orderIndex - the index of the order that finished
      * @param {Object} [data] - serialized data returned from the ai executing that order
      * @returns {string} the name of the order that was finished
@@ -254,7 +254,7 @@ var BaseGame = Class(DeltaMergeable, {
         }
         else {
             var finished = order.name;
-            var defaultCallback = this["aiFinished_" + finished];
+            var defaultCallback = this["aiFinished" + finished.upcaseFirst()];
 
             var returned = serializer.deserialize(data, this);
             returned = this.gameManager.sanitizeFinished(order, returned);
@@ -321,7 +321,9 @@ var BaseGame = Class(DeltaMergeable, {
         }
 
         var asyncReturnWrapper = {}; // just an object both asyncReturn and the promise have scope to to pass things to and from.
-        var asyncReturn = function(asyncReturnValue) { asyncReturnWrapper.callback(asyncReturnValue); }; // callback function setup below
+        var asyncReturn = function(asyncReturnValue) {
+            asyncReturnWrapper.callback(asyncReturnValue);
+        }; // callback function setup below
 
         argsArray.unshift(player);
         argsArray.push(asyncReturn);
@@ -348,6 +350,11 @@ var BaseGame = Class(DeltaMergeable, {
 
     /**
      * After we run game logic, santatize the ran data and send it back
+     *
+     * @param {Function} runCallback - the callback we finished
+     * @param {Player} player - the player that requested we run something
+     * @param {*} returned - the value we returned, and need to sanitize because statically typed clients are lame
+     * @returns {*} the avtual return value, handling invalid messaged if returned was an error
      */
     _finishRun: function(runCallback, player, returned) {
         var isGameLogicError = typeof(returned) === "object" && returned.isGameLogicError;
@@ -379,9 +386,10 @@ var BaseGame = Class(DeltaMergeable, {
      * @param {string} orderName - the name of the order to the player's ai to execute
      * @param {Array} [args] - an array that represents the args to send to the order function on the client ai, or [callback] if no args
      * @param {function} [callback] - callback function to execute instead of the normal aiFinished callback
+     * @returns {Object} the order flag signifying that this was an order to execute
      */
     order: function(player, orderName, args, callback) {
-        if(callback === undefined && typeof(args) == "function") {
+        if(callback === undefined && typeof(args) === "function") {
             callback = args;
         }
 
@@ -416,9 +424,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    ///////////////////////////
+    // /////////////////////////
     // States & Delta States //
-    ///////////////////////////
+    // /////////////////////////
 
     /**
      * Gets the true delta state of the game, with nothing hidden
@@ -442,8 +450,7 @@ var BaseGame = Class(DeltaMergeable, {
     /**
      * Called by all DeltaMergeables in this game whenever a property of theirs is updated
      *
-     * @param {Array} basePath - the path of keys to where this property's object is
-     * @param {string} propertyKey - they key of the property at the end of the basePath
+     * @param {Object} property - the property to update in the delta
      * @param {boolean} [wasDeleted] - true if the value was removed (deleted)
      */
     updateDelta: function(property, wasDeleted) {
@@ -480,9 +487,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    /////////////////////////
+    // ///////////////////////
     // Winning and Loosing //
-    /////////////////////////
+    // ///////////////////////
 
     /**
      * Checks if a game is over, or sets if a game is over
@@ -520,8 +527,9 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Player} loser - the player that lost the game
      * @see BaseGame.declareLosers
+     * @returns {boolean} true if the game ended beacuse of this, false otherwise
      */
-    declareLoser: function(loser /*...*/) {
+    declareLoser: function(loser /* ...*/) {
         var args = Array.prototype.slice.call(arguments);
         args[0] = [ loser ];
         return this.declareLosers.apply(this, args);
@@ -562,8 +570,9 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Player} winner - the player that won the game
      * @see BaseGame.declareWinners
+     * @returns {boolean} true if the game ended beacuse of this, false otherwise
      */
-    declareWinner: function(winner /*...*/) {
+    declareWinner: function(winner /* ...*/) {
         var args = Array.prototype.slice.call(arguments);
         args[0] = [ winner ];
         return this.declareWinners.apply(this, args);
@@ -592,8 +601,6 @@ var BaseGame = Class(DeltaMergeable, {
 
     /**
      * Does a basic check if this game is over because there is a winner (all other players have lost). For game logic related winner checking you should write your own checkForWinner() function on the sub class.
-     *
-     * @returns {boolean} boolean represnting if the game is over
      */
     _checkForGameOver: function() {
         if(this._winners.length > 0) { // someone has won, so let's end this
@@ -622,7 +629,7 @@ var BaseGame = Class(DeltaMergeable, {
         }
 
         var winnerIndex = Math.randomInt(players.length - 1);
-        for(var i = 0; i < players.length; i++) {
+        for(i = 0; i < players.length; i++) {
             if(i === winnerIndex) {
                 this.declareWinner(players[i], "Won via coin flip.");
             }

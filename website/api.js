@@ -6,6 +6,13 @@ var app = require("./app");
 module.exports = function(args) {
     var lobby = args.lobby;
 
+    /**
+     * Gets the info for some session of some game
+     *
+     * @param {string} gameName - name of the game
+     * @param {string} id - id of the session of that gameName
+     * @returns {Object} information about the session for the api
+     */
     function _getSessionInfo(gameName, id) {
         try {
             gameName = lobby.getGameNameForAlias(gameName);
@@ -30,9 +37,10 @@ module.exports = function(args) {
             return info;
         }
 
+        var client;
         // if the game session was found there should be some clients...
         for(var i = 0; i < session.clients.length; i++) {
-            var client = session.clients[i];
+            client = session.clients[i];
             info.clients.push({
                 name: client.name,
                 index: client.playerIndex === undefined ? client.index : client.playerIndex,
@@ -54,15 +62,15 @@ module.exports = function(args) {
         if(session.isOver()) {
             info.status = "over";
 
-            for(var i = 0; i < session.winners.length; i++) {
-                var client = info.clients[session.winners[i].index];
+            for(i = 0; i < session.winners.length; i++) {
+                client = info.clients[session.winners[i].index];
                 client.won = true;
                 client.reason = session.winners[i].reason;
             }
 
-            for(var i = 0; i < session.losers.length; i++) {
-                var loser = session.losers[i]
-                var client = info.clients[loser.index];
+            for(i = 0; i < session.losers.length; i++) {
+                var loser = session.losers[i];
+                client = info.clients[loser.index];
 
                 client.lost = true;
                 client.reason = loser.reason;
@@ -74,9 +82,9 @@ module.exports = function(args) {
         }
 
         return {
-            "error": "Requested game name and session are in an unexpected state of running while over."
+            "error": "Requested game name and session are in an unexpected state of running while over.",
         };
-    };
+    }
 
     /**
      * @apiGroup API
@@ -189,7 +197,7 @@ module.exports = function(args) {
      *      gameName: "unknownGameName"
      *  }
      */
-    app.get('/status/:gameName/:gameSession', function(req, res) {
+    app.get("/status/:gameName/:gameSession", function(req, res) {
         var gameName = req.params.gameName;
         var id = req.params.gameSession;
 
@@ -218,7 +226,7 @@ module.exports = function(args) {
      * @apiParam {String} id    id of the gamelog, this is sent to clients when a game is over, and in status when a game is over.
      * @apiError (404) error    if the gamelog was not found.
      */
-    app.get('/gamelog/:filename', function(req, res) {
+    app.get("/gamelog/:filename", function(req, res) {
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -246,7 +254,7 @@ module.exports = function(args) {
      * @apiError (404) success              false if not found
      * @apiError (500) success              false if an error in deletion
      */
-    app.delete('/gamelog/:filename', function(req, res) {
+    app.delete("/gamelog/:filename", function(req, res) {
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");

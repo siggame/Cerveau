@@ -3,7 +3,7 @@ var getGameInfos = require("./getGameInfos");
 var formatGamelogs = require("./formatGamelogs");
 
 module.exports = function(args) {
-    app.get('/archives/:gameName?/:pageStart?/:pageCount?', function(req, res) {
+    app.get("/archives/:gameName?/:pageStart?/:pageCount?", function(req, res) {
         var gameName = req.params.gameName || "all";
 
         var pageStart = req.params.pageStart !== undefined ? parseInt(req.params.pageStart) : NaN;
@@ -39,7 +39,7 @@ module.exports = function(args) {
                 olderUri = "/archives/" + gameName + "/" + (pageStart + 1);
             }
 
-            res.render('archives', {
+            res.render("archives", {
                 gamelogs: formatGamelogs(gamelogs),
                 newerUri: newerUri,
                 olderUri: olderUri,

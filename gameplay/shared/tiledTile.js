@@ -48,6 +48,8 @@ var TiledTile = Class({
     },
 
     /**
+     * String coercion override
+     *
      * @override
      */
     toString: function() {

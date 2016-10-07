@@ -156,18 +156,19 @@ var Session = Class({
     /**
      * Generates the info of the clients in playerIndex order for thread safe passing, also re-sorts this.clients
      *
-     * @returns Array.<Object> array of client like objects that can be passed to a thread via json, then turned back to a client on that thread
+     * @returns {Array.<Object>} an array of client like objects that can be passed to a thread via json, then turned back to a client on that thread
      */
     _generateClientInfos: function() {
         // each client sent their info with the 'play' event already, we need to send that to the new thread
         var clients = [];
+        var client;
         var unplacedPlayers = [];
         var numberOfPlayers = 0;
         var specators = [];
 
         // place players where they want to be based on playerIndex
         for(var i = 0; i < this.clients.length; i++) {
-            var client = this.clients[i];
+            client = this.clients[i];
 
             if(client.spectating) {
                 specators.push(client);
@@ -185,13 +186,13 @@ var Session = Class({
         }
 
         // place clients after all the players, so the clients array will look like: [player1, player2, ..., playerN, spectator1, spectator2, ..., specatorN]
-        for(var i = numberOfPlayers; i < this.clients.length; i++) {
+        for(i = numberOfPlayers; i < this.clients.length; i++) {
             clients[i] = specators[i - numberOfPlayers];
         }
 
         // finally, find a spot for the unplaced players
         var nextPlayerIndex = 0;
-        for(var i = 0; i < unplacedPlayers.length; i++) {
+        for(i = 0; i < unplacedPlayers.length; i++) {
             while(clients[nextPlayerIndex]) {
                 nextPlayerIndex++;
             }
@@ -200,16 +201,16 @@ var Session = Class({
         }
 
         // update the playerIndexes for all the clients here on the lobby
-        for(var i = 0; i < clients.length; i++) {
-            var client = clients[i];
+        for(i = 0; i < clients.length; i++) {
+            client = clients[i];
             if(!client.spectating) {
                 client.playerIndex = i;
             }
         }
 
         var clientInfos = [];
-        for(var i = 0; i < clients.length; i++) {
-            var client = clients[i];
+        for(i = 0; i < clients.length; i++) {
+            client = clients[i];
             this.clients[i] = client;
 
             clientInfos.push({

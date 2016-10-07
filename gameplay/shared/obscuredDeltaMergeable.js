@@ -4,7 +4,7 @@ var Class = require(__basedir + "/utilities/class");
 var DeltaMergeable = require("./deltaMergeable");
 
 var ObscuredDeltaMergeable = Class(DeltaMergeable, {
-    _setupProperty: function(key /*... */) {
+    _setupProperty: function(key /* ... */) {
         DeltaMergeable._setupProperty.apply(this, arguments);
 
         this._properties[key].obscured = {};
@@ -43,6 +43,7 @@ var ObscuredDeltaMergeable = Class(DeltaMergeable, {
      *
      * @param {Player|Array.<Player>} forPlayers - a single player, or array of players to manipulate the obscuring for
      * @param {string} key - the key you are manipulating the obscuring of
+     * @param {Function} callback - callback to apply for each property and player
      * @returns {boolean} true if worked, false if there is no property present to obscure
      */
     _obscure: function(forPlayers, key, callback) {

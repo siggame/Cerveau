@@ -1,9 +1,9 @@
 var utilities = require(__basedir + "/utilities/");
 var Class = utilities.Class;
-var fs = require('fs');
-var zlib = require('zlib');
-var path = require('path');
-var moment = require('moment');
+var fs = require("fs");
+var zlib = require("zlib");
+var path = require("path");
+var moment = require("moment");
 var extend = require("extend");
 var sanitize = require("sanitize-filename");
 var log = require("./log");
@@ -13,10 +13,12 @@ var log = require("./log");
  */
 var GameLogger = Class({
     /**
+     * Initializes the GameLogger (needed on every thread)
+     *
      * @param {Object} args - initialization args, from args.js, plus `directory` override
      */
     init: function(args) {
-        this.gamelogDirectory = (args && args.directory) || 'output/gamelogs/';
+        this.gamelogDirectory = (args && args.directory) || "output/gamelogs/";
 
         if(args.arena) {
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
@@ -41,7 +43,7 @@ var GameLogger = Class({
         var filename = this.filenameFor(gamelog);
 
         var path = (this.gamelogDirectory + filename + this.gamelogExtension);
-        var writeSteam = fs.createWriteStream(path, 'utf8');
+        var writeSteam = fs.createWriteStream(path, "utf8");
         var gzip = zlib.createGzip();
 
         gzip.on("error", function(err) {
@@ -55,6 +57,8 @@ var GameLogger = Class({
 
     /**
      * Gets all the gamelogs in output/gamelogs. The gamelogs are not complete, but rather a "shallow" gamelog.
+     *
+     * @param {Function} callback - callback to invoke once gamelogs have been loaded asyncronously
      */
     getLogs: function(callback) {
         var self = this;
@@ -85,12 +89,12 @@ var GameLogger = Class({
     },
 
     /**
-     * Returns the expected filename to gamelog
+     * Returns the expected filename for a gamelog
      *
-     * @static
      * @param {string|Object} gameName - name of the game, or an object with these parms as key/values
-     * @param (string) gameSession - name of the session
+     * @param {string} gameSession - name of the session
      * @param {number} epoch - when thge gamelog was logged
+     * @returns {string} the filename for the given game settings
      */
     filenameFor: function(gameName, gameSession, epoch) {
         var obj = {};
@@ -140,16 +144,16 @@ var GameLogger = Class({
             var readStream = fs.createReadStream(gamelogPath)
                 .pipe(zlib.createGunzip()) // Un-Gzip
                 .on("data", function(buffer) {
-                    strings.push(buffer.toString('utf8'));
+                    strings.push(buffer.toString("utf8"));
                 })
                 .on("end", function() {
                     var gamelog;
                     try {
-                        gamelog = JSON.parse(strings.join(''));
+                        gamelog = JSON.parse(strings.join(""));
                     }
                     catch(err) {
                         return callback(undefined, {
-                            "error": "Error parsing gamelog."
+                            "error": "Error parsing gamelog.",
                         });
                     }
 
@@ -181,10 +185,11 @@ var GameLogger = Class({
      * @param {string} filename - filename of the url, or the gamelog itself
      * @param {string} [host] - host name override
      * @param {number} [port] - port override
+     * @returns {string} url to the gamelog
      */
     getURL: function(filename, host, port) {
         if(typeof(filename) === "object") {
-            filname = this.filenameFor(filename);
+            filename = this.filenameFor(filename);
         }
 
         return "http://{}:{}/gamelog/{}".format(

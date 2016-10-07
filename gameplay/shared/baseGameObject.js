@@ -20,11 +20,18 @@ var BaseGameObject = Class(DeltaMergeable, {
      *
      * @param {Player} player - the player requesting to log the string to this game object
      * @param {string} message - string to log
+     * @param {Function} asyncReturn - return for async, this will never be used for log()
      */
     log: function(player, message, asyncReturn) {
         this.logs.push(message);
     },
 
+    /**
+     * String coerecion override, handles players by default as every game has them
+     *
+     * @override
+     * @returns {string} formatted string for this name
+     */
     toString: function() {
         var str = "{gameObjectName} #{id}";
 

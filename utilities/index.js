@@ -10,7 +10,7 @@ module.exports = {
     /**
      * simple function to get director names in a directory.
      *
-     * @param {string} path to check in
+     * @param {string} srcpath - path to check in
      * @returns {Array.<string>} array of strings representing all directory names in a directory (not recursive).
      */
     getDirs: function(srcpath) {
@@ -22,7 +22,7 @@ module.exports = {
     /**
      * simple function to get file names in a directory.
      *
-     * @param {string} path to check in
+     * @param {string} srcpath - path to check in
      * @returns {Array.<string>} array of strings representing all file names in a directory (not recursive).
      */
     getFiles: function(srcpath) {

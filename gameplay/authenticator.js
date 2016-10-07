@@ -1,7 +1,7 @@
-var http = require('http');
+var http = require("http");
 var crypto = require("crypto");
 var querystring = require("querystring");
-var extend = require('extend');
+var extend = require("extend");
 var Class = require(__basedir + "/utilities/class");
 
 /*
@@ -67,7 +67,7 @@ var Authenticator = Class({
                 }
             }
         }).end();
-    }
+    },
 });
 
-module.exports = Authenticator
+module.exports = Authenticator;

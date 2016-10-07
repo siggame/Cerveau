@@ -14,10 +14,10 @@ var _obj = {};
  * @type {Array.<Array<string>>} every element is a pair of two strings representing two colors that should never be paired for Instance color pairs, as they are too hard to read.
  */
 var _disallowedColorsPairs = [
-    [ "Magenta",  "Red" ],
+    [ "Magenta", "Red" ],
     [ "Magenta", "Red Bold" ],
     [ "Magenta", "Blue Bold" ],
-    [ "Yellow",  "White" ],
+    [ "Yellow", "White" ],
     [ "Green", "Yellow" ],
     [ "Green", "Cyan" ],
     [ "Blue", "Magenta" ],
@@ -29,7 +29,7 @@ var _disallowedColorsPairs = [
     [ "Magenta", "Black Bold" ],
     [ "Red", "Black Bold" ],
     [ "White", "Black" ], // Because that's the Lobby's color
-    [ "White", "Black Bold" ] // and this is too similar to above
+    [ "White", "Black Bold" ], // and this is too similar to above
 ];
 
 /**
@@ -49,7 +49,9 @@ var log = function(/* ... */) {
 log.error = function(/* ... */) {
     if(arguments[0] instanceof Error) {
         var err = arguments[0];
+        /* eslint-disable no-console */
         console.log(err.loc);
+        /* eslint-enable no-console */
         arguments[0] = "Error logged:\n{name}\n---\n{message}\n---\n{stack}\n---\n{syscall}\n---".format(err);
     }
     _obj.log(arguments, colors.red.bold);
@@ -62,7 +64,7 @@ log.error = function(/* ... */) {
  */
 log.debug = function(/* ... */) {
     _obj.log(arguments, colors.cyan);
-}
+};
 
 /**
  * logs to stdio and/or files
@@ -103,7 +105,7 @@ _obj.log = function(argsArray, colorFunction) {
                     }
 
                     // remove disallowed color combinations
-                    for(var i = 0; i < _disallowedColorsPairs.length; i++) {
+                    for(i = 0; i < _disallowedColorsPairs.length; i++) {
                         var pair = _disallowedColorsPairs[i];
 
                         var index = pair.indexOf(bgColor);
@@ -120,20 +122,24 @@ _obj.log = function(argsArray, colorFunction) {
                 _obj.nameColor = colors[fgSplit[0].toLowerCase()]["bg" + bgColor];
 
                 if(fgSplit[1] === "Bold") {
-                    _obj.nameColor =  _obj.nameColor.bold;
+                    _obj.nameColor = _obj.nameColor.bold;
                 }
             }
 
+            /* eslint-disable no-console */
             console.log("[{time}] {colored} {str}".format({
                 time: colors.green(moment().format("HH:mm:ss.SSS")),
                 colored: _obj.nameColor ? _obj.nameColor(" " + _obj.server.name + " ") : "???",
                 str: str,
             }));
+            /* eslint-enable no-console */
         }
     }
     else { // they are using log before the server has been initialized
+        /* eslint-disable no-console */
         console.log.apply(console, argsArray);
+        /* eslint-enable no-console */
     }
-}
+};
 
 module.exports = log;

@@ -11,7 +11,7 @@ module.exports = function(args) {
         var lobby = args.lobby;
         formatGamelogs.init(lobby, args);
 
-        app.get('/', function(req, res){
+        app.get("/", function(req, res) {
             var gameInfos = getGameInfos();
 
             var games = [];
