@@ -49,6 +49,9 @@ var Player = Class(GameObject, {
         else if(!player.youngGun) {
             reason = "You have no 'Young Gun' to call in.";
         }
+        else if(player.cowboys.length >= this.game.maxCowboys) {
+            reason = "Cannot call in another cowboy, you are already at the max ({this.game.maxCowboys})";
+        }
 
         var actualJob; // make sure the job is valid
         for(var i = 0; i < this.game.jobs.length; i++) {
