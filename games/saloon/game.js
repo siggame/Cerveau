@@ -293,12 +293,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      * @param {Player} player - the player to apply Young Gun logic to
      */
     _doYoungGun: function(player) {
-        player.youngGun = player.youngGun || this.create("Cowboy", {
-            owner: player,
-            job: "Young Gun",
-            tile: player.youngGunCurrentTile,
-            canMove: false,
-        });
+        if(!player.youngGun && player.cowboys.length-1 > this.maxCowboys) {
+            this.create("Cowboy", {
+                owner: player,
+                job: "Young Gun",
+                tile: player.youngGunCurrentTile,
+                canMove: false,
+            });
+        }
 
         var tiles = player.youngGunCurrentTile.getNeighbors();
         for(var t = 0; t < tiles.length; t++) {

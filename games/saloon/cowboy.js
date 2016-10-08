@@ -96,7 +96,7 @@ var Cowboy = Class(GameObject, {
             }
         }
 
-        if(!this.tile.getNeighbors().contains(tile)) {
+        if(this.tile && !this.tile.getNeighbors().contains(tile)) {
             reason = "{tile} is not adjacent to {this.tile}";
         }
 
@@ -185,6 +185,9 @@ var Cowboy = Class(GameObject, {
         }
         else if(this.siesta > 0) {
             return "{this} is asleep because of their siesta and cannot be controlled by you.";
+        }
+        else if(this.job === "Young Gun") {
+            return "{this} is a Young Gun and needs to be send in first.";
         }
         else if(!tile) {
             return "{tile} is not a valid Tile.";
