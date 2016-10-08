@@ -96,7 +96,10 @@ var Cowboy = Class(GameObject, {
             }
         }
 
-        if(!this.tile.getNeighbors().contains(tile)) {
+        if(this.isDead) {
+            reason = "{this} is dead and cannot move.";
+        }
+        else if(!this.tile.getNeighbors().contains(tile)) {
             reason = "{tile} is not adjacent to {this.tile}";
         }
 
