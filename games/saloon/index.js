@@ -52,7 +52,7 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    maxCowboys: {
+    maxCowboysPerJob: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -391,25 +391,12 @@ classes.Player._deltaMergeableProperties = {
     },
 
     youngGun: {
-        type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
+        type: {"is_game_object": true, "keyType": null, "name": "YoungGun", "valueType": null},
         defaultValue: null,
     },
 
 };
 
-
-classes.Player.sendIn.cerveau = {
-    args: [
-        {
-            name: "job",
-            type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
-        },
-    ],
-    returns: {
-        type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
-        defaultValue: null,
-    },
-};
 
 //<<-- Creer-Merge: secret-Player -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -441,7 +428,7 @@ classes.Tile._deltaMergeableProperties = {
         defaultValue: false,
     },
 
-    isWall: {
+    isBalcony: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
@@ -476,6 +463,11 @@ classes.Tile._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    youngGun: {
+        type: {"is_game_object": true, "keyType": null, "name": "YoungGun", "valueType": null},
+        defaultValue: null,
+    },
+
 };
 
 
@@ -484,6 +476,47 @@ classes.Tile._deltaMergeableProperties = {
 // if you want to add a "secret" method that clients don't publicly know about, but can call, do so here. Best use case is an easy way for human clients to ask for special game information, otherwise forget this exists.
 
 //<<-- /Creer-Merge: secret-Tile -->>
+
+
+classes.YoungGun = require("./youngGun");
+
+classes.YoungGun._deltaMergeableProperties = {
+    canCallIn: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+
+    owner: {
+        type: {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null},
+        defaultValue: null,
+    },
+
+    tile: {
+        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        defaultValue: null,
+    },
+
+};
+
+
+classes.YoungGun.callIn.cerveau = {
+    args: [
+        {
+            name: "job",
+            type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
+        },
+    ],
+    returns: {
+        type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
+        defaultValue: null,
+    },
+};
+
+//<<-- Creer-Merge: secret-YoungGun -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+// if you want to add a "secret" method that clients don't publicly know about, but can call, do so here. Best use case is an easy way for human clients to ask for special game information, otherwise forget this exists.
+
+//<<-- /Creer-Merge: secret-YoungGun -->>
 
 
 // Hook up the game's internal classes that we just finished initializing

@@ -189,9 +189,6 @@ var Cowboy = Class(GameObject, {
         else if(this.siesta > 0) {
             return "{this} is asleep because of their siesta and cannot be controlled by you.";
         }
-        else if(this.job === "Young Gun") {
-            return "{this} is a Young Gun and needs to be send in first.";
-        }
         else if(!tile) {
             return "{tile} is not a valid Tile.";
         }
@@ -306,16 +303,6 @@ var Cowboy = Class(GameObject, {
      */
     actBrawler: function() {
         return "{this} cannot act because they are a 'Brawler'.";
-    },
-
-    /**
-     * Called when a young gun wants to act
-     *
-     * @see Cowboy#act
-     * @returns {string} invalid reason string
-     */
-    actYoungGun: function() {
-        return "{this} cannot act because they are a 'Young Gun'.";
     },
 
     /**

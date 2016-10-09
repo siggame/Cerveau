@@ -40,9 +40,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // game constants
         this.rowdynessToSiesta = 20;
-        this.maxCowboys = 6;
+        this.maxCowboysPerJob = 6;
 
-        // Note: "Young Gun" is not in here as you don't send them in
         this.jobs.push(
             "Sharpshooter",
             "Bartender",
@@ -127,13 +126,26 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // create the players' Young Guns
-        this.players[0].youngGunPrevTile = this.getTile(0, 2);
-        this.players[0].youngGunCurrentTile = this.getTile(0, 1);
-        this._doYoungGun(this.players[0]); // this will advance the young gun to (0, 0)
+        for(var i = 0; i < this.players.length; i++) {
+            var player = this.players[i];
 
-        this.players[1].youngGunPrevTile = this.getTile(this.mapWidth-1, this.mapHeight-3);
-        this.players[1].youngGunCurrentTile = this.getTile(this.mapWidth-1, this.mapHeight-2);
-        this._doYoungGun(this.players[1]); // this will advance the young gun to (mapWidth-1, mapHeight-1)
+            x = 0;
+            y = 0;
+            var dy = 1;
+            if(i > 0) { // then change x, y for the second player
+                x = this.mapWidth - 1;
+                y = this.mapHeight - 1;
+                dy = -1;
+            }
+
+            player.youngGun = this.create("YoungGun", {
+                owner: player,
+                tile: this.getTile(x, y),
+                canCallIn: true,
+            });
+
+            player.youngGun.previousTile = this.getTile(x, y + dy); // used for moving the young guns around the map, but not a property exposed to clients
+        }
 
         //<<-- /Creer-Merge: begin -->>
     },
@@ -218,7 +230,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     cowboy.focus++;
                 }
 
-                cowboy.canMove = (cowboy.job !== "Young Gun");
+                cowboy.canMove = true;
             }
 
             cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
@@ -288,32 +300,25 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     /**
-     * Does Young Gun related logic, spawning and moving them clockwise
+     * Does Young Gun related logic: moving them clockwise
      *
      * @param {Player} player - the player to apply Young Gun logic to
      */
     _doYoungGun: function(player) {
-        if(!player.youngGun && player.cowboys.length-1 > this.maxCowboys) {
-            this.create("Cowboy", {
-                owner: player,
-                job: "Young Gun",
-                tile: player.youngGunCurrentTile,
-                canMove: false,
-            });
-        }
+        var youngGun = player.youngGun; // shorthand
+        youngGun.canCallIn = true;
 
-        var tiles = player.youngGunCurrentTile.getNeighbors();
+        var tiles = youngGun.tile.getNeighbors();
         for(var t = 0; t < tiles.length; t++) {
             var tile = tiles[t];
 
-            if(tile.isWall && player.youngGunPrevTile !== tile) { // this is the tile the young gun needs to talk to
-                player.youngGunPrevTile = player.youngGunCurrentTile;
-                player.youngGunCurrentTile = tile;
+            if(tile.isWall && youngGun.previousTile !== tile) { // this is the tile the young gun needs to talk to
+                youngGun.previousTile = youngGun.tile;
 
-                if(player.youngGun) { // move them
-                    player.youngGun.tile.cowboy = null;
-                    player.youngGun.tile = tile;
-                    tile.cowboy = player.youngGun;
+                if(youngGun) { // move them
+                    youngGun.tile.youngGun = null;
+                    youngGun.tile = tile;
+                    tile.youngGun = youngGun;
                 }
 
                 break;
