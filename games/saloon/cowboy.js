@@ -84,8 +84,11 @@ var Cowboy = Class(GameObject, {
         if(!this.canMove) {
             reason = "{this} has already moved.";
         }
-        else if(tile) { // check if blocked
-            if(tile.isWall) {
+        else if(tile) { // check if blocked or not adjacent
+            if(this.tile && !this.tile.getNeighbors().contains(tile)) {
+                reason = "{tile} is not adjacent to {this.tile}";
+            }
+            else if(tile.isWall) {
                 reason = "{tile} is a wall and cannot be moved into.";
             }
             else if(tile.cowboy) {
@@ -96,8 +99,8 @@ var Cowboy = Class(GameObject, {
             }
         }
 
-        if(this.tile && !this.tile.getNeighbors().contains(tile)) {
-            reason = "{tile} is not adjacent to {this.tile}";
+        if(this.isDead) {
+            reason = "{this} is dead and cannot move.";
         }
 
         if(reason) {
@@ -200,9 +203,6 @@ var Cowboy = Class(GameObject, {
      * @param {number} damage - how much damage to do to this
      */
     damage: function(damage) {
-        if(this.job == "Young Gun") {
-            return;
-        }
         this.health = Math.max(0, this.health - damage);
         if(this.health === 0) {
             this.isDead = true;
