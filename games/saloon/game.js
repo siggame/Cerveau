@@ -40,7 +40,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // game constants
         this.rowdynessToSiesta = 20;
-        this.maxCowboysPerJob = 6;
+        this.maxCowboysPerJob = 2;
 
         this.jobs.push(
             "Sharpshooter",
@@ -75,14 +75,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // make top and bottom sides walls
         for(var x = 0; x < this.mapWidth; x++) {
-            this.getTile(x, 0).isWall = true;
-            this.getTile(x, this.mapHeight - 1).isWall = true;
+            this.getTile(x, 0).isBalcony = true;
+            this.getTile(x, this.mapHeight - 1).isBalcony = true;
         }
 
         // make left and right sides walls
         for(var y = 0; y < this.mapHeight; y++) {
-            this.getTile(0, y).isWall = true;
-            this.getTile(this.mapWidth - 1, y).isWall = true;
+            this.getTile(0, y).isBalcony = true;
+            this.getTile(this.mapWidth - 1, y).isBalcony = true;
         }
 
         // spawn some random furnishings in quadrants
@@ -205,13 +205,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             if(cowboy.isDrunk) { // move him!
                 var next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
-                if(!next || next.isWall || next.cowboy || next.furnishing) { // then something is in the way
+                if(!next || next.isBalcony || next.cowboy || next.furnishing) { // then something is in the way
                     if(next) {
                         if(next.cowboy) {
                             next.cowboy.focus = 0;
                         }
 
-                        if(next.isWall || next.furnishing) {
+                        if(next.isBalcony || next.furnishing) {
                             cowboy.damage(1);
                         }
                     }
@@ -312,7 +312,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(var t = 0; t < tiles.length; t++) {
             var tile = tiles[t];
 
-            if(tile.isWall && youngGun.previousTile !== tile) { // this is the tile the young gun needs to talk to
+            if(tile.isBalcony && youngGun.previousTile !== tile) { // this is the tile the young gun needs to talk to
                 youngGun.previousTile = youngGun.tile;
 
                 if(youngGun) { // move them

@@ -90,12 +90,12 @@ var YoungGun = Class(GameObject, {
         // if we got here, it was valid!
 
         // do a quick BFS to find an open tile to spawn him on
-        var tiles = [ this.youngGun.tile ];
+        var tiles = [ this.tile ];
         var openTile;
         while(tiles.length > 0) {
             var tile = tiles.shift();
 
-            if(tile.isWall) {
+            if(tile.isBalcony) {
                 tiles = tiles.concat(tile.getNeighbors());
             }
             else {
@@ -115,7 +115,7 @@ var YoungGun = Class(GameObject, {
 
         this.canCallIn = false;
 
-        cowboy = this.create("Cowboy", {
+        cowboy = this.game.create("Cowboy", {
             owner: this.owner,
             job: actualJob,
             tile: openTile,

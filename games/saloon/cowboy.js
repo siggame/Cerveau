@@ -88,8 +88,8 @@ var Cowboy = Class(GameObject, {
             if(this.tile && !this.tile.getNeighbors().contains(tile)) {
                 reason = "{tile} is not adjacent to {this.tile}";
             }
-            else if(tile.isWall) {
-                reason = "{tile} is a wall and cannot be moved into.";
+            else if(tile.isBalcony) {
+                reason = "{tile} is a balcony and cannot be moved onto.";
             }
             else if(tile.cowboy) {
                 reason = "{tile} is blocked by {tile.cowboy} and cannot be moved into.";
@@ -234,7 +234,7 @@ var Cowboy = Class(GameObject, {
         while(shot && this.focus > 0) { // shoot things
             this.focus--; // yes we could do this above but it reads stupid
             shot = shot["tile" + adjacentDirection];
-            if(!shot || shot.isWall) {
+            if(!shot || shot.isBalcony) {
                 break; // we are done
             }
 
