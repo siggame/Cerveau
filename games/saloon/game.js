@@ -323,20 +323,19 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      */
     _doYoungGun: function(player) {
         var youngGun = player.youngGun; // shorthand
-        youngGun.canCallIn = true;
+        youngGun.canCallIn = true; // they can call in a cowboy in their next turn
 
+        // find the adjacent tile that they were not on last turn,
+        //   this way all YoungGuns continue walking clockwise
         var tiles = youngGun.tile.getNeighbors();
-        for(var t = 0; t < tiles.length; t++) {
-            var tile = tiles[t];
+        for(var i = 0; i < tiles.length; i++) {
+            var tile = tiles[i];
 
-            if(tile.isBalcony && youngGun.previousTile !== tile) { // this is the tile the young gun needs to talk to
+            if(tile.isBalcony && youngGun.previousTile !== tile) { // then this is the tile the young gun needs to talk to
                 youngGun.previousTile = youngGun.tile;
-
-                if(youngGun) { // move them
-                    youngGun.tile.youngGun = null;
-                    youngGun.tile = tile;
-                    tile.youngGun = youngGun;
-                }
+                youngGun.tile.youngGun = null;
+                youngGun.tile = tile;
+                tile.youngGun = youngGun;
 
                 break;
             }
