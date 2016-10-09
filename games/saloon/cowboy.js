@@ -24,9 +24,10 @@ var Cowboy = Class(GameObject, {
 
         this.canMove = true;
         this.health = 10;
-        this.game.cowboys.push(this);
-        this.owner.cowboys.push(this);
         this.tile.cowboy = this;
+
+        // NOTE: don't add to the cowboys arrays so they don't resize during a turn
+        this.game.spawnedCowboys.push(this); // just tell the game we spawned
 
         //<<-- /Creer-Merge: init -->>
     },

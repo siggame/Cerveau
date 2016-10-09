@@ -48,6 +48,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             "Brawler"
         );
 
+        // list of cowboys to add to their cowboy lists between turns (so we don't resize arrays during players turns)
+        this.spawnedCowboys = [];
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -175,6 +178,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
 
+        this._updateSpawnedCowboys();
+
         this._updateCowboys();
         this._advanceBottles();
         this._damagePianos();
@@ -190,6 +195,18 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
         // else continue to the next player (normal next turn logic)
         return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    /**
+     * Take all the cowboys spawned during the turn and put them in the appropriate arrays
+     */
+    _updateSpawnedCowboys: function() {
+        while(this.spawnedCowboys.length > 0) {
+            var cowboy = this.spawnedCowboys.pop();
+
+            this.cowboys.push(cowboy);
+            cowboy.owner.cowboys.push(cowboy);
+        }
     },
 
     /**
