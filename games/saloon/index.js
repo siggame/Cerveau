@@ -110,8 +110,8 @@ classes.Bottle = require("./bottle");
 
 classes.Bottle._deltaMergeableProperties = {
     direction: {
-        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
-        defaultValue: null,
+        type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
+        defaultValue: "",
     },
 
     drunkDirection: {

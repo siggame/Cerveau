@@ -282,9 +282,9 @@
                     "default": null,
                     "description": "The Direction this Bottle is flying and will move to between turns, can be 'North', 'East', 'South', or 'West'.",
                     "type": {
-                        "is_game_object": true,
+                        "is_game_object": false,
                         "keyType": null,
-                        "name": "Tile",
+                        "name": "string",
                         "valueType": null
                     }
                 },
