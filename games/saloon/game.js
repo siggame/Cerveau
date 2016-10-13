@@ -242,7 +242,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     next.cowboy = cowboy;
                 }
 
-                cowboy.turnsBusy = Math.min(0, cowboy.turnsBusy - 1);
+                cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
                 cowboy.isDrunk = (cowboy.turnsBusy !== 0);
                 cowboy.canMove = !cowboy.isDrunk;
             }
