@@ -230,7 +230,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                         if(next.isBalcony || next.furnishing) {
                             cowboy.damage(1);
-                            if(cowboy.isDead) {
+                            if(cowboy.isDead) { // RIP he died from that
                                 continue; // don't update dead dudes, they won't come back
                             }
                         }
@@ -242,8 +242,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     next.cowboy = cowboy;
                 }
 
-                cowboy.focus = Math.min(0, cowboy.focus + 1);
-                cowboy.isDrunk = (cowboy.focus !== 0);
+                cowboy.turnsBusy = Math.min(0, cowboy.turnsBusy - 1);
+                cowboy.isDrunk = (cowboy.turnsBusy !== 0);
                 cowboy.canMove = !cowboy.isDrunk;
             }
             else { // they are not drunk, so update them for use next turn
