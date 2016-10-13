@@ -60,6 +60,7 @@ var Bottle = Class(GameObject, {
         if(cowboy) {
             if(!cowboy.owner.addRowdyness(1)) { // then they did not start a seista
                 cowboy.isDrunk = true;
+                cowboy.drunkDirection = this.drunkDirection;
                 cowboy.focus = -5;
                 cowboy.canMove = false;
             }
