@@ -143,10 +143,11 @@ var Session = Class({
             if(data.gamelog) {
                 self.lobby.gameLogger.log(data.gamelog);
 
-                delete self._worker;
+                delete self._worker; // we are done with that worker thread
                 self.over = true;
                 self.winners = data.gamelog.winners;
                 self.losers = data.gamelog.losers;
+                self.gamelogFilename = self.lobby.gameLogger.filenameFor(data.gamelog);
             }
         });
 

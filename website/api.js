@@ -61,6 +61,7 @@ module.exports = function(args) {
         // otherwise that game session should be over
         if(session.isOver()) {
             info.status = "over";
+            info.gamelogFilename = session.gamelogFilename;
 
             for(i = 0; i < session.winners.length; i++) {
                 client = info.clients[session.winners[i].index];
