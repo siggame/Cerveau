@@ -157,7 +157,7 @@ var Cowboy = Class(GameObject, {
 
         // if we got here the play() was valid. play that piano!
 
-        this.isBusy = true;
+        this.turnsBusy = 1;
         this.owner.score++;
         piano.damage(1);
 
