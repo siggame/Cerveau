@@ -166,7 +166,7 @@ module.exports = function(args) {
      *      status: "over",
      *      gameName: "Chess",
      *      gameSession: "1",
-     *      gamelog: "2016.03.01.11.54.30.868-Chess-1",
+     *      gamelogFilename: "2016.03.01.11.54.30.868-Chess-1",
      *      numberOfPlayers: 2,
      *      clients: [
      *          {
