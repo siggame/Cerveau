@@ -39,7 +39,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapHeight = 12;
 
         // game constants
-        this.rowdynessToSiesta = 20;
+        this.rowdynessToSiesta = 8;
+        this.siestaLength = 8;
         this.maxCowboysPerJob = 2;
 
         this.jobs.push(
