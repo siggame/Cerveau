@@ -54,7 +54,9 @@ var Cowboy = Class(GameObject, {
         }
 
         // job specific acts
-        this["act" + this.job.replace(" ", "")].apply(this, arguments);
+        if(!reason) {
+            reason = this["act" + this.job.replace(" ", "")].apply(this, arguments);
+        }
 
         if(reason) {
             return this.game.logicError(false, reason.format({
@@ -275,7 +277,7 @@ var Cowboy = Class(GameObject, {
         }
 
         if(!validDrunkDirection) {
-            return "{drunkDirection} is not a valid direction to send drunk Cowboys hit by {this}'s Bottles.";
+            return "{drunkDirection} is not a valid direction to send drunk Cowboys hit by {this}'s Bottles.".format({this: this, drunkDirection});
         }
 
         var adjacentDirection;
