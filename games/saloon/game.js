@@ -309,7 +309,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(var i = 0; i < this.cowboys.length; i++) {
             var cowboy = this.cowboys[i];
 
-            if (cowboy.tile && cowboy.tile.hasHazard) {
+            if(cowboy.tile && cowboy.tile.hasHazard) {
                 cowboy.damage(1);
             }
         }
