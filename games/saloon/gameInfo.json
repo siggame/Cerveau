@@ -28,6 +28,7 @@
     "Game": {
         "attribute_names": [
             "bottles",
+            "brawlerDamage",
             "cowboys",
             "currentPlayer",
             "currentTurn",
@@ -41,6 +42,7 @@
             "players",
             "rowdynessToSiesta",
             "session",
+            "sharpshooterDamage",
             "siestaLength",
             "tiles"
         ],
@@ -58,6 +60,16 @@
                         "name": "Bottle",
                         "valueType": null
                     }
+                }
+            },
+            "brawlerDamage": {
+                "default": null,
+                "description": "How much damage is applied to neighboring things bit by the Sharpshooter between turns.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
                 }
             },
             "cowboys": {
@@ -226,6 +238,16 @@
                     "valueType": null
                 }
             },
+            "sharpshooterDamage": {
+                "default": null,
+                "description": "How much damage is applied to things hit by Sharpshooters when they act.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "siestaLength": {
                 "default": null,
                 "description": "How long siestas are for a player's team.",
@@ -252,7 +274,7 @@
                 }
             }
         },
-        "description": "Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Coyboys.",
+        "description": "Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.",
         "function_names": [],
         "functions": {},
         "inheritedAttribute_names": [],
@@ -736,6 +758,7 @@
                 "health",
                 "isDestroyed",
                 "isPiano",
+                "isPlaying",
                 "tile"
             ],
             "attributes": {
@@ -762,6 +785,16 @@
                 "isPiano": {
                     "default": null,
                     "description": "True if this Furnishing is a piano and can be played, False otherwise.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "isPlaying": {
+                    "default": null,
+                    "description": "If this is a piano and a Cowboy is playing it this turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1424,11 +1457,22 @@
         },
         "YoungGun": {
             "attribute_names": [
+                "callInTile",
                 "canCallIn",
                 "owner",
                 "tile"
             ],
             "attributes": {
+                "callInTile": {
+                    "default": null,
+                    "description": "The Tile that a Cowboy will be called in on if this YoungGun calls in a Cowboy.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
                 "canCallIn": {
                     "default": null,
                     "description": "True if the YoungGun can call in a Cowboy, false otherwise.",
@@ -1451,7 +1495,7 @@
                 },
                 "tile": {
                     "default": null,
-                    "description": "The Tile this YoungGun is currently on. Cowboys they send in will be on the nearest non-balcony Tile.",
+                    "description": "The Tile this YoungGun is currently on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1484,7 +1528,7 @@
                             }
                         }
                     ],
-                    "description": "Tells the YoungGun to call in a new Cowbow of the given job to the open Tile nearest to them.",
+                    "description": "Tells the YoungGun to call in a new Cowboy of the given job to the open Tile nearest to them.",
                     "returns": {
                         "default": null,
                         "description": "The new Cowboy that was called in if valid. They will not be added to any `cowboys` lists until the turn ends. Null otherwise.",

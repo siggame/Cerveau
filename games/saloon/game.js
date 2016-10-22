@@ -1,4 +1,4 @@
-// Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Coyboys.
+// Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.
 
 var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
@@ -12,7 +12,7 @@ var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
 
 //<<-- /Creer-Merge: requires -->>
 
-// @class Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Coyboys.
+// @class Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.
 var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
      * Initializes Games.

@@ -31,7 +31,7 @@ var YoungGun = Class(GameObject, {
 
 
     /**
-     * Tells the YoungGun to call in a new Cowbow of the given job to the open Tile nearest to them.
+     * Tells the YoungGun to call in a new Cowboy of the given job to the open Tile nearest to them.
      *
      * @param {Player} player - the player that called this.
      * @param {string} job - The job you want the Cowboy being brought to have.

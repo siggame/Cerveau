@@ -12,6 +12,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
+    brawlerDamage: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     cowboys: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null}},
         defaultValue: [],
@@ -75,6 +80,11 @@ classes.Game._deltaMergeableProperties = {
     session: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
+    },
+
+    sharpshooterDamage: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
     siestaLength: {
@@ -265,6 +275,11 @@ classes.Furnishing._deltaMergeableProperties = {
     },
 
     isPiano: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+
+    isPlaying: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
@@ -481,6 +496,11 @@ classes.Tile._deltaMergeableProperties = {
 classes.YoungGun = require("./youngGun");
 
 classes.YoungGun._deltaMergeableProperties = {
+    callInTile: {
+        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        defaultValue: null,
+    },
+
     canCallIn: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
