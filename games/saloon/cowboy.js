@@ -159,6 +159,7 @@ var Cowboy = Class(GameObject, {
 
         // if we got here the play() was valid. play that piano!
 
+        this.isPlaying = true;
         this.turnsBusy = 1;
         this.owner.score++;
         piano.damage(1);
@@ -243,11 +244,11 @@ var Cowboy = Class(GameObject, {
             }
 
             if(shot.cowboy) {
-                shot.cowboy.damage(1);
+                shot.cowboy.damage(this.game.sharpshooterDamage);
             }
 
             if(shot.furnishing) {
-                shot.furnishing.damage(1);
+                shot.furnishing.damage(this.game.sharpshooterDamage);
             }
         }
 

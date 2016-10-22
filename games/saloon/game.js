@@ -26,14 +26,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // these settings are all per side
-        this._minFurnishings = 0;
-        this._maxFurnishings = 5;
-        this._minPianos = 2;
-        this._maxPianos = 5;
-        this._minHazards = 0;
-        this._maxHazards = 6;
-
         // map dimensions used for tile generation
         this.mapWidth = 22;
         this.mapHeight = 12;
@@ -42,12 +34,22 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.rowdynessToSiesta = 8;
         this.siestaLength = 8;
         this.maxCowboysPerJob = 2;
+        this.sharpshooterDamage = 4;
+        this.brawlerDamage = 1;
 
         this.jobs.push(
             "Sharpshooter",
             "Bartender",
             "Brawler"
         );
+
+        // these settings are all per side
+        this._minFurnishings = 0;
+        this._maxFurnishings = 5;
+        this._minPianos = 1;
+        this._maxPianos = this.jobs.length; // the max number of pianos is the same as the number of jobs, therefore at least half the cowboys spawned can't play pianos as there will always be more possible cowboys than pianos
+        this._minHazards = 0;
+        this._maxHazards = 6;
 
         // list of cowboys to add to their cowboy lists between turns (so we don't resize arrays during players turns)
         this.spawnedCowboys = [];
@@ -144,11 +146,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             player.youngGun = this.create("YoungGun", {
                 owner: player,
-                tile: this.getTile(x, y),
+                tile: this.getTile(x, y + dy),
                 canCallIn: true,
             });
 
-            player.youngGun.previousTile = this.getTile(x, y + dy); // used for moving the young guns around the map, but not a property exposed to clients
+            player.youngGun.previousTile = this.getTile(x, y + dy*2); // used for moving the young guns around the map, but not a property exposed to clients
+
+            this._doYoungGun(player);
         }
 
         //<<-- /Creer-Merge: begin -->>
@@ -263,10 +267,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 for(var j = 0; j < neighbors.length; j++) { // for each neighbor
                     var neighbor = neighbors[j];
                     if(neighbor.cowboy) { // if there is a cowboy, damage them
-                        neighbor.cowboy.damage(1);
+                        neighbor.cowboy.damage(this.brawlerDamage);
                     }
                     if(neighbor.furnishing) { // if there is a furnishing, damage it
-                        neighbor.furnishing.damage(1);
+                        neighbor.furnishing.damage(this.brawlerDamage);
                     }
                 }
             }
@@ -274,7 +278,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     /**
-     * Moves all bottles currenly in the game
+     * Moves all bottles currently in the game
      */
     _advanceBottles: function() {
         for(var i = 0; i < this.bottles.length; i++) {
@@ -298,6 +302,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 continue;
             }
             // else it's a non destroyed piano, so damage it
+            furnishing.isPlaying = false;
             furnishing.damage(1);
         }
     },
@@ -342,23 +347,44 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      */
     _doYoungGun: function(player) {
         var youngGun = player.youngGun; // shorthand
-        youngGun.canCallIn = true; // they can call in a cowboy in their next turn
+        youngGun.canCallIn = true; // they can call in a cowboy on their next turn
 
         // find the adjacent tile that they were not on last turn,
         //   this way all YoungGuns continue walking clockwise
         var tiles = youngGun.tile.getNeighbors();
+        var moveTo;
         for(var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
 
-            if(tile.isBalcony && youngGun.previousTile !== tile) { // then this is the tile the young gun needs to talk to
-                youngGun.previousTile = youngGun.tile;
-                youngGun.tile.youngGun = null;
-                youngGun.tile = tile;
-                tile.youngGun = youngGun;
-
+            if(tile.isBalcony && youngGun.previousTile !== tile) { // then this is the tile the young gun needs to be moved to to
+                moveTo = tile;
                 break;
             }
         }
+
+        // do a quick BFS to find the callInTile
+        var searchTiles = [ moveTo ];
+        var searched = {};
+        while(searchTiles.length > 0) {
+            var searchTile = searchTiles.shift();
+
+            if(!searched[searchTile.id]) {
+                searched[searchTile.id] = true;
+
+                if(searchTile.isBalcony) { // add its neighbors to be searched
+                    searchTiles = searchTiles.concat(searchTile.getNeighbors());
+                }
+                else {
+                    youngGun.callInTile = searchTile;
+                    break; // we found it
+                }
+            }
+        }
+
+        youngGun.previousTile = youngGun.tile;
+        youngGun.tile.youngGun = null;
+        youngGun.tile = moveTo;
+        moveTo.youngGun = youngGun;
     },
 
     /**
@@ -393,7 +419,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         if(players[0].score !== players[1].score) { // someone won with a higher score
             players.sortDescending("score");
 
-            this.declareWinner(players.shift(), "Has highest score after " + reason);
+            this.declareWinner(players.shift(), "Has highest score ({}) once {}".format(players[0].score, reason));
             this.declareLosers(players, "Lower score than winner");
             return true;
         }
@@ -401,7 +427,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         if(players[0].kills > players[1].kills) { // someone won with a higher kill count
             players.sortDescending("kills");
 
-            this.declareWinner(players.shift(), "Has most kills after " + reason);
+            this.declareWinner(players.shift(), "Has most kills ({}) once {}".format(players[0].kills, reason));
             this.declareLosers(players, "Less kills than winner");
             return true;
         }

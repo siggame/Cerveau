@@ -41,8 +41,9 @@ var Furnishing = Class(GameObject, {
      */
     damage: function(damage) {
         this.health = Math.max(0, this.health - damage);
-        if(this.health === 0) {
+        if(this.health === 0) { // it has been destroyed
             this.isDestroyed = true;
+            this.isPlaying = false;
             this.tile.furnishing = null;
             this.tile = null;
         }

@@ -89,28 +89,13 @@ var YoungGun = Class(GameObject, {
 
         // if we got here, it was valid!
 
-        // do a quick BFS to find an open tile to spawn him on
-        var tiles = [ this.tile ];
-        var openTile;
-        while(tiles.length > 0) {
-            var tile = tiles.shift();
-
-            if(tile.isBalcony) {
-                tiles = tiles.concat(tile.getNeighbors());
-            }
-            else {
-                openTile = tile;
-                break;
-            }
-        }
-
         // clear the open tile before moving the young gun to it
-        if(openTile.cowboy) {
-            openTile.cowboy.damage(Infinity);
+        if(this.callInTile.cowboy) {
+            this.callInTile.cowboy.damage(Infinity);
         }
 
-        if(openTile.furnishing) {
-            openTile.furnishing.damage(Infinity);
+        if(this.callInTile.furnishing) {
+            this.callInTile.furnishing.damage(Infinity);
         }
 
         this.canCallIn = false;
@@ -118,11 +103,11 @@ var YoungGun = Class(GameObject, {
         cowboy = this.game.create("Cowboy", {
             owner: this.owner,
             job: actualJob,
-            tile: openTile,
+            tile: this.callInTile,
             canMove: false,
         });
 
-        openTile.cowboy = cowboy;
+        this.callInTile.cowboy = cowboy;
 
         return cowboy;
 
