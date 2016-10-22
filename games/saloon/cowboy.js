@@ -204,6 +204,7 @@ var Cowboy = Class(GameObject, {
         this.health = Math.max(0, this.health - damage);
         if(this.health === 0) {
             this.isDead = true;
+            this.canMove = false;
             this.tile.cowboy = null;
             this.tile = null;
         }
