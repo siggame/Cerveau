@@ -184,6 +184,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this._updateCowboys();
         this._advanceBottles();
         this._damagePianos();
+        this._applyHazardDamage();
 
         this._cleanupArray("cowboys");
         this._cleanupArray("furnishings");
@@ -298,6 +299,19 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
             // else it's a non destroyed piano, so damage it
             furnishing.damage(1);
+        }
+    },
+
+    /**
+     * Damages all cowboys which are standing on a hazard
+     */
+    _applyHazardDamage: function() {
+        for(var i = 0; i < this.cowboys.length; i++) {
+            var cowboy = this.cowboys[i];
+
+            if(cowboy.tile && cowboy.tile.hasHazard) {
+                cowboy.damage(1);
+            }
         }
     },
 
