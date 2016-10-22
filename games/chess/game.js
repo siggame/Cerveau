@@ -214,7 +214,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         }*/
         // instead we'll use his simplified rules
         else if(this._inSimplifiedThreefoldRepetition()) {
-            this.declareLosers(this.players, "Draw - Simplified threefold repetition occured.");
+            this.declareLosers(this.players, "Draw - Simplified threefold repetition occurred.");
         }
         else { // the game is not over
             this._generateMoves();
@@ -241,32 +241,33 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * if for the last eight moves no capture, promotions, or pawn movement has happened and moves 0,1,2, and 3 are identical to moves 4, 5, 6, and 7 respectively, then a draw has occurred
      *
-     * @returns {Boolean} true if so, false otherwise
+     * @returns {Boolean} true if the last moves are indeed in simplified threefold repetition (STFR), false otherwise
      */
     _inSimplifiedThreefoldRepetition: function() {
-        var moves = this.moves.length;
+        var numberOfMoves = this.moves.length;
 
-        if(moves < 8) {
-            return false;
+        if(numberOfMoves < 8) {
+            return false; // not enough moves have even occurred to be in STFR
         }
 
+        // for the last 4 "rounds" (two turns for each player)
         for(var i = 0; i < 4; i++) {
-            var move = this.moves[moves + i - 8];
-            var nextMove = this.moves[moves + i - 4];
+            var move = this.moves[numberOfMoves + i - 8];
+            var nextMove = this.moves[numberOfMoves + i - 4];
 
-            // if for the last eight moves a capture, promotions, or pawn movement has happened, then simplified threefold repetition has NOT occured
+            // if for the last eight moves a capture, promotion, or pawn movement has happened, then simplified threefold repetition has NOT occurred
             if(this._moveHasCapturePromotionOrPawnAdvancement(move) || this._moveHasCapturePromotionOrPawnAdvancement(nextMove)) {
-                return false;
+                return false; // has not occurred
             }
 
-            // if any of the moves 0 and 4, 1 and 5, ..., 3 and 7 are NOT identical, then a draw has NOT occured
+            // if any of the moves 0 and 4, 1 and 5, ..., 3 and 7 are NOT identical, then a draw has NOT occurred
             //    Two moves are identical if the starting position (file and rank) and ending position (file and rank) of the moves are identical.
             if(move.piece !== nextMove.piece || move.fromFile + move.fromRank !== nextMove.fromFile + nextMove.fromRank || move.toFile + move.toRank !== nextMove.toFile + nextMove.toRank) {
-                return false;
+                return false; // has not occurred
             }
         }
 
-        return true; // if we got here we could not find anything about the move that would make it repetitive, so it is in Simplied Threefold Repetition
+        return true; // if we got here the last 8 moves are repeats, so it is in STFR
     },
 
     /**
