@@ -44,7 +44,22 @@ var prototype = {
     },
 
     /**
-     * re-implimentation of Array.push which registers pushed properties. Use this for expanding DeltaMergeableArrays instead of 'this[this.length] = newNum';
+     * Public setter override to make sure this DeltaMergeableArray is never overwritten
+     *
+     * @param {Array} newArray - the new array we are supposed to be "set" to, instead copy its elements
+     * @returns {DeltaMergeableArray} this array
+     */
+    replace: function(newArray) {
+        this.length = newArray.length;
+        for(var i = 0; i < this.length; i++) {
+            this[i] = newArray[i];
+        }
+
+        return this;
+    },
+
+    /**
+     * re-implementation of Array.push which registers pushed properties. Use this for expanding DeltaMergeableArrays instead of 'this[this.length] = newNum';
      *
      * @see Array.push
      * @param {...*} var_args - any number of elements to push into this array.
@@ -61,7 +76,7 @@ var prototype = {
     },
 
     /**
-     * re-implimentation of Array.pop which registers removes popped properties. Use this for removing DeltaMergeableArrays instead of 'delete this[this.length - 1]';
+     * re-implementation of Array.pop which registers removes popped properties. Use this for removing DeltaMergeableArrays instead of 'delete this[this.length - 1]';
      *
      * @see Array.pop
      * @returns {*} element popped from the end of the list
@@ -73,7 +88,7 @@ var prototype = {
     },
 
     /**
-     * re-implimentation of Array.unshift which registers pushed properties at the front. Use this for expanding DeltaMergeableArrays.
+     * re-implementation of Array.unshift which registers pushed properties at the front. Use this for expanding DeltaMergeableArrays.
      *
      * @see Array.unshift
      * @param {...*} var_args - any number of elements to push into this array at the front
@@ -89,7 +104,7 @@ var prototype = {
     },
 
     /**
-     * re-implimentation of Array.shift which pops the first element off the array, shift all ements down.
+     * re-implementation of Array.shift which pops the first element off the array, shift all elements down.
      *
      * @see Array.shift
      * @returns {*} the element of the array that was shifted from the front.
@@ -106,7 +121,7 @@ var prototype = {
     },
 
     /**
-     * re-implimentation of Array.concat to also consider DeltaMergeable as arrays (and not a single object)
+     * re-implementation of Array.concat to also consider DeltaMergeable as arrays (and not a single object)
      *
      * @see Array.concat
      * @returns {Array} the new concated Array (not DeltaMergeableArray)

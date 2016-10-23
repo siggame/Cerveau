@@ -17,7 +17,36 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
     },
 
     /**
-     * Registers a new key as a property. Use this instead of the traditional 'this[key] = value;'
+     * Public setter override to make sure this DeltaMergeableDictionary is never overwritten
+     *
+     * @param {Object} newDict - the new object we are supposed to be "set" to, instead copy its key/values
+     * @returns {DeltaMergeableDictionary} this dict
+     */
+    replace: function(newDict) {
+        var oldKeys = Object.keys(this._poperties);
+
+        // add the new keys to this dict
+        for(var newKey in newDict) {
+            if(newDict.hasOwnProperty(newKey)) {
+                if(!this._hasProperty(newKey)) {
+                    this.add(newKey, newDict[newKey]);
+                }
+
+                // remove the newKey from the old keys so it is not removed
+                oldKeys.removeElement(newKey);
+            }
+        }
+
+        // remove all the old keys that were not a new key
+        for(var i = 0; i < oldKeys.length; i++) {
+            this.remove(oldKeys[i]);
+        }
+
+        return this;
+    },
+
+    /**
+     * Registers a new key as a property. Use this instead of the traditional `this[key] = value;`
      *
      * @param {string} key - key you are adding
      * @param {*} value - value you are adding
@@ -29,7 +58,7 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
     },
 
     /**
-     * Removed a key from being a property. Use this instead of the traditiona 'delete this[key];'
+     * Removed a key from being a property. Use this instead of the traditional `delete this[key];`
      *
      * @param {string} key - key in this object
      */
@@ -38,7 +67,7 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
     },
 
     /**
-     * Convienence function like a traditional dictionary extend
+     * Convenience function like a traditional dictionary extend
      *
      * @param {Object|DeltaMergeableDictionary} copyFrom - other object to copy properties from
      */

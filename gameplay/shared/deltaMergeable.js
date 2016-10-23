@@ -9,7 +9,7 @@ var DeltaMergeable = Class({
     /**
      * Creates something that is DeltaMergeable, that is will only serialize certain keys. Can be re-initialized multiple times and will not overwrite values
      *
-     * @contructor
+     * @constructor
      * @param {BaseGame} baseGame - the game this is in
      * @param {Array.<string>} pathInBaseGame - path to this item from the root (game)
      * @param {Object} values - key value pairs of values to set
@@ -52,7 +52,7 @@ var DeltaMergeable = Class({
     },
 
     /**
-     * Adds multiple properties at once with optinal values
+     * Adds multiple properties at once with optional values
      *
      * @see _addProperty
      * @param {Object} properties - keys to properties, with the value being the property options
@@ -182,7 +182,7 @@ var DeltaMergeable = Class({
     },
 
     /**
-     * Generic function that hooks up nested arrays or obejcts
+     * Generic function that hooks up nested arrays or objects
      *
      * @param {string} type - "Array" or "Dictionary" based on class type
      * @param {string} key - the key this array or object will be stored in
@@ -197,6 +197,12 @@ var DeltaMergeable = Class({
         var nested = new DeltaMergeableType.uninitialized();
         this._addProperty(key, nested);
         nested.init(this._baseGame, newPath, copyFrom, options);
+
+        // prevent these nested objects from being set to different nested DeltaMergeables, instead these setters in the sub classes will copy over the values in what they were set to.
+        this._properties[key].setter = function(newValue) {
+            return nested.replace(newValue);
+        };
+
         return nested;
     },
 });
