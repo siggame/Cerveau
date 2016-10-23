@@ -99,10 +99,10 @@ module.exports = function(args) {
      * @apiParam {String} gameName      The name of the game (or an alias), must be a valid game on the server.
      * @apiParam {String} gameSession   The session id of the game you want to check the status of.
      *
-     * @apiSuccess {String} gameName                The actual name of the game, e.g. "chess" -> "Chess".
-     * @apiSuccess {String} gameSession             The id of the session in that game.
-     * @apiSuccess {String|null} gamelogFilename    The filename (id) of the gamelog. To get the actual gamelog use the /gamelog/:id part of the API. null means the gamelog does not exist yet because it is still being written to the filesystem
-     * @apiSuccess {String} status               What the status of this game session is:
+     * @apiSuccess {String} gameName                    The actual name of the game, e.g. "chess" -> "Chess".
+     * @apiSuccess {String} gameSession                 The id of the session in that game.
+     * @apiSuccess {String} gamelogFilename             The filename (id) of the gamelog. To get the actual gamelog use the /gamelog/:id part of the API. null means the gamelog does not exist yet because it is still being written to the filesystem
+     * @apiSuccess {String} status                      What the status of this game session is:
      *  * "empty" if the game session is valid, but does not exist because no clients have ever connected to it.
      *  * "open" if the game session has had a least 1 client connect, but the game has not started.
      *  * "running" if all players have connected, and the game is actively in progress, but not over.
