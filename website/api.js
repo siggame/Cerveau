@@ -95,21 +95,21 @@ module.exports = function(args) {
      * @api {get} /status/:gameName/:gameSession Status
      * @apiName Status
      * @apiGroup API
-     * @apiDescription When given a gameName and session id, responds with json data about what is going on in that game session, incuding what clients are connected.
+     * @apiDescription When given a gameName and session id, responds with json data about what is going on in that game session, including what clients are connected.
      * @apiParam {String} gameName      The name of the game (or an alias), must be a valid game on the server.
      * @apiParam {String} gameSession   The session id of the game you want to check the status of.
      *
-     * @apiSuccess {String} gameName            The actual name of the game, e.g. "chess" -> "Chess".
-     * @apiSuccess {String} gameSession         The id of the session in that game.
-     * @apiSuccess {String} gamelog             The id of the gamelog. To get the actual gamelog use the /gamelog/:id part of the API.
-     * @apiSuccess {String} status              What the status of this game session is:
+     * @apiSuccess {String} gameName                The actual name of the game, e.g. "chess" -> "Chess".
+     * @apiSuccess {String} gameSession             The id of the session in that game.
+     * @apiSuccess {String|null} gamelogFilename    The filename (id) of the gamelog. To get the actual gamelog use the /gamelog/:id part of the API. null means the gamelog does not exist yet because it is still being written to the filesystem
+     * @apiSuccess {String} status               What the status of this game session is:
      *  * "empty" if the game session is valid, but does not exist because no clients have ever connected to it.
      *  * "open" if the game session has had a least 1 client connect, but the game has not started.
      *  * "running" if all players have connected, and the game is actively in progress, but not over.
-     *  * "over" if the game session has ran to completion and clients have disconected.
+     *  * "over" if the game session has ran to completion and clients have disconnected.
      *  * "error" otherwise, such as if the gameName was invalid.
-     * @apiSuccess {Number} numberOfPlayers     The number of clients that are playing needed to connect to make the game session start running.
-     * @apiSuccess {Client[]} clients           An array of clients currently in that game session.
+     * @apiSuccess {Number} numberOfPlayers         The number of clients that are playing needed to connect to make the game session start running.
+     * @apiSuccess {Client[]} clients               An array of clients currently in that game session.
      *
      * @apiSuccess (Client) {Number} [index]            If the player requested, or was assigned, a player index. When a game session reaches "running" this will be set.
      * @apiSuccess (Client) {String} name               The name of the client.

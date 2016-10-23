@@ -141,13 +141,16 @@ var Session = Class({
 
         this._worker.on("message", function(data) { // this message should only happen once, when the game is over
             if(data.gamelog) {
-                self.lobby.gameLogger.log(data.gamelog);
-
                 delete self._worker; // we are done with that worker thread
                 self.over = true;
                 self.winners = data.gamelog.winners;
                 self.losers = data.gamelog.losers;
-                self.gamelogFilename = self.lobby.gameLogger.filenameFor(data.gamelog);
+                self.gamelogFilename = null; // null to signify the gamelog does not exist, as it has not be written to the file system yet
+
+                // write the gamelog, once written update our `gamelogFilename` to the actual slug to signify it can be read now
+                self.lobby.gameLogger.log(data.gamelog, function(filename) {
+                    self.gamelogFilename = filename;
+                });
             }
         });
 
