@@ -148,6 +148,9 @@ var Cowboy = Class(GameObject, {
         else if(!piano || !piano.isPiano) {
             reason = "{piano} is not a piano to play";
         }
+        else if(piano.isPlaying) {
+            reason = "{piano} is already playing music this turn.";
+        }
 
         if(reason) {
             return this.game.logicError(false, reason.format({
