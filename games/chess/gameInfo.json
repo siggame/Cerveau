@@ -105,7 +105,7 @@
             },
             "moves": {
                 "default": null,
-                "description": " The list of Moves that have occured, in order.",
+                "description": "The list of Moves that have occurred, in order.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -326,7 +326,7 @@
                 },
                 "promotion": {
                     "default": null,
-                    "description": "The Piece type this Move's Piece was promoted to from a Pawn, empty string if no promotion occured.",
+                    "description": "The Piece type this Move's Piece was promoted to from a Pawn, empty string if no promotion occurred.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -759,7 +759,7 @@
                 },
                 "pieces": {
                     "default": null,
-                    "description": "All the unpcaptured chess Pieces owned by this player.",
+                    "description": "All the uncaptured chess Pieces owned by this player.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,

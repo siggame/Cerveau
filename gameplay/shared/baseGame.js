@@ -47,7 +47,7 @@ var BaseGame = Class(DeltaMergeable, {
 
     // The following variable are static, and no game instances should override these, but their class prototypes can
     name: "Base Game", // should be overwritten by the child game class's prototype inheriting this
-    aliases: [], // should be overwitten as well, and populated with strings like the web server id. aliases are NOT case sensitive
+    aliases: [], // should be overwritten as well, and populated with strings like the web server id. aliases are NOT case sensitive
     numberOfPlayers: 2,
     maxInvalidsPerPlayer: Infinity,
     _orderFlag: {isOrderFlag: true},
@@ -95,14 +95,14 @@ var BaseGame = Class(DeltaMergeable, {
      * returns {*} returns any start data you want stored in the game log, such as the random seed (if any procedural generation is used)
      */
     begin: function() {
-        // This should be inheritied in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
+        // This should be inherited in <gamename>/game.js. This function is simply here in case they delete the function because they don't need it (no idea why that would be the case though).
     },
 
 
 
-    // ///////////
-    // Players //
-    // ///////////
+    // ///////// //
+    //  Players  //
+    // ///////// //
 
     /**
      * Initializes the players based on what clients are connected.
@@ -113,7 +113,7 @@ var BaseGame = Class(DeltaMergeable, {
         if(this.players.length === 0) {
             for(var i = 0; i < clients.length; i++) {
                 var client = clients[i];
-                var player = this.create("Player", { // this method should be implimented in GeneratedGame
+                var player = this.create("Player", { // this method should be implemented in GeneratedGame
                     name: client.name || ("Player " + i),
                     clientType: client.type || "Unknown",
                 });
@@ -133,7 +133,7 @@ var BaseGame = Class(DeltaMergeable, {
      * Called when a client disconnected to remove the client from the game and check if they have a player and if removing them alters the game
      *
      * @param {Player} player - the player whose client disconnected
-     * @param {string} reason - human readable resason why this player disconnected
+     * @param {string} reason - human readable reason why this player disconnected
      */
     playerDisconnected: function(player, reason) {
         if(player && this.hasStarted() && !this.isOver()) {
@@ -201,7 +201,7 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * returns the next availible game object id, which by default is the number number as a string. But games where linear id numbers give away info this can be overridden to hide.
+     * returns the next available game object id, which by default is the number number as a string. But games where linear id numbers give away info this can be overridden to hide.
      *
      * @returns {string} the next id for a game object. It should never be an id already used this instance, even if that game object is dereferenced everwhere.
      */
@@ -274,7 +274,7 @@ var BaseGame = Class(DeltaMergeable, {
                 return finished;
             }
             else {
-                this.throwErrorClass(errors.EventDataError, "No callback for finshed order '" + finished + "'.");
+                this.throwErrorClass(errors.EventDataError, "No callback for finished order '" + finished + "'.");
             }
         }
     },
@@ -332,7 +332,7 @@ var BaseGame = Class(DeltaMergeable, {
             try {
                 var ranReturned = runCallback.apply(run.caller, argsArray);
 
-                if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asyncronously
+                if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asynchronously
                     asyncReturnWrapper.callback = function(asyncReturnValue) {
                         resolve(self._finishRun(runCallback, player, asyncReturnValue));
                     };
@@ -349,12 +349,12 @@ var BaseGame = Class(DeltaMergeable, {
     },
 
     /**
-     * After we run game logic, santatize the ran data and send it back
+     * After we run game logic, sanitize the ran data and send it back
      *
      * @param {Function} runCallback - the callback we finished
      * @param {Player} player - the player that requested we run something
      * @param {*} returned - the value we returned, and need to sanitize because statically typed clients are lame
-     * @returns {*} the avtual return value, handling invalid messaged if returned was an error
+     * @returns {*} the actual return value, handling invalid messaged if returned was an error
      */
     _finishRun: function(runCallback, player, returned) {
         var isGameLogicError = typeof(returned) === "object" && returned.isGameLogicError;
@@ -382,7 +382,7 @@ var BaseGame = Class(DeltaMergeable, {
     /**
      * Called internally by games to order ais (clients) to execute some order.
      *
-     * @param {Player} player - the player that we want to execture the order
+     * @param {Player} player - the player that we want to execute the order
      * @param {string} orderName - the name of the order to the player's ai to execute
      * @param {Array} [args] - an array that represents the args to send to the order function on the client ai, or [callback] if no args
      * @param {function} [callback] - callback function to execute instead of the normal aiFinished callback
@@ -487,9 +487,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    // ///////////////////////
-    // Winning and Loosing //
-    // ///////////////////////
+    // /////////////////////// //
+    //   Winning and Loosing   //
+    // /////////////////////// //
 
     /**
      * Checks if a game is over, or sets if a game is over
@@ -527,7 +527,7 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Player} loser - the player that lost the game
      * @see BaseGame.declareLosers
-     * @returns {boolean} true if the game ended beacuse of this, false otherwise
+     * @returns {boolean} true if the game ended because of this, false otherwise
      */
     declareLoser: function(loser /* ...*/) {
         var args = Array.prototype.slice.call(arguments);
@@ -570,7 +570,7 @@ var BaseGame = Class(DeltaMergeable, {
      *
      * @param {Player} winner - the player that won the game
      * @see BaseGame.declareWinners
-     * @returns {boolean} true if the game ended beacuse of this, false otherwise
+     * @returns {boolean} true if the game ended because of this, false otherwise
      */
     declareWinner: function(winner /* ...*/) {
         var args = Array.prototype.slice.call(arguments);
@@ -618,6 +618,9 @@ var BaseGame = Class(DeltaMergeable, {
         }
     },
 
+    /**
+     * End the game via coin flip (1 random winner, the rest lose)
+     */
     _endGameViaCoinFlip: function() {
         // Win via coin flip - if we got here no player won via game rules. They probably played identically to each other.
         var players = [];

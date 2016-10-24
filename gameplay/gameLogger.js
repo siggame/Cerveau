@@ -27,6 +27,7 @@ var GameLogger = Class({
         this._host = args.host;
         this._port = args.httpPort;
         this._visualizerURL = args.visualizerURL;
+        this._filenamesWritting = {}; // easy lookup filenames we are writting to the filesystem, so they are not reported as gamelogs and read in incomplete
     },
 
 
@@ -37,8 +38,10 @@ var GameLogger = Class({
      * Creates a gamelog for the game in the directory set during init
      *
      * @param {Object} gamelog - the gamelog which should be serializable to json representation of the gamelog
+     * @param {Function} callback - callback to invoke once the file has been written to the filesystem.
      */
-    log: function(gamelog) {
+    log: function(gamelog, callback) {
+        var self = this;
         var serialized = JSON.stringify(gamelog);
         var filename = this.filenameFor(gamelog);
 
@@ -50,6 +53,14 @@ var GameLogger = Class({
             log.error("Could not save gamelog '" + gamelog.gameName + "' - '" + gamelog.gameSession + "'.", err);
         });
 
+        this._filenamesWritting[filename] = true;
+        gzip.on("finish", function() {
+            delete self._filenamesWritting[filename];
+            if(callback) {
+                callback(filename);
+            }
+        });
+
         gzip.pipe(writeSteam);
         gzip.write(serialized);
         gzip.end();
@@ -58,7 +69,7 @@ var GameLogger = Class({
     /**
      * Gets all the gamelogs in output/gamelogs. The gamelogs are not complete, but rather a "shallow" gamelog.
      *
-     * @param {Function} callback - callback to invoke once gamelogs have been loaded asyncronously
+     * @param {function} callback - callback to invoke once gamelogs have been loaded asynchronously
      */
     getLogs: function(callback) {
         var self = this;
@@ -70,7 +81,7 @@ var GameLogger = Class({
             var gamelogs = [];
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                if(filename.endsWith(self.gamelogExtension)) { // then it is a gamelog
+                if(!this._filenamesWritting[filename] && filename.endsWith(self.gamelogExtension)) { // then it is a gamelog
                     var split = filename.split("-");
                     if(split.length === 3) { // then we can figure out what the game is based on file name
                         var session = split[2];
@@ -122,6 +133,11 @@ var GameLogger = Class({
      */
     _checkGamelog: function(filename, callback) {
         var gamelogPath = path.join(this.gamelogDirectory, filename + this.gamelogExtension);
+
+        if(this._filenamesWritting[filename]) {
+            callback(undefined); // tell them it does not exist yet, as it is not written to the file system
+            return;
+        }
 
         fs.stat(gamelogPath, function(err, stats) {
             callback(err || !stats.isFile() ? undefined : gamelogPath, err);

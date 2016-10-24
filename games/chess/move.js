@@ -15,10 +15,67 @@ var Move = Class(GameObject, {
     /**
      * Initializes Moves.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * The Piece captured by this Move, null if no capture.
+         *
+         * @type {Piece}
+         */
+        this.captured = this.captured || null;
+
+        /**
+         * The file the Piece moved from.
+         *
+         * @type {string}
+         */
+        this.fromFile = this.fromFile || "";
+
+        /**
+         * The rank the Piece moved from.
+         *
+         * @type {number}
+         */
+        this.fromRank = this.fromRank || 0;
+
+        /**
+         * The Piece that was moved.
+         *
+         * @type {Piece}
+         */
+        this.piece = this.piece || null;
+
+        /**
+         * The Piece type this Move's Piece was promoted to from a Pawn, empty string if no promotion occurred.
+         *
+         * @type {string}
+         */
+        this.promotion = this.promotion || "";
+
+        /**
+         * The standard algebraic notation (SAN) representation of the move.
+         *
+         * @type {string}
+         */
+        this.san = this.san || "";
+
+        /**
+         * The file the Piece moved to.
+         *
+         * @type {string}
+         */
+        this.toFile = this.toFile || "";
+
+        /**
+         * The rank the Piece moved to.
+         *
+         * @type {number}
+         */
+        this.toRank = this.toRank || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

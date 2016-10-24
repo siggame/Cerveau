@@ -33,7 +33,7 @@ if not 'cerveau' in shared:
         if base_type == "dictionary":
             return "Object.<" + cerveau_type(type_obj['keyType']) + ", " + cerveau_type(type_obj['valueType']) + ">"
         elif base_type == "list":
-            return "list.<" + cerveau_type(type_obj['valueType']) + ">"
+            return "Array.<" + cerveau_type(type_obj['valueType']) + ">"
         elif base_type == "int" or base_type == "float":
             return "number"
         else:
