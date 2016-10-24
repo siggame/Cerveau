@@ -81,7 +81,7 @@ var GameLogger = Class({
             var gamelogs = [];
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                if(!this._filenamesWritting[filename] && filename.endsWith(self.gamelogExtension)) { // then it is a gamelog
+                if(!self._filenamesWritting[filename] && filename.endsWith(self.gamelogExtension)) { // then it is a gamelog
                     var split = filename.split("-");
                     if(split.length === 3) { // then we can figure out what the game is based on file name
                         var session = split[2];
