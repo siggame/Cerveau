@@ -47,15 +47,16 @@ var prototype = {
      * Public setter override to make sure this DeltaMergeableArray is never overwritten
      *
      * @param {Array} newArray - the new array we are supposed to be "set" to, instead copy its elements
-     * @returns {DeltaMergeableArray} this array
      */
     replace: function(newArray) {
+        if(newArray === this) {
+            return;
+        }
+
         this.length = newArray.length;
         for(var i = 0; i < this.length; i++) {
             this[i] = newArray[i];
         }
-
-        return this;
     },
 
     /**

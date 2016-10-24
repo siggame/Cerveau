@@ -100,9 +100,9 @@ var BaseGame = Class(DeltaMergeable, {
 
 
 
-    // ///////////
-    // Players //
-    // ///////////
+    // ///////// //
+    //  Players  //
+    // ///////// //
 
     /**
      * Initializes the players based on what clients are connected.

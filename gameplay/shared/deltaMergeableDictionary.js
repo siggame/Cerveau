@@ -20,10 +20,13 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
      * Public setter override to make sure this DeltaMergeableDictionary is never overwritten
      *
      * @param {Object} newDict - the new object we are supposed to be "set" to, instead copy its key/values
-     * @returns {DeltaMergeableDictionary} this dict
      */
     replace: function(newDict) {
-        var oldKeys = Object.keys(this._poperties);
+        if(newDict === this) {
+            return;
+        }
+
+        var oldKeys = Object.keys(this._properties);
 
         // add the new keys to this dict
         for(var newKey in newDict) {
@@ -41,8 +44,6 @@ var DeltaMergeableDictionary = Class(DeltaMergeable, {
         for(var i = 0; i < oldKeys.length; i++) {
             this.remove(oldKeys[i]);
         }
-
-        return this;
     },
 
     /**

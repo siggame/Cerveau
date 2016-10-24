@@ -15,10 +15,53 @@ var Piece = Class(GameObject, {
     /**
      * Initializes Pieces.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * When the Piece has been captured (removed from the board) this is true. Otherwise false.
+         *
+         * @type {boolean}
+         */
+        this.captured = this.captured || false;
+
+        /**
+         * The file (column) coordinate of the Piece represented as a letter [a-h], with 'a' starting at the left of the board.
+         *
+         * @type {string}
+         */
+        this.file = this.file || "";
+
+        /**
+         * If the Piece has moved from its starting position.
+         *
+         * @type {boolean}
+         */
+        this.hasMoved = this.hasMoved || false;
+
+        /**
+         * The player that controls this chess Piece.
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
+        /**
+         * The rank (row) coordinate of the Piece represented as a number [1-8], with 1 starting at the bottom of the board.
+         *
+         * @type {number}
+         */
+        this.rank = this.rank || 0;
+
+        /**
+         * The type of chess Piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.
+         *
+         * @type {string}
+         */
+        this.type = this.type || "";
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

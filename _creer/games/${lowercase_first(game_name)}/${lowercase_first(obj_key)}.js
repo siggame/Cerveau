@@ -23,11 +23,25 @@ var ${obj_key} = Class(${", ".join(all_parent_classes) + "," if all_parent_class
     /**
      * Initializes ${obj_key}s.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
 % for parent_class in reversed(parent_classes):
         ${parent_class}.init.apply(this, arguments);
+% endfor
+
+% for attr_name in obj['attribute_names']:
+<%
+    attr_parms = obj['attributes'][attr_name]
+    #if 'serverPredefined' in attr_parms and attr_parms['serverPredefined']:
+    #    continue
+%>        /**
+         * ${attr_parms['description']}
+         *
+         * @type {${shared['cerveau']['type'](attr_parms['type'])}}
+         */
+        this.${attr_name} = this.${attr_name} || ${shared['cerveau']['default'](attr_parms['type'])};
+
 % endfor
 
 ${merge("        //", "init",

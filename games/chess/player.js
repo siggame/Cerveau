@@ -15,10 +15,102 @@ var Player = Class(GameObject, {
     /**
      * Initializes Players.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
+         *
+         * @type {string}
+         */
+        this.clientType = this.clientType || "";
+
+        /**
+         * The color (side) of this player. Either 'White' or 'Black', with the 'White' player having the first move.
+         *
+         * @type {string}
+         */
+        this.color = this.color || "";
+
+        /**
+         * True if this player is currently in check, and must move out of check, false otherwise.
+         *
+         * @type {boolean}
+         */
+        this.inCheck = this.inCheck || false;
+
+        /**
+         * If the player lost the game or not.
+         *
+         * @type {boolean}
+         */
+        this.lost = this.lost || false;
+
+        /**
+         * If the Player has made their move for the turn. true means they can no longer move a Piece this turn.
+         *
+         * @type {boolean}
+         */
+        this.madeMove = this.madeMove || false;
+
+        /**
+         * The name of the player.
+         *
+         * @type {string}
+         */
+        this.name = this.name || "";
+
+        /**
+         * This player's opponent in the game.
+         *
+         * @type {Player}
+         */
+        this.opponent = this.opponent || null;
+
+        /**
+         * All the uncaptured chess Pieces owned by this player.
+         *
+         * @type {Array.<Piece>}
+         */
+        this.pieces = this.pieces || [];
+
+        /**
+         * The direction your Pieces must go along the rank axis until they reach the other side.
+         *
+         * @type {number}
+         */
+        this.rankDirection = this.rankDirection || 0;
+
+        /**
+         * The reason why the player lost the game.
+         *
+         * @type {string}
+         */
+        this.reasonLost = this.reasonLost || "";
+
+        /**
+         * The reason why the player won the game.
+         *
+         * @type {string}
+         */
+        this.reasonWon = this.reasonWon || "";
+
+        /**
+         * The amount of time (in ns) remaining for this AI to send commands.
+         *
+         * @type {number}
+         */
+        this.timeRemaining = this.timeRemaining || 0;
+
+        /**
+         * If the player won the game or not.
+         *
+         * @type {boolean}
+         */
+        this.won = this.won || false;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

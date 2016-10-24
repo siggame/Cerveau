@@ -34,12 +34,12 @@ var GameManager = Class({
                 if(DeltaMergeableArray.isInstance(sanitizing)) {
                     return sanitizing;
                 }
-                return serializer.defaultArray(sanitizing);
+                return null;
             case "dictionary":
                 if(DeltaMergeableDictionary.isInstance(sanitizing)) {
                     return sanitizing;
                 }
-                return serializer.defaultObject(sanitizing);
+                return null;
             default:
                 if(type[0] === type[0].toUpperCase()) { // then it is a GameObject
                     var gameObjectClass = this._game.classes[type];

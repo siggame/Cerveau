@@ -200,7 +200,8 @@ var DeltaMergeable = Class({
 
         // prevent these nested objects from being set to different nested DeltaMergeables, instead these setters in the sub classes will copy over the values in what they were set to.
         this._properties[key].setter = function(newValue) {
-            return nested.replace(newValue);
+            nested.replace(newValue);
+            return nested;
         };
 
         return nested;

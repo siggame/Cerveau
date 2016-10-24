@@ -16,11 +16,82 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         TurnBasedGame.init.apply(this, arguments);
         TwoPlayerGame.init.apply(this, arguments);
+
+        /**
+         * The player whose turn it is currently. That player can send commands. Other players cannot.
+         *
+         * @type {Player}
+         */
+        this.currentPlayer = this.currentPlayer || null;
+
+        /**
+         * The current turn number, starting at 0 for the first player's turn.
+         *
+         * @type {number}
+         */
+        this.currentTurn = this.currentTurn || 0;
+
+        /**
+         * Forsyth–Edwards Notation, a notation that describes the game board.
+         *
+         * @type {string}
+         */
+        this.fen = this.fen || "";
+
+        /**
+         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
+         *
+         * @type {Object.<string, GameObject>}
+         */
+        this.gameObjects = this.gameObjects || {};
+
+        /**
+         * The maximum number of turns before the game will automatically end.
+         *
+         * @type {number}
+         */
+        this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * The list of Moves that have occurred, in order.
+         *
+         * @type {Array.<Move>}
+         */
+        this.moves = this.moves || [];
+
+        /**
+         * All the uncaptured Pieces in the game.
+         *
+         * @type {Array.<Piece>}
+         */
+        this.pieces = this.pieces || [];
+
+        /**
+         * List of all the players in the game.
+         *
+         * @type {Array.<Player>}
+         */
+        this.players = this.players || [];
+
+        /**
+         * A unique identifier for the game instance that is being played.
+         *
+         * @type {string}
+         */
+        this.session = this.session || "";
+
+        /**
+         * How many turns until the game ends because no pawn has moved and no Piece has been taken.
+         *
+         * @type {number}
+         */
+        this.turnsToDraw = this.turnsToDraw || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
