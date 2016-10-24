@@ -15,10 +15,88 @@ var Cowboy = Class(GameObject, {
     /**
      * Initializes Cowboys.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * If the Cowboy can be moved this turn via its owner.
+         *
+         * @type {boolean}
+         */
+        this.canMove = this.canMove || false;
+
+        /**
+         * The direction this Cowboy is moving while drunk. Will be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+         *
+         * @type {string}
+         */
+        this.drunkDirection = this.drunkDirection || "";
+
+        /**
+         * How much focus this Cowboy has. Different Jobs do different things with their Cowboy's focus.
+         *
+         * @type {number}
+         */
+        this.focus = this.focus || 0;
+
+        /**
+         * How much health this Cowboy currently has.
+         *
+         * @type {number}
+         */
+        this.health = this.health || 0;
+
+        /**
+         * If this Cowboy is dead and has been removed from the game.
+         *
+         * @type {boolean}
+         */
+        this.isDead = this.isDead || false;
+
+        /**
+         * If this Cowboy is drunk, and will automatically walk.
+         *
+         * @type {boolean}
+         */
+        this.isDrunk = this.isDrunk || false;
+
+        /**
+         * The job that this Cowboy does, and dictates how they fight and interact within the Saloon.
+         *
+         * @type {string}
+         */
+        this.job = this.job || "";
+
+        /**
+         * The Player that owns and can control this Cowboy.
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
+        /**
+         * The Tile that this Cowboy is located on.
+         *
+         * @type {Tile}
+         */
+        this.tile = this.tile || null;
+
+        /**
+         * How many times this unit has been drunk before taking their siesta and reseting this to 0.
+         *
+         * @type {number}
+         */
+        this.tolerance = this.tolerance || 0;
+
+        /**
+         * How many turns this unit has remaining before it is no longer busy and can `act()` or `play()` again.
+         *
+         * @type {number}
+         */
+        this.turnsBusy = this.turnsBusy || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

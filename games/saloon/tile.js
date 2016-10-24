@@ -16,10 +16,95 @@ var Tile = Class(GameObject, TiledTile, {
     /**
      * Initializes Tiles.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * The beer Bottle currently flying over this Tile.
+         *
+         * @type {Bottle}
+         */
+        this.bottle = this.bottle || null;
+
+        /**
+         * The Cowboy that is on this Tile, null otherwise.
+         *
+         * @type {Cowboy}
+         */
+        this.cowboy = this.cowboy || null;
+
+        /**
+         * The furnishing that is on this Tile, null otherwise.
+         *
+         * @type {Furnishing}
+         */
+        this.furnishing = this.furnishing || null;
+
+        /**
+         * If this Tile is pathable, but has a hazard that damages Cowboys that path through it.
+         *
+         * @type {boolean}
+         */
+        this.hasHazard = this.hasHazard || false;
+
+        /**
+         * If this Tile is a balcony of the Saloon that YoungGuns walk around on, and can never be pathed through by Cowboys.
+         *
+         * @type {boolean}
+         */
+        this.isBalcony = this.isBalcony || false;
+
+        /**
+         * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.
+         *
+         * @type {Tile}
+         */
+        this.tileEast = this.tileEast || null;
+
+        /**
+         * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of the map.
+         *
+         * @type {Tile}
+         */
+        this.tileNorth = this.tileNorth || null;
+
+        /**
+         * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of the map.
+         *
+         * @type {Tile}
+         */
+        this.tileSouth = this.tileSouth || null;
+
+        /**
+         * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the map.
+         *
+         * @type {Tile}
+         */
+        this.tileWest = this.tileWest || null;
+
+        /**
+         * The x (horizontal) position of this Tile.
+         *
+         * @type {number}
+         */
+        this.x = this.x || 0;
+
+        /**
+         * The y (vertical) position of this Tile.
+         *
+         * @type {number}
+         */
+        this.y = this.y || 0;
+
+        /**
+         * The YoungGun on this tile, null otherwise.
+         *
+         * @type {YoungGun}
+         */
+        this.youngGun = this.youngGun || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

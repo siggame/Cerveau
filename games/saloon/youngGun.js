@@ -15,10 +15,39 @@ var YoungGun = Class(GameObject, {
     /**
      * Initializes YoungGuns.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * The Tile that a Cowboy will be called in on if this YoungGun calls in a Cowboy.
+         *
+         * @type {Tile}
+         */
+        this.callInTile = this.callInTile || null;
+
+        /**
+         * True if the YoungGun can call in a Cowboy, false otherwise.
+         *
+         * @type {boolean}
+         */
+        this.canCallIn = this.canCallIn || false;
+
+        /**
+         * The Player that owns and can control this YoungGun.
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
+        /**
+         * The Tile this YoungGun is currently on.
+         *
+         * @type {Tile}
+         */
+        this.tile = this.tile || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

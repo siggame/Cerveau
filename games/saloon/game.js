@@ -17,12 +17,139 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
      * Initializes Games.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         TiledGame.init.apply(this, arguments);
         TurnBasedGame.init.apply(this, arguments);
         TwoPlayerGame.init.apply(this, arguments);
+
+        /**
+         * All the beer Bottles currently flying across the saloon in the game.
+         *
+         * @type {Array.<Bottle>}
+         */
+        this.bottles = this.bottles || [];
+
+        /**
+         * How much damage is applied to neighboring things bit by the Sharpshooter between turns.
+         *
+         * @type {number}
+         */
+        this.brawlerDamage = this.brawlerDamage || 0;
+
+        /**
+         * Every Cowboy in the game.
+         *
+         * @type {Array.<Cowboy>}
+         */
+        this.cowboys = this.cowboys || [];
+
+        /**
+         * The player whose turn it is currently. That player can send commands. Other players cannot.
+         *
+         * @type {Player}
+         */
+        this.currentPlayer = this.currentPlayer || null;
+
+        /**
+         * The current turn number, starting at 0 for the first player's turn.
+         *
+         * @type {number}
+         */
+        this.currentTurn = this.currentTurn || 0;
+
+        /**
+         * Every furnishing in the game.
+         *
+         * @type {Array.<Furnishing>}
+         */
+        this.furnishings = this.furnishings || [];
+
+        /**
+         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
+         *
+         * @type {Object.<string, GameObject>}
+         */
+        this.gameObjects = this.gameObjects || {};
+
+        /**
+         * All the jobs that Cowboys can be called in with.
+         *
+         * @type {Array.<string>}
+         */
+        this.jobs = this.jobs || [];
+
+        /**
+         * The number of Tiles in the map along the y (vertical) axis.
+         *
+         * @type {number}
+         */
+        this.mapHeight = this.mapHeight || 0;
+
+        /**
+         * The number of Tiles in the map along the x (horizontal) axis.
+         *
+         * @type {number}
+         */
+        this.mapWidth = this.mapWidth || 0;
+
+        /**
+         * The maximum number of Cowboys a Player can bring into the saloon of each specific job.
+         *
+         * @type {number}
+         */
+        this.maxCowboysPerJob = this.maxCowboysPerJob || 0;
+
+        /**
+         * The maximum number of turns before the game will automatically end.
+         *
+         * @type {number}
+         */
+        this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * List of all the players in the game.
+         *
+         * @type {Array.<Player>}
+         */
+        this.players = this.players || [];
+
+        /**
+         * When a player's rowdyness reaches or exceeds this number their Cowboys take a collective siesta.
+         *
+         * @type {number}
+         */
+        this.rowdynessToSiesta = this.rowdynessToSiesta || 0;
+
+        /**
+         * A unique identifier for the game instance that is being played.
+         *
+         * @type {string}
+         */
+        this.session = this.session || "";
+
+        /**
+         * How much damage is applied to things hit by Sharpshooters when they act.
+         *
+         * @type {number}
+         */
+        this.sharpshooterDamage = this.sharpshooterDamage || 0;
+
+        /**
+         * How long siestas are for a player's team.
+         *
+         * @type {number}
+         */
+        this.siestaLength = this.siestaLength || 0;
+
+        /**
+         * All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.
+         *
+         * @type {Array.<Tile>}
+         */
+        this.tiles = this.tiles || [];
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

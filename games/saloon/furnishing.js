@@ -15,10 +15,46 @@ var Furnishing = Class(GameObject, {
     /**
      * Initializes Furnishings.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * How much health this Furnishing currently has.
+         *
+         * @type {number}
+         */
+        this.health = this.health || 0;
+
+        /**
+         * If this Furnishing has been destroyed, and has been removed from the game.
+         *
+         * @type {boolean}
+         */
+        this.isDestroyed = this.isDestroyed || false;
+
+        /**
+         * True if this Furnishing is a piano and can be played, False otherwise.
+         *
+         * @type {boolean}
+         */
+        this.isPiano = this.isPiano || false;
+
+        /**
+         * If this is a piano and a Cowboy is playing it this turn.
+         *
+         * @type {boolean}
+         */
+        this.isPlaying = this.isPlaying || false;
+
+        /**
+         * The Tile that this Furnishing is located on.
+         *
+         * @type {Tile}
+         */
+        this.tile = this.tile || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
