@@ -42,8 +42,9 @@ var Instance = Class(Server, {
         log.error(err);
         this._fatal = true;
 
-        for(var i = 0; i < this.clients.length; i++) {
-            this.clients[i].disconnect("An unhandled fatal error occured on the server.");
+        var clients = this.clients.slice();
+        for(var i = 0; i < clients.length; i++) {
+            clients[i].disconnect("An unhandled fatal error occured on the server.");
         }
 
         if(this._addedClients === this._initArgs.clientInfos.length) {
