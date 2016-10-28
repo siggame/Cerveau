@@ -154,8 +154,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // map dimensions used for tile generation
-        this.mapWidth = 22;
-        this.mapHeight = 12;
+        this.mapWidth = this.mapWidth || 22;
+        this.mapHeight = this.mapHeight || 12;
 
         // game constants
         this.rowdynessToSiesta = 8;
@@ -543,10 +543,12 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      */
     _makeSomeoneWin: function(reason) {
         var players = this.players.clone();
+        var winner;
         if(players[0].score !== players[1].score) { // someone won with a higher score
             players.sortDescending("score");
 
-            this.declareWinner(players.shift(), "Has highest score ({}) once {}".format(players[0].score, reason));
+            winner = players.shift();
+            this.declareWinner(winner, "Has highest score ({}) once {}".format(winner, reason));
             this.declareLosers(players, "Lower score than winner");
             return true;
         }
@@ -554,7 +556,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         if(players[0].kills > players[1].kills) { // someone won with a higher kill count
             players.sortDescending("kills");
 
-            this.declareWinner(players.shift(), "Has most kills ({}) once {}".format(players[0].kills, reason));
+            winner = players.shift()
+            this.declareWinner(winner, "Has most kills ({}) once {}".format(winner, reason));
             this.declareLosers(players, "Less kills than winner");
             return true;
         }
