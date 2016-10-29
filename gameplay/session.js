@@ -223,6 +223,7 @@ var Session = Class({
                 type: client.type,
                 connectionType: client.connectionType,
                 spectating: client.spectating,
+                metaDeltas: client.metaDeltas || false,
             });
         }
 
