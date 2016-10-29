@@ -33,6 +33,12 @@ var BaseGame = Class(DeltaMergeable, {
             name: this._classe.prototype.name,
         });
 
+        for(var key in data) {
+            if(data.hasOwnProperty(key) && this._hasProperty(key)) {
+                this[key] = data[key];
+            }
+        }
+
         this._dir = __basedir + "/games/" + this.name.lowercaseFirst() + "/";
         this._instance = instance;
         this._orders = [];

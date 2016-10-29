@@ -18,6 +18,7 @@ var Client = Class({
         this.playerIndex = undefined;
         this.gameSession = undefined;
         this.spectating = false;
+        this.metaDeltas = false;
 
         this.setInfo(info);
 

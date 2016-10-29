@@ -293,6 +293,7 @@ var Lobby = Class(Server, {
                     playerIndex: isNaN(playerIndex) ? undefined : playerIndex,
                     type: data.clientType,
                     spectating: Boolean(data.spectating),
+                    metaDeltas: Boolean(data.metaDeltas),
                 });
 
                 session.addClient(client);

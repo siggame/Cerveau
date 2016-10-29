@@ -7,6 +7,7 @@ var constants = require("./constants");
 var moment = require("moment");
 var fs = require("fs");
 var log = require("./log");
+var extend = require("extend");
 
 /**
  * @class Instance: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
@@ -189,6 +190,12 @@ var Instance = Class(Server, {
                 if(client.player && deltaToSend !== trueDelta) { // then this player got a different game state that the "true" one (it was probably obscured), so record that in the gamelog too
                     delta.gameToPlayer = delta.gameToPlayer || {};
                     delta.gameToPlayer[client.player.id] = deltaToSend;
+                }
+
+                if(client.metaDeltas) { // then give them the metadata about the delta
+                    deltaToSend = extend({}, delta, {
+                        game: deltaToSend,
+                    });
                 }
 
                 client.send("delta", deltaToSend);
