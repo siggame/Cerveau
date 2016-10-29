@@ -556,7 +556,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         if(players[0].kills > players[1].kills) { // someone won with a higher kill count
             players.sortDescending("kills");
 
-            winner = players.shift()
+            winner = players.shift();
             this.declareWinner(winner, "Has most kills ({}) once {}".format(winner, reason));
             this.declareLosers(players, "Less kills than winner");
             return true;
