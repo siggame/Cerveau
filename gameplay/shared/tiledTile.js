@@ -11,10 +11,12 @@ var TiledTile = Class({
      * @returns {string|undefined} The string direction ("North", "East", "South", or "West") if found in that direction, undefined otherwise
      */
     adjacentDirection: function(adjacentTile) {
-        for(var i = 0; i < this.game.tileDirections.length; i++) {
-            var dir = this.game.tileDirections[i];
-            if(this.getNeighbor(dir) === adjacentTile) {
-                return dir;
+        if(adjacentTile) {
+            for(var i = 0; i < this.game.tileDirections.length; i++) {
+                var dir = this.game.tileDirections[i];
+                if(this.getNeighbor(dir) === adjacentTile) {
+                    return dir;
+                }
             }
         }
     },
@@ -48,12 +50,13 @@ var TiledTile = Class({
     },
 
     /**
-     * String coercion override
+     * Checks if a tile has another tile as its neighbor
      *
-     * @override
+     * @param {Tile} tile - tile to check
+     * @return {Boolean} true if neighbor, false otherwise
      */
-    toString: function() {
-        return "{gameObjectName} ({x}, {y}) #{id}".format(this);
+    hasNeighbor: function(tile) {
+        return Boolean(this.adjacentDirection(tile));
     },
 });
 
