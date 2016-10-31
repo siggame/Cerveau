@@ -27,7 +27,7 @@ var BaseGameObject = Class(DeltaMergeable, {
     },
 
     /**
-     * String coerecion override, handles players by default as every game has them
+     * String coercion override, handles players by default as every game has them
      *
      * @override
      * @returns {string} formatted string for this name
@@ -35,8 +35,14 @@ var BaseGameObject = Class(DeltaMergeable, {
     toString: function() {
         var str = "{gameObjectName} #{id}";
 
-        if(this.gameObjectName === "Player") { // every game will have a 'Player' game object, but we don't have a BasePlayer object in Cerveau.
-            str = "{gameObjectName} '{name}' #{id}";
+        // common game objects in games might have prettier strings to use
+        switch(this.gameObjectName) {
+            case "Player": // every game will have a 'Player' game object, but we don't have a BasePlayer object in Cerveau.
+                str = "{gameObjectName} '{name}' #{id}";
+                break;
+            case "Tile": // TiledGames have these, so include their (x, y) position
+                str = "{gameObjectName} ({x}, {y}) #{id}";
+                break;
         }
 
         return str.format(this);
