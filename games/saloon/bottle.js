@@ -62,44 +62,40 @@ var Bottle = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+    /**
+     * advances the bottle (moves it) 1 tile in between turns
+     * Note: game calls this so game will update this bottle's tile
+     */
     advance: function() {
         var next = this.tile["tile" + this.direction];
-        if(!next || next.isWall) {
-            return this.destroy(); // went off map
+        if(!next || !next.isPathableToBottles()) {
+            this.break(); // hit something
+            return;
         }
 
-        this.tile.bottle = null;
+        this.tile.bottle = null; // we moved off it
         this.tile = next;
-        var hitOtherBottle = false;
-        if(next.bottle) {
-            next.bottle.destroy();
-            hitOtherBottle = true;
-        }
-
-        next.bottle = this;
-
-        if(next.cowboy || next.furnishing || hitOtherBottle) {
-            this.destroy(); // we hit something!
-        }
+        // we won't update this.tile.bottle to us, as the game will handle bottle <--> bottle collisions after all bottles have advanced
     },
 
-    destroy: function() {
+    /**
+     * Breaks (destroys) this bottle, getting cowboys drunk in the process
+     */
+    break: function() {
+        if(this.isDestroyed) {
+            return; // we're already broken :(
+        }
+
         var cowboy = this.tile.cowboy;
 
         if(cowboy) {
-            if(!cowboy.owner.addRowdyness(1)) { // then they did not start a seista
-                // so make them drunk!
-                cowboy.isDrunk = true;
-                cowboy.turnsBusy = 5;
-                cowboy.drunkDirection = this.drunkDirection;
-                cowboy.focus = 0;
-                cowboy.canMove = false;
-            }
+            cowboy.getDrunk(this.drunkDirection);
         }
 
         this.isDestroyed = true;
         this.tile.bottle = null;
         this.tile = null;
+        this.game.bottles.removeElement(this);
     },
 
     //<<-- /Creer-Merge: added-functions -->>

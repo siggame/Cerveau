@@ -373,6 +373,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     cowboy.tile.cowboy = null;
                     cowboy.tile = next;
                     next.cowboy = cowboy;
+
+                    if(next.bottle) {
+                        next.bottle.break();
+                    }
                 }
 
                 cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
@@ -408,13 +412,39 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      * Moves all bottles currently in the game
      */
     _advanceBottles: function() {
-        for(var i = 0; i < this.bottles.length; i++) {
-            var bottle = this.bottles[i];
+        var bottles = this.bottles.clone(); // make a copy as bottles breaking could change the array's size during iteration
+
+        var bottlesAtTile = {};
+        for(var i = 0; i < bottles.length; i++) {
+            var bottle = bottles[i];
             if(bottle.isDestroyed) {
                 continue;
             }
 
             bottle.advance();
+            if(!bottle.isDestroyed) {
+                bottlesAtTile[bottle.tile.id] = bottlesAtTile[bottle.tile.id] || [];
+                bottlesAtTile[bottle.tile.id].push(bottle);
+            }
+        }
+
+        // now check for bottle <--> bottle collisions, and cleanup
+        for(var id in bottlesAtTile) {
+            if(bottlesAtTile.hasOwnProperty(id)) {
+                var tile = this.gameObjects[id];
+                bottles = bottlesAtTile[id];
+
+                if(bottles.length > 1) { // there's more than 1 bottle on that tile, break them all
+                    for(i = 0; i < bottles.length; i++) {
+                        bottles[i].break();
+                    }
+                }
+                else { // there is 1 or 0 bottles on the tile with `id`
+                    tile.bottle = bottles[0];
+                }
+
+                tile.bottle = tile.bottle || null;
+            }
         }
     },
 
@@ -548,16 +578,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             players.sortDescending("score");
 
             winner = players.shift();
-            this.declareWinner(winner, "Has highest score ({}) once {}".format(winner, reason));
+            this.declareWinner(winner, "Has highest score ({}) once {}".format(winner.score, reason));
             this.declareLosers(players, "Lower score than winner");
             return true;
         }
 
-        if(players[0].kills > players[1].kills) { // someone won with a higher kill count
+        if(players[0].kills !== players[1].kills) { // someone won with a higher kill count
             players.sortDescending("kills");
 
             winner = players.shift();
-            this.declareWinner(winner, "Has most kills ({}) once {}".format(winner, reason));
+            this.declareWinner(winner, "Has most kills ({}) once {}".format(winner.kills, reason));
             this.declareLosers(players, "Less kills than winner");
             return true;
         }

@@ -198,6 +198,11 @@ var Cowboy = Class(GameObject, {
         this.tile = tile; // and move me to the new tile
         this.canMove = false; // and mark me as having moved this turn
 
+        if(this.tile.bottle) {
+            this.tile.bottle.break();
+        }
+
+        // sharpshooters loose focus when they move
         if(this.job === "Sharpshooter") {
             this.focus = 0;
         }
@@ -311,7 +316,7 @@ var Cowboy = Class(GameObject, {
         if(tile) { // make sure the tile is a valid target for the Sharpshooter to fire at
             adjacentDirection = this.tile.adjacentDirection(tile);
             if(!adjacentDirection) {
-                return "{tile} is not adjacent to the Tile {this} is on ({this.tile}).";
+                return "{tile} is not adjacent to the Tile that {this} is on ({this.tile}).";
             }
         }
 
@@ -347,6 +352,7 @@ var Cowboy = Class(GameObject, {
      * @returns {string|undefined} the invalid reason if invalid (format not invoked against it), undefined if valid
      */
     actBartender: function(player, tile, drunkDirection) {
+        // validate drunkDirection
         var validDrunkDirection = false;
         var simple = drunkDirection.toLowerCase()[0];
         for(var i = 0; i < this.game.tileDirections.length; i++) {
@@ -363,20 +369,37 @@ var Cowboy = Class(GameObject, {
             return "{drunkDirection} is not a valid direction to send drunk Cowboys hit by {this}'s Bottles.".format({this: this, drunkDirection});
         }
 
+
+        // make sure the tile is an adjacent tile
         var adjacentDirection;
         if(tile) { // make sure the tile is a valid target for the Bartender to spawn a bottle on
             adjacentDirection = this.tile.adjacentDirection(tile);
             if(!adjacentDirection) {
-                return "{tile} is not adjacent to the Tile {this} is on ({this.tile}).";
+                return "{tile} is not adjacent to the Tile that {this} is on ({this.tile}).";
             }
         }
 
+
         // if we got here the bartender's act is valid
-        var bottle = this.game.create("Bottle", {
-            tile: tile,
-            drunkDirection: validDrunkDirection,
-            direction: adjacentDirection,
-        });
+
+        // check to make sure the tile the bottle spawns on would not cause it to instantly break
+        // because if so, don't create it, just instantly get the cowboy there drunk
+        if(!tile.isPathableToBottles() || tile.bottle) { // don't spawn a bottle, just splash the beer at them
+            if(tile.cowboy) {
+                tile.cowboy.getDrunk(validDrunkDirection);
+            }
+
+            if(tile.bottle) {
+                tile.bottle.break();
+            }
+        }
+        else { // the adjacent tile is empty, so spawn one
+            var bottle = this.game.create("Bottle", {
+                tile: tile,
+                drunkDirection: validDrunkDirection,
+                direction: adjacentDirection,
+            });
+        }
 
         this.turnsBusy = 5;
     },
@@ -389,6 +412,21 @@ var Cowboy = Class(GameObject, {
      */
     actBrawler: function() {
         return "{this} cannot act because they are a 'Brawler'.";
+    },
+
+    /**
+     * Gets this cowboy drunk
+     *
+     * @param  {string} drunkDirection - the valid string direction to set this.drunkDirection
+     */
+    getDrunk: function(drunkDirection) {
+        if(!this.owner.addRowdyness(1)) { // then they did not start a siesta, so they actually get drunk
+            this.isDrunk = true;
+            this.turnsBusy = 5;
+            this.drunkDirection = drunkDirection;
+            this.focus = 0;
+            this.canMove = false;
+        }
     },
 
     /**

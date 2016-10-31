@@ -118,7 +118,14 @@ var Tile = Class(GameObject, TiledTile, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Checks if this tile would cause a Bottle moving to it to break
+     *
+     * @return {Boolean} true if bottle break on this tile, false otherwise
+     */
+    isPathableToBottles: function() {
+        return Boolean(!this.isBalcony && !this.furnishing && !this.cowboy);
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
