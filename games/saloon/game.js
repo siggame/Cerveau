@@ -314,7 +314,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this._updateCowboys();
         this._advanceBottles();
-        this._damagePianos();
+        this._resetPianoPlaying();
         this._applyHazardDamage();
 
         this._cleanupArray("cowboys");
@@ -421,16 +421,15 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
      * Damages all pianos 1 damage, accelerating the game
      */
-    _damagePianos: function() {
+    _resetPianoPlaying: function() {
         for(var i = 0; i < this.furnishings.length; i++) {
             var furnishing = this.furnishings[i];
 
             if(furnishing.isDestroyed || !furnishing.isPiano) {
                 continue;
             }
-            // else it's a non destroyed piano, so damage it
+            // else it's a non destroyed piano
             furnishing.isPlaying = false;
-            furnishing.damage(1);
         }
     },
 
