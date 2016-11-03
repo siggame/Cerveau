@@ -153,6 +153,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.maxTurns = 150;
+
         // map dimensions used for tile generation
         this.mapWidth = this.mapWidth || 22;
         this.mapHeight = this.mapHeight || 12;

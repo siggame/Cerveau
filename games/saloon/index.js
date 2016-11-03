@@ -64,7 +64,7 @@ classes.Game._deltaMergeableProperties = {
 
     maxTurns: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 150,
+        defaultValue: 100,
     },
 
     players: {
