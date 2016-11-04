@@ -67,26 +67,26 @@ var Bottle = Class(GameObject, {
      * Note: game calls this so game will update this bottle's tile
      */
     advance: function() {
-        var next = this.tile["tile" + this.direction];
-        if(!next || !next.isPathableToBottles()) {
-            this.break(); // hit something
-            return;
-        }
-
-        this.tile.bottle = null; // we moved off it
-        this.tile = next;
         // we won't update this.tile.bottle to us, as the game will handle bottle <--> bottle collisions after all bottles have advanced
+        this.tile.bottle = null; // we moved off it
+        this.tile = this.tile.getNeighbor(this.direction);
+
+        if(!this.tile.isPathableToBottles()) {
+            this.break(); // hit something
+        }
     },
 
     /**
      * Breaks (destroys) this bottle, getting cowboys drunk in the process
+     *
+     * @param {Cowboy} cowboy - the cowboy to break on
      */
-    break: function() {
+    break: function(cowboy) {
         if(this.isDestroyed) {
             return; // we're already broken :(
         }
 
-        var cowboy = this.tile.cowboy;
+        cowboy = cowboy || this.tile.cowboy;
 
         if(cowboy) {
             cowboy.getDrunk(this.drunkDirection);

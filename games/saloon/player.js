@@ -131,29 +131,33 @@ var Player = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    addRowdyness: function(num) {
-        this.rowdyness += num;
+    /**
+     * Adds rowdiness to the player, which may cause a siesta
+     *
+     * @param {number} num - amount of rowdiness to add
+     */
+    addRowdiness: function(num) {
+        this.rowdiness += num;
 
-        if(this.rowdyness >= this.game.rowdynessToSiesta) {
-            this.rowdyness = 0;
+        if(this.rowdiness >= this.game.rowdinessToSiesta) {
+            this.rowdiness = 0;
+            this.siesta = this.game.siestaLength;
+
             // siesta!
             for(var i = 0; i < this.cowboys.length; i++) {
                 var cowboy = this.cowboys[i];
 
-                if(cowboy.isDead || cowboy.job === "Young Gun") {
+                if(cowboy.isDead) {
                     continue;
                 }
 
-                cowboy.siesta = true;
                 cowboy.turnsBusy = this.game.siestaLength;
+                cowboy.isDrunk = true;
+                cowboy.drunkDirection = ""; // they don't move in a direction during a siesta
                 cowboy.hasMoved = true;
                 cowboy.focus = 0;
             }
-
-            return true; // siesta'd!
         }
-
-        return false; // no siesta
     },
 
     //<<-- /Creer-Merge: added-functions -->>

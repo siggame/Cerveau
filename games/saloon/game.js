@@ -160,6 +160,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapHeight = this.mapHeight || 12;
 
         // game constants
+        this.turnsDrunk = 5;
+        this.bartenderCooldown = 5;
         this.rowdynessToSiesta = 8;
         this.siestaLength = 8;
         this.maxCowboysPerJob = 2;
@@ -311,9 +313,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      */
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
-
         this._updateSpawnedCowboys();
 
+        // update their siesta
+        this.currentPlayer.siesta = Math.max(0, this.currentPlayer.siesta - 1);
         this._updateCowboys();
         this._advanceBottles();
         this._resetPianoPlaying();
@@ -355,10 +358,10 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 continue; // don't update dead dudes, they won't come back
             }
 
-            if(cowboy.isDrunk) { // move him!
-                var next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
-                if(!next || next.isBalcony || next.cowboy || next.furnishing) { // then something is in the way
-                    if(next) {
+            if(cowboy.isDrunk) {
+                if(cowboy.drunkDirection !== "") { // then they are not drunk because of a siesta, so move them
+                    var next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
+                    if(next.isBalcony || next.cowboy || next.furnishing) { // then something is in the way
                         if(next.cowboy) {
                             next.cowboy.focus = 0;
                         }
@@ -370,14 +373,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                             }
                         }
                     }
-                }
-                else { // the next tile is valid
-                    cowboy.tile.cowboy = null;
-                    cowboy.tile = next;
-                    next.cowboy = cowboy;
+                    else { // the next tile is valid
+                        cowboy.tile.cowboy = null;
+                        cowboy.tile = next;
+                        next.cowboy = cowboy;
 
-                    if(next.bottle) {
-                        next.bottle.break();
+                        if(next.bottle) {
+                            next.bottle.break();
+                        }
                     }
                 }
 

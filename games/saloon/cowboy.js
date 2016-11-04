@@ -401,7 +401,7 @@ var Cowboy = Class(GameObject, {
             });
         }
 
-        this.turnsBusy = 5;
+        this.turnsBusy = this.game.bartenderCooldown;
     },
 
     /**
@@ -417,12 +417,14 @@ var Cowboy = Class(GameObject, {
     /**
      * Gets this cowboy drunk
      *
-     * @param  {string} drunkDirection - the valid string direction to set this.drunkDirection
+     * @param {string} drunkDirection - the valid string direction to set this.drunkDirection
      */
     getDrunk: function(drunkDirection) {
-        if(!this.owner.addRowdyness(1)) { // then they did not start a siesta, so they actually get drunk
+        this.owner.addRowdiness(1);
+
+        if(this.owner.siesta === 0) { // then they did not start a siesta, so they actually get drunk
             this.isDrunk = true;
-            this.turnsBusy = 5;
+            this.turnsBusy = this.game.turnsDrunk;
             this.drunkDirection = drunkDirection;
             this.focus = 0;
             this.canMove = false;
@@ -430,7 +432,8 @@ var Cowboy = Class(GameObject, {
     },
 
     /**
-     * string coercian override
+     * string coercion override
+     *
      * @override
      * @returns {string} string stating what this cowboy is
      */
