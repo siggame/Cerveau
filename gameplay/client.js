@@ -6,7 +6,7 @@ var DEFAULT_STR = "Unknown";
 
 /*
  * @class
- * @classdesc the basic implimentation of a connection to the server via some io. Should be inheritired and implimented with that IO. This is just a base class.
+ * @classdesc the basic implementation of a connection to the server via some io. Should be inherited and implemented with that IO. This is just a base class.
  * @interface
  */
 var Client = Class({
@@ -97,7 +97,7 @@ var Client = Class({
     },
 
     /**
-     * called when the client disconnects unexpectidly
+     * called when the client disconnects unexpectedly
      */
     _onSocketError: function() {
         this.disconnected();
@@ -279,7 +279,7 @@ var Client = Class({
     },
 
     /**
-     * called when this Client runs out of time om it's timer. Probably because it infinte looped, broke, or is just very slow.
+     * called when this Client runs out of time om it's timer. Probably because it infinite looped, broke, or is just very slow.
      */
     _timedOut: function() {
         this._hasTimedOut = true;
@@ -291,7 +291,7 @@ var Client = Class({
     /**
      * If this client has timed out
      *
-     * @returns {boolean} True if they have timed out, false otherwiese
+     * @returns {boolean} True if they have timed out, false otherwise
      */
     hasTimedOut: function() {
         return Boolean(this._hasTimedOut);

@@ -9,10 +9,11 @@ var log = require("../log");
  */
 var TurnBasedGame = Class(BaseGame, {
     init: function(data /* ... */) {
+        // clients can request a different amount of time added after each time, in sec
         if(data.turnTimeAdded) {
             var num = Number(data.turnTimeAdded);
-            if(!isNaN(num)) {
-                this._playerAdditionalTimePerTurn = num * 1e10;
+            if(!isNaN(num) && num > 0) {
+                this._playerAdditionalTimePerTurn = num * 1e9; // convert sec to ns
             }
         }
 

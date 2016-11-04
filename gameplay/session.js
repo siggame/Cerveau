@@ -99,7 +99,7 @@ var Session = Class({
      */
     addGameSettings: function(settings) {
         for(var key in settings) {
-            if(settings.hasOwnProperty(key) && !this.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
+            if(Object.prototype.hasOwnProperty.call(settings, key) && !this.gameSettings.hasOwnProperty(key)) { // this way if another player wants to set a game setting an earlier player set, the first requested setting is used.
                 this.gameSettings[key] = utilities.unstringify(settings[key]);
             }
         }
