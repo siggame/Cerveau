@@ -7,6 +7,11 @@ var classes = {};
 classes.Game = require("./game");
 
 classes.Game._deltaMergeableProperties = {
+    bartenderCooldown: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     bottles: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Bottle", "valueType": null}},
         defaultValue: [],
@@ -72,7 +77,7 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
-    rowdynessToSiesta: {
+    rowdinessToSiesta: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -95,6 +100,11 @@ classes.Game._deltaMergeableProperties = {
     tiles: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null}},
         defaultValue: [],
+    },
+
+    turnsDrunk: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
 };
@@ -380,7 +390,7 @@ classes.Player._deltaMergeableProperties = {
         defaultValue: "",
     },
 
-    rowdyness: {
+    rowdiness: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },

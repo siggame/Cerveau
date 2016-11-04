@@ -25,6 +25,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.init.apply(this, arguments);
 
         /**
+         * How many turns a Bartender will be busy for after throwing a Bottle.
+         *
+         * @type {number}
+         */
+        this.bartenderCooldown = this.bartenderCooldown || 0;
+
+        /**
          * All the beer Bottles currently flying across the saloon in the game.
          *
          * @type {Array.<Bottle>}
@@ -116,11 +123,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.players = this.players || [];
 
         /**
-         * When a player's rowdyness reaches or exceeds this number their Cowboys take a collective siesta.
+         * When a player's rowdiness reaches or exceeds this number their Cowboys take a collective siesta.
          *
          * @type {number}
          */
-        this.rowdynessToSiesta = this.rowdynessToSiesta || 0;
+        this.rowdinessToSiesta = this.rowdinessToSiesta || 0;
 
         /**
          * A unique identifier for the game instance that is being played.
@@ -149,6 +156,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {Array.<Tile>}
          */
         this.tiles = this.tiles || [];
+
+        /**
+         * How many turns a Cowboy will be drunk for if a bottle breaks on it.
+         *
+         * @type {number}
+         */
+        this.turnsDrunk = this.turnsDrunk || 0;
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

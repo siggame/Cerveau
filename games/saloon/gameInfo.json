@@ -27,6 +27,7 @@
     },
     "Game": {
         "attribute_names": [
+            "bartenderCooldown",
             "bottles",
             "brawlerDamage",
             "cowboys",
@@ -40,13 +41,24 @@
             "maxCowboysPerJob",
             "maxTurns",
             "players",
-            "rowdynessToSiesta",
+            "rowdinessToSiesta",
             "session",
             "sharpshooterDamage",
             "siestaLength",
-            "tiles"
+            "tiles",
+            "turnsDrunk"
         ],
         "attributes": {
+            "bartenderCooldown": {
+                "default": null,
+                "description": "How many turns a Bartender will be busy for after throwing a Bottle.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "bottles": {
                 "default": null,
                 "description": "All the beer Bottles currently flying across the saloon in the game.",
@@ -217,9 +229,9 @@
                     }
                 }
             },
-            "rowdynessToSiesta": {
+            "rowdinessToSiesta": {
                 "default": null,
-                "description": "When a player's rowdyness reaches or exceeds this number their Cowboys take a collective siesta.",
+                "description": "When a player's rowdiness reaches or exceeds this number their Cowboys take a collective siesta.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -271,6 +283,16 @@
                         "name": "Tile",
                         "valueType": null
                     }
+                }
+            },
+            "turnsDrunk": {
+                "default": null,
+                "description": "How many turns a Cowboy will be drunk for if a bottle breaks on it.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
                 }
             }
         },
@@ -992,7 +1014,7 @@
                 "opponent",
                 "reasonLost",
                 "reasonWon",
-                "rowdyness",
+                "rowdiness",
                 "score",
                 "siesta",
                 "timeRemaining",
@@ -1085,7 +1107,7 @@
                         "valueType": null
                     }
                 },
-                "rowdyness": {
+                "rowdiness": {
                     "default": null,
                     "description": "How rowdy their team is. When it gets too high their team takes a collective siesta.",
                     "type": {

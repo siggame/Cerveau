@@ -81,7 +81,7 @@ var Player = Class(GameObject, {
          *
          * @type {number}
          */
-        this.rowdyness = this.rowdyness || 0;
+        this.rowdiness = this.rowdiness || 0;
 
         /**
          * How many times their team has played a piano.
