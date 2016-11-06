@@ -179,7 +179,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // game constants
         this.turnsDrunk = 5;
         this.bartenderCooldown = 5;
-        this.rowdynessToSiesta = 8;
+        this.rowdinessToSiesta = 8;
         this.siestaLength = 8;
         this.maxCowboysPerJob = 2;
         this.sharpshooterDamage = 4;
