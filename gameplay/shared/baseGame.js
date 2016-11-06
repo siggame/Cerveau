@@ -21,10 +21,11 @@ var BaseGame = Class(DeltaMergeable, {
         this._baseGameInitialized = true;
         this._delta = {}; // the current delta we are recoding
 
+        // clients can request a different starting time (in seconds)
         if(data.startTime) {
             var num = Number(data.startTime);
-            if(!isNaN(num)) {
-                this._playerAdditionalTimePerTurn = num * 1e10;
+            if(!isNaN(num) && num > 0) {
+                this._playerStartingTime = num * 1e9; // convert sec to ns
             }
         }
 

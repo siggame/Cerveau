@@ -1,10 +1,10 @@
 var ArgumentParser = require("argparse").ArgumentParser;
 var parser = new ArgumentParser({description: "Run the JavaScript client with options to connect to a game server. Must provide a game name to play."});
 var parserArgs = [
-    [["--port-offset"], {action: "store", dest: "portOffset", defaultValue: 0, help: "port offset for the default port values"}],
-    [["--tcp-port"], {action: "store", dest: "tcpPort", defaultValue: 3000, help: "the port that TCP clients should connect through"}],
-    [["--http-port"], {action: "store", dest: "httpPort", defaultValue: 3080, help: "the port that the webinterface should be accessed through"}],
-    [["--ws-port"], {action: "store", dest: "wsPort", defaultValue: 3088, help: "the port that WebSocket clients should connect though"}],
+    [["--port-offset"], {action: "store", dest: "portOffset", defaultValue: 0, type: "int", help: "port offset for the default port values"}],
+    [["--tcp-port"], {action: "store", dest: "tcpPort", defaultValue: 3000, type: "int", help: "the port that TCP clients should connect through"}],
+    [["--http-port"], {action: "store", dest: "httpPort", defaultValue: 3080, type: "int", help: "the port that the webinterface should be accessed through"}],
+    [["--ws-port"], {action: "store", dest: "wsPort", defaultValue: 3088, type: "int", help: "the port that WebSocket clients should connect though"}],
     [["--host"], {action: "store", dest: "host", defaultValue: "127.0.0.1", help: "the host that this should run on"}],
     [["--title"], {action: "store", dest: "title", defaultValue: "Cerveau", help: "the title of this game sever for the web interface"}],
     [["--authenticate"], {action: "storeTrue", dest: "authenticate", help: "forces clients to authenticate against the authentication server"}],
