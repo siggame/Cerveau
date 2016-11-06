@@ -167,11 +167,14 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.maxTurns = 150;
-
         // map dimensions used for tile generation
         this.mapWidth = this.mapWidth || 22;
         this.mapHeight = this.mapHeight || 12;
+
+        // remove overlapping tiles, then *2 to go around the other side of the map
+        var turnsAroundMap = 2* ((this.mapWidth - 1) + (this.mapHeight - 1));
+
+        this.maxTurns = turnsAroundMap * 3;
 
         // game constants
         this.turnsDrunk = 5;
@@ -191,8 +194,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // these settings are all per side
         this._minFurnishings = 0;
         this._maxFurnishings = 5;
-        this._minPianos = 1;
-        this._maxPianos = this.jobs.length; // the max number of pianos is the same as the number of jobs, therefore at least half the cowboys spawned can't play pianos as there will always be more possible cowboys than pianos
+        this._minPianos = 2;
+        this._maxPianos = this.jobs.length + 1; // the max number of pianos is the same as the number of jobs, therefore at least half the cowboys spawned can't play pianos as there will always be more possible cowboys than pianos
         this._minHazards = 0;
         this._maxHazards = 6;
 

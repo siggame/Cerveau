@@ -296,6 +296,7 @@ var Cowboy = Class(GameObject, {
             this.canMove = false;
             this.tile.cowboy = null;
             this.tile = null;
+            this.owner.opponent.kills++;
         }
     },
 
