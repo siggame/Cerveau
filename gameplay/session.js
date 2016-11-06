@@ -106,12 +106,12 @@ var Session = Class({
     },
 
     /**
-     * This happens when there are enough clients to start the game Isntance. We start the on a seperate "worker" thread, true multi-threading via cluster
+     * This happens when there are enough clients to start the game Instance. We start the on a separate "worker" thread, true multi-threading via cluster
      */
     _threadInstance: function() {
         var clientInfos = this._generateClientInfos();
 
-        var workerGameSessionData = extend({ // can only pass strings via env variables so serialize them here and the worker threads will deserialize them once running
+        var workerGameSessionData = extend({ // can only pass strings via environment variables so serialize them here and the worker threads will deserialize them once running
             __basedir: __basedir,
             _mainDebugPort: process._debugPort,
             gameSession: this.id,
