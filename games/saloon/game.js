@@ -583,6 +583,20 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             return true;
         }
 
+        // check to see if one player has more score than the other can possibly get
+        var players = this.players.clone();
+        players.sortDescending("score");
+
+        var losing = players[1];
+        // this assumes they play every piano on every remaining turn
+        var remainingTurns = (this.maxTurns - this.currentTurn);
+        var maxAdditionalScore = Math.ceil(numberOfPianos * remainingTurns/2);
+        if(players[0].score > players[1].score + maxAdditionalScore) { // then the losing player can't catch up to the winner's score, so end the game early
+            var winner = players.shift();
+            this.declareWinner(winner, "Score ({}) high enough that the opponent can't win in the remaining turns ({}).".format(winner.score, remainingTurns));
+            this.declareLosers(players, "Score too low to catch up to the winner in the number of remaining turns.");
+        }
+
         return false;
     },
 
