@@ -246,6 +246,7 @@ var Cowboy = Class(GameObject, {
         // if we got here the play() was valid. play that piano!
 
         piano.isPlaying = true;
+        this.focus = 0; // sharpshooters loose focus when they play a piano
         this.turnsBusy = 1;
         this.owner.score++;
         piano.damage(1);

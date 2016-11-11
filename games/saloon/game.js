@@ -406,7 +406,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 cowboy.canMove = !cowboy.isDrunk;
             }
             else { // they are not drunk, so update them for use next turn
-                if(cowboy.job === "Sharpshooter" && cowboy.canMove) { // then the sharpshooter didn't move, so increase his focus
+                if(cowboy.job === "Sharpshooter" && cowboy.canMove && cowboy.turnsBusy === 0) { // then the sharpshooter didn't move, so increase his focus
                     cowboy.focus++;
                 }
 
