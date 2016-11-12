@@ -138,7 +138,7 @@ var YoungGun = Class(GameObject, {
 
         if(this.callInTile.bottle) {
             // then break the bottle on this new cowboy, so he immediately gets drunk
-            this.callInTile.bottle(cowboy);
+            this.callInTile.bottle.break(cowboy);
         }
 
         this.callInTile.cowboy = cowboy;
