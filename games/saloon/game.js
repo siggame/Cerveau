@@ -197,7 +197,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this._minPianos = 2;
         this._maxPianos = this.jobs.length + 1; // the max number of pianos is the same as the number of jobs, therefore at least half the cowboys spawned can't play pianos as there will always be more possible cowboys than pianos
         this._minHazards = 0;
-        this._maxHazards = 6;
+        this._maxHazards = 12;
 
         // list of cowboys to add to their cowboy lists between turns (so we don't resize arrays during players turns)
         this.spawnedCowboys = [];
