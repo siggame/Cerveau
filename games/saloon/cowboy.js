@@ -323,9 +323,10 @@ var Cowboy = Class(GameObject, {
 
         // if we got here the sharpshooter act is valid
         var shot = tile;
-        while(shot && this.focus > 0) { // shoot things
-            this.focus--; // yes we could do this above but it reads stupid
-            shot = shot["tile" + adjacentDirection];
+        var distance = this.focus;
+        while(shot && distance > 0) { // shoot things
+            distance--; // yes we could do this above but it reads stupid
+
             if(!shot || shot.isBalcony) {
                 break; // we are done
             }
@@ -337,6 +338,12 @@ var Cowboy = Class(GameObject, {
             if(shot.furnishing) {
                 shot.furnishing.damage(this.game.sharpshooterDamage);
             }
+
+            if(shot.bottle) {
+                shot.bottle.break();
+            }
+
+            shot = shot.getNeighbor(adjacentDirection);
         }
 
         this.focus = 0;
