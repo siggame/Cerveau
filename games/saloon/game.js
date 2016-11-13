@@ -9,7 +9,7 @@ var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
 // any additional requires you want can be required here safely between Creer re-runs
-
+var gaussian = require("gaussian");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.
@@ -257,13 +257,17 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             numPianos = 8;
         }
 
+        var distributionX = gaussian(this.mapWidth/2, this.mapWidth/3);
+        var distributionY = gaussian(this.mapHeight/2, this.mapHeight/3);
+
         var numHazards = Math.randomInt(this._maxHazards, this._minHazards)*2;
         while(numFurnishings > 0 || numPianos > 0 || numHazards > 0) { // while there is stuff to spawn
             while(true) { // get a random tile on this side that is empty
-                x = Math.randomInt(this.mapWidth/2 - 1, 1);
-                y = Math.randomInt(this.mapHeight - 2, 1);
+                x = Math.round(distributionX.ppf(Math.random()));
+                y = Math.round(distributionY.ppf(Math.random()));
+                var tile = this.getTile(x, y);
 
-                if(!this.getTile(x, y).furnishing) {
+                if(tile && !tile.furnishing) {
                     break; // because we found a tile that does not have a furnishing to spawn one on, else we continue our random search
                 }
             }
