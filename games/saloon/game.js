@@ -267,7 +267,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 y = Math.round(distributionY.ppf(Math.random()));
                 var tile = this.getTile(x, y);
 
-                if(tile && !tile.furnishing) {
+                if(tile && !tile.furnishing && !tile.isBalcony) {
                     break; // because we found a tile that does not have a furnishing to spawn one on, else we continue our random search
                 }
             }
