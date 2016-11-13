@@ -234,6 +234,12 @@ var Cowboy = Class(GameObject, {
         else if(piano.isPlaying) {
             reason = "{piano} is already playing music this turn.";
         }
+        else if(piano.isDestroyed) {
+            reason = "{piano} is destroyed and cannot be played.";
+        }
+        else if(!piano || !piano.tile || !piano.tile.getNeighbors().contains(this.tile)) {
+            reason = "{piano} is not adjacent to {this}";
+        }
 
         if(reason) {
             return this.game.logicError(false, reason.format({

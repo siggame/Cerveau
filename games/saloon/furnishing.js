@@ -82,6 +82,11 @@ var Furnishing = Class(GameObject, {
             this.isPlaying = false;
             this.tile.furnishing = null;
             this.tile = null;
+
+            if(this.isPiano) {
+                // then we may have been the last piano getting destroyed, so check to end the game
+                this.game.checkForWinner();
+            }
         }
     },
 

@@ -345,7 +345,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this._doYoungGun(this.currentPlayer);
 
-        if(this._checkForWinner()) {
+        if(this.checkForWinner()) {
             return;
         }
         // else continue to the next player (normal next turn logic)
@@ -570,10 +570,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      *
      * @returns {boolean} true if there was a winner and the game is over, false otherwise
      */
-    _checkForWinner: function() {
+    checkForWinner: function() {
         var numberOfPianos = 0;
         for(var i = 0; i < this.furnishings.length; i++) {
-            if(this.furnishings[i].isPiano) {
+            var furnishing = this.furnishings[i];
+            if(!furnishing.isDead && furnishing.isPiano) {
                 numberOfPianos++;
             }
         }
