@@ -241,7 +241,22 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // spawn some random furnishings in quadrants
         var numFurnishings = Math.randomInt(this._maxFurnishings, this._minFurnishings)*2; // *2 for each side
-        var numPianos = Math.randomInt(this._maxPianos, this._minPianos)*2;
+
+        var rand = Math.random();
+        var numPianos = 2;
+        // 80% of the time, have 4 pianos
+        if(rand < 0.80) {
+            numPianos = 4;
+        }
+        // the other 15% of the time have 6
+        else if(rand < 0.95) {
+            numPianos = 6;
+        }
+        // and 5% of the time have
+        else {
+            numPianos = 8;
+        }
+
         var numHazards = Math.randomInt(this._maxHazards, this._minHazards)*2;
         while(numFurnishings > 0 || numPianos > 0 || numHazards > 0) { // while there is stuff to spawn
             while(true) { // get a random tile on this side that is empty
