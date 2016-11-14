@@ -112,8 +112,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     aliases: [
         //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         "MegaMinerAI-Chess",
-        "Chess-SP2016",
-        "Chess-FS2016",
+        "Spring-2016-Chess",
+        "Fall-2016-Chess",
+        "Spring-2017-Chess",
         //<<-- /Creer-Merge: aliases -->>
     ],
 
