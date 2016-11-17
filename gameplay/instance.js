@@ -10,7 +10,7 @@ var log = require("./log");
 var extend = require("extend");
 
 /**
- * @class Instance: the server that handles of communications between a game and its clients, on a seperate thread than the lobby.
+ * @class Instance: the server that handles of communications between a game and its clients, on a separate thread than the lobby.
  */
 var Instance = Class(Server, {
     init: function(args) {
@@ -45,7 +45,7 @@ var Instance = Class(Server, {
 
         var clients = this.clients.slice();
         for(var i = 0; i < clients.length; i++) {
-            clients[i].disconnect("An unhandled fatal error occured on the server.");
+            clients[i].disconnect("An unhandled fatal error occurred on the server.");
         }
 
         if(this._addedClients === this._initArgs.clientInfos.length) {
@@ -64,7 +64,7 @@ var Instance = Class(Server, {
         this._addedClients++;
 
         if(this._fatal) {
-            client.disconnect("An unhandled fatal error occured on the server.");
+            client.disconnect("An unhandled fatal error occurred on the server.");
         }
 
         if(this._addedClients === this._initArgs.clientInfos.length) {
@@ -75,6 +75,9 @@ var Instance = Class(Server, {
                 this.start();
             }
         }
+
+        // Disables Nagle
+        client.getNetSocket().setNoDelay(true);
 
         return client;
     },
@@ -257,7 +260,7 @@ var Instance = Class(Server, {
     },
 
     /**
-     * Sends to all the clients in the game, that the game has orders they need to execute, depleating the orders stack
+     * Sends to all the clients in the game, that the game has orders they need to execute, depleting the orders stack
      */
     _sendGameOrders: function() {
         var orders = this.game.getNewOrders();

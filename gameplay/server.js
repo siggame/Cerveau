@@ -47,7 +47,7 @@ var Server = Class({
     /**
      * Gets the number of playing of clients (not spectating)
      *
-     * @param {Array.<Client>} [clients] - clients to check from that are playing. defautls to this.clients
+     * @param {Array.<Client>} [clients] - clients to check from that are playing. defaults to this.clients
      * @returns {number} Number of playing clients currently connected that are/want to play (not spectate)
      */
     getClientsPlaying: function(clients) {
