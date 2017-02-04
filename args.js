@@ -5,7 +5,6 @@ var parserArgs = [
     [["--tcp-port"], {action: "store", dest: "tcpPort", defaultValue: 3000, type: "int", help: "the port that TCP clients should connect through"}],
     [["--http-port"], {action: "store", dest: "httpPort", defaultValue: 3080, type: "int", help: "the port that the webinterface should be accessed through"}],
     [["--ws-port"], {action: "store", dest: "wsPort", defaultValue: 3088, type: "int", help: "the port that WebSocket clients should connect though"}],
-    [["--host"], {action: "store", dest: "host", defaultValue: "127.0.0.1", help: "the host that this should run on"}],
     [["--title"], {action: "store", dest: "title", defaultValue: "Cerveau", help: "the title of this game sever for the web interface"}],
     [["--authenticate"], {action: "storeTrue", dest: "authenticate", help: "forces clients to authenticate against the authentication server"}],
     [["--profile"], {action: "storeTrue", dest: "profile", help: "run the v8 profilers against threaded game sessions"}],
@@ -55,10 +54,6 @@ if(args.arena) {
     args.gameSettings = false;
     args.web = false;
     args.loadGamelogs = false;
-}
-
-if(args.chesser) {
-    args.chesser += "?file={gamelogFilename}";
 }
 
 if(!isNaN(args.portOffset)) {

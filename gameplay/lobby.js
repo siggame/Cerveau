@@ -24,7 +24,6 @@ var Lobby = Class(Server, {
         Server.init.call(this, args);
 
         this.name = "Lobby @ " + process.pid;
-        this.host = args.host;
         this.tcpPort = args.tcpPort;
         this.wsPort = args.wsPort;
         this._authenticate = Boolean(args.authenticate); // flag to see if the lobby should authenticate play requests with web server
@@ -149,7 +148,7 @@ var Lobby = Class(Server, {
      * @param {number} port - port errored on
      */
     _socketError: function(err, port) {
-        log.error(err.code !== "EADDRINUSE" ? err : "Lobby cannot listen on port " + this.host + ":" + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
+        log.error(err.code !== "EADDRINUSE" ? err : "Lobby cannot listen on port " + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
 
         process.exit(1);
     },

@@ -24,7 +24,6 @@ var GameLogger = Class({
             this._filenameFormat = "{gameName}-{gameSession}"; // TODO: upgrade arena so it can get the "real" filename with the moment string in it via RESTful API
         }
 
-        this._host = args.host;
         this._port = args.httpPort;
         this._visualizerURL = args.visualizerURL;
         this._filenamesWritting = {}; // easy lookup filenames we are writting to the filesystem, so they are not reported as gamelogs and read in incomplete
@@ -182,7 +181,7 @@ var GameLogger = Class({
      * Deletes the first gamelog matching the filename, without the extension
      *
      * @param {string} filename - the base filename (without gamelog extension) you want in output/gamelogs/
-     * @param {function} callback - passes the a boolean if it was scuessfully deleted, and the error if error happened.
+     * @param {function} callback - passes the a boolean if it was successfully deleted, and the error if error happened.
      */
     deleteGamelog: function(filename, callback) {
         this._checkGamelog(filename, function gamelogChecked(gamelogPath) {
@@ -199,17 +198,15 @@ var GameLogger = Class({
     /**
      * Returns a url string to the gamelog
      * @param {string} filename - filename of the url, or the gamelog itself
-     * @param {string} [host] - host name override
      * @param {number} [port] - port override
      * @returns {string} url to the gamelog
      */
-    getURL: function(filename, host, port) {
+    getURL: function(filename, port) {
         if(typeof(filename) === "object") {
             filename = this.filenameFor(filename);
         }
 
-        return "http://{}:{}/gamelog/{}".format(
-            host || this._host,
+        return "http://__HOSTNAME__:{}/gamelog/{}".format(
             port || this._port,
             filename
         );
