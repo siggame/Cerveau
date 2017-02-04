@@ -16,11 +16,117 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         TurnBasedGame.init.apply(this, arguments);
         TwoPlayerGame.init.apply(this, arguments);
+
+        /**
+         * The player whose turn it is currently. That player can send commands. Other players cannot.
+         *
+         * @type {Player}
+         */
+        this.currentPlayer = this.currentPlayer || null;
+
+        /**
+         * The current turn number, starting at 0 for the first player's turn.
+         *
+         * @type {number}
+         */
+        this.currentTurn = this.currentTurn || 0;
+
+        /**
+         * The speed at which Cutters work to do cut Webs.
+         *
+         * @type {number}
+         */
+        this.cutSpeed = this.cutSpeed || 0;
+
+        /**
+         * Constant used to calculate how many eggs BroodMothers get on their owner's turns.
+         *
+         * @type {number}
+         */
+        this.eggsScalar = this.eggsScalar || 0;
+
+        /**
+         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
+         *
+         * @type {Object.<string, GameObject>}
+         */
+        this.gameObjects = this.gameObjects || {};
+
+        /**
+         * The starting strength for Webs.
+         *
+         * @type {number}
+         */
+        this.initialWebStrength = this.initialWebStrength || 0;
+
+        /**
+         * The maximum number of turns before the game will automatically end.
+         *
+         * @type {number}
+         */
+        this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * The speed at which Spiderlings move on Webs.
+         *
+         * @type {number}
+         */
+        this.movementSpeed = this.movementSpeed || 0;
+
+        /**
+         * Every Nest in the game.
+         *
+         * @type {Array.<Nest>}
+         */
+        this.nests = this.nests || [];
+
+        /**
+         * List of all the players in the game.
+         *
+         * @type {Array.<Player>}
+         */
+        this.players = this.players || [];
+
+        /**
+         * A unique identifier for the game instance that is being played.
+         *
+         * @type {string}
+         */
+        this.session = this.session || "";
+
+        /**
+         * The speed at which Spitters work to spit new Webs.
+         *
+         * @type {number}
+         */
+        this.spitSpeed = this.spitSpeed || 0;
+
+        /**
+         * How much web strength is added or removed from Webs when they are weaved.
+         *
+         * @type {number}
+         */
+        this.weavePower = this.weavePower || 0;
+
+        /**
+         * The speed at which Weavers work to do strengthens and weakens on Webs.
+         *
+         * @type {number}
+         */
+        this.weaveSpeed = this.weaveSpeed || 0;
+
+        /**
+         * Every Web in the game.
+         *
+         * @type {Array.<Web>}
+         */
+        this.webs = this.webs || [];
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

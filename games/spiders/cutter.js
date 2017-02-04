@@ -15,10 +15,18 @@ var Cutter = Class(Spiderling, {
     /**
      * Initializes Cutters.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         Spiderling.init.apply(this, arguments);
+
+        /**
+         * The Web that this Cutter is trying to cut. Null if not cutting.
+         *
+         * @type {Web}
+         */
+        this.cuttingWeb = this.cuttingWeb || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

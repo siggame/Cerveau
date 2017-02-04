@@ -16,11 +16,117 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         TurnBasedGame.init.apply(this, arguments);
         TwoPlayerGame.init.apply(this, arguments);
+
+        /**
+         * How many bribes players get at the beginning of their turn, not counting their burned down Buildings.
+         *
+         * @type {number}
+         */
+        this.baseBribesPerTurn = this.baseBribesPerTurn || 0;
+
+        /**
+         * All the buildings in the game.
+         *
+         * @type {Array.<Building>}
+         */
+        this.buildings = this.buildings || [];
+
+        /**
+         * The current Forecast, which will be applied at the end of the turn.
+         *
+         * @type {Forecast}
+         */
+        this.currentForecast = this.currentForecast || null;
+
+        /**
+         * The player whose turn it is currently. That player can send commands. Other players cannot.
+         *
+         * @type {Player}
+         */
+        this.currentPlayer = this.currentPlayer || null;
+
+        /**
+         * The current turn number, starting at 0 for the first player's turn.
+         *
+         * @type {number}
+         */
+        this.currentTurn = this.currentTurn || 0;
+
+        /**
+         * All the forecasts in the game, indexed by turn number.
+         *
+         * @type {Array.<Forecast>}
+         */
+        this.forecasts = this.forecasts || [];
+
+        /**
+         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
+         *
+         * @type {Object.<string, GameObject>}
+         */
+        this.gameObjects = this.gameObjects || {};
+
+        /**
+         * The width of the entire map along the vertical (y) axis.
+         *
+         * @type {number}
+         */
+        this.mapHeight = this.mapHeight || 0;
+
+        /**
+         * The width of the entire map along the horizontal (x) axis.
+         *
+         * @type {number}
+         */
+        this.mapWidth = this.mapWidth || 0;
+
+        /**
+         * The maximum amount of fire value for any Building.
+         *
+         * @type {number}
+         */
+        this.maxFire = this.maxFire || 0;
+
+        /**
+         * The maximum amount of intensity value for any Forecast.
+         *
+         * @type {number}
+         */
+        this.maxForecastIntensity = this.maxForecastIntensity || 0;
+
+        /**
+         * The maximum number of turns before the game will automatically end.
+         *
+         * @type {number}
+         */
+        this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * The next Forecast, which will be applied at the end of your opponent's turn. This is also the Forecast WeatherStations can control this turn.
+         *
+         * @type {Forecast}
+         */
+        this.nextForecast = this.nextForecast || null;
+
+        /**
+         * List of all the players in the game.
+         *
+         * @type {Array.<Player>}
+         */
+        this.players = this.players || [];
+
+        /**
+         * A unique identifier for the game instance that is being played.
+         *
+         * @type {string}
+         */
+        this.session = this.session || "";
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

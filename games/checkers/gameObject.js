@@ -13,10 +13,32 @@ var GameObject = Class(BaseGameObject, {
     /**
      * Initializes GameObjects.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         BaseGameObject.init.apply(this, arguments);
+
+        /**
+         * String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.
+         *
+         * @type {string}
+         */
+        this.gameObjectName = this.gameObjectName || "";
+
+        /**
+         * A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.
+         *
+         * @type {string}
+         */
+        this.id = this.id || "";
+
+        /**
+         * Any strings logged will be stored here. Intended for debugging.
+         *
+         * @type {Array.<string>}
+         */
+        this.logs = this.logs || [];
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function

@@ -15,10 +15,32 @@ var Spider = Class(GameObject, {
     /**
      * Initializes Spiders.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * If this Spider is dead and has been removed from the game.
+         *
+         * @type {boolean}
+         */
+        this.isDead = this.isDead || false;
+
+        /**
+         * The Nest that this Spider is currently on. Null when moving on a Web.
+         *
+         * @type {Nest}
+         */
+        this.nest = this.nest || null;
+
+        /**
+         * The Player that owns this Spider, and can command it.
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

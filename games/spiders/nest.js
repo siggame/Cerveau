@@ -15,10 +15,39 @@ var Nest = Class(GameObject, {
     /**
      * Initializes Nests.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * All the Spiders currently located on this Nest.
+         *
+         * @type {Array.<Spider>}
+         */
+        this.spiders = this.spiders || [];
+
+        /**
+         * Webs that connect to this Nest.
+         *
+         * @type {Array.<Web>}
+         */
+        this.webs = this.webs || [];
+
+        /**
+         * The X coordinate of the Nest. Used for distance calculations.
+         *
+         * @type {number}
+         */
+        this.x = this.x || 0;
+
+        /**
+         * The Y coordinate of the Nest. Used for distance calculations.
+         *
+         * @type {number}
+         */
+        this.y = this.y || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

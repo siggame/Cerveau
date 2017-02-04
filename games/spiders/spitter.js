@@ -15,10 +15,18 @@ var Spitter = Class(Spiderling, {
     /**
      * Initializes Spitters.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         Spiderling.init.apply(this, arguments);
+
+        /**
+         * The Nest that this Spitter is creating a Web to spit at, thus connecting them. Null if not spitting.
+         *
+         * @type {Nest}
+         */
+        this.spittingWebToNest = this.spittingWebToNest || null;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

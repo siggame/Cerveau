@@ -14,11 +14,89 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         TurnBasedGame.init.apply(this, arguments);
         TwoPlayerGame.init.apply(this, arguments);
+
+        /**
+         * The height of the board for the Y component of a checker.
+         *
+         * @type {number}
+         */
+        this.boardHeight = this.boardHeight || 0;
+
+        /**
+         * The width of the board for X component of a checker.
+         *
+         * @type {number}
+         */
+        this.boardWidth = this.boardWidth || 0;
+
+        /**
+         * The checker that last moved and must be moved because only one checker can move during each players turn.
+         *
+         * @type {Checker}
+         */
+        this.checkerMoved = this.checkerMoved || null;
+
+        /**
+         * If the last checker that moved jumped, meaning it can move again.
+         *
+         * @type {boolean}
+         */
+        this.checkerMovedJumped = this.checkerMovedJumped || false;
+
+        /**
+         * All the checkers currently in the game.
+         *
+         * @type {Array.<Checker>}
+         */
+        this.checkers = this.checkers || [];
+
+        /**
+         * The player whose turn it is currently. That player can send commands. Other players cannot.
+         *
+         * @type {Player}
+         */
+        this.currentPlayer = this.currentPlayer || null;
+
+        /**
+         * The current turn number, starting at 0 for the first player's turn.
+         *
+         * @type {number}
+         */
+        this.currentTurn = this.currentTurn || 0;
+
+        /**
+         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
+         *
+         * @type {Object.<string, GameObject>}
+         */
+        this.gameObjects = this.gameObjects || {};
+
+        /**
+         * The maximum number of turns before the game will automatically end.
+         *
+         * @type {number}
+         */
+        this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * List of all the players in the game.
+         *
+         * @type {Array.<Player>}
+         */
+        this.players = this.players || [];
+
+        /**
+         * A unique identifier for the game instance that is being played.
+         *
+         * @type {string}
+         */
+        this.session = this.session || "";
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         this.boardWidth = 8;

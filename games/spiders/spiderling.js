@@ -15,10 +15,46 @@ var Spiderling = Class(Spider, {
     /**
      * Initializes Spiderlings.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         Spider.init.apply(this, arguments);
+
+        /**
+         * When empty string this Spiderling is not busy, and can act. Otherwise a string representing what it is busy with, e.g. 'Moving', 'Attacking'.
+         *
+         * @type {string}
+         */
+        this.busy = this.busy || "";
+
+        /**
+         * The Web this Spiderling is using to move. Null if it is not moving.
+         *
+         * @type {Web}
+         */
+        this.movingOnWeb = this.movingOnWeb || null;
+
+        /**
+         * The Nest this Spiderling is moving to. Null if it is not moving.
+         *
+         * @type {Nest}
+         */
+        this.movingToNest = this.movingToNest || null;
+
+        /**
+         * The number of Spiderlings busy with the same work this Spiderling is doing, speeding up the task.
+         *
+         * @type {number}
+         */
+        this.numberOfCoworkers = this.numberOfCoworkers || 0;
+
+        /**
+         * How much work needs to be done for this Spiderling to finish being busy. See docs for the Work forumla.
+         *
+         * @type {number}
+         */
+        this.workRemaining = this.workRemaining || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

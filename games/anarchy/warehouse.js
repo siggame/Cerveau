@@ -13,10 +13,25 @@ var Warehouse = Class(Building, {
     /**
      * Initializes Warehouses.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         Building.init.apply(this, arguments);
+
+        /**
+         * How exposed the anarchists in this warehouse are to PoliceDepartments. Raises when bribed to ignite buildings, and drops each turn if not bribed.
+         *
+         * @type {number}
+         */
+        this.exposure = this.exposure || 0;
+
+        /**
+         * The amount of fire added to buildings when bribed to ignite a building. Headquarters add more fire than normal Warehouses.
+         *
+         * @type {number}
+         */
+        this.fireAdded = this.fireAdded || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

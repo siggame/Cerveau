@@ -15,10 +15,53 @@ var Web = Class(GameObject, {
     /**
      * Initializes Webs.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * How long this Web is, i.e., the distance between its nestA and nestB.
+         *
+         * @type {number}
+         */
+        this.length = this.length || 0;
+
+        /**
+         * How much weight this Web currently has on it, which is the sum of all its Spiderlings weight.
+         *
+         * @type {number}
+         */
+        this.load = this.load || 0;
+
+        /**
+         * The first Nest this Web is connected to.
+         *
+         * @type {Nest}
+         */
+        this.nestA = this.nestA || null;
+
+        /**
+         * The second Nest this Web is connected to.
+         *
+         * @type {Nest}
+         */
+        this.nestB = this.nestB || null;
+
+        /**
+         * All the Spiderlings currently moving along this Web.
+         *
+         * @type {Array.<Spiderling>}
+         */
+        this.spiderlings = this.spiderlings || [];
+
+        /**
+         * How much weight this Web can take before snapping and destroying itself and all the Spiders on it.
+         *
+         * @type {number}
+         */
+        this.strength = this.strength || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

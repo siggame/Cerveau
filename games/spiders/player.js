@@ -15,10 +15,88 @@ var Player = Class(GameObject, {
     /**
      * Initializes Players.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * This player's BroodMother. If it dies they lose the game.
+         *
+         * @type {BroodMother}
+         */
+        this.broodMother = this.broodMother || null;
+
+        /**
+         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
+         *
+         * @type {string}
+         */
+        this.clientType = this.clientType || "";
+
+        /**
+         * If the player lost the game or not.
+         *
+         * @type {boolean}
+         */
+        this.lost = this.lost || false;
+
+        /**
+         * The max number of Spiderlings players can spawn.
+         *
+         * @type {number}
+         */
+        this.maxSpiderlings = this.maxSpiderlings || 0;
+
+        /**
+         * The name of the player.
+         *
+         * @type {string}
+         */
+        this.name = this.name || "";
+
+        /**
+         * This player's opponent in the game.
+         *
+         * @type {Player}
+         */
+        this.opponent = this.opponent || null;
+
+        /**
+         * The reason why the player lost the game.
+         *
+         * @type {string}
+         */
+        this.reasonLost = this.reasonLost || "";
+
+        /**
+         * The reason why the player won the game.
+         *
+         * @type {string}
+         */
+        this.reasonWon = this.reasonWon || "";
+
+        /**
+         * All the Spiders owned by this player.
+         *
+         * @type {Array.<Spider>}
+         */
+        this.spiders = this.spiders || [];
+
+        /**
+         * The amount of time (in ns) remaining for this AI to send commands.
+         *
+         * @type {number}
+         */
+        this.timeRemaining = this.timeRemaining || 0;
+
+        /**
+         * If the player won the game or not.
+         *
+         * @type {boolean}
+         */
+        this.won = this.won || false;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

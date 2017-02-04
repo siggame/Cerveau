@@ -14,10 +14,88 @@ var Building = Class(GameObject, {
     /**
      * Initializes Buildings.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * When true this building has already been bribed this turn and cannot be bribed again this turn.
+         *
+         * @type {boolean}
+         */
+        this.bribed = this.bribed || false;
+
+        /**
+         * The Building directly to the east of this building, or null if not present.
+         *
+         * @type {Building}
+         */
+        this.buildingEast = this.buildingEast || null;
+
+        /**
+         * The Building directly to the north of this building, or null if not present.
+         *
+         * @type {Building}
+         */
+        this.buildingNorth = this.buildingNorth || null;
+
+        /**
+         * The Building directly to the south of this building, or null if not present.
+         *
+         * @type {Building}
+         */
+        this.buildingSouth = this.buildingSouth || null;
+
+        /**
+         * The Building directly to the west of this building, or null if not present.
+         *
+         * @type {Building}
+         */
+        this.buildingWest = this.buildingWest || null;
+
+        /**
+         * How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.
+         *
+         * @type {number}
+         */
+        this.fire = this.fire || 0;
+
+        /**
+         * How much health this building currently has. When this reaches 0 the Building has been burned down.
+         *
+         * @type {number}
+         */
+        this.health = this.health || 0;
+
+        /**
+         * True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.
+         *
+         * @type {boolean}
+         */
+        this.isHeadquarters = this.isHeadquarters || false;
+
+        /**
+         * The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
+        /**
+         * The location of the Building along the x-axis.
+         *
+         * @type {number}
+         */
+        this.x = this.x || 0;
+
+        /**
+         * The location of the Building along the y-axis.
+         *
+         * @type {number}
+         */
+        this.y = this.y || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

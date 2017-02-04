@@ -14,10 +14,32 @@ var Forecast = Class(GameObject, {
     /**
      * Initializes Forecasts.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * The Player that can use WeatherStations to control this Forecast when its the nextForecast.
+         *
+         * @type {Player}
+         */
+        this.controllingPlayer = this.controllingPlayer || null;
+
+        /**
+         * The direction the wind will blow fires in. Can be 'north', 'east', 'south', or 'west'.
+         *
+         * @type {string}
+         */
+        this.direction = this.direction || "";
+
+        /**
+         * How much of a Building's fire that can be blown in the direction of this Forecast. Fire is duplicated (copied), not moved (transfered).
+         *
+         * @type {number}
+         */
+        this.intensity = this.intensity || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

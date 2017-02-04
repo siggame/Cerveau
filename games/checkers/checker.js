@@ -13,10 +13,39 @@ var Checker = Class(GameObject, {
     /**
      * Initializes Checkers.
      *
-     * @param {Object} data - a simple mapping passsed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
         GameObject.init.apply(this, arguments);
+
+        /**
+         * If the checker has been kinged and can move backwards.
+         *
+         * @type {boolean}
+         */
+        this.kinged = this.kinged || false;
+
+        /**
+         * The player that controls this Checker.
+         *
+         * @type {Player}
+         */
+        this.owner = this.owner || null;
+
+        /**
+         * The x coordinate of the checker.
+         *
+         * @type {number}
+         */
+        this.x = this.x || 0;
+
+        /**
+         * The y coordinate of the checker.
+         *
+         * @type {number}
+         */
+        this.y = this.y || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
