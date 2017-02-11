@@ -33,6 +33,7 @@ output/logs
 
 # generated docs via apidoc or jsdoc
 docs
+api-docs
 
 # eslint cache
 .eslintcache
