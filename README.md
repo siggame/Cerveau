@@ -1,4 +1,4 @@
-# Cerveau
+# Cerveau 
 The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.
 
 ![{Cadre}](http://i.imgur.com/17wwI3f.png)
