@@ -126,6 +126,53 @@ var Tile = Class(GameObject, TiledTile, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Checks if a tile is in flow with another tile
+     * @param {Tile} tile - the tile to ceck in flow with
+     * @returns {bool} boolean if this tile is in flow with the provided tile
+     */
+    _tileInFlow: function(tile) {
+        if(this.type != "Water")
+            return false;
+        if(this.tileNorth == tile && this.flowDirection == "North") {
+            return true;
+        }
+        else if (this.tileEast == tile && this.flowDirection == "East") {
+            return true;
+        }
+        else if (this.tileWest == tile && this.flowDirection == "West") {
+            return true;
+        }
+        else if (this.tileSouth == tile && this.flowDirection == "South") {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a tile is in flow with another tile
+     * @param {Tile} tile - the tile to ceck in flow with
+     * @returns {bool} boolean if this tile is in flow with the provided tile
+     */
+    _tileAgainstFlow: function(tile) {
+        if(tile.type != "Water")
+            return false;
+        if(this.tileNorth == tile && tile.flowDirection == "South") {
+            return true;
+        }
+        else if (this.tileEast == tile && tile.flowDirection == "West") {
+            return true;
+        }
+        else if (this.tileWest == tile && tile.flowDirection == "East") {
+            return true;
+        }
+        else if (this.tileSouth == tile && tile.flowDirection == "North") {
+            return true;
+        }
+        return false;
+    }
+
+
 
     //<<-- /Creer-Merge: added-functions -->>
 
