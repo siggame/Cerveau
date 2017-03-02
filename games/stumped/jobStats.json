@@ -21,6 +21,22 @@
 			"health": 10,
 			"moves": 2,
 			"carry": 2
-		}
+		},
+		"Fishing": {
+			"fishing": 3,
+			"distract": 2
+		},
+		"Swimming": {
+			"fishing": 2,
+			"moves": 5,
+			"carry": 2
+		},
+		"Hot Lady": {
+			"distract": 3,
+			"carry": 1
+		},
+		"Build": {
+			"chopping": 3
+		},
 	}
 }
