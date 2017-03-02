@@ -142,6 +142,24 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
+        this.mapWidth = this.mapWidth || 30;
+        this.mapHeight = this.mapHeight || 60;
+
+        this.maxTurns = this.maxTurns || 500;
+
+        this.freeBeaversCount = this.freeBeaversCount || 10;
+        this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
+
+        this.jobs.push(
+            this.create("Job", {"title": "Normal"}),
+            this.create("Job", {"title": "Buff"}),
+            this.create("Job", {"title": "Tank"}),
+            this.create("Job", {"title": "Fisher"}),
+            this.create("Job", {"title": "Swimmer"}),
+            this.create("Job", {"title": "Hot Lady"}),
+            this.create("Job", {"title": "Builder"})
+        );
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -149,7 +167,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     aliases: [
         //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-##-Stumped",
+        "MegaMinerAI-19-Stumped",
         //<<-- /Creer-Merge: aliases -->>
     ],
 
@@ -164,7 +182,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic after init can be put here
+        TiledGame._initMap.call(this);
+
+        /* Generate the map */
+        // console.log(typeof this.tiles);
+        for(let x = 0; x < this.mapWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                this.getTile(x, y).type = Math.random() < 0.2 ? "Water" : "Land";
+            }
+        }
+
         //<<-- /Creer-Merge: begin -->>
     },
 

@@ -1,0 +1,26 @@
+{
+	"default": {
+		"damage": 1,
+		"health": 3,
+		"moves": 3,
+		"actions": 1,
+		"chopping": 1,
+		"fishing": 1,
+		"carry": 3,
+		"distract": 0
+	},
+	"jobs": {
+		"Buff": {
+			"damage": 3,
+			"health": 4,
+			"moves": 2,
+			"carry": 6
+		},
+		"Tank": {
+			"damage": 2,
+			"health": 10,
+			"moves": 2,
+			"carry": 2
+		}
+	}
+}
