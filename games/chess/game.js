@@ -97,8 +97,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.chess = new Chess();
 
-        if(data.fen && this.chess.validate_fen(data.fen)) {
-            this.chess.load(data.fen);
+        if(data.fen) {
+            // trim whitespace, as chess.js will see trailing whitespace as an illegal string
+            let fen = (data.fen || "").trim();
+            let validated = this.chess.validate_fen(fen);
+            if(validated && validated.valid) {
+                this.chess.load(fen);
+            }
         }
 
         this.maxTurns = 6000; // longest possible known game without stalemate is 5,950
