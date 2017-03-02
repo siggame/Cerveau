@@ -6,7 +6,7 @@ var GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-// any additional requires you want can be required here safely between Creer re-runs
+const JobStats = require("./jobStats.json");
 
 //<<-- /Creer-Merge: requires -->>
 
@@ -90,10 +90,18 @@ var Job = Class(GameObject, {
          */
         this.title = this.title || "";
 
-
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // put any initialization logic here. the base variables should be set from 'data' above
+        this.title = this.title || "Normal";
+
+        let thisJob = JobStats.jobs[this.title];
+        for(let key of Object.keys(JobStats.default)) {
+            this[key] = JobStats.default[key];
+            if(thisJob && key in thisJob) {
+                this[key] = thisJob[key];
+            }
+        }
 
         //<<-- /Creer-Merge: init -->>
     },

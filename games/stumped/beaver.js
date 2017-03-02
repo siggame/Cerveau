@@ -6,8 +6,6 @@ var GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-// any additional requires you want can be required here safely between Creer re-runs
-
 //<<-- /Creer-Merge: requires -->>
 
 // @class Beaver: A beaver in the game.
@@ -86,7 +84,9 @@ var Beaver = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        for(var key of this.job) {
+            this[key] = this.job[key];
+        }
 
         //<<-- /Creer-Merge: init -->>
     },
