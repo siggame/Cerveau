@@ -179,21 +179,21 @@ var Beaver = Class(GameObject, {
         if(this.moves <= 0) {
             reason = "{this} is out of movement.";
         }
-        else if(tile.beaver != null) {
+        else if(tile.beaver !== null) {
             reason = "There's a beaver on {tile}!";
         }
-        else if(tile.lodgeOwner != null /*&& tile.lodgeOwner != this.owner*/ ) {
+        else if(tile.lodgeOwner !== null /*&& tile.lodgeOwner != this.owner*/ ) {
             reason = "{tile} contains an enemy lodge!";
         }
-        else if(tile.Spawner != null) {
+        else if(tile.Spawner !== null) {
             reason = "{tile} contains a spawner!";
         }
         else {
-            if(this.tile._tileAgainstFlow(tile)) {
+            if(this.tile.tileAgainstFlow(tile)) {
                 moveCost++;
             }
 
-            if(this.tile._tileInFlow(tile)) {
+            if(this.tile.isInFlowDirection(tile)) {
                 moveCost--;
             }
 
@@ -202,7 +202,7 @@ var Beaver = Class(GameObject, {
             }
         }
 
-        if(this.health == 0) {
+        if(this.health === 0) {
             reason = "{this} is dead and cannot move.";
         }
 

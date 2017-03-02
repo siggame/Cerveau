@@ -3,6 +3,7 @@
 var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var TiledTile = require(__basedir + "/gameplay/shared/tiledTile");
+var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
 var GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -131,45 +132,17 @@ var Tile = Class(GameObject, TiledTile, {
      * @param {Tile} tile - the tile to ceck in flow with
      * @returns {bool} boolean if this tile is in flow with the provided tile
      */
-    _tileInFlow: function(tile) {
-        if(this.type != "Water")
-            return false;
-        if(this.tileNorth == tile && this.flowDirection == "North") {
-            return true;
-        }
-        else if (this.tileEast == tile && this.flowDirection == "East") {
-            return true;
-        }
-        else if (this.tileWest == tile && this.flowDirection == "West") {
-            return true;
-        }
-        else if (this.tileSouth == tile && this.flowDirection == "South") {
-            return true;
-        }
-        return false;
-    }
+    isInFlowDirection: function(tile) {
+        return Boolean(tile && this.getNeighbor(this.flowDirection) === tile);
+    },
 
     /**
      * Checks if a tile is in flow with another tile
      * @param {Tile} tile - the tile to ceck in flow with
      * @returns {bool} boolean if this tile is in flow with the provided tile
      */
-    _tileAgainstFlow: function(tile) {
-        if(tile.type != "Water")
-            return false;
-        if(this.tileNorth == tile && tile.flowDirection == "South") {
-            return true;
-        }
-        else if (this.tileEast == tile && tile.flowDirection == "West") {
-            return true;
-        }
-        else if (this.tileWest == tile && tile.flowDirection == "East") {
-            return true;
-        }
-        else if (this.tileSouth == tile && tile.flowDirection == "North") {
-            return true;
-        }
-        return false;
+    IsAgainstFlowDirection: function(tile) {
+        return Boolean(tile && this.getNeighbor(TiledGame.reverseDirection(tile.flowDirection) === tile));
     }
 
 
