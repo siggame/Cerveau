@@ -104,6 +104,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
             if(validated && validated.valid) {
                 this.chess.load(fen);
             }
+            else {
+                this._fenInvalid = validated ? validated.error : "Invalid FEN string";
+            }
         }
 
         this.maxTurns = 6000; // longest possible known game without stalemate is 5,950
@@ -173,6 +176,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 this.pieces.push(piece);
                 piece.owner.pieces.push(piece);
             }
+        }
+
+        // if not every player has 1 king, then the fen was validated, but the game can't be completed
+        if(!this.players.every((player) => player.pieces.some((piece) => piece.type === "King"))) {
+            this._fenInvalid = "Not every player has a king, so the game is un-winnable.";
+        }
+
+        if(this._fenInvalid) {
+            this.declareLosers(this.players, `Invalid Game - The initial state from the FEN string is invalid: ${this._fenInvalid}`);
+            return;
         }
 
         this._generateMoves();
