@@ -12,13 +12,13 @@ var formatGamelogs = function(logs) {
         var log = logs[i];
 
         var filename = gameLogger.filenameFor(log);
-        var visualizerLink = gameLogger.getVisualizerURL(filename);
 
         gamelogs.push({
             game: log.gameName,
             session: log.gameSession,
             epoch: log.epoch,
-            url: visualizerLink || "gamelog/" + filename,
+            gamelogURL: gameLogger.getSlug(filename),
+            visualizerURL: gameLogger.getVisualizerURL(filename),
         });
     }
     return gamelogs;

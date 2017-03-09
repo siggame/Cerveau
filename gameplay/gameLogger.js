@@ -202,14 +202,22 @@ var GameLogger = Class({
      * @returns {string} url to the gamelog
      */
     getURL: function(filename, port) {
+        // Note: __HOSTNAME__ is expected to be overwritten by clients, as we can't know for certain what hostname they used to connect to us via.
+        return `http://__HOSTNAME__:${port || this._port}${this.getSlug(filename)}`;
+    },
+
+    /**
+     * Returns the slug for a url to the gamelog
+     * @param {string} filename - filename of the url, or the gamelog itself
+     * @param {number} [port] - port override
+     * @returns {string} url to the gamelog
+     */
+    getSlug: function(filename, port) {
         if(typeof(filename) === "object") {
             filename = this.filenameFor(filename);
         }
 
-        return "http://__HOSTNAME__:{}/gamelog/{}".format(
-            port || this._port,
-            filename
-        );
+        return `/gamelog/${filename}`;
     },
 
     /**

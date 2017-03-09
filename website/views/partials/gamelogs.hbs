@@ -4,13 +4,26 @@
 		<th class="gamelog-session">Session</th>
 		<th class="gamelog-name">Date</th>
 		<th class="gamelog-link">Gamelog</th>
+		<th class="gamelog-link">Visualize</th>
 	</tr>
 {{#each gamelogs}}
 	<tr>
 		<td class="gamelog-name">{{this.game}}</td>
 		<td class="gamelog-session">{{this.session}}</td>
 		<td class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</td>
-		<td class="gamelog-link"><a href="{{this.url}}">View</a></td>
+		<td class="gamelog-raw-link"><a href="{{this.gamelogURL}}">Download</a></td>
+		<td class="gamelog-vis-link"><a href="{{this.visualizerURL}}">View</a></td>
 	</tr>
 {{/each}}
 </table>
+<script type="text/javascript">
+// Have the web browser rewrite urls to inject the hostname they used to reach this web interface
+$('.gamelog-vis-link a').each(function() {
+	var $this = $(this);
+	var href = $this.attr('href');
+
+	if (href.includes('__HOSTNAME__')) { // then rewrite it
+		$this.attr('href', href.replace('__HOSTNAME__', location.hostname));
+	}
+});
+</script>
