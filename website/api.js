@@ -232,7 +232,12 @@ module.exports = function(args) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-        lobby.gameLogger.getGamelog(req.params.filename, function(gamelog) {
+        let filename = req.params.filename || "";
+        if(filename.endsWith(".json")) {
+            filename = filename.replace(/\.[^/.]+$/, ""); // remove extension
+        }
+
+        lobby.gameLogger.getGamelog(filename, function(gamelog) {
             if(!gamelog) {
                 res.status(404); // not found
                 gamelog = {
