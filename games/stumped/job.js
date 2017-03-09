@@ -97,9 +97,11 @@ var Job = Class(GameObject, {
 
         let thisJob = JobStats.jobs[this.title];
         for(let key of Object.keys(JobStats.default)) {
-            this[key] = JobStats.default[key];
             if(thisJob && key in thisJob) {
                 this[key] = thisJob[key];
+            }
+            else {
+                this[key] = JobStats.default[key];
             }
         }
 

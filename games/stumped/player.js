@@ -100,7 +100,9 @@ var Player = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.name = this.name || "Unnamed Player";
+        this.clientType = this.clientType || "Unknown";
+        this.branchesToBuildLodge = this.branchesToBuildLodge || 10;
 
         //<<-- /Creer-Merge: init -->>
     },
