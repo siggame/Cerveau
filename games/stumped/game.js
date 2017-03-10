@@ -160,6 +160,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             this.create("Job", {"title": "Builder"})
         );
 
+        this.spawnerTypes.push("Fish", "Branch");
+
         //<<-- /Creer-Merge: init -->>
     },
 
