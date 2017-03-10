@@ -122,6 +122,10 @@ var Job = Class(GameObject, {
     recruit: function(player, lodge, asyncReturn) {
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        this.create("Beaver", {"job": this, "owner": player});
+        
+        
+
         // Developer: Put your game logic for the Job's recruit function here
         return null;
 
