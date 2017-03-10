@@ -157,6 +157,7 @@ var Beaver = Class(GameObject, {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's harvest function here
+        // Beginning work on beaver harvesting...
         return false;
 
         // <<-- /Creer-Merge: harvest -->>
