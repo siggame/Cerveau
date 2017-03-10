@@ -142,8 +142,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
-        this.mapWidth = this.mapWidth || 30;
-        this.mapHeight = this.mapHeight || 60;
+        this.mapWidth = this.mapWidth || 60;
+        this.mapHeight = this.mapHeight || 30;
 
         this.maxTurns = this.maxTurns || 500;
 
