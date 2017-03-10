@@ -124,7 +124,6 @@ var Job = Class(GameObject, {
 
         let beav = this.game.create("Beaver", {"job": this, "owner": player});
         beav.tile = lodge;
-        
 
         // Developer: Put your game logic for the Job's recruit function here
         return null;

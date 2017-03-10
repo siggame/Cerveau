@@ -84,6 +84,10 @@ var Beaver = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        if(!this.job) {
+            this.job = this.game.jobs[0];
+        }
+
         for(var key of this.job) {
             this[key] = this.job[key];
         }
