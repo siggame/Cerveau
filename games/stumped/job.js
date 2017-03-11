@@ -122,15 +122,33 @@ var Job = Class(GameObject, {
     recruit: function(player, lodge, asyncReturn) {
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(player && lodge && lodge.beaver === null && player.fish >= this.cost) {
-            let beav = this.game.create("Beaver", {"job": this, "owner": player});
+        let reason;
+
+        if(!player) {
+            reason = "Player is not defined";
+        }
+        else if(!lodge) {
+            reason = "Lodge is not defined";
+        }
+        else if(lodge.beaver) {
+            reason = "There's already a beaver at that lodge";
+        }
+        else if(player.beavers.length < this.game.freeBeaversCount && player.fish < this.cost) {
+            reason = "You don't have enough fish to recruit that beaver, {player}";
+        }
+        else {
+            let beav = this.game.create("Beaver", { "job": this, "owner": player });
             beav.tile = lodge;
             lodge.beaver = beav;
             player.fish = player.fish - this.cost;
+            player.beavers.push(beav);
             return beav;
         }
 
-        return null;
+        return this.game.logicError(null, reason.format({
+            this: this,
+            player,
+        }));
 
         // <<-- /Creer-Merge: recruit -->>
     },
