@@ -121,6 +121,39 @@ var Beaver = Class(GameObject, {
     buildLodge: function(player, asyncReturn) {
         // <<-- Creer-Merge: buildLodge -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        let reason = "";
+        if(!player || player !== this.game.currentPlayer){
+            reason = "{player} it is not your turn.";
+        }
+        else if(this.owner !== player){
+            reason = "{this} is not your beaver.";
+        }
+        else if(this.distracted !== 0){
+            reason = "{this} is distracted.";
+        }
+        else if(this.health == 0){
+            reason = "{this} is dead.";
+        }
+        else if(this.actions == 0){
+            reason = "{this} has no more actions.";
+        }
+        else if((this.branches+this.tile.branches) < player.branchesToBuildLodge){
+            reason = "{this} does not have enough branches to build the lodge.";
+        }  
+        else if(this.tile.lodgeOwner !== null){
+            reason = "{this.tile} already has a lodge.";
+        } 
+        else if(this.tile.spawner !== null){
+             reason = "{this.tile} has a spawner which cannot be built over.";
+        }
+        else if(this.tile.branches !== 0 || this.tile.fish !== 0){
+            reason = "{this.tile} has resources on it, which cannot be built over.";
+        }
+        else{
+            this.branches -= player.branchesToBuildLodge;
+            this.tile.lodgeOwner = player;
+            return true;
+        }
         // Developer: Put your game logic for the Beaver's buildLodge function here
         return false;
 
