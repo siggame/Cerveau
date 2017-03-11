@@ -180,16 +180,16 @@ var Beaver = Class(GameObject, {
         const available = Math.pow(2, tile.spawner.health);
         const space = this.job.carryLimit - load;
         let skill = this.job.fishing;
-        let container = this.fish;
+        let container = "fish";
 
         if(tile.spawner.type === "Branch") {
             skill = this.job.chopping;
-            container = this.branches;
+            container = "branches";
         }
 
         gathered = available < skill ? available : skill;
         gathered = gathered > space ? space : gathered;
-        container += gathered;
+        this[container] += gathered;
 
         if(tile.spawner.health > 0) {
             tile.spawner.health--;
