@@ -157,8 +157,30 @@ var Beaver = Class(GameObject, {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's harvest function here
-        // Beginning work on beaver harvesting...
-        return false;
+        const neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        let gathered = 0;
+
+        if(tile !== null && tile.spawner !== null && tile in neighbors) {
+            const carryCount = this.fish + this.branches;
+
+            if(carryCount < this.job.carryLimit) {
+                const availableResources = Math.pow(2, tile.spawner.health);
+
+                if(tile.spawner.type === "Fish") {
+                    gathered = availableResources >= this.job.fishing ? this.job.fishing : availableResources;
+                    this.fish += gathered;
+                }
+                else if( tile.spawner.type === "Branch") {
+                    gathered = availableResources >= this.job.chopping ? this.job.chopping : availableResources;
+                    this.branches += gathered;
+                }
+                if(tile.spawner.health > 0) {
+                    tile.spawner.health--;
+                }
+            }
+        }
+
+        return gathered > 0;
 
         // <<-- /Creer-Merge: harvest -->>
     },
