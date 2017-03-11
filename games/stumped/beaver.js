@@ -192,6 +192,50 @@ var Beaver = Class(GameObject, {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's pickup function here
+        let reason = "";
+        
+        
+        if(this.health <= 0 ){
+          reason = "{player} is dead ";
+        }
+        else if(this.actions <= 0){
+          reason = "{player} can not take any more actions this turn. ";
+        }
+        else if(this.owner !== player){
+          reason = "{player} is not your beaver. ";
+        }
+        else if(player !== this.game.currentPlayer){
+          reason = "{player} is not your turn. ";
+        }
+        else if(resource === branches && this.tile.branches <= 0){
+          reason = "{this.tile} has no branches.";
+        }
+        else  if(resource  === fish && this.tile.fish <= 0 ){
+          reason = "{this.tile} has no fish ";
+        }
+        else if(!(resorce === branches || resorce === fish)){
+          reason = "{resorce} that is not a valid resorce. ";
+        }
+        else if(resorce === branches && this.tile.branches < amount){
+          reason = "{this.tile.branches}does not have that amount of resource.";
+        }
+        else if(resorce === fish && this.tile.fish < amount ){
+          reason = "{this.tile.fish} does not have that amount of resource.";
+        }
+        else if(this.job.carryLimmit < amount ){
+         reason = "{player} you do not have the carry capicity for this amount " ;
+        }
+        else if(this.distracted > 0){
+          reason = "{this.distracted} turns till your not distracted and able to pick up resources .";
+        }
+        else if(resorces === branches){ 
+          this.branches += amount
+          this.tile.brances -= amount
+        }
+        else if(resorces === fish){
+          this.fish += amount
+          this.tile.fish -= amount
+        }
         return false;
 
         // <<-- /Creer-Merge: pickup -->>
