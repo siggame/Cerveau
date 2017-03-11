@@ -150,7 +150,15 @@ var Beaver = Class(GameObject, {
             reason = "{this.tile} has resources on it, which cannot be built over.";
         }
         else{
-            this.branches -= player.branchesToBuildLodge;
+            var count = player.branchesToBuildLodge;
+            if(count < this.tile.branches){
+                this.tile.branches -= player.branchesToBuildLodge;
+            }
+            else(){
+                count = this.tile.branches - count;
+                this.tile.branches = 0;
+                this.branches -= count;
+            }
             this.tile.lodgeOwner = player;
             return true;
         }
