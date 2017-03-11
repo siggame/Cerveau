@@ -155,8 +155,6 @@ var Beaver = Class(GameObject, {
      */
     harvest: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        const neighbors = [this.tile.tileNorth, this.tile.tileEast,
-                           this.tile.tileSouth, this.tile.tileWest];
         let gathered = 0;
 
         if(tile === null) {
@@ -167,7 +165,7 @@ var Beaver = Class(GameObject, {
             // set reason
             return false;
         }
-        if(!(tile in neighbors)) {
+        if(!this.tile.hasNeighbor(tile)) {
             // set reason
             return false;
         }
