@@ -155,33 +155,49 @@ var Beaver = Class(GameObject, {
      */
     harvest: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Beaver's harvest function here
-        const neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        const neighbors = [this.tile.tileNorth, this.tile.tileEast,
+                           this.tile.tileSouth, this.tile.tileWest];
         let gathered = 0;
 
-        if(tile !== null && tile.spawner !== null && tile in neighbors) {
-            const carryCount = this.fish + this.branches;
+        if(tile === null) {
+            // set reason
+            return false;
+        }
+        if(tile.spawner === null) {
+            // set reason
+            return false;
+        }
+        if(!(tile in neighbors)) {
+            // set reason
+            return false;
+        }
 
-            if(carryCount < this.job.carryLimit) {
-                const availableResources = Math.pow(2, tile.spawner.health);
+        const load = this.fish + this.branches;
 
-                if(tile.spawner.type === "Fish") {
-                    gathered = availableResources >= this.job.fishing ? this.job.fishing : availableResources;
-                    this.fish += gathered;
-                }
-                else if( tile.spawner.type === "Branch") {
-                    gathered = availableResources >= this.job.chopping ? this.job.chopping : availableResources;
-                    this.branches += gathered;
-                }
-                if(tile.spawner.health > 0) {
-                    tile.spawner.health--;
-                }
-            }
+        if(load >= this.job.carryLimit) {
+            // set reason
+            return false;
+        }
+
+        const available = Math.pow(2, tile.spawner.health);
+        const space = this.job.carryLimit - load;
+        let skill = this.job.fishing;
+        let container = this.fish;
+
+        if(tile.spawner.type === "Branch") {
+            skill = this.job.chopping;
+            container = this.branches;
+        }
+
+        gathered = available < skill ? available : skill;
+        gathered = gathered > space ? space : gathered;
+        container += gathered;
+
+        if(tile.spawner.health > 0) {
+            tile.spawner.health--;
         }
 
         return gathered > 0;
-
         // <<-- /Creer-Merge: harvest -->>
     },
 
