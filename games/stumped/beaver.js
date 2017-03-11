@@ -105,8 +105,52 @@ var Beaver = Class(GameObject, {
     attack: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's attack function here
-        return false;
+        let reason;
+
+        if(!player || player !== this.game.currentPlayer) {
+            reason = `${player} it is not your turn.`;
+        }
+        else if(this.owner !== player) {
+            reason = `${this} is not owned by you.`;
+        }
+        else if(this.health === 0) {
+            reason = `${this} is dead.`;
+        }
+        else if(!tile) {
+            reason = `${tile} is not a valid Tile.`;
+        }
+        else if(!tile.beaver) {
+            reason = `No beaver exists on tile ${tile}.`;
+        }
+        else if(!this.tile.hasNeighbor(tile)) {
+            reason = `${tile} is not adjacent to beaver attacking.`;
+        }
+        else if(this.beaver.distracted) {
+            reason = `${this} is distracted.`;
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        // If no errors occur
+        tile.beaver.health -= this.beaver.job.damage;
+        this.actions--;
+        tile.beaver.distracted = tile.beaver.distracted || this.jobs.distracts;
+
+        if(tile.beaver.health <= 0) {
+            tile.branches += tile.beaver.branches;
+            tile.fish += tile.beaver.fish;
+            tile.beaver.branches = -1;
+            tile.beaver.fish = -1;
+            tile.beaver.actions = -1;
+            tile.beaver.moves = -1;
+            tile.beaver.health = -1;
+            tile.beaver.distracted = -1;
+            tile.beaver.tile = null;
+            tile.beaver = null;
+        }
+        return true;
 
         // <<-- /Creer-Merge: attack -->>
     },
