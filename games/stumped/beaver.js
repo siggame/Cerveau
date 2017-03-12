@@ -153,6 +153,9 @@ var Beaver = Class(GameObject, {
         else if(this.distracted) {
             reason = `${this} is distracted.`;
         }
+        else if(!this.actions) {
+            reason = `${this} does not have any actions left.`;
+        }
         else if(resource[0] === "f" && amount > this.fish) {
             reason = `${this} does not have ${amount} fish to drop.`;
         }
