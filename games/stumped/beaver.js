@@ -176,11 +176,11 @@ var Beaver = Class(GameObject, {
         // If no errors occur
         this.actions--;
 
-        if(resource === "fish") {
+        if(resource[0] === "f") {
             this.tile.fish += amount;
             this.fish -= amount;
         }
-        if(resource === "branches") {
+        else {  // (resource[0] === "b") 
             this.tile.branches += amount;
             this.branches -= amount;
         }
