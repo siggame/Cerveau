@@ -128,6 +128,9 @@ var Beaver = Class(GameObject, {
         else if(this.distracted) {
             reason = `${this} is distracted.`;
         }
+        else if(!this.actions) {
+            reason = `${this} does not have any actions left.`;
+        }
 
         if(reason) {
             return this.game.logicError(false, reason);
