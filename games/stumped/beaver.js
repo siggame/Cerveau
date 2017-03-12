@@ -139,15 +139,6 @@ var Beaver = Class(GameObject, {
     drop: function(player, resource, amount, asyncReturn) {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        /* CHECKS:
-        * -------------------------------------------------
-        * Its the current player's turn
-        * The current player is controlling their own units
-        * The beaver isn't dead
-        * That the beaver isn't distracted
-        * The beaver isn't trying to drop something it doesn't have
-        */
-
         let reason;
 
         if(!player || player !== this.game.currentPlayer) {
@@ -162,15 +153,33 @@ var Beaver = Class(GameObject, {
         else if(this.distracted) {
             reason = `${this} is distracted.`;
         }
-        else if(this.resource === "fish" && amount > this.fish) {
+        else if(resource[0] === "f" && amount > this.fish) {
             reason = `${this} does not have ${amount} fish to drop.`;
         }
-        else if(this.resource === "branch" && amount > this.branch) {
+        else if(resource[0] === "b" && amount > this.branches) {
             reason = `${this} does not have ${amount} branch(es) to drop.`;
+        }
+        else if(resource[0] !== "f" && resource[0] !== "b") {
+            reason = `${resource} is not a valid resource.`;
+        }
+        else if(amount < 0) {
+            reason = `${this} can not drop a negative amount of ${resource}.`;
         }
 
         if(reason) {
             return this.game.logicError(false, reason);
+        }
+
+        // If no errors occur
+        this.actions--;
+
+        if(resource === "fish") {
+            this.tile.fish += amount;
+            this.fish -= amount;
+        }
+        if(resource === "branches") {
+            this.tile.branches += amount;
+            this.branches -= amount;
         }
 
         return true;
