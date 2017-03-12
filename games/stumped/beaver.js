@@ -151,7 +151,7 @@ var Beaver = Class(GameObject, {
             reason = `${this} is dead.`;
         }
         else if(this.distracted) {
-            reason = `${this} is distracted.`;
+            reason = `${this.distracted} turns til ${this} is not distracted and is able to drop resources.`;
         }
         else if(!this.actions) {
             reason = `${this} does not have any actions left.`;
@@ -180,7 +180,7 @@ var Beaver = Class(GameObject, {
             this.tile.fish += amount;
             this.fish -= amount;
         }
-        else {  // (resource[0] === "b") 
+        else {  // (resource[0] === "b")
             this.tile.branches += amount;
             this.branches -= amount;
         }
