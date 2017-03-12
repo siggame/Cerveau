@@ -192,51 +192,56 @@ var Beaver = Class(GameObject, {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's pickup function here
-        let reason = "";
-        
-        
-        if(this.health <= 0 ){
-          reason = "{player} is dead ";
+        let reason;
+
+        if(this.health <= 0 ) {
+            reason = `${this} is dead.`;
         }
-        else if(this.actions <= 0){
-          reason = "{player} can not take any more actions this turn. ";
+        else if(this.actions <= 0) {
+            reason = `${this} can not take any more actions this turn.`;
         }
-        else if(this.owner !== player){
-          reason = "{player} is not your beaver. ";
+        else if(this.owner !== player) {
+            reason = `${this} is not your beaver.`;
         }
-        else if(player !== this.game.currentPlayer){
-          reason = "{player} is not your turn. ";
+        else if(player !== this.game.currentPlayer) {
+            reason = `${player}, it is not your turn.`;
         }
-        else if(resource === branches && this.tile.branches <= 0){
-          reason = "{this.tile} has no branches.";
+        else if(resource[0] !== "f" && resource[0] !== "b") {
+            reason = `${resource} that is not a valid resource.`;
         }
-        else  if(resource  === fish && this.tile.fish <= 0 ){
-          reason = "{this.tile} has no fish ";
+        else if(resource[0] === "b" && this.tile.branches < amount) {
+            reason = `${this.tile} does not have ${amount} branch(es).`;
         }
-        else if(!(resorce === branches || resorce === fish)){
-          reason = "{resorce} that is not a valid resorce. ";
+        else if(resource[0] === "f" && this.tile.fish < amount ) {
+            reason = `${this.tile} does not have ${amount} fish.`;
         }
-        else if(resorce === branches && this.tile.branches < amount){
-          reason = "{this.tile.branches}does not have that amount of resource.";
+        else if((this.job.carryLimmit - (this.fish + this.branches)) < amount ) {
+            reason = `${this} does not have the carry capicity for this amount.` ;
         }
-        else if(resorce === fish && this.tile.fish < amount ){
-          reason = "{this.tile.fish} does not have that amount of resource.";
+        else if(this.distracted > 0) {
+            reason = `${this.distracted} turns til ${this} is not distracted and is able to pick up resources.`;
         }
-        else if(this.job.carryLimmit < amount ){
-         reason = "{player} you do not have the carry capicity for this amount " ;
+        else if(amount < 0) {
+            reason = `${this} can not pick up a negative amount of ${resource}.`;
         }
-        else if(this.distracted > 0){
-          reason = "{this.distracted} turns till your not distracted and able to pick up resources .";
+
+        if(reason) {
+            return this.game.logicError(false, reason);
         }
-        else if(resorces === branches){ 
-          this.branches += amount
-          this.tile.brances -= amount
+
+        // If no errors occur
+        this.actions--;
+
+        if(resource[0] === "b") {
+            this.branches += amount;
+            this.tile.branches -= amount;
         }
-        else if(resorces === fish){
-          this.fish += amount
-          this.tile.fish -= amount
+        else { // (resource[0] === "f") {
+            this.fish += amount;
+            this.tile.fish -= amount;
         }
-        return false;
+
+        return true;
 
         // <<-- /Creer-Merge: pickup -->>
     },
