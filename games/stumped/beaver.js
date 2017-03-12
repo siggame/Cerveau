@@ -125,7 +125,7 @@ var Beaver = Class(GameObject, {
         else if(!this.tile.hasNeighbor(tile)) {
             reason = `${tile} is not adjacent to beaver attacking.`;
         }
-        else if(this.beaver.distracted) {
+        else if(this.distracted) {
             reason = `${this} is distracted.`;
         }
 
