@@ -113,7 +113,7 @@ var Beaver = Class(GameObject, {
         else if(this.owner !== player) {
             reason = `${this} is not owned by you.`;
         }
-        else if(this.health === 0) {
+        else if(this.health <= 0) {
             reason = `${this} is dead.`;
         }
         else if(!tile) {
