@@ -139,9 +139,41 @@ var Beaver = Class(GameObject, {
     drop: function(player, resource, amount, asyncReturn) {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's drop function here
-        return false;
+        /* CHECKS:
+        * -------------------------------------------------
+        * Its the current player's turn
+        * The current player is controlling their own units
+        * The beaver isn't dead
+        * That the beaver isn't distracted
+        * The beaver isn't trying to drop something it doesn't have
+        */
 
+        let reason;
+
+        if(!player || player !== this.game.currentPlayer) {
+            reason = `${player} it is not your turn.`;
+        }
+        else if(this.owner !== player) {
+            reason = `${this} is not owned by you.`;
+        }
+        else if(this.health <= 0) {
+            reason = `${this} is dead.`;
+        }
+        else if(this.distracted) {
+            reason = `${this} is distracted.`;
+        }
+        else if(this.resource === "fish" && amount > this.fish) {
+            reason = "{this} does not have {amount} fish to drop.";
+        }
+        else if(this.resource === "branch" && amount > this.branch) {
+            reason = "{this} does not have {amount} branch(es) to drop.";
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        return true;
         // <<-- /Creer-Merge: drop -->>
     },
 
