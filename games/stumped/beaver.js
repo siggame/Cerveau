@@ -155,26 +155,38 @@ var Beaver = Class(GameObject, {
      */
     harvest: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = null;
         let gathered = 0;
-
-        if(tile === null) {
-            // set reason
-            return false;
-        }
-        if(tile.spawner === null) {
-            // set reason
-            return false;
-        }
-        if(!this.tile.hasNeighbor(tile)) {
-            // set reason
-            return false;
-        }
-
         const load = this.fish + this.branches;
 
-        if(load >= this.job.carryLimit) {
-            // set reason
-            return false;
+        if(this.owner !== player) {
+            reason = "{this} is owned by {this.owner} not by {player}.";
+        }
+        else if(tile === null) {
+            reason = "Tile {tile} is null.";
+        }
+        else if(tile.spawner === null) {
+            reason = "Tile {tile} has no spawner.";
+        }
+        else if(!this.tile.hasNeighbor(tile)) {
+            reason = "{this} on tile {this.tile} is not adjacent to {tile}.";
+        }
+        else if(load >= this.job.carryLimit) {
+            reason = "Beaver cannot carry more. Limit: ({this.job.carryLimit})";
+        }
+        else if(this.actions <= 0) {
+            reason = "{this} has no actions available.";
+        }
+        else if(this.distracted > 0) {
+            reason = "{this} is distracted for {this.distracted} more turns.";
+        }
+
+        if(reason !== null) {
+            return this.game.logicError(false, reason.format({
+                this: this,
+                player,
+                tile,
+            }));
         }
 
         const available = Math.pow(2, tile.spawner.health);
@@ -190,6 +202,7 @@ var Beaver = Class(GameObject, {
         gathered = available < skill ? available : skill;
         gathered = gathered > space ? space : gathered;
         this[container] += gathered;
+        this.actions--;
 
         if(tile.spawner.health > 0) {
             tile.spawner.health--;
