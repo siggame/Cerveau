@@ -171,14 +171,17 @@ var Beaver = Class(GameObject, {
         else if(!this.tile.hasNeighbor(tile)) {
             reason = "{this} on tile {this.tile} is not adjacent to {tile}.";
         }
-        else if(load >= this.job.carryLimit) {
-            reason = "Beaver cannot carry more. Limit: ({this.job.carryLimit})";
+        else if(this.health <= 0) {
+            reason = "{this} is dead.";
         }
         else if(this.actions <= 0) {
             reason = "{this} has no actions available.";
         }
         else if(this.distracted > 0) {
             reason = "{this} is distracted for {this.distracted} more turns.";
+        }
+        else if(load >= this.job.carryLimit) {
+            reason = "Beaver cannot carry more. Limit: ({this.job.carryLimit})";
         }
 
         if(reason !== null) {
