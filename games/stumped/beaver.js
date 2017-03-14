@@ -188,12 +188,7 @@ var Beaver = Class(GameObject, {
         }
 
         if(reason !== null) {
-            return this.game.logicError(false, reason.format({
-                this: this,
-                player,
-                tile,
-                load,
-            }));
+            return this.game.logicError(false, reason);
         }
 
         const available = Math.pow(2, tile.spawner.health);
