@@ -159,29 +159,32 @@ var Beaver = Class(GameObject, {
         let gathered = 0;
         const load = this.fish + this.branches;
 
-        if(this.owner !== player) {
-            reason = "{this} is owned by {this.owner} not by {player}.";
+        if(player === null || player !== this.game.currentPlayer) {
+            reason = `Not ${player}'s turn.`;
+        }
+        else if(this.owner !== player) {
+            reason = `${this} is owned by ${this.owner} not by ${player}.`;
         }
         else if(tile === null) {
-            reason = "Tile {tile} is null.";
+            reason = `${tile} is not a valid Tile.`;
         }
         else if(tile.spawner === null) {
-            reason = "Tile {tile} has no spawner.";
+            reason = `Tile ${tile} has no spawner.`;
         }
         else if(!this.tile.hasNeighbor(tile)) {
-            reason = "{this} on tile {this.tile} is not adjacent to {tile}.";
+            reason = `${this} on tile ${this.tile} is not adjacent to ${tile}.`;
         }
         else if(this.health <= 0) {
-            reason = "{this} is dead.";
+            reason = `${this} is dead.`;
         }
         else if(this.actions <= 0) {
-            reason = "{this} has no actions available.";
+            reason = `${this} has no actions available.`;
         }
         else if(this.distracted > 0) {
-            reason = "{this} is distracted for {this.distracted} more turns.";
+            reason = `${this} is distracted for ${this.distracted} more turns.`;
         }
         else if(load >= this.job.carryLimit) {
-            reason = "Beaver cannot carry more. Limit: ({this.job.carryLimit})";
+            reason = `Beaver cannot carry more. Limit: (${load}/${this.job.carryLimit})`;
         }
 
         if(reason !== null) {
@@ -189,6 +192,7 @@ var Beaver = Class(GameObject, {
                 this: this,
                 player,
                 tile,
+                load,
             }));
         }
 
