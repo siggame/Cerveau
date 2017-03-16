@@ -120,36 +120,43 @@ var Job = Class(GameObject, {
      * @returns {Beaver} The recruited Beaver if successful, null otherwise.
      */
     recruit: function(player, lodge, asyncReturn) {
+        let tile = lodge;
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         let reason;
 
-        if(!player) {
-            reason = "Player is not defined";
+        if(!player || player !== this.game.currentPlayer) {
+            reason = `Not ${player}'s turn.`;
         }
-        else if(!lodge) {
-            reason = "Lodge is not defined";
+        else if(!tile) {
+            reason = `${tile} is not a valid Tile.`;
         }
-        else if(lodge.beaver) {
-            reason = "There's already a beaver at that lodge";
+        else if(tile.lodgeOwner !== player) {
+            reason = `${tile} is not owned by ${player}.`;
         }
-        else if(player.beavers.length < this.game.freeBeaversCount && player.fish < this.cost) {
-            reason = "You don't have enough fish to recruit that beaver, {player}";
+        else if(tile.beaver) {
+            reason = `There's already ${tile.beaver} at that lodge`;
         }
-        else {
-            let beav = this.game.create("Beaver", { "job": this, "owner": player });
-            beav.tile = lodge;
-            lodge.beaver = beav;
-            player.fish = player.fish - this.cost;
-            player.beavers.push(beav);
-            return beav;
+        else if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.fish < this.cost) {
+            reason = `${tile} does not have enough fish available. (${tile.fish}/${this.cost})`;
         }
 
-        return this.game.logicError(null, reason.format({
-            this: this,
-            player,
-        }));
+        if(reason) {
+            return this.game.logicError(null, reason);
+        }
 
+        let beaver = this.game.create("Beaver", {
+            job: this,
+            owner: player,
+            tile: tile,
+        });
+
+        tile.beaver = beaver;
+        if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
+            tile.fish -= this.cost;
+        }
+
+        return beaver;
         // <<-- /Creer-Merge: recruit -->>
     },
 
