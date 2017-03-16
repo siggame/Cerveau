@@ -176,7 +176,10 @@ var Beaver = Class(GameObject, {
         let reason = this._check(player, tile);
         let moveCost = 2;
 
-        if(this.moves <= 0) {
+        if(reason) {
+            // don't update to a new reason, use the first invalid reason
+        }
+        else if(this.moves <= 0) {
             reason = `${this} is out of movement.`;
         }
         else if(tile.beaver !== null) {
