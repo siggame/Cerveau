@@ -143,7 +143,7 @@ var Tile = Class(GameObject, TiledTile, {
      */
     IsAgainstFlowDirection: function(tile) {
         return Boolean(tile && this.getNeighbor(TiledGame.reverseDirection(tile.flowDirection) === tile));
-    }
+    },
 
 
 

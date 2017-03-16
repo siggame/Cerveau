@@ -173,20 +173,20 @@ var Beaver = Class(GameObject, {
     move: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var reason = this._check(player, tile);
-        var moveCost = 2;
+        let reason = this._check(player, tile);
+        let moveCost = 2;
 
         if(this.moves <= 0) {
-            reason = "{this} is out of movement.";
+            reason = `${this} is out of movement.`;
         }
         else if(tile.beaver !== null) {
-            reason = "There's a beaver on {tile}!";
+            reason = `${tile} is already occupied by ${tile.beaver}.`;
         }
-        else if(tile.lodgeOwner !== null /*&& tile.lodgeOwner != this.owner*/ ) {
-            reason = "{tile} contains an enemy lodge!";
+        else if(tile.lodgeOwner !== null && tile.lodgeOwner !== player) {
+            reason = `${tile} contains an enemy lodge!`;
         }
-        else if(tile.Spawner !== null) {
-            reason = "{tile} contains a spawner!";
+        else if(tile.spawner !== null) {
+            reason = `${tile} contains ${tile.spawner}!`;
         }
         else {
             if(this.tile.tileAgainstFlow(tile)) {
@@ -198,26 +198,22 @@ var Beaver = Class(GameObject, {
             }
 
             if(moveCost > this.moves) {
-                reason = "{tile} costs too much to move to!";
+                reason = `${tile} costs ${moveCost} to reach and ${this} has ${this.moves}.`;
             }
         }
 
-        if(this.health === 0) {
-            reason = "{this} is dead and cannot move.";
-        }
-
         if(reason) {
-            return this.game.logicError(false, reason.formatting({
-                this: this,
-                player,
-                tile
-            }));
+            return this.game.logicError(false, reason);
         }
 
         // Here is valid!
-        this.tile.beaver = null; // remove me from the time I was on
+        // remove me from the time I was on
+        this.tile.beaver = null;
+        // update target tile's beaver to this beaver
         tile.beaver = this;
+        // update this beaver's tile to target tile
         this.tile = tile;
+        // decrement this beaver's moves count by the move cost
         this.moves -= moveCost;
 
         return true;
@@ -254,21 +250,21 @@ var Beaver = Class(GameObject, {
      */
     _check: function(player, tile) {
         if(!player || player !== this.game.currentPlayer) {
-            return "{player} it is not your trun.";
+            return `${player} it is not your turn.`;
         }
         else if(this.owner !== player) {
-            return "{this} is not owned by you.";
+            return `${this} is not owned by you.`;
         }
-        else if(this.health == 0) {
-            return "{this} is dead.";
+        else if(this.health <= 0) {
+            return `${this} is dead.`;
         }
-        else if(this.distracted) {
-            return "{this} is distracted, and cannot act.";
+        else if(this.distracted > 0) {
+            return `${this} is distracted for ${this.distracted} more turns.`;
         }
         else if(!tile) {
-            return "{tile} is not a valid Tile."
+            return `${tile} is not a valid Tile.`;
         }
-    }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
