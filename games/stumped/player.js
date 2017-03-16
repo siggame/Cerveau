@@ -114,6 +114,11 @@ var Player = Class(GameObject, {
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
+    getAliveBeavers: function() {
+        return this.beavers.filter((beaver) => beaver.health > 0)
+        .concat(this.game.newBeavers);
+    },
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });
