@@ -186,9 +186,53 @@ var Beaver = Class(GameObject, {
     drop: function(player, resource, amount, asyncReturn) {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's drop function here
-        return false;
+        let reason;
 
+        if(!player || player !== this.game.currentPlayer) {
+            reason = `${player} it is not your turn.`;
+        }
+        else if(this.owner !== player) {
+            reason = `${this} is not owned by you.`;
+        }
+        else if(this.health <= 0) {
+            reason = `${this} is dead.`;
+        }
+        else if(this.distracted) {
+            reason = `${this.distracted} turns til ${this} is not distracted and is able to drop resources.`;
+        }
+        else if(!this.actions) {
+            reason = `${this} does not have any actions left.`;
+        }
+        else if(resource[0] === "f" && amount > this.fish) {
+            reason = `${this} does not have ${amount} fish to drop.`;
+        }
+        else if(resource[0] === "b" && amount > this.branches) {
+            reason = `${this} does not have ${amount} branch(es) to drop.`;
+        }
+        else if(resource[0] !== "f" && resource[0] !== "b") {
+            reason = `${resource} is not a valid resource.`;
+        }
+        else if(amount < 0) {
+            reason = `${this} can not drop a negative amount of ${resource}.`;
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        // If no errors occur
+        this.actions--;
+
+        if(resource[0] === "f") {
+            this.tile.fish += amount;
+            this.fish -= amount;
+        }
+        else {  // (resource[0] === "b")
+            this.tile.branches += amount;
+            this.branches -= amount;
+        }
+
+        return true;
         // <<-- /Creer-Merge: drop -->>
     },
 
