@@ -162,6 +162,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this.spawnerTypes.push("Fish", "Branch");
 
+        this.newBeavers = [];
+
         //<<-- /Creer-Merge: init -->>
     },
 
