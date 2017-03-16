@@ -155,43 +155,28 @@ var Beaver = Class(GameObject, {
      */
     harvest: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = null;
+        let reason = this._check(player, tile);
         let gathered = 0;
         const load = this.fish + this.branches;
 
-        if(player === null || player !== this.game.currentPlayer) {
-            reason = `Not ${player}'s turn.`;
-        }
-        else if(this.owner !== player) {
-            reason = `${this} is owned by ${this.owner} not by ${player}.`;
-        }
-        else if(tile === null) {
-            reason = `${tile} is not a valid Tile.`;
-        }
-        else if(tile.spawner === null) {
-            reason = `Tile ${tile} has no spawner.`;
+        if(reason) {
+            // reason exists, don't update with new reason
         }
         else if(!this.tile.hasNeighbor(tile)) {
             reason = `${this} on tile ${this.tile} is not adjacent to ${tile}.`;
         }
-        else if(this.health <= 0) {
-            reason = `${this} is dead.`;
-        }
         else if(this.actions <= 0) {
             reason = `${this} has no actions available.`;
-        }
-        else if(this.distracted > 0) {
-            reason = `${this} is distracted for ${this.distracted} more turns.`;
         }
         else if(load >= this.job.carryLimit) {
             reason = `Beaver cannot carry more. Limit: (${load}/${this.job.carryLimit})`;
         }
 
-        if(reason !== null) {
+        if(reason) {
             return this.game.logicError(false, reason);
         }
 
-        const available = Math.pow(2, tile.spawner.health);
+        const available = Math.pow(2 /* tbd */, tile.spawner.health);
         const space = this.job.carryLimit - load;
         let skill = this.job.fishing;
         let container = "fish";
@@ -210,7 +195,7 @@ var Beaver = Class(GameObject, {
             tile.spawner.health--;
         }
 
-        return gathered > 0;
+        return true;
         // <<-- /Creer-Merge: harvest -->>
     },
 
