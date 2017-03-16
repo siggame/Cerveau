@@ -213,8 +213,77 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Invoked when the current player ends their turn. Perform in between game logic here
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    nextTurn: function() {
+        // before we go to the next turn, reset variables and do end of turn logic
+        this.updateBeavers();
+        this.updateResources();
 
+
+        // else continue to the next player (normal next turn logic)
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    checkForWinner: function(){
+        return false;
+    },
+
+    updateBeavers: function(){
+        for(let beaver of this.beavers){
+            beaver.distracted = (beaver.distracted > 0) ? beaver.distracted - 1 : beaver.distracted;
+        }
+    },
+
+    updateResources: function(){
+        let tilesChecked = [];
+        for (let tile of this.tiles){
+            // Kill fish on land
+            if (tile.fish > 0 && tile.type == "Land"){
+                tile.fish --;
+            }
+
+            // Move branches downstream
+            this.moveBranches(tile, tilesChecked);
+
+            // Spawn new resources
+            if (tile.spawner) {
+                tile.spawner.health += 1;
+            }
+        }
+    },
+
+    moveBranches: function(tile, tilesChecked) {
+        if (tile in tilesChecked) return;
+        tilesChecked.push(tile);
+        if (tile.type == "Water" && tile.flowDirection !== "") {
+            let nextTile = tile["tile" + tile.flowDirection];
+            if (nextTile) {
+                this.moveBranches(nextTile, tilesChecked);
+                nextTile.branches += tile.branches;
+                tile.branches = 0;
+            }
+        }
+    },
+
+    cleanupArrays: function(){
+        // For each beaver, if its health <= 0
+        // - remove it from this.beavers
+        // - set beaver.tile.beaver = null
+        // - remove it from beaver.owner.beavers
+        for(let beaver in this.beavers){
+            if(beaver.health <=0){
+                this.beavers.removeElement(beaver);
+                beaver.tile.beaver = null;
+                beaver.owner.beavers.removeElement(beaver);
+            }
+        }
+    }
+    
     //<<-- /Creer-Merge: added-functions -->>
 
 });
