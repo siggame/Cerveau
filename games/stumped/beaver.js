@@ -283,10 +283,47 @@ var Beaver = Class(GameObject, {
      */
     harvest: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = this._check(player, tile);
+        let gathered = 0;
+        const load = this.fish + this.branches;
 
-        // Developer: Put your game logic for the Beaver's harvest function here
-        return false;
+        if(reason) {
+            // reason exists, don't update with new reason
+        }
+        else if(!this.tile.hasNeighbor(tile)) {
+            reason = `${this} on tile ${this.tile} is not adjacent to ${tile}.`;
+        }
+        else if(this.actions <= 0) {
+            reason = `${this} has no actions available.`;
+        }
+        else if(load >= this.job.carryLimit) {
+            reason = `Beaver cannot carry more. Limit: (${load}/${this.job.carryLimit})`;
+        }
 
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        const available = Math.pow(2 /* tbd */, tile.spawner.health);
+        const space = this.job.carryLimit - load;
+        let skill = this.job.fishing;
+        let container = "fish";
+
+        if(tile.spawner.type === "Branch") {
+            skill = this.job.chopping;
+            container = "branches";
+        }
+
+        gathered = available < skill ? available : skill;
+        gathered = gathered > space ? space : gathered;
+        this[container] += gathered;
+        this.actions--;
+
+        if(tile.spawner.health > 0) {
+            tile.spawner.health--;
+        }
+
+        return true;
         // <<-- /Creer-Merge: harvest -->>
     },
 
