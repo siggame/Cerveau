@@ -264,9 +264,53 @@ var Beaver = Class(GameObject, {
     move: function(player, tile, asyncReturn) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's move function here
-        return false;
+        let reason = this._check(player, tile);
+        let moveCost = 2;
 
+        if(reason) {
+            // don't update to a new reason, use the first invalid reason
+        }
+        else if(this.moves <= 0) {
+            reason = `${this} is out of movement.`;
+        }
+        else if(tile.beaver !== null) {
+            reason = `${tile} is already occupied by ${tile.beaver}.`;
+        }
+        else if(tile.lodgeOwner !== null && tile.lodgeOwner !== player) {
+            reason = `${tile} contains an enemy lodge!`;
+        }
+        else if(tile.spawner !== null) {
+            reason = `${tile} contains ${tile.spawner}!`;
+        }
+        else {
+            if(this.tile.tileAgainstFlow(tile)) {
+                moveCost++;
+            }
+
+            if(this.tile.isInFlowDirection(tile)) {
+                moveCost--;
+            }
+
+            if(moveCost > this.moves) {
+                reason = `${tile} costs ${moveCost} to reach and ${this} has ${this.moves}.`;
+            }
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        // Here is valid!
+        // remove me from the time I was on
+        this.tile.beaver = null;
+        // update target tile's beaver to this beaver
+        tile.beaver = this;
+        // update this beaver's tile to target tile
+        this.tile = tile;
+        // decrement this beaver's moves count by the move cost
+        this.moves -= moveCost;
+
+        return true;
         // <<-- /Creer-Merge: move -->>
     },
 
@@ -291,6 +335,30 @@ var Beaver = Class(GameObject, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+
+    /**
+     * Checks if this Beaver can do things based on the player and tile (can move, attack, etc)
+     * @param {Player} player - the player commanding this Beeaver
+     * @param {Tile} tile - the tile trying to do something to
+     * @returns {string|undefined} the reason this is invalid (still in need of formatting), undefined if valid
+     */
+    _check: function(player, tile) {
+        if(!player || player !== this.game.currentPlayer) {
+            return `${player} it is not your turn.`;
+        }
+        else if(this.owner !== player) {
+            return `${this} is not owned by you.`;
+        }
+        else if(this.health <= 0) {
+            return `${this} is dead.`;
+        }
+        else if(this.distracted > 0) {
+            return `${this} is distracted for ${this.distracted} more turns.`;
+        }
+        else if(!tile) {
+            return `${tile} is not a valid Tile.`;
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

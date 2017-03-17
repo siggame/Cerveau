@@ -3,6 +3,7 @@
 var Class = require("classe");
 var log = require(__basedir + "/gameplay/log");
 var TiledTile = require(__basedir + "/gameplay/shared/tiledTile");
+var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
 var GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -126,6 +127,25 @@ var Tile = Class(GameObject, TiledTile, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Checks if a tile is in flow with another tile
+     * @param {Tile} tile - the tile to ceck in flow with
+     * @returns {bool} boolean if this tile is in flow with the provided tile
+     */
+    isInFlowDirection: function(tile) {
+        return Boolean(tile && this.getNeighbor(this.flowDirection) === tile);
+    },
+
+    /**
+     * Checks if a tile is in flow with another tile
+     * @param {Tile} tile - the tile to ceck in flow with
+     * @returns {bool} boolean if this tile is in flow with the provided tile
+     */
+    IsAgainstFlowDirection: function(tile) {
+        return Boolean(tile && this.getNeighbor(TiledGame.reverseDirection(tile.flowDirection) === tile));
+    },
+
+
 
     //<<-- /Creer-Merge: added-functions -->>
 
