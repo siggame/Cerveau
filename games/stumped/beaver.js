@@ -128,7 +128,7 @@ var Beaver = Class(GameObject, {
         else if(this.actions <= 0) {
             reason = `${this} has no more actions.`;
         }
-        else if((this.branches+this.tile.branches) < player.branchesToBuildLodge) {
+        else if((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
             reason = `${this} does not have enough branches to build the lodge.`;
         }
         else if(this.tile.lodgeOwner !== null) {
@@ -154,6 +154,7 @@ var Beaver = Class(GameObject, {
         }
         this.actions--;
         this.tile.lodgeOwner = player;
+        this.player.lodges.push(this.tile);
 
         return true;
         // <<-- /Creer-Merge: buildLodge -->>
