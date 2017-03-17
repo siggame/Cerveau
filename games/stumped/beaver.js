@@ -168,9 +168,42 @@ var Beaver = Class(GameObject, {
     buildLodge: function(player, asyncReturn) {
         // <<-- Creer-Merge: buildLodge -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's buildLodge function here
-        return false;
+        let reason = this._check(player, this.tile);
+        if(reason) {
+            // reason already exists, don't update with new reason
+        }
+        else if(this.actions <= 0) {
+            reason = `${this} has no more actions.`;
+        }
+        else if((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
+            reason = `${this} does not have enough branches to build the lodge.`;
+        }
+        else if(this.tile.lodgeOwner !== null) {
+            reason = `${this.tile} already has a lodge owned by ${this.tile.lodgeOwner}.`;
+        }
+        else if(this.tile.spawner !== null) {
+            reason = `${this.tile} has a spawner which cannot be built over.`;
+        }
 
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        // valid, build lodge
+
+        // overcharge tile's branches
+        this.tile.branches -= player.branchesToBuildLodge;
+        if(this.tile.branches < 0) {
+            // make up difference with this beaver's branches
+            // NOTE tile has a debt, ie a negative value being added
+            this.branches += this.tile.branches;
+            this.tile.branches = 0;
+        }
+        this.actions--;
+        this.tile.lodgeOwner = player;
+        this.player.lodges.push(this.tile);
+
+        return true;
         // <<-- /Creer-Merge: buildLodge -->>
     },
 
