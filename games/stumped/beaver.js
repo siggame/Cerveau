@@ -398,10 +398,54 @@ var Beaver = Class(GameObject, {
      * @returns {boolean} True if successfully picked up a resource, false otherwise.
      */
     pickup: function(player, resource, amount, asyncReturn) {
+        let tile = this.tile;
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's pickup function here
-        return false;
+        let reason = this._check(player, tile);
+
+        if(this.health <= 0 ) {
+            reason = `${this} is dead.`;
+        }
+        else if(this.actions <= 0) {
+            reason = `${this} can not take any more actions this turn.`;
+        }
+        else if(resource[0] !== "f" && resource[0] !== "b") {
+            reason = `${resource} that is not a valid resource.`;
+        }
+        else if(resource[0] === "b" && this.tile.branches < amount) {
+            reason = `${this.tile} does not have ${amount} branch(es).`;
+        }
+        else if(resource[0] === "f" && this.tile.fish < amount ) {
+            reason = `${this.tile} does not have ${amount} fish.`;
+        }
+        else if((this.job.carryLimmit - (this.fish + this.branches)) < amount ) {
+            reason = `${this} does not have the carry capicity for this amount.` ;
+        }
+        else if(this.distracted > 0) {
+            reason = `${this.distracted} turns til ${this} is not distracted and is able to pick up resources.`;
+        }
+        else if(amount < 0) {
+            reason = `${this} can not pick up a negative amount of ${resource}.`;
+        }
+
+        if(reason) {
+            return this.game.logicError(false, reason);
+        }
+
+        // If no errors occur
+        this.actions--;
+
+        if(resource[0] === "b") {
+            this.branches += amount;
+            this.tile.branches -= amount;
+        }
+        else { // (resource[0] === "f") {
+            this.fish += amount;
+            this.tile.fish -= amount;
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: pickup -->>
     },
