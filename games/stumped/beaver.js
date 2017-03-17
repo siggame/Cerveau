@@ -189,22 +189,17 @@ var Beaver = Class(GameObject, {
      * @returns {boolean} True if successfully picked up a resource, false otherwise.
      */
     pickup: function(player, resource, amount, asyncReturn) {
+        let tile = this.tile;
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's pickup function here
-        let reason;
+        let reason = this._check(player, tile);
 
         if(this.health <= 0 ) {
             reason = `${this} is dead.`;
         }
         else if(this.actions <= 0) {
             reason = `${this} can not take any more actions this turn.`;
-        }
-        else if(this.owner !== player) {
-            reason = `${this} is not your beaver.`;
-        }
-        else if(player !== this.game.currentPlayer) {
-            reason = `${player}, it is not your turn.`;
         }
         else if(resource[0] !== "f" && resource[0] !== "b") {
             reason = `${resource} that is not a valid resource.`;
