@@ -142,8 +142,8 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
-        this.mapWidth = this.mapWidth || 30;
-        this.mapHeight = this.mapHeight || 60;
+        this.mapWidth = this.mapWidth || 60;
+        this.mapHeight = this.mapHeight || 30;
 
         this.maxTurns = this.maxTurns || 500;
 
@@ -151,16 +151,18 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
 
         this.jobs.push(
-            this.create("Job", {"title": "Normal"}),
-            this.create("Job", {"title": "Buff"}),
-            this.create("Job", {"title": "Tank"}),
-            this.create("Job", {"title": "Fisher"}),
-            this.create("Job", {"title": "Swimmer"}),
-            this.create("Job", {"title": "Hot Lady"}),
-            this.create("Job", {"title": "Builder"})
+            this.create("Job", { "title": "Normal" }),
+            this.create("Job", { "title": "Buff" }),
+            this.create("Job", { "title": "Tank" }),
+            this.create("Job", { "title": "Fisher" }),
+            this.create("Job", { "title": "Swimmer" }),
+            this.create("Job", { "title": "Hot Lady" }),
+            this.create("Job", { "title": "Builder" })
         );
 
         this.spawnerTypes.push("Fish", "Branch");
+
+        this.newBeavers = [];
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -213,7 +215,225 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Invoked when the current player ends their turn. Perform in between game logic here
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    nextTurn: function() {
+        // before we go to the next turn, reset variables and do end of turn logic
+        this.updateBeavers();
+        this.updateResources();
+        this.cleanupArrays();
+
+
+        if(this.checkForWinner()) {
+            return;
+        }
+
+        // else continue to the next player (normal next turn logic)
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    checkForWinner: function() {
+        // Check if a player has created 10 lodges (they are built instantly)
+        // Check if this.maxTurns turns have passed, and if so, in this order:
+        // - Player with most lodges wins
+        // - Player with most branches wins
+        // - Player with most fish wins
+        // - Random player wins
+
+        // Get player info
+        let playerInfo = [];
+
+        for(let i = 0; i < this.players.length; i++) {
+            let player = this.players[i];
+
+            playerInfo[i] = {
+                "lodges": player.lodges.length,
+                "branches": 0,
+                "fish": 0,
+            };
+
+            for(let j = 0; j < player.beavers.length; j++) {
+                let beaver = player.beavers[j];
+
+                playerInfo[i]["branches"] += beaver.branches;
+                playerInfo[i]["fish"] += beaver.fish;
+            }
+        }
+
+        let checkSecondaryConditions = this.currentTurn >= this.maxTurns - 1;
+        if(this.currentTurn % this.players.length === 0) {
+            // Check if a player has created the required number lodges
+            let max = 0;
+            let playerWithMax = -1;
+            for(let player = 0; player < playerInfo.length; player++) {
+                let playerLodges = playerInfo[player]["lodges"];
+
+                if(playerLodges > max) {
+                    max = playerLodges;
+                    playerWithMax = player;
+                }
+                else if(playerLodges === max) {
+                    playerWithMax = -1;
+                }
+            }
+
+            if(max >= this.lodgesCompleteToWin && playerWithMax >= 0) {
+                let losers = this.players.clone();
+                this.declareWinner(losers[playerWithMax], "Player has won because they have the most lodges.");
+                losers.splice(playerWithMax, 1);
+                this.declareLosers(losers, "Player does not have most lodges.");
+                return true;
+            }
+            else if(max >= this.lodgesCompleteToWin) {
+                checkSecondaryConditions = true;
+            }
+        }
+
+        // Check if the maximum number of turns have passed
+        if(checkSecondaryConditions) {
+            // Find the player with the most lodges
+            let max = 0;
+            let playerWithMax = -1;
+            for(let player = 0; player < playerInfo.length; player++) {
+                let playerLodges = playerInfo[player]["lodges"];
+
+                if(playerLodges > max) {
+                    max = playerLodges;
+                    playerWithMax = player;
+                }
+                else if(playerLodges === max) {
+                    playerWithMax = -1;
+                }
+            }
+
+            if(playerWithMax >= 0) {
+                let losers = this.players.clone();
+                this.declareWinner(losers[playerWithMax], "Player has won because they have the most lodges.");
+                losers.splice(playerWithMax, 1);
+                this.declareLosers(losers, "Player does not have most lodges.");
+                return true;
+            }
+
+            // Find the player with the most branches
+            max = 0;
+            playerWithMax = -1;
+            for(let player = 0; player < playerInfo.length; player++) {
+                let playerLodges = playerInfo[player]["branches"];
+
+                if(playerLodges > max) {
+                    max = playerLodges;
+                    playerWithMax = player;
+                }
+                else if(playerLodges === max) {
+                    playerWithMax = -1;
+                }
+            }
+
+            if(playerWithMax >= 0) {
+                let losers = this.players.clone();
+                this.declareWinner(losers[playerWithMax], "Player has won because they have the most branches.");
+                losers.splice(playerWithMax, 1);
+                this.declareLosers(losers, "Player does not have most branches.");
+                return true;
+            }
+
+            // Find the player with the most fish
+            max = 0;
+            playerWithMax = -1;
+            for(let player = 0; player < playerInfo.length; player++) {
+                let playerLodges = playerInfo[player]["fish"];
+
+                if(playerLodges > max) {
+                    max = playerLodges;
+                    playerWithMax = player;
+                }
+                else if(playerLodges === max) {
+                    playerWithMax = -1;
+                }
+            }
+
+            if(playerWithMax >= 0) {
+                let losers = this.players.clone();
+                this.declareWinner(losers[playerWithMax], "Player has won because they have the most fish.");
+                losers.splice(playerWithMax, 1);
+                this.declareLosers(losers, "Player does not have most fish.");
+                return true;
+            }
+
+            // Pick a random player
+            let winner = Math.floor(Math.random() * this.players.length);
+            let losers = this.players.clone();
+            this.declareWinner(losers[winner], "Player was randomly selected.");
+            losers.splice(playerWithMax, 1);
+            this.declareLosers(losers, "Player was not randomly selected.");
+            return true;
+        }
+
+        return false;
+    },
+
+    updateBeavers: function() {
+        for(let i = 0; i < this.beavers.length; i++) {
+            let beaver = this.beavers[i];
+            beaver.distracted = (beaver.distracted > 0) ? beaver.distracted - 1 : beaver.distracted;
+        }
+    },
+
+    updateResources: function() {
+        let tilesChecked = [];
+        for(let i = 0; i < this.tiles.length; i++) {
+            let tile = this.tiles[i];
+
+            // Kill fish on land
+            if(tile.fish > 0 && tile.type === "Land") {
+                tile.fish--;
+            }
+
+            // Move branches downstream
+            this.moveBranches(tile, tilesChecked);
+
+            // Spawn new resources
+            if(tile.spawner) {
+                tile.spawner.health += 1;
+            }
+        }
+    },
+
+    moveBranches: function(tile, tilesChecked) {
+        if(tile in tilesChecked) {
+            return;
+        }
+
+        tilesChecked.push(tile);
+        if(tile.type === "Water" && tile.flowDirection !== "") {
+            let nextTile = tile["tile" + tile.flowDirection];
+            if(nextTile) {
+                this.moveBranches(nextTile, tilesChecked);
+                nextTile.branches += tile.branches;
+                tile.branches = 0;
+            }
+        }
+    },
+
+    cleanupArrays: function() {
+        // For each beaver, if its health <= 0
+        // - remove it from this.beavers
+        // - set beaver.tile.beaver = null
+        // - remove it from beaver.owner.beavers
+        for(let i = 0; i < this.beavers.length; i++) {
+            let beaver = this.beavers[i];
+
+            if(beaver.health <= 0) {
+                this.beavers.removeElement(beaver);
+                beaver.tile.beaver = null;
+                beaver.owner.beavers.removeElement(beaver);
+            }
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

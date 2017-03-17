@@ -120,11 +120,43 @@ var Job = Class(GameObject, {
      * @returns {Beaver} The recruited Beaver if successful, null otherwise.
      */
     recruit: function(player, lodge, asyncReturn) {
+        let tile = lodge;
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Job's recruit function here
-        return null;
+        let reason;
 
+        if(!player || player !== this.game.currentPlayer) {
+            reason = `Not ${player}'s turn.`;
+        }
+        else if(!tile) {
+            reason = `${tile} is not a valid Tile.`;
+        }
+        else if(tile.lodgeOwner !== player) {
+            reason = `${tile} is not owned by ${player}.`;
+        }
+        else if(tile.beaver) {
+            reason = `There's already ${tile.beaver} at that lodge`;
+        }
+        else if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.fish < this.cost) {
+            reason = `${tile} does not have enough fish available. (${tile.fish}/${this.cost})`;
+        }
+
+        if(reason) {
+            return this.game.logicError(null, reason);
+        }
+
+        let beaver = this.game.create("Beaver", {
+            job: this,
+            owner: player,
+            tile: tile,
+        });
+
+        tile.beaver = beaver;
+        if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
+            tile.fish -= this.cost;
+        }
+
+        return beaver;
         // <<-- /Creer-Merge: recruit -->>
     },
 
