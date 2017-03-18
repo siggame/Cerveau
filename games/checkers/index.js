@@ -118,15 +118,18 @@ classes.Checker._deltaMergeableProperties = {
 
 
 classes.Checker.isMine.cerveau = {
+    invalidate: classes.Checker.invalidateIsMine,
     args: [
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Checker.move.cerveau = {
+    invalidate: classes.Checker.invalidateMove,
     args: [
         {
             name: "x",
@@ -141,6 +144,7 @@ classes.Checker.move.cerveau = {
         type: {"is_game_object": true, "keyType": null, "name": "Checker", "valueType": null},
         defaultValue: null,
     },
+    invalidValue: null,
 };
 
 //<<-- Creer-Merge: secret-Checker -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -172,6 +176,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",

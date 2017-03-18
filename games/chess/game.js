@@ -1,9 +1,9 @@
 // Game: The traditional 8x8 chess board with pieces.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -12,7 +12,7 @@ var Chess = require("chess.js").Chess; // a very popular chess framework we will
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: The traditional 8x8 chess board with pieces.
-var Game = Class(TwoPlayerGame, TurnBasedGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
@@ -97,8 +97,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
 
         this.chess = new Chess();
 
-        if(data.fen && this.chess.validate_fen(data.fen)) {
-            this.chess.load(data.fen);
+        if(data.fen) {
+            // trim whitespace, as chess.js will see trailing whitespace as an illegal string
+            let fen = (data.fen || "").trim();
+            let validated = this.chess.validate_fen(fen);
+            if(validated && validated.valid) {
+                this.chess.load(fen);
+            }
+            else {
+                this._fenInvalid = validated ? validated.error : "Invalid FEN string";
+            }
         }
 
         this.maxTurns = 6000; // longest possible known game without stalemate is 5,950
@@ -168,6 +176,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
                 this.pieces.push(piece);
                 piece.owner.pieces.push(piece);
             }
+        }
+
+        // if not every player has 1 king, then the fen was validated, but the game can't be completed
+        if(!this.players.every((player) => player.pieces.some((piece) => piece.type === "King"))) {
+            this._fenInvalid = "Not every player has a king, so the game is un-winnable.";
+        }
+
+        if(this._fenInvalid) {
+            this.declareLosers(this.players, `Invalid Game - The initial state from the FEN string is invalid: ${this._fenInvalid}`);
+            return;
         }
 
         this._generateMoves();

@@ -13,7 +13,6 @@
                 ],
                 "arguments": [
                     {
-                        "//": "this argument exists mostly as a template for creer templates for an AI function with arguments, and that returns nothing",
                         "default": null,
                         "description": "The checker that was captured.",
                         "name": "checker",
@@ -88,7 +87,6 @@
             "checkerMoved": {
                 "default": null,
                 "description": "The checker that last moved and must be moved because only one checker can move during each players turn.",
-                "k-means": "sum",
                 "type": {
                     "is_game_object": true,
                     "keyType": null,
@@ -99,7 +97,6 @@
             "checkerMovedJumped": {
                 "default": null,
                 "description": "If the last checker that moved jumped, meaning it can move again.",
-                "k-means": "sum",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -211,7 +208,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "maxInvalidsPerPlayer": 10,
         "name": "Checkers",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -232,7 +228,6 @@
                 "kinged": {
                     "default": false,
                     "description": "If the checker has been kinged and can move backwards.",
-                    "k-means": "sum",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -285,6 +280,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if it is yours, false if it is not yours.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -330,6 +326,7 @@
                     "returns": {
                         "default": null,
                         "description": "Returns the same checker that moved if the move was successful. null otherwise.",
+                        "invalidValue": null,
                         "type": {
                             "is_game_object": true,
                             "keyType": null,

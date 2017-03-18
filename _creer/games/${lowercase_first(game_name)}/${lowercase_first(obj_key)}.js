@@ -1,12 +1,12 @@
 // ${obj_key}: ${obj['description']}
 <%include file="functions.noCreer" />
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
+const Class = require("classe");
+const log = require(`${'$'}{__basedir}/gameplay/log`);
 % for parent_class in obj['serverParentClasses']:
-var ${parent_class} = require(__basedir + "/gameplay/shared/${lowercase_first(parent_class)}");
+const ${parent_class} = require(`${'$'}{__basedir}/gameplay/shared/${lowercase_first(parent_class)}`);
 % endfor
 % for parent_class in obj['parentClasses']:
-var ${parent_class} = require("./${lowercase_first(parent_class)}");
+const ${parent_class} = require("./${lowercase_first(parent_class)}");
 % endfor
 <%parent_classes = obj['parentClasses']
 all_parent_classes = obj['parentClasses'] + obj['serverParentClasses']
@@ -19,7 +19,7 @@ ${merge("//", "requires", """
 """)}
 
 // @class ${obj_key}: ${obj['description']}
-var ${obj_key} = Class(${", ".join(all_parent_classes) + "," if all_parent_classes else ""} {
+let ${obj_key} = Class(${", ".join(all_parent_classes) + "," if all_parent_classes else ""} {
     /**
      * Initializes ${obj_key}s.
      *
@@ -96,9 +96,36 @@ else:
 % for function_name in function_holder['obj']['function_names']:
 <%
     function_parms = function_holder['obj']['functions'][function_name]
+
     if 'serverPredefined' in function_parms and function_parms['serverPredefined']:
         continue
 %>
+% if obj_key != "Game": # invalidate function too!
+    /**
+     * Invalidation function for ${function_name}
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+% if 'arguments' in function_parms:
+% for arg_parms in function_parms['arguments']:
+     * @param {${shared['cerveau']['type'](arg_parms['type'])}} ${arg_parms['name']} - ${arg_parms['description']}
+% endfor
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+% endif
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    ${"invalidate" + upcase_first(function_name)}: function(player${", ".join([""] + function_parms["argument_names"])}, args) {
+${merge("        // ", "invalidate" + upcase_first(function_name), (
+"""
+        // Developer: try to invalidate the game logic for {0}'s {1} function here
+        return undefined; // meaning valid
+
+"""
+).format(obj_key, function_name)
+)}
+    },
+
+% endif
     /**
      * ${function_parms['description']}
      *
@@ -108,25 +135,24 @@ else:
      * @param {${shared['cerveau']['type'](arg_parms['type'])}} ${arg_parms['name']} - ${arg_parms['description']}
 % endfor
 % endif
-% if not 'order' in function_holder:
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
-% endif
 % if function_parms['returns']:
      * @returns {${shared['cerveau']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
-% else:
-    * @returns {undefined} nothing is expected to be returned.
 % endif
      */
-    ${("aiFinished" + upcase_first(function_name)) if 'order' in function_holder else function_name}: function(player${", ".join([""] + function_parms["argument_names"])}${", asyncReturn" if not 'order' in function_holder else ""}) {
+    ${("aiFinished" + upcase_first(function_name)) if 'order' in function_holder else function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {
 ${merge("        // ", function_name, (
 """
         // Developer: Put your game logic for the {0}'s {1} function here
-        return {2};
+        return{2};
 
 """
-).format(obj_key, function_name, shared['cerveau']['default'](function_parms['returns']['type']) if function_parms['returns'] else "undefined")
+).format(
+    obj_key,
+    function_name,
+    (" " + shared['cerveau']['default'](function_parms['returns']['type'])) if function_parms['returns'] else "")
 )}
     },
+
 % endfor
 % endfor
 

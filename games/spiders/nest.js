@@ -1,8 +1,8 @@
 // Nest: A location (node) connected to other Nests via Webs (edges) in the game that Spiders can converge on, regardless of owner.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Nest: A location (node) connected to other Nests via Webs (edges) in the game that Spiders can converge on, regardless of owner.
-var Nest = Class(GameObject, {
+let Nest = Class(GameObject, {
     /**
      * Initializes Nests.
      *

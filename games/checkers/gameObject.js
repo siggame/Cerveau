@@ -1,15 +1,15 @@
 // GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var BaseGameObject = require(__basedir + "/gameplay/shared/baseGameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const BaseGameObject = require(`${__basedir}/gameplay/shared/baseGameObject`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 // any additional requires you want can be required here safely between cree runs
 //<<-- /Creer-Merge: requires -->>
 
 // @class GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
-var GameObject = Class(BaseGameObject, {
+let GameObject = Class(BaseGameObject, {
     /**
      * Initializes GameObjects.
      *

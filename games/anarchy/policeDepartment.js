@@ -1,16 +1,15 @@
 // PoliceDepartment: Used to keep cities under control and raid Warehouses.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var Building = require("./building");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const Building = require("./building");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-// any additional requires you want can be required here safely between cree runs
+const Warehouse = require("./warehouse");
 //<<-- /Creer-Merge: requires -->>
 
 // @class PoliceDepartment: Used to keep cities under control and raid Warehouses.
-var PoliceDepartment = Class(Building, {
+let PoliceDepartment = Class(Building, {
     /**
      * Initializes PoliceDepartments.
      *
@@ -32,34 +31,37 @@ var PoliceDepartment = Class(Building, {
 
 
     /**
+     * Invalidation function for raid
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Warehouse} warehouse - The warehouse you want to raid.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateRaid: function(player, warehouse, args) {
+        // <<-- Creer-Merge: invalidateRaid -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        if(!warehouse || !Class.isInstance(warehouse, Warehouse)) {
+            return `${warehouse} not a valid Warehouse to for ${this} to raid.`;
+        }
+
+        return this._invalidateBribe(player);
+
+        // <<-- /Creer-Merge: invalidateRaid -->>
+    },
+
+    /**
      * Bribe the police to raid a Warehouse, dealing damage equal based on the Warehouse's current exposure, and then resetting it to 0.
      *
      * @param {Player} player - the player that called this.
      * @param {Warehouse} warehouse - The warehouse you want to raid.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {number} The amount of damage dealt to the warehouse, or -1 if there was an error.
      */
-    raid: function(player, warehouse, asyncReturn) {
+    raid: function(player, warehouse) {
         // <<-- Creer-Merge: raid -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        var logicError = this._checkIfBribeIsValid(player, -1);
-        if(logicError) {
-            return logicError;
-        }
-
-        if(!warehouse) {
-            return this.game.logicError(-1, "PoliceDepartment {{{0}}} sent no Warehouse to raid.".format(this.id));
-        }
-
-        if(warehouse.gameObjectName !== "Warehouse") {
-            return this.game.logicError(-1, "PoliceDepartment {{{0}}} commanded to raid warehouse {{{1}}}, however that is not a Warehouse, but instead a '{2}'".format(
-                this.id,
-                warehouse.id,
-                warehouse.gameObjectName
-            ));
-        }
-
-        var oldHealth = warehouse.oldHealth;
+        const oldHealth = warehouse.oldHealth;
         warehouse.health = Math.max(warehouse.health - warehouse.exposure, 0);
         warehouse.exposure = 0;
 
@@ -70,6 +72,7 @@ var PoliceDepartment = Class(Building, {
 
         // <<-- /Creer-Merge: raid -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

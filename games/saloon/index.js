@@ -221,6 +221,7 @@ classes.Cowboy._deltaMergeableProperties = {
 
 
 classes.Cowboy.act.cerveau = {
+    invalidate: classes.Cowboy.invalidateAct,
     args: [
         {
             name: "tile",
@@ -236,9 +237,11 @@ classes.Cowboy.act.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Cowboy.move.cerveau = {
+    invalidate: classes.Cowboy.invalidateMove,
     args: [
         {
             name: "tile",
@@ -249,9 +252,11 @@ classes.Cowboy.move.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Cowboy.play.cerveau = {
+    invalidate: classes.Cowboy.invalidatePlay,
     args: [
         {
             name: "piano",
@@ -262,6 +267,7 @@ classes.Cowboy.play.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Cowboy -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -331,6 +337,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",
@@ -530,6 +537,7 @@ classes.YoungGun._deltaMergeableProperties = {
 
 
 classes.YoungGun.callIn.cerveau = {
+    invalidate: classes.YoungGun.invalidateCallIn,
     args: [
         {
             name: "job",
@@ -540,6 +548,7 @@ classes.YoungGun.callIn.cerveau = {
         type: {"is_game_object": true, "keyType": null, "name": "Cowboy", "valueType": null},
         defaultValue: null,
     },
+    invalidValue: null,
 };
 
 //<<-- Creer-Merge: secret-YoungGun -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

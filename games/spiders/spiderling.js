@@ -1,8 +1,8 @@
 // Spiderling: A Spider spawned by the BroodMother.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var Spider = require("./spider");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const Spider = require("./spider");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var Web = require("./web");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Spiderling: A Spider spawned by the BroodMother.
-var Spiderling = Class(Spider, {
+let Spiderling = Class(Spider, {
     /**
      * Initializes Spiderlings.
      *
@@ -67,46 +67,52 @@ var Spiderling = Class(Spider, {
 
 
     /**
+     * Invalidation function for attack
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Spiderling} spiderling - The Spiderling to attack.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateAttack: function(player, spiderling, args) {
+        // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = Spiderling._invalidate.call(this, player);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(!spiderling || !Spiderling.isInstance(spiderling)) {
+            return `${this} cannot attack because '${spiderling}' is not a Spiderling.`;
+        }
+
+        if(spiderling.nest !== this.nest) {
+            return `${this} cannot attack because '${spiderling}' is not on the same Nest as itself.`;
+        }
+
+        if(this === Spiderling) {
+            return `${this} cannot attack itself.`;
+        }
+
+        if(spiderling.isDead) {
+            return `${this} cannot attack because'${spiderling}' is dead.`;
+        }
+
+        // <<-- /Creer-Merge: invalidateAttack -->>
+    },
+
+    /**
      * Attacks another Spiderling
      *
      * @param {Player} player - the player that called this.
      * @param {Spiderling} spiderling - The Spiderling to attack.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if the attack was successful, false otherwise.
      */
-    attack: function(player, spiderling, asyncReturn) {
+    attack: function(player, spiderling) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Spiderling's attack function here
-
-        var error = Spiderling._validate.call(this, player, false);
-        if(error) {
-            return error;
-        }
-
-        var reason;
-
-        if(!Spiderling.isInstance(spiderling)) {
-            reason = "{this} cannot attack because '{spiderling}' is not a Spiderling.";
-        }
-        else if(spiderling.nest !== this.nest) {
-            reason = "{this} cannot attack because '{spiderling}' is not on the same Nest as itself.";
-        }
-        else if(this === Spiderling) {
-            reason = "{this} cannot attack itself.";
-        }
-        else if(spiderling.isDead) {
-            reason = "{this} cannot attack because'{spiderling}' is dead.";
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason.format({
-                this: this,
-                spiderling,
-            }));
-        }
-
-        // if we got here the attack is valid!
 
         // Rock Paper Scissors
         // Cutter > Weaver > Spitter > Cutter
@@ -138,11 +144,38 @@ var Spiderling = Class(Spider, {
             this.workRemaining = 1;
         }
 
-        this.game.csHack();
-
         return true;
 
         // <<-- /Creer-Merge: attack -->>
+    },
+
+
+    /**
+     * Invalidation function for move
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Web} web - The Web you want to move across to the other Nest.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateMove: function(player, web, args) {
+        // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = Spiderling._invalidate.call(this, player);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(!web || !Web.isInstance(web)) {
+            return `${web} is not a Web for ${this} to move on.`;
+        }
+
+        if(!web.isConnectedTo(this.nest)) {
+            return `${web} is not connected to ${this.nest} for ${this} to move on.`;
+        }
+
+        // <<-- /Creer-Merge: invalidateMove -->>
     },
 
     /**
@@ -150,34 +183,10 @@ var Spiderling = Class(Spider, {
      *
      * @param {Player} player - the player that called this.
      * @param {Web} web - The Web you want to move across to the other Nest.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if the move was successful, false otherwise.
      */
-    move: function(player, web, asyncReturn) {
+    move: function(player, web) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        var error = Spiderling._validate.call(this, player, false);
-        if(error) {
-            return error;
-        }
-
-        var reason;
-
-        if(!web || !Web.isInstance(web)) {
-            reason = "{web} is not a Web for {this} to move on.";
-        }
-        else if(!web.isConnectedTo(this.nest)) {
-            reason = "{web} is not connected to {this.nest} for {this} to move on.";
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason.format({
-                this: this,
-                web: web,
-            }));
-        }
-
-        // if we got here the move is valid
 
         this.busy = "Moving";
         this.workRemaining = Math.ceil(web.length / this.game.movementSpeed);
@@ -191,12 +200,11 @@ var Spiderling = Class(Spider, {
         web.spiderlings.push(this);
         web.addLoad(1);
 
-        this.game.csHack();
-
         return true;
 
         // <<-- /Creer-Merge: move -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -228,23 +236,20 @@ var Spiderling = Class(Spider, {
     },
 
     /**
-     * Validates that this spiderling is not busy
+     * Tries to invalidate args for a Spiderlings action
      *
      * @override
      * @param {Player} player - the player validating for
-     * @param {*} invalidReturnValue - if an error is returned, this is the inavalid return value sent to the client
      * @returns {Cerveau.GameLogicError} an error is returned if invalid, undefined otherwise
      */
-    _validate: function(player, invalidReturnValue) {
-        var error = Spider._validate.apply(this, arguments);
-        if(error) {
-            return error;
+    _invalidate: function(player) {
+        const invalid = Spider._invalidate.apply(this, arguments);
+        if(invalid) {
+            return invalid;
         }
 
         if(this.busy) {
-            return this.game.logicError(invalidReturnValue, "{this} is already busy with '{this.busy}'.".format({
-                this: this,
-            }));
+            return `${this} is already busy with '${this.busy}'.`;
         }
     },
 

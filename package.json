@@ -41,7 +41,8 @@
   },
   "scripts": {
     "lint": "eslint --cache ./",
-    "apidoc": "apidoc -i ./website/ -o ./api-docs"
+    "apidoc": "apidoc -i ./website/ -o ./api-docs",
+    "fix": "eslint --cache ./ --fix"
   },
   "license": "MIT"
 }

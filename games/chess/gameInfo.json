@@ -178,7 +178,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "maxInvalidsPerPlayer": 10,
         "name": "Chess",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -481,7 +480,6 @@
                     }
                 },
                 "hasMoved": {
-                    "arenaInterest": "sum",
                     "default": null,
                     "description": "If the Piece has moved from its starting position.",
                     "type": {
@@ -513,7 +511,7 @@
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of chess Piece this is, either: 'King', 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
+                    "description": "The type of chess Piece this is, either 'King, 'Queen', 'Knight', 'Rook', 'Bishop', or 'Pawn'.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -578,6 +576,7 @@
                     "returns": {
                         "default": null,
                         "description": "The Move you did if successful, otherwise null if invalid. In addition if your move was invalid you will lose.",
+                        "invalidValue": null,
                         "type": {
                             "is_game_object": true,
                             "keyType": null,

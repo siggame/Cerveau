@@ -1,8 +1,8 @@
 // Furnishing: An furnishing in the Saloon that must be pathed around, or destroyed.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Furnishing: An furnishing in the Saloon that must be pathed around, or destroyed.
-var Furnishing = Class(GameObject, {
+let Furnishing = Class(GameObject, {
     /**
      * Initializes Furnishings.
      *

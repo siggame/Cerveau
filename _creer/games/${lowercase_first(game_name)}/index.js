@@ -26,9 +26,11 @@ classes.${game_obj_name}._deltaMergeableProperties = {
 % endfor
 };
 <%
-if game_obj_name == 'Game': # because they have no functions, but the AI does
+if game_obj_name == 'Game': # because they have no functions, but the AI does, so use those
+    is_ai = True
     game_obj = ai
-    function_prefix = "aiFinished"
+else:
+    is_ai = False
 %>
 % for function_name in game_obj['function_names']:
 <% function_parms = game_obj['functions'][function_name]
@@ -37,6 +39,9 @@ if game_obj_name == "Game":
     formatted_function_name = "aiFinished" + upcase_first(function_name)
 %>
 classes.${game_obj_name}.${formatted_function_name}.cerveau = {
+% if not is_ai:
+    invalidate: classes.${game_obj_name}.invalidate${upcase_first(formatted_function_name)},
+% endif
     args: [
 % for argument in function_parms['arguments']:
         {
@@ -53,6 +58,9 @@ classes.${game_obj_name}.${formatted_function_name}.cerveau = {
         type: ${json.dumps(function_parms['returns']['type'], sort_keys=True)},
         defaultValue: ${shared['cerveau']['default'](function_parms['returns']['type'], function_parms['returns']['default'])},
     },
+% if not is_ai:
+    invalidValue: ${shared['cerveau']['default'](function_parms['returns']['type'], function_parms['returns']['invalidValue'])},
+% endif
 % endif
 };
 % endfor

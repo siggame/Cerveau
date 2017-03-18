@@ -1,8 +1,8 @@
 // Weaver: A Spiderling that can alter existing Webs by weaving to add or remove silk from the Webs, thus altering its strength.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var Spiderling = require("./spiderling");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const Spiderling = require("./spiderling");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var Spiderling = require("./spiderling");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Weaver: A Spiderling that can alter existing Webs by weaving to add or remove silk from the Webs, thus altering its strength.
-var Weaver = Class(Spiderling, {
+let Weaver = Class(Spiderling, {
     /**
      * Initializes Weavers.
      *
@@ -44,14 +44,30 @@ var Weaver = Class(Spiderling, {
 
 
     /**
+     * Invalidation function for strengthen
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Web} web - The web you want to strengthen. Must be connected to the Nest this Weaver is currently on.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateStrengthen: function(player, web, args) {
+        // <<-- Creer-Merge: invalidateStrengthen -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        return this._invalidateWeave(player, web, "Strengthening");
+
+        // <<-- /Creer-Merge: invalidateStrengthen -->>
+    },
+
+    /**
      * Weaves more silk into an existing Web to strengthen it.
      *
      * @param {Player} player - the player that called this.
      * @param {Web} web - The web you want to strengthen. Must be connected to the Nest this Weaver is currently on.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if the strengthen was successfully started, false otherwise.
      */
-    strengthen: function(player, web, asyncReturn) {
+    strengthen: function(player, web) {
         // <<-- Creer-Merge: strengthen -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         return this._weave(player, web, "Strengthening");
@@ -59,15 +75,32 @@ var Weaver = Class(Spiderling, {
         // <<-- /Creer-Merge: strengthen -->>
     },
 
+
+    /**
+     * Invalidation function for weaken
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Web} web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateWeaken: function(player, web, args) {
+        // <<-- Creer-Merge: invalidateWeaken -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        return this._invalidateWeave(player, web, "Weakening");
+
+        // <<-- /Creer-Merge: invalidateWeaken -->>
+    },
+
     /**
      * Weaves more silk into an existing Web to strengthen it.
      *
      * @param {Player} player - the player that called this.
      * @param {Web} web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if the weaken was successfully started, false otherwise.
      */
-    weaken: function(player, web, asyncReturn) {
+    weaken: function(player, web) {
         // <<-- Creer-Merge: weaken -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         return this._weave(player, web, "Weakening");
@@ -75,7 +108,35 @@ var Weaver = Class(Spiderling, {
         // <<-- /Creer-Merge: weaken -->>
     },
 
+
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+    /**
+     * A generic strengthen/weaken wrapper because both are so similar to try to invalidate it
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Web} web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
+     * @param {string} weaveType - should be "Strengthening" or "Weakening" as appropriate
+     * @returns {boolean} True if the weaken was successfully started, false otherwise.
+     */
+    _invalidateWeave(player, web, weaveType) {
+        var invalid = Spiderling._invalidate.call(this, player, false);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(!web) {
+            return `${web} is not a valid Web to strengthen for ${this}.`;
+        }
+
+        if(this.nest !== web.nestA && this.nest !== web.nestB) {
+            return `${this} can only strengthen Webs connected to ${this.nest}, ${web} is not.`;
+        }
+
+        if(weaveType === "Weakening" && web.strength <= 1) {
+            return `${this} cannot weaken ${web} as its strength is at the minimum (1).`;
+        }
+    },
 
     /**
      * A generic strengthen/weaken wrapper because both are so similar
@@ -86,31 +147,6 @@ var Weaver = Class(Spiderling, {
      * @returns {boolean} True if the weaken was successfully started, false otherwise.
      */
     _weave: function(player, web, weaveType) {
-        var error = Spiderling._validate.call(this, player, false);
-        if(error) {
-            return error;
-        }
-
-        var reason;
-        if(!web) {
-            reason = "{web} is not a valid Web to strengthen for {this}.";
-        }
-        else if(this.nest !== web.nestA && this.nest !== web.nestB) {
-            reason = "{this} can only strengthen Webs connected to {this.nest}, {web} is not.";
-        }
-        else if(weaveType === "Weakening" && web.strength <= 1) {
-            reason = "{this} cannot weaken {web} as its strength is at the minimum (1).";
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason.format({
-                this: this,
-                web: web,
-            }));
-        }
-
-        // if we got here it is valid!
-
         this.busy = weaveType;
 
         var webField = weaveType.toLowerCase() + "Web";
@@ -120,9 +156,7 @@ var Weaver = Class(Spiderling, {
         this.workRemaining = web.length * Math.sqrt(web.strength) / this.game.weaveSpeed;
 
         // find coworkers
-        var sideSpiders = web.getSideSpiders();
-        for(var i = 0; i < sideSpiders.length; i++) {
-            var spider = sideSpiders[i];
+        for(const spider of web.getSideSpiders()) {
             if(spider !== this && spider[webField] === web) {
                 this.coworkers.push(spider);
                 this.numberOfCoworkers = this.coworkers.length;
@@ -131,10 +165,7 @@ var Weaver = Class(Spiderling, {
             }
         }
 
-        this.game.csHack();
-
         return true;
-
     },
 
     /**

@@ -143,7 +143,7 @@ var prototype = {
 
 // We copy all the functions from the Array prototype to this prototype so it can act like an array. They above functions have to be manually re-written so the properties get created correctly
 // NOTE: These functions SHOULD all work, because DeltaMergeableArrays function like a normal Array, but errors could happen. Be careful
-var arrayPrototypeKeys = Object.getOwnPropertyNames(Array.prototype);
+var arrayPrototypeKeys = Object.getOwnPropertyNames(Array.prototype).concat(Object.getOwnPropertySymbols(Array.prototype));
 for(var i = 0; i < arrayPrototypeKeys.length; i++) {
     var property = arrayPrototypeKeys[i];
     if(!prototype.hasOwnProperty(property)) {
@@ -156,7 +156,7 @@ for(var i = 0; i < arrayPrototypeKeys.length; i++) {
 }
 
 /**
- * @class DeltaMergeableArray - a re-implimentation of the native js Array that tracks its deltas
+ * @class DeltaMergeableArray - a re-implementation of the native js Array that tracks its deltas
  */
 var DeltaMergeableArray = Class(DeltaMergeable, prototype);
 module.exports = DeltaMergeableArray;

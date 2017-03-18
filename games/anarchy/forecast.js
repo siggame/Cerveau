@@ -1,8 +1,8 @@
 // Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -10,7 +10,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
-var Forecast = Class(GameObject, {
+let Forecast = Class(GameObject, {
     /**
      * Initializes Forecasts.
      *

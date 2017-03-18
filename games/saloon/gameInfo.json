@@ -303,7 +303,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "maxInvalidsPerPlayer": 10,
         "name": "Saloon",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -619,6 +618,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the act worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -651,6 +651,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -683,6 +684,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the play worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1554,6 +1556,7 @@
                     "returns": {
                         "default": null,
                         "description": "The new Cowboy that was called in if valid. They will not be added to any `cowboys` lists until the turn ends. Null otherwise.",
+                        "invalidValue": null,
                         "type": {
                             "is_game_object": true,
                             "keyType": null,

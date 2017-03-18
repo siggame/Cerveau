@@ -1,10 +1,10 @@
 // Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
-var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
+const TiledGame = require(`${__basedir}/gameplay/shared/tiledGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -13,7 +13,7 @@ var gaussian = require("gaussian");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: Use cowboys to have a good time and play some music on a Piano, while brawling with enemy Cowboys.
-var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
      * Initializes Games.
      *

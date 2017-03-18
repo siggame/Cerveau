@@ -54,15 +54,19 @@ var GameManager = Class({
      *
      * @param {Array.<Object>} argsStructure - array of args information
      * @param {Array} untreatedArgs - args as sent that have not been sanitized
+     * @param {Object} [args] - the arguments as a key value dictionary
      * @returns {Array} a new array of sanitized args
      */
-    _sanitizeArgs: function(argsStructure, untreatedArgs) {
+    _sanitizeArgs: function(argsStructure, untreatedArgs, args) {
         var sanitized = [];
         for(var i = 0; i < argsStructure.length; i++) {
             var arg = argsStructure[i];
             var val = untreatedArgs[arg.name] || untreatedArgs[i];
 
             sanitized[i] = this._sanitizeValue(val, arg);
+            if(args !== undefined) {
+                args[arg.name] = val;
+            }
         }
 
         return sanitized;
@@ -84,10 +88,11 @@ var GameManager = Class({
      *
      * @param {Function} runFunction - the ai run function
      * @param {Object} kwargs - key word formatted args (not array in order)
+     * @param {Object} args - key/value arguments object sanitized
      * @returns {Array} sanitized args for the run
      */
-    sanitizeRun: function(runFunction, kwargs) {
-        return this._sanitizeArgs(runFunction.cerveau.args, kwargs);
+    sanitizeRun: function(runFunction, kwargs, args) {
+        return this._sanitizeArgs(runFunction.cerveau.args, kwargs, args);
     },
 
     /**
