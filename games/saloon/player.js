@@ -1,8 +1,8 @@
 // Player: A player in this game. Every AI controls one player.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Player: A player in this game. Every AI controls one player.
-var Player = Class(GameObject, {
+let Player = Class(GameObject, {
     /**
      * Initializes Players.
      *

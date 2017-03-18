@@ -233,7 +233,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "maxInvalidsPerPlayer": 10,
         "name": "Anarchy",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -498,6 +497,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the bribe worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1240,6 +1240,7 @@
                     "returns": {
                         "default": null,
                         "description": "The amount of damage dealt to the warehouse, or -1 if there was an error.",
+                        "invalidValue": -1,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1519,6 +1520,7 @@
                     "returns": {
                         "default": null,
                         "description": "The exposure added to this Building's exposure. -1 is returned if there was an error.",
+                        "invalidValue": -1,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1777,6 +1779,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the intensity was changed, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1811,6 +1814,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the rotation worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,

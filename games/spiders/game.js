@@ -1,9 +1,9 @@
 // Game: There's an infestation of enemy spiders challenging your queen broodmother spider! Protect her and attack the other broodmother in this turn based, node based, game.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -12,7 +12,7 @@ var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: There's an infestation of enemy spiders challenging your queen broodmother spider! Protect her and attack the other broodmother in this turn based, node based, game.
-var Game = Class(TwoPlayerGame, TurnBasedGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
@@ -481,15 +481,6 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
         this._secondaryWin("Max turns reached (" + this.maxTurns + ")");
 
         return returned;
-    },
-
-    /**
-     * a HACK to give C# players time back for calls to server. will be removed when c# client is fixed
-     */
-    csHack: function() {
-        if(this.currentPlayer.clientType === "#C") {
-            this.currentPlayer.timeRemaining += 2e8;
-        }
     },
 
     //<<-- /Creer-Merge: added-functions -->>

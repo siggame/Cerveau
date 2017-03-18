@@ -181,6 +181,7 @@ classes.FireDepartment._deltaMergeableProperties = {
 
 
 classes.FireDepartment.extinguish.cerveau = {
+    invalidate: classes.FireDepartment.invalidateExtinguish,
     args: [
         {
             name: "building",
@@ -191,6 +192,7 @@ classes.FireDepartment.extinguish.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-FireDepartment -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -250,6 +252,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",
@@ -361,6 +364,7 @@ classes.PoliceDepartment._deltaMergeableProperties = {
 
 
 classes.PoliceDepartment.raid.cerveau = {
+    invalidate: classes.PoliceDepartment.invalidateRaid,
     args: [
         {
             name: "warehouse",
@@ -371,6 +375,7 @@ classes.PoliceDepartment.raid.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
+    invalidValue: -1,
 };
 
 //<<-- Creer-Merge: secret-PoliceDepartment -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -397,6 +402,7 @@ classes.Warehouse._deltaMergeableProperties = {
 
 
 classes.Warehouse.ignite.cerveau = {
+    invalidate: classes.Warehouse.invalidateIgnite,
     args: [
         {
             name: "building",
@@ -407,6 +413,7 @@ classes.Warehouse.ignite.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
+    invalidValue: -1,
 };
 
 //<<-- Creer-Merge: secret-Warehouse -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -423,6 +430,7 @@ classes.WeatherStation._deltaMergeableProperties = {
 
 
 classes.WeatherStation.intensify.cerveau = {
+    invalidate: classes.WeatherStation.invalidateIntensify,
     args: [
         {
             name: "negative",
@@ -434,9 +442,11 @@ classes.WeatherStation.intensify.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.WeatherStation.rotate.cerveau = {
+    invalidate: classes.WeatherStation.invalidateRotate,
     args: [
         {
             name: "counterclockwise",
@@ -448,6 +458,7 @@ classes.WeatherStation.rotate.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-WeatherStation -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

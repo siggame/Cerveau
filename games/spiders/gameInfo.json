@@ -233,7 +233,6 @@
         "inheritedAttributes": {},
         "inheritedFunction_names": [],
         "inheritedFunctions": {},
-        "maxInvalidsPerPlayer": 10,
         "name": "Spiders",
         "numberOfPlayers": 2,
         "parentClasses": [],
@@ -299,6 +298,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the Spiderling was consumed. False otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -331,6 +331,7 @@
                     "returns": {
                         "default": null,
                         "description": "The newly spwaned Spiderling if successful. Null otherwise.",
+                        "invalidValue": null,
                         "type": {
                             "is_game_object": true,
                             "keyType": null,
@@ -503,6 +504,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the cut was successfully started, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -687,6 +689,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -744,6 +747,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1415,6 +1419,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1447,6 +1452,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1619,6 +1625,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the spit was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1803,6 +1810,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1860,6 +1868,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1931,6 +1940,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the strengthen was successfully started, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -1963,6 +1973,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the weaken was successfully started, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -2147,6 +2158,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the attack was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -2204,6 +2216,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move was successful, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,

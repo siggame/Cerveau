@@ -1,8 +1,8 @@
 // FireDepartment: Can put out fires completely.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var Building = require("./building");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const Building = require("./building");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -10,7 +10,7 @@ var Building = require("./building");
 //<<-- /Creer-Merge: requires -->>
 
 // @class FireDepartment: Can put out fires completely.
-var FireDepartment = Class(Building, {
+let FireDepartment = Class(Building, {
     /**
      * Initializes FireDepartments.
      *
@@ -38,36 +38,35 @@ var FireDepartment = Class(Building, {
 
 
     /**
+     * Invalidation function for extinguish
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Building} building - The Building you want to extinguish.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateExtinguish: function(player, building, args) {
+        // <<-- Creer-Merge: invalidateExtinguish -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        if(!building || !Class.isInstance(building, Building) || building.isHeadquarters) {
+            return `${building} not a valid building to for ${this} to extinguish.`;
+        }
+
+        return this._invalidateBribe(player);
+
+        // <<-- /Creer-Merge: invalidateExtinguish -->>
+    },
+
+    /**
      * Bribes this FireDepartment to extinguish the some of the fire in a building.
      *
      * @param {Player} player - the player that called this.
      * @param {Building} building - The Building you want to extinguish.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if the bribe worked, false otherwise.
      */
-    extinguish: function(player, building, asyncReturn) {
+    extinguish: function(player, building) {
         // <<-- Creer-Merge: extinguish -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        var logicError = this._checkIfBribeIsValid(player, false);
-        if(logicError) {
-            return logicError;
-        }
-
-        if(!building) {
-            return this.game.logicError(false, "FireDepartment {{{0}}} sent no building to extinguish.".format(this.id));
-        }
-
-        if(!Class.isInstance(building, Building)) {
-            return this.game.logicError(false, "FireDepartment {{{0}}} commanded to extinguish Building {{{1}}}, however that is not a Building, but instead a '{2}'".format(
-                this.id,
-                building.id,
-                building.gameObjectName
-            ));
-        }
-
-        if(building.isHeadquarters) {
-            return this.game.logicError(false, "FireDepartment {{{0}}} commanded to extinguish a headquarters.".format(this.id));
-        }
 
         building.fire = Math.clamp(building.fire - this.fireExtinguished, 0, this.game.maxFire);
 
@@ -78,6 +77,7 @@ var FireDepartment = Class(Building, {
 
         // <<-- /Creer-Merge: extinguish -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

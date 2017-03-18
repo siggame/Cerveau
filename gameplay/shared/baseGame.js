@@ -294,31 +294,34 @@ var BaseGame = Class(DeltaMergeable, {
      * @returns {Promise} A promise that should eventually resolve to whatever the game logic returned from running the 'run' command.
      */
     aiRun: function(player, data) {
-        var self = this;
-        var run = serializer.deserialize(data, this);
-        var runCallback = run.caller[run.functionName];
+        let run = serializer.deserialize(data, this);
+        // try to get from the calling GameObject the function they are invoking
+        let runCallback = run.caller[run.functionName];
 
+        // if we could not find the run function, then reject this run
         if(!runCallback || !runCallback.cerveau) { // then the run callback is invalid
             return new Promise(function(resolve, reject) {
-                reject(new errors.CerveauError("'{}'' is not a valid function name in {}".format(run.functionName, run.caller)));
+                reject(new errors.CerveauError(`'${run.functionName}' is not a valid function name in ${run.caller}`));
             });
         }
+        // else try to run it!
 
-        var ran = {};
+        let ran = {};
 
-        var argsArray;
-        var sendError;
+        let argsObject = {};
+        let argsArray;
+        let sendError;
 
         try {
             if(this.gameManager.isSecret(runCallback)) {
                 data.isSecret = true;
             }
-            argsArray = this.gameManager.sanitizeRun(runCallback, run.args || {});
+            argsArray = this.gameManager.sanitizeRun(runCallback, run.args || {}, argsObject);
         }
         catch(err) {
             if(Class.isInstance(err, errors.CerveauError)) { // then something about the run command was incorrect and we couldn't figure out what they want to run
-                return new Promise(function(resolve, reject) {
-                    self._instance.fatal(err);
+                return new Promise((resolve, reject) => {
+                    this._instance.fatal(err);
                     reject(err);
                 });
             }
@@ -327,29 +330,33 @@ var BaseGame = Class(DeltaMergeable, {
             }
         }
 
-        var asyncReturnWrapper = {}; // just an object both asyncReturn and the promise have scope to to pass things to and from.
-        var asyncReturn = function(asyncReturnValue) {
-            asyncReturnWrapper.callback(asyncReturnValue);
-        }; // callback function setup below
-
+        // the player (AI) running this is the first arg, always
         argsArray.unshift(player);
-        argsArray.push(asyncReturn);
+        // the arguments as key/value pairs as the last arg
+        argsArray.push(argsObject);
 
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             try {
-                var ranReturned = runCallback.apply(run.caller, argsArray);
+                // first, let's run the game's logic to try to invalidate this AI's run
+                let invalid = runCallback.cerveau.invalidate.apply(run.caller, argsArray);
+                let ranReturned;
+                if(invalid) {
+                    // then we need to tell that player that the run is invalid (and won't we ran)
+                    ranReturned = this.logicError(runCallback.invalidReturnValue, invalid);
+                }
+                else { // the run is not invalid, so actually run the function
+                    // the argsObject is a hacky way to pass by reference, so update the position args before we run the actual function
+                    argsArray = this.gameManager.sanitizeRun(runCallback, argsObject);
+                    argsArray.unshift(player); // put the player back into the array
 
-                if(ranReturned === BaseGame._orderFlag) { // then they want to execute an order, and are thus returning the value asynchronously
-                    asyncReturnWrapper.callback = function(asyncReturnValue) {
-                        resolve(self._finishRun(runCallback, player, asyncReturnValue));
-                    };
+                    // now run the actual game logic that's it's validated and the args have been updated
+                    ranReturned = runCallback.apply(run.caller, argsArray);
                 }
-                else {
-                    resolve(self._finishRun(runCallback, player, ranReturned));
-                }
+
+                this._finishRun(runCallback, player, ranReturned, resolve, reject);
             }
             catch(err) {
-                self._instance.fatal(err);
+                this._instance.fatal(err);
                 reject(err);
             }
         });
@@ -361,11 +368,24 @@ var BaseGame = Class(DeltaMergeable, {
      * @param {Function} runCallback - the callback we finished
      * @param {Player} player - the player that requested we run something
      * @param {*} returned - the value we returned, and need to sanitize because statically typed clients are lame
-     * @returns {*} the actual return value, handling invalid messaged if returned was an error
+     * @param {Function} resolve - the resolve function for the promised aiRun
+     * @param {Function} reject - the reject function for the promised aiRun
      */
-    _finishRun: function(runCallback, player, returned) {
-        var isGameLogicError = typeof(returned) === "object" && returned.isGameLogicError;
-        var returnedValue = this.gameManager.sanitizeRan(runCallback, (isGameLogicError ? returned.returned : returned));
+    _finishRun: function(runCallback, player, returned, resolve, reject) {
+        // first check if they returned a promise, and if so just run this once it resolves
+        if(returned instanceof Promise) {
+            returned.then((asyncReturned) => {
+                this._finishRun(runCallback, player, asyncReturned, resolve, reject);
+            }).catch((err) => {
+                this._instance.fatal(err);
+                reject(err);
+            });
+
+            return; // no need to do anything more, the run is asynchronous and they promised a return value
+        }
+
+        let isGameLogicError = typeof(returned) === "object" && returned.isGameLogicError;
+        let returnedValue = this.gameManager.sanitizeRan(runCallback, (isGameLogicError ? returned.returned : returned));
 
         if(isGameLogicError) {
             returned.returned = returnedValue;
@@ -383,7 +403,7 @@ var BaseGame = Class(DeltaMergeable, {
             returned = returnedValue;
         }
 
-        return returned;
+        resolve(returned);
     },
 
     /**

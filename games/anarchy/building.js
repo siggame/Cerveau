@@ -1,8 +1,8 @@
 // Building: A basic building. It does nothing besides burn down. Other Buildings inherit from this class.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -10,7 +10,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Building: A basic building. It does nothing besides burn down. Other Buildings inherit from this class.
-var Building = Class(GameObject, {
+let Building = Class(GameObject, {
     /**
      * Initializes Buildings.
      *
@@ -116,32 +116,30 @@ var Building = Class(GameObject, {
     maxHealth: 100,
 
     /**
-     * does the basic checking that all buildings must meet for valid bribes
+     * Tries to find a reason why the bribe (action) is invalid
      *
      * @param {Player} player - the player trying to bribe this building
-     * @param {*} errorValue - the error value to store in the game logic error
      * @returns {Object|undefined} a game logic error is returned if the bribe is NOT valid, undefined otherwise
      */
-    _checkIfBribeIsValid: function(player, errorValue) {
-        var reason;
-        if(this.owner !== player) {
-            reason = "Player {{{player.id}}} cannot bribe this Building {{{self.id}}} owned by Player {{{self.owner.id}}}.";
-        }
-        else if(player.bribesRemaining <= 0) {
-            reason = "Player {{{player.id}}} has no bribes remaining to bribe Building {{{self.id}}} with.";
-        }
-        else if(this.health <= 0) {
-            reason = "Building {{{self.id}}} has been burned down and cannot be bribed.";
-        }
-        else if(this.bribed) {
-            reason = "Building {{{self.id}}} has already been bribed this turn and cannot be bribed again.";
+    _invalidateBribe: function(player) {
+        if(player !== this.game.currentPlayer) {
+            return `${player} is it not your turn.`;
         }
 
-        if(reason) {
-            return this.game.logicError(errorValue, reason.format({
-                self: this,
-                player: player,
-            }));
+        if(player !== this.owner) {
+            return `${this} is not owned by ${player} and cannot be bribed.`;
+        }
+
+        if(player.bribesRemaining <= 0) {
+            return `${player} has no bribes left to bribe ${this} with.`;
+        }
+
+        if(this.health <= 0) {
+            return `${this} has been burned down and cannot be bribed.`;
+        }
+
+        if(this.bribed) {
+            return `${this} has already been bribed this turn and cannot be bribed again.`;
         }
     },
 

@@ -1,8 +1,8 @@
 // Bottle: A bottle thrown by a bartender at a Tile.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Bottle: A bottle thrown by a bartender at a Tile.
-var Bottle = Class(GameObject, {
+let Bottle = Class(GameObject, {
     /**
      * Initializes Bottles.
      *

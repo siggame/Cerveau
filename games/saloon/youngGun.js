@@ -1,8 +1,8 @@
 // YoungGun: An eager young person that wants to join your gang, and will call in the veteran Cowboys you need to win the brawl in the saloon.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class YoungGun: An eager young person that wants to join your gang, and will call in the veteran Cowboys you need to win the brawl in the saloon.
-var YoungGun = Class(GameObject, {
+let YoungGun = Class(GameObject, {
     /**
      * Initializes YoungGuns.
      *
@@ -60,63 +60,64 @@ var YoungGun = Class(GameObject, {
 
 
     /**
-     * Tells the YoungGun to call in a new Cowboy of the given job to the open Tile nearest to them.
+     * Invalidation function for callIn
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
      * @param {string} job - The job you want the Cowboy being brought to have.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
-     * @returns {Cowboy} The new Cowboy that was called in if valid. They will not be added to any `cowboys` lists until the turn ends. Null otherwise.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    callIn: function(player, job, asyncReturn) {
-        // <<-- Creer-Merge: callIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        var reason;
+    invalidateCallIn: function(player, job, args) {
+        // <<-- Creer-Merge: invalidateCallIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         if(player !== this.game.currentPlayer) {
-            reason = "{player} it is not your turn.";
+            return `${player} it is not your turn.`;
         }
 
         if(!this.canCallIn) {
-            reason = "{this} cannot call in any more Cowboys this turn.";
+            return `${this} cannot call in any more Cowboys this turn.`;
         }
 
-        var actualJob; // make sure the job is valid
-        for(var i = 0; i < this.game.jobs.length; i++) {
-            var j = this.game.jobs[i];
+        let actualJob; // make sure the job is valid
+        for(const j of this.game.jobs) {
             if(job.toLowerCase() === j.toLowerCase()) {
                 actualJob = j;
                 break;
             }
         }
 
-        var cowboy;
         if(!actualJob) {
-            reason = "{job} is not a valid job to send in.";
+            return `${job} is not a valid job to send in.`;
         }
-        else { // make sure they are not trying to go above the limit
-            var count = 0;
-            for(i = 0; i < this.owner.cowboys.length; i++) {
-                cowboy = this.owner.cowboys[i];
-                if(cowboy.job === actualJob) {
-                    count++; // yes you could add the boolean value (coerced to 0 or 1), but that reads weird
-                }
-            }
 
-            if(count >= this.game.maxCowboysPerJob) {
-                reason = "You cannot call in any more '{actualJob}' (max of {this.game.maxCowboysPerJob})";
+        // make sure they are not trying to go above the limit
+        let count = 0;
+        for(const cowboy of this.owner.cowboys) {
+            if(cowboy.job === actualJob) {
+                count++; // yes you could add the boolean value (coerced to 0 or 1), but that reads weird
             }
         }
 
-        if(reason) {
-            return this.game.logicError(null, reason.format({
-                this: this,
-                job,
-                actualJob,
-                player,
-            }));
+        if(count >= this.game.maxCowboysPerJob) {
+            return `You cannot call in any more '${actualJob}' (max of ${this.game.maxCowboysPerJob})`;
         }
 
-        // if we got here, it was valid!
+        // make the job arg the correct job, as it looks valid!
+        args.job = actualJob;
+
+        // <<-- /Creer-Merge: invalidateCallIn -->>
+    },
+
+    /**
+     * Tells the YoungGun to call in a new Cowboy of the given job to the open Tile nearest to them.
+     *
+     * @param {Player} player - the player that called this.
+     * @param {string} job - The job you want the Cowboy being brought to have.
+     * @returns {Cowboy} The new Cowboy that was called in if valid. They will not be added to any `cowboys` lists until the turn ends. Null otherwise.
+     */
+    callIn: function(player, job) {
+        // <<-- Creer-Merge: callIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // clear the open tile before moving the young gun to it
         if(this.callInTile.cowboy) {
@@ -129,9 +130,9 @@ var YoungGun = Class(GameObject, {
 
         this.canCallIn = false;
 
-        cowboy = this.game.create("Cowboy", {
+        let cowboy = this.game.create("Cowboy", {
             owner: this.owner,
-            job: actualJob,
+            job: job,
             tile: this.callInTile,
             canMove: false,
         });
@@ -148,6 +149,7 @@ var YoungGun = Class(GameObject, {
 
         // <<-- /Creer-Merge: callIn -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

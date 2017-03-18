@@ -1,9 +1,9 @@
 // Game: The traditional 8x8 chess board with pieces.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -12,7 +12,7 @@ var Chess = require("chess.js").Chess; // a very popular chess framework we will
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: The traditional 8x8 chess board with pieces.
-var Game = Class(TwoPlayerGame, TurnBasedGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *

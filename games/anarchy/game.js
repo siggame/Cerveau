@@ -1,9 +1,9 @@
 // Game: Two player grid based game where each player tries to burn down the other player's buildings. Let it burn.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -12,7 +12,7 @@ var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: Two player grid based game where each player tries to burn down the other player's buildings. Let it burn.
-var Game = Class(TwoPlayerGame, TurnBasedGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *

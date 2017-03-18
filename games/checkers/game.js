@@ -1,16 +1,16 @@
 // Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 // any additional requires you want can be required here safely between cree runs
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.
-var Game = Class(TwoPlayerGame, TurnBasedGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, {
     /**
      * Initializes Games.
      *
@@ -145,16 +145,16 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, {
      *
      * @param {Player} player - the player that called this.
      * @param {Checker} checker - The checker that was captured.
-    * @returns {undefined} nothing is expected to be returned.
      */
     aiFinishedGotCaptured: function(player, checker) {
         // <<-- Creer-Merge: gotCaptured -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Game's gotCaptured function here
-        return undefined;
+        return;
 
         // <<-- /Creer-Merge: gotCaptured -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 

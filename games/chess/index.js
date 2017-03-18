@@ -98,6 +98,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",
@@ -204,6 +205,7 @@ classes.Piece._deltaMergeableProperties = {
 
 
 classes.Piece.move.cerveau = {
+    invalidate: classes.Piece.invalidateMove,
     args: [
         {
             name: "file",
@@ -223,6 +225,7 @@ classes.Piece.move.cerveau = {
         type: {"is_game_object": true, "keyType": null, "name": "Move", "valueType": null},
         defaultValue: null,
     },
+    invalidValue: null,
 };
 
 //<<-- Creer-Merge: secret-Piece -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

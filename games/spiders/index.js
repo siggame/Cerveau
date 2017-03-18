@@ -118,6 +118,7 @@ classes.BroodMother._deltaMergeableProperties = {
 
 
 classes.BroodMother.consume.cerveau = {
+    invalidate: classes.BroodMother.invalidateConsume,
     args: [
         {
             name: "spiderling",
@@ -128,9 +129,11 @@ classes.BroodMother.consume.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.BroodMother.spawn.cerveau = {
+    invalidate: classes.BroodMother.invalidateSpawn,
     args: [
         {
             name: "spiderlingType",
@@ -141,6 +144,7 @@ classes.BroodMother.spawn.cerveau = {
         type: {"is_game_object": true, "keyType": null, "name": "Spiderling", "valueType": null},
         defaultValue: null,
     },
+    invalidValue: null,
 };
 
 //<<-- Creer-Merge: secret-BroodMother -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -162,6 +166,7 @@ classes.Cutter._deltaMergeableProperties = {
 
 
 classes.Cutter.cut.cerveau = {
+    invalidate: classes.Cutter.invalidateCut,
     args: [
         {
             name: "web",
@@ -172,6 +177,7 @@ classes.Cutter.cut.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Cutter -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -203,6 +209,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",
@@ -380,6 +387,7 @@ classes.Spiderling._deltaMergeableProperties = {
 
 
 classes.Spiderling.attack.cerveau = {
+    invalidate: classes.Spiderling.invalidateAttack,
     args: [
         {
             name: "spiderling",
@@ -390,9 +398,11 @@ classes.Spiderling.attack.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Spiderling.move.cerveau = {
+    invalidate: classes.Spiderling.invalidateMove,
     args: [
         {
             name: "web",
@@ -403,6 +413,7 @@ classes.Spiderling.move.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Spiderling -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -424,6 +435,7 @@ classes.Spitter._deltaMergeableProperties = {
 
 
 classes.Spitter.spit.cerveau = {
+    invalidate: classes.Spitter.invalidateSpit,
     args: [
         {
             name: "nest",
@@ -434,6 +446,7 @@ classes.Spitter.spit.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Spitter -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -460,6 +473,7 @@ classes.Weaver._deltaMergeableProperties = {
 
 
 classes.Weaver.strengthen.cerveau = {
+    invalidate: classes.Weaver.invalidateStrengthen,
     args: [
         {
             name: "web",
@@ -470,9 +484,11 @@ classes.Weaver.strengthen.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Weaver.weaken.cerveau = {
+    invalidate: classes.Weaver.invalidateWeaken,
     args: [
         {
             name: "web",
@@ -483,6 +499,7 @@ classes.Weaver.weaken.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Weaver -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

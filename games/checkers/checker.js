@@ -1,15 +1,15 @@
 // Checker: A checker on the game board.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 // any additional requires you want can be required here safely between cree runs
 //<<-- /Creer-Merge: requires -->>
 
 // @class Checker: A checker on the game board.
-var Checker = Class(GameObject, {
+let Checker = Class(GameObject, {
     /**
      * Initializes Checkers.
      *
@@ -57,16 +57,90 @@ var Checker = Class(GameObject, {
 
 
     /**
+     * Invalidation function for isMine
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateIsMine: function(player, args) {
+        // <<-- Creer-Merge: invalidateIsMine -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        return undefined; // always valid
+        // <<-- /Creer-Merge: invalidateIsMine -->>
+    },
+
+    /**
      * Returns if the checker is owned by your player or not.
      *
      * @param {Player} player - the player that called this.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if it is yours, false if it is not yours.
      */
-    isMine: function(player, asyncReturn) {
+    isMine: function(player) {
         // <<-- Creer-Merge: isMine -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         return (player === this.owner);
         // <<-- /Creer-Merge: isMine -->>
+    },
+
+
+    /**
+     * Invalidation function for move
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {number} x - The x coordinate to move to.
+     * @param {number} y - The y coordinate to move to.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateMove: function(player, x, y, args) {
+        // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        if(this.game.currentPlayer !== player) {
+            return `${player} it is not your turn!`;
+        }
+
+        if(this.owner !== player) {
+            return `${this} is not owned by you.`;
+        }
+
+        if(this.game.checkerMoved) {
+            if(this.game.checkerMoved !== this) {
+                return "Tried to move a check after already moving one.";
+            }
+            else if(!this.game.checkerMovedJumped) {
+                return "Tried to move again after not jumping another checker.";
+            }
+        }
+
+        let checkerAt = this.game.getCheckerAt(x, y);
+        if(checkerAt) {
+            return `Cannot move to (${x}, ${y}) because there is ${checkerAt} present at that location.`;
+        }
+
+        const dy = y - this.y;
+        const dx = x - this.x;
+
+        const fromString = `(${this.x}, ${this.y}) -> (${x}, ${y})`;
+        if(!this.kinged) { // then check if they are moving the right direction via dy when not kinged
+            if((this.owner.yDirection === 1 && dy < 1) || (this.owner.yDirection === -1 && dy > -1)) {
+                return `Moved ${this} in the wrong vertical direction ${fromString}`;
+            }
+        }
+
+        let jumped = this.getJumped(x, y);
+        if(jumped && jumped.owner === this.owner) { // then it's jumping something
+            return `${this} tried to jump its own checker ${fromString}`;
+        }
+        else if(Math.abs(dx) === 1 && Math.abs(dy) === 1) { // then they are just moving 1 tile diagonally
+            if(this.game.checkerMovedJumped) {
+                return `The current checker must jump again, not move diagonally one tile ${fromString}`;
+            }
+            // else valid as normal move
+        }
+        else {
+            return `Invalid move ${fromString}`;
+        }
+        // <<-- /Creer-Merge: invalidateMove -->>
     },
 
     /**
@@ -75,109 +149,66 @@ var Checker = Class(GameObject, {
      * @param {Player} player - the player that called this.
      * @param {number} x - The x coordinate to move to.
      * @param {number} y - The y coordinate to move to.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {Checker} Returns the same checker that moved if the move was successful. null otherwise.
      */
-    move: function(player, x, y, asyncReturn) {
+    move: function(player, x, y) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        var game = this.game;
-        if(this.owner !== player) {
-            return game.logicError(null, "tried to move a checker they didn't own");
-        }
-
-        if(game.checkerMoved) {
-            if(game.checkerMoved !== this) {
-                return game.logicError(null, "tried to move a diferent checker than the already moved one");
-            }
-            else if(!game.checkerMovedJumped) {
-                return game.logicError(null, "tried to move again after not jumping another checker.");
-            }
-        }
-
-        if(game.getCheckerAt(x, y)) {
-            return game.logicError(null, "tried to move onto another checker");
-        }
-
-        var yOffset = this.owner.yDirection;
-        var yKing = (yOffset === 1 ? (game.boardHeight - 1) : 0);
-
-        var dy = y - this.y;
-        var dx = x - this.x;
-
-        var fromString = "(" + this.x + ", " + this.y + ") -> (" + x + ", " + y + ")";
-        if(!this.kinged) { // then check if they are moving the right direction via dy when not kinged
-            if((yOffset === 1 && dy < 1) || (yOffset === -1 && dy > -1)) {
-                return game.logicError(null, "moved in the wrong vertical direction " + fromString);
-            }
-        }
-
-        var jumped;
-        if(Math.abs(dx) === 2 && Math.abs(dy) === 2) { // then it's jumping something
-            jumped = game.getCheckerAt(this.x + dx/2, this.y + dy/2);
-
-            if(!jumped) {
-                return game.logicError(null, "tried to jump nothing " + fromString);
-            }
-            else if(jumped.owner.id === this.owner.id) {
-                return game.logicError(null, "tried to jump own checker " + fromString);
-            }
-        }
-        else if(Math.abs(dx) === 1 && Math.abs(dy) === 1) { // then they are just moving 1 tile diagonally
-            if(game.checkerMovedJumped) {
-                return game.logicError(null, "current checker must jump again, not move diagonally one tile " + fromString);
-            }
-            // else valid as normal move
-        }
-        else {
-            return game.logicError(null, "can't move there " + fromString);
-        }
-
-        // if we got here all the checks passed! the checker moves
-
         this.x = x;
         this.y = y;
 
-        if(this.y === yKing) {
+        // check if they need to be kinged
+        if(this.y === (this.owner.yDirection === 1 ? (this.game.boardHeight - 1) : 0)) {
             this.kinged = true;
         }
 
-        if(!game.checkerMoved) {
-            game.checkerMoved = this;
+        // mark us as the checker that moved
+        if(!this.game.checkerMoved) {
+            this.game.checkerMoved = this;
         }
 
+        // and remove the checker we jumped (if we did), and check if we won
+        let jumped = this.getJumped(x, y);
         if(jumped) {
-            if(jumped.owner !== this.owner) {
-                game.checkers.removeElement(jumped);
-                jumped.owner.checkers.removeElement(jumped);
+            this.game.checkers.removeElement(jumped);
+            jumped.owner.checkers.removeElement(jumped);
 
-                this.game.order(jumped.owner, "gotCaptured", {
-                    checker: jumped,
-                }); // tell the owner's AI that their jumped checker was captured
+            this.game.order(jumped.owner, "gotCaptured", {
+                checker: jumped,
+            }); // tell the owner's AI that their jumped checker was captured
 
-                // we need to check if the owner won because they just jumped all the other checkers
-                var checkersOwnerWon = true;
-                for(var i = 0; i < game.checkers.length; i++) {
-                    if(this.owner !== game.checkers[i].owner) {
-                        checkersOwnerWon = false;
-                        break;
-                    }
-                }
-
-                if(checkersOwnerWon) {
-                    game.declareLoser(this.game.getOtherPlayers(this.owner)[0], "No checkers remaining", { dontCheckForWinner: true });
-                    game.declareWinner(this.owner, "All enemy checkers jumped");
+            // we need to check if the owner won because they just jumped all the other checkers
+            var checkersOwnerWon = true;
+            for(const checker of this.game.checkers) {
+                if(this.owner !== checker.owner) {
+                    checkersOwnerWon = false;
+                    break;
                 }
             }
 
-            game.checkerMovedJumped = true;
+            if(checkersOwnerWon) {
+                this.game.declareLosers(this.owner.opponent, "No checkers remaining", { dontCheckForWinner: true });
+                this.game.declareWinner(this.owner, "All enemy checkers jumped");
+            }
+
+            this.game.checkerMovedJumped = true;
         }
 
         return this;
         // <<-- /Creer-Merge: move -->>
     },
 
+
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+
+    getJumped: function(x, y) {
+        const dy = y - this.y;
+        const dx = x - this.x;
+
+        if(Math.abs(dx) === 2 && Math.abs(dy) === 2) { // then it's jumping something
+            return this.game.getCheckerAt(this.x + dx/2, this.y + dy/2);
+        }
+    },
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });

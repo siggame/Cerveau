@@ -1,8 +1,8 @@
 // Spider: A Spider in the game. The most basic unit.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Spider: A Spider in the game. The most basic unit.
-var Spider = Class(GameObject, {
+let Spider = Class(GameObject, {
     /**
      * Initializes Spiders.
      *
@@ -75,30 +75,26 @@ var Spider = Class(GameObject, {
     },
 
     /**
-     * Checks if this spiderling is valid to do something
+     * Tries to invalidate args sent for a Spider to do
      *
      * @param {Player} player - the player that is trying to command this Spiderling
-     * @param {*} invalidReturnValue - what to return if invalid (in the GameLogicError)
      * @returns {GameLogicError} a game logic error if there is something wrong, undefined otherwise
      */
-    _validate: function(player, invalidReturnValue) {
-        var reason;
+    _invalidate: function(player) {
+        if(this.game.currentPlayer !== player) {
+            return `${player} it is not your turn!`;
+        }
 
         if(this.owner !== player) {
-            reason = "{player} does not own {this}.";
-        }
-        else if(this.isDead) {
-            reason = "{this} is dead and cannot do anything.";
-        }
-        else if(this.busy) {
-            reason = "{this} is already busy with '{this.busy}'.";
+            return `${player} does not own ${this}.`;
         }
 
-        if(reason) {
-            return this.game.logicError(invalidReturnValue, reason.format({
-                this: this,
-                player: player,
-            }));
+        if(this.isDead) {
+            return `${this} is dead and cannot do anything.`;
+        }
+
+        if(this.busy) {
+            return `${this} is already busy with '${this.busy}'.`;
         }
     },
 
