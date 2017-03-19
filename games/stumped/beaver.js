@@ -565,7 +565,7 @@ let Beaver = Class(GameObject, {
         }
 
         if(this.turnsDistracted > 0) {
-            return `${this} is distracted for ${this.distracted} more turns.`;
+            return `${this} is distracted for ${this.turnsDistracted} more turns.`;
         }
 
         if(!this.recruited) {
