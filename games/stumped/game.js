@@ -1,19 +1,19 @@
 // Game: Gather branches and build up your lodge as beavers fight to survive.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TwoPlayerGame = require(__basedir + "/gameplay/shared/twoPlayerGame");
-var TurnBasedGame = require(__basedir + "/gameplay/shared/turnBasedGame");
-var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
+const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
+const TiledGame = require(`${__basedir}/gameplay/shared/tiledGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-// any additional requires you want can be required here safely between Creer re-runs
+const JobStats = require("./jobStats.json");
 
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: Gather branches and build up your lodge as beavers fight to survive.
-var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
+let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
      * Initializes Games.
      *
@@ -74,6 +74,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.jobs = this.jobs || [];
 
         /**
+         * Constant number used to calculate what it costs to spawn a new lodge.
+         *
+         * @type {number}
+         */
+        this.lodgeCostConstant = this.lodgeCostConstant || 0;
+
+        /**
          * How many lodges must be complete at once to win the game.
          *
          * @type {number}
@@ -123,6 +130,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.spawner = this.spawner || [];
 
         /**
+         * Constant number used to calculate how many breanches/fish Beavers harvest from spawners.
+         *
+         * @type {number}
+         */
+        this.spawnerHarvestConstant = this.spawnerHarvestConstant || 0;
+
+        /**
          * All the types of spawners in the game.
          *
          * @type {Array.<string>}
@@ -147,20 +161,20 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this.maxTurns = this.maxTurns || 500;
 
+        this.spawnerHarvestConstant = this.spawnerHarvestConstant || 2;
+        this.lodgeCostConstant = this.lodgeCostConstant || 50;
+
         this.freeBeaversCount = this.freeBeaversCount || 10;
         this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
 
-        this.jobs.push(
-            this.create("Job", { "title": "Normal" }),
-            this.create("Job", { "title": "Buff" }),
-            this.create("Job", { "title": "Tank" }),
-            this.create("Job", { "title": "Fisher" }),
-            this.create("Job", { "title": "Swimmer" }),
-            this.create("Job", { "title": "Hot Lady" }),
-            this.create("Job", { "title": "Builder" })
-        );
+        // read in all the jobs in the jobStats.json file and initialize a Job instance for it.
+        for(const title of Object.keys(JobStats.jobs).sort()) {
+            this.jobs.push(
+                this.create("Job", {title})
+            );
+        }
 
-        this.spawnerTypes.push("Fish", "Branch");
+        this.spawnerTypes.push("fish", "branches");
 
         this.newBeavers = [];
 
@@ -186,14 +200,34 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        // creates the 2D map based off the mapWidth/mapHeight set in the init function
         TiledGame._initMap.call(this);
 
         /* Generate the map */
-        // console.log(typeof this.tiles);
+        // TODO: actual map generation
         for(let x = 0; x < this.mapWidth; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
                 this.getTile(x, y).type = Math.random() < 0.2 ? "Water" : "Land";
             }
+        }
+
+        // give each player a starting beaver
+        for(const player of this.players) {
+            let tile = null;
+            while(!tile) {
+                tile = this.tiles.randomElement();
+                if(tile.spawner || tile.beaver) {
+                    tile = null;
+                }
+            }
+
+            this.create("Beaver", {
+                owner: player,
+                tile: tile,
+                job: this.jobs[0],
+                recruited: true,
+            });
         }
 
         //<<-- /Creer-Merge: begin -->>
@@ -216,6 +250,25 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     /**
+     * Invoked before the current player starts their turn
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    beforeTurn: function() {
+        // before they start their turn, cleanup the arrays
+        this.cleanupArrays();
+
+        // finish recruiting any new beavers
+        for(const beaver of this.currentPlayer.beavers) {
+            beaver.recruited = true;
+        }
+
+        // else continue to the next player (normal next turn logic)
+        return TurnBasedGame.beforeTurn.apply(this, arguments);
+    },
+
+    /**
      * Invoked when the current player ends their turn. Perform in between game logic here
      *
      * @override
@@ -225,10 +278,9 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // before we go to the next turn, reset variables and do end of turn logic
         this.updateBeavers();
         this.updateResources();
-        this.cleanupArrays();
-
 
         if(this.checkForWinner()) {
+            // we found a winner, no need to proceed to the next turn
             return;
         }
 
@@ -236,7 +288,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
 
-    checkForWinner: function() {
+    checkForWinner: function(force) {
         // Check if a player has created 10 lodges (they are built instantly)
         // Check if this.maxTurns turns have passed, and if so, in this order:
         // - Player with most lodges wins
@@ -265,7 +317,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         let checkSecondaryConditions = this.currentTurn >= this.maxTurns - 1;
-        if(this.currentTurn % this.players.length === 0) {
+        if(this.currentTurn % this.players.length === this.players.length - 1) {
             // Check if a player has created the required number lodges
             let max = 0;
             let playerWithMax = -1;
@@ -365,11 +417,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
 
             // Pick a random player
-            let winner = Math.floor(Math.random() * this.players.length);
-            let losers = this.players.clone();
-            this.declareWinner(losers[winner], "Player was randomly selected.");
-            losers.splice(playerWithMax, 1);
-            this.declareLosers(losers, "Player was not randomly selected.");
+            this._endGameViaCoinFlip();
             return true;
         }
 
@@ -379,15 +427,13 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateBeavers: function() {
         for(let i = 0; i < this.beavers.length; i++) {
             let beaver = this.beavers[i];
-            beaver.distracted = (beaver.distracted > 0) ? beaver.distracted - 1 : beaver.distracted;
+            beaver.turnsDistracted = (beaver.turnsDistracted > 0) ? beaver.turnsDistracted - 1 : beaver.turnsDistracted;
         }
     },
 
     updateResources: function() {
         let tilesChecked = [];
-        for(let i = 0; i < this.tiles.length; i++) {
-            let tile = this.tiles[i];
-
+        for(const tile of this.tiles) {
             // Kill fish on land
             if(tile.fish > 0 && tile.type === "Land") {
                 tile.fish--;
@@ -398,7 +444,11 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             // Spawn new resources
             if(tile.spawner) {
-                tile.spawner.health += 1;
+                if(!tile.spawner.hasBeenHarvested) {
+                    tile.spawner.health += 1;
+                }
+
+                tile.spawner.hasBeenHarvested = false;
             }
         }
     },
@@ -409,7 +459,7 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         tilesChecked.push(tile);
-        if(tile.type === "Water" && tile.flowDirection !== "") {
+        if(tile.type === "Water" && tile.flowDirection) {
             let nextTile = tile["tile" + tile.flowDirection];
             if(nextTile) {
                 this.moveBranches(nextTile, tilesChecked);
@@ -422,16 +472,18 @@ var Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     cleanupArrays: function() {
         // For each beaver, if its health <= 0
         // - remove it from this.beavers
-        // - set beaver.tile.beaver = null
         // - remove it from beaver.owner.beavers
-        for(let i = 0; i < this.beavers.length; i++) {
-            let beaver = this.beavers[i];
-
+        for(const beaver of this.beavers) {
             if(beaver.health <= 0) {
                 this.beavers.removeElement(beaver);
-                beaver.tile.beaver = null;
                 beaver.owner.beavers.removeElement(beaver);
             }
+        }
+
+        // For each new beaver, insert them into the array
+        for(const beaver of this.newBeavers) {
+            this.beavers.push(beaver);
+            beaver.owner.beavers.push(beaver);
         }
     },
 

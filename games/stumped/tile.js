@@ -1,10 +1,9 @@
 // Tile: A Tile in the game that makes up the 2D map grid.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var TiledTile = require(__basedir + "/gameplay/shared/tiledTile");
-var TiledGame = require(__basedir + "/gameplay/shared/tiledGame");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const TiledTile = require(`${__basedir}/gameplay/shared/tiledTile`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -13,7 +12,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Tile: A Tile in the game that makes up the 2D map grid.
-var Tile = Class(GameObject, TiledTile, {
+let Tile = Class(GameObject, TiledTile, {
     /**
      * Initializes Tiles.
      *
@@ -126,9 +125,9 @@ var Tile = Class(GameObject, TiledTile, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
     /**
      * Checks if a tile is in flow with another tile
+     *
      * @param {Tile} tile - the tile to ceck in flow with
      * @returns {bool} boolean if this tile is in flow with the provided tile
      */
@@ -138,14 +137,35 @@ var Tile = Class(GameObject, TiledTile, {
 
     /**
      * Checks if a tile is in flow with another tile
+     *
      * @param {Tile} tile - the tile to ceck in flow with
      * @returns {bool} boolean if this tile is in flow with the provided tile
      */
-    IsAgainstFlowDirection: function(tile) {
-        return Boolean(tile && this.getNeighbor(TiledGame.reverseDirection(tile.flowDirection) === tile));
+    isAgainstFlowDirection: function(tile) {
+        return Boolean(tile && this.getNeighbor(this.invertDirection(tile.flowDirection) === tile));
     },
 
+    /**
+     * Gets the cost to move from this tile to another tile
+     *
+     * @param {Tile} tile - other tile to check against
+     * @return {number} NaN if this Tile and the passed in ones are not neighbors and thus can never have a bonus. 2 if flow direction does not matter, 1 if same direction bonus, 3 if against direction bonus
+     */
+    getMovementCost: function(tile) {
+        if(this.hasNeighbor(tile)) {
+            if(this.isInFlowDirection(tile)) {
+                return 1; // same direction, bonus -1
+            }
+            else if(this.isAgainstFlowDirection(tile)) {
+                return 3; // against direction, bonus +1
+            }
+            else {
+                return 2; // neighbor with no flow, so no bonus +0
+            }
+        }
 
+        return NaN;
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

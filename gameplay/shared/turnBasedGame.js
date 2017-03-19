@@ -29,6 +29,8 @@ var TurnBasedGame = Class(BaseGame, {
         BaseGame.begin.apply(this, arguments);
 
         this.currentPlayer = this.players[0];
+
+        this.beforeTurn(); // different from nextPlayer, this is called because their turn has not yet started
     },
 
     /**
@@ -58,6 +60,22 @@ var TurnBasedGame = Class(BaseGame, {
      * Transitions to the next turn, increasing turn and setting the currentPlayer to the next one.
      */
     nextTurn: function() {
+        if(this.currentTurn + 1 === this.maxTurns) {
+            this._maxTurnsReached();
+            return;
+        }
+
+        this.currentTurn++;
+        this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
+        this.currentPlayer.timeRemaining += this._playerAdditionalTimePerTurn;
+
+        this.beforeTurn();
+    },
+
+    /**
+     * Called before a players turn, including the first turn.
+     */
+    beforeTurn: function() {
         if(this.currentTurn + 1 === this.maxTurns) {
             this._maxTurnsReached();
             return;

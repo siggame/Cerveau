@@ -42,6 +42,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
+    lodgeCostConstant: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
     lodgesCompleteToWin: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -75,6 +80,11 @@ classes.Game._deltaMergeableProperties = {
     spawner: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Spawner", "valueType": null}},
         defaultValue: [],
+    },
+
+    spawnerHarvestConstant: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
     },
 
     spawnerTypes: {
@@ -119,11 +129,6 @@ classes.Beaver._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    distracted: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     fish: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -149,38 +154,57 @@ classes.Beaver._deltaMergeableProperties = {
         defaultValue: null,
     },
 
+    recruited: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+
     tile: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
+    },
+
+    turnsDistracted: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
 };
 
 
 classes.Beaver.attack.cerveau = {
+    invalidate: classes.Beaver.invalidateAttack,
     args: [
         {
-            name: "tile",
-            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+            name: "beaver",
+            type: {"is_game_object": true, "keyType": null, "name": "Beaver", "valueType": null},
         },
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Beaver.buildLodge.cerveau = {
+    invalidate: classes.Beaver.invalidateBuildLodge,
     args: [
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Beaver.drop.cerveau = {
+    invalidate: classes.Beaver.invalidateDrop,
     args: [
+        {
+            name: "tile",
+            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        },
         {
             name: "resource",
             type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
@@ -195,22 +219,26 @@ classes.Beaver.drop.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Beaver.harvest.cerveau = {
+    invalidate: classes.Beaver.invalidateHarvest,
     args: [
         {
-            name: "tile",
-            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+            name: "spawner",
+            type: {"is_game_object": true, "keyType": null, "name": "Spawner", "valueType": null},
         },
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Beaver.move.cerveau = {
+    invalidate: classes.Beaver.invalidateMove,
     args: [
         {
             name: "tile",
@@ -221,10 +249,16 @@ classes.Beaver.move.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 classes.Beaver.pickup.cerveau = {
+    invalidate: classes.Beaver.invalidatePickup,
     args: [
+        {
+            name: "tile",
+            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        },
         {
             name: "resource",
             type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
@@ -239,6 +273,7 @@ classes.Beaver.pickup.cerveau = {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
         defaultValue: false,
     },
+    invalidValue: false,
 };
 
 //<<-- Creer-Merge: secret-Beaver -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -270,6 +305,7 @@ classes.GameObject._deltaMergeableProperties = {
 
 
 classes.GameObject.log.cerveau = {
+    invalidate: classes.GameObject.invalidateLog,
     args: [
         {
             name: "message",
@@ -314,7 +350,7 @@ classes.Job._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    distracts: {
+    distractionPower: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -343,9 +379,10 @@ classes.Job._deltaMergeableProperties = {
 
 
 classes.Job.recruit.cerveau = {
+    invalidate: classes.Job.invalidateRecruit,
     args: [
         {
-            name: "lodge",
+            name: "tile",
             type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         },
     ],
@@ -353,6 +390,7 @@ classes.Job.recruit.cerveau = {
         type: {"is_game_object": true, "keyType": null, "name": "Beaver", "valueType": null},
         defaultValue: null,
     },
+    invalidValue: null,
 };
 
 //<<-- Creer-Merge: secret-Job -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -433,6 +471,11 @@ classes.Player._deltaMergeableProperties = {
 classes.Spawner = require("./spawner");
 
 classes.Spawner._deltaMergeableProperties = {
+    hasBeenHarvested: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+
     health: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,

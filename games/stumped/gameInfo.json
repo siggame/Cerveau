@@ -34,6 +34,7 @@
             "freeBeaversCount",
             "gameObjects",
             "jobs",
+            "lodgeCostConstant",
             "lodgesCompleteToWin",
             "mapHeight",
             "mapWidth",
@@ -41,6 +42,7 @@
             "players",
             "session",
             "spawner",
+            "spawnerHarvestConstant",
             "spawnerTypes",
             "tiles"
         ],
@@ -138,6 +140,16 @@
                     }
                 }
             },
+            "lodgeCostConstant": {
+                "default": null,
+                "description": "Constant number used to calculate what it costs to spawn a new lodge.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
             "lodgesCompleteToWin": {
                 "default": null,
                 "description": "How many lodges must be complete at once to win the game.",
@@ -221,6 +233,16 @@
                     }
                 }
             },
+            "spawnerHarvestConstant": {
+                "default": null,
+                "description": "Constant number used to calculate how many breanches/fish Beavers harvest from spawners.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
             "spawnerTypes": {
                 "default": null,
                 "description": "All the types of spawners in the game.",
@@ -273,13 +295,14 @@
             "attribute_names": [
                 "actions",
                 "branches",
-                "distracted",
                 "fish",
                 "health",
                 "job",
                 "moves",
                 "owner",
-                "tile"
+                "recruited",
+                "tile",
+                "turnsDistracted"
             ],
             "attributes": {
                 "actions": {
@@ -295,16 +318,6 @@
                 "branches": {
                     "default": null,
                     "description": "The number of branches this beaver is holding.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "distracted": {
-                    "default": null,
-                    "description": "Number of turns this beaver is distracted for (0 means not distracted).",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -362,6 +375,16 @@
                         "valueType": null
                     }
                 },
+                "recruited": {
+                    "default": null,
+                    "description": "True if the Beaver has finished being recruited and can do things, False otherwise.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
                 "tile": {
                     "default": null,
                     "description": "The tile this beaver is on.",
@@ -369,6 +392,16 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "turnsDistracted": {
+                    "default": null,
+                    "description": "Number of turns this beaver is distracted for (0 means not distracted).",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 }
@@ -386,18 +419,18 @@
                 "attack": {
                     "altersState": true,
                     "argument_names": [
-                        "tile"
+                        "beaver"
                     ],
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The tile of the beaver you want to attack.",
-                            "name": "tile",
+                            "description": "The beaver to attack. Must be on an adjacent tile.",
+                            "name": "beaver",
                             "optional": false,
                             "type": {
                                 "is_game_object": true,
                                 "keyType": null,
-                                "name": "Tile",
+                                "name": "Beaver",
                                 "valueType": null
                             }
                         }
@@ -406,6 +439,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if successfully attacked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -423,6 +457,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if successfully built a lodge, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -435,10 +470,23 @@
                 "drop": {
                     "altersState": true,
                     "argument_names": [
+                        "tile",
                         "resource",
                         "amount"
                     ],
                     "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
                         {
                             "default": null,
                             "description": "The type of resource to drop ('branch' or 'fish').",
@@ -453,7 +501,7 @@
                         },
                         {
                             "default": 0,
-                            "description": "The amount of the resource to drop, numbers <= 0 will drop all of that type.",
+                            "description": "The amount of the resource to drop, numbers <= 0 will drop all the resource type.",
                             "name": "amount",
                             "optional": true,
                             "type": {
@@ -466,10 +514,11 @@
                     ],
                     "description": "Drops some of the given resource on the beaver's tile. Fish dropped in water disappear instantly, and fish dropped on land die one per tile per turn.",
                     "optionals": 1,
-                    "optionals_start_index": 1,
+                    "optionals_start_index": 2,
                     "returns": {
                         "default": null,
                         "description": "True if successfully dropped the resource, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -482,18 +531,18 @@
                 "harvest": {
                     "altersState": true,
                     "argument_names": [
-                        "tile"
+                        "spawner"
                     ],
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The tile you want to harvest.",
-                            "name": "tile",
+                            "description": "The Spawner you want to harvest. Must be on an adjacent tile.",
+                            "name": "spawner",
                             "optional": false,
                             "type": {
                                 "is_game_object": true,
                                 "keyType": null,
-                                "name": "Tile",
+                                "name": "Spawner",
                                 "valueType": null
                             }
                         }
@@ -502,6 +551,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if successfully harvested, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -519,7 +569,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The tile this beaver should move to. Costs 2 moves normally, 3 if moving upstream, and 1 if moving downstream.",
+                            "description": "The tile this beaver should move to.",
                             "name": "tile",
                             "optional": false,
                             "type": {
@@ -534,6 +584,7 @@
                     "returns": {
                         "default": null,
                         "description": "True if the move worked, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -546,10 +597,23 @@
                 "pickup": {
                     "altersState": true,
                     "argument_names": [
+                        "tile",
                         "resource",
                         "amount"
                     ],
                     "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
                         {
                             "default": null,
                             "description": "The type of resource to pickup ('branch' or 'fish').",
@@ -564,7 +628,7 @@
                         },
                         {
                             "default": 0,
-                            "description": "The amount of the resource to drop, numbers <= 0 will pickup all of that type.",
+                            "description": "The amount of the resource to drop, numbers <= 0 will pickup all of the resource type.",
                             "name": "amount",
                             "optional": true,
                             "type": {
@@ -577,10 +641,11 @@
                     ],
                     "description": "Picks up some branches or fish on the beaver's tile.",
                     "optionals": 1,
-                    "optionals_start_index": 1,
+                    "optionals_start_index": 2,
                     "returns": {
                         "default": null,
                         "description": "True if successfully picked up a resource, false otherwise.",
+                        "invalidValue": false,
                         "type": {
                             "is_game_object": false,
                             "keyType": null,
@@ -764,7 +829,7 @@
                 "chopping",
                 "cost",
                 "damage",
-                "distracts",
+                "distractionPower",
                 "fishing",
                 "health",
                 "moves",
@@ -821,7 +886,7 @@
                         "valueType": null
                     }
                 },
-                "distracts": {
+                "distractionPower": {
                     "default": null,
                     "description": "How many turns a beaver attacked by this job is distracted by.",
                     "type": {
@@ -880,13 +945,13 @@
                 "recruit": {
                     "altersState": true,
                     "argument_names": [
-                        "lodge"
+                        "tile"
                     ],
                     "arguments": [
                         {
                             "default": null,
                             "description": "The Tile that is a lodge owned by you that you wish to spawn the Beaver of this Job on.",
-                            "name": "lodge",
+                            "name": "tile",
                             "optional": false,
                             "type": {
                                 "is_game_object": true,
@@ -900,6 +965,7 @@
                     "returns": {
                         "default": null,
                         "description": "The recruited Beaver if successful, null otherwise.",
+                        "invalidValue": null,
                         "type": {
                             "is_game_object": true,
                             "keyType": null,
@@ -1215,14 +1281,25 @@
         },
         "Spawner": {
             "attribute_names": [
+                "hasBeenHarvested",
                 "health",
                 "tile",
                 "type"
             ],
             "attributes": {
+                "hasBeenHarvested": {
+                    "default": null,
+                    "description": "True if this Spawner has been harvested this turn, and it will not heal at the end of the turn, false otherwise.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
                 "health": {
                     "default": null,
-                    "description": "How much of the resource is left.",
+                    "description": "How much health this spawner has, which is used to calculate how much of its resource can be harvested.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1232,7 +1309,7 @@
                 },
                 "tile": {
                     "default": null,
-                    "description": "The tile this resource is on.",
+                    "description": "The tile this Spawner is on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,

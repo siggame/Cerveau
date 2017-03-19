@@ -1,15 +1,15 @@
 // Beaver: A beaver in the game.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
 //<<-- /Creer-Merge: requires -->>
 
 // @class Beaver: A beaver in the game.
-var Beaver = Class(GameObject, {
+let Beaver = Class(GameObject, {
     /**
      * Initializes Beavers.
      *
@@ -31,13 +31,6 @@ var Beaver = Class(GameObject, {
          * @type {number}
          */
         this.branches = this.branches || 0;
-
-        /**
-         * Number of turns this beaver is distracted for (0 means not distracted).
-         *
-         * @type {number}
-         */
-        this.distracted = this.distracted || 0;
 
         /**
          * The number of fish this beaver is holding.
@@ -75,22 +68,33 @@ var Beaver = Class(GameObject, {
         this.owner = this.owner || null;
 
         /**
+         * True if the Beaver has finished being recruited and can do things, False otherwise.
+         *
+         * @type {boolean}
+         */
+        this.recruited = this.recruited || false;
+
+        /**
          * The tile this beaver is on.
          *
          * @type {Tile}
          */
         this.tile = this.tile || null;
 
+        /**
+         * Number of turns this beaver is distracted for (0 means not distracted).
+         *
+         * @type {number}
+         */
+        this.turnsDistracted = this.turnsDistracted || 0;
+
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(!this.job) {
-            this.job = this.game.jobs[0];
-        }
+        // start with the max health as defined by our job
+        this.health = this.job.health;
 
-        for(var key of this.job) {
-            this[key] = this.job[key];
-        }
+        this.game.newBeavers.push(this);
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -99,101 +103,114 @@ var Beaver = Class(GameObject, {
 
 
     /**
+     * Invalidation function for attack
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Beaver} beaver - The beaver to attack. Must be on an adjacent tile.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateAttack: function(player, beaver, args) {
+        // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(!beaver) {
+            return `${beaver} is not a valid beaver for ${this} to attack.`;
+        }
+
+        if(!beaver.recruited) {
+            return `${beaver} has not finished being recruited yet, and cannot be attacked yet.`;
+        }
+
+        if(!this.tile.hasNeighbor(beaver.tile)) {
+            return `${beaver} is not adjacent to ${this} beaver to be attacked.`;
+        }
+
+        // <<-- /Creer-Merge: invalidateAttack -->>
+    },
+
+    /**
      * Attacks another adjacent beaver.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The tile of the beaver you want to attack.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {Beaver} beaver - The beaver to attack. Must be on an adjacent tile.
      * @returns {boolean} True if successfully attacked, false otherwise.
      */
-    attack: function(player, tile, asyncReturn) {
+    attack: function(player, beaver) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        let reason;
-
-        if(!player || player !== this.game.currentPlayer) {
-            reason = `${player} it is not your turn.`;
-        }
-        else if(this.owner !== player) {
-            reason = `${this} is not owned by you.`;
-        }
-        else if(this.health <= 0) {
-            reason = `${this} is dead.`;
-        }
-        else if(!tile) {
-            reason = `${tile} is not a valid Tile.`;
-        }
-        else if(!tile.beaver) {
-            reason = `No beaver exists on tile ${tile}.`;
-        }
-        else if(!this.tile.hasNeighbor(tile)) {
-            reason = `${tile} is not adjacent to beaver attacking.`;
-        }
-        else if(this.distracted) {
-            reason = `${this} is distracted.`;
-        }
-        else if(!this.actions) {
-            reason = `${this} does not have any actions left.`;
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        // If no errors occur
-        tile.beaver.health -= this.beaver.job.damage;
+        beaver.health = Math.max(0, beaver.health, this.beaver.job.damage);
+        beaver.turnsDistracted = beaver.turnsDistracted || this.jobs.distractionPower; // if the beaver is already distracted, keep that value, otherwise they get distracted by this attack
         this.actions--;
-        tile.beaver.distracted = tile.beaver.distracted || this.jobs.distracts;
 
-        if(tile.beaver.health <= 0) {
-            tile.branches += tile.beaver.branches;
-            tile.fish += tile.beaver.fish;
-            tile.beaver.branches = -1;
-            tile.beaver.fish = -1;
-            tile.beaver.actions = -1;
-            tile.beaver.moves = -1;
-            tile.beaver.health = -1;
-            tile.beaver.distracted = -1;
-            tile.beaver.tile = null;
-            tile.beaver = null;
+        // check if the enemy beaver died
+        if(beaver.health <= 0) {
+            // drop it's resources on the ground
+            beaver.tile.branches += beaver.branches;
+            beaver.fish += beaver.fish;
+
+            // and set its values to invalid numbers to signify it is dead
+            beaver.branches = -1;
+            beaver.fish = -1;
+            beaver.actions = -1;
+            beaver.moves = -1;
+            beaver.turnsDistracted = -1;
+
+            // remove him from the map of tiles
+            beaver.tile.beaver = null;
+            beaver.tile = null;
         }
+
         return true;
 
         // <<-- /Creer-Merge: attack -->>
+    },
+
+
+    /**
+     * Invalidation function for buildLodge
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateBuildLodge: function(player, args) {
+        // <<-- Creer-Merge: invalidateBuildLodge -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player);
+        if(invalid) {
+            return invalid;
+        }
+
+        if((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
+            return `${this} does not have enough branches to build the lodge.`;
+        }
+
+        if(this.tile.lodgeOwner !== null) {
+            return `${this.tile} already has a lodge owned by ${this.tile.lodgeOwner}.`;
+        }
+
+        if(this.tile.spawner !== null) {
+            return `${this.tile} has a spawner which cannot be built over.`;
+        }
+
+        // <<-- /Creer-Merge: invalidateBuildLodge -->>
     },
 
     /**
      * Builds a lodge on the Beavers current tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
      * @returns {boolean} True if successfully built a lodge, false otherwise.
      */
-    buildLodge: function(player, asyncReturn) {
+    buildLodge: function(player) {
         // <<-- Creer-Merge: buildLodge -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        let reason = this._check(player, this.tile);
-        if(reason) {
-            // reason already exists, don't update with new reason
-        }
-        else if(this.actions <= 0) {
-            reason = `${this} has no more actions.`;
-        }
-        else if((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
-            reason = `${this} does not have enough branches to build the lodge.`;
-        }
-        else if(this.tile.lodgeOwner !== null) {
-            reason = `${this.tile} already has a lodge owned by ${this.tile.lodgeOwner}.`;
-        }
-        else if(this.tile.spawner !== null) {
-            reason = `${this.tile} has a spawner which cannot be built over.`;
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        // valid, build lodge
 
         // overcharge tile's branches
         this.tile.branches -= player.branchesToBuildLodge;
@@ -203,278 +220,360 @@ var Beaver = Class(GameObject, {
             this.branches += this.tile.branches;
             this.tile.branches = 0;
         }
-        this.actions--;
+
         this.tile.lodgeOwner = player;
         this.player.lodges.push(this.tile);
+        this.actions--;
 
         return true;
+
         // <<-- /Creer-Merge: buildLodge -->>
+    },
+
+
+    /**
+     * Invalidation function for drop
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to drop ('branch' or 'fish').
+     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will drop all the resource type.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateDrop: function(player, tile, resource, amount, args) {
+        // <<-- Creer-Merge: invalidateDrop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player);
+        if(invalid) {
+            return invalid;
+        }
+
+        // transform the resource into the first, lower cased, character.
+        // We only need to know 'f' vs 'b' to tell what resource type.
+        const char = resource[0].toLowerCase();
+
+        if(char !== "f" || char !== "b") {
+            return `${resource} is not a valid resource to drop.`;
+        }
+
+        // now clean the actual resource
+        resource = char === "f" ? "fish" : "branches";
+
+        // transform the amount if they passed in a number =< 0
+        if(amount <= 0) {
+            amount = this[resource];
+        }
+
+        if(amount <= 0) {
+            return `${this} cannot drop ${amount} of ${resource}`;
+        }
+
+        if(amount > this[resource]) {
+            return `${this} does not have ${amount} ${resource} to drop.`;
+        }
+
+        if(!tile) {
+            return `${tile} is not a valid tile to drop resources on.`;
+        }
+
+        if(this.tile !== tile || this.tile.hasNeighbor(tile)) {
+            return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
+        }
+
+        if(tile.spawner) {
+            return `${tile} has ${tile.spawner} on it, and cannot have resourced dropped onto it.`;
+        }
+
+        // looks valid, let's update the args for the actual drop function
+        args.amount = amount;
+        args.resource = resource;
+
+        // <<-- /Creer-Merge: invalidateDrop -->>
     },
 
     /**
      * Drops some of the given resource on the beaver's tile. Fish dropped in water disappear instantly, and fish dropped on land die one per tile per turn.
      *
      * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.
      * @param {string} resource - The type of resource to drop ('branch' or 'fish').
-     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will drop all of that type.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will drop all the resource type.
      * @returns {boolean} True if successfully dropped the resource, false otherwise.
      */
-    drop: function(player, resource, amount, asyncReturn) {
+    drop: function(player, tile, resource, amount) {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        let reason;
-
-        if(!player || player !== this.game.currentPlayer) {
-            reason = `${player} it is not your turn.`;
-        }
-        else if(this.owner !== player) {
-            reason = `${this} is not owned by you.`;
-        }
-        else if(this.health <= 0) {
-            reason = `${this} is dead.`;
-        }
-        else if(this.distracted) {
-            reason = `${this.distracted} turns til ${this} is not distracted and is able to drop resources.`;
-        }
-        else if(!this.actions) {
-            reason = `${this} does not have any actions left.`;
-        }
-        else if(resource[0] === "f" && amount > this.fish) {
-            reason = `${this} does not have ${amount} fish to drop.`;
-        }
-        else if(resource[0] === "b" && amount > this.branches) {
-            reason = `${this} does not have ${amount} branch(es) to drop.`;
-        }
-        else if(resource[0] !== "f" && resource[0] !== "b") {
-            reason = `${resource} is not a valid resource.`;
-        }
-        else if(amount < 0) {
-            reason = `${this} can not drop a negative amount of ${resource}.`;
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        // If no errors occur
+        this[resource] -= amount;
+        this.tile[resource] += amount;
         this.actions--;
 
-        if(resource[0] === "f") {
-            this.tile.fish += amount;
-            this.fish -= amount;
-        }
-        else {  // (resource[0] === "b")
-            this.tile.branches += amount;
-            this.branches -= amount;
+        return true;
+
+        // <<-- /Creer-Merge: drop -->>
+    },
+
+
+    /**
+     * Invalidation function for harvest
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent tile.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateHarvest: function(player, spawner, args) {
+        // <<-- Creer-Merge: invalidateHarvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player);
+        if(invalid) {
+            return invalid;
         }
 
-        return true;
-        // <<-- /Creer-Merge: drop -->>
+        if(!this.tile.hasNeighbor(spawner.tile)) {
+            return `${this} on tile ${this.tile} is not adjacent to ${spawner.tile}.`;
+        }
+
+        const load = this.fish + this.branches;
+        if(load >= this.job.carryLimit) {
+            return `Beaver cannot carry any more resources. Limit: (${load}/${this.job.carryLimit})`;
+        }
+
+        // <<-- /Creer-Merge: invalidateHarvest -->>
     },
 
     /**
      * Harvests the branches or fish from a Spawner on an adjacent tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The tile you want to harvest.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent tile.
      * @returns {boolean} True if successfully harvested, false otherwise.
      */
-    harvest: function(player, tile, asyncReturn) {
+    harvest: function(player, spawner) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = this._check(player, tile);
-        let gathered = 0;
+
         const load = this.fish + this.branches;
+        const spaceAvailable = this.job.carryLimit - load;
+        const skillScalar = spawner.type === "branches" ? this.job.chopping : this.job.fishing;
+        const maxCanHarvest = Math.pow(this.game.spawnerHarvestConstant, spawner.health) * skillScalar;
 
-        if(reason) {
-            // reason exists, don't update with new reason
-        }
-        else if(!this.tile.hasNeighbor(tile)) {
-            reason = `${this} on tile ${this.tile} is not adjacent to ${tile}.`;
-        }
-        else if(this.actions <= 0) {
-            reason = `${this} has no actions available.`;
-        }
-        else if(load >= this.job.carryLimit) {
-            reason = `Beaver cannot carry more. Limit: (${load}/${this.job.carryLimit})`;
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        const available = Math.pow(2 /* tbd */, tile.spawner.health);
-        const space = this.job.carryLimit - load;
-        let skill = this.job.fishing;
-        let container = "fish";
-
-        if(tile.spawner.type === "Branch") {
-            skill = this.job.chopping;
-            container = "branches";
-        }
-
-        gathered = available < skill ? available : skill;
-        gathered = gathered > space ? space : gathered;
-        this[container] += gathered;
+        this[spawner.type] += Math.max(spaceAvailable, maxCanHarvest);
         this.actions--;
 
-        if(tile.spawner.health > 0) {
-            tile.spawner.health--;
+        // damage the spawner because we harvested from it
+        if(spawner.health > 0) {
+            spawner.health--;
         }
 
         return true;
+
         // <<-- /Creer-Merge: harvest -->>
+    },
+
+
+    /**
+     * Invalidation function for move
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The tile this beaver should move to.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateMove: function(player, tile, args) {
+        // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player, true);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(this.moves <= 0) {
+            return `${this} is out of moves.`;
+        }
+
+        if(!tile) {
+            return `${tile} is not a valid tile to move to.`;
+        }
+
+        if(tile.beaver) {
+            return `${tile} is already occupied by ${tile.beaver}.`;
+        }
+
+        if(tile.lodgeOwner && tile.lodgeOwner !== player) {
+            return `${tile} contains an enemy lodge.`;
+        }
+
+        if(tile.spawner) {
+            return `${tile} contains ${tile.spawner}.`;
+        }
+
+        const movementCost = this.tile.getMovementCost(tile);
+        if(isNaN(movementCost)) {
+            return `${tile} is not adjacent to ${this.tile}`;
+        }
+
+        if(this.moves < movementCost) {
+            return `${tile} costs ${movementCost} to reach, and ${this} only has ${this.moves} moves.`;
+        }
+
+        // <<-- /Creer-Merge: invalidateMove -->>
     },
 
     /**
      * Moves this beaver from its current tile to an adjacent tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The tile this beaver should move to. Costs 2 moves normally, 3 if moving upstream, and 1 if moving downstream.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {Tile} tile - The tile this beaver should move to.
      * @returns {boolean} True if the move worked, false otherwise.
      */
-    move: function(player, tile, asyncReturn) {
+    move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        let reason = this._check(player, tile);
-        let moveCost = 2;
-
-        if(reason) {
-            // don't update to a new reason, use the first invalid reason
-        }
-        else if(this.moves <= 0) {
-            reason = `${this} is out of movement.`;
-        }
-        else if(tile.beaver !== null) {
-            reason = `${tile} is already occupied by ${tile.beaver}.`;
-        }
-        else if(tile.lodgeOwner !== null && tile.lodgeOwner !== player) {
-            reason = `${tile} contains an enemy lodge!`;
-        }
-        else if(tile.spawner !== null) {
-            reason = `${tile} contains ${tile.spawner}!`;
-        }
-        else {
-            if(this.tile.tileAgainstFlow(tile)) {
-                moveCost++;
-            }
-
-            if(this.tile.isInFlowDirection(tile)) {
-                moveCost--;
-            }
-
-            if(moveCost > this.moves) {
-                reason = `${tile} costs ${moveCost} to reach and ${this} has ${this.moves}.`;
-            }
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        // Here is valid!
-        // remove me from the time I was on
-        this.tile.beaver = null;
         // update target tile's beaver to this beaver
         tile.beaver = this;
+
+        // remove me from the time I was on
+        this.tile.beaver = null;
+
         // update this beaver's tile to target tile
         this.tile = tile;
-        // decrement this beaver's moves count by the move cost
-        this.moves -= moveCost;
+
+        // finally decrement this beaver's moves count by the move cost
+        this.moves -= this.tile.getMovementCost(tile);
 
         return true;
         // <<-- /Creer-Merge: move -->>
+    },
+
+
+    /**
+     * Invalidation function for pickup
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to pickup ('branch' or 'fish').
+     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will pickup all of the resource type.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidatePickup: function(player, tile, resource, amount, args) {
+        // <<-- Creer-Merge: invalidatePickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        const invalid = this._invalidate(player);
+        if(invalid) {
+            return invalid;
+        }
+
+        if(!tile) {
+            return `${tile} is not a valid tile to drop resources on.`;
+        }
+
+        if(this.tile !== tile || this.tile.hasNeighbor(tile)) {
+            return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
+        }
+
+        if(tile.spawner) {
+            return `${tile} has ${tile.spawner} on it, and cannot have resourced dropped onto it.`;
+        }
+
+        // transform the resource into the first, lower cased, character.
+        // We only need to know 'f' vs 'b' to tell what resource type.
+        const char = resource[0].toLowerCase();
+
+        if(char !== "f" || char !== "b") {
+            return `${resource} is not a valid resource to drop.`;
+        }
+
+        // now clean the actual resource
+        resource = char === "f" ? "fish" : "branches";
+
+        // transform the amount if they passed in a number =< 0
+        if(amount <= 0) {
+            amount = tile[resource];
+        }
+
+        if(amount <= 0) {
+            return `${this} cannot pickup ${amount} of ${resource}`;
+        }
+
+        if(amount > tile[resource]) {
+            return `${tile} does not have ${amount} ${resource} to pickup.`;
+        }
+
+        const spaceAvailable = this.job.carryLimit - this.branches - this.fish;
+        if(amount > spaceAvailable) {
+            return `${this} cannot carry ${amount} of ${resource} because it only can carry ${spaceAvailable} more resources`;
+        }
+
+        // looks valid, let's update the args for the actual drop function
+        args.amount = amount;
+        args.resource = resource;
+
+        // <<-- /Creer-Merge: invalidatePickup -->>
     },
 
     /**
      * Picks up some branches or fish on the beaver's tile.
      *
      * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.
      * @param {string} resource - The type of resource to pickup ('branch' or 'fish').
-     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will pickup all of that type.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {number} amount - The amount of the resource to drop, numbers <= 0 will pickup all of the resource type.
      * @returns {boolean} True if successfully picked up a resource, false otherwise.
      */
-    pickup: function(player, resource, amount, asyncReturn) {
-        let tile = this.tile;
+    pickup: function(player, tile, resource, amount) {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Beaver's pickup function here
-        let reason = this._check(player, tile);
 
-        if(this.health <= 0 ) {
-            reason = `${this} is dead.`;
-        }
-        else if(this.actions <= 0) {
-            reason = `${this} can not take any more actions this turn.`;
-        }
-        else if(resource[0] !== "f" && resource[0] !== "b") {
-            reason = `${resource} that is not a valid resource.`;
-        }
-        else if(resource[0] === "b" && this.tile.branches < amount) {
-            reason = `${this.tile} does not have ${amount} branch(es).`;
-        }
-        else if(resource[0] === "f" && this.tile.fish < amount ) {
-            reason = `${this.tile} does not have ${amount} fish.`;
-        }
-        else if((this.job.carryLimmit - (this.fish + this.branches)) < amount ) {
-            reason = `${this} does not have the carry capicity for this amount.` ;
-        }
-        else if(this.distracted > 0) {
-            reason = `${this.distracted} turns til ${this} is not distracted and is able to pick up resources.`;
-        }
-        else if(amount < 0) {
-            reason = `${this} can not pick up a negative amount of ${resource}.`;
-        }
-
-        if(reason) {
-            return this.game.logicError(false, reason);
-        }
-
-        // If no errors occur
+        this.tile[resource] -= amount;
+        this[resource] += amount;
         this.actions--;
-
-        if(resource[0] === "b") {
-            this.branches += amount;
-            this.tile.branches -= amount;
-        }
-        else { // (resource[0] === "f") {
-            this.fish += amount;
-            this.tile.fish -= amount;
-        }
 
         return true;
 
         // <<-- /Creer-Merge: pickup -->>
     },
 
+
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
     /**
-     * Checks if this Beaver can do things based on the player and tile (can move, attack, etc)
-     * @param {Player} player - the player commanding this Beeaver
-     * @param {Tile} tile - the tile trying to do something to
-     * @returns {string|undefined} the reason this is invalid (still in need of formatting), undefined if valid
+     * Tries to invalidate args for an action function
+     *
+     * @param {Player} player - the player commanding this Beaver
+     * @param {boolean} [dontCheckActions] - pass true to not check if the beaver has enough actions
+     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
      */
-    _check: function(player, tile) {
+    _invalidate: function(player, dontCheckActions) {
         if(!player || player !== this.game.currentPlayer) {
             return `${player} it is not your turn.`;
         }
-        else if(this.owner !== player) {
+
+        if(this.owner !== player) {
             return `${this} is not owned by you.`;
         }
-        else if(this.health <= 0) {
+
+        if(this.health <= 0) {
             return `${this} is dead.`;
         }
-        else if(this.distracted > 0) {
+
+        if(this.turnsDistracted > 0) {
             return `${this} is distracted for ${this.distracted} more turns.`;
         }
-        else if(!tile) {
-            return `${tile} is not a valid Tile.`;
+
+        if(!this.recruited) {
+            return `${this} is still being recruited and cannot be ordered yet.`;
+        }
+
+        if(!dontCheckActions && this.actions <= 0) {
+            return `${this} does not have any actions left.`;
         }
     },
 

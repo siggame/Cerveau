@@ -10,6 +10,7 @@
 		"distract": 0
 	},
 	"jobs": {
+		"Basic": {},
 		"Buff": {
 			"damage": 3,
 			"health": 4,

@@ -1,8 +1,8 @@
 // Spawner: A resource spawner that generates branches or fish.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ var GameObject = require("./gameObject");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Spawner: A resource spawner that generates branches or fish.
-var Spawner = Class(GameObject, {
+let Spawner = Class(GameObject, {
     /**
      * Initializes Spawners.
      *
@@ -21,14 +21,21 @@ var Spawner = Class(GameObject, {
         GameObject.init.apply(this, arguments);
 
         /**
-         * How much of the resource is left.
+         * True if this Spawner has been harvested this turn, and it will not heal at the end of the turn, false otherwise.
+         *
+         * @type {boolean}
+         */
+        this.hasBeenHarvested = this.hasBeenHarvested || false;
+
+        /**
+         * How much health this spawner has, which is used to calculate how much of its resource can be harvested.
          *
          * @type {number}
          */
         this.health = this.health || 0;
 
         /**
-         * The tile this resource is on.
+         * The tile this Spawner is on.
          *
          * @type {Tile}
          */

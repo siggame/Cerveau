@@ -1,8 +1,8 @@
 // Job: Information about a beaver's job.
 
-var Class = require("classe");
-var log = require(__basedir + "/gameplay/log");
-var GameObject = require("./gameObject");
+const Class = require("classe");
+const log = require(`${__basedir}/gameplay/log`);
+const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
@@ -11,7 +11,7 @@ const JobStats = require("./jobStats.json");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Job: Information about a beaver's job.
-var Job = Class(GameObject, {
+let Job = Class(GameObject, {
     /**
      * Initializes Jobs.
      *
@@ -60,7 +60,7 @@ var Job = Class(GameObject, {
          *
          * @type {number}
          */
-        this.distracts = this.distracts || 0;
+        this.distractionPower = this.distractionPower || 0;
 
         /**
          * Scalar for how many fish this job harvests at once.
@@ -90,19 +90,18 @@ var Job = Class(GameObject, {
          */
         this.title = this.title || "";
 
+
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // put any initialization logic here. the base variables should be set from 'data' above
         this.title = this.title || "Normal";
 
-        let thisJob = JobStats.jobs[this.title];
+        // we have no actual stats at this point, so use the ones in the JobStats file
+        let ourJobStats = JobStats.jobs[this.title];
+
         for(let key of Object.keys(JobStats.default)) {
-            if(thisJob && key in thisJob) {
-                this[key] = thisJob[key];
-            }
-            else {
-                this[key] = JobStats.default[key];
-            }
+            // set our value to the stat defined in our job in the JobStats file, otherwise use the default value
+            this[key] = (key in ourJobStats) ? ourJobStats[key] : JobStats.default[key];
         }
 
         //<<-- /Creer-Merge: init -->>
@@ -112,46 +111,54 @@ var Job = Class(GameObject, {
 
 
     /**
+     * Invalidation function for recruit
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile that is a lodge owned by you that you wish to spawn the Beaver of this Job on.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateRecruit: function(player, tile, args) {
+        // <<-- Creer-Merge: invalidateRecruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        if(!player || player !== this.game.currentPlayer) {
+            return `Not ${player}'s turn.`;
+        }
+        if(!tile) {
+            return `${tile} is not a valid Tile.`;
+        }
+        if(tile.lodgeOwner !== player) {
+            return `${tile} is not owned by ${player}.`;
+        }
+        if(tile.beaver) {
+            return `There's already ${tile.beaver} at that lodge`;
+        }
+        if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.fish < this.cost) {
+            return `${tile} does not have enough fish available. (${tile.fish}/${this.cost})`;
+        }
+
+        // <<-- /Creer-Merge: invalidateRecruit -->>
+    },
+
+    /**
      * Recruits a Beaver of this Job to a lodge
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} lodge - The Tile that is a lodge owned by you that you wish to spawn the Beaver of this Job on.
-     * @param {function} asyncReturn - if you nest orders in this function you must return that value via this function in the order's callback.
+     * @param {Tile} tile - The Tile that is a lodge owned by you that you wish to spawn the Beaver of this Job on.
      * @returns {Beaver} The recruited Beaver if successful, null otherwise.
      */
-    recruit: function(player, lodge, asyncReturn) {
-        let tile = lodge;
+    recruit: function(player, tile) {
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        let reason;
-
-        if(!player || player !== this.game.currentPlayer) {
-            reason = `Not ${player}'s turn.`;
-        }
-        else if(!tile) {
-            reason = `${tile} is not a valid Tile.`;
-        }
-        else if(tile.lodgeOwner !== player) {
-            reason = `${tile} is not owned by ${player}.`;
-        }
-        else if(tile.beaver) {
-            reason = `There's already ${tile.beaver} at that lodge`;
-        }
-        else if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.fish < this.cost) {
-            reason = `${tile} does not have enough fish available. (${tile.fish}/${this.cost})`;
-        }
-
-        if(reason) {
-            return this.game.logicError(null, reason);
-        }
 
         let beaver = this.game.create("Beaver", {
             job: this,
             owner: player,
             tile: tile,
+            recruited: false,
         });
 
-        tile.beaver = beaver;
+        // if they have more beavers
         if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
             tile.fish -= this.cost;
         }
@@ -159,6 +166,7 @@ var Job = Class(GameObject, {
         return beaver;
         // <<-- /Creer-Merge: recruit -->>
     },
+
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
