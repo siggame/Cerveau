@@ -74,16 +74,10 @@ var TurnBasedGame = Class(BaseGame, {
 
     /**
      * Called before a players turn, including the first turn.
+     * You don't have to call this base method if you don't want to, it does nothing without overriding it
      */
     beforeTurn: function() {
-        if(this.currentTurn + 1 === this.maxTurns) {
-            this._maxTurnsReached();
-            return;
-        }
-
-        this.currentTurn++;
-        this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
-        this.currentPlayer.timeRemaining += this._playerAdditionalTimePerTurn;
+        // intended to be overwritten by games that need this
     },
 
     /**
