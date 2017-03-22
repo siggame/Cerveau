@@ -51,7 +51,7 @@ let Spawner = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.health = 1;
 
         //<<-- /Creer-Merge: init -->>
     },

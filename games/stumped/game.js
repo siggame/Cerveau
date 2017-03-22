@@ -208,7 +208,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // TODO: actual map generation
         for(let x = 0; x < this.mapWidth; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
-                this.getTile(x, y).type = Math.random() < 0.2 ? "Water" : "Land";
+                let tile = this.getTile(x, y);
+                tile.type = Math.random() < 0.2 ? "water" : "land";
+                if(Math.random() < 0.8) {
+                    this.create("Spawner", {
+                        tile: tile,
+                        type: tile.type === "water" ? "fish" : "branches",
+                    });
+                }
             }
         }
 
@@ -428,6 +435,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(let i = 0; i < this.beavers.length; i++) {
             let beaver = this.beavers[i];
             beaver.turnsDistracted = (beaver.turnsDistracted > 0) ? beaver.turnsDistracted - 1 : beaver.turnsDistracted;
+            beaver.actions = beaver.job.actions;
+            beaver.moves = beaver.job.moves;
         }
     },
 

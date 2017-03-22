@@ -93,6 +93,8 @@ let Beaver = Class(GameObject, {
 
         // start with the max health as defined by our job
         this.health = this.job.health;
+        this.actions = this.job.actions;
+        this.moves = this.job.moves;
 
         this.game.newBeavers.push(this);
 
@@ -144,8 +146,8 @@ let Beaver = Class(GameObject, {
     attack: function(player, beaver) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        beaver.health = Math.max(0, beaver.health, this.beaver.job.damage);
-        beaver.turnsDistracted = beaver.turnsDistracted || this.jobs.distractionPower; // if the beaver is already distracted, keep that value, otherwise they get distracted by this attack
+        beaver.health = Math.max(0, beaver.health, this.job.damage);
+        beaver.turnsDistracted = beaver.turnsDistracted || this.job.distractionPower; // if the beaver is already distracted, keep that value, otherwise they get distracted by this attack
         this.actions--;
 
         // check if the enemy beaver died
@@ -222,8 +224,10 @@ let Beaver = Class(GameObject, {
         }
 
         this.tile.lodgeOwner = player;
-        this.player.lodges.push(this.tile);
+        this.owner.lodges.push(this.tile);
         this.actions--;
+
+        player.branchesToBuildLodge += 50; // TODO: actual equation
 
         return true;
 
@@ -366,6 +370,8 @@ let Beaver = Class(GameObject, {
         if(spawner.health > 0) {
             spawner.health--;
         }
+
+        spawner.hasBeenHarvested = true;
 
         return true;
 

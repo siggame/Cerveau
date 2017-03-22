@@ -102,7 +102,7 @@ let Player = Class(GameObject, {
 
         this.name = this.name || "Unnamed Player";
         this.clientType = this.clientType || "Unknown";
-        this.branchesToBuildLodge = this.branchesToBuildLodge || 10;
+        this.branchesToBuildLodge = this.branchesToBuildLodge || 0;
 
         //<<-- /Creer-Merge: init -->>
     },
