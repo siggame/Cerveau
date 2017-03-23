@@ -210,7 +210,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             for(let y = 0; y < this.mapHeight; y++) {
                 let tile = this.getTile(x, y);
                 tile.type = Math.random() < 0.2 ? "water" : "land";
-                if(Math.random() < 0.8) {
+                if(Math.random() > 0.8) {
                     this.create("Spawner", {
                         tile: tile,
                         type: tile.type === "water" ? "fish" : "branches",

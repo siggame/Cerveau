@@ -52,6 +52,7 @@ let Spawner = Class(GameObject, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.health = 1;
+        this.tile.spawner = this;
 
         //<<-- /Creer-Merge: init -->>
     },
