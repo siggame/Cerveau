@@ -210,7 +210,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             for(let y = 0; y < this.mapHeight; y++) {
                 let tile = this.getTile(x, y);
                 tile.type = Math.random() < 0.2 ? "water" : "land";
-                if(Math.random() > 0.8) {
+                if(Math.random() < 0.05) {
                     this.create("Spawner", {
                         tile: tile,
                         type: tile.type === "water" ? "fish" : "branches",
@@ -283,6 +283,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      */
     nextTurn: function() {
         // before we go to the next turn, reset variables and do end of turn logic
+        this.cleanupArrays();
         this.updateBeavers();
         this.updateResources();
 
@@ -443,15 +444,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateResources: function() {
         let tilesChecked = [];
         for(const tile of this.tiles) {
-            // Kill fish on land
+        // Kill fish on land
             if(tile.fish > 0 && tile.type === "Land") {
                 tile.fish--;
             }
 
-            // Move branches downstream
+        // Move branches downstream
             this.moveBranches(tile, tilesChecked);
 
-            // Spawn new resources
+        // Spawn new resources
             if(tile.spawner) {
                 if(!tile.spawner.hasBeenHarvested) {
                     tile.spawner.health += 1;
@@ -482,10 +483,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // For each beaver, if its health <= 0
         // - remove it from this.beavers
         // - remove it from beaver.owner.beavers
-        for(const beaver of this.beavers) {
+        for(let i = 0; i < this.beavers.length; i++) {
+            let beaver = this.beavers[i];
             if(beaver.health <= 0) {
                 this.beavers.removeElement(beaver);
                 beaver.owner.beavers.removeElement(beaver);
+                i--;
             }
         }
 
@@ -494,6 +497,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             this.beavers.push(beaver);
             beaver.owner.beavers.push(beaver);
         }
+        this.newBeavers = [];
     },
 
     //<<-- /Creer-Merge: added-functions -->>
