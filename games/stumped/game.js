@@ -167,6 +167,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.freeBeaversCount = this.freeBeaversCount || 10;
         this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
 
+        this.maxSpawnerHealth = this.maxSpawnerHealth || 5;
+        
         // read in all the jobs in the jobStats.json file and initialize a Job instance for it.
         for(const title of Object.keys(JobStats.jobs).sort()) {
             this.jobs.push(
@@ -438,6 +440,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             beaver.turnsDistracted = (beaver.turnsDistracted > 0) ? beaver.turnsDistracted - 1 : beaver.turnsDistracted;
             beaver.actions = beaver.job.actions;
             beaver.moves = beaver.job.moves;
+            
+            // Make sure these are ints
+            if (beaver.branches != Math.floor(beaver.branches))
+                console.log("Fish: " + beaver.fish);
+            if (beaver.fish != Math.floor(beaver.fish))
+                console.log("Fish: " + beaver.fish);
         }
     },
 
@@ -454,7 +462,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Spawn new resources
             if(tile.spawner) {
-                if(!tile.spawner.hasBeenHarvested) {
+                if(!tile.spawner.hasBeenHarvested && tile.spawner.health < this.maxSpawnerHealth) {
                     tile.spawner.health += 1;
                 }
 
