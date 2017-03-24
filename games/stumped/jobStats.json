@@ -1,6 +1,6 @@
 {
 	"default": {
-        "cost": 1,
+        "cost": 3,
 		"damage": 1,
 		"health": 3,
 		"moves": 3,
@@ -13,37 +13,37 @@
 	"jobs": {
 		"Basic": {},
 		"Buff": {
-            "cost": 4,
+            "cost": 12,
 			"damage": 3,
 			"health": 4,
 			"moves": 2,
 			"carryLimit": 6
 		},
 		"Tank": {
-            "cost": 4,
+            "cost": 12,
 			"damage": 2,
 			"health": 10,
 			"moves": 2,
 			"carryLimit": 2
 		},
 		"Fishing": {
-            "cost": 4,
+            "cost": 12,
 			"fishing": 3,
 			"distract": 2
 		},
 		"Swimming": {
-            "cost": 2,
+            "cost": 6,
 			"fishing": 2,
 			"moves": 5,
 			"carryLimit": 2
 		},
 		"Hot Lady": {
-            "cost": 5,
+            "cost": 15,
 			"distract": 3,
 			"carryLimit": 1
 		},
 		"Build": {
-            "cost": 2,
+            "cost": 6,
 			"chopping": 3
 		}
 	}
