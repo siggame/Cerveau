@@ -1,6 +1,9 @@
 var constants = require("./constants");
 var Class = require(__basedir + "/utilities/class");
 var BaseGameObject = require("./shared/baseGameObject");
+let log = require("./log");
+const INT_MAX = 2147483647;
+const INT_MIN = -2147483648;
 
 /**
  * A collection of static functions that deals with transforming game states to and from serializable objects when communicating between client <--> sever
@@ -29,7 +32,18 @@ var serializer = {
     },
 
     defaultInteger: function(i) {
-        return parseInt(i) || 0;
+        i = parseInt(i) || 0;
+
+        if(i > INT_MAX) {
+            log.warning(`Integer ${i} exceeds INT_MAX`);
+            i = INT_MAX;
+        }
+        else if(i < INT_MIN) {
+            log.warning(`Integer ${i} exceeds INT_MIN`);
+            i = INT_MIN;
+        }
+
+        return i;
     },
 
     defaultString: function(s) {

@@ -58,12 +58,21 @@ log.error = function(/* ... */) {
 };
 
 /**
- * logs variables to the debug stream, replaces console.debug() -> log()
+ * logs variables to the debug stream, replaces console.debug() -> log.debug()
  *
  * @param {...*} arguments - anything you'd log just like console.log
  */
 log.debug = function(/* ... */) {
     _obj.log(arguments, colors.cyan);
+};
+
+/**
+ * logs variables to the warn stream, replaces console.wan() -> log.warning()
+ *
+ * @param {...*} arguments - anything you'd log just like console.log
+ */
+log.warning = function(/* ... */) {
+    _obj.log(arguments, colors.yellow);
 };
 
 /**
