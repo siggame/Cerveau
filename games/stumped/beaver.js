@@ -227,7 +227,7 @@ let Beaver = Class(GameObject, {
         this.owner.lodges.push(this.tile);
         this.actions--;
 
-        player.branchesToBuildLodge += 50; // TODO: actual equation
+        player.branchesToBuildLodge += 20; // TODO: actual equation
 
         return true;
 
@@ -310,7 +310,7 @@ let Beaver = Class(GameObject, {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this[resource] -= amount;
-        this.tile[resource] += amount;
+        tile[resource] += amount;
         this.actions--;
 
         return true;
@@ -363,7 +363,7 @@ let Beaver = Class(GameObject, {
         const skillScalar = spawner.type === "branches" ? this.job.chopping : this.job.fishing;
         const maxCanHarvest = Math.pow(this.game.spawnerHarvestConstant, spawner.health) * skillScalar;
 
-        this[spawner.type] += Math.max(spaceAvailable, maxCanHarvest);
+        this[spawner.type] += Math.min(spaceAvailable, maxCanHarvest);
         this.actions--;
 
         // damage the spawner because we harvested from it
@@ -475,42 +475,44 @@ let Beaver = Class(GameObject, {
         }
 
         if(!tile) {
-            return `${tile} is not a valid tile to drop resources on.`;
+            return `${tile} is not a valid tile to pick up resources from.`;
         }
 
-        if(this.tile !== tile || this.tile.hasNeighbor(tile)) {
+        if(this.tile !== tile && !this.tile.hasNeighbor(tile)) {
             return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
         }
 
         if(tile.spawner) {
-            return `${tile} has ${tile.spawner} on it, and cannot have resourced dropped onto it.`;
+            return `${tile} has ${tile.spawner} on it, and cannot have resources picked up from it.`;
         }
 
         // transform the resource into the first, lower cased, character.
         // We only need to know 'f' vs 'b' to tell what resource type.
         const char = resource[0].toLowerCase();
 
-        if(char !== "f" || char !== "b") {
-            return `${resource} is not a valid resource to drop.`;
+        if(char !== "f" && char !== "b") {
+            return `${resource} is not a valid resource to pick up.`;
         }
 
         // now clean the actual resource
         resource = char === "f" ? "fish" : "branches";
 
+        // Calculate max resources the beaver can carry
+        const spaceAvailable = this.job.carryLimit - this.branches - this.fish;
+        
         // transform the amount if they passed in a number =< 0
         if(amount <= 0) {
-            amount = tile[resource];
+            amount = Math.min(tile[resource], spaceAvailable);
         }
 
         if(amount <= 0) {
-            return `${this} cannot pickup ${amount} of ${resource}`;
+            return `${this} cannot pick up ${amount} of ${resource}`;
         }
 
         if(amount > tile[resource]) {
-            return `${tile} does not have ${amount} ${resource} to pickup.`;
+            return `${tile} does not have ${amount} ${resource} to pick up.`;
         }
 
-        const spaceAvailable = this.job.carryLimit - this.branches - this.fish;
         if(amount > spaceAvailable) {
             return `${this} cannot carry ${amount} of ${resource} because it only can carry ${spaceAvailable} more resources`;
         }
