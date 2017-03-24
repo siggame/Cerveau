@@ -440,12 +440,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             beaver.turnsDistracted = (beaver.turnsDistracted > 0) ? beaver.turnsDistracted - 1 : beaver.turnsDistracted;
             beaver.actions = beaver.job.actions;
             beaver.moves = beaver.job.moves;
-            
-            // Make sure these are ints
-            if (beaver.branches != Math.floor(beaver.branches))
-                console.log("Fish: " + beaver.fish);
-            if (beaver.fish != Math.floor(beaver.fish))
-                console.log("Fish: " + beaver.fish);
         }
     },
 
