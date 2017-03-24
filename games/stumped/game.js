@@ -446,11 +446,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateResources: function() {
         let tilesChecked = [];
         for(const tile of this.tiles) {
-            // Kill fish on land
-            if(tile.fish > 0 && tile.type === "Land") {
-                tile.fish--;
-            }
-
             // Move branches downstream
             this.moveBranches(tile, tilesChecked);
 
