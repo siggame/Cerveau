@@ -258,7 +258,7 @@ let Beaver = Class(GameObject, {
         // We only need to know 'f' vs 'b' to tell what resource type.
         const char = resource[0].toLowerCase();
 
-        if(char !== "f" || char !== "b") {
+        if(char !== "f" && char !== "b") {
             return `${resource} is not a valid resource to drop.`;
         }
 
@@ -282,7 +282,7 @@ let Beaver = Class(GameObject, {
             return `${tile} is not a valid tile to drop resources on.`;
         }
 
-        if(this.tile !== tile || this.tile.hasNeighbor(tile)) {
+        if(this.tile !== tile && !this.tile.hasNeighbor(tile)) {
             return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
         }
 
