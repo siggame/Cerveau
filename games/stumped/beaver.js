@@ -361,7 +361,7 @@ let Beaver = Class(GameObject, {
         const load = this.fish + this.branches;
         const spaceAvailable = this.job.carryLimit - load;
         const skillScalar = spawner.type === "branches" ? this.job.chopping : this.job.fishing;
-        const maxCanHarvest = Math.pow(this.game.spawnerHarvestConstant, spawner.health) * skillScalar;
+        const maxCanHarvest = this.game.spawnerHarvestConstant * spawner.health * skillScalar;
 
         this[spawner.type] += Math.min(spaceAvailable, maxCanHarvest);
         this.actions--;
@@ -438,18 +438,21 @@ let Beaver = Class(GameObject, {
     move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // calculate movement cost before moving
+        let cost = this.tile.getMovementCost(tile);
+        
         // update target tile's beaver to this beaver
         tile.beaver = this;
 
         // remove me from the time I was on
         this.tile.beaver = null;
-
+        
         // update this beaver's tile to target tile
         this.tile = tile;
 
         // finally decrement this beaver's moves count by the move cost
-        this.moves -= this.tile.getMovementCost(tile);
-
+        this.moves -= cost;
+        
         return true;
         // <<-- /Creer-Merge: move -->>
     },
