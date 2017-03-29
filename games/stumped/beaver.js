@@ -440,19 +440,19 @@ let Beaver = Class(GameObject, {
 
         // calculate movement cost before moving
         let cost = this.tile.getMovementCost(tile);
-        
+
         // update target tile's beaver to this beaver
         tile.beaver = this;
 
         // remove me from the time I was on
         this.tile.beaver = null;
-        
+
         // update this beaver's tile to target tile
         this.tile = tile;
 
         // finally decrement this beaver's moves count by the move cost
         this.moves -= cost;
-        
+
         return true;
         // <<-- /Creer-Merge: move -->>
     },
@@ -502,7 +502,7 @@ let Beaver = Class(GameObject, {
 
         // Calculate max resources the beaver can carry
         const spaceAvailable = this.job.carryLimit - this.branches - this.fish;
-        
+
         // transform the amount if they passed in a number =< 0
         if(amount <= 0) {
             amount = Math.min(tile[resource], spaceAvailable);
