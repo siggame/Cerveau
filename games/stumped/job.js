@@ -151,17 +151,17 @@ let Job = Class(GameObject, {
     recruit: function(player, tile) {
         // <<-- Creer-Merge: recruit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // if they have more beavers
+        if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
+            tile.fish -= this.cost;
+        }
+
         let beaver = this.game.create("Beaver", {
             job: this,
             owner: player,
             tile: tile,
             recruited: false,
         });
-
-        // if they have more beavers
-        if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
-            tile.fish -= this.cost;
-        }
 
         return beaver;
         // <<-- /Creer-Merge: recruit -->>

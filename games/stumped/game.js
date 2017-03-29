@@ -168,7 +168,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
 
         this.maxSpawnerHealth = this.maxSpawnerHealth || 5;
-        
+
         // read in all the jobs in the jobStats.json file and initialize a Job instance for it.
         for(const title of Object.keys(JobStats.jobs).sort()) {
             this.jobs.push(
@@ -478,17 +478,17 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             this.beavers.push(beaver);
         }
         this.newBeavers = [];
-        
+
         // Clear each player's beavers array. It will be recreated.
         for(const player of this.players) {
             player.beavers = [];
         }
-        
+
         // Clear each tile's beaver property. It will be reassigned.
         for(const tile of this.tiles) {
             tile.beaver = null;
         }
-        
+
         // For each beaver, if its health <= 0
         // - remove it from this.beavers
         // - remove it from beaver.owner.beavers
@@ -497,7 +497,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             if(beaver.health <= 0) {
                 this.beavers.removeElement(beaver);
                 i--;
-            } else {
+            }
+            else {
                 beaver.owner.beavers.push(beaver);
                 beaver.tile.beaver = beaver;
             }
