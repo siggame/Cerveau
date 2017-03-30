@@ -102,7 +102,6 @@ let Player = Class(GameObject, {
 
         this.name = this.name || "Unnamed Player";
         this.clientType = this.clientType || "Unknown";
-        this.branchesToBuildLodge = this.branchesToBuildLodge || 0;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -117,6 +116,11 @@ let Player = Class(GameObject, {
     getAliveBeavers: function() {
         return this.beavers.filter((beaver) => beaver.health > 0)
         .concat(this.game.newBeavers);
+    },
+
+    calculateBranchesToBuildLodge: function() {
+        // TODO: document this in the game rules
+        this.branchesToBuildLodge = this.game.lodgeCostConstant * this.lodges.length;
     },
 
     //<<-- /Creer-Merge: added-functions -->>

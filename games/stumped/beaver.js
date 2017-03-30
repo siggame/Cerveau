@@ -227,7 +227,7 @@ let Beaver = Class(GameObject, {
         this.owner.lodges.push(this.tile);
         this.actions--;
 
-        player.branchesToBuildLodge += 20; // TODO: actual equation
+        player.calculateBranchesToBuildLodge();
 
         return true;
 
@@ -539,11 +539,17 @@ let Beaver = Class(GameObject, {
     pickup: function(player, tile, resource, amount) {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Beaver's pickup function here
-
-        this.tile[resource] -= amount;
+        tile[resource] -= amount;
         this[resource] += amount;
         this.actions--;
+
+        // if the tile is a lodge, and it has reached 0 branches, it is no longer a lodge
+        if(tile.lodgeOwner && tile.branches === 0) {
+            const lodgeOwner = tile.lodgeOwner;
+            lodgeOwner.lodges.removeElement(tile);
+            tile.lodgeOwner = null;
+            lodgeOwner.calculateBranchesToBuildLodge();
+        }
 
         return true;
 

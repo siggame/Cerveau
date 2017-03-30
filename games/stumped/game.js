@@ -156,14 +156,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
-        this.mapWidth = this.mapWidth || 60;
-        this.mapHeight = this.mapHeight || 30;
+        this.mapWidth = this.mapWidth || 32;
+        this.mapHeight = this.mapHeight || 20;
 
         this.maxTurns = this.maxTurns || 500;
 
         this.spawnerHarvestConstant = this.spawnerHarvestConstant || 2;
         this.lodgeCostConstant = this.lodgeCostConstant || 50;
 
+        this.branchesToCompleteLodge= this.branchesToCompleteLodge || 100;
         this.freeBeaversCount = this.freeBeaversCount || 10;
         this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
 
