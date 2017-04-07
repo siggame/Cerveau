@@ -147,6 +147,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // initialize all the constants in this game
         this.mapWidth = this.mapWidth || 32;
         this.mapHeight = this.mapHeight || 20;
 
@@ -427,19 +428,23 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     updateBeavers: function() {
-        for(let i = 0; i < this.beavers.length; i++) {
-            let beaver = this.beavers[i];
-            beaver.turnsDistracted = (beaver.turnsDistracted > 0) ? beaver.turnsDistracted - 1 : beaver.turnsDistracted;
+        for(const beaver of this.beavers) {
+            // if they are distracted
+            if(beaver.turnsDistracted > 0) {
+                beaver.turnsDistracted--; // decrement the turns count
+            }
+
+            // reset their actions/moves for next turn
             beaver.actions = beaver.job.actions;
             beaver.moves = beaver.job.moves;
         }
     },
 
     updateResources: function() {
-        let tilesChecked = [];
+        let tilesChecked = new Set();
         for(const tile of this.tiles) {
             // Move branches downstream
-            this.moveBranches(tile, tilesChecked);
+            this.moveResources(tile, tilesChecked);
 
             // Spawn new resources
             if(tile.spawner) {
@@ -452,12 +457,24 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    moveBranches: function(tile, tilesChecked) {
-        if(tile.type === "Water" && tile.flowDirection && !(tile in tilesChecked)) {
-            tilesChecked.push(tile);
-            let nextTile = tile["tile" + tile.flowDirection];
-            if(nextTile) {
-                this.moveBranches(nextTile, tilesChecked);
+    moveResources: function(tile, tilesChecked) {
+        // if the tile we are checking:
+        //  - is a water tile
+        //  - has no lodge owner (resources don't flow out of lodges)
+        //  - has a flow direction (water flows through it)
+        //  - has not already been checked
+        // then we need to flow resources off it
+        if(tile.type === "Water" && !tile.lodgeOwner && tile.flowDirection && !tilesChecked.has(tile)) {
+            tilesChecked.add(tile);
+            const nextTile = tile.getNeighbor(tile.flowDirection);
+            // if there is a tile to flow to, the move all the branches and food to that tile
+            if(nextTile && !nextTile.lodgeOwner) {
+                // recursively move the next tile's resources, this way the furthest down steam tile gets updated first, so we don't update resources on top of each other.
+                this.moveResources(nextTile, tilesChecked);
+
+                nextTile.food += tile.food;
+                tile.food = 0;
+
                 nextTile.branches += tile.branches;
                 tile.branches = 0;
             }
@@ -465,34 +482,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     cleanupArrays: function() {
-        // For each new beaver, insert them into the array
-        for(const beaver of this.newBeavers) {
-            this.beavers.push(beaver);
-        }
-        this.newBeavers = [];
+        // add all the new beavers to this.beavers
+        this.beavers.push.apply(this.beavers, this.newBeavers);
 
-        // Clear each player's beavers array. It will be recreated.
-        for(const player of this.players) {
-            player.beavers = [];
-        }
+        // and empty out the `this.newBeavers` array as they are no longer new and have been added above
+        this.newBeavers.length = 0;
 
-        // Clear each tile's beaver property. It will be reassigned.
-        for(const tile of this.tiles) {
-            tile.beaver = null;
-        }
-
-        // For each beaver, if its health <= 0
-        // - remove it from this.beavers
-        // - remove it from beaver.owner.beavers
-        for(let i = 0; i < this.beavers.length; i++) {
-            let beaver = this.beavers[i];
+        let allBeavers = this.beavers.slice(); // clone of array so we can remove them from the actual array and not fuck up loop iteration
+        for(const beaver of allBeavers) {
             if(beaver.health <= 0) {
+                // poor beaver died, remove it from arrays
                 this.beavers.removeElement(beaver);
-                i--;
-            }
-            else {
-                beaver.owner.beavers.push(beaver);
-                beaver.tile.beaver = beaver;
+                beaver.owner.beavers.removeElement(beaver);
             }
         }
     },
