@@ -447,9 +447,36 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     updateResources: function() {
         let tilesChecked = new Set();
+        let newResources = {};
         for(const tile of this.tiles) {
-            // Move branches downstream
-            this.moveResources(tile, tilesChecked);
+            if(tile.type === "water" && tile.flowDirection) {
+                const nextTile = tile.getNeighbor(tile.flowDirection);
+
+                // Move resources downstream
+                if(newResources[nextTile]) {
+                    let curResources = newResources[nextTile];
+                    newResources[nextTile] = [curResources[0] + tile.branches, curResources[1] + tile.fish];
+                }
+                else {
+                    newResources[nextTile] = [tile.branches, tile.food];
+                }
+
+                if(!newResources[tile]) {
+                    newResources[tile] = [0, 0];
+                }
+            }
+            else {
+                // Keep resources here
+                if(newResources[tile]) {
+                    let curResources = newResources[tile];
+                    newResources[tile] = [curResources[0] + tile.branches, curResources[1] + tile.fish];
+                }
+                else {
+                    newResources[tile] = [tile.branches, tile.food];
+                }
+            }
+            tile.branches = 0;
+            tile.fish = 0;
 
             // Spawn new resources
             if(tile.spawner) {
@@ -460,29 +487,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile.spawner.hasBeenHarvested = false;
             }
         }
-    },
 
-    moveResources: function(tile, tilesChecked) {
-        // if the tile we are checking:
-        //  - is a water tile
-        //  - has no lodge owner (resources don't flow out of lodges)
-        //  - has a flow direction (water flows through it)
-        //  - has not already been checked
-        // then we need to flow resources off it
-        if(tile.type === "Water" && !tile.lodgeOwner && tile.flowDirection && !tilesChecked.has(tile)) {
-            tilesChecked.add(tile);
-            const nextTile = tile.getNeighbor(tile.flowDirection);
-            // if there is a tile to flow to, the move all the branches and food to that tile
-            if(nextTile && !nextTile.lodgeOwner) {
-                // recursively move the next tile's resources, this way the furthest down steam tile gets updated first, so we don't update resources on top of each other.
-                this.moveResources(nextTile, tilesChecked);
-
-                nextTile.food += tile.food;
-                tile.food = 0;
-
-                nextTile.branches += tile.branches;
-                tile.branches = 0;
-            }
+        // Move resources
+        for(const tile of this.tiles) {
+            tile.branches = newResources[tile][0];
+            tile.fish = newResources[tile][1];
         }
     },
 
