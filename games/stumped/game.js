@@ -234,6 +234,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             });
         }
 
+        this.generateMap();
+
         //<<-- /Creer-Merge: begin -->>
     },
 
@@ -528,11 +530,288 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(const beaver of allBeavers) {
             if(beaver.health <= 0) {
                 // poor beaver died, remove it from arrays
-                this.beavers.removeElement(beaver);
                 beaver.owner.beavers.removeElement(beaver);
+                this.beavers.removeElement(beaver);
+            }
+            else {
+                beaver.owner.beavers.push(beaver);
+                beaver.tile.beaver = beaver;
             }
         }
     },
+
+    generateMap: function() {
+        /* Fill map with land */
+        for(let x = 0; x < this.mapWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let tile = this.getTile(x, y);
+                tile.type = "land";
+            }
+        }
+
+        // Used for symmetry
+        let horizontal = true || Math.random() < 0.5;
+        let lake = 0;
+
+        /* Generate lake */
+        if(horizontal) {
+            // Lake center
+            lake = Math.floor(this.mapWidth / 2);
+
+            // Generate random metaballs where the lake will be
+            let balls = [];
+            const minRadius = 0.5;
+            const maxRadius = 5.0;
+            const maxOffset = 2.0;
+            const additionalBalls = 5;
+            const gooeyness = 1.0;
+            const threshold = 3.5;
+            const radiusRange = maxRadius - minRadius;
+
+            // Initial ball (lake center)
+            balls.push({
+                x: lake,
+                y: this.mapHeight / 2,
+                r: Math.random() * radiusRange + minRadius,
+            });
+
+            // Extra balls
+            for(let i = 0; i < additionalBalls; i++) {
+                balls.push({
+                    x: lake + Math.random() * maxOffset * 2 - maxOffset,
+                    y: this.mapHeight / 2 - Math.random() * maxOffset,
+                    r: Math.random() * radiusRange + minRadius,
+                });
+            }
+
+            // Generate lake from metaballs
+            for(let x = 0; x < this.mapWidth; x++) {
+                for(let y = 0; y < this.mapHeight / 2; y++) {
+                    let tile = this.getTile(x, y);
+                    let energy = 0;
+                    for(const ball of balls) {
+                        let r = ball.r;
+                        let dist = Math.sqrt(Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2));
+                        let d = Math.max(0.0001, Math.pow(dist, gooeyness));
+                        energy += r / d;
+                    }
+
+                    if(energy > threshold) {
+                        tile.type = "water";
+                    }
+                }
+            }
+        }
+
+        /* Generate rivers */
+        const minTheta = Math.PI / 4;
+        const maxTheta = 3 * Math.PI / 4;
+        const minThetaDelta = Math.PI / 6;
+        const maxThetaDelta = Math.PI / 4;
+        const thetaDeltaRange = maxThetaDelta - minThetaDelta;
+
+        let theta = minTheta - minThetaDelta;
+        if(horizontal) {
+            while(true) {
+                theta += Math.random() * thetaDeltaRange + minThetaDelta;
+                if(theta >= maxTheta) {
+                    break;
+                }
+                // console.log(`Generating river at ${theta * 180 / Math.PI} degrees`);
+
+                // Define the line segments
+                let points = [];
+
+                // Starting point - The center of lake, at (0, 0)
+                points.push({
+                    x: 0,
+                    y: 0,
+                });
+
+                // Final point - Outside the edge of the map
+                points.push({
+                    x: this.mapWidth + this.mapHeight,
+                    y: 0,
+                });
+
+                // Generate fractals
+                // createFractal(points, 0, 1);
+
+                // Transform points
+                let offset = Math.PI;
+                for(let p of points) {
+                    let r = Math.sqrt(p.x * p.x + p.y * p.y);
+                    let t = Math.atan2(p.y, p.x) + theta + offset;
+                    p.x = lake + r * Math.cos(t);
+                    p.y = this.mapHeight / 2 + r * Math.sin(t);
+                }
+
+                // console.log("Points:");
+                // console.log(points);
+
+                // Draw line segments
+                let collided = false;
+                for(let i = 1; !collided && i < points.length; i++) {
+                    let a = points[i - 1];
+                    let b = points[i];
+
+                    // Useful values
+                    let dx = b.x - a.x;
+                    let dy = b.y - a.y;
+                    let steps = 0;
+                    if(Math.abs(dx) > Math.abs(dy)) {
+                        steps = Math.abs(dx);
+                    }
+                    else {
+                        steps = Math.abs(dy);
+                    }
+                    let xInc = dx / steps;
+                    let yInc = dy / steps;
+
+                    let x = a.x;
+                    let y = a.y;
+                    let lastX = -1;
+                    let lastY = -1;
+                    let nextDir = null;
+                    for(let step = 0; !collided && step < steps; step++) {
+                        x += xInc;
+                        y += yInc;
+                        let realX = Math.floor(x);
+                        let realY = Math.floor(y);
+                        let nextX = Math.floor(x + xInc);
+                        let nextY = Math.floor(y + yInc);
+
+                        // Verify the current tile exists
+                        if(realX >= 0 && realY >= 0 && realX < this.mapWidth && realY < this.mapHeight / 2) {
+                            // Set tile to water
+                            let tile = this.getTile(realX, realY);
+
+                            // Don't go diagonal
+                            if(realX !== nextX && realY !== nextY) {
+                                y -= yInc;
+                            }
+
+                            // Flow direction
+                            if(tile.type !== "water") {
+                                if(nextDir === null) {
+                                    if(realY > lastY) {
+                                        tile.flowDirection = "North";
+                                    }
+                                    else if(realY < lastY) {
+                                        tile.flowDirection = "South";
+                                    }
+                                    else if(realX < lastX) {
+                                        tile.flowDirection = "East";
+                                    }
+                                    else if(realX > lastX) {
+                                        tile.flowDirection = "West";
+                                    }
+                                }
+                                else {
+                                    tile.flowDirection = nextDir;
+                                    nextDir = null;
+                                }
+
+                                tile.type = "water";
+                            }
+                            else if(tile.flowDirection !== "") {
+                                collided = true;
+                            }
+                        }
+
+                        // Update last coords
+                        lastX = realX;
+                        lastY = realY;
+                    }
+                }
+            }
+        }
+
+        /* Generate resources */
+        for(let x = 0; x < this.mapWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let tile = this.getTile(x, y);
+                if(Math.random() < 0.05) {
+                    this.create("Spawner", {
+                        tile: tile,
+                        type: tile.type === "water" ? "fish" : "branches",
+                    });
+                }
+            }
+        }
+
+        /* Mirror map */
+        if(horizontal) {
+            for(let x = 0; x < this.mapWidth; x++) {
+                for(let y = 0; y < this.mapHeight / 2; y++) {
+                    let orig = this.getTile(x, y);
+                    let target = this.getTile(x, this.mapHeight - y - 1);
+
+                    // Copy data
+                    target.type = orig.type;
+                    target.spawner = orig.spawner;
+
+                    switch(orig.flowDirection) {
+                        case "North":
+                            target.flowDirection = "South";
+                            break;
+                        case "South":
+                            target.flowDirection = "North";
+                            break;
+                        case "East":
+                            target.flowDirection = "East";
+                            break;
+                        case "West":
+                            target.flowDirection = "West";
+                            break;
+                    }
+                }
+            }
+        }
+
+        /* Place starting beavers */
+        if(horizontal) {
+            let x = Math.floor(Math.random() * this.mapWidth);
+            let y = Math.floor(Math.random() * this.mapHeight / 2);
+            let p1 = this.getTile(x, y);
+            let p2 = this.getTile(x, this.mapHeight - y - 1);
+
+            // Player 1
+            this.create("Beaver", {
+                owner: this.players[0],
+                tile: p1,
+                job: this.jobs[0],
+                recruited: true,
+            });
+
+            // Player 2
+            this.create("Beaver", {
+                owner: this.players[0].opponent,
+                tile: p2,
+                job: this.jobs[0],
+                recruited: true,
+            });
+        }
+    },
+
+    /*createFractal: function(points, index, depth) {
+        let a = points[index];
+        let b = points[index + 1];
+        let center = {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2,
+        };
+
+        // Modify center's y value
+        let curVariance = 3 / depth;
+        center.y += Math.random() * 2 * curVariance - curVariance;
+
+        // Insert center point into the array
+        points.splice(index, 0, center);
+
+        // Offset for recursion
+        return 1;
+    }*/
 
     //<<-- /Creer-Merge: added-functions -->>
 
