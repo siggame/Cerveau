@@ -12,14 +12,14 @@
     },
     "jobs": {
         "Basic": {},
-        "Buff": {
+        "Fighter": {
             "cost": 12,
             "damage": 3,
             "health": 4,
             "moves": 2,
             "carryLimit": 6
         },
-        "Tank": {
+        "Bulky": {
             "cost": 12,
             "damage": 2,
             "health": 10,
@@ -27,9 +27,10 @@
             "carryLimit": 2
         },
         "Hungry": {
-            "cost": 12,
+            "cost": 8,
             "munching": 3,
-            "distract": 2
+            "distract": 2,
+            "carryLimit": 15
         },
         "Swift": {
             "cost": 6,
@@ -44,7 +45,8 @@
         },
         "Builder": {
             "cost": 6,
-            "chopping": 3
+            "chopping": 3,
+            "carryLimit": 15
         }
     }
 }

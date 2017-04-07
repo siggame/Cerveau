@@ -95,6 +95,7 @@ let Beaver = Class(GameObject, {
         this.health = this.job.health;
         this.actions = this.job.actions;
         this.moves = this.job.moves;
+        this.tile.beaver = this;
 
         this.game.newBeavers.push(this);
 
@@ -223,7 +224,7 @@ let Beaver = Class(GameObject, {
             this.tile.branches = 0;
         }
 
-        this.tile.branches = player.player.branchesToBuildLodge; // all the branches are now on this tile to makeup the lodge
+        this.tile.branches = player.branchesToBuildLodge; // all the branches are now on this tile to makeup the lodge
         this.tile.lodgeOwner = player;
         this.owner.lodges.push(this.tile);
         this.actions--;

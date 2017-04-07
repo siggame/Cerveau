@@ -148,18 +148,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // initialize all the constants in this game
-        this.mapWidth = this.mapWidth || 32;
-        this.mapHeight = this.mapHeight || 20;
+        this.mapWidth = data.mapWidth || 32;
+        this.mapHeight = data.mapHeight || 20;
 
-        this.maxTurns = this.maxTurns || 500;
+        this.maxTurns = data.maxTurns || 500;
 
-        this.spawnerHarvestConstant = this.spawnerHarvestConstant || 2;
-        this.lodgeCostConstant = this.lodgeCostConstant || mathjs.phi;
+        this.spawnerHarvestConstant = data.spawnerHarvestConstant || 2;
+        this.lodgeCostConstant = data.lodgeCostConstant || mathjs.phi;
 
-        this.freeBeaversCount = this.freeBeaversCount || 10;
-        this.lodgesToWin = this.lodgesCompleteToWin || 10;
+        this.freeBeaversCount = data.freeBeaversCount || 10;
+        this.lodgesToWin = data.lodgesCompleteToWin || 10;
 
-        this.maxSpawnerHealth = this.maxSpawnerHealth || 5;
+        this.maxSpawnerHealth = data.maxSpawnerHealth || 5;
 
         this.spawnerTypes.push("food", "branches");
 
@@ -215,6 +215,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // give each player a starting beaver
         for(const player of this.players) {
+            player.calculateBranchesToBuildLodge();
+
             let tile = null;
             while(!tile) {
                 tile = this.tiles.randomElement();
@@ -226,7 +228,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             this.create("Beaver", {
                 owner: player,
                 tile: tile,
-                job: this.jobs[0],
+                job: this.jobs[0], // Basic Beaver
                 recruited: true,
                 branches: 1,
             });
@@ -282,6 +284,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.updateBeavers();
         this.updateResources();
 
+        for(const b of this.beavers) {
+            for(const a of this.beavers) {
+                if(a !== b && a.tile && a.tile === b.tile) {
+                    throw new Error(`FUCK ${a} is on ${b} at ${a.tile}`);
+                }
+            }
+        }
+
         if(this.checkForWinner()) {
             // we found a winner, no need to proceed to the next turn
             return;
@@ -294,10 +304,32 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     checkForWinner: function(force) {
         // Check if a player has created 10 lodges (they are built instantly)
         // Check if this.maxTurns turns have passed, and if so, in this order:
+        // - Player has been made extinct (all beavers & lodges destroyed)
         // - Player with most lodges wins
         // - Player with most branches wins
         // - Player with most food wins
         // - Random player wins
+
+        const extinctPlayers = this.players.filter((p) => p.beavers.length === 0 && p.lodges.length === 0);
+
+        if(extinctPlayers.length > 0) {
+            // someone lost via extermination
+            if(extinctPlayers.length === this.players.length) {
+                // they both somehow killed everything, so the board is empty. Win via coin flip
+                this._endGameViaCoinFlip("Simultaneous Extinction");
+                return true;
+            }
+            else {
+                // all exterminated players lost
+                const notExtinct = this.players.filter((p) => extinctPlayers.indexOf(p) === -1);
+                if(notExtinct.length === 1) {
+                    // that player won, all other players are extinct
+                    this.declareWinner(notExtinct[0], "Drove opponent to extinction!");
+                }
+                // all extinct players have now lost
+                this.declareLosers(extinctPlayers, "Extinct - All Beavers and lodges destroyed");
+            }
+        }
 
         // Get player info
         let playerInfo = [];
@@ -483,12 +515,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     cleanupArrays: function() {
         // add all the new beavers to this.beavers
-        this.beavers.push.apply(this.beavers, this.newBeavers);
+        for(const newBeaver of this.newBeavers) {
+            this.beavers.push(newBeaver);
+            newBeaver.owner.beavers.push(newBeaver);
+        }
 
         // and empty out the `this.newBeavers` array as they are no longer new and have been added above
         this.newBeavers.length = 0;
 
         let allBeavers = this.beavers.slice(); // clone of array so we can remove them from the actual array and not fuck up loop iteration
+        // remove all beavers from the game that died
         for(const beaver of allBeavers) {
             if(beaver.health <= 0) {
                 // poor beaver died, remove it from arrays

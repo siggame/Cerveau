@@ -647,8 +647,11 @@ var BaseGame = Class(DeltaMergeable, {
 
     /**
      * End the game via coin flip (1 random winner, the rest lose)
+     *
+     * @param {string} [reason="Draw"] - optional reason why win via coin flip is happening
      */
-    _endGameViaCoinFlip: function() {
+    _endGameViaCoinFlip: function(reason) {
+        reason = reason || "Draw";
         // Win via coin flip - if we got here no player won via game rules. They probably played identically to each other.
         var players = [];
         for(var i = 0; i < this.players.length; i++) {
@@ -661,10 +664,10 @@ var BaseGame = Class(DeltaMergeable, {
         var winnerIndex = Math.randomInt(players.length - 1);
         for(i = 0; i < players.length; i++) {
             if(i === winnerIndex) {
-                this.declareWinner(players[i], "Won via coin flip.");
+                this.declareWinner(players[i], `${reason} - Won via coin flip.`);
             }
             else {
-                this.declareLoser(players[i], "Lost via coin flip.");
+                this.declareLoser(players[i], `${reason} - Lost via coin flip.`);
             }
         }
     },
