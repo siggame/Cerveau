@@ -146,7 +146,7 @@ let Beaver = Class(GameObject, {
     attack: function(player, beaver) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        beaver.health = Math.max(0, beaver.health, this.job.damage);
+        beaver.health = Math.max(0, beaver.health - this.job.damage);
         beaver.turnsDistracted = beaver.turnsDistracted || this.job.distractionPower; // if the beaver is already distracted, keep that value, otherwise they get distracted by this attack
         this.actions--;
 
@@ -163,9 +163,7 @@ let Beaver = Class(GameObject, {
             beaver.moves = -1;
             beaver.turnsDistracted = -1;
 
-            // remove him from the map of tiles
-            beaver.tile.beaver = null;
-            beaver.tile = null;
+            // beaver will be removed at the end of the turn
         }
 
         return true;
