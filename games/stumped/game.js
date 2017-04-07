@@ -8,6 +8,7 @@ const TiledGame = require(`${__basedir}/gameplay/shared/tiledGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+const mathjs = require("mathjs");
 const JobStats = require("./jobStats.json");
 
 //<<-- /Creer-Merge: requires -->>
@@ -146,31 +147,20 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
-
         this.mapWidth = this.mapWidth || 32;
         this.mapHeight = this.mapHeight || 20;
 
         this.maxTurns = this.maxTurns || 500;
 
         this.spawnerHarvestConstant = this.spawnerHarvestConstant || 2;
-        this.lodgeCostConstant = this.lodgeCostConstant || 50;
+        this.lodgeCostConstant = this.lodgeCostConstant || mathjs.phi;
 
-        this.branchesToCompleteLodge= this.branchesToCompleteLodge || 100;
         this.freeBeaversCount = this.freeBeaversCount || 10;
-        this.lodgesCompleteToWin = this.lodgesCompleteToWin || 10;
+        this.lodgesToWin = this.lodgesCompleteToWin || 10;
 
         this.maxSpawnerHealth = this.maxSpawnerHealth || 5;
 
-        // read in all the jobs in the jobStats.json file and initialize a Job instance for it.
-        for(const title of Object.keys(JobStats.jobs).sort()) {
-            this.jobs.push(
-                this.create("Job", {title})
-            );
-        }
-
-        this.spawnerTypes.push("fish", "branches");
+        this.spawnerTypes.push("food", "branches");
 
         this.newBeavers = [];
 
@@ -197,6 +187,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        // read in all the jobs in the `jobStats.json` file and initialize a Job instance for it.
+        for(const title of Object.keys(JobStats.jobs).sort()) {
+            this.jobs.push(
+                this.create("Job", {title})
+            );
+        }
+
         // creates the 2D map based off the mapWidth/mapHeight set in the init function
         TiledGame._initMap.call(this);
 
@@ -209,7 +206,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(Math.random() < 0.05) {
                     this.create("Spawner", {
                         tile: tile,
-                        type: tile.type === "water" ? "fish" : "branches",
+                        type: tile.type === "water" ? "food" : "branches",
                     });
                 }
             }
@@ -230,6 +227,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile: tile,
                 job: this.jobs[0],
                 recruited: true,
+                branches: 1,
             });
         }
 
@@ -297,7 +295,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Check if this.maxTurns turns have passed, and if so, in this order:
         // - Player with most lodges wins
         // - Player with most branches wins
-        // - Player with most fish wins
+        // - Player with most food wins
         // - Random player wins
 
         // Get player info
@@ -309,14 +307,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             playerInfo[i] = {
                 "lodges": player.lodges.length,
                 "branches": 0,
-                "fish": 0,
+                "food": 0,
             };
 
             for(let j = 0; j < player.beavers.length; j++) {
                 let beaver = player.beavers[j];
 
                 playerInfo[i]["branches"] += beaver.branches;
-                playerInfo[i]["fish"] += beaver.fish;
+                playerInfo[i]["food"] += beaver.food;
             }
         }
 
@@ -397,11 +395,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 return true;
             }
 
-            // Find the player with the most fish
+            // Find the player with the most food
             max = 0;
             playerWithMax = -1;
             for(let player = 0; player < playerInfo.length; player++) {
-                let playerLodges = playerInfo[player]["fish"];
+                let playerLodges = playerInfo[player]["food"];
 
                 if(playerLodges > max) {
                     max = playerLodges;
@@ -414,9 +412,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             if(playerWithMax >= 0) {
                 let losers = this.players.clone();
-                this.declareWinner(losers[playerWithMax], "Player has won because they have the most fish.");
+                this.declareWinner(losers[playerWithMax], "Player has won because they have the most food.");
                 losers.splice(playerWithMax, 1);
-                this.declareLosers(losers, "Player does not have most fish.");
+                this.declareLosers(losers, "Player does not have most food.");
                 return true;
             }
 

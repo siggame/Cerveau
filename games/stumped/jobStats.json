@@ -1,50 +1,50 @@
 {
-	"default": {
-		"cost": 3,
-		"damage": 1,
-		"health": 3,
-		"moves": 3,
-		"actions": 1,
-		"chopping": 1,
-		"fishing": 1,
-		"carryLimit": 3,
-		"distract": 0
-	},
-	"jobs": {
-		"Basic": {},
-		"Buff": {
-			"cost": 12,
-			"damage": 3,
-			"health": 4,
-			"moves": 2,
-			"carryLimit": 6
-		},
-		"Tank": {
-			"cost": 12,
-			"damage": 2,
-			"health": 10,
-			"moves": 2,
-			"carryLimit": 2
-		},
-		"Fishing": {
-			"cost": 12,
-			"fishing": 3,
-			"distract": 2
-		},
-		"Swimming": {
-			"cost": 6,
-			"fishing": 2,
-			"moves": 5,
-			"carryLimit": 2
-		},
-		"Hot Lady": {
-			"cost": 15,
-			"distract": 3,
-			"carryLimit": 1
-		},
-		"Build": {
-			"cost": 6,
-			"chopping": 3
-		}
-	}
+    "default": {
+        "cost": 3,
+        "damage": 1,
+        "health": 3,
+        "moves": 3,
+        "actions": 1,
+        "chopping": 1,
+        "munching": 1,
+        "carryLimit": 3,
+        "distract": 0
+    },
+    "jobs": {
+        "Basic": {},
+        "Buff": {
+            "cost": 12,
+            "damage": 3,
+            "health": 4,
+            "moves": 2,
+            "carryLimit": 6
+        },
+        "Tank": {
+            "cost": 12,
+            "damage": 2,
+            "health": 10,
+            "moves": 2,
+            "carryLimit": 2
+        },
+        "Hungry": {
+            "cost": 12,
+            "munching": 3,
+            "distract": 2
+        },
+        "Swift": {
+            "cost": 6,
+            "munching": 2,
+            "moves": 5,
+            "carryLimit": 2
+        },
+        "Hot Lady": {
+            "cost": 15,
+            "distract": 3,
+            "carryLimit": 1
+        },
+        "Builder": {
+            "cost": 6,
+            "chopping": 3
+        }
+    }
 }

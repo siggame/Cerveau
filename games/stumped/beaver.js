@@ -154,11 +154,11 @@ let Beaver = Class(GameObject, {
         if(beaver.health <= 0) {
             // drop it's resources on the ground
             beaver.tile.branches += beaver.branches;
-            beaver.fish += beaver.fish;
+            beaver.food += beaver.food;
 
             // and set its values to invalid numbers to signify it is dead
             beaver.branches = -1;
-            beaver.fish = -1;
+            beaver.food = -1;
             beaver.actions = -1;
             beaver.moves = -1;
             beaver.turnsDistracted = -1;
@@ -223,6 +223,7 @@ let Beaver = Class(GameObject, {
             this.tile.branches = 0;
         }
 
+        this.tile.branches = player.player.branchesToBuildLodge; // all the branches are now on this tile to makeup the lodge
         this.tile.lodgeOwner = player;
         this.owner.lodges.push(this.tile);
         this.actions--;
@@ -263,7 +264,7 @@ let Beaver = Class(GameObject, {
         }
 
         // now clean the actual resource
-        resource = char === "f" ? "fish" : "branches";
+        resource = char === "f" ? "food" : "branches";
 
         // transform the amount if they passed in a number =< 0
         if(amount <= 0) {
@@ -340,7 +341,7 @@ let Beaver = Class(GameObject, {
             return `${this} on tile ${this.tile} is not adjacent to ${spawner.tile}.`;
         }
 
-        const load = this.fish + this.branches;
+        const load = this.food + this.branches;
         if(load >= this.job.carryLimit) {
             return `Beaver cannot carry any more resources. Limit: (${load}/${this.job.carryLimit})`;
         }
@@ -358,9 +359,9 @@ let Beaver = Class(GameObject, {
     harvest: function(player, spawner) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        const load = this.fish + this.branches;
+        const load = this.food + this.branches;
         const spaceAvailable = this.job.carryLimit - load;
-        const skillScalar = spawner.type === "branches" ? this.job.chopping : this.job.fishing;
+        const skillScalar = spawner.type === "branches" ? this.job.chopping : this.job.munching;
         const maxCanHarvest = this.game.spawnerHarvestConstant * spawner.health * skillScalar;
 
         this[spawner.type] += Math.min(spaceAvailable, maxCanHarvest);
@@ -498,10 +499,10 @@ let Beaver = Class(GameObject, {
         }
 
         // now clean the actual resource
-        resource = char === "f" ? "fish" : "branches";
+        resource = char === "f" ? "food" : "branches";
 
         // Calculate max resources the beaver can carry
-        const spaceAvailable = this.job.carryLimit - this.branches - this.fish;
+        const spaceAvailable = this.job.carryLimit - this.branches - this.food;
 
         // transform the amount if they passed in a number =< 0
         if(amount <= 0) {

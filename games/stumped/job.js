@@ -134,8 +134,8 @@ let Job = Class(GameObject, {
         if(tile.beaver) {
             return `There's already ${tile.beaver} at that lodge`;
         }
-        if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.fish < this.cost) {
-            return `${tile} does not have enough fish available. (${tile.fish}/${this.cost})`;
+        if(player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.food < this.cost) {
+            return `${tile} does not have enough food available. (${tile.food}/${this.cost})`;
         }
 
         // <<-- /Creer-Merge: invalidateRecruit -->>
@@ -153,7 +153,7 @@ let Job = Class(GameObject, {
 
         // if they have more beavers
         if(player.getAliveBeavers().length >= this.game.freeBeaversCount) {
-            tile.fish -= this.cost;
+            tile.food -= this.cost;
         }
 
         let beaver = this.game.create("Beaver", {

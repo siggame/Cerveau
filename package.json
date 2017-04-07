@@ -19,6 +19,7 @@
     "extend": "3.0.0",
     "gaussian": "1.1.0",
     "lark-websocket": "JacobFischer/lark-websocket",
+    "mathjs": "3.11.4",
     "moment": "2.11.2",
     "sanitize-filename": "1.5.3",
     "seedrandom": "2.4.2",

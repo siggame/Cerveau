@@ -100,8 +100,7 @@ let Player = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.name = this.name || "Unnamed Player";
-        this.clientType = this.clientType || "Unknown";
+        // put any initialization logic here. the base variables should be set from 'data' above
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -114,13 +113,14 @@ let Player = Class(GameObject, {
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
     getAliveBeavers: function() {
-        return this.beavers.filter((beaver) => beaver.health > 0)
-        .concat(this.game.newBeavers);
+        // return all our beavers and filter out dead ones (health === 0) concatenated with the newly spawned beavers
+        // NOTE: only works when you call this on the current player (as they spawn the new beavers)
+        return this.beavers.filter((beaver) => beaver.health > 0).concat(this.game.newBeavers);
     },
 
     calculateBranchesToBuildLodge: function() {
         // TODO: document this in the game rules
-        this.branchesToBuildLodge = this.game.lodgeCostConstant * this.lodges.length;
+        this.branchesToBuildLodge = Math.ceil(Math.pow(this.game.lodgeCostConstant, this.lodges.length));
     },
 
     //<<-- /Creer-Merge: added-functions -->>
