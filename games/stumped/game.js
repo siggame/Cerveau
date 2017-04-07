@@ -165,6 +165,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this.newBeavers = [];
 
+        this._minSpawners = 2;
+        this._maxSpawners = 20;
+
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -198,40 +201,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // creates the 2D map based off the mapWidth/mapHeight set in the init function
         TiledGame._initMap.call(this);
 
-        /* Generate the map */
-        // TODO: actual map generation
-        for(let x = 0; x < this.mapWidth; x++) {
-            for(let y = 0; y < this.mapHeight; y++) {
-                let tile = this.getTile(x, y);
-                tile.type = Math.random() < 0.2 ? "water" : "land";
-                if(Math.random() < 0.05) {
-                    this.create("Spawner", {
-                        tile: tile,
-                        type: tile.type === "water" ? "food" : "branches",
-                    });
-                }
-            }
-        }
-
-        // give each player a starting beaver
         for(const player of this.players) {
             player.calculateBranchesToBuildLodge();
-
-            let tile = null;
-            while(!tile) {
-                tile = this.tiles.randomElement();
-                if(tile.spawner || tile.beaver) {
-                    tile = null;
-                }
-            }
-
-            this.create("Beaver", {
-                owner: player,
-                tile: tile,
-                job: this.jobs[0], // Basic Beaver
-                recruited: true,
-                branches: 1,
-            });
         }
 
         this.generateMap();
@@ -727,14 +698,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
         }
 
-        /* Generate resources */
+        /* Generate resources on the top half of the map */
         for(let x = 0; x < this.mapWidth; x++) {
-            for(let y = 0; y < this.mapHeight; y++) {
+            for(let y = 0; y < this.mapHeight/2; y++) {
                 let tile = this.getTile(x, y);
                 if(Math.random() < 0.05) {
                     this.create("Spawner", {
                         tile: tile,
-                        type: tile.type === "water" ? "fish" : "branches",
+                        type: tile.type === "water" ? "food" : "branches",
                     });
                 }
             }
@@ -743,13 +714,19 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         /* Mirror map */
         if(horizontal) {
             for(let x = 0; x < this.mapWidth; x++) {
-                for(let y = 0; y < this.mapHeight / 2; y++) {
+                for(let y = 0; y < this.mapHeight/2; y++) {
                     let orig = this.getTile(x, y);
                     let target = this.getTile(x, this.mapHeight - y - 1);
 
                     // Copy data
                     target.type = orig.type;
-                    target.spawner = orig.spawner;
+                    // clone Spawner
+                    if(orig.spawner) {
+                        target.spawner = this.create("Spawner", {
+                            tile: target,
+                            type: orig.spawner.type,
+                        });
+                    }
 
                     switch(orig.flowDirection) {
                         case "North":
@@ -782,6 +759,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile: p1,
                 job: this.jobs[0],
                 recruited: true,
+                branches: 1,
             });
 
             // Player 2
@@ -790,6 +768,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile: p2,
                 job: this.jobs[0],
                 recruited: true,
+                branches: 1,
             });
         }
     },
