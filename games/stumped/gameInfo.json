@@ -224,7 +224,7 @@
             },
             "spawnerHarvestConstant": {
                 "default": null,
-                "description": "Constant number used to calculate how many breanches/food Beavers harvest from Spawners.",
+                "description": "Constant number used to calculate how many branches/food Beavers harvest from Spawners.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,

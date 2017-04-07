@@ -124,7 +124,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.spawner = this.spawner || [];
 
         /**
-         * Constant number used to calculate how many breanches/food Beavers harvest from Spawners.
+         * Constant number used to calculate how many branches/food Beavers harvest from Spawners.
          *
          * @type {number}
          */
