@@ -12,11 +12,6 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
-    branchesToCompleteLodge: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     currentPlayer: {
         type: {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null},
         defaultValue: null,
@@ -47,7 +42,7 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    lodgesCompleteToWin: {
+    lodgesToWin: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -129,7 +124,7 @@ classes.Beaver._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    fish: {
+    food: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -355,17 +350,17 @@ classes.Job._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    fishing: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     health: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
 
     moves: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    munching: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -514,14 +509,14 @@ classes.Tile._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    fish: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     flowDirection: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
+    },
+
+    food: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
     lodgeOwner: {

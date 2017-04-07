@@ -28,7 +28,7 @@ let Player = Class(GameObject, {
         this.beavers = this.beavers || [];
 
         /**
-         * How many branches are required to build a lodge for this player.
+         * How many branches are required to build a lodge for this Player.
          *
          * @type {number}
          */
@@ -42,7 +42,7 @@ let Player = Class(GameObject, {
         this.clientType = this.clientType || "";
 
         /**
-         * A list of tiles that contain lodges owned by this player.
+         * A list of Tiles that contain lodges owned by this player.
          *
          * @type {Array.<Tile>}
          */

@@ -22,42 +22,42 @@ let Tile = Class(GameObject, TiledTile, {
         GameObject.init.apply(this, arguments);
 
         /**
-         * The beaver on this tile if present, otherwise null.
+         * The Beaver on this Tile if present, otherwise null.
          *
          * @type {Beaver}
          */
         this.beaver = this.beaver || null;
 
         /**
-         * The number of branches dropped on this tile.
+         * The number of branches dropped on this Tile.
          *
          * @type {number}
          */
         this.branches = this.branches || 0;
 
         /**
-         * The number of fish dropped on this tile.
-         *
-         * @type {number}
-         */
-        this.fish = this.fish || 0;
-
-        /**
-         * The cardinal direction water is flowing on this tile ('North', 'East', 'South', 'West').
+         * The cardinal direction water is flowing on this Tile ('North', 'East', 'South', 'West').
          *
          * @type {string}
          */
         this.flowDirection = this.flowDirection || "";
 
         /**
-         * The owner of the beaver lodge on this tile, if present, otherwise null.
+         * The number of food dropped on this Tile.
+         *
+         * @type {number}
+         */
+        this.food = this.food || 0;
+
+        /**
+         * The owner of the Beaver lodge on this Tile, if present, otherwise null.
          *
          * @type {Player}
          */
         this.lodgeOwner = this.lodgeOwner || null;
 
         /**
-         * The resource spawner on this tile if present, otherwise null.
+         * The resource Spawner on this Tile if present, otherwise null.
          *
          * @type {Spawner}
          */

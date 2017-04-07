@@ -21,70 +21,70 @@ let Job = Class(GameObject, {
         GameObject.init.apply(this, arguments);
 
         /**
-         * The number of actions this job can make per turn.
+         * The number of actions this Job can make per turn.
          *
          * @type {number}
          */
         this.actions = this.actions || 0;
 
         /**
-         * How many resources a beaver with this job can hold at once.
+         * How many combined resources a beaver with this Job can hold at once.
          *
          * @type {number}
          */
         this.carryLimit = this.carryLimit || 0;
 
         /**
-         * Scalar for how many branches this job harvests at once.
+         * Scalar for how many branches this Job harvests at once.
          *
          * @type {number}
          */
         this.chopping = this.chopping || 0;
 
         /**
-         * How many fish this Job costs to recruit.
+         * How much food this Job costs to recruit.
          *
          * @type {number}
          */
         this.cost = this.cost || 0;
 
         /**
-         * The amount of damage this job does per attack.
+         * The amount of damage this Job does per attack.
          *
          * @type {number}
          */
         this.damage = this.damage || 0;
 
         /**
-         * How many turns a beaver attacked by this job is distracted by.
+         * How many turns a beaver attacked by this Job is distracted by.
          *
          * @type {number}
          */
         this.distractionPower = this.distractionPower || 0;
 
         /**
-         * Scalar for how many fish this job harvests at once.
-         *
-         * @type {number}
-         */
-        this.fishing = this.fishing || 0;
-
-        /**
-         * The amount of starting health this job has.
+         * The amount of starting health this Job has.
          *
          * @type {number}
          */
         this.health = this.health || 0;
 
         /**
-         * The number of moves this job can make per turn.
+         * The number of moves this Job can make per turn.
          *
          * @type {number}
          */
         this.moves = this.moves || 0;
 
         /**
-         * The job title ('builder', 'fisher', etc).
+         * Scalar for how much food this Job harvests at once.
+         *
+         * @type {number}
+         */
+        this.munching = this.munching || 0;
+
+        /**
+         * The Job title.
          *
          * @type {string}
          */

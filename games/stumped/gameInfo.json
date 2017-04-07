@@ -28,14 +28,13 @@
     "Game": {
         "attribute_names": [
             "beavers",
-            "branchesToCompleteLodge",
             "currentPlayer",
             "currentTurn",
             "freeBeaversCount",
             "gameObjects",
             "jobs",
             "lodgeCostConstant",
-            "lodgesCompleteToWin",
+            "lodgesToWin",
             "mapHeight",
             "mapWidth",
             "maxTurns",
@@ -62,16 +61,6 @@
                     }
                 }
             },
-            "branchesToCompleteLodge": {
-                "default": null,
-                "description": "How many branches a lodge must have to be considered complete.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
-                }
-            },
             "currentPlayer": {
                 "default": null,
                 "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
@@ -96,7 +85,7 @@
             },
             "freeBeaversCount": {
                 "default": null,
-                "description": "When a Player has less Beavers than this number, recruiting other Beavers is free.",
+                "description": "When a Player has less Beavers than this number, then recruiting other Beavers is free.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -150,9 +139,9 @@
                     "valueType": null
                 }
             },
-            "lodgesCompleteToWin": {
+            "lodgesToWin": {
                 "default": null,
-                "description": "How many lodges must be complete at once to win the game.",
+                "description": "How many lodges must be owned by a Player at once to win the game.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -235,7 +224,7 @@
             },
             "spawnerHarvestConstant": {
                 "default": null,
-                "description": "Constant number used to calculate how many breanches/fish Beavers harvest from spawners.",
+                "description": "Constant number used to calculate how many breanches/food Beavers harvest from Spawners.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -245,7 +234,7 @@
             },
             "spawnerTypes": {
                 "default": null,
-                "description": "All the types of spawners in the game.",
+                "description": "All the types of Spawners in the game.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -295,7 +284,7 @@
             "attribute_names": [
                 "actions",
                 "branches",
-                "fish",
+                "food",
                 "health",
                 "job",
                 "moves",
@@ -307,7 +296,7 @@
             "attributes": {
                 "actions": {
                     "default": null,
-                    "description": "The number of actions remaining for the beaver this turn.",
+                    "description": "The number of actions remaining for the Beaver this turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -317,7 +306,7 @@
                 },
                 "branches": {
                     "default": null,
-                    "description": "The number of branches this beaver is holding.",
+                    "description": "The amount of branches this Beaver is holding.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -325,9 +314,9 @@
                         "valueType": null
                     }
                 },
-                "fish": {
+                "food": {
                     "default": null,
-                    "description": "The number of fish this beaver is holding.",
+                    "description": "The amount of food this Beaver is holding.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -337,7 +326,7 @@
                 },
                 "health": {
                     "default": null,
-                    "description": "How much health this beaver has left.",
+                    "description": "How much health this Beaver has left.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -347,7 +336,7 @@
                 },
                 "job": {
                     "default": null,
-                    "description": "The Job this beaver was recruited to do.",
+                    "description": "The Job this Beaver was recruited to do.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -357,7 +346,7 @@
                 },
                 "moves": {
                     "default": null,
-                    "description": "How many moves this beaver has left this turn.",
+                    "description": "How many moves this Beaver has left this turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -367,7 +356,7 @@
                 },
                 "owner": {
                     "default": null,
-                    "description": "The Player that owns and can control this beaver.",
+                    "description": "The Player that owns and can control this Beaver.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -387,7 +376,7 @@
                 },
                 "tile": {
                     "default": null,
-                    "description": "The tile this beaver is on.",
+                    "description": "The Tile this Beaver is on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -397,7 +386,7 @@
                 },
                 "turnsDistracted": {
                     "default": null,
-                    "description": "Number of turns this beaver is distracted for (0 means not distracted).",
+                    "description": "Number of turns this Beaver is distracted for (0 means not distracted).",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -424,7 +413,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The beaver to attack. Must be on an adjacent tile.",
+                            "description": "The Beaver to attack. Must be on an adjacent Tile.",
                             "name": "beaver",
                             "optional": false,
                             "type": {
@@ -453,7 +442,7 @@
                     "altersState": true,
                     "argument_names": [],
                     "arguments": [],
-                    "description": "Builds a lodge on the Beavers current tile.",
+                    "description": "Builds a lodge on the Beavers current Tile.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully built a lodge, false otherwise.",
@@ -477,7 +466,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.",
+                            "description": "The Tile to drop branches/food on. Must be the same Tile that the Beaver is on, or an adjacent one.",
                             "name": "tile",
                             "optional": false,
                             "type": {
@@ -489,7 +478,7 @@
                         },
                         {
                             "default": null,
-                            "description": "The type of resource to drop ('branch' or 'fish').",
+                            "description": "The type of resource to drop ('branch' or 'food').",
                             "name": "resource",
                             "optional": false,
                             "type": {
@@ -512,7 +501,7 @@
                             }
                         }
                     ],
-                    "description": "Drops some of the given resource on the beaver's tile. Fish dropped in water disappear instantly, and fish dropped on land die one per tile per turn.",
+                    "description": "Drops some of the given resource on the beaver's Tile.",
                     "optionals": 1,
                     "optionals_start_index": 2,
                     "returns": {
@@ -536,7 +525,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The Spawner you want to harvest. Must be on an adjacent tile.",
+                            "description": "The Spawner you want to harvest. Must be on an adjacent Tile.",
                             "name": "spawner",
                             "optional": false,
                             "type": {
@@ -547,7 +536,7 @@
                             }
                         }
                     ],
-                    "description": "Harvests the branches or fish from a Spawner on an adjacent tile.",
+                    "description": "Harvests the branches or food from a Spawner on an adjacent Tile.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully harvested, false otherwise.",
@@ -569,7 +558,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The tile this beaver should move to.",
+                            "description": "The Tile this Beaver should move to.",
                             "name": "tile",
                             "optional": false,
                             "type": {
@@ -580,7 +569,7 @@
                             }
                         }
                     ],
-                    "description": "Moves this beaver from its current tile to an adjacent tile.",
+                    "description": "Moves this Beaver from its current Tile to an adjacent Tile.",
                     "returns": {
                         "default": null,
                         "description": "True if the move worked, false otherwise.",
@@ -604,7 +593,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.",
+                            "description": "The Tile to pickup branches/food from. Must be the same Tile that the Beaver is on, or an adjacent one.",
                             "name": "tile",
                             "optional": false,
                             "type": {
@@ -616,7 +605,7 @@
                         },
                         {
                             "default": null,
-                            "description": "The type of resource to pickup ('branch' or 'fish').",
+                            "description": "The type of resource to pickup ('branch' or 'food').",
                             "name": "resource",
                             "optional": false,
                             "type": {
@@ -639,7 +628,7 @@
                             }
                         }
                     ],
-                    "description": "Picks up some branches or fish on the beaver's tile.",
+                    "description": "Picks up some branches or food on the beaver's tile.",
                     "optionals": 1,
                     "optionals_start_index": 2,
                     "returns": {
@@ -830,15 +819,15 @@
                 "cost",
                 "damage",
                 "distractionPower",
-                "fishing",
                 "health",
                 "moves",
+                "munching",
                 "title"
             ],
             "attributes": {
                 "actions": {
                     "default": null,
-                    "description": "The number of actions this job can make per turn.",
+                    "description": "The number of actions this Job can make per turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -848,7 +837,7 @@
                 },
                 "carryLimit": {
                     "default": null,
-                    "description": "How many resources a beaver with this job can hold at once.",
+                    "description": "How many combined resources a beaver with this Job can hold at once.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -858,7 +847,7 @@
                 },
                 "chopping": {
                     "default": null,
-                    "description": "Scalar for how many branches this job harvests at once.",
+                    "description": "Scalar for how many branches this Job harvests at once.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -868,7 +857,7 @@
                 },
                 "cost": {
                     "default": null,
-                    "description": "How many fish this Job costs to recruit.",
+                    "description": "How much food this Job costs to recruit.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -878,7 +867,7 @@
                 },
                 "damage": {
                     "default": null,
-                    "description": "The amount of damage this job does per attack.",
+                    "description": "The amount of damage this Job does per attack.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -888,17 +877,7 @@
                 },
                 "distractionPower": {
                     "default": null,
-                    "description": "How many turns a beaver attacked by this job is distracted by.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "fishing": {
-                    "default": null,
-                    "description": "Scalar for how many fish this job harvests at once.",
+                    "description": "How many turns a beaver attacked by this Job is distracted by.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -908,7 +887,7 @@
                 },
                 "health": {
                     "default": null,
-                    "description": "The amount of starting health this job has.",
+                    "description": "The amount of starting health this Job has.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -918,7 +897,17 @@
                 },
                 "moves": {
                     "default": null,
-                    "description": "The number of moves this job can make per turn.",
+                    "description": "The number of moves this Job can make per turn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "munching": {
+                    "default": null,
+                    "description": "Scalar for how much food this Job harvests at once.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -928,7 +917,7 @@
                 },
                 "title": {
                     "default": null,
-                    "description": "The job title ('builder', 'fisher', etc).",
+                    "description": "The Job title.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1090,7 +1079,7 @@
                 },
                 "branchesToBuildLodge": {
                     "default": null,
-                    "description": "How many branches are required to build a lodge for this player.",
+                    "description": "How many branches are required to build a lodge for this Player.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1110,7 +1099,7 @@
                 },
                 "lodges": {
                     "default": null,
-                    "description": "A list of tiles that contain lodges owned by this player.",
+                    "description": "A list of Tiles that contain lodges owned by this player.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1299,7 +1288,7 @@
                 },
                 "health": {
                     "default": null,
-                    "description": "How much health this spawner has, which is used to calculate how much of its resource can be harvested.",
+                    "description": "How much health this Spawner has, which is used to calculate how much of its resource can be harvested.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1309,7 +1298,7 @@
                 },
                 "tile": {
                     "default": null,
-                    "description": "The tile this Spawner is on.",
+                    "description": "The Tile this Spawner is on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1319,7 +1308,7 @@
                 },
                 "type": {
                     "default": null,
-                    "description": "What type of resource this is ('Fish' or 'Branch').",
+                    "description": "What type of resource this is ('food' or 'branches').",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1328,7 +1317,7 @@
                     }
                 }
             },
-            "description": "A resource spawner that generates branches or fish.",
+            "description": "A resource spawner that generates branches or food.",
             "function_names": [],
             "functions": {},
             "inheritedAttribute_names": [
@@ -1417,8 +1406,8 @@
             "attribute_names": [
                 "beaver",
                 "branches",
-                "fish",
                 "flowDirection",
+                "food",
                 "lodgeOwner",
                 "spawner",
                 "tileEast",
@@ -1432,7 +1421,7 @@
             "attributes": {
                 "beaver": {
                     "default": null,
-                    "description": "The beaver on this tile if present, otherwise null.",
+                    "description": "The Beaver on this Tile if present, otherwise null.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1442,17 +1431,7 @@
                 },
                 "branches": {
                     "default": null,
-                    "description": "The number of branches dropped on this tile.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "fish": {
-                    "default": null,
-                    "description": "The number of fish dropped on this tile.",
+                    "description": "The number of branches dropped on this Tile.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1462,7 +1441,7 @@
                 },
                 "flowDirection": {
                     "default": null,
-                    "description": "The cardinal direction water is flowing on this tile ('North', 'East', 'South', 'West').",
+                    "description": "The cardinal direction water is flowing on this Tile ('North', 'East', 'South', 'West').",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1470,9 +1449,19 @@
                         "valueType": null
                     }
                 },
+                "food": {
+                    "default": null,
+                    "description": "The number of food dropped on this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
                 "lodgeOwner": {
                     "default": null,
-                    "description": "The owner of the beaver lodge on this tile, if present, otherwise null.",
+                    "description": "The owner of the Beaver lodge on this Tile, if present, otherwise null.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1482,7 +1471,7 @@
                 },
                 "spawner": {
                     "default": null,
-                    "description": "The resource spawner on this tile if present, otherwise null.",
+                    "description": "The resource Spawner on this Tile if present, otherwise null.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,

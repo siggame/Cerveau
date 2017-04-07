@@ -32,13 +32,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.beavers = this.beavers || [];
 
         /**
-         * How many branches a lodge must have to be considered complete.
-         *
-         * @type {number}
-         */
-        this.branchesToCompleteLodge = this.branchesToCompleteLodge || 0;
-
-        /**
          * The player whose turn it is currently. That player can send commands. Other players cannot.
          *
          * @type {Player}
@@ -53,7 +46,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.currentTurn = this.currentTurn || 0;
 
         /**
-         * When a Player has less Beavers than this number, recruiting other Beavers is free.
+         * When a Player has less Beavers than this number, then recruiting other Beavers is free.
          *
          * @type {number}
          */
@@ -81,11 +74,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.lodgeCostConstant = this.lodgeCostConstant || 0;
 
         /**
-         * How many lodges must be complete at once to win the game.
+         * How many lodges must be owned by a Player at once to win the game.
          *
          * @type {number}
          */
-        this.lodgesCompleteToWin = this.lodgesCompleteToWin || 0;
+        this.lodgesToWin = this.lodgesToWin || 0;
 
         /**
          * The number of Tiles in the map along the y (vertical) axis.
@@ -130,14 +123,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.spawner = this.spawner || [];
 
         /**
-         * Constant number used to calculate how many breanches/fish Beavers harvest from spawners.
+         * Constant number used to calculate how many breanches/food Beavers harvest from Spawners.
          *
          * @type {number}
          */
         this.spawnerHarvestConstant = this.spawnerHarvestConstant || 0;
 
         /**
-         * All the types of spawners in the game.
+         * All the types of Spawners in the game.
          *
          * @type {Array.<string>}
          */

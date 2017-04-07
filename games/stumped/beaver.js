@@ -19,49 +19,49 @@ let Beaver = Class(GameObject, {
         GameObject.init.apply(this, arguments);
 
         /**
-         * The number of actions remaining for the beaver this turn.
+         * The number of actions remaining for the Beaver this turn.
          *
          * @type {number}
          */
         this.actions = this.actions || 0;
 
         /**
-         * The number of branches this beaver is holding.
+         * The amount of branches this Beaver is holding.
          *
          * @type {number}
          */
         this.branches = this.branches || 0;
 
         /**
-         * The number of fish this beaver is holding.
+         * The amount of food this Beaver is holding.
          *
          * @type {number}
          */
-        this.fish = this.fish || 0;
+        this.food = this.food || 0;
 
         /**
-         * How much health this beaver has left.
+         * How much health this Beaver has left.
          *
          * @type {number}
          */
         this.health = this.health || 0;
 
         /**
-         * The Job this beaver was recruited to do.
+         * The Job this Beaver was recruited to do.
          *
          * @type {Job}
          */
         this.job = this.job || null;
 
         /**
-         * How many moves this beaver has left this turn.
+         * How many moves this Beaver has left this turn.
          *
          * @type {number}
          */
         this.moves = this.moves || 0;
 
         /**
-         * The Player that owns and can control this beaver.
+         * The Player that owns and can control this Beaver.
          *
          * @type {Player}
          */
@@ -75,14 +75,14 @@ let Beaver = Class(GameObject, {
         this.recruited = this.recruited || false;
 
         /**
-         * The tile this beaver is on.
+         * The Tile this Beaver is on.
          *
          * @type {Tile}
          */
         this.tile = this.tile || null;
 
         /**
-         * Number of turns this beaver is distracted for (0 means not distracted).
+         * Number of turns this Beaver is distracted for (0 means not distracted).
          *
          * @type {number}
          */
@@ -109,7 +109,7 @@ let Beaver = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Beaver} beaver - The beaver to attack. Must be on an adjacent tile.
+     * @param {Beaver} beaver - The Beaver to attack. Must be on an adjacent Tile.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -140,7 +140,7 @@ let Beaver = Class(GameObject, {
      * Attacks another adjacent beaver.
      *
      * @param {Player} player - the player that called this.
-     * @param {Beaver} beaver - The beaver to attack. Must be on an adjacent tile.
+     * @param {Beaver} beaver - The Beaver to attack. Must be on an adjacent Tile.
      * @returns {boolean} True if successfully attacked, false otherwise.
      */
     attack: function(player, beaver) {
@@ -206,7 +206,7 @@ let Beaver = Class(GameObject, {
     },
 
     /**
-     * Builds a lodge on the Beavers current tile.
+     * Builds a lodge on the Beavers current Tile.
      *
      * @param {Player} player - the player that called this.
      * @returns {boolean} True if successfully built a lodge, false otherwise.
@@ -240,8 +240,8 @@ let Beaver = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.
-     * @param {string} resource - The type of resource to drop ('branch' or 'fish').
+     * @param {Tile} tile - The Tile to drop branches/food on. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to drop ('branch' or 'food').
      * @param {number} amount - The amount of the resource to drop, numbers <= 0 will drop all the resource type.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
@@ -298,11 +298,11 @@ let Beaver = Class(GameObject, {
     },
 
     /**
-     * Drops some of the given resource on the beaver's tile. Fish dropped in water disappear instantly, and fish dropped on land die one per tile per turn.
+     * Drops some of the given resource on the beaver's Tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to drop branches/fish on. Must be the same Tile that the Beaver is on, or an adjacent one.
-     * @param {string} resource - The type of resource to drop ('branch' or 'fish').
+     * @param {Tile} tile - The Tile to drop branches/food on. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to drop ('branch' or 'food').
      * @param {number} amount - The amount of the resource to drop, numbers <= 0 will drop all the resource type.
      * @returns {boolean} True if successfully dropped the resource, false otherwise.
      */
@@ -324,7 +324,7 @@ let Beaver = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent tile.
+     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent Tile.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -349,10 +349,10 @@ let Beaver = Class(GameObject, {
     },
 
     /**
-     * Harvests the branches or fish from a Spawner on an adjacent tile.
+     * Harvests the branches or food from a Spawner on an adjacent Tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent tile.
+     * @param {Spawner} spawner - The Spawner you want to harvest. Must be on an adjacent Tile.
      * @returns {boolean} True if successfully harvested, false otherwise.
      */
     harvest: function(player, spawner) {
@@ -384,7 +384,7 @@ let Beaver = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The tile this beaver should move to.
+     * @param {Tile} tile - The Tile this Beaver should move to.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -429,10 +429,10 @@ let Beaver = Class(GameObject, {
     },
 
     /**
-     * Moves this beaver from its current tile to an adjacent tile.
+     * Moves this Beaver from its current Tile to an adjacent Tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The tile this beaver should move to.
+     * @param {Tile} tile - The Tile this Beaver should move to.
      * @returns {boolean} True if the move worked, false otherwise.
      */
     move: function(player, tile) {
@@ -463,8 +463,8 @@ let Beaver = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.
-     * @param {string} resource - The type of resource to pickup ('branch' or 'fish').
+     * @param {Tile} tile - The Tile to pickup branches/food from. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to pickup ('branch' or 'food').
      * @param {number} amount - The amount of the resource to drop, numbers <= 0 will pickup all of the resource type.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
@@ -528,11 +528,11 @@ let Beaver = Class(GameObject, {
     },
 
     /**
-     * Picks up some branches or fish on the beaver's tile.
+     * Picks up some branches or food on the beaver's tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to pickup branches/fish from. Must be the same Tile that the Beaver is on, or an adjacent one.
-     * @param {string} resource - The type of resource to pickup ('branch' or 'fish').
+     * @param {Tile} tile - The Tile to pickup branches/food from. Must be the same Tile that the Beaver is on, or an adjacent one.
+     * @param {string} resource - The type of resource to pickup ('branch' or 'food').
      * @param {number} amount - The amount of the resource to drop, numbers <= 0 will pickup all of the resource type.
      * @returns {boolean} True if successfully picked up a resource, false otherwise.
      */

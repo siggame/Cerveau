@@ -1,4 +1,4 @@
-// Spawner: A resource spawner that generates branches or fish.
+// Spawner: A resource spawner that generates branches or food.
 
 const Class = require("classe");
 const log = require(`${__basedir}/gameplay/log`);
@@ -10,7 +10,7 @@ const GameObject = require("./gameObject");
 
 //<<-- /Creer-Merge: requires -->>
 
-// @class Spawner: A resource spawner that generates branches or fish.
+// @class Spawner: A resource spawner that generates branches or food.
 let Spawner = Class(GameObject, {
     /**
      * Initializes Spawners.
@@ -28,21 +28,21 @@ let Spawner = Class(GameObject, {
         this.hasBeenHarvested = this.hasBeenHarvested || false;
 
         /**
-         * How much health this spawner has, which is used to calculate how much of its resource can be harvested.
+         * How much health this Spawner has, which is used to calculate how much of its resource can be harvested.
          *
          * @type {number}
          */
         this.health = this.health || 0;
 
         /**
-         * The tile this Spawner is on.
+         * The Tile this Spawner is on.
          *
          * @type {Tile}
          */
         this.tile = this.tile || null;
 
         /**
-         * What type of resource this is ('Fish' or 'Branch').
+         * What type of resource this is ('food' or 'branches').
          *
          * @type {string}
          */
