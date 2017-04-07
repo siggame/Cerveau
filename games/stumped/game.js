@@ -664,6 +664,17 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         /* Generate resources */
+        for(let x = 0; x < this.mapWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let tile = this.getTile(x, y);
+                if(Math.random() < 0.05) {
+                    this.create("Spawner", {
+                        tile: tile,
+                        type: tile.type === "water" ? "fish" : "branches",
+                    });
+                }
+            }
+        }
 
         /* Mirror map */
         if(horizontal) {
@@ -695,8 +706,28 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         /* Place starting beavers */
+        if(horizontal) {
+            let x = Math.floor(Math.random() * this.mapWidth);
+            let y = Math.floor(Math.random() * this.mapHeight / 2);
+            let p1 = this.getTile(x, y);
+            let p2 = this.getTile(x, this.mapHeight - y - 1);
 
+            // Player 1
+            this.create("Beaver", {
+                owner: this.players[0],
+                tile: p1,
+                job: this.jobs[0],
+                recruited: true,
+            });
 
+            // Player 2
+            this.create("Beaver", {
+                owner: this.players[0].opponent,
+                tile: p2,
+                job: this.jobs[0],
+                recruited: true,
+            });
+        }
     },
 
     /*createFractal: function(points, index, depth) {
