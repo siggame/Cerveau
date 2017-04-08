@@ -142,7 +142,7 @@ let Tile = Class(GameObject, TiledTile, {
      * @returns {bool} boolean if this tile is in flow with the provided tile
      */
     isAgainstFlowDirection: function(tile) {
-        return Boolean(tile && this.getNeighbor(this.game.invertTileDirection(tile.flowDirection) === tile));
+        return Boolean(tile && this.getNeighbor(this.game.invertTileDirection(tile.flowDirection)) === tile);
     },
 
     /**
