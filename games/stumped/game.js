@@ -778,6 +778,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 recruited: true,
                 branches: 1,
             });
+
+            this.cleanupArrays();
         }
     },
 
