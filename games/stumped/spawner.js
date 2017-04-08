@@ -53,6 +53,7 @@ let Spawner = Class(GameObject, {
 
         this.health = 1;
         this.tile.spawner = this;
+        this.game.spawner.push(this); // should be `spawners`, if we ever re-run creer
 
         //<<-- /Creer-Merge: init -->>
     },
