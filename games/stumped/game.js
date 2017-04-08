@@ -505,7 +505,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 this.beavers.removeElement(beaver);
             }
             else {
-                beaver.owner.beavers.push(beaver);
                 beaver.tile.beaver = beaver;
             }
         }
