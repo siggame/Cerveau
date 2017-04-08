@@ -338,8 +338,12 @@ let Beaver = Class(GameObject, {
             return invalid;
         }
 
+        if(!spawner) {
+            return "Spawner must not be null";
+        }
+
         if(!this.tile.hasNeighbor(spawner.tile)) {
-            return `${this} on tile ${this.tile} is not adjacent to ${spawner.tile}.`;
+            return `${this} on tile ${this.tile} is not adjacent to ${spawner.tile}`;
         }
 
         const load = this.food + this.branches;

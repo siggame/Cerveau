@@ -758,6 +758,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         if(horizontal) {
             let x = Math.floor(Math.random() * this.mapWidth);
             let y = Math.floor(Math.random() * this.mapHeight / 2);
+
+            while(this.getTile(x, y).spawner) {
+                x = Math.floor(Math.random() * this.mapWidth);
+                y = Math.floor(Math.random() * this.mapHeight / 2);
+            }
+
             let p1 = this.getTile(x, y);
             let p2 = this.getTile(x, this.mapHeight - y - 1);
 
