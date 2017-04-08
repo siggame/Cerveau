@@ -155,7 +155,7 @@ let Beaver = Class(GameObject, {
         if(beaver.health <= 0) {
             // drop it's resources on the ground
             beaver.tile.branches += beaver.branches;
-            beaver.food += beaver.food;
+            beaver.tile.food += beaver.food;
 
             // and set its values to invalid numbers to signify it is dead
             beaver.branches = -1;
