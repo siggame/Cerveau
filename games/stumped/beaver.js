@@ -339,7 +339,7 @@ let Beaver = Class(GameObject, {
         }
 
         if(!spawner) {
-            return "Spawner must not be null";
+            return `${spawner} is not a valid Spawner`;
         }
 
         if(!this.tile.hasNeighbor(spawner.tile)) {
