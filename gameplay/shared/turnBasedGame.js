@@ -29,6 +29,8 @@ var TurnBasedGame = Class(BaseGame, {
         BaseGame.begin.apply(this, arguments);
 
         this.currentPlayer = this.players[0];
+
+        this.beforeTurn(); // different from nextPlayer, this is called because their turn has not yet started
     },
 
     /**
@@ -66,6 +68,16 @@ var TurnBasedGame = Class(BaseGame, {
         this.currentTurn++;
         this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
         this.currentPlayer.timeRemaining += this._playerAdditionalTimePerTurn;
+
+        this.beforeTurn();
+    },
+
+    /**
+     * Called before a players turn, including the first turn.
+     * You don't have to call this base method if you don't want to, it does nothing without overriding it
+     */
+    beforeTurn: function() {
+        // intended to be overwritten by games that need this
     },
 
     /**

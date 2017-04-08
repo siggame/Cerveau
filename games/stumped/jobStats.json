@@ -1,0 +1,52 @@
+{
+    "default": {
+        "cost": 3,
+        "damage": 1,
+        "health": 3,
+        "moves": 3,
+        "actions": 1,
+        "chopping": 1,
+        "munching": 1,
+        "carryLimit": 3,
+        "distract": 0
+    },
+    "jobs": {
+        "Basic": {},
+        "Fighter": {
+            "cost": 12,
+            "damage": 3,
+            "health": 4,
+            "moves": 2,
+            "carryLimit": 6
+        },
+        "Bulky": {
+            "cost": 12,
+            "damage": 2,
+            "health": 10,
+            "moves": 2,
+            "carryLimit": 2
+        },
+        "Hungry": {
+            "cost": 8,
+            "munching": 3,
+            "distract": 2,
+            "carryLimit": 15
+        },
+        "Swift": {
+            "cost": 6,
+            "munching": 2,
+            "moves": 5,
+            "carryLimit": 2
+        },
+        "Hot Lady": {
+            "cost": 15,
+            "distract": 3,
+            "carryLimit": 1
+        },
+        "Builder": {
+            "cost": 6,
+            "chopping": 3,
+            "carryLimit": 15
+        }
+    }
+}

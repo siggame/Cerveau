@@ -44,6 +44,22 @@ var TiledGame = Class(BaseGame, {
     tileDirections: ["North", "East", "South", "West"],
 
     /**
+     * Inverts a direction string, e.g. "North" -> "South"
+     *
+     * @static
+     * @param {string} direction - the direction string to invert
+     * @returns {string|undefined} the direction inverted, e.g. "East" -> "West", undefined if the direction was not a valid direction string
+     */
+    invertTileDirection: function(direction) {
+        switch(direction) {
+            case "North": return "South";
+            case "East": return "West";
+            case "South": return "North";
+            case "West": return "East";
+        }
+    },
+
+    /**
      * Gets the tile at (x, y), or null if the co-ordinates are off-map
      *
      * @param {number} x - x position of the desired tile
