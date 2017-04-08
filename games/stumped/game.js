@@ -450,13 +450,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         let tilesChecked = new Set();
         let newResources = {};
         for(const tile of this.tiles) {
-            if(tile.type === "water" && tile.flowDirection) {
+            if(!tile.lodgeOwner && tile.type === "water" && tile.flowDirection) {
                 const nextTile = tile.getNeighbor(tile.flowDirection);
 
                 // Move resources downstream
                 if(newResources[nextTile]) {
                     let curResources = newResources[nextTile];
-                    newResources[nextTile] = [curResources[0] + tile.branches, curResources[1] + tile.fish];
+                    newResources[nextTile] = [curResources[0] + tile.branches, curResources[1] + tile.food];
                 }
                 else {
                     newResources[nextTile] = [tile.branches, tile.food];
@@ -470,14 +470,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 // Keep resources here
                 if(newResources[tile]) {
                     let curResources = newResources[tile];
-                    newResources[tile] = [curResources[0] + tile.branches, curResources[1] + tile.fish];
+                    newResources[tile] = [curResources[0] + tile.branches, curResources[1] + tile.food];
                 }
                 else {
                     newResources[tile] = [tile.branches, tile.food];
                 }
             }
             tile.branches = 0;
-            tile.fish = 0;
+            tile.food = 0;
 
             // Spawn new resources
             if(tile.spawner) {
@@ -492,7 +492,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Move resources
         for(const tile of this.tiles) {
             tile.branches = newResources[tile][0];
-            tile.fish = newResources[tile][1];
+            tile.food = newResources[tile][1];
         }
     },
 
