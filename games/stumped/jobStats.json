@@ -8,7 +8,7 @@
         "chopping": 1,
         "munching": 1,
         "carryLimit": 3,
-        "distract": 0
+        "distractionPower": 0
     },
     "jobs": {
         "Basic": {},
@@ -29,7 +29,7 @@
         "Hungry": {
             "cost": 8,
             "munching": 3,
-            "distract": 2,
+            "distractionPower": 1,
             "carryLimit": 15
         },
         "Swift": {
@@ -40,7 +40,7 @@
         },
         "Hot Lady": {
             "cost": 15,
-            "distract": 3,
+            "distractionPower": 3,
             "carryLimit": 1
         },
         "Builder": {
