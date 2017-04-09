@@ -154,7 +154,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxTurns = data.maxTurns || 500;
 
         this.spawnerHarvestConstant = data.spawnerHarvestConstant || 2;
-        this.lodgeCostConstant = parseInt(data.lodgeCostConstant || mathjs.phi);
+        this.lodgeCostConstant = data.lodgeCostConstant || mathjs.phi;
 
         this.freeBeaversCount = data.freeBeaversCount || 10;
         this.lodgesToWin = data.lodgesToWin || 10;
@@ -415,11 +415,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             // Spawn new resources
             if(tile.spawner) {
-                if(!tile.spawner.hasBeenHarvested && tile.spawner.health < this.maxSpawnerHealth) {
-                    tile.spawner.health += 1;
-                }
+                if(tile.spawner.hasBeenHarvested) {
+                    tile.spawner.harvestCooldown--;
 
-                tile.spawner.hasBeenHarvested = false;
+                    if(tile.spawner.harvestCooldown === 0) {
+                        tile.spawner.hasBeenHarvested = false;
+                    }
+                }
+                else if(tile.spawner.health < this.maxSpawnerHealth) {
+                    tile.spawner.health++;
+                }
             }
         }
 

@@ -378,6 +378,7 @@ let Beaver = Class(GameObject, {
         }
 
         spawner.hasBeenHarvested = true;
+        spawner.harvestCooldown = 2;
 
         return true;
 
