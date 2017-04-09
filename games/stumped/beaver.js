@@ -415,8 +415,8 @@ let Beaver = Class(GameObject, {
             return `${tile} is already occupied by ${tile.beaver}.`;
         }
 
-        if(tile.lodgeOwner && tile.lodgeOwner !== player) {
-            return `${tile} contains an enemy lodge.`;
+        if(tile.lodgeOwner) {
+            return `${tile} contains a lodge.`;
         }
 
         if(tile.spawner) {
