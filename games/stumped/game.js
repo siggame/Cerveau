@@ -154,10 +154,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxTurns = data.maxTurns || 500;
 
         this.spawnerHarvestConstant = data.spawnerHarvestConstant || 2;
-        this.lodgeCostConstant = data.lodgeCostConstant || mathjs.phi;
+        this.lodgeCostConstant = parseInt(data.lodgeCostConstant || mathjs.phi);
 
         this.freeBeaversCount = data.freeBeaversCount || 10;
-        this.lodgesToWin = data.lodgesCompleteToWin || 10;
+        this.lodgesToWin = data.lodgesToWin || 10;
 
         this.maxSpawnerHealth = data.maxSpawnerHealth || 5;
 
@@ -275,7 +275,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         return TurnBasedGame.nextTurn.apply(this, arguments);
     },
 
-    checkForWinner: function(force) {
+    checkForWinner: function(secondaryWin) {
         // Check if a player has created 10 lodges (they are built instantly)
         // Check if this.maxTurns turns have passed, and if so, in this order:
         // - Player has been made extinct (all beavers & lodges destroyed)
@@ -284,153 +284,87 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // - Player with most food wins
         // - Random player wins
 
-        const extinctPlayers = this.players.filter((p) => p.beavers.length === 0 && p.lodges.length === 0);
+        let players = this.players.slice();
+        const extinctPlayers = players.filter((p) => p.beavers.length === 0 && p.lodges.length === 0);
 
         if(extinctPlayers.length > 0) {
             // someone lost via extermination
             if(extinctPlayers.length === this.players.length) {
                 // they both somehow killed everything, so the board is empty. Win via coin flip
-                this._endGameViaCoinFlip("Simultaneous Extinction");
-                return true;
+                secondaryWin = "Both Players exterminated on the same turn";
             }
             else {
                 // all exterminated players lost
-                const notExtinct = this.players.filter((p) => extinctPlayers.indexOf(p) === -1);
-                if(notExtinct.length === 1) {
-                    // that player won, all other players are extinct
-                    this.declareWinner(notExtinct[0], "Drove opponent to extinction!");
-                }
-                // all extinct players have now lost
-                this.declareLosers(extinctPlayers, "Extinct - All Beavers and lodges destroyed");
+                const loser = extinctPlayers[0];
+                this.declareWinner(loser.opponent, "Drove opponent to extinction");
+                this.declareLoser(loser, "Extinct - All Beavers and lodges destroyed");
+                return true;
             }
         }
 
-        // Get player info
-        let playerInfo = [];
+        players.sort((a, b) => b.lodges.length - a.lodges.length);
 
-        for(let i = 0; i < this.players.length; i++) {
-            let player = this.players[i];
+        if(this.currentTurn % 2 === 1) {
+            // round end, check for primary win condition
 
-            playerInfo[i] = {
-                "lodges": player.lodges.length,
-                "branches": 0,
-                "food": 0,
-            };
-
-            for(let j = 0; j < player.beavers.length; j++) {
-                let beaver = player.beavers[j];
-
-                playerInfo[i]["branches"] += beaver.branches;
-                playerInfo[i]["food"] += beaver.food;
+            if(players[0].lodges.length >= this.lodgesToWin) {
+                if(players[0].lodges.length === players[1].lodges.length) {
+                    // then both players completed the same number of lodges by the end of this round, do secondary win conditions
+                    secondaryWin = "Lodges complete on the same round";
+                }
+                else {
+                    // someone won
+                    this.declareWinner(players[0], `Reached ${players[0].lodges.length}/${this.lodgesToWin} lodges!`);
+                    this.declareLoser(players[1], "Less lodges than winner who reached completed all lodges");
+                    return true;
+                }
             }
         }
 
-        let checkSecondaryConditions = this.currentTurn >= this.maxTurns - 1;
-        if(this.currentTurn % this.players.length === this.players.length - 1) {
-            // Check if a player has created the required number lodges
-            let max = 0;
-            let playerWithMax = -1;
-            for(let player = 0; player < playerInfo.length; player++) {
-                let playerLodges = playerInfo[player]["lodges"];
-
-                if(playerLodges > max) {
-                    max = playerLodges;
-                    playerWithMax = player;
-                }
-                else if(playerLodges === max) {
-                    playerWithMax = -1;
-                }
-            }
-
-            if(max >= this.lodgesCompleteToWin && playerWithMax >= 0) {
-                let losers = this.players.clone();
-                this.declareWinner(losers[playerWithMax], "Player has won because they have the most lodges.");
-                losers.splice(playerWithMax, 1);
-                this.declareLosers(losers, "Player does not have most lodges.");
-                return true;
-            }
-            else if(max >= this.lodgesCompleteToWin) {
-                checkSecondaryConditions = true;
-            }
-        }
-
-        // Check if the maximum number of turns have passed
-        if(checkSecondaryConditions) {
-            // Find the player with the most lodges
-            let max = 0;
-            let playerWithMax = -1;
-            for(let player = 0; player < playerInfo.length; player++) {
-                let playerLodges = playerInfo[player]["lodges"];
-
-                if(playerLodges > max) {
-                    max = playerLodges;
-                    playerWithMax = player;
-                }
-                else if(playerLodges === max) {
-                    playerWithMax = -1;
-                }
-            }
-
-            if(playerWithMax >= 0) {
-                let losers = this.players.clone();
-                this.declareWinner(losers[playerWithMax], "Player has won because they have the most lodges.");
-                losers.splice(playerWithMax, 1);
-                this.declareLosers(losers, "Player does not have most lodges.");
+        if(secondaryWin) {
+            // check if someone won by having more lodges
+            if(players[0].lodges.length !== players[1].lodges.length) {
+                this.declareWinner(players[0], `${secondaryWin} - Has the most lodges (${players[0].lodges.length})`);
+                this.declareLoser(players[1], `${secondaryWin} - Less lodges than opponent`);
                 return true;
             }
 
-            // Find the player with the most branches
-            max = 0;
-            playerWithMax = -1;
-            for(let player = 0; player < playerInfo.length; player++) {
-                let playerLodges = playerInfo[player]["branches"];
+            // check if someone won by having more branches or food
+            for(const resource of ["branches", "food"]) {
+                /**
+                 * counts the number of resources a player has
+                 *
+                 * @param {Player} p - player to count for
+                 * @returns {int} the count f resource
+                 */
+                let count = (p) => (p.lodges.map((m) => m[resource]).reduce((acc, val) => acc + val));
+                const player0Count = count(players[0]);
+                const player1Count = count(players[1]);
 
-                if(playerLodges > max) {
-                    max = playerLodges;
-                    playerWithMax = player;
-                }
-                else if(playerLodges === max) {
-                    playerWithMax = -1;
-                }
-            }
-
-            if(playerWithMax >= 0) {
-                let losers = this.players.clone();
-                this.declareWinner(losers[playerWithMax], "Player has won because they have the most branches.");
-                losers.splice(playerWithMax, 1);
-                this.declareLosers(losers, "Player does not have most branches.");
-                return true;
-            }
-
-            // Find the player with the most food
-            max = 0;
-            playerWithMax = -1;
-            for(let player = 0; player < playerInfo.length; player++) {
-                let playerLodges = playerInfo[player]["food"];
-
-                if(playerLodges > max) {
-                    max = playerLodges;
-                    playerWithMax = player;
-                }
-                else if(playerLodges === max) {
-                    playerWithMax = -1;
+                if(player0Count !== player1Count) {
+                    const winner = players[player0Count > player1Count ? 0 : 1];
+                    const winnerCount = Math.max(player0Count, player1Count);
+                    const looserCount = Math.min(player0Count, player1Count);
+                    this.declareWinner(winner, `${secondaryWin} - Has more ${resource} than opponent (${winnerCount})`);
+                    this.declareLoser(winner.opponent, `${secondaryWin} - Less ${resource} than winner (${looserCount})`);
+                    return true;
                 }
             }
 
-            if(playerWithMax >= 0) {
-                let losers = this.players.clone();
-                this.declareWinner(losers[playerWithMax], "Player has won because they have the most food.");
-                losers.splice(playerWithMax, 1);
-                this.declareLosers(losers, "Player does not have most food.");
-                return true;
-            }
-
-            // Pick a random player
-            this._endGameViaCoinFlip();
-            return true;
+            // if we got here they both probably did nothing, so win via coin flip
+            this._endGameViaCoinFlip(secondaryWin);
         }
 
         return false;
+    },
+
+    /**
+     * invoked when max turns are reached
+     *
+     * @override
+     */
+    _maxTurnsReached: function() {
+        this.checkForWinner("Max turns reached");
     },
 
     updateBeavers: function() {
