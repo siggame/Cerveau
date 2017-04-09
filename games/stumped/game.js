@@ -165,8 +165,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this.newBeavers = [];
 
-        this._minSpawners = 2;
-        this._maxSpawners = 20;
+        this._minSpawners = {
+            food: 1,
+            branches: 4,
+        };
+
+        this._maxSpawners = {
+            food: 3,
+            branches: 12,
+        };
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -646,16 +653,19 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
         }
 
-        /* Generate resources on the top half of the map */
-        for(let x = 0; x < this.mapWidth; x++) {
-            for(let y = 0; y < this.mapHeight/2; y++) {
-                let tile = this.getTile(x, y);
-                if(Math.random() < 0.05) {
-                    this.create("Spawner", {
-                        tile: tile,
-                        type: tile.type === "water" ? "food" : "branches",
-                    });
+        // create spawners
+        for(const type of this.spawnerTypes) {
+            const count = Math.randomInt(this._maxSpawners[type], this._minSpawners[type]);
+            const tileType = type === "food" ? "water" : "land";
+
+            for(let i = 0; i < count; i++) {
+                let tile;
+                while(!tile || tile.type !== tileType) {
+                    // generate a new tile to see if it is valid
+                    tile = this.getTile(Math.randomInt(this.mapWidth - 1), Math.randomInt(this.mapHeight/2 - 1));
                 }
+
+                this.create("Spawner", {tile, type});
             }
         }
 
