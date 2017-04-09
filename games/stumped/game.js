@@ -344,7 +344,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                  * @param {Player} p - player to count for
                  * @returns {int} the count f resource
                  */
-                let count = (p) => (p.lodges.map((m) => m[resource]).reduce((acc, val) => acc + val));
+                let count = (p) => (p.lodges.map((m) => m[resource]).reduce((acc, val) => acc + val, 0));
                 const player0Count = count(players[0]);
                 const player1Count = count(players[1]);
 
