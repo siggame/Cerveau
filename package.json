@@ -9,8 +9,8 @@
   "private": true,
   "dependencies": {
     "argparse": "1.0.6",
-    "chess.js": "0.9.3",
     "cadre-js-extensions": "siggame/Cadre-js-extensions",
+    "chess.js": "0.9.3",
     "classe": "1.0.0",
     "clone": "1.0.2",
     "colors": "1.1.2",
@@ -18,11 +18,15 @@
     "express-handlebars": "3.0.0",
     "extend": "3.0.0",
     "gaussian": "1.1.0",
+    "git-rev": "0.2.1",
+    "hosted-git-info": "2.4.2",
     "lark-websocket": "JacobFischer/lark-websocket",
     "mathjs": "3.11.4",
     "moment": "2.11.2",
+    "request": "2.81.0",
     "sanitize-filename": "1.5.3",
     "seedrandom": "2.4.2",
+    "simple-git": "1.70.0",
     "uuid": "2.0.1"
   },
   "devDependencies": {

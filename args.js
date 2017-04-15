@@ -18,7 +18,9 @@ var parserArgs = [
     [["--no-game-settings"], {action: "storeFalse", dest: "gameSettings", help: "ignores any requested game settings from clients", defaultValue: true}],
     [["--no-load-gamelogs"], {action: "storeFalse", dest: "loadGamelogs", help: "gamelogs are not loaded to get the status or view in the web interface", defaultValue: true}],
     [["--no-api"], {action: "storeFalse", dest: "api", help: "does not run the hooks for the RESTful API service", defaultValue: true}],
-    [["--no-web"], {action: "storeFalse", dest: "web", help: "does not run web interface", defaultValue: true}],
+    [["--no-web"], {action: "storeFalse", dest: "web", help: "does not run the web interface", defaultValue: true}],
+    [["--no-updater"], {action: "storeFalse", dest: "updater", help: "does not run the update checker", defaultValue: true}],
+    [["--no-autoupdate"], {action: "storeFalse", dest: "autoupdate", help: "the updater will not try to autoupdate when updates are found", defaultValue: true}],
 ];
 
 for(var i = 0; i < parserArgs.length; i++) {

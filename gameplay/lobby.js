@@ -1,25 +1,26 @@
-var utilities = require(__basedir + "/utilities/");
-var constants = require("./constants");
-var errors = require("./errors");
-var Class = utilities.Class;
-var GameLogger = require("./gameLogger");
-var Server = require("./server");
-var Session = require("./session");
-var Authenticator = require("./authenticator");
-var log = require("./log");
+const utilities = require(__basedir + "/utilities/");
+const constants = require("./constants");
+const errors = require("./errors");
+const Class = utilities.Class;
+const GameLogger = require("./gameLogger");
+const Server = require("./server");
+const Session = require("./session");
+const Authenticator = require("./authenticator");
+const Updater = require("./updater");
+const log = require("./log");
 
-var extend = require("extend");
-var ws = require("lark-websocket");
-var fs = require("fs");
-var url = require("url");
-var net = require("net");
-var cluster = require("cluster");
-var readline = require("readline");
+const extend = require("extend");
+const ws = require("lark-websocket");
+const fs = require("fs");
+const url = require("url");
+const net = require("net");
+const cluster = require("cluster");
+const readline = require("readline");
 
 /**
  * @class Lobby: The server clients initially connect to before being moved to their game session. Basically creates and manages game sessions.
  */
-var Lobby = Class(Server, {
+const Lobby = Class(Server, {
     init: function(args) {
         Server.init.call(this, args);
 
@@ -88,6 +89,12 @@ var Lobby = Class(Server, {
                 process.exit(1);
             }
         });
+
+        if(args.updater) {
+            this.updater = new Updater({
+                autoupdate: args.autoupdate,
+            });
+        }
     },
 
     /**
