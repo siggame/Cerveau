@@ -56,6 +56,8 @@ if(args.arena) {
     args.gameSettings = false;
     args.web = false;
     args.loadGamelogs = false;
+    args.updater = false;
+    args.autoupdate = false;
 }
 
 if(!isNaN(args.portOffset)) {
