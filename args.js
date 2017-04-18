@@ -31,7 +31,10 @@ for(var i = 0; i < parserArgs.length; i++) {
 var config = require("./config.json");
 for(var key in config) {
     if(config.hasOwnProperty(key)) {
-        process.argv.push("--" + key, config[key]);
+        process.argv.push("--" + key);
+        if(config[key] !== null) {
+            process.argv.push(config[key]);
+        }
     }
 }
 
