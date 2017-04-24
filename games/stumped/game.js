@@ -265,14 +265,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.updateBeavers();
         this.updateResources();
 
-        for(const b of this.beavers) {
-            for(const a of this.beavers) {
-                if(a !== b && a.tile && a.tile === b.tile) {
-                    throw new Error(`FUCK ${a} is on ${b} at ${a.tile}`);
-                }
-            }
-        }
-
         if(this.checkForWinner()) {
             // we found a winner, no need to proceed to the next turn
             return;
