@@ -115,6 +115,8 @@ const Updater = Classe({
      * Tries to auto-update this repo is an update was found
      */
     _tryToUpdate: function() {
+        this._foundUpdates = true;
+
         if(!this.autoupdate) {
             log.warning("Update found on GitHub, but autoupdate is disabled. Manually update please!");
             return; // autoupdate is disabled
@@ -128,6 +130,10 @@ const Updater = Classe({
             }
             else {
                 log.warning("Auto Update applied. You may want to restart Cerveau if the update changed the base components, otherwise game changes will be reflected in the next run of that game automatically.");
+                this._foundUpdates = false; // as we applied them
+
+                // then re-cache the commits now that they are updated
+                this._cacheCommits();
             }
         });
     },
@@ -146,6 +152,15 @@ const Updater = Classe({
         }
 
         this.dead = true;
+    },
+
+    /**
+     * Checks if the Updater has found updates and they are not applied
+     *
+     * @return {boolean} true if found updates, false otherwise
+     */
+    foundUpdates() {
+        return Boolean(this._foundUpdates);
     },
 });
 

@@ -71,6 +71,9 @@ var Session = Class({
      * Starts this session by having it spin up a new worker thread for the game instance
      */
     start: function() {
+        if(this.lobby.updater && this.lobby.updater.foundUpdates()) {
+            log.warning("Starting a game session without updates!");
+        }
         this._threadInstance();
     },
 
