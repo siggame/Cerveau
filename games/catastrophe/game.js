@@ -135,6 +135,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
+        this.maxTurns = 730;
+        this.catEnergyMult = 2;
+        this.harvestCooldown = 1;
+        this.mapHeight = 30;
+        this.mapWidth = 40;
+        this.starvingEnergyMult = .5;
+        
         //<<-- /Creer-Merge: init -->>
     },
 
