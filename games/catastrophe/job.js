@@ -25,7 +25,7 @@ let Job = Class(GameObject, {
          *
          * @type {number}
          */
-        this.actCost = this.actCost || 0;
+        this.actionCost = this.actionCost || 0;
 
         /**
          * How many combined resources a Unit with this Job can hold at once.
@@ -56,7 +56,7 @@ let Job = Class(GameObject, {
         this.title = this.title || "";
 
         /**
-         * The amount of food per turn this Unit consumes. If there isn't enough food for every Unit, all units become starved and do not consume food.
+         * The amount of food per turn this Unit consumes. If there isn't enough food for every Unit, all Units become starved and do not consume food.
          *
          * @type {number}
          */

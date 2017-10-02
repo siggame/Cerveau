@@ -31,6 +31,7 @@
             "currentPlayer",
             "currentTurn",
             "gameObjects",
+            "harvestCooldown",
             "jobs",
             "mapHeight",
             "mapWidth",
@@ -45,7 +46,7 @@
         "attributes": {
             "catEnergyMult": {
                 "default": null,
-                "description": "The multiplier for the amount of energy regenerated when resting in a base with the cat overlord.",
+                "description": "The multiplier for the amount of energy regenerated when resting in a shelter with the cat overlord.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -94,6 +95,16 @@
                         "name": "GameObject",
                         "valueType": null
                     }
+                }
+            },
+            "harvestCooldown": {
+                "default": null,
+                "description": "The amount of turns it takes for a Tile that was just harvested to grow food again.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
                 }
             },
             "jobs": {
@@ -328,7 +339,7 @@
         },
         "Job": {
             "attribute_names": [
-                "actCost",
+                "actionCost",
                 "carryLimit",
                 "moves",
                 "regenRate",
@@ -336,7 +347,7 @@
                 "upkeep"
             ],
             "attributes": {
-                "actCost": {
+                "actionCost": {
                     "default": null,
                     "description": "The amount of energy this Job normally uses to perform its actions.",
                     "type": {
@@ -388,7 +399,7 @@
                 },
                 "upkeep": {
                     "default": null,
-                    "description": "The amount of food per turn this Unit consumes. If there isn't enough food for every Unit, all units become starved and do not consume food.",
+                    "description": "The amount of food per turn this Unit consumes. If there isn't enough food for every Unit, all Units become starved and do not consume food.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -621,7 +632,7 @@
                 },
                 "upkeep": {
                     "default": null,
-                    "description": "The total upkeep of every Unit owned by this Player.",
+                    "description": "The total upkeep of every Unit owned by this Player. If there isn't enough food for every Unit, all Units become starved and do not consume food.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -746,7 +757,7 @@
                 },
                 "materials": {
                     "default": null,
-                    "description": "The number of materials in this Structure.",
+                    "description": "The number of materials in this Structure. Once this number reaches 0, this Structure is destroyed.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -766,7 +777,7 @@
                 },
                 "tile": {
                     "default": null,
-                    "description": "The Tile this structure is on.",
+                    "description": "The Tile this Structure is on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -776,7 +787,7 @@
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of structure this is.",
+                    "description": "The type of Structure this is ('shelter', 'monument', 'wall', 'road').",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -880,6 +891,7 @@
                 "tileNorth",
                 "tileSouth",
                 "tileWest",
+                "turnsToHarvest",
                 "type",
                 "unit",
                 "x",
@@ -898,7 +910,7 @@
                 },
                 "harvestRate": {
                     "default": null,
-                    "description": "The amount of food that can be harvested from this tile per turn.",
+                    "description": "The amount of food that can be harvested from this Tile per turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -918,7 +930,7 @@
                 },
                 "structure": {
                     "default": null,
-                    "description": "The structure on this Tile if present, otherwise null.",
+                    "description": "The Structure on this Tile if present, otherwise null.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -963,6 +975,16 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "turnsToHarvest": {
+                    "default": null,
+                    "description": "The amount of turns before this resource can be harvested.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
                         "valueType": null
                     }
                 },
@@ -1112,7 +1134,7 @@
             "attributes": {
                 "acted": {
                     "default": null,
-                    "description": "Whether this unit has performed its action this turn.",
+                    "description": "Whether this Unit has performed its action this turn.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1122,7 +1144,7 @@
                 },
                 "energy": {
                     "default": null,
-                    "description": "The amount of energy this unit has (from 0.0 to 1.0).",
+                    "description": "The amount of energy this Unit has (from 0.0 to 100.0).",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1162,7 +1184,7 @@
                 },
                 "movementTarget": {
                     "default": null,
-                    "description": "The tile this Unit is moving to. This only applies to neutral fresh humans spawned on the road.",
+                    "description": "The tile this Unit is moving to. This only applies to neutral fresh humans spawned on the road. Otherwise, the tile this Unit is on.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1182,7 +1204,7 @@
                 },
                 "owner": {
                     "default": null,
-                    "description": "The Player that owns and can control this Unit, or null if the unit is neutral.",
+                    "description": "The Player that owns and can control this Unit, or null if the Unit is neutral.",
                     "type": {
                         "is_game_object": true,
                         "keyType": null,
@@ -1192,7 +1214,7 @@
                 },
                 "squad": {
                     "default": null,
-                    "description": "The units in the same squad as this unit. Units in the same squad attack and defend together.",
+                    "description": "The Units in the same squad as this Unit. Units in the same squad attack and defend together.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1207,7 +1229,7 @@
                 },
                 "starving": {
                     "default": null,
-                    "description": "Whether this unit is starving. Starving units regenerate energy at half the rate they normally would while resting.",
+                    "description": "Whether this Unit is starving. Starving Units regenerate energy at half the rate they normally would while resting.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1227,7 +1249,7 @@
                 },
                 "turnsToDie": {
                     "default": null,
-                    "description": "The number of turns before this Unit dies. This only applies to neutral fresh humans created from combat.",
+                    "description": "The number of turns before this Unit dies. This only applies to neutral fresh humans created from combat. Otherwise, 0.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -1269,7 +1291,7 @@
                             }
                         }
                     ],
-                    "description": "Attacks an adjacent tile. Costs an action for each unit in this squad. Units in this squad without an action don't participate in combat. Units in the squad cannot move after performing this action.",
+                    "description": "Attacks an adjacent Tile. Costs an action for each Unit in this Unit's squad. Units in the squad without an action don't participate in combat. Units in combat cannot move afterwards.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully attacked, false otherwise.",
@@ -1302,7 +1324,7 @@
                             }
                         }
                     ],
-                    "description": "Changes this Unit's Job. Must be at max energy (1.0) to change Jobs.",
+                    "description": "Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully changed Jobs, false otherwise.",
@@ -1325,7 +1347,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The Tile to construct the structure on. It must have enough materials on it for a structure to be constructed.",
+                            "description": "The Tile to construct the Structure on. It must have enough materials on it for a Structure to be constructed.",
                             "name": "tile",
                             "optional": false,
                             "type": {
@@ -1337,7 +1359,7 @@
                         },
                         {
                             "default": null,
-                            "description": "The type of structure to construct on that tile.",
+                            "description": "The type of Structure to construct on that Tile.",
                             "name": "type",
                             "optional": false,
                             "type": {
@@ -1348,7 +1370,7 @@
                             }
                         }
                     ],
-                    "description": "Constructs a structure on an adjacent Tile.",
+                    "description": "Constructs a Structure on an adjacent Tile.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully constructed a structure, false otherwise.",
@@ -1462,7 +1484,7 @@
                         },
                         {
                             "default": 0,
-                            "description": "The amount of the resource to drop, numbers <= 0 will drop all of the resource.",
+                            "description": "The amount of the resource to drop. Amounts <= 0 will drop as much as possible.",
                             "name": "amount",
                             "optional": true,
                             "type": {
@@ -1473,7 +1495,7 @@
                             }
                         }
                     ],
-                    "description": "Drops some of the given resource on or adjacent to the unit's Tile. Does not count as an action.",
+                    "description": "Drops some of the given resource on or adjacent to the Unit's Tile. Does not count as an action.",
                     "optionals": 1,
                     "optionals_start_index": 2,
                     "returns": {
@@ -1589,7 +1611,7 @@
                         },
                         {
                             "default": 0,
-                            "description": "The amount of the resource to pickup, numbers <= 0 will pickup all of the resource possible.",
+                            "description": "The amount of the resource to pickup. Amounts <= 0 will pickup as much as possible.",
                             "name": "amount",
                             "optional": true,
                             "type": {
@@ -1600,7 +1622,7 @@
                             }
                         }
                     ],
-                    "description": "Picks up some materials or food on or adjacent to the unit's tile. Does not count as an action.",
+                    "description": "Picks up some materials or food on or adjacent to the Unit's Tile. Does not count as an action.",
                     "optionals": 1,
                     "optionals_start_index": 2,
                     "returns": {
@@ -1620,7 +1642,7 @@
                     "altersState": true,
                     "argument_names": [],
                     "arguments": [],
-                    "description": "Regenerates energy. Must be in range of a friendly shelter to rest. Unit cannot move after performing this action.",
+                    "description": "Regenerates energy. Must be in range of a friendly shelter to rest. Costs an action. Units cannot move after resting.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully rested, false otherwise.",

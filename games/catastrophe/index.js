@@ -27,6 +27,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: {},
     },
 
+    harvestCooldown: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     jobs: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Job", "valueType": null}},
         defaultValue: [],
@@ -138,7 +143,7 @@ classes.GameObject.log.cerveau = {
 classes.Job = require("./job");
 
 classes.Job._deltaMergeableProperties = {
-    actCost: {
+    actionCost: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
     },
@@ -335,6 +340,11 @@ classes.Tile._deltaMergeableProperties = {
     tileWest: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,
+    },
+
+    turnsToHarvest: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
     type: {

@@ -29,7 +29,7 @@ let Tile = Class(GameObject, TiledTile, {
         this.food = this.food || 0;
 
         /**
-         * The amount of food that can be harvested from this tile per turn.
+         * The amount of food that can be harvested from this Tile per turn.
          *
          * @type {number}
          */
@@ -43,7 +43,7 @@ let Tile = Class(GameObject, TiledTile, {
         this.materials = this.materials || 0;
 
         /**
-         * The structure on this Tile if present, otherwise null.
+         * The Structure on this Tile if present, otherwise null.
          *
          * @type {string}
          */
@@ -76,6 +76,13 @@ let Tile = Class(GameObject, TiledTile, {
          * @type {Tile}
          */
         this.tileWest = this.tileWest || null;
+
+        /**
+         * The amount of turns before this resource can be harvested.
+         *
+         * @type {number}
+         */
+        this.turnsToHarvest = this.turnsToHarvest || 0;
 
         /**
          * What type of Tile this is.

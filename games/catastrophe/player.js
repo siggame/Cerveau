@@ -98,7 +98,7 @@ let Player = Class(GameObject, {
         this.units = this.units || [];
 
         /**
-         * The total upkeep of every Unit owned by this Player.
+         * The total upkeep of every Unit owned by this Player. If there isn't enough food for every Unit, all Units become starved and do not consume food.
          *
          * @type {number}
          */

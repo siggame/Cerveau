@@ -25,7 +25,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.init.apply(this, arguments);
 
         /**
-         * The multiplier for the amount of energy regenerated when resting in a base with the cat overlord.
+         * The multiplier for the amount of energy regenerated when resting in a shelter with the cat overlord.
          *
          * @type {number}
          */
@@ -51,6 +51,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {Object.<string, GameObject>}
          */
         this.gameObjects = this.gameObjects || {};
+
+        /**
+         * The amount of turns it takes for a Tile that was just harvested to grow food again.
+         *
+         * @type {number}
+         */
+        this.harvestCooldown = this.harvestCooldown || 0;
 
         /**
          * All the Jobs that Units can have in the game.

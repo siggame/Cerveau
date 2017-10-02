@@ -28,7 +28,7 @@ let Structure = Class(GameObject, {
         this.effectRadius = this.effectRadius || 0;
 
         /**
-         * The number of materials in this Structure.
+         * The number of materials in this Structure. Once this number reaches 0, this Structure is destroyed.
          *
          * @type {number}
          */
@@ -42,14 +42,14 @@ let Structure = Class(GameObject, {
         this.owner = this.owner || null;
 
         /**
-         * The Tile this structure is on.
+         * The Tile this Structure is on.
          *
          * @type {Tile}
          */
         this.tile = this.tile || null;
 
         /**
-         * The type of structure this is.
+         * The type of Structure this is ('shelter', 'monument', 'wall', 'road').
          *
          * @type {string}
          */
