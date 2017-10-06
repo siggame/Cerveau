@@ -107,7 +107,9 @@ let Unit = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.energy = 100;
+        // Soldiers are in their own squad, and other units, while not in squads, should be in their own squad for ease of use.
+        this.squad[0] = this;
 
         //<<-- /Creer-Merge: init -->>
     },
