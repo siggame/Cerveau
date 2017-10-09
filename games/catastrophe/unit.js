@@ -216,6 +216,17 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's construct function here
+        if(player.energy >= 51 && tile.materials >= COST ) {
+          let structure = new Structure();
+          tile.structure = type;
+          player.energy -= 51;
+          tile.materials -= COST;
+          structure.materials += COST;
+          structure.tile = tile;
+
+          return true;
+        }
+
         return false;
 
         // <<-- /Creer-Merge: construct -->>
