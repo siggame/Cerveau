@@ -197,7 +197,13 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        if(this.energy <= 51} {
+          return "Not enough energy to construct!"
+        } else if(this.job != 'builder') {
+          return "Only builders can construct!"
+        } else if(tile.structure) {
+          return "This tile already has a structure! You cannot construct here!"
+        }
         // Developer: try to invalidate the game logic for Unit's construct function here
         return undefined; // meaning valid
 
@@ -209,25 +215,22 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to construct the Structure on. It must have enough materials on it for a Structure to be constructed.
-     * @param {string} type - The type of Structure to construct on that Tile.
+     * @param {Structure} structure - The type of Structure to construct on that Tile.
      * @returns {boolean} True if successfully constructed a structure, false otherwise.
      */
-    construct: function(player, tile, type) {
+    construct: function(player, tile, structure) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's construct function here
-        if(player.energy >= 51 && tile.materials >= COST ) {
-          let structure = new Structure();
-          tile.structure = type;
-          player.energy -= 51;
-          tile.materials -= COST;
-          structure.materials += COST;
-          structure.tile = tile;
 
-          return true;
-        }
+        let this.structure = this.create('Structure';
+        tile.structure = structure;
+        this.energy -= 51;
+        tile.materials -= 10;
+        structure.materials += 10;
+        structure.tile = tile;
 
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: construct -->>
     },
