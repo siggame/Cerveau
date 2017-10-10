@@ -456,13 +456,13 @@ let Unit = Class(GameObject, {
         {
           return "You can only make your own units rest.";
         }
-        if(this.owner.cat === this)
-        {
-          return "One does not simply heal the cat overlord.";
-        }
         if(this.energy === 100)
         {
           return "The unit is at full health!";
+        }
+        if(this.acted === true) // I think being explicit here will only make it more clear
+        {
+          return "Unit must not of acted this turn to heal";
         }
         for (s in this.owner.structures) // from the list of structures
         {
@@ -481,10 +481,6 @@ let Unit = Class(GameObject, {
           {
             return "Unit must be at one of your shelters to heal";
           }
-        }
-        if(this.acted === true) // I think being explicit here will only make it more clear
-        {
-          return "Unit must not of acted this turn to heal";
         }
         return undefined; // meaning valid
 
