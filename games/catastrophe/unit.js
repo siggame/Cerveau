@@ -379,6 +379,30 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's move function here
+        if(this.owner !== player)
+        {
+          return "You can only move your own units";
+        }
+        if(tile.unit === Null)
+        {
+          return "The tile is already occupied";
+        }
+        if(this.moves < 1)
+        {
+          return "Your unit is out of moves!";
+        }
+        if(tile === Null)
+        {
+          return "You can't move to a tile that doesn't exist";
+        }
+        if(tile !== this.tileEast && tile !== this.tileWest && tile !== this.tileNorth && tile !== this.tileSouth)
+        {
+          return "You must move to a tile to the north, south, east, or west.";
+        }
+        if(tile.structure.type === "wall" && tile.structure.type === "monument" && tile.structure.type === "neutral")
+        {
+          return "You cannot move onto structures other than roads and monuments"; // feel free to change it so it mentioned what they tried to move onto.
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateMove -->>
@@ -395,6 +419,11 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's move function here
+        this.moves = this.moves - 1;
+        this.tile.unit = Null;
+        this.tile = tile;
+        tile.unit = this;
+        this.calculateSquads()
         return false;
 
         // <<-- /Creer-Merge: move -->>
