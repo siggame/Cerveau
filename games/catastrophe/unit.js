@@ -344,6 +344,39 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateHarvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's harvest function here
+        if(tile === Null)
+        {
+          return "You cannot harvest resources off the edge of the world";
+        }
+        if(this.owner !== player)
+        {
+          return "You can only harvest with your own units";
+        }
+        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth
+           && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest)
+        {
+          return "You can only harvest things on your tile or ajecent tiles";
+        }
+        if(tile.turnsToHarvest !== 0)
+        {
+          return "This tile isn't ready to harvest";
+        }
+        if(this.energy < this.job.actionCost)
+        {
+          return "The unit doesn't have enough energy to harvest anything";
+        }
+        if(tile.structure.type === "shelter")
+        {
+          if(tile.structure.owner === player)
+          {
+            return "You cannot steal from yourself";
+          }
+        }
+        let carry = this.food + this.materials;
+        if(this.job.carryLimit <= carry)
+        {
+          return "You cannot carry anymore";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateHarvest -->>
@@ -360,6 +393,23 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's harvest function here
+        let carry = this.job.carryLimit - (this.food + this.materials);
+        let pickup = 0;
+        if(tile.structure.type === "shelter")
+        {
+          if(tile.structure.owner !== player)
+          {
+            pickup = Math.min(tile.structure.owner.food, carry);
+            tile.structure.owner.food = tile.structure.owner.food - Math.min(tile.structure.owner.food, carry);
+          }
+        }
+        else
+        {
+          pickup = Math.min(tile.harvestRate, carry);
+          tile.turnsToHarvest = 5;
+        }
+        this.energy = this.energy - this.job.actionCost;
+        this.food = this.food + pickup;
         return false;
 
         // <<-- /Creer-Merge: harvest -->>
