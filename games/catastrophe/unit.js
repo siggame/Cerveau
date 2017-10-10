@@ -469,9 +469,9 @@ let Unit = Class(GameObject, {
           let notFound = true;
           if(s.type === 'structure')
           {
-            if(this.tile.x > (s.tile.x-((s.effectRadius-1)/2)) && this.tile.x < (s.tile.x+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius) // dynamically calculate if in range.
             {
-              if(this.tile.y > (s.tile.y-((s.effectRadius-1)/2)) && this.tile.y < (s.tile.y+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius) // dynamically calculate if in range.
               {
                 notFound = false;
               }
@@ -497,8 +497,32 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's rest function here
+        let cat = false;
+        for (s in this.owner.structures) // from the list of structures
+        {
+          if(s.type === 'structure')
+          {
+            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius) // dynamically calculate if in range.
+            {
+              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius) // dynamically calculate if in range.
+              {
+                if(this.job.title == "cat overlord")
+                {
+                  cat = true;
+                }
+              }
+            }
+          }
+        }
         this.acted = true;
-        this.energy = this.energy + this.job.regenRate;
+        if(cat === true)
+        {
+          this.energy = this.energy + (2*this.job.regenRate);
+        }
+        else
+        {
+          this.energy = this.energy + this.job.regenRate;
+        }
         if(this.energy > 100)
         {
           this.energy = 100;
