@@ -416,6 +416,32 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidatePickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's pickup function here
+        if(tile === Null)
+        {
+          return "You can only pick things up off tiles that exist";
+        }
+        if(this.energy < amount)
+        {
+          return "You do not have enough energy to pick up these items";
+        }
+        if(this.owner !== player)
+        {
+          return "You can only pickup with your own units";
+        }
+        if(amount < 1)
+        {
+          return "You must pickup at least one resource, Did you mean to use the drop action?";
+        }
+        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth
+           && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest)
+        {
+          return "You can only pickup things on your tile or ajecent tiles";
+        }
+        if(resource !== "food" && resource !== "Food" && resource !== "materials" && resource !== "Materials"
+           && resource !== "mat" && resource !== "Mat")
+        {
+          return "Enter in either food or materials to pickup a resource";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidatePickup -->>
@@ -434,6 +460,26 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's pickup function here
+        let pickup = amount
+        if(resource === "food" && resource === "Food")
+        {
+          if(amount > tile.food)
+          {
+            pickup = tile.food;
+          }
+          tile.food = tile.food - pickup;
+          this.food = this.food + pickup;
+        }
+        if(resource === "materials" && resource === "Materials" && resource === "mat" && resource === "Mat")
+        {
+          if(amount > tile.materials)
+          {
+            pickup = tile.materials;
+          }
+          tile.materials = tile.materials - pickup;
+          this.materials = this.materials + pickup;
+        }
+        this.energy = this.energy - pickup;
         return false;
 
         // <<-- /Creer-Merge: pickup -->>
