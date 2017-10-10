@@ -331,6 +331,13 @@ let Unit = Class(GameObject, {
         {
           return "Enter in either food or materials to drop a resource";
         }
+        if(tile.structure.type === "shelter")
+        {
+          if(tile.structure.owner !== player)
+          {
+            return "You can't drop things in enemy shelters. Nice thought though";
+          }
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDrop -->>
