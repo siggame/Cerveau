@@ -356,31 +356,22 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's drop function here
-        let drop = amount
         if(resource === "food" && resource === "Food")
-        {
-          if(amount > this.food)
-          {
-            drop = this.food;
-          }
+        {]
           if(tile.structure.type === "shelter")
           {
-            this.player.food = this.player.food + drop;
+            this.player.food = this.player.food + Math.min(amount, this.food);
           }
           else
           {
-            tile.food = tile.food + drop;
+            tile.food = tile.food + Math.min(amount, this.food);
           }
-          this.food = this.food - drop;
+          this.food = this.food - Math.min(amount, this.food);
         }
         if(resource === "materials" && resource === "Materials" && resource === "mat" && resource === "Mat")
-        {
-          if(amount > this.materials)
-          {
-            drop = this.materials;
-          }
-          tile.materials = tile.materials + drop;
-          this.materials = this.materials - drop;
+        {]
+          tile.materials = tile.materials + Math.min(amount, this.materials);
+          this.materials = this.materials - Math.min(amount, this.materials);
         }
         return false;
 
