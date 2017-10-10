@@ -214,6 +214,7 @@ let Unit = Class(GameObject, {
 
         this.job = job;
         this.moves = 0; // both have moves, might want to make a blank job for "jobless" humans.
+        this.calculateSquads()
         return false;
 
         // <<-- /Creer-Merge: changeJob -->>
