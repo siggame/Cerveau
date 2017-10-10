@@ -460,26 +460,18 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's pickup function here
-        let pickup = amount
         if(resource === "food" && resource === "Food")
         {
-          if(amount > tile.food)
-          {
-            pickup = tile.food;
-          }
-          tile.food = tile.food - pickup;
-          this.food = this.food + pickup;
+          tile.food = tile.food - Math.min(amount, tile.food);
+          this.food = this.food + Math.min(amount, tile.food);
+          this.energy = this.energy - Math.min(amount, tile.food);
         }
         if(resource === "materials" && resource === "Materials" && resource === "mat" && resource === "Mat")
         {
-          if(amount > tile.materials)
-          {
-            pickup = tile.materials;
-          }
-          tile.materials = tile.materials - pickup;
-          this.materials = this.materials + pickup;
+          tile.materials = tile.materials - Math.min(amount, tile.materials);
+          this.materials = this.materials + Math.min(amount, tile.materials);
+          this.energy = this.energy - Math.min(amount, tile.materials);
         }
-        this.energy = this.energy - pickup;
         return false;
 
         // <<-- /Creer-Merge: pickup -->>
