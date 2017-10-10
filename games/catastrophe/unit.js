@@ -163,39 +163,39 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateChangeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // job is now a string
-        if(this.owner.cat === this)
+        if (this.job.title == "cat overlord")
         {
-          return "The cat overloard is the overload. He cannot change jobs."
+          return "The cat overlord is the overlord. He cannot change jobs.";
         }
         if(this.owner !== player)
         {
-          return "You can only change the role of your own unit."
+          return "You can only change the role of your own unit.";
         }
         if(this.energy < 100)
         {
-          return "Unit must be at 100 energy to change roles"
+          return "Unit must be at 100 energy to change roles";
         }
         for (s in this.owner.structures) // from the list of structures
         {
-          let notFound = true
+          let notFound = true;
           if(s.type === 'structure')
           {
             if(this.tile.x > (s.tile.x-((s.effectRadius-1)/2)) && this.tile.x < (s.tile.x+((s.effectRadius-1)/2))) // dynamically calculate if in range.
             {
               if(this.tile.y > (s.tile.y-((s.effectRadius-1)/2)) && this.tile.y < (s.tile.y+((s.effectRadius-1)/2))) // dynamically calculate if in range.
               {
-                notFound = false
+                notFound = false;
               }
             }
           }
           if(notFound)
           {
-            return "Unit must be at one of your shelters to change roles"
+            return "Unit must be at one of your shelters to change roles";
           }
         }
         if(this.acted === true) // I think being explicit here will only make it more clear
         {
-          return "Unit must not of acted this turn to change roles"
+          return "Unit must not of acted this turn to change roles";
         }
         return undefined; // meaning valid
 
@@ -213,7 +213,7 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: changeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         this.job = job;
-        this.moves = this.job.moves; // both have moves, might want to make a blank job for "jobless" humans.
+        this.moves = 0; // both have moves, might want to make a blank job for "jobless" humans.
         return false;
 
         // <<-- /Creer-Merge: changeJob -->>
