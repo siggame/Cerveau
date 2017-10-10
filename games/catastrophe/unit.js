@@ -305,8 +305,32 @@ let Unit = Class(GameObject, {
      */
     invalidateDrop: function(player, tile, resource, amount, args) {
         // <<-- Creer-Merge: invalidateDrop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        
+        // I am assumeing resource us a string
 
         // Developer: try to invalidate the game logic for Unit's drop function here
+        if(tile === Null)
+        {
+          return "You cannot toss resources off the edge of the world";
+        }
+        if(this.owner !== player)
+        {
+          return "You can only do this with your own units";
+        }
+        if(amount < 1)
+        {
+          return "You must drop at least one resource";
+        }
+        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth
+           && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest)
+        {
+          return "You can only drop things on your tile or ajecent tiles";
+        }
+        if(resource !== "food" && resource !== "Food" && resource !== "materials" && resource !== "Materials"
+           && resource !== "mat" && resource !== "Mat")
+        {
+          return "Enter in either food or materials to drop a resource";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDrop -->>
@@ -325,6 +349,32 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's drop function here
+        let drop = amount
+        if(resource === "food" && resource === "Food")
+        {
+          if(amount > this.food)
+          {
+            drop = this.food;
+          }
+          if(tile.structure.type === "shelter")
+          {
+            this.player.food = this.player.food + drop;
+          }
+          else
+          {
+            tile.food = tile.food + drop;
+          }
+          this.food = this.food - drop;
+        }
+        if(resource === "materials" && resource === "Materials" && resource === "mat" && resource === "Mat")
+        {
+          if(amount > this.materials)
+          {
+            drop = this.materials;
+          }
+          tile.materials = tile.materials + drop;
+          this.materials = this.materials - drop;
+        }
         return false;
 
         // <<-- /Creer-Merge: drop -->>
