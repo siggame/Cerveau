@@ -452,6 +452,40 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's rest function here
+        if(this.owner !== player)
+        {
+          return "You can only make your own units rest.";
+        }
+        if(this.owner.cat === this)
+        {
+          return "One does not simply heal the cat overlord.";
+        }
+        if(this.energy === 100)
+        {
+          return "The unit is at full health!";
+        }
+        for (s in this.owner.structures) // from the list of structures
+        {
+          let notFound = true;
+          if(s.type === 'structure')
+          {
+            if(this.tile.x > (s.tile.x-((s.effectRadius-1)/2)) && this.tile.x < (s.tile.x+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+            {
+              if(this.tile.y > (s.tile.y-((s.effectRadius-1)/2)) && this.tile.y < (s.tile.y+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+              {
+                notFound = false;
+              }
+            }
+          }
+          if(notFound)
+          {
+            return "Unit must be at one of your shelters to heal";
+          }
+        }
+        if(this.acted === true) // I think being explicit here will only make it more clear
+        {
+          return "Unit must not of acted this turn to heal";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateRest -->>
@@ -467,6 +501,13 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's rest function here
+        this.acted = true;
+        this.energy = this.energy + this.job.regenRate;
+        if(this.energy > 100)
+        {
+          this.energy = 100;
+        }
+        this.moves = 0;
         return false;
 
         // <<-- /Creer-Merge: rest -->>
