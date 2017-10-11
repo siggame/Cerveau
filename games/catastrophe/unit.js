@@ -212,8 +212,15 @@ let Unit = Class(GameObject, {
     changeJob: function(player, job) {
         // <<-- Creer-Merge: changeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.job = job;
-        this.moves = 0; // both have moves, might want to make a blank job for "jobless" humans.
+        for x in this.game.jobs
+        {
+          if(x.title === job)
+          {
+            this.job = x;
+          }
+        }
+        this.acted = true;
+        this.moves = 0; // It takes all their time
         this.calculateSquads()
         return false;
 
