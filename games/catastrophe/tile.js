@@ -45,9 +45,9 @@ let Tile = Class(GameObject, TiledTile, {
         /**
          * The Structure on this Tile if present, otherwise null.
          *
-         * @type {string}
+         * @type {Structure}
          */
-        this.structure = this.structure || "";
+        this.structure = this.structure || null;
 
         /**
          * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.
@@ -83,13 +83,6 @@ let Tile = Class(GameObject, TiledTile, {
          * @type {number}
          */
         this.turnsToHarvest = this.turnsToHarvest || 0;
-
-        /**
-         * What type of Tile this is.
-         *
-         * @type {string}
-         */
-        this.type = this.type || "";
 
         /**
          * The Unit on this Tile if present, otherwise null.

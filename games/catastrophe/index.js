@@ -318,8 +318,8 @@ classes.Tile._deltaMergeableProperties = {
     },
 
     structure: {
-        type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
-        defaultValue: "",
+        type: {"is_game_object": true, "keyType": null, "name": "Structure", "valueType": null},
+        defaultValue: null,
     },
 
     tileEast: {
@@ -345,11 +345,6 @@ classes.Tile._deltaMergeableProperties = {
     turnsToHarvest: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
-    },
-
-    type: {
-        type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
-        defaultValue: "",
     },
 
     unit: {
@@ -463,7 +458,7 @@ classes.Unit.changeJob.cerveau = {
     args: [
         {
             name: "job",
-            type: {"is_game_object": true, "keyType": null, "name": "Job", "valueType": null},
+            type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         },
     ],
     returns: {

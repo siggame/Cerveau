@@ -155,7 +155,7 @@ let Unit = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -172,7 +172,7 @@ let Unit = Class(GameObject, {
      * Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @returns {boolean} True if successfully changed Jobs, false otherwise.
      */
     changeJob: function(player, job) {
