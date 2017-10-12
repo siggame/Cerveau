@@ -109,7 +109,7 @@ let Unit = Class(GameObject, {
 
         this.energy = 100;
         // Soldiers are in their own squad, and other units, while not in squads, should be in their own squad for ease of use.
-        this.squad[0] = this;
+        this.calculateSquad();
 
         //<<-- /Creer-Merge: init -->>
     },
