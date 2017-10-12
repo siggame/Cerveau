@@ -235,6 +235,14 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateConvert -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's convert function here
+        if(this.owner === player)
+        {
+          return "You can't make enemies convert your followers";
+        }
+        if(this.job.title !== "missionary")
+        {
+          return "You unit isn't a missionary and is thus unable to convince him to join you cul- I mean kingdom";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateConvert -->>
