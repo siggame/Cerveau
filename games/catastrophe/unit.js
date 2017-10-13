@@ -310,7 +310,7 @@ let Unit = Class(GameObject, {
 
         this.energy -= 75;
 
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: deconstruct -->>
     },
