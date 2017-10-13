@@ -317,25 +317,35 @@ let Unit = Class(GameObject, {
         {
           return "You can only do this with your own units";
         }
-        if(amount < 1)
-        {
-          return "You must drop at least one resource";
-        }
-        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth
-           && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest)
+        if(this.tile !== tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth
+           && tile !== this.tile.tileEast && tile !== this.tile.tileWest)
         {
           return "You can only drop things on your tile or ajecent tiles";
         }
-        if(resource !== "food" && resource !== "Food" && resource !== "materials" && resource !== "Materials"
-           && resource !== "mat" && resource !== "Mat")
+        if(!resource || resource = "")
+        {
+          return "You need to pass something in for resource";
+        }
+        if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M")
         {
           return "Enter in either food or materials to drop a resource";
         }
-        if(tile.structure.type === "shelter")
+        if(tile.structure)
         {
-          if(tile.structure.owner !== player)
+          if(tile.structure.type === "shelter")
           {
-            return "You can't drop things in enemy shelters. Nice thought though";
+            if(tile.structure.owner !== player)
+            {
+              return "You can't drop things in enemy shelters. Nice thought though";
+            }
+            else if(resource[0] !== "m" && resource[0] !== "M")
+            {
+              return "You can't drop resources on structures";
+            }
+          }
+          if(tile.structure.type !== "road")
+          {
+            return "You can't drop resources on structures";
           }
         }
         return undefined; // meaning valid
@@ -356,24 +366,35 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's drop function here
-        if(resource === "food" && resource === "Food")
-        {]
-          if(tile.structure.type === "shelter")
+        if(amount < 1)
+        {
+          if(resource[0] === "f" && resource[0] === "F")
+          {
+            amount = this.food
+          }
+          else
+          {
+            amount = this.materials;
+          }
+        }
+        if(resource[0] === "f" && resource[0] === "F")
+        {
+          if(tile.structure && tile.structure.type === "shelter")
           {
             this.player.food = this.player.food + Math.min(amount, this.food);
           }
           else
           {
-            tile.food = tile.food + Math.min(amount, this.food);
+            tile.food += Math.min(amount, this.food);
           }
-          this.food = this.food - Math.min(amount, this.food);
+          this.food -= Math.min(amount, this.food);
         }
-        if(resource === "materials" && resource === "Materials" && resource === "mat" && resource === "Mat")
-        {]
-          tile.materials = tile.materials + Math.min(amount, this.materials);
-          this.materials = this.materials - Math.min(amount, this.materials);
+        else
+        {
+          tile.materials += Math.min(amount, this.materials);
+          this.materials -= Math.min(amount, this.materials);
         }
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: drop -->>
     },
