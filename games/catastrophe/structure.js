@@ -80,6 +80,7 @@ let Structure = Class(GameObject, {
         }
         
         this.game.structures.push(this);
+        this.owner.structures.push(this);
 
         //<<-- /Creer-Merge: init -->>
     },
