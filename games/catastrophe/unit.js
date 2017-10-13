@@ -269,7 +269,22 @@ let Unit = Class(GameObject, {
     invalidateDeconstruct: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateDeconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's deconstruct function here
+        if(!tile.structure){
+            return "No structure to deconstruct";
+        }
+        else if(this.job !== "builder"){
+            return "Only builders can deconstruct a structure";
+        }
+        else if(this.energy <= 75){
+            return "Too little energy to deconstruct";
+        }
+        else if(this.owner === tile.structure.owner){
+            return "Cannot deconstruct a friendly structure";
+        }
+        else if(this.materials === 50){
+            return "Cannot carry any more materials";
+        }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
@@ -285,7 +300,16 @@ let Unit = Class(GameObject, {
     deconstruct: function(player, tile) {
         // <<-- Creer-Merge: deconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's deconstruct function here
+        if(50 - this.materials > tile.structure.materials){
+            this.materials += tile.structure.materials;
+            tile.structure.materials = 0;
+        }else{
+            tile.structure.materials -= 50 - this.materials;
+            this.materials = 50;
+        }
+
+        this.energy -= 75;
+
         return false;
 
         // <<-- /Creer-Merge: deconstruct -->>
