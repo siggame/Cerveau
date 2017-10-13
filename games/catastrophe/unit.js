@@ -175,23 +175,22 @@ let Unit = Class(GameObject, {
         {
           return "Unit must be at 100 energy to change roles";
         }
-        for (s in this.owner.structures) // from the list of structures
-        {
-          let notFound = true;
-          if(s.type === 'structure')
+        let found = this.owner.structure.find(function(s){
+          if(s.type === 'shelter')
           {
-            if(this.tile.x > (s.tile.x-((s.effectRadius-1)/2)) && this.tile.x < (s.tile.x+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius)) // dynamically calculate if in range.
             {
-              if(this.tile.y > (s.tile.y-((s.effectRadius-1)/2)) && this.tile.y < (s.tile.y+((s.effectRadius-1)/2))) // dynamically calculate if in range.
+              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius)) // dynamically calculate if in range.
               {
-                notFound = false;
+                return true;
               }
             }
           }
-          if(notFound)
-          {
-            return "Unit must be at one of your shelters to change roles";
-          }
+          return false;
+        });
+        if(!found)
+        {
+          return "Unit must be at one of your shelters to change roles";
         }
         if(this.acted === true) // I think being explicit here will only make it more clear
         {
@@ -212,17 +211,11 @@ let Unit = Class(GameObject, {
     changeJob: function(player, job) {
         // <<-- Creer-Merge: changeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        for x in this.game.jobs
-        {
-          if(x.title === job)
-          {
-            this.job = x;
-          }
-        }
+        this.job = this.game.jobs.find(j=>j.title === job);
         this.acted = true;
         this.moves = 0; // It takes all their time
         this.calculateSquads()
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: changeJob -->>
     },
