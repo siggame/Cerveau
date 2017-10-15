@@ -188,7 +188,7 @@ let Unit = Class(GameObject, {
           }
           return false;
         });
-        if(!found)
+        if(found === false) // easier to read
         {
           return "Unit must be at one of your shelters to change roles";
         }
@@ -214,7 +214,7 @@ let Unit = Class(GameObject, {
         this.job = this.game.jobs.find(j=>j.title === job);
         this.acted = true;
         this.moves = 0; // It takes all their time
-        this.calculateSquads()
+        this.calculateSquads();
         return true;
 
         // <<-- /Creer-Merge: changeJob -->>
