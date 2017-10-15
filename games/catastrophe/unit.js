@@ -109,7 +109,7 @@ let Unit = Class(GameObject, {
 
         this.energy = 100;
         this.job = data.job || this.game.jobs[0];
-        this.moves = this.job.moves;
+        this.moves = this.job.moves || 0;
         this.owner = data.owner || null;
         this.tile = data.tile || null;
         this.turnsToDie = -1;
