@@ -163,13 +163,17 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateChangeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // job is now a string
+        if(!job)
+        {
+          return "You must pass something in for the job argument to change jobs";
+        }
         if (this.job.title == "cat overlord")
         {
-          return "The cat overlord is the overlord. He cannot change jobs.";
+          return "The cat overlord is the overlord. He cannot change jobs";
         }
         if(this.owner !== player)
         {
-          return "You can only change the role of your own unit.";
+          return "You can only change the role of your own unit";
         }
         if(this.energy < 100)
         {
