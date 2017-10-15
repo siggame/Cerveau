@@ -370,7 +370,7 @@ let Unit = Class(GameObject, {
         {
           if(resource[0] === "f" && resource[0] === "F")
           {
-            amount = this.food
+            amount = this.food;
           }
           else
           {
