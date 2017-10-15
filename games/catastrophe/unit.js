@@ -475,8 +475,115 @@ let Unit = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
-
+    //unit attacks
+    invalidateAttack: function(player, tile, args) {
+        if(this.job !== "soidier")
+            return "The attack cannot occur as the unit is not a soldier!";
+        if(this.Owner !== player)
+            return "The attack cannot occur as you have to attack with your own soldiers!";
+        if(tile.Unit === player)
+            return "The attack cannot occur as you have to attack an enemy!";
+        if(this.Acted === true)
+            return "This unit has already acted and cannot attack!";
+        if(tile !== this.Tile.tileEast() && tile !== this.Tile.tileNorth() && tile !== this.Tile.tileSount() && tile !== this.Tile.tileWest())
+            return "The tile to attack is not next to your soldier!";
+        return undefined; // meaning valid
+    }
+    attack: function(player, tile) { //when would I use player if invalidateAttack was run and squads wont mix teams? does this call invalidateAttack?
+        let attackSum=0;//damage to be distributed
+        let attackMod=1;//damage modifier, if unit near allied monument
+        for(let x=this.tile.x-2; x<=this.tile.x+2; x++)  //is a soldier in it's own squad? if so this and next 14 lines arent needed
+            for(let y=this.tile.y-2; y<=this.tile.y+2; y++)
+                if(this.game.getTile(x, y).Structure="monument" && this.game.getTile(x, y).Owner=player)//check if ally monument nearby
+                    attackMod=.5;
+        this.Energy -= 25*attackMod;
+        this.Acted === true;
+        attackSum += 25;
+        if(this.Energy <= 0) {
+            attackSum += this.Energy/attackMod; //this.Energy is negative here
+            this.job="fresh human";
+            for(unit in this.Player.Units)//this players unit list
+                if (unit.Squad.indexOf(this) > -1)
+                    unit.Squad.splice(unit.Squad.indexOf(this), 1); //no longer in other unit's squads      NOTE THIS IS A LINE OF UPDATE SQUADS         wiping squad done later so can use squad in attacking calc
+            this.Owner=NULL;
+            this.TurnsToDie=10;
+            this.Energy=100; //when changed to fresh humans, do they have full energy?
+        }
+        attackMod=1; //resetting attack mod after every unit
+        for(soldier in this.Squad) {
+            if(soldier.Acted === false) {
+                for(let x=soldier.tile.x-2; x<=soldier.tile.x+2; x++)  //is a soldier in it's own squad? if so this and next 14 lines arent needed
+                    for(let y=soldier.tile.y-2; y<=soldier.tile.y+2; y++)
+                        if(this.game.getTile(x, y).Structure="monument" && this.game.getTile(x, y).Owner=player)//check if ally monument nearby
+                            attackMod=.5;
+                soldier.Energy -= 25*attackMod;
+                soldier.Acted === true;
+                attackSum += 25;
+                if(soldier.Energy <= 0) {
+                    attackSum += soldier.Energy/attackMod; //soldier.Energy is negative here
+                    soldier.job="fresh human";
+                    for(unit in soldier.Player.Units)//this players unit list
+                        if (unit.Squad.indexOf(soldier) > -1)
+                    unit.Squad.splice(unit.Squad.indexOf(soldier), 1); //no longer in other unit's squads      NOTE THIS IS A LINE OF UPDATE SQUADS
+                    soldier.updateSquads();//wipe own squad list                                               NOTE THIS IS A LINE OF UPDATE SQUADS
+                    soldier.Owner=NULL;
+                    soldier.TurnsToDie=10;
+                    soldier.Energy=100; //when changed to fresh humans, do they have full energy?
+                }
+            }
+        } 
+        if(this.job="fresh human")//if the original attacker died          NOTE THIS IS A LINE OF UPDATE SQUADS
+            this.updateSquads();//wipe own squad list                      NOTE THIS IS A LINE OF UPDATE SQUADS
+        //EVERYTHING BEFORE IS CALCULATING DAMAGE, AFTER IS DEALING THE DAMAGE
+        if(tile.Unit !== NULL) { //checking if unit or structure under attack
+            for(let x=tile.x-2; x<=tile.x+2; x++)  //is a soldier in it's own squad? if so this and next 11 lines arent needed
+                for(let y=tile.y-2; y<=tile.y+2; y++)
+                    if(this.game.getTile(x, y).Structure="monument" && this.game.getTile(x, y).Owner !== player && this.game.getTile(x, y).Owner !== NULL)//check if enemy monument nearby
+                        attackMod=.5;
+            tile.Unit.Energy -= (attackSum*attackMod/(tile.Squad.size()+1));
+            attackMod=1;//resetting as not used for this unit past here
+            if(tile.Unit.Energy <= 0) {
+                tile.Unit.job="fresh human";
+                for(unit in tile.Unit.Player.Units)//opponents unit list
+                    if (unit.Squad.indexOf(tile.Unit) > -1)
+                        unit.Squad.splice(unit.Squad.indexOf(tile.Unit), 1); //no longer in other unit's squads      NOTE THIS IS A LINE OF UPDATE SQUADS         wiping squad done later so can use squad in defending calc
+                tile.Unit.Owner=NULL; 
+                tile.Unit.TurnsToDie=10;
+                tile.Unit.Energy=100; //when changed to fresh humans, do they have full energy?
+            }
+            for(target in tile.Unit.Squad) {
+                for(let x=tile.x-2; x<=tile.x+2; x++)
+                    for(let y=tile.y-2; y<=tile.y+2; y++)
+                        if(this.game.getTile(x, y).Structure="monument" && this.game.getTile(x, y).Owner !== player && this.game.getTile(x, y).Owner !== NULL)//check if enemy monument nearby
+                            attackMod=.5;
+                target.Energy -= (attackSum*attackMod/(tile.Squad.size()+1)) //if a soldier is in their own squad remove +1
+                attackMod=1;//resetting as not used for this unit past here
+                if(target.Energy <= 0) {
+                    taret.job="fresh human";
+                    for(unit in target.Player.Units)//opponents players unit list
+                        if (unit.Squad.indexOf(target) > -1)
+                            unit.Squad.splice(unit.Squad.indexOf(target), 1); //no longer in other unit's squads      NOTE THIS IS A LINE OF UPDATE SQUADS
+                    target.updateSquads();//wipe own squad list                                                       NOTE THIS IS A LINE OF UPDATE SQUADS
+                    target.Owner=NULL;
+                    target.TurnsToDie=10;
+                    target.Energy=100; //when changed to fresh humans, do they have full energy?
+                }
+            }
+            if(tile.Unit.job="fresh human")//if the original defender died          NOTE THIS IS A LINE OF UPDATE SQUADS
+                tile.Unit.updateSquads();//wipe own squad list                      NOTE THIS IS A LINE OF UPDATE SQUADS
+        }
+        else { //v checking if structure, which it should be if not a unit
+            if(tile.Structure !== NULL) { //as roads and neutral should be unowned, invalidateAttack should filter those structs out. no attacking neutral right?
+                tile.Structure.Materials -= attackSum*2;
+                if(tile.Structure.Materials <= 0) {
+                    tile.Structure.Materials = 0; //dunno if this is cleared w/ NULL so setting it anyway so no overspending when rebuilding a structure (spending just to return this to 0)
+                    tile.Structure=NULL;
+                }
+            }
+            else return false; //if nothing on tile to attack, which should never occur due to invalidateAttack but eh... dont know how to use return false w/ invalidate attack existing
+        }       
+        return true;
+    }
     //<<-- /Creer-Merge: added-functions -->>
 
 });
