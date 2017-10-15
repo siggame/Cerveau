@@ -477,7 +477,7 @@ let Unit = Class(GameObject, {
               }
             }
           }
-          if(notFound)
+          if(notFound === true)
           {
             return "Unit must be at one of your shelters to heal";
           }
@@ -506,7 +506,7 @@ let Unit = Class(GameObject, {
             {
               if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius) // dynamically calculate if in range.
               {
-                if(this.job.title == "cat overlord")
+                if(s.tile.unit.job.title == "cat overlord")
                 {
                   cat = true;
                 }
