@@ -493,15 +493,15 @@ let Unit = Class(GameObject, {
         }
         if(resource[0] === "f" && resource[0] === "F")
         {
-          tile.food = tile.food - Math.min(number, tile.food);
-          this.food = this.food + Math.min(number, tile.food);
+          tile.food -= Math.min(number, tile.food);
+          this.food += Math.min(number, tile.food);
           this.energy = this.energy - Math.min(amount, tile.food);
         }
         if(resource[0] === "m" && resource[0] === "M")
         {
-          tile.materials = tile.materials - Math.min(number, tile.materials);
-          this.materials = this.materials + Math.min(number, tile.materials);
-          this.energy = this.energy - Math.min(number, tile.materials);
+          tile.materials -= Math.min(number, tile.materials);
+          this.materials += Math.min(number, tile.materials);
+          this.energy -= Math.min(number, tile.materials);
         }
         return false;
 
