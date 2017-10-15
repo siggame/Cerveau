@@ -365,11 +365,14 @@ let Unit = Class(GameObject, {
         {
           return "The unit doesn't have enough energy to harvest anything";
         }
-        if(tile.structure.type === "shelter")
+        if(tile.structure)
         {
-          if(tile.structure.owner === player)
+          if(tile.structure.type === "shelter")
           {
-            return "You cannot steal from yourself";
+            if(tile.structure.owner === player)
+            {
+              return "You cannot steal from yourself";
+            }
           }
         }
         let carry = this.food + this.materials;
@@ -397,11 +400,8 @@ let Unit = Class(GameObject, {
         let pickup = 0;
         if(tile.structure.type === "shelter")
         {
-          if(tile.structure.owner !== player)
-          {
-            pickup = Math.min(tile.structure.owner.food, carry);
-            tile.structure.owner.food = tile.structure.owner.food - Math.min(tile.structure.owner.food, carry);
-          }
+          pickup = Math.min(tile.structure.owner.food, carry);
+          tile.structure.owner.food = tile.structure.owner.food - Math.min(tile.structure.owner.food, carry);
         }
         else
         {
