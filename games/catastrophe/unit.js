@@ -235,13 +235,37 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateConvert -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's convert function here
-        if(this.owner === player)
+        if(this.owner !== player)
         {
           return "You can't make enemies convert your followers";
         }
         if(this.job.title !== "missionary")
         {
           return "You unit isn't a missionary and is thus unable to convince him to join you cul- I mean kingdom";
+        }
+        if(tile === null)
+        {
+          return "The great void offers you no follows, and it will not join you";
+        }
+        if(tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest)
+        {
+          return "You can only convert units on ajacent tiles";
+        }
+        if(tile.unit === null)
+        {
+          return "The wind will not join your cause";
+        }
+        if(this.acted === true)
+        {
+          return "Your unit has already acted and thus cannot convert anyone";
+        }
+        if(this.energy < this.job.actionCost)
+        {
+          return "Your unit doesn't have enough energy to do this";
+        }
+        if(tile.unit.owner !== null)
+        {
+          return "The human is already part of a cul- I mean kingdom";
         }
         return undefined; // meaning valid
 
@@ -259,6 +283,14 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: convert -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's convert function here
+        tile.unit.turnsToDie = -1;
+        tile.unit.owner = player;
+        tile.unit.energy = 100;
+        tile.unit.acted = true;
+        tile.unit.moves = 0;
+        this.energy -= this.job.actionCost;
+        this.acted = true;
+        player.units.push(tile.unit);
         return false;
 
         // <<-- /Creer-Merge: convert -->>
