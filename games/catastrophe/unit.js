@@ -397,6 +397,7 @@ let Unit = Class(GameObject, {
         if(tile.structure && tile.structure.type !== "road" && tile.structure.type !== "shelter") {
             return "You cannot move onto structures other than roads and shelters";
         }
+        return undefined; // meaning valid
         // <<-- /Creer-Merge: invalidateMove -->>
     },
 
