@@ -197,9 +197,9 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.energy <= 51} {
+        if(this.energy <= this.job.actionCost} {
           return "Not enough energy to construct!"
-        } else if(this.job != 'builder') {
+        } else if(this.job.title != 'builder') {
           return "Only builders can construct!"
         } else if(tile.structure) {
           return "This tile already has a structure! You cannot construct here!"
@@ -218,12 +218,15 @@ let Unit = Class(GameObject, {
      * @param {Structure} structure - The type of Structure to construct on that Tile.
      * @returns {boolean} True if successfully constructed a structure, false otherwise.
      */
-    construct: function(player, tile, structure) {
+    construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's construct function here
 
-        let this.structure = this.create('Structure';
+        let this.structure = this.create("Structure", {
+          type: type, // This is assuming that `type` is an argument being passed in. It'd be better to pass in.
+          tile: tile, // This is the tile argument being passed in. We pass this as the tile value to the structure.
+        });
         tile.structure = structure;
         this.energy -= 51;
         tile.materials -= 10;
