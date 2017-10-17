@@ -228,10 +228,8 @@ let Unit = Class(GameObject, {
           tile: tile, // This is the tile argument being passed in. We pass this as the tile value to the structure.
         });
         tile.structure = structure;
-        this.energy -= 51;
-        tile.materials -= 10;
-        structure.materials += 10;
-        structure.tile = tile;
+        this.energy -= this.job.actionCost;
+        tile.materials -= structure.materials;
 
         return true;
 
