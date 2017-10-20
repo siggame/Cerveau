@@ -269,21 +269,18 @@ let Unit = Class(GameObject, {
     invalidateDeconstruct: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateDeconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(!tile.structure){
+        if(!tile.structure)
             return "No structure to deconstruct";
-        }
-        else if(this.job !== "builder"){
+        else if(this.job.title !== "builder")
             return "Only builders can deconstruct a structure";
-        }
-        else if(this.energy <= 75){
+        else if(this.acted)
+            return "This unit has already acted";
+        else if(this.energy <= 75)
             return "Too little energy to deconstruct";
-        }
-        else if(this.owner === tile.structure.owner){
+        else if(this.owner === tile.structure.owner)
             return "Cannot deconstruct a friendly structure";
-        }
-        else if(this.materials === 50){
+        else if(this.materials === 50)
             return "Cannot carry any more materials";
-        }
 
         return undefined; // meaning valid
 
@@ -309,6 +306,7 @@ let Unit = Class(GameObject, {
         }
 
         this.energy -= 75;
+        this.acted = true;
 
         return true;
 
