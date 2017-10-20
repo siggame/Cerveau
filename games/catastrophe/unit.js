@@ -197,7 +197,13 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        if(this.energy <= this.job.actionCost} {
+          return "Not enough energy to construct!"
+        } else if(this.job.title != 'builder') {
+          return "Only builders can construct!"
+        } else if(tile.structure) {
+          return "This tile already has a structure! You cannot construct here!"
+        }
         // Developer: try to invalidate the game logic for Unit's construct function here
         return undefined; // meaning valid
 
@@ -209,14 +215,23 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to construct the Structure on. It must have enough materials on it for a Structure to be constructed.
-     * @param {string} type - The type of Structure to construct on that Tile.
+     * @param {Structure} structure - The type of Structure to construct on that Tile.
      * @returns {boolean} True if successfully constructed a structure, false otherwise.
      */
     construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's construct function here
-        return false;
+
+        let this.structure = this.create("Structure", {
+          type: type, // This is assuming that `type` is an argument being passed in. It'd be better to pass in.
+          tile: tile, // This is the tile argument being passed in. We pass this as the tile value to the structure.
+        });
+        tile.structure = structure;
+        this.energy -= this.job.actionCost;
+        tile.materials -= structure.materials;
+
+        return true;
 
         // <<-- /Creer-Merge: construct -->>
     },
