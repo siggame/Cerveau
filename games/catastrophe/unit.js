@@ -271,14 +271,16 @@ let Unit = Class(GameObject, {
 
         if(!tile.structure)
             return "No structure to deconstruct";
-        else if(this.job.title !== "builder")
-            return "Only builders can deconstruct a structure";
+        else if(this.owner != player)
+            return "This is not your unit";
+        else if(this.job.title !== "builder" || this.job.title !== "soldier")
+            return "Only builders and soldiers can deconstruct a structure";
         else if(this.acted)
             return "This unit has already acted";
-        else if(this.energy <= 75)
+        else if(this.energy < 75)
             return "Too little energy to deconstruct";
-        else if(this.owner === tile.structure.owner)
-            return "Cannot deconstruct a friendly structure";
+        else if(this.owner === tile.structure.owner && this.job.title !== "soldier")
+            return "Builders cannot deconstruct a friendly structure";
         else if(this.materials === 50)
             return "Cannot carry any more materials";
 
@@ -297,13 +299,16 @@ let Unit = Class(GameObject, {
     deconstruct: function(player, tile) {
         // <<-- Creer-Merge: deconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(50 - this.materials > tile.structure.materials){
-            this.materials += tile.structure.materials;
+        if(this.job.title === "builder")
+            if(50 - this.materials > tile.structure.materials){
+                this.materials += tile.structure.materials;
+                tile.structure.materials = 0;
+            }else{
+                tile.structure.materials -= 50 - this.materials;
+                this.materials = 50;
+            }
+        else
             tile.structure.materials = 0;
-        }else{
-            tile.structure.materials -= 50 - this.materials;
-            this.materials = 50;
-        }
 
         this.energy -= 75;
         this.acted = true;
