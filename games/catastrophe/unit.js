@@ -310,6 +310,12 @@ let Unit = Class(GameObject, {
         else
             tile.structure.materials = 0;
 
+        if(tile.structure.materials === 0){
+            tile.structure.owner.structures.splice(tile.structure.owner.structures.indexOf(tile.strucutre),1);
+            this.game.structures.splice(tile.structure.owner.structures.indexOf(tile.structure),1);
+            tile.structure = null;
+        }
+
         this.energy -= 75;
         this.acted = true;
 
