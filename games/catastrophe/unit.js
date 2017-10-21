@@ -457,10 +457,35 @@ let Unit = Class(GameObject, {
      */
     invalidateHarvest: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateHarvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, true, true);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's harvest function here
-        return undefined; // meaning valid
+        if(!tile) {
+            return "You cannot harvest resources off the edge of the world.";
+        }
+        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest) {
+            return "You can only harvest things on your tile or ajecent tiles.";
+        }
 
+        // Make sure unit is harvesting a valid tile
+        if(tile.structure) {
+            if(tile.structure.type !== "shelter" || tile.structure.owner === player) {
+                return "You can only steal from enemy shelters.";
+            }
+        }
+        else if(tile.harvestRate < 1) {
+            return "You can't harvest food from that tile.";
+        }
+        else if(tile.turnsToHarvest !== 0) {
+            return "This tile isn't ready to harvest.";
+        }
+
+        const carry = this.food + this.materials;
+        if(carry >= this.job.carryLimit) {
+            return "You cannot carry anymore";
+        }
         // <<-- /Creer-Merge: invalidateHarvest -->>
     },
 
@@ -473,9 +498,21 @@ let Unit = Class(GameObject, {
      */
     harvest: function(player, tile) {
         // <<-- Creer-Merge: harvest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const carry = this.job.carryLimit - (this.food + this.materials);
+        let pickup = 0;
+        if(tile.structure) {
+            pickup = Math.min(tile.structure.owner.food, carry);
+            tile.structure.owner.food -= pickup;
+        }
+        else {
+            pickup = Math.min(tile.harvestRate, carry);
+            tile.turnsToHarvest = 5;
+        }
 
-        // Developer: Put your game logic for the Unit's harvest function here
-        return false;
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        this.energy -= this.job.actionCost * mult;
+        this.food += pickup;
+        return true;
 
         // <<-- /Creer-Merge: harvest -->>
     },
