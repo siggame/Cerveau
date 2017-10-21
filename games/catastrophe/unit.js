@@ -107,7 +107,16 @@ let Unit = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.energy = data.energy || 100;
+        this.job = data.job || this.game.jobs[0];
+        this.moves = this.job.moves;
+        this.owner = data.owner || null;
+        this.tile = data.tile || null;
+        this.turnsToDie = data.turnsToDie || -1;
+        this.movementTarget = data.movementTarget || null;
+
+        // Soldiers are in their own squad, and other units, while not in squads, should be in their own squad for ease of use.
+        this.calculateSquad();
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -155,7 +164,7 @@ let Unit = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -172,7 +181,7 @@ let Unit = Class(GameObject, {
      * Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @returns {boolean} True if successfully changed Jobs, false otherwise.
      */
     changeJob: function(player, job) {
@@ -197,10 +206,37 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, true, true);
 
-        // Developer: try to invalidate the game logic for Unit's construct function here
-        return undefined; // meaning valid
+        if(reason) {
+            return reason;
+        }
+        else if(this.job.title !== "builder") {
+            return "Only builders can construct!";
+        }
+        else if(tile.structure) {
+            return "This tile already has a structure! You cannot construct here!";
+        }
 
+        // Check structure type and if they have enough materials
+        type = type.toLowerCase();
+        let matsNeeded = 0;
+        if(type === "wall") {
+            matsNeeded = 50;
+        }
+        else if(type === "shelter") {
+            matsNeeded = 100;
+        }
+        else if(type === "monument") {
+            matsNeeded = 150;
+        }
+        else {
+            return `Unknown structure '${type}'. You can only build 'wall', 'shelter', or 'monument'.`;
+        }
+
+        if(tile.materials < matsNeeded) {
+            return `There aren't enough materials on that tile. You need ${matsNeeded} to construct a ${type}.`;
+        }
         // <<-- /Creer-Merge: invalidateConstruct -->>
     },
 
@@ -214,10 +250,16 @@ let Unit = Class(GameObject, {
      */
     construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        tile.structure = this.create("Structure", {
+            type: type.toLowerCase(),
+            tile: tile,
+        });
 
-        // Developer: Put your game logic for the Unit's construct function here
-        return false;
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        this.energy -= this.job.actionCost * mult;
+        tile.materials -= tile.structure.materials;
 
+        return true;
         // <<-- /Creer-Merge: construct -->>
     },
 
@@ -345,10 +387,36 @@ let Unit = Class(GameObject, {
      */
     invalidateDrop: function(player, tile, resource, amount, args) {
         // <<-- Creer-Merge: invalidateDrop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's drop function here
-        return undefined; // meaning valid
-
+        if(!tile) {
+            return "You must pass a tile to drop the resources onto.";
+        }
+        if(this.tile !== tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
+            return "You can only drop things on or adjacent to your tile.";
+        }
+        if(!resource || resource === "") {
+            return "You need to pass something in for resource";
+        }
+        if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M") {
+            return "Resource must be either 'food' or 'materials'.";
+        }
+        if(tile.structure) {
+            if(tile.structure.type === "shelter") {
+                if(tile.structure.owner !== player) {
+                    return "You can't drop things in enemy shelters. Nice thought though.";
+                }
+                else if(resource[0] !== "f" && resource[0] !== "F") {
+                    return "You can only drop food on shelters.";
+                }
+            }
+            else if(tile.structure.type !== "road") {
+                return "You can't drop resources on structures.";
+            }
+        }
         // <<-- /Creer-Merge: invalidateDrop -->>
     },
 
@@ -363,10 +431,35 @@ let Unit = Class(GameObject, {
      */
     drop: function(player, tile, resource, amount) {
         // <<-- Creer-Merge: drop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Calculate how much is being dropped
+        if(amount < 1) {
+            // Drop it all
+            if(resource[0] === "f" && resource[0] === "F") {
+                amount = this.food;
+            }
+            else {
+                amount = this.materials;
+            }
+        }
 
-        // Developer: Put your game logic for the Unit's drop function here
-        return false;
+        // Drop the resource
+        if(resource[0] === "f" && resource[0] === "F") {
+            amount = Math.min(amount, this.food);
+            if(tile.structure && tile.structure.type === "shelter") {
+                this.player.food = this.player.food + amount;
+            }
+            else {
+                tile.food += amount;
+            }
+            this.food -= amount;
+        }
+        else {
+            amount = Math.min(amount, this.materials);
+            tile.materials += amount;
+            this.materials -= amount;
+        }
 
+        return true;
         // <<-- /Creer-Merge: drop -->>
     },
 
@@ -417,10 +510,26 @@ let Unit = Class(GameObject, {
      */
     invalidateMove: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's move function here
-        return undefined; // meaning valid
-
+        if(tile === null) {
+            return "You can't move to a tile that doesn't exist.";
+        }
+        if(tile.unit !== null) {
+            return `Can't move because the tile is already occupied by ${tile.unit}.`;
+        }
+        if(this.moves < 1) {
+            return "Your unit is out of moves!";
+        }
+        if(tile !== this.tile.tileEast && tile !== this.tile.tileWest && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth) {
+            return "Your unit must move to a tile to the north, south, east, or west.";
+        }
+        if(tile.structure && tile.structure.type !== "road" && (tile.structure.type !== "shelter" || tile.structure.owner !== this.owner)) {
+            return "Units cannot move onto structures other than roads and friendly shelters.";
+        }
         // <<-- /Creer-Merge: invalidateMove -->>
     },
 
@@ -434,8 +543,17 @@ let Unit = Class(GameObject, {
     move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's move function here
-        return false;
+        // Deduct the move from the unit
+        this.moves -= 1;
+
+        // Update the tiles
+        this.tile.unit = null;
+        this.tile = tile;
+        tile.unit = this;
+
+        // Recalculate squads
+        this.owner.calculateSquads();
+        return true;
 
         // <<-- /Creer-Merge: move -->>
     },
@@ -515,8 +633,50 @@ let Unit = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Tries to invalidate args for an action function
+     *
+     * @param {Player} player - the player commanding this Unit
+     * @param {boolean} [checkAction] - true to check if this Unit has an action
+     * @param {boolean} [checkEnergy] - true to check if this Unit has enough energy
+     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
+     */
+    _invalidate: function(player, checkAction, checkEnergy) {
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
 
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if(checkAction && !this.action) {
+            return `${this} cannot perform another action this turn.`;
+        }
+
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        if(checkEnergy && this.energy < this.job.actionCost * mult) {
+            return `${this} doesn't have enough energy.`;
+        }
+    },
+
+    /**
+     * Checks if this unit is in range of a structure of the given type.
+     *
+     * @param {string} type - the type of structure to search for
+     * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
+     */
+    inRange: function(type) {
+        return this.game.tiles.find(function(tile) {
+            const structure = tile.structure;
+            if(!structure || structure.owner !== this.owner || structure.type !== type) {
+                return false;
+            }
+
+            const radius = structure.effectRadius;
+            return Math.abs(this.tile.x - tile.x) <= radius && Math.abs(this.tile.y - tile.y) <= radius;
+        }, this);
+    },
     //<<-- /Creer-Merge: added-functions -->>
 
 });
