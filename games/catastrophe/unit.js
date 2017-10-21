@@ -349,24 +349,23 @@ let Unit = Class(GameObject, {
      */
     invalidateDeconstruct: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateDeconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, true, true);
+        if(reason) {
+            return reason;
+        }
 
-        if(!tile.structure)
-            return "No structure to deconstruct";
-        else if(this.owner != player)
-            return "This is not your unit";
-        else if(this.job.title !== "builder" || this.job.title !== "soldier")
-            return "Only builders and soldiers can deconstruct a structure";
-        else if(this.acted)
-            return "This unit has already acted";
-        else if(this.energy < 75)
-            return "Too little energy to deconstruct";
-        else if(this.owner === tile.structure.owner && this.job.title !== "soldier")
-            return "Builders cannot deconstruct a friendly structure";
-        else if(this.materials === 50)
-            return "Cannot carry any more materials";
-
-        return undefined; // meaning valid
-
+        if(!tile.structure) {
+            return "No structure to deconstruct.";
+        }
+        else if(this.job.title !== "builder") {
+            return "Only builders can deconstruct.";
+        }
+        else if(this.owner === tile.structure.owner) {
+            return "Builders cannot deconstruct friendly structures.";
+        }
+        else if(this.materials + this.food >= this.job.carryLimit) {
+            return "Cannot carry any more materials.";
+        }
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
     },
 
@@ -379,29 +378,22 @@ let Unit = Class(GameObject, {
      */
     deconstruct: function(player, tile) {
         // <<-- Creer-Merge: deconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Take materials from the structure
+        let amount = Math.min(this.carryLimit - this.materials - this.food, tile.structure.materials);
+        this.materials += amount;
+        tile.structure.materials -= amount;
 
-        if(this.job.title === "builder")
-            if(50 - this.materials > tile.structure.materials){
-                this.materials += tile.structure.materials;
-                tile.structure.materials = 0;
-            }else{
-                tile.structure.materials -= 50 - this.materials;
-                this.materials = 50;
-            }
-        else
-            tile.structure.materials = 0;
-
-        if(tile.structure.materials === 0){
-            tile.structure.owner.structures.splice(tile.structure.owner.structures.indexOf(tile.strucutre),1);
-            this.game.structures.splice(tile.structure.owner.structures.indexOf(tile.structure),1);
+        // Destroy structure if it's out of materials
+        if(tile.structure.materials <= 0) {
+            tile.structure.owner.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
+            this.game.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
             tile.structure = null;
         }
 
-        this.energy -= 75;
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        this.energy -= this.job.actionCost * mult;
         this.acted = true;
-
         return true;
-
         // <<-- /Creer-Merge: deconstruct -->>
     },
 
