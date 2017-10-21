@@ -408,7 +408,7 @@ let Unit = Class(GameObject, {
             tile.materials += amount;
             this.materials -= amount;
         }
-        
+
         return true;
         // <<-- /Creer-Merge: drop -->>
     },
