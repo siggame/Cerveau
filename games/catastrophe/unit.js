@@ -772,14 +772,13 @@ let Unit = Class(GameObject, {
      * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
      */
     inRange: function(type) {
-        return this.game.tiles.find(function(tile) {
-            const structure = tile.structure;
-            if(!structure || structure.owner !== this.owner || structure.type !== type) {
+        return this.game.structures.find(function(structure) {
+            if(structure.owner !== this.owner || structure.type !== type) {
                 return false;
             }
 
             const radius = structure.effectRadius;
-            return Math.abs(this.tile.x - tile.x) <= radius && Math.abs(this.tile.y - tile.y) <= radius;
+            return Math.abs(this.tile.x - structure.tile.x) <= radius && Math.abs(this.tile.y - structure.tile.y) <= radius;
         }, this);
     },
     //<<-- /Creer-Merge: added-functions -->>
