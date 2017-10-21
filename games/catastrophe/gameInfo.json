@@ -892,7 +892,6 @@
                 "tileSouth",
                 "tileWest",
                 "turnsToHarvest",
-                "type",
                 "unit",
                 "x",
                 "y"
@@ -932,9 +931,9 @@
                     "default": null,
                     "description": "The Structure on this Tile if present, otherwise null.",
                     "type": {
-                        "is_game_object": false,
+                        "is_game_object": true,
                         "keyType": null,
-                        "name": "string",
+                        "name": "Structure",
                         "valueType": null
                     }
                 },
@@ -985,16 +984,6 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "int",
-                        "valueType": null
-                    }
-                },
-                "type": {
-                    "default": null,
-                    "description": "What type of Tile this is.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "string",
                         "valueType": null
                     }
                 },
@@ -1313,13 +1302,13 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "The Job to change to.",
+                            "description": "The name of the Job to change to.",
                             "name": "job",
                             "optional": false,
                             "type": {
-                                "is_game_object": true,
+                                "is_game_object": false,
                                 "keyType": null,
-                                "name": "Job",
+                                "name": "string",
                                 "valueType": null
                             }
                         }
