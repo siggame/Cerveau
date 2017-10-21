@@ -170,10 +170,25 @@ let Unit = Class(GameObject, {
      */
     invalidateChangeJob: function(player, job, args) {
         // <<-- Creer-Merge: invalidateChangeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = this._invalidate(player, true, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's changeJob function here
-        return undefined; // meaning valid
-
+        job = job.toLowerCase();
+        job = this.game.jobs.find(j => j.title === job);
+        if(!job) {
+            return "You must pass in a valid job to change jobs.";
+        }
+        if(this.job.title === "cat overlord" || job.title === "cat overlord") {
+            return "The cat overlord is the overlord. He cannot change jobs, and humans cannot become cats.";
+        }
+        if(this.energy < 100) {
+            return "Unit must be at 100 energy to change roles";
+        }
+        if(!this.inRange("shelter")) {
+            return "Unit must be at one of your shelters to change roles";
+        }
         // <<-- /Creer-Merge: invalidateChangeJob -->>
     },
 
@@ -186,10 +201,12 @@ let Unit = Class(GameObject, {
      */
     changeJob: function(player, job) {
         // <<-- Creer-Merge: changeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Unit's changeJob function here
-        return false;
-
+        job = job.toLowerCase();
+        this.job = this.game.jobs.find(j => j.title === job);
+        this.acted = true;
+        this.moves = 0; // It takes all their time
+        this.owner.calculateSquads();
+        return true;
         // <<-- /Creer-Merge: changeJob -->>
     },
 
