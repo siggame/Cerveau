@@ -45,9 +45,9 @@ let Tile = Class(GameObject, TiledTile, {
         /**
          * The Structure on this Tile if present, otherwise null.
          *
-         * @type {string}
+         * @type {Structure}
          */
-        this.structure = this.structure || "";
+        this.structure = this.structure || null;
 
         /**
          * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.
@@ -85,13 +85,6 @@ let Tile = Class(GameObject, TiledTile, {
         this.turnsToHarvest = this.turnsToHarvest || 0;
 
         /**
-         * What type of Tile this is.
-         *
-         * @type {string}
-         */
-        this.type = this.type || "";
-
-        /**
          * The Unit on this Tile if present, otherwise null.
          *
          * @type {Unit}
@@ -115,7 +108,12 @@ let Tile = Class(GameObject, TiledTile, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.food = 0;
+        this.harvestRate = 0;
+        this.materials = 0;
+        this.structure = null;
+        this.turnsToHarvest = 0;
+        this.unit = null;
 
         //<<-- /Creer-Merge: init -->>
     },
