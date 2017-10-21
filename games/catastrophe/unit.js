@@ -349,10 +349,23 @@ let Unit = Class(GameObject, {
      */
     invalidateDeconstruct: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateDeconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, true, true);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's deconstruct function here
-        return undefined; // meaning valid
-
+        if(!tile.structure) {
+            return "No structure to deconstruct.";
+        }
+        else if(this.job.title !== "builder") {
+            return "Only builders can deconstruct.";
+        }
+        else if(this.owner === tile.structure.owner) {
+            return "Builders cannot deconstruct friendly structures.";
+        }
+        else if(this.materials + this.food >= this.job.carryLimit) {
+            return "Cannot carry any more materials.";
+        }
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
     },
 
@@ -365,10 +378,22 @@ let Unit = Class(GameObject, {
      */
     deconstruct: function(player, tile) {
         // <<-- Creer-Merge: deconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Take materials from the structure
+        let amount = Math.min(this.carryLimit - this.materials - this.food, tile.structure.materials);
+        this.materials += amount;
+        tile.structure.materials -= amount;
 
-        // Developer: Put your game logic for the Unit's deconstruct function here
-        return false;
+        // Destroy structure if it's out of materials
+        if(tile.structure.materials <= 0) {
+            tile.structure.owner.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
+            this.game.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
+            tile.structure = null;
+        }
 
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        this.energy -= this.job.actionCost * mult;
+        this.acted = true;
+        return true;
         // <<-- /Creer-Merge: deconstruct -->>
     },
 
