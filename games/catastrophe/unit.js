@@ -206,7 +206,7 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = this._invalidate(player, true, true);
+        const reason = this._invalidate(player, true, true);
 
         if(reason) {
             return reason;
@@ -255,7 +255,8 @@ let Unit = Class(GameObject, {
             tile: tile,
         });
 
-        this.energy -= this.job.actionCost;
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        this.energy -= this.job.actionCost * mult;
         tile.materials -= tile.structure.materials;
 
         return true;
@@ -346,7 +347,7 @@ let Unit = Class(GameObject, {
      */
     invalidateDrop: function(player, tile, resource, amount, args) {
         // <<-- Creer-Merge: invalidateDrop -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = this._invalidate(player, false, false);
+        const reason = this._invalidate(player, false, false);
         if(reason) {
             return reason;
         }
@@ -469,7 +470,7 @@ let Unit = Class(GameObject, {
      */
     invalidateMove: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = this._invalidate(player, false, false);
+        const reason = this._invalidate(player, false, false);
         if(reason) {
             return reason;
         }
@@ -613,11 +614,29 @@ let Unit = Class(GameObject, {
             return `${this} cannot perform another action this turn.`;
         }
 
-        if(checkEnergy && this.energy < this.job.actionCost) {
+        const mult = this.inRange("monument") ? 0.5 : 1;
+        if(checkEnergy && this.energy < this.job.actionCost * mult) {
             return `${this} doesn't have enough energy.`;
         }
     },
 
+    /**
+     * Checks if this unit is in range of a structure of the given type.
+     *
+     * @param {string} type - the type of structure to search for
+     * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
+     */
+    inRange: function(type) {
+        return this.game.tiles.find(function(tile) {
+            const structure = tile.structure;
+            if(!structure || structure.owner !== this.owner || structure.type !== type) {
+                return false;
+            }
+
+            const radius = structure.effectRadius;
+            return Math.abs(this.tile.x - tile.x) <= radius && Math.abs(this.tile.y - tile.y) <= radius;
+        }, this);
+    },
     //<<-- /Creer-Merge: added-functions -->>
 
 });
