@@ -170,47 +170,25 @@ let Unit = Class(GameObject, {
      */
     invalidateChangeJob: function(player, job, args) {
         // <<-- Creer-Merge: invalidateChangeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = this._invalidate(player, true, false);
+        if(reason) {
+            return reason;
+        }
 
-        // job is now a string
-        if(!job)
-        {
-          return "You must pass something in for the job argument to change jobs";
+        job = job.toLowerCase();
+        job = this.game.jobs.find(j => j.title === job);
+        if(!job) {
+            return "You must pass in a valid job to change jobs.";
         }
-        if (this.job.title == "cat overlord")
-        {
-          return "The cat overlord is the overlord. He cannot change jobs";
+        if(this.job.title === "cat overlord" || job.title === "cat overlord") {
+            return "The cat overlord is the overlord. He cannot change jobs, and humans cannot become cats.";
         }
-        if(this.owner !== player)
-        {
-          return "You can only change the role of your own unit";
+        if(this.energy < 100) {
+            return "Unit must be at 100 energy to change roles";
         }
-        if(this.energy < 100)
-        {
-          return "Unit must be at 100 energy to change roles";
+        if(!this.inRange("shelter")) {
+            return "Unit must be at one of your shelters to change roles";
         }
-        let found = this.owner.structure.find(function(s){
-          if(s.type === 'shelter')
-          {
-            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius)) // dynamically calculate if in range.
-            {
-              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius)) // dynamically calculate if in range.
-              {
-                return true;
-              }
-            }
-          }
-          return false;
-        });
-        if(found === false) // easier to read
-        {
-          return "Unit must be at one of your shelters to change roles";
-        }
-        if(this.acted === true) // I think being explicit here will only make it more clear
-        {
-          return "Unit must not of acted this turn to change roles";
-        }
-        return undefined; // meaning valid
-
         // <<-- /Creer-Merge: invalidateChangeJob -->>
     },
 
@@ -223,13 +201,12 @@ let Unit = Class(GameObject, {
      */
     changeJob: function(player, job) {
         // <<-- Creer-Merge: changeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        this.job = this.game.jobs.find(j=>j.title === job);
+        job = job.toLowerCase();
+        this.job = this.game.jobs.find(j => j.title === job);
         this.acted = true;
         this.moves = 0; // It takes all their time
-        this.calculateSquads();
+        this.owner.calculateSquads();
         return true;
-
         // <<-- /Creer-Merge: changeJob -->>
     },
 
