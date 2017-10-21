@@ -155,7 +155,7 @@ let Unit = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -172,7 +172,7 @@ let Unit = Class(GameObject, {
      * Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.
      *
      * @param {Player} player - the player that called this.
-     * @param {Job} job - The Job to change to.
+     * @param {string} job - The name of the Job to change to.
      * @returns {boolean} True if successfully changed Jobs, false otherwise.
      */
     changeJob: function(player, job) {
@@ -197,10 +197,37 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = this._invalidate(player, true, true);
 
-        // Developer: try to invalidate the game logic for Unit's construct function here
-        return undefined; // meaning valid
+        if(reason) {
+            return reason;
+        }
+        else if(this.job.title !== "builder") {
+            return "Only builders can construct!";
+        }
+        else if(tile.structure) {
+            return "This tile already has a structure! You cannot construct here!";
+        }
 
+        // Check structure type and if they have enough materials
+        type = type.toLowerCase();
+        let matsNeeded = 0;
+        if(type === "wall") {
+            matsNeeded = 50;
+        }
+        else if(type === "shelter") {
+            matsNeeded = 100;
+        }
+        else if(type === "monument") {
+            matsNeeded = 150;
+        }
+        else {
+            return `Unknown structure '${type}'. You can only build 'wall', 'shelter', or 'monument'.`;
+        }
+
+        if(tile.materials < matsNeeded) {
+            return `There aren't enough materials on that tile. You need ${matsNeeded} to construct a ${type}.`;
+        }
         // <<-- /Creer-Merge: invalidateConstruct -->>
     },
 
@@ -214,10 +241,15 @@ let Unit = Class(GameObject, {
      */
     construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        tile.structure = this.create("Structure", {
+            type: type.toLowerCase(),
+            tile: tile,
+        });
 
-        // Developer: Put your game logic for the Unit's construct function here
-        return false;
+        this.energy -= this.job.actionCost;
+        tile.materials -= tile.structure.materials;
 
+        return true;
         // <<-- /Creer-Merge: construct -->>
     },
 
@@ -544,7 +576,31 @@ let Unit = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Tries to invalidate args for an action function
+     *
+     * @param {Player} player - the player commanding this Unit
+     * @param {boolean} [checkAction] - true to check if this Unit has an action
+     * @param {boolean} [checkEnergy] - true to check if this Unit has enough energy
+     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
+     */
+    _invalidate: function(player, checkAction, checkEnergy) {
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if(checkAction && !this.action) {
+            return `${this} cannot perform another action this turn.`;
+        }
+
+        if(checkEnergy && this.energy < this.job.actionCost) {
+            return `${this} doesn't have enough energy.`;
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
