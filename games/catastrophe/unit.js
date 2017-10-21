@@ -469,27 +469,26 @@ let Unit = Class(GameObject, {
      */
     invalidateMove: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's move function here
-        if(this.owner !== player) {
-            return "You can only move your own units";
+        if(tile === null) {
+            return "You can't move to a tile that doesn't exist.";
         }
         if(tile.unit !== null) {
-            return "The tile is already occupied";
+            return `Can't move because the tile is already occupied by ${tile.unit}.`;
         }
         if(this.moves < 1) {
             return "Your unit is out of moves!";
         }
-        if(tile === null) {
-            return "You can't move to a tile that doesn't exist";
-        }
         if(tile !== this.tile.tileEast && tile !== this.tile.tileWest && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth) {
-            return "You must move to a tile to the north, south, east, or west.";
+            return "Your unit must move to a tile to the north, south, east, or west.";
         }
-        if(tile.structure && tile.structure.type !== "road" && tile.structure.type !== "shelter") {
-            return "You cannot move onto structures other than roads and shelters";
+        if(tile.structure && tile.structure.type !== "road" && (tile.structure.type !== "shelter" || tile.structure.owner !== this.owner)) {
+            return "Units cannot move onto structures other than roads and friendly shelters.";
         }
-        return undefined; // meaning valid
         // <<-- /Creer-Merge: invalidateMove -->>
     },
 
@@ -503,12 +502,16 @@ let Unit = Class(GameObject, {
     move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's move function here
+        // Deduct the move from the unit
         this.moves -= 1;
+
+        // Update the tiles
         this.tile.unit = null;
         this.tile = tile;
         tile.unit = this;
-        this.calculateSquads();
+
+        // Recalculate squads
+        this.owner.calculateSquads();
         return true;
 
         // <<-- /Creer-Merge: move -->>
