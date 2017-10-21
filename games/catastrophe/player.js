@@ -113,15 +113,8 @@ let Player = Class(GameObject, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // put any initialization logic here. the base variables should be set from 'data' above
         this.cat = data.cat || null;
-        this.clientType = data.clientType || null;
         this.food = data.food || null;
-        this.name = data.name || null;
-        this.opponent = data.opponent || null;
-        this.timeRemaining = data.timeRemaining || -1;
-
         //<<-- /Creer-Merge: init -->>
     },
 
