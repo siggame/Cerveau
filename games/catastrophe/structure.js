@@ -61,26 +61,34 @@ let Structure = Class(GameObject, {
         this.owner = data.owner || null;
         this.tile = data.tile || null;
         this.type = data.type || "neutral";
+        this.type = this.type.toLowerCase();
 
-        if(this.type === "wall"){
+        if(this.type === "wall") {
             this.materials = 50;
             this.effectRadius = 0;
-        }else if(this.type === "shelter"){
+        }
+        else if(this.type === "shelter") {
             this.materials = 100;
             this.effectRadius = 1;
-        }else if(this.type === "monument"){
+        }
+        else if(this.type === "monument") {
             this.materials = 150;
             this.effectRadius = 3;
-        }else if(this.type === "neutral"){
+        }
+        else if(this.type === "neutral") {
             this.materials = 150;
             this.effectRadius = 0;
-        }else if(this.type === "road"){
+        }
+        else if(this.type === "road") {
             this.materials = 0;
             this.effectRadius = 0;
         }
-        
+
         this.game.structures.push(this);
-        this.owner.structures.push(this);
+
+        if(this.owner) {
+            this.owner.structures.push(this);
+        }
 
         //<<-- /Creer-Merge: init -->>
     },
