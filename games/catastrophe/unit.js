@@ -591,10 +591,33 @@ let Unit = Class(GameObject, {
      */
     invalidatePickup: function(player, tile, resource, amount, args) {
         // <<-- Creer-Merge: invalidatePickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's pickup function here
-        return undefined; // meaning valid
+        if(!tile) {
+            return "You can only pick things up off tiles that exist";
+        }
+        if(this.tile !== tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
+            return "You can only pickup resources on or adjacent to your tile.";
+        }
+        if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M") {
+            return "You can only pickup 'food' or 'materials'.";
+        }
+        if(amount < 1) {
+            if(resource[0] === "f" && resource[0] === "F") {
+                amount = tile.food;
+            }
+            else {
+                amount = tile.materials;
+            }
+        }
 
+        amount = Math.min(amount, this.job.carryLimit - (this.food + this.materials), Math.floor(this.energy));
+        if(amount <= 0) {
+            return "You can't pick up 0 resources.";
+        }
         // <<-- /Creer-Merge: invalidatePickup -->>
     },
 
@@ -609,10 +632,31 @@ let Unit = Class(GameObject, {
      */
     pickup: function(player, tile, resource, amount) {
         // <<-- Creer-Merge: pickup -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Calculate amount being picked up
+        if(amount < 1) {
+            if(resource[0] === "f" && resource[0] === "F") {
+                amount = tile.food;
+            }
+            else {
+                amount = tile.materials;
+            }
+        }
+        amount = Math.min(amount, this.job.carryLimit - (this.food + this.materials), Math.floor(this.energy));
 
-        // Developer: Put your game logic for the Unit's pickup function here
-        return false;
-
+        // Pickup the resource
+        if(resource[0] === "f" && resource[0] === "F") {
+            amount = Math.min(amount, tile.food);
+            tile.food -= amount;
+            this.food += amount;
+            this.energy -= amount;
+        }
+        if(resource[0] === "m" && resource[0] === "M") {
+            amount = Math.min(amount, tile.materials);
+            tile.materials -= amount;
+            this.materials += amount;
+            this.energy -= amount;
+        }
+        return true;
         // <<-- /Creer-Merge: pickup -->>
     },
 
