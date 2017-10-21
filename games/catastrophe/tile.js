@@ -108,7 +108,12 @@ let Tile = Class(GameObject, TiledTile, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.food = 0;
+        this.harvestRate = 0;
+        this.materials = 0;
+        this.structure = null;
+        this.turnsToHarvest = 0;
+        this.unit = null;
 
         //<<-- /Creer-Merge: init -->>
     },
