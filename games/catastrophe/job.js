@@ -64,15 +64,12 @@ let Job = Class(GameObject, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // put any initialization logic here. the base variables should be set from 'data' above
         this.actionCost = data.actionCost || 0;
         this.carryLimit = data.carryLimit || 0;
         this.moves = data.moves || 0;
         this.regenRate = data.regenRate || 0;
         this.title = data.title || "";
         this.upkeep = data.upkeep || 0;
-
         //<<-- /Creer-Merge: init -->>
     },
 
