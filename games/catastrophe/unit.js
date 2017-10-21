@@ -197,16 +197,37 @@ let Unit = Class(GameObject, {
      */
     invalidateConstruct: function(player, tile, type, args) {
         // <<-- Creer-Merge: invalidateConstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        if(this.energy <= this.job.actionCost} {
-          return "Not enough energy to construct!"
-        } else if(this.job.title != 'builder') {
-          return "Only builders can construct!"
-        } else if(tile.structure) {
-          return "This tile already has a structure! You cannot construct here!"
-        }
-        // Developer: try to invalidate the game logic for Unit's construct function here
-        return undefined; // meaning valid
+        let reason = this._invalidate(player, true, true);
 
+        if(reason) {
+            return reason;
+        }
+        else if(this.job.title !== "builder") {
+            return "Only builders can construct!";
+        }
+        else if(tile.structure) {
+            return "This tile already has a structure! You cannot construct here!";
+        }
+
+        // Check structure type and if they have enough materials
+        type = type.toLowerCase();
+        let matsNeeded = 0;
+        if(type === "wall") {
+            matsNeeded = 50;
+        }
+        else if(type === "shelter") {
+            matsNeeded = 100;
+        }
+        else if(type === "monument") {
+            matsNeeded = 150;
+        }
+        else {
+            return `Unknown structure '${type}'. You can only build 'wall', 'shelter', or 'monument'.`;
+        }
+
+        if(tile.materials < matsNeeded) {
+            return `There aren't enough materials on that tile. You need ${matsNeeded} to construct a ${type}.`;
+        }
         // <<-- /Creer-Merge: invalidateConstruct -->>
     },
 
@@ -215,24 +236,20 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to construct the Structure on. It must have enough materials on it for a Structure to be constructed.
-     * @param {Structure} structure - The type of Structure to construct on that Tile.
+     * @param {string} type - The type of Structure to construct on that Tile.
      * @returns {boolean} True if successfully constructed a structure, false otherwise.
      */
     construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Unit's construct function here
-
-        let this.structure = this.create("Structure", {
-          type: type, // This is assuming that `type` is an argument being passed in. It'd be better to pass in.
-          tile: tile, // This is the tile argument being passed in. We pass this as the tile value to the structure.
+        tile.structure = this.create("Structure", {
+            type: type.toLowerCase(),
+            tile: tile,
         });
-        tile.structure = structure;
+
         this.energy -= this.job.actionCost;
-        tile.materials -= structure.materials;
+        tile.materials -= tile.structure.materials;
 
         return true;
-
         // <<-- /Creer-Merge: construct -->>
     },
 
@@ -490,7 +507,31 @@ let Unit = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Tries to invalidate args for an action function
+     *
+     * @param {Player} player - the player commanding this Unit
+     * @param {boolean} [checkAction] - true to check if this Unit has an action
+     * @param {boolean} [checkEnergy] - true to check if this Unit has enough energy
+     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
+     */
+    _invalidate: function(player, checkAction, checkEnergy) {
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if(checkAction && !this.action) {
+            return `${this} cannot perform another action this turn.`;
+        }
+
+        if(checkEnergy && this.energy < this.job.actionCost) {
+            return `${this} doesn't have enough energy.`;
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
