@@ -218,12 +218,14 @@ let Unit = Class(GameObject, {
         // IT'S KILLING TIME
         for(let dead of toDie) {
             if(dead.owner) {
+                if(dead.job.title !== "cat overlord") {
                 // actually fresh human converting time, not in fact killing time
-                dead.job = this.game.jobs[0];
-                dead.turnsToDie = 10;
-                dead.energy = 100;
-                dead.owner = null;
-                dead.squad = [dead];
+                    dead.job = this.game.jobs[0];
+                    dead.turnsToDie = 10;
+                    dead.energy = 100;
+                    dead.owner = null;
+                    dead.squad = [dead];
+                }
             }
             else {
                 // Neutral fresh human, will get removed from arrays in next turn logic

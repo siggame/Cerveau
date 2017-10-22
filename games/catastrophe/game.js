@@ -186,6 +186,44 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      * @returns {*} passes through the default return value
      */
     beforeTurn: function() {
+        // Update all arrays
+        this.updateArrays();
+
+        // Call base class' beforeTurn function
+        return TurnBasedGame.beforeTurn.apply(this, arguments);
+    },
+
+    /**
+     * Invoked when the current player ends their turn. Perform in between game logic here
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    nextTurn: function() {
+        // Update all arrays
+        this.updateArrays();
+        this.updateUnits();
+        this.updateResources();
+
+        if(this.checkForWinner(false)) {
+            // If somebody won, don't continue to the next turn
+            return;
+        }
+
+        // Continue to the next player (normal next turn logic)
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    /**
+     * invoked when max turns are reached
+     *
+     * @override
+     */
+    _maxTurnsReached: function() {
+        this.checkForWinner("Max turns reached");
+    },
+
+    updateArrays: function() {
         // Properly add all new structures
         for(let structure of this.newStructures) {
             this.structures.push(structure);
@@ -212,7 +250,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Properly remove all killed units
         for(let i = 0; i < this.units.length; i++) {
             const unit = this.units[i];
-            if(!unit.tile) {
+            if(!unit.tile || unit.turnsToDie === 0) {
                 if(unit.owner) {
                     // Remove this unit from the player's units array
                     unit.owner.units.removeElement(unit);
@@ -223,8 +261,159 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 i--; // Make sure we don't skip an element
             }
         }
+    },
 
-        return TurnBasedGame.beforeTurn.apply(this, arguments);
+    updateUnits: function() {
+        // Reset all upkeeps
+        for(let player of this.players) {
+            player.upkeep = 0;
+        }
+
+        for(let unit of this.units) {
+            unit.acted = false;
+            unit.moves = unit.job.moves;
+            unit.starving = false;
+
+            if(unit.owner) {
+                // Add this unit's upkeep to the player's total upkeep
+                unit.owner.upkeep += unit.job.upkeep;
+            }
+            else {
+                let target = unit.movementTarget;
+                if(target) {
+                    // Move neutral fresh humans on the road
+                    // while(unit.moves > 0) {
+                    let nextTile;
+                    if(target.x < unit.x) {
+                        nextTile = unit.tileWest;
+                    }
+                    else {
+                        nextTile = unit.tileEast;
+                    }
+
+                    if(!nextTile || nextTile.unit) {
+                        break;
+                    }
+
+                    unit.tile.unit = null;
+                    nextTile.unit = unit;
+                    unit.tile = nextTile;
+                    unit.moves--;
+                    // }
+                }
+            }
+        }
+
+        // Check if new fresh humans should walk across the road
+        if(this.currentTurn % 14 === 0) { // Every 7 turns taken by both players
+            // Spawn two new fresh humans
+            let unit = this.create("Unit", {
+                job: this.jobs[0],
+                owner: null,
+                tile: this.getTile(0, this.mapHeight / 2 - 1),
+                turnsToDie: 10,
+                movementTarget: this.getTile(this.mapWidth - 1, this.mapHeight / 2 - 1),
+            });
+            unit.tile.unit = unit;
+
+            unit = this.create("Unit", {
+                job: this.jobs[0],
+                owner: null,
+                tile: this.getTile(this.mapWidth - 1, this.mapHeight / 2),
+                turnsToDie: 10,
+                movementTarget: this.getTile(0, this.mapHeight / 2),
+            });
+            unit.tile.unit = unit;
+        }
+
+        // Check if units are starving and update food
+        for(let player of this.players) {
+            if(player.food < player.upkeep) {
+                player.food -= player.upkeep;
+            }
+            else {
+                for(let unit of player.units) {
+                    unit.starving = true;
+                }
+            }
+        }
+    },
+
+    updateResources: function() {
+        // Decrease resources every 30 days (60 turns)
+        let endOfMonth = this.currentTurn % 60 === 0;
+
+        // Iterate through every tile
+        for(let tile of this.tiles) {
+            if(tile.turnsToHarvest > 0) {
+                tile.turnsToHarvest--;
+            }
+
+            if(endOfMonth && tile.harvestRate > 0) {
+                tile.harvestRate--;
+            }
+        }
+    },
+
+    checkForWinner: function(secondaryReason) {
+        let players = this.players.slice();
+
+        // Primary win conditions: defeat enemy cat or defeat all enemy humans
+        const loseReasons = players.reduce((loseReasons, p) => {
+            if(p.cat.energy <= 0) {
+                loseReasons[p] = "Cat died";
+            }
+            else if(p.units.length === 1) {
+                loseReasons[p] = "Humans died";
+            }
+        }, {});
+
+        const losers = Object.keys(loseReasons);
+        if(losers.length === players.length) {
+            // Both players lost
+            secondaryReason = "Both players met a primary win condition";
+        }
+        else if(losers.length > 0) {
+            // One player lost
+            const loser = losers[0];
+            const reason = loseReasons[loser];
+            this.declareWinner(loser.opponent, `Opponent lost: ${reason}`);
+            this.declareLoser(loser, reason);
+            return true;
+        }
+
+        if(secondaryReason) {
+            // Secondary win conditions
+            // 1. Most units
+            players.sort((a, b) => b.units.length - a.units.length);
+            if(players[0].units.length > players[1].units.length) {
+                this.declareWinner(players[0], `${secondaryReason}: Had the most units`);
+                this.declareLoser(players[1], `${secondaryReason}: Had the least units`);
+                return true;
+            }
+
+            // 2. Most food
+            players.sort((a, b) => b.food - a.food);
+            if(players[0].food > players[1].food) {
+                this.declareWinner(players[0], `${secondaryReason}: Had the most food`);
+                this.declareLoser(players[1], `${secondaryReason}: Had the least food`);
+                return true;
+            }
+
+            // 3. Most structures
+            players.sort((a, b) => b.structures.length - a.structures.length);
+            if(players[0].structures.length > players[1].structures.length) {
+                this.declareWinner(players[0], `${secondaryReason}: Had the most structures`);
+                this.declareLoser(players[1], `${secondaryReason}: Had the least structures`);
+                return true;
+            }
+
+            // 4. Coin toss
+            this._endGameViaCoinFlip(secondaryReason);
+            return true;
+        }
+
+        return false;
     },
     //<<-- /Creer-Merge: added-functions -->>
 
