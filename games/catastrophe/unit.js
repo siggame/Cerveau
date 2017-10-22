@@ -253,7 +253,7 @@ let Unit = Class(GameObject, {
      */
     invalidateChangeJob: function(player, job, args) {
         // <<-- Creer-Merge: invalidateChangeJob -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let reason = this._invalidate(player, true, false);
+        const reason = this._invalidate(player, true, false);
         if(reason) {
             return reason;
         }
@@ -350,7 +350,7 @@ let Unit = Class(GameObject, {
      */
     construct: function(player, tile, type) {
         // <<-- Creer-Merge: construct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        tile.structure = this.create("Structure", {
+        tile.structure = this.game.create("Structure", {
             type: type.toLowerCase(),
             tile: tile,
         });
@@ -468,8 +468,8 @@ let Unit = Class(GameObject, {
 
         // Destroy structure if it's out of materials
         if(tile.structure.materials <= 0) {
-            tile.structure.owner.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
-            this.game.structures.splice(tile.structure.owner.structures.indexOf(tile.structure), 1);
+            // Structure is removed from arrays in next turn logic
+            tile.structure.tile = null;
             tile.structure = null;
         }
 

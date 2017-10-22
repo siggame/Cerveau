@@ -179,9 +179,53 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    /**
+     * Invoked before the current player starts their turn
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    beforeTurn: function() {
+        // Properly add all new structures
+        for(let structure of this.newStructures) {
+            this.structures.push(structure);
+            if(structure.owner) {
+                structure.owner.structures.push(structure);
+            }
+        }
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+        // Properly remove all destroyed structures
+        for(let i = 0; i < this.structures.length; i++) {
+            const structure = this.structures[i];
+            if(!structure.tile) {
+                if(structure.owner) {
+                    // Remove this structure from the player's structures array
+                    structure.owner.structures.removeElement(structure);
+                }
 
+                // Remove this structure from the game's structures array
+                this.structures.splice(i, 1);
+                i--; // Make sure we don't skip an element
+            }
+        }
+
+        // Properly remove all killed units
+        for(let i = 0; i < this.units.length; i++) {
+            const unit = this.units[i];
+            if(!unit.tile) {
+                if(unit.owner) {
+                    // Remove this unit from the player's units array
+                    unit.owner.units.removeElement(unit);
+                }
+
+                // Remove this unit from the game's units array
+                this.units.splice(i, 1);
+                i--; // Make sure we don't skip an element
+            }
+        }
+
+        return TurnBasedGame.beforeTurn.apply(this, arguments);
+    },
     //<<-- /Creer-Merge: added-functions -->>
 
 });

@@ -57,7 +57,6 @@ let Structure = Class(GameObject, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
         this.owner = data.owner || null;
         this.tile = data.tile || null;
         this.type = data.type || "neutral";
@@ -84,12 +83,7 @@ let Structure = Class(GameObject, {
             this.effectRadius = 0;
         }
 
-        this.game.structures.push(this);
-
-        if(this.owner) {
-            this.owner.structures.push(this);
-        }
-
+        this.game.newStructures.push(this);
         //<<-- /Creer-Merge: init -->>
     },
 
