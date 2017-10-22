@@ -272,6 +272,9 @@ let Unit = Class(GameObject, {
         if(this.job.title === "cat overlord" || job.title === "cat overlord") {
             return "The cat overlord is the overlord. He cannot change jobs, and humans cannot become cats.";
         }
+        if(this.job === job) {
+            return "You cannot change to your own job!";
+        }
         if(this.energy < 100) {
             return "Unit must be at 100 energy to change roles";
         }
@@ -872,7 +875,7 @@ let Unit = Class(GameObject, {
             return `${this} isn't owned by you.`;
         }
 
-        if(checkAction && !this.action) {
+        if(checkAction && this.acted) {
             return `${this} cannot perform another action this turn.`;
         }
 
