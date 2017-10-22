@@ -713,40 +713,17 @@ let Unit = Class(GameObject, {
      */
     invalidateRest: function(player, args) {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's rest function here
-        if(this.owner !== player)
-        {
-          return "You can only make your own units rest.";
+        if(this.energy === 100) {
+            return "The unit has full energy!";
         }
-        if(this.energy === 100)
-        {
-          return "The unit is at full health!";
+        if(!this.inRange("shelter")) {
+            return "Unit must be in range of a friendly shelter to heal";
         }
-        if(this.acted === true) // I think being explicit here will only make it more clear
-        {
-          return "Unit must not of acted this turn to heal";
-        }
-        for (s in this.owner.structures) // from the list of structures
-        {
-          let notFound = true;
-          if(s.type === 'structure')
-          {
-            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius) // dynamically calculate if in range.
-            {
-              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius) // dynamically calculate if in range.
-              {
-                notFound = false;
-              }
-            }
-          }
-          if(notFound === true)
-          {
-            return "Unit must be at one of your shelters to heal";
-          }
-        }
-        return undefined; // meaning valid
-
         // <<-- /Creer-Merge: invalidateRest -->>
     },
 
@@ -758,44 +735,34 @@ let Unit = Class(GameObject, {
      */
     rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Unit's rest function here
-        let cat = false;
-        for (s in this.owner.structures) // from the list of structures
-        {
-          if(s.type === 'structure')
-          {
-            if(this.tile.x > (s.tile.x-s.effectRadius) && this.tile.x < (s.tile.x+s.effectRadius) // dynamically calculate if in range.
-            {
-              if(this.tile.y > (s.tile.y-s.effectRadius) && this.tile.y < (s.tile.y+s.effectRadius) // dynamically calculate if in range.
-              {
-                if(s.tile.unit.job.title == "cat overlord")
-                {
-                  cat = true;
-                }
-              }
+        let cat = this.owner.structures.find(function(structure) {
+            if(structure.type !== "shelter") {
+                return false;
             }
-          }
-        }
-        this.acted = true;
-        if(cat === true)
-        {
-          this.energy = this.energy + (2*this.job.regenRate);
-        }
-        else
-        {
-          this.energy = this.energy + this.job.regenRate;
-        }
-        if(this.energy > 100)
-        {
-          this.energy = 100;
-        }
-        this.moves = 0;
-        return false;
 
+            const radius = structure.effectRadius;
+            if(Math.abs(this.tile.x - structure.tile.x) > radius || Math.abs(this.tile.y - structure.tile.y) > radius) {
+                return false;
+            }
+
+            return structure.tile.unit && structure.tile.unit.job.title === "cat overlord";
+        });
+
+        if(cat) {
+            this.energy += this.game.catEnergyMult * this.job.regenRate;
+        }
+        else {
+            this.energy += this.job.regenRate;
+        }
+        if(this.energy > 100) {
+            this.energy = 100;
+        }
+
+        this.acted = true;
+        this.moves = 0;
+        return true;
         // <<-- /Creer-Merge: rest -->>
     },
-
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
