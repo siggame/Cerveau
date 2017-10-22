@@ -545,6 +545,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile: selected,
                 job: this.jobs[0],
             });
+            possibleTiles.removeElement(selected);
         }
 
         // Mirror map
