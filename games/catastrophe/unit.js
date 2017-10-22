@@ -114,17 +114,13 @@ let Unit = Class(GameObject, {
         this.turnsToDie = data.turnsToDie || -1;
         this.movementTarget = data.movementTarget || null;
 
+        this.game.units.push(this);
         if(this.owner) {
             this.owner.units.push(this);
             this.owner.calculateSquads();
         }
         else {
             this.squad = [this];
-        }
-
-        this.game.units.push(this);
-        if(this.owner) {
-            this.owner.units.push(this);
         }
         //<<-- /Creer-Merge: init -->>
     },
