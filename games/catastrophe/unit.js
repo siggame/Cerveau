@@ -735,7 +735,7 @@ let Unit = Class(GameObject, {
      */
     rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        let cat = this.owner.structures.find(function(structure) {
+        let cat = this.owner.structures.find(structure => {
             if(structure.type !== "shelter") {
                 return false;
             }
@@ -800,7 +800,7 @@ let Unit = Class(GameObject, {
      * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
      */
     inRange: function(type) {
-        return this.game.structures.find(function(structure) {
+        return this.game.structures.find(structure => {
             if(structure.owner !== this.owner || structure.type !== type) {
                 return false;
             }
