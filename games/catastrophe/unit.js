@@ -135,10 +135,30 @@ let Unit = Class(GameObject, {
      */
     invalidateAttack: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, true, true);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's attack function here
-        return undefined; // meaning valid
+        if(this.job.title !== "soldier") {
+            return "This unit cannot attack as they are not a soldier! Their only combat ability is as a meatshield!";
+        }
+        if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+            return "The tile to attack is not adjacent to your soldier.";
+        }
 
+        if(tile.structure && tile.structure.type !== "road") {
+            // Attacking a structure, no checks needed here
+        }
+        else if(tile.unit) {
+            // Attacking a unit
+            if(tile.unit.owner === player) {
+                return "You can't attack friends!";
+            }
+        }
+        else {
+            return "There is nothing on that tile to attack!";
+        }
         // <<-- /Creer-Merge: invalidateAttack -->>
     },
 
@@ -151,10 +171,73 @@ let Unit = Class(GameObject, {
      */
     attack: function(player, tile) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let attackSum = 0; // damage to be distributed
+        let toDie = []; // update dead later
+        for(let soldier of this.squad) {
+            let attackMod = 1;// damage modifier, if unit near allied monument
+            if(!soldier.acted) { // if soldier hasn't acted
+                if(soldier.inRange("monument")) {
+                    attackMod = 0.5;
+                }// if ally monument nearby, take less dmg from contributing
+                soldier.energy -= soldier.job.actionCost * attackMod;
+                soldier.acted = true;
+                soldier.moves = 0;
+                attackSum += soldier.job.actionCost;
+                if(soldier.energy <= 0) { // if died
+                    attackSum += soldier.energy / attackMod; // soldier.energy is negative here, can only contribute as much energy as unit has
+                    toDie.push(soldier);
+                }
+            }
+        }
 
-        // Developer: Put your game logic for the Unit's attack function here
-        return false;
+        // EVERYTHING BEFORE IS CALCULATING DAMAGE, AFTER IS DEALING THE DAMAGE
+        if(tile.structure && tile.structure.type !== "road") { // checking if unit or attackable structure
+            // Attack a structure
+            tile.structure.materials -= attackSum;
+            if(tile.structure.materials <= 0) {
+                // Structure will get removed from arrays in next turn logic
+                tile.structure.tile = null;
+                tile.structure = null;
+            }
+        }
+        else { // assuming unit, which it should be if not a structure
+            // Attack a unit/squad
+            for(let target of tile.unit.squad) {
+                let attackMod = 1; // damage modifier
+                if(target.inRange("monument")) {
+                    // if near enemy monument, take less dmg
+                    attackMod=0.5;
+                }
+                target.energy -= attackSum * attackMod / tile.unit.squad.length;
+                if(target.energy <= 0) {
+                    toDie.push(target);
+                }
+            }
+        }
 
+        // IT'S KILLING TIME
+        for(let dead of toDie) {
+            if(dead.owner) {
+                // actually fresh human converting time, not in fact killing time
+                dead.job = this.game.jobs[0];
+                dead.turnsToDie = 10;
+                dead.energy = 100;
+                dead.owner = null;
+                dead.squad = [dead];
+            }
+            else {
+                // Neutral fresh human, will get removed from arrays in next turn logic
+                dead.tile.unit = null;
+                dead.tile = null;
+            }
+        }
+
+        // updating squads
+        for(let player of this.game.players) {
+            player.updateSquads();
+        }
+
+        return true;
         // <<-- /Creer-Merge: attack -->>
     },
 
@@ -765,7 +848,6 @@ let Unit = Class(GameObject, {
     },
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
     /**
      * Tries to invalidate args for an action function
      *
@@ -809,6 +891,7 @@ let Unit = Class(GameObject, {
             return Math.abs(this.tile.x - structure.tile.x) <= radius && Math.abs(this.tile.y - structure.tile.y) <= radius;
         }, this);
     },
+
     //<<-- /Creer-Merge: added-functions -->>
 
 });
