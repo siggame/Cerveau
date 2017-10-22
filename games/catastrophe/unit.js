@@ -668,10 +668,10 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        if(tile === null) {
+        if(!tile) {
             return "You can't move to a tile that doesn't exist.";
         }
-        if(tile.unit !== null) {
+        if(tile.unit) {
             return `Can't move because the tile is already occupied by ${tile.unit}.`;
         }
         if(this.moves < 1) {

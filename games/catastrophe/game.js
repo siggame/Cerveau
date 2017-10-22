@@ -172,6 +172,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Generate the map and units
         this.generateMap();
+        this.updateArrays();
 
         // Calculate player upkeeps
         for(let player of this.players) {
