@@ -129,7 +129,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.maxTurns = data.maxTurns || 730;
+        this.maxTurns = data.maxTurns || 300;
         this.catEnergyMult = data.catEnergyMult || 2;
         this.harvestCooldown = data.harvestCooldown || 1;
         this.mapHeight = data.mapHeight || 30;
