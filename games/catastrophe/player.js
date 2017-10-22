@@ -122,9 +122,30 @@ let Player = Class(GameObject, {
 
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    calculateSquads: function() {
+        for(let unit of this.units) {
+            // Reset squad
+            unit.squad = [];
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+            // Flood fill to calculate squads
+            let open = [unit.tile];
+            let closed = new Set();
+            while(open.length > 0) {
+                const tile = open.shift();
+                const cur = tile && tile.unit;
+                if(!cur || cur.owner !== this || (unit.squad.length > 0 && cur.job.title !== "soldier") || closed.has(tile)) {
+                    continue;
+                }
 
+                unit.squad.push(cur);
+                closed.add(tile);
+                open.push(tile.tileNorth);
+                open.push(tile.tileEast);
+                open.push(tile.tileSouth);
+                open.push(tile.tileWest);
+            }
+        }
+    },
     //<<-- /Creer-Merge: added-functions -->>
 
 });

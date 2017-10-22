@@ -116,10 +116,11 @@ let Unit = Class(GameObject, {
 
         if(this.owner) {
             this.owner.units.push(this);
+            this.owner.calculateSquads();
         }
-
-        // Soldiers are in their own squad, and other units, while not in squads, should be in their own squad for ease of use.
-        this.calculateSquad();
+        else {
+            this.squad = [this];
+        }
         //<<-- /Creer-Merge: init -->>
     },
 
