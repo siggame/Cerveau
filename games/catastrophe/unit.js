@@ -713,10 +713,17 @@ let Unit = Class(GameObject, {
      */
     invalidateRest: function(player, args) {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        const reason = this._invalidate(player, false, false);
+        if(reason) {
+            return reason;
+        }
 
-        // Developer: try to invalidate the game logic for Unit's rest function here
-        return undefined; // meaning valid
-
+        if(this.energy === 100) {
+            return "The unit has full energy!";
+        }
+        if(!this.inRange("shelter")) {
+            return "Unit must be in range of a friendly shelter to heal";
+        }
         // <<-- /Creer-Merge: invalidateRest -->>
     },
 
@@ -728,13 +735,34 @@ let Unit = Class(GameObject, {
      */
     rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        let cat = this.owner.structures.find(function(structure) {
+            if(structure.type !== "shelter") {
+                return false;
+            }
 
-        // Developer: Put your game logic for the Unit's rest function here
-        return false;
+            const radius = structure.effectRadius;
+            if(Math.abs(this.tile.x - structure.tile.x) > radius || Math.abs(this.tile.y - structure.tile.y) > radius) {
+                return false;
+            }
 
+            return structure.tile.unit && structure.tile.unit.job.title === "cat overlord";
+        });
+
+        if(cat) {
+            this.energy += this.game.catEnergyMult * this.job.regenRate;
+        }
+        else {
+            this.energy += this.job.regenRate;
+        }
+        if(this.energy > 100) {
+            this.energy = 100;
+        }
+
+        this.acted = true;
+        this.moves = 0;
+        return true;
         // <<-- /Creer-Merge: rest -->>
     },
-
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
