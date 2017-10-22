@@ -272,6 +272,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(let i = 0; i < this.units.length; i++) {
             const unit = this.units[i];
             if(!unit.tile || unit.turnsToDie === 0) {
+                if(unit.tile) {
+                    unit.tile.unit = null;
+                    unit.tile = null;
+                }
+
                 if(unit.owner) {
                     // Remove this unit from the player's units array
                     unit.owner.units.removeElement(unit);
@@ -308,17 +313,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 let target = unit.movementTarget;
                 if(target) {
-                    // console.log("Moving fresh human");
                     // Move neutral fresh humans on the road
                     // while(unit.moves > 0) {
-                    let nextTile;
-                    if(target.x < unit.x) {
-                        nextTile = unit.tileEast;
-                    }
-                    else {
-                        nextTile = unit.tileWest;
-                    }
-
+                    let nextTile = this.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
                     if(!nextTile || nextTile.unit) {
                         break;
                     }
@@ -335,23 +332,29 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Check if new fresh humans should walk across the road
         if(this.currentTurn % 14 === 0) { // Every 7 turns taken by both players
             // Spawn two new fresh humans
-            let unit = this.create("Unit", {
-                job: this.jobs[0],
-                owner: null,
-                tile: this.getTile(0, this.mapHeight / 2 - 1),
-                turnsToDie: 10,
-                movementTarget: this.getTile(this.mapWidth - 1, this.mapHeight / 2 - 1),
-            });
-            unit.tile.unit = unit;
+            let tile = this.getTile(0, this.mapHeight / 2 - 1);
+            if(!tile.unit) {
+                let unit = this.create("Unit", {
+                    job: this.jobs[0],
+                    owner: null,
+                    tile: tile,
+                    turnsToDie: this.mapWidth,
+                    movementTarget: this.getTile(this.mapWidth - 1, this.mapHeight / 2 - 1),
+                });
+                unit.tile.unit = unit;
+            }
 
-            unit = this.create("Unit", {
-                job: this.jobs[0],
-                owner: null,
-                tile: this.getTile(this.mapWidth - 1, this.mapHeight / 2),
-                turnsToDie: 10,
-                movementTarget: this.getTile(0, this.mapHeight / 2),
-            });
-            unit.tile.unit = unit;
+            tile = this.getTile(this.mapWidth - 1, this.mapHeight / 2);
+            if(!tile.unit) {
+                let unit = this.create("Unit", {
+                    job: this.jobs[0],
+                    owner: null,
+                    tile: tile,
+                    turnsToDie: this.mapWidth,
+                    movementTarget: this.getTile(0, this.mapHeight / 2),
+                });
+                unit.tile.unit = unit;
+            }
         }
 
         // Check if units are starving and update food
