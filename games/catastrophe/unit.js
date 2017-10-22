@@ -181,7 +181,7 @@ let Unit = Class(GameObject, {
             if(!soldier.acted) { // if soldier hasn't acted
                 if(soldier.inRange("monument")) {
                     attackMod = 0.5;
-                }// if ally monument nearby, take less dmg from contributing
+                } // if ally monument nearby, take less dmg from contributing
                 soldier.energy -= soldier.job.actionCost * attackMod;
                 soldier.acted = true;
                 soldier.moves = 0;
