@@ -290,6 +290,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             player.upkeep = 0;
         }
 
+        // Iterate through all units
         for(let unit of this.units) {
             unit.acted = false;
             unit.moves = unit.job.moves;
@@ -307,14 +308,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 let target = unit.movementTarget;
                 if(target) {
+                    // console.log("Moving fresh human");
                     // Move neutral fresh humans on the road
                     // while(unit.moves > 0) {
                     let nextTile;
                     if(target.x < unit.x) {
-                        nextTile = unit.tileWest;
+                        nextTile = unit.tileEast;
                     }
                     else {
-                        nextTile = unit.tileEast;
+                        nextTile = unit.tileWest;
                     }
 
                     if(!nextTile || nextTile.unit) {
@@ -523,9 +525,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         return false;
                     }
 
+                    // Make sure it's on the correct side of the map
+                    if(t.x >= halfWidth) {
+                        return false;
+                    }
+
                     // Check if the tile is close enough to the cat
-                    // return Math.abs(cat.x - t.x) <= maxDist && Math.abs(cat.y - t.y) <= maxDist
-                    return t.x < halfWidth / 2;
+                    return Math.abs(cat.tile.x - t.x) <= maxDist && Math.abs(cat.tile.y - t.y) <= maxDist;
                 });
             }
 

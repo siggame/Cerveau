@@ -121,6 +121,11 @@ let Unit = Class(GameObject, {
         else {
             this.squad = [this];
         }
+
+        this.game.units.push(this);
+        if(this.owner) {
+            this.owner.units.push(this);
+        }
         //<<-- /Creer-Merge: init -->>
     },
 
