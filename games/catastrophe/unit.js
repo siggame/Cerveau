@@ -106,7 +106,6 @@ let Unit = Class(GameObject, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
         this.energy = data.energy || 100;
         this.job = data.job || this.game.jobs[0];
         this.moves = this.job.moves;
@@ -115,9 +114,12 @@ let Unit = Class(GameObject, {
         this.turnsToDie = data.turnsToDie || -1;
         this.movementTarget = data.movementTarget || null;
 
+        if(this.owner) {
+            this.owner.units.push(this);
+        }
+
         // Soldiers are in their own squad, and other units, while not in squads, should be in their own squad for ease of use.
         this.calculateSquad();
-
         //<<-- /Creer-Merge: init -->>
     },
 

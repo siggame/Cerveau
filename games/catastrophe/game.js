@@ -160,7 +160,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic after init can be put here
+        // Generate the map and units
+        this.generateMap();
+
+        // Calculate player upkeeps
+        for(let player of this.players) {
+            player.upkeep = 0;
+            for(let unit of player.units) {
+                player.upkeep += unit.job.upkeep;
+            }
+
+            player.food = 100;
+        }
         //<<-- /Creer-Merge: begin -->>
     },
 
@@ -419,6 +430,143 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         return false;
+    },
+
+    /**
+     * Generates the map and places the resources, players, and starting units
+     */
+    generateMap: function() {
+        const halfWidth = Math.floor(this.mapWidth / 2);
+        const halfHeight = Math.floor(this.mapHeight / 2);
+
+        // Place structures and food spawners
+        for(let x = 0; x < halfWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let tile = this.getTile(x, y);
+
+                // Generate starting unit
+                if(x === 0 && y === 0) {
+                    tile.unit = this.create("Unit", {
+                        owner: this.players[0],
+                        tile: tile,
+                        job: this.jobs[0],
+                    });
+                }
+
+                // Generate structures and spawners
+                if(y === halfHeight - 1 || y === halfHeight) {
+                    // Generate road
+                    tile.structure = this.create("Structure", {
+                        tile: tile,
+                        type: "road",
+                    });
+                }
+                else {
+                    if(Math.random() < 0.05) {
+                        // Generate food spawner
+                        tile.harvestRate = 10;
+                    }
+                    else if(Math.random() < 0.01) {
+                        // Generate neutral structures
+                        tile.structure = this.create("Structure", {
+                            tile: tile,
+                            type: "neutral",
+                        });
+                    }
+                }
+            }
+        }
+
+        // Place cat and starting shelter
+        let possibleTiles = this.tiles.filter(t => {
+            // Check if tile is empty
+            if(t.shelter || t.unit || t.harvestRate > 0) {
+                return false;
+            }
+
+            // Make sure tile is close enough to the edge of the map
+            return t.x < this.mapWidth / 3;
+        });
+
+        let selected = possibleTiles[Math.floor(Math.random() * possibleTiles.length)];
+
+        // Shelter
+        selected.structure = this.create("Structure", {
+            owner: this.players[0],
+            tile: selected,
+            type: "shelter",
+        });
+
+        // Cat
+        this.players[0].cat = selected.unit = this.create("Unit", {
+            owner: this.players[0],
+            tile: selected,
+            job: this.jobs.find(j => j.title === "cat overlord"),
+        });
+
+        // Place starting units
+        const cat = this.players[0].cat;
+        const increment = 2;
+        let maxDist = 1 - increment;
+        possibleTiles = [];
+
+        for(let i = 0; i < 3; i++) {
+            // Make sure there's valid tiles in range
+            while(possibleTiles.length === 0) {
+                // Expand the range a bit
+                maxDist += increment;
+                possibleTiles = this.tiles.filter(t => {
+                    // Check if tile is empty
+                    if(t.shelter || t.unit || t.harvestRate > 0) {
+                        return false;
+                    }
+
+                    // Check if the tile is close enough to the cat
+                    return Math.abs(cat.x - t.x) <= maxDist && Math.abs(cat.y - t.y) <= maxDist;
+                });
+            }
+
+            // Choose a tile
+            let selected = possibleTiles[Math.floor(Math.random() * possibleTiles.length)];
+            selected.unit = this.create("Unit", {
+                owner: this.players[0],
+                tile: selected,
+                job: this.jobs[0],
+            });
+        }
+
+        // Mirror map
+        for(let x = 0; x < halfWidth; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let orig = this.getTile(x, y);
+                let target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+
+                // Copy data
+                target.harvestRate = orig.harvestRate;
+
+                // Clone structure
+                if(orig.structure) {
+                    target.structure = this.create("Structure", {
+                        tile: target,
+                        type: orig.structure.type,
+                        owner: orig.structure.owner && orig.structure.owner.opponent,
+                    });
+                }
+
+                // Clone unit
+                if(orig.unit) {
+                    target.unit = this.create("Unit", {
+                        tile: target,
+                        owner: orig.unit.owner.opponent,
+                        job: orig.unit.job,
+                    });
+
+                    if(target.unit.job.title === "cat overlord") {
+                        target.unit.owner.cat = target.unit;
+                    }
+                }
+            }
+        }
     },
     //<<-- /Creer-Merge: added-functions -->>
 
