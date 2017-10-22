@@ -49,7 +49,7 @@ let Structure = Class(GameObject, {
         this.tile = this.tile || null;
 
         /**
-         * The type of Structure this is ('shelter', 'monument', 'wall', 'road').
+         * The type of Structure this is ('shelter', 'monument', 'wall', 'road', 'neutral').
          *
          * @type {string}
          */

@@ -787,7 +787,7 @@
                 },
                 "type": {
                     "default": null,
-                    "description": "The type of Structure this is ('shelter', 'monument', 'wall', 'road').",
+                    "description": "The type of Structure this is ('shelter', 'monument', 'wall', 'road', 'neutral').",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
