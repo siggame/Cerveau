@@ -1,0 +1,40 @@
+{
+    "default": {
+        "actionCost": 0,
+        "carryLimit": 10,
+        "moves": 3,
+        "regenRate": 50,
+        "upkeep": 2
+    },
+    "jobs": {
+        "fresh human": {},
+        "cat overlord": {
+            "carryLimit": 10,
+            "moves": 1,
+            "regenRate": 10,
+            "upkeep": 0
+        },
+        "soldier": {
+            "actionCost": 25,
+            "moves": 2,
+            "regenRate": 25,
+            "upkeep": 5
+        },
+        "gatherer": {
+            "actionCost": 75,
+            "carryLimit": 50,
+            "upkeep": 3
+        },
+        "builder": {
+            "actionCost": 75,
+            "carryLimit": 50,
+            "regenRate": 50,
+            "upkeep": 3
+        },
+        "missionary": {
+            "actionCost": 75,
+            "regenRate": 50,
+            "upkeep": 2
+        }
+    }
+}

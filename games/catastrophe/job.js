@@ -5,9 +5,7 @@ const log = require(`${__basedir}/gameplay/log`);
 const GameObject = require("./gameObject");
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-// any additional requires you want can be required here safely between Creer re-runs
-
+const JobStats = require("./jobStats.json");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Job: Information about a Unit's job.
@@ -64,9 +62,15 @@ let Job = Class(GameObject, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        this.title = data.title || "fresh human";
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-
+        // Get stats from jobStats.json
+        for(let key of Object.keys(JobStats.default)) {
+            this[key] = JobStats.jobs[this.title][key];
+            if(this[key] === undefined || this[key] === null) {
+                this[key] = JobStats.default[key];
+            }
+        }
         //<<-- /Creer-Merge: init -->>
     },
 

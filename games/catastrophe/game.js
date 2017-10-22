@@ -7,9 +7,7 @@ const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
 const TiledGame = require(`${__basedir}/gameplay/shared/tiledGame`);
 
 //<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-// any additional requires you want can be required here safely between Creer re-runs
-
+const JobStats = require("./jobStats.json");
 //<<-- /Creer-Merge: requires -->>
 
 // @class Game: Convert as many humans to as you can to survive in this post-apocalyptic wasteland.
@@ -131,10 +129,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        this.maxTurns = data.maxTurns || 730;
+        this.catEnergyMult = data.catEnergyMult || 2;
+        this.harvestCooldown = data.harvestCooldown || 1;
+        this.mapHeight = data.mapHeight || 30;
+        this.mapWidth = data.mapWidth || 40;
+        this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
-
+        // For structures created during the turn
+        this.newStructures = [];
         //<<-- /Creer-Merge: init -->>
     },
 
