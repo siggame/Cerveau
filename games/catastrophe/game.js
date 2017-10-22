@@ -161,6 +161,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         // Import jobs
+        // console.log("Importing jobs");
         for(const title of Object.keys(JobStats.jobs)) {
             this.jobs.push(
                 this.create("Job", {title})
@@ -171,9 +172,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TiledGame._initMap.call(this);
 
         // Generate the map and units
+        // console.log("Generating the map");
         this.generateMap();
 
         // Calculate player upkeeps
+        // console.log("Calculating player upkeeps");
         for(let player of this.players) {
             player.upkeep = 0;
             for(let unit of player.units) {
@@ -385,13 +388,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         let players = this.players.slice();
 
         // Primary win conditions: defeat enemy cat or defeat all enemy humans
-        const loseReasons = players.reduce((loseReasons, p) => {
+        const loseReasons = players.reduce((loseReasons, p, i, arr) => {
             if(p.cat.energy <= 0) {
                 loseReasons[p] = "Cat died";
             }
             else if(p.units.length === 1) {
                 loseReasons[p] = "Humans died";
             }
+            return loseReasons;
         }, {});
 
         const losers = Object.keys(loseReasons);
@@ -488,6 +492,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Place cat and starting shelter
+        // console.log("Placing cat and starting shelter");
         let possibleTiles = this.tiles.filter(t => {
             // Check if tile is empty
             if(t.shelter || t.unit || t.harvestRate > 0) {
@@ -515,6 +520,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         });
 
         // Place starting units
+        // console.log("Placing starting units");
         const cat = this.players[0].cat;
         const increment = 2;
         let maxDist = 1 - increment;
@@ -522,6 +528,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         for(let i = 0; i < 3; i++) {
             // Make sure there's valid tiles in range
+            // console.log(`Unit ${i}`);
             while(possibleTiles.length === 0) {
                 // Expand the range a bit
                 maxDist += increment;
@@ -532,8 +539,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     }
 
                     // Check if the tile is close enough to the cat
-                    return Math.abs(cat.x - t.x) <= maxDist && Math.abs(cat.y - t.y) <= maxDist;
+                    // return Math.abs(cat.x - t.x) <= maxDist && Math.abs(cat.y - t.y) <= maxDist
+                    return true;
                 });
+                // console.log(`Expanding search radius to ${maxDist} (${possibleTiles.length} tiles found)`);
             }
 
             // Choose a tile

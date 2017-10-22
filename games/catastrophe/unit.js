@@ -676,8 +676,8 @@ let Unit = Class(GameObject, {
         if(tile !== this.tile.tileEast && tile !== this.tile.tileWest && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth) {
             return "Your unit must move to a tile to the north, south, east, or west.";
         }
-        if(tile.structure && tile.structure.type !== "road" && (tile.structure.type !== "shelter" || tile.structure.owner !== this.owner)) {
-            return "Units cannot move onto structures other than roads and friendly shelters.";
+        if(tile.structure && tile.structure.type !== "road" && tile.structure.type !== "shelter") {
+            return "Units cannot move onto structures other than roads and shelters.";
         }
         // <<-- /Creer-Merge: invalidateMove -->>
     },
