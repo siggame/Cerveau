@@ -160,6 +160,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Import jobs
+        for(const title of Object.keys(JobStats.jobs)) {
+            this.jobs.push(
+                this.create("Job", {title})
+            );
+        }
+
+        // Initialize the map and creates all the tiles
+        TiledGame._initMap.call(this);
+
         // Generate the map and units
         this.generateMap();
 
