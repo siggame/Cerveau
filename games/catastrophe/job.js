@@ -66,8 +66,10 @@ let Job = Class(GameObject, {
 
         // Get stats from jobStats.json
         for(let key of Object.keys(JobStats.default)) {
-            this[key] = JobStats.jobs[this.title][key];
-            if(this[key] === undefined || this[key] === null) {
+            if(key in JobStats.jobs[this.title]) {
+                this[key] = JobStats.jobs[this.title][key];
+            }
+            else {
                 this[key] = JobStats.default[key];
             }
         }
