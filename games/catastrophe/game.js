@@ -279,6 +279,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 unit.owner.upkeep += unit.job.upkeep;
             }
             else {
+                // Neutral fresh humans
+                if(unit.turnsToDie > 0) {
+                    unit.turnsToDie--;
+                }
+
                 let target = unit.movementTarget;
                 if(target) {
                     // Move neutral fresh humans on the road
