@@ -172,7 +172,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Generate the map and units
         this.generateMap();
-        this.updateArrays();
+
+        // Properly add all new structures
+        for(let structure of this.newStructures) {
+            this.structures.push(structure);
+            if(structure.owner) {
+                structure.owner.structures.push(structure);
+            }
+        }
+        this.newStructures = [];
 
         // Calculate player upkeeps
         for(let player of this.players) {
@@ -253,6 +261,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 structure.owner.structures.push(structure);
             }
         }
+        this.newStructures = [];
 
         // Properly remove all destroyed structures
         for(let i = 0; i < this.structures.length; i++) {
