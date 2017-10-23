@@ -342,25 +342,43 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Check if new fresh humans should walk across the road
         if(this.currentTurn % 14 === 0) { // Every 7 turns taken by both players
             // Spawn two new fresh humans
-            let tile = this.getTile(0, this.mapHeight / 2 - 1);
+            let tile;
+
+            // Search for a valid spawning tile
+            for(let x = 0; x < this.mapWidth; x++) {
+                tile = this.getTile(x, this.mapHeight / 2 - 1);
+                if(!tile.unit) {
+                    break;
+                }
+            }
+
+            // If one was found (as in, not a map-wide line of units), spawn a new fresh human
             if(!tile.unit) {
                 let unit = this.create("Unit", {
                     job: this.jobs[0],
                     owner: null,
                     tile: tile,
-                    turnsToDie: this.mapWidth,
+                    turnsToDie: this.mapWidth - tile.x,
                     movementTarget: this.getTile(this.mapWidth - 1, this.mapHeight / 2 - 1),
                 });
                 unit.tile.unit = unit;
             }
 
-            tile = this.getTile(this.mapWidth - 1, this.mapHeight / 2);
+            // Search for a valid spawning tile
+            for(let x = this.mapWidth - 1; x >= 0; x--) {
+                tile = this.getTile(x, this.mapHeight / 2);
+                if(!tile.unit) {
+                    break;
+                }
+            }
+
+            // If one was found (as in, not a map-wide line of units), spawn a new fresh human
             if(!tile.unit) {
                 let unit = this.create("Unit", {
                     job: this.jobs[0],
                     owner: null,
                     tile: tile,
-                    turnsToDie: this.mapWidth,
+                    turnsToDie: tile.x,
                     movementTarget: this.getTile(0, this.mapHeight / 2),
                 });
                 unit.tile.unit = unit;

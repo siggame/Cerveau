@@ -373,6 +373,7 @@ let Unit = Class(GameObject, {
         const mult = this.inRange("monument") ? 0.5 : 1;
         this.energy -= this.job.actionCost * mult;
         tile.materials -= tile.structure.materials;
+        tile.harvestRate = 0;
 
         return true;
         // <<-- /Creer-Merge: construct -->>
