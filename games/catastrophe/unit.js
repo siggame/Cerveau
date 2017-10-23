@@ -605,8 +605,8 @@ let Unit = Class(GameObject, {
         if(!tile) {
             return "You cannot harvest resources off the edge of the world.";
         }
-        if(this.tile !== tile && this.tile !== this.tile.tileNorth && this.tile !== this.tile.tileSouth && this.tile !== this.tile.tileEast && this.tile !== this.tile.tileWest) {
-            return "You can only harvest things on your tile or ajecent tiles.";
+        if(tile !== this.tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
+            return "You can only harvest on or adjacent to your tile.";
         }
 
         // Make sure unit is harvesting a valid tile
@@ -689,6 +689,7 @@ let Unit = Class(GameObject, {
         if(tile.structure && tile.structure.type !== "road" && tile.structure.type !== "shelter") {
             return "Units cannot move onto structures other than roads and shelters.";
         }
+        // console.log(`${this} trying to move to ${tile}`);
         // <<-- /Creer-Merge: invalidateMove -->>
     },
 
@@ -711,6 +712,7 @@ let Unit = Class(GameObject, {
 
         // Recalculate squads
         this.owner.calculateSquads();
+        // console.log(`${this} moving to ${tile}`);
         return true;
         // <<-- /Creer-Merge: move -->>
     },
