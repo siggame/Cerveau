@@ -497,7 +497,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Place cat and starting shelter
         let possibleTiles = this.tiles.filter(t => {
             // Check if tile is empty
-            if(t.shelter || t.unit || t.harvestRate > 0) {
+            if(t.structure || t.unit || t.harvestRate > 0) {
                 return false;
             }
 

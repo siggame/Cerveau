@@ -221,9 +221,15 @@ let Unit = Class(GameObject, {
 
         // IT'S KILLING TIME
         for(let dead of toDie) {
+            // Drop carried resources
+            dead.tile.food += dead.food;
+            dead.tile.materials += dead.materials;
+            dead.food = 0;
+            dead.materials = 0;
+
             if(dead.owner) {
                 if(dead.job.title !== "cat overlord") {
-                // actually fresh human converting time, not in fact killing time
+                    // actually fresh human converting time, not in fact killing time
                     dead.job = this.game.jobs[0];
                     dead.turnsToDie = 10;
                     dead.energy = 100;
@@ -695,7 +701,6 @@ let Unit = Class(GameObject, {
      */
     move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
         // Deduct the move from the unit
         this.moves -= 1;
 
@@ -707,7 +712,6 @@ let Unit = Class(GameObject, {
         // Recalculate squads
         this.owner.calculateSquads();
         return true;
-
         // <<-- /Creer-Merge: move -->>
     },
 
