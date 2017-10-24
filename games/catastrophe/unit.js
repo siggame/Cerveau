@@ -246,7 +246,7 @@ let Unit = Class(GameObject, {
 
         // updating squads
         for(let player of this.game.players) {
-            player.updateSquads();
+            player.calculateSquads();
         }
 
         return true;
