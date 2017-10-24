@@ -235,6 +235,9 @@ let Unit = Class(GameObject, {
                     dead.energy = 100;
                     dead.owner = null;
                     dead.squad = [dead];
+
+                    // Don't actually remove it from the player's units array yet
+                    dead.owner.defeatedUnits.push(dead);
                 }
             }
             else {

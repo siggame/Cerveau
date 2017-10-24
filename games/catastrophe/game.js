@@ -303,6 +303,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Reset all upkeeps
         for(let player of this.players) {
             player.upkeep = 0;
+
+            // Remove all defeated units from their units list
+            for(let unit of player.defeatedUnits) {
+                player.units.removeElement(unit);
+            }
+
+            player.defeatedUnits = [];
         }
 
         // Iterate through all units

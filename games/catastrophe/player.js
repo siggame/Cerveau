@@ -115,6 +115,9 @@ let Player = Class(GameObject, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         this.cat = data.cat || null;
         this.food = data.food || null;
+
+        // Keep track of all units defeated in combat
+        this.defeatedUnits = [];
         //<<-- /Creer-Merge: init -->>
     },
 
@@ -122,6 +125,10 @@ let Player = Class(GameObject, {
 
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    /**
+     * Recalculates all squads for this player's units.
+     * Unowned units just have squads with only themselves in it.
+     */
     calculateSquads: function() {
         for(let unit of this.units) {
             // Reset squad
@@ -131,14 +138,23 @@ let Player = Class(GameObject, {
             let open = [unit.tile];
             let closed = new Set();
             while(open.length > 0) {
+                // Grab a tile from the open list
                 const tile = open.shift();
                 const cur = tile && tile.unit;
-                if(!cur || cur.owner !== this || (unit.squad.length > 0 && cur.job.title !== "soldier") || closed.has(tile)) {
+
+                // If the tile grabbed is null/undefined, there's no valid unit there, or we already checked this tile
+                if(!cur || cur.owner !== this || (unit.squad.length > 0 && cur.job.title !== "soldier") || closed.has(tile.id)) {
+                    // Skip this tile (and don't spread out from it)
                     continue;
                 }
 
+                // Add this unit to the squad
                 unit.squad.push(cur);
-                closed.add(tile);
+
+                // Make sure we never check this tile again
+                closed.add(tile.id);
+
+                // Add the surrounding tiles to the open list to check
                 open.push(tile.tileNorth);
                 open.push(tile.tileEast);
                 open.push(tile.tileSouth);
