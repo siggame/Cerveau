@@ -136,6 +136,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapWidth = data.mapWidth || 40;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
+        // Variables that aren't in creer but could be added
+        this.turnsToCreateHuman = 14;
+        this.turnsToLowerHarvest = 60;
+        this.structureChance = 0.025;
+        this.minFoodChance = 0.01;
+        this.maxFoodChance = 0.1;
+
         // For structures created during the turn
         this.newStructures = [];
         //<<-- /Creer-Merge: init -->>
@@ -347,7 +354,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Check if new fresh humans should walk across the road
-        if(this.currentTurn % 14 === 0) { // Every 7 turns taken by both players
+        if(this.currentTurn % this.turnsToCreateHuman === 0) {
             // Spawn two new fresh humans
             let tile;
 
@@ -406,8 +413,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     updateResources: function() {
-        // Decrease resources every 30 days (60 turns)
-        let endOfMonth = this.currentTurn % 60 === 0;
+        let lowerHarvests = this.currentTurn % this.turnsToLowerHarvest === 0;
 
         // Iterate through every tile
         for(let tile of this.tiles) {
@@ -415,7 +421,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 tile.turnsToHarvest--;
             }
 
-            if(endOfMonth && tile.harvestRate > 0) {
+            if(lowerHarvests && tile.harvestRate > 0) {
                 tile.harvestRate--;
             }
         }
@@ -504,11 +510,26 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     });
                 }
                 else {
-                    if(Math.random() < 0.05) {
+                    let cx = this.mapWidth / 2;
+                    let cy = this.mapHeight / 2;
+                    const exp = 2;
+
+                    // Calculate max distances from center of map, raised to exp
+                    let maxD = Math.pow(cx, exp) + Math.pow(cy, exp);
+
+                    // This is a fancy function based on some easing functions
+                    let factor = Math.abs(Math.pow(Math.abs(x - cx) - cx, exp) + Math.pow(Math.abs(y - cy) - cy, exp)) / maxD;
+
+                    // Food chance increases toward center of map
+                    let foodChanceRange = this.maxFoodChance - this.minFoodChance;
+                    let foodChance = factor * foodChanceRange + this.minFoodChance;
+
+                    // Try to place food or structure
+                    if(Math.random() < foodChance) {
                         // Generate food spawner
                         tile.harvestRate = 10;
                     }
-                    else if(Math.random() < 0.01) {
+                    else if(Math.random() < this.structureChance) {
                         // Generate neutral structures
                         tile.structure = this.create("Structure", {
                             tile: tile,
@@ -526,8 +547,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 return false;
             }
 
-            // Make sure tile is close enough to the edge of the map
-            return t.x < halfWidth / 2;
+            // Make sure tile is close enough to a corner of the map
+            return t.x < halfWidth / 2 && (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2);
         });
 
         let selected = possibleTiles[Math.floor(Math.random() * possibleTiles.length)];
