@@ -139,7 +139,7 @@ let Unit = Class(GameObject, {
      */
     invalidateAttack: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        const reason = this._invalidate(player, true, true);
+        const reason = this._invalidate(player, true, false);
         if(reason) {
             return reason;
         }
@@ -176,7 +176,7 @@ let Unit = Class(GameObject, {
     attack: function(player, tile) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         let attackSum = 0; // damage to be distributed
-        let toDie = []; // update dead later
+        let toDie = new Set(); // update dead later
         for(let soldier of this.squad) {
             let attackMod = 1;// damage modifier, if unit near allied monument
             if(!soldier.acted) { // if soldier hasn't acted
@@ -189,7 +189,7 @@ let Unit = Class(GameObject, {
                 attackSum += soldier.job.actionCost;
                 if(soldier.energy <= 0) { // if died
                     attackSum += soldier.energy / attackMod; // soldier.energy is negative here, can only contribute as much energy as unit has
-                    toDie.push(soldier);
+                    toDie.add(soldier);
                 }
             }
         }
@@ -214,7 +214,7 @@ let Unit = Class(GameObject, {
                 }
                 target.energy -= attackSum * attackMod / tile.unit.squad.length;
                 if(target.energy <= 0) {
-                    toDie.push(target);
+                    toDie.add(target);
                 }
             }
         }
@@ -233,11 +233,13 @@ let Unit = Class(GameObject, {
                     dead.job = this.game.jobs[0];
                     dead.turnsToDie = 10;
                     dead.energy = 100;
-                    dead.owner = null;
                     dead.squad = [dead];
 
                     // Don't actually remove it from the player's units array yet
                     dead.owner.defeatedUnits.push(dead);
+
+                    // Make sure the previous owner can't control it anymore
+                    dead.owner = null;
                 }
             }
             else {

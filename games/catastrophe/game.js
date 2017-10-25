@@ -425,12 +425,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         let players = this.players.slice();
 
         // Primary win conditions: defeat enemy cat or defeat all enemy humans
-        const loseReasons = players.reduce((loseReasons, p, i, arr) => {
+        const loseReasons = players.reduce((loseReasons, p) => {
             if(p.cat.energy <= 0) {
-                loseReasons[p] = "Cat died";
+                loseReasons[p.id] = "Cat died";
             }
             else if(p.units.length === 1) {
-                loseReasons[p] = "Humans died";
+                loseReasons[p.id] = "Humans died";
             }
             return loseReasons;
         }, {});
@@ -442,8 +442,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
         else if(losers.length > 0) {
             // One player lost
-            const loser = losers[0];
-            const reason = loseReasons[loser];
+            const loser = players.find(p => p.id === losers[0]);
+            const reason = loseReasons[loser.id];
             this.declareWinner(loser.opponent, `Opponent lost: ${reason}`);
             this.declareLoser(loser, reason);
             return true;
