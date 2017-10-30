@@ -62,8 +62,8 @@ let Structure = Class(GameObject, {
         this.type = data.type || "neutral";
         this.type = this.type.toLowerCase();
 
-        this.materials = this.game.shelterCost(this.type) || 0;
-        this.effectRadius = this.game.shelterRange(this.type) || 0;
+        this.materials = this.game.structureCost(this.type) || 0;
+        this.effectRadius = this.game.structureRange(this.type) || 0;
 
         this.game.newStructures.push(this);
         //<<-- /Creer-Merge: init -->>
