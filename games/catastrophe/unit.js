@@ -341,14 +341,8 @@ let Unit = Class(GameObject, {
         // Check structure type and if they have enough materials
         type = type.toLowerCase();
         let matsNeeded = 0;
-        if(type === "wall") {
-            matsNeeded = 50;
-        }
-        else if(type === "shelter") {
-            matsNeeded = 100;
-        }
-        else if(type === "monument") {
-            matsNeeded = 150;
+        if(type === "wall" || type === "shelter" || type === "monument") {
+            matsNeeded = this.game.structureCost(type);
         }
         else {
             return `Unknown structure '${type}'. You can only build 'wall', 'shelter', or 'monument'.`;
@@ -658,6 +652,7 @@ let Unit = Class(GameObject, {
         const mult = this.inRange("monument") ? 0.5 : 1;
         this.energy -= this.job.actionCost * mult;
         this.food += pickup;
+        this.acted = true;
         return true;
 
         // <<-- /Creer-Merge: harvest -->>

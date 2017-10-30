@@ -132,8 +132,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxTurns = data.maxTurns || 300;
         this.catEnergyMult = data.catEnergyMult || 2;
         this.harvestCooldown = data.harvestCooldown || 1;
-        this.mapHeight = data.mapHeight || 30;
-        this.mapWidth = data.mapWidth || 40;
+        this.mapWidth = data.mapWidth || 32;
+        this.mapHeight = data.mapHeight || 20;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
         // Variables that aren't in creer but could be added
@@ -424,6 +424,42 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             if(lowerHarvests && tile.harvestRate > 0) {
                 tile.harvestRate--;
             }
+        }
+    },
+
+    structureCost: function(structure) {
+        if(structure === "neutral") {
+            return 75;
+        }
+        else if(structure === "road") {
+            return 0;
+        }
+        else if(structure === "wall") {
+            return 50;
+        }
+        else if(structure === "shelter") {
+            return 100;
+        }
+        else if(structure === "monument") {
+            return 150;
+        }
+    },
+
+    structureRange: function(structure) {
+        if(structure === "neutral") {
+            return 0;
+        }
+        else if(structure === "road") {
+            return 0;
+        }
+        else if(structure === "wall") {
+            return 0;
+        }
+        else if(structure === "shelter") {
+            return 1;
+        }
+        else if(structure === "monument") {
+            return 3;
         }
     },
 
