@@ -145,10 +145,10 @@ let Unit = Class(GameObject, {
         }
 
         if(this.job.title !== "soldier") {
-            return "This unit cannot attack as they are not a soldier! Their only combat ability is as a meatshield!";
+            return `${this} cannot attack as they are not a soldier! Their only combat ability is as a meatshield!`;
         }
         if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
-            return "The tile to attack is not adjacent to your soldier.";
+            return `${tile} is not adjacent to ${this}.`;
         }
 
         if(tile.structure && tile.structure.type !== "road") {
@@ -157,11 +157,11 @@ let Unit = Class(GameObject, {
         else if(tile.unit) {
             // Attacking a unit
             if(tile.unit.owner === player) {
-                return "You can't attack friends!";
+                return `${this} can't attack friends!`;
             }
         }
         else {
-            return "There is nothing on that tile to attack!";
+            return `There is nothing on ${tile} for ${this} to attack!`;
         }
         // <<-- /Creer-Merge: invalidateAttack -->>
     },
@@ -278,19 +278,19 @@ let Unit = Class(GameObject, {
         job = job.toLowerCase();
         job = this.game.jobs.find(j => j.title === job);
         if(!job) {
-            return "You must pass in a valid job to change jobs.";
+            return `You must pass in a valid job to change the job for ${this}.`;
         }
         if(this.job.title === "cat overlord" || job.title === "cat overlord") {
-            return "The cat overlord is the overlord. He cannot change jobs, and humans cannot become cats.";
+            return `${this} is the overlord. He cannot change jobs, and humans cannot become cats.`;
         }
         if(this.job === job) {
-            return "You cannot change to your own job!";
+            return `${this} cannot change to your own job!`;
         }
         if(this.energy < 100) {
-            return "Unit must be at 100 energy to change jobs";
+            return `${this} must be at 100 energy to change jobs`;
         }
         if(Math.abs(this.tile.x - player.cat.tile.x) > 1 || Math.abs(this.tile.y - player.cat.tile.y) > 1) {
-            return "Unit must be adjacent or diagonal to your cat to change jobs";
+            return `${this} must be adjacent or diagonal to your cat to change jobs`;
         }
         // <<-- /Creer-Merge: invalidateChangeJob -->>
     },
@@ -332,10 +332,10 @@ let Unit = Class(GameObject, {
             return reason;
         }
         else if(this.job.title !== "builder") {
-            return "Only builders can construct!";
+            return `${this} is not a builder. Only builders can construct!`;
         }
         else if(tile.structure) {
-            return "This tile already has a structure! You cannot construct here!";
+            return `${tile} already has a structure! ${this} cannot construct here!`;
         }
 
         // Check structure type and if they have enough materials
@@ -349,7 +349,7 @@ let Unit = Class(GameObject, {
         }
 
         if(tile.materials < matsNeeded) {
-            return `There aren't enough materials on that tile. You need ${matsNeeded} to construct a ${type}.`;
+            return `There aren't enough materials on ${tile}. You need ${matsNeeded} to construct a ${type}.`;
         }
         // <<-- /Creer-Merge: invalidateConstruct -->>
     },
@@ -396,19 +396,19 @@ let Unit = Class(GameObject, {
         }
 
         if(this.job.title !== "missionary") {
-            return "You unit isn't a missionary and is thus unable to convince units to join you cul- I mean kingdom.";
+            return `${this} isn't a missionary and is thus unable to convince units to join you cul- I mean kingdom.`;
         }
         if(!tile) {
-            return "You can't convert a nonexistent tile to your cause.";
+            return `${this} can't convert a nonexistent tile to your cause.`;
         }
         if(tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
-            return "You can only convert units on ajacent tiles.";
+            return `${this} can only convert units on adjacent tiles.`;
         }
         if(!tile.unit) {
-            return "You must convert a unit.";
+            return `${this} must convert a unit. There is no unit on ${tile}.`;
         }
         if(tile.unit.owner) {
-            return "That unit is already owned by somebody.";
+            return `The unit on ${tile} is already owned by somebody. ${this} can't convert it.`;
         }
         // <<-- /Creer-Merge: invalidateConvert -->>
     },
@@ -453,16 +453,16 @@ let Unit = Class(GameObject, {
         }
 
         if(!tile.structure) {
-            return "No structure to deconstruct.";
+            return `No structure on ${tile} for ${this} to deconstruct.`;
         }
         else if(this.job.title !== "builder") {
-            return "Only builders can deconstruct.";
+            return `${this} is not a builder. Only builders can deconstruct.`;
         }
         else if(this.owner === tile.structure.owner) {
-            return "Builders cannot deconstruct friendly structures.";
+            return `${this} cannot deconstruct friendly structures. Soldiers can destroy them by attacking them, though.`;
         }
         else if(this.materials + this.food >= this.job.carryLimit) {
-            return "Cannot carry any more materials.";
+            return `${this} cannot carry any more materials.`;
         }
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
     },
@@ -515,28 +515,28 @@ let Unit = Class(GameObject, {
         }
 
         if(!tile) {
-            return "You must pass a tile to drop the resources onto.";
+            return `You must pass a tile for ${this} to drop the resources onto.`;
         }
         if(this.tile !== tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
-            return "You can only drop things on or adjacent to your tile.";
+            return `${this} can only drop things on or adjacent to your tile.`;
         }
         if(!resource || resource === "") {
-            return "You need to pass something in for resource";
+            return `You need to specify a resource for ${this} to drop.`;
         }
         if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M") {
-            return "Resource must be either 'food' or 'materials'.";
+            return `Resource for ${this} to drop must be either 'food' or 'materials'.`;
         }
         if(tile.structure) {
             if(tile.structure.type === "shelter") {
                 if(tile.structure.owner !== player) {
-                    return "You can't drop things in enemy shelters. Nice thought though.";
+                    return `${this} can't drop things in enemy shelters. Nice thought though.`;
                 }
                 else if(resource[0] !== "f" && resource[0] !== "F") {
-                    return "You can only drop food on shelters.";
+                    return `${this} can only store food in shelters.`;
                 }
             }
             else if(tile.structure.type !== "road") {
-                return "You can't drop resources on structures.";
+                return `${this} can't drop resources on structures.`;
             }
         }
         // <<-- /Creer-Merge: invalidateDrop -->>
