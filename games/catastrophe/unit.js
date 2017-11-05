@@ -568,7 +568,7 @@ let Unit = Class(GameObject, {
         if(resource[0] === "f" || resource[0] === "F") {
             amount = Math.min(amount, this.food);
             if(tile.structure && tile.structure.type === "shelter") {
-                this.player.food += amount;
+                this.owner.food += amount;
             }
             else {
                 tile.food += amount;
