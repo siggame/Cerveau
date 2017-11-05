@@ -400,14 +400,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Check if units are starving and update food
-        for(let player of this.players) {
-            if(player.food >= player.upkeep) {
-                player.food -= player.upkeep;
-            }
-            else {
-                for(let unit of player.units) {
-                    unit.starving = true;
-                }
+        let curPlayer = this.players[this.currentTurn % this.players.length];
+        if(curPlayer.food >= curPlayer.upkeep) {
+            curPlayer.food -= curPlayer.upkeep;
+        }
+        else {
+            for(let unit of curPlayer.units) {
+                unit.starving = true;
             }
         }
     },

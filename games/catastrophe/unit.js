@@ -523,7 +523,7 @@ let Unit = Class(GameObject, {
         if(!resource || resource === "") {
             return "You need to pass something in for resource";
         }
-        if(resource[0] !== "food" && resource[0] !== "Food" && resource[0] !== "materials" && resource[0] !== "Materials") {
+        if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M") {
             return "Resource must be either 'food' or 'materials'.";
         }
         if(tile.structure) {
@@ -531,7 +531,7 @@ let Unit = Class(GameObject, {
                 if(tile.structure.owner !== player) {
                     return "You can't drop things in enemy shelters. Nice thought though.";
                 }
-                else if(resource[0] !== "food" && resource[0] !== "Food") {
+                else if(resource[0] !== "f" && resource[0] !== "F") {
                     return "You can only drop food on shelters.";
                 }
             }
@@ -556,7 +556,7 @@ let Unit = Class(GameObject, {
         // Calculate how much is being dropped
         if(amount < 1) {
             // Drop it all
-            if(resource[0] === "food" || resource[0] === "Food") {
+            if(resource[0] === "f" || resource[0] === "F") {
                 amount = this.food;
             }
             else {
@@ -565,9 +565,9 @@ let Unit = Class(GameObject, {
         }
 
         // Drop the resource
-        if(resource[0] === "food" || resource[0] === "Food") {
+        if(resource[0] === "f" || resource[0] === "F") {
             amount = Math.min(amount, this.food);
-            if(tile.structure.type === "shelter") {
+            if(tile.structure && tile.structure.type === "shelter") {
                 this.player.food += amount;
             }
             else {
