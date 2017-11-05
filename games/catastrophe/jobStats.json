@@ -28,7 +28,7 @@
             "upkeep": 3
         },
         "builder": {
-            "carryLimit": 50,
+            "carryLimit": 50
         },
         "missionary": {}
     }
