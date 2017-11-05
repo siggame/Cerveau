@@ -132,7 +132,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxTurns = data.maxTurns || 720;
         this.catEnergyMult = data.catEnergyMult || 2;
         this.harvestCooldown = data.harvestCooldown || 1;
-        this.mapWidth = data.mapWidth || 25;
+        this.mapWidth = data.mapWidth || 26;
         this.mapHeight = data.mapHeight || 18;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
