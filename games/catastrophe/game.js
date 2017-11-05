@@ -129,11 +129,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.maxTurns = data.maxTurns || 300;
+        this.maxTurns = data.maxTurns || 720;
         this.catEnergyMult = data.catEnergyMult || 2;
         this.harvestCooldown = data.harvestCooldown || 1;
-        this.mapWidth = data.mapWidth || 32;
-        this.mapHeight = data.mapHeight || 20;
+        this.mapWidth = data.mapWidth || 25;
+        this.mapHeight = data.mapHeight || 18;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
         // Variables that aren't in creer but could be added
@@ -421,7 +421,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
 
             if(lowerHarvests && tile.harvestRate > 0) {
-                tile.harvestRate--;
+                tile.harvestRate -= 10;
             }
         }
     },
@@ -434,10 +434,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             return 0;
         }
         else if(structure === "wall") {
-            return 50;
+            return 75;
         }
         else if(structure === "shelter") {
-            return 100;
+            return 50;
         }
         else if(structure === "monument") {
             return 150;
@@ -562,7 +562,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     // Try to place food or structure
                     if(Math.random() < foodChance) {
                         // Generate food spawner
-                        tile.harvestRate = 10;
+                        tile.harvestRate = 100;
                     }
                     else if(Math.random() < this.structureChance) {
                         // Generate neutral structures

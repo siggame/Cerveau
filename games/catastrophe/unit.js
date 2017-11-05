@@ -287,10 +287,10 @@ let Unit = Class(GameObject, {
             return "You cannot change to your own job!";
         }
         if(this.energy < 100) {
-            return "Unit must be at 100 energy to change roles";
+            return "Unit must be at 100 energy to change jobs";
         }
-        if(!this.inRange("shelter")) {
-            return "Unit must be at one of your shelters to change roles";
+        if(Math.abs(this.tile.x - player.cat.tile.x) > 1 || Math.abs(this.tile.y - player.cat.tile.y) > 1) {
+            return "Unit must be adjacent or diagonal to your cat to change jobs";
         }
         // <<-- /Creer-Merge: invalidateChangeJob -->>
     },
