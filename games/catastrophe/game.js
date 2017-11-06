@@ -321,9 +321,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Iterate through all units
         for(let unit of this.units) {
-            unit.acted = false;
-            unit.moves = unit.job.moves;
-            unit.starving = false;
+            if(!unit.owner || unit.owner === this.currentPlayer) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+                unit.starving = false;
+            }
 
             if(unit.owner) {
                 // Add this unit's upkeep to the player's total upkeep
@@ -400,12 +402,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Check if units are starving and update food
-        let curPlayer = this.players[this.currentTurn % this.players.length];
-        if(curPlayer.food >= curPlayer.upkeep) {
-            curPlayer.food -= curPlayer.upkeep;
+        if(this.currentPlayer.food >= this.currentPlayer.upkeep) {
+            this.currentPlayer.food -= this.currentPlayer.upkeep;
         }
         else {
-            for(let unit of curPlayer.units) {
+            for(let unit of this.currentPlayer.units) {
                 unit.starving = true;
             }
         }
