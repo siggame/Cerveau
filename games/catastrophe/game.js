@@ -137,8 +137,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
         // Variables that aren't in creer but could be added
-        this.turnsToCreateHuman = 14;
+        this.turnsToCreateHuman = 30;
         this.turnsToLowerHarvest = 60;
+        this.lowerHarvestAmount = 10;
         this.structureChance = 0.025;
         this.minFoodChance = 0.01;
         this.maxFoodChance = 0.1;

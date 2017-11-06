@@ -311,6 +311,10 @@ let Unit = Class(GameObject, {
         this.job = this.game.jobs.find(j => j.title === job);
         this.acted = true;
         this.moves = 0; // It takes all their time
+        this.tile.food += this.food;
+        this.tile.materials += this.materials;
+        this.food = 0;
+        this.materials = 0;
         this.owner.calculateSquads();
         return true;
         // <<-- /Creer-Merge: changeJob -->>
