@@ -147,6 +147,9 @@ let Unit = Class(GameObject, {
         if(this.job.title !== "soldier") {
             return `${this} cannot attack as they are not a soldier! Their only combat ability is as a meatshield!`;
         }
+        if(!tile) {
+            return `${this} needs to know which tile to attack!`;
+        }
         if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
             return `${tile} is not adjacent to ${this}.`;
         }
@@ -454,6 +457,9 @@ let Unit = Class(GameObject, {
 
         if(!tile.structure) {
             return `No structure on ${tile} for ${this} to deconstruct.`;
+        }
+        if(tile.structure.type === "road") {
+            return `${this} cannot deconstruct roads!`;
         }
         else if(this.job.title !== "builder") {
             return `${this} is not a builder. Only builders can deconstruct.`;

@@ -340,7 +340,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 let target = unit.movementTarget;
                 if(target) {
                     // Move neutral fresh humans on the road
-                    // while(unit.moves > 0) {
                     let nextTile = this.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
                     if(!nextTile || nextTile.unit) {
                         break;
@@ -349,8 +348,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     unit.tile.unit = null;
                     nextTile.unit = unit;
                     unit.tile = nextTile;
-                    unit.moves--;
-                    // }
                 }
             }
         }
