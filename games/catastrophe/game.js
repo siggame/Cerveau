@@ -140,9 +140,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.turnsToCreateHuman = 30;
         this.turnsToLowerHarvest = 60;
         this.lowerHarvestAmount = 10;
+        this.turnsBetweenHarvests = 10;
         this.structureChance = 0.025;
         this.minFoodChance = 0.01;
         this.maxFoodChance = 0.1;
+        this.minHarvestRate = 50;
+        this.maxHarvestRate = 150;
 
         // For structures created during the turn
         this.newStructures = [];
@@ -420,7 +423,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
 
             if(lowerHarvests && tile.harvestRate > 0) {
-                tile.harvestRate -= 10;
+                tile.harvestRate -= this.lowerHarvestAmount;
             }
         }
     },
@@ -560,8 +563,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                     // Try to place food or structure
                     if(Math.random() < foodChance) {
+                        // Calculate the multiplier for the harvest rate, increasing food toward center
+                        const maxDistFromCenter = Math.sqrt(cx * cx + cy * cy);
+                        const dx = cx - x;
+                        const dy = cy - y;
+                        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+                        const harvestRateMult = 1 - distFromCenter / maxDistFromCenter;
+                        const harvestRateRange = this.maxHarvestRate - this.minHarvestRate;
+
                         // Generate food spawner
-                        tile.harvestRate = 100;
+                        tile.harvestRate = this.minHarvestRate + harvestRateRange * Math.ceil(harvestRateMult);
                     }
                     else if(Math.random() < this.structureChance) {
                         // Generate neutral structures
