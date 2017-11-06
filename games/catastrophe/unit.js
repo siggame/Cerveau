@@ -483,7 +483,7 @@ let Unit = Class(GameObject, {
     deconstruct: function(player, tile) {
         // <<-- Creer-Merge: deconstruct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         // Take materials from the structure
-        let amount = Math.min(this.carryLimit - this.materials - this.food, tile.structure.materials);
+        let amount = Math.min(this.job.carryLimit - this.materials - this.food, tile.structure.materials);
         this.materials += amount;
         tile.structure.materials -= amount;
 
@@ -915,6 +915,15 @@ let Unit = Class(GameObject, {
         }, this);
     },
 
+    /**
+     * Returns how much stuff this unit can pickup or be given before hitting the carry limit
+     *
+     * @param {string} type - the type of structure to search for
+     * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
+     */
+    carryLeft: function() {
+        return this.job.carryLimit - this.materials - this.food;
+    },
     //<<-- /Creer-Merge: added-functions -->>
 
 });
