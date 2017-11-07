@@ -852,6 +852,11 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         // Try to get a shelter in range of this unit with a cat in range of that shelter
         let cat = this.owner.structures.find(structure => {
+            // Make sure this structure isn't destroyed
+            if(!structure.tile) {
+                return false;
+            }
+
             // Make sure this structure is a shelter
             if(structure.type !== "shelter") {
                 return false;
@@ -926,7 +931,7 @@ let Unit = Class(GameObject, {
      */
     inRange: function(type) {
         return this.game.structures.find(structure => {
-            if(structure.owner !== this.owner || structure.type !== type) {
+            if(!structure.tile || structure.owner !== this.owner || structure.type !== type) {
                 return false;
             }
 
