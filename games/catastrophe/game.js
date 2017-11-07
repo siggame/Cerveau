@@ -321,6 +321,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
 
             player.defeatedUnits = [];
+
+            // Add all new units to their units list
+            for(let unit of player.newUnits) {
+                player.units.push(unit);
+            }
+
+            player.newUnits = [];
         }
 
         // Iterate through all units

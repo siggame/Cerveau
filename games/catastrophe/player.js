@@ -118,6 +118,7 @@ let Player = Class(GameObject, {
 
         // Keep track of all units defeated in combat
         this.defeatedUnits = [];
+        this.newUnits = [];
         //<<-- /Creer-Merge: init -->>
     },
 

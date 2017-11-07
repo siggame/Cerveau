@@ -374,6 +374,7 @@ let Unit = Class(GameObject, {
         tile.structure = this.game.create("Structure", {
             type: type.toLowerCase(),
             tile: tile,
+            owner: player,
         });
 
         const mult = this.inRange("monument") ? 0.5 : 1;
@@ -429,15 +430,17 @@ let Unit = Class(GameObject, {
      */
     convert: function(player, tile) {
         // <<-- Creer-Merge: convert -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Unit will be added to the player's units array at the start of their next turn
         tile.unit.turnsToDie = -1;
         tile.unit.owner = player;
         tile.unit.energy = 100;
         tile.unit.acted = true;
         tile.unit.moves = 0;
+        tile.unit.movementTarget = null;
         const mult = this.inRange("monument") ? 0.5 : 1;
         this.energy -= this.job.actionCost * mult;
         this.acted = true;
-        player.units.push(tile.unit);
+        player.newUnits.push(tile.unit);
         return true;
         // <<-- /Creer-Merge: convert -->>
     },
@@ -656,7 +659,7 @@ let Unit = Class(GameObject, {
         }
         else {
             pickup = Math.min(tile.harvestRate, carry);
-            tile.turnsToHarvest = 5;
+            tile.turnsToHarvest = this.game.turnsBetweenHarvests;
         }
 
         const mult = this.inRange("monument") ? 0.5 : 1;
@@ -748,26 +751,29 @@ let Unit = Class(GameObject, {
         }
 
         if(!tile) {
-            return "You can only pick things up off tiles that exist";
+            return `${this} can only pick things up off tiles that exist`;
         }
         if(this.tile !== tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
-            return "You can only pickup resources on or adjacent to your tile.";
+            return `${this} can only pickup resources on or adjacent to its tile.`;
         }
-        if(resource[0] !== "f" && resource[0] !== "F" && resource[0] !== "m" && resource[0] !== "M") {
-            return "You can only pickup 'food' or 'materials'.";
-        }
-        if(amount < 1) {
-            if(resource[0] === "f" && resource[0] === "F") {
+
+        if(resource[0] === "f" || resource[0] === "F") {
+            if(amount < 1) {
                 amount = tile.food;
             }
-            else {
+        }
+        else if(resource[0] === "m" || resource[0] === "M") {
+            if(amount < 1) {
                 amount = tile.materials;
             }
         }
+        else {
+            return `${this} can only pickup 'food' or 'materials', not ${resource}.`;
+        }
 
-        amount = Math.min(amount, this.job.carryLimit - (this.food + this.materials), Math.floor(this.energy));
+        amount = Math.min(amount, this.carryLeft(), Math.floor(this.energy));
         if(amount <= 0) {
-            return "You can't pick up 0 resources.";
+            return `${this} can't pickup 0 resources.`;
         }
         // <<-- /Creer-Merge: invalidatePickup -->>
     },
@@ -792,16 +798,16 @@ let Unit = Class(GameObject, {
                 amount = tile.materials;
             }
         }
-        amount = Math.min(amount, this.job.carryLimit - (this.food + this.materials), Math.floor(this.energy));
+        amount = Math.min(amount, this.carryLeft(), Math.floor(this.energy));
 
         // Pickup the resource
-        if(resource[0] === "f" && resource[0] === "F") {
+        if(resource[0] === "f" || resource[0] === "F") {
             amount = Math.min(amount, tile.food);
             tile.food -= amount;
             this.food += amount;
             this.energy -= amount;
         }
-        if(resource[0] === "m" && resource[0] === "M") {
+        else {
             amount = Math.min(amount, tile.materials);
             tile.materials -= amount;
             this.materials += amount;
@@ -844,29 +850,39 @@ let Unit = Class(GameObject, {
      */
     rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // Try to get a shelter in range of this unit with a cat in range of that shelter
         let cat = this.owner.structures.find(structure => {
+            // Make sure this structure is a shelter
             if(structure.type !== "shelter") {
                 return false;
             }
 
+            // Make sure this shelter is in range of this unit
             const radius = structure.effectRadius;
             if(Math.abs(this.tile.x - structure.tile.x) > radius || Math.abs(this.tile.y - structure.tile.y) > radius) {
                 return false;
             }
 
-            return structure.tile.unit && structure.tile.unit.job.title === "cat overlord";
+            // Make sure the cat is in range of this shelter
+            return Math.abs(player.cat.tile.x - structure.tile.x) <= radius && Math.abs(player.cat.tile.y - structure.tile.y) <= radius;
         });
 
+        // Calculate the energy multiplier
+        let mult = 1;
+        if(this.starving) {
+            mult *= this.game.starvingEnergyMult;
+        }
         if(cat) {
-            this.energy += this.game.catEnergyMult * this.job.regenRate;
+            mult *= this.game.catEnergyMult;
         }
-        else {
-            this.energy += this.job.regenRate;
-        }
+
+        // Add energy to this unit
+        this.energy += mult * this.job.regenRate;
         if(this.energy > 100) {
             this.energy = 100;
         }
 
+        // Make sure they can't do anything else this turn
         this.acted = true;
         this.moves = 0;
         return true;
