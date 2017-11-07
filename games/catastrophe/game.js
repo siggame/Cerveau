@@ -341,17 +341,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     unit.turnsToDie--;
                 }
 
-                let target = unit.movementTarget;
+                const target = unit.movementTarget;
                 if(target) {
                     // Move neutral fresh humans on the road
-                    let nextTile = this.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
-                    if(!nextTile || nextTile.unit) {
-                        break;
+                    const nextTile = this.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
+                    if(nextTile && !nextTile.unit) {
+                        unit.tile.unit = null;
+                        nextTile.unit = unit;
+                        unit.tile = nextTile;
                     }
-
-                    unit.tile.unit = null;
-                    nextTile.unit = unit;
-                    unit.tile = nextTile;
                 }
             }
         }
