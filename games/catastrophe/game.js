@@ -136,16 +136,19 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapHeight = data.mapHeight || 18;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
-        // Variables that aren't in creer but could be added
-        this.turnsToCreateHuman = 30;
-        this.turnsToLowerHarvest = 60;
-        this.lowerHarvestAmount = 10;
-        this.turnsBetweenHarvests = 10;
+        // Variables that aren't in creer but should be added
+        this.turnsToCreateHuman = data.turnsToCreateHuman || 30;
+        this.turnsToLowerHarvest = data.turnsToLowerHarvest || 60;
+        this.lowerHarvestAmount = data.lowerHarvestAmount || 10;
+        this.turnsBetweenHarvests = data.turnsBetweenHarvests || 10;
+        this.minHarvestRate = data.minHarvestRate || 50;
+        this.maxHarvestRate = data.maxHarvestRate || 150;
+        this.monumentCostMult = data.monumentCostMult || 0.5;
+
+        // Mapgen variables
         this.structureChance = 0.025;
         this.minFoodChance = 0.01;
         this.maxFoodChance = 0.1;
-        this.minHarvestRate = 50;
-        this.maxHarvestRate = 150;
 
         // For structures created during the turn
         this.newStructures = [];

@@ -184,7 +184,7 @@ let Unit = Class(GameObject, {
             let attackMod = 1;// damage modifier, if unit near allied monument
             if(!soldier.acted) { // if soldier hasn't acted
                 if(soldier.inRange("monument")) {
-                    attackMod = 0.5;
+                    attackMod = this.game.monumentCostMult;
                 } // if ally monument nearby, take less dmg from contributing
                 soldier.energy -= soldier.job.actionCost * attackMod;
                 soldier.acted = true;
@@ -213,7 +213,7 @@ let Unit = Class(GameObject, {
                 let attackMod = 1; // damage modifier
                 if(target.inRange("monument")) {
                     // if near enemy monument, take less dmg
-                    attackMod=0.5;
+                    attackMod = this.game.monumentCostMult;
                 }
                 target.energy -= attackSum * attackMod / tile.unit.squad.length;
                 if(target.energy <= 0) {
@@ -377,7 +377,7 @@ let Unit = Class(GameObject, {
             owner: player,
         });
 
-        const mult = this.inRange("monument") ? 0.5 : 1;
+        const mult = this.inRange("monument") ? this.game.monumentCostMult : 1;
         this.energy -= this.job.actionCost * mult;
         tile.materials -= tile.structure.materials;
         tile.harvestRate = 0;
@@ -437,7 +437,7 @@ let Unit = Class(GameObject, {
         tile.unit.acted = true;
         tile.unit.moves = 0;
         tile.unit.movementTarget = null;
-        const mult = this.inRange("monument") ? 0.5 : 1;
+        const mult = this.inRange("monument") ? this.game.monumentCostMult : 1;
         this.energy -= this.job.actionCost * mult;
         this.acted = true;
         player.newUnits.push(tile.unit);
@@ -501,7 +501,7 @@ let Unit = Class(GameObject, {
             tile.structure = null;
         }
 
-        const mult = this.inRange("monument") ? 0.5 : 1;
+        const mult = this.inRange("monument") ? this.game.monumentCostMult : 1;
         this.energy -= this.job.actionCost * mult;
         this.acted = true;
         return true;
@@ -662,7 +662,7 @@ let Unit = Class(GameObject, {
             tile.turnsToHarvest = this.game.turnsBetweenHarvests;
         }
 
-        const mult = this.inRange("monument") ? 0.5 : 1;
+        const mult = this.inRange("monument") ? this.game.monumentCostMult : 1;
         this.energy -= this.job.actionCost * mult;
         this.food += pickup;
         this.acted = true;
@@ -850,8 +850,8 @@ let Unit = Class(GameObject, {
      */
     rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // Try to get a shelter in range of this unit with a cat in range of that shelter
-        let cat = this.owner.structures.find(structure => {
+        // Get all shelters this unit is in range of
+        const nearbyShelters = this.owner.allStructures().filter(structure => {
             // Make sure this structure isn't destroyed
             if(!structure.tile) {
                 return false;
@@ -864,12 +864,15 @@ let Unit = Class(GameObject, {
 
             // Make sure this shelter is in range of this unit
             const radius = structure.effectRadius;
-            if(Math.abs(this.tile.x - structure.tile.x) > radius || Math.abs(this.tile.y - structure.tile.y) > radius) {
-                return false;
-            }
+            return Math.abs(this.tile.x - structure.tile.x) <= radius && Math.abs(this.tile.y - structure.tile.y) <= radius;
+        });
 
+        // Get a nearby shelter with a cat in range of it, or null if none
+        const catShelter = nearbyShelters.find(shelter => {
             // Make sure the cat is in range of this shelter
-            return Math.abs(player.cat.tile.x - structure.tile.x) <= radius && Math.abs(player.cat.tile.y - structure.tile.y) <= radius;
+            const cat = this.owner.cat;
+            const radius = shelter.effectRadius;
+            return Math.abs(cat.tile.x - shelter.tile.x) <= radius && Math.abs(cat.tile.y - shelter.tile.y) <= radius;
         });
 
         // Calculate the energy multiplier
@@ -877,7 +880,7 @@ let Unit = Class(GameObject, {
         if(this.starving) {
             mult *= this.game.starvingEnergyMult;
         }
-        if(cat) {
+        if(catShelter) {
             mult *= this.game.catEnergyMult;
         }
 
@@ -917,7 +920,7 @@ let Unit = Class(GameObject, {
             return `${this} cannot perform another action this turn.`;
         }
 
-        const mult = this.inRange("monument") ? 0.5 : 1;
+        const mult = this.inRange("monument") ? this.game.monumentCostMult : 1;
         if(checkEnergy && this.energy < this.job.actionCost * mult) {
             return `${this} doesn't have enough energy.`;
         }

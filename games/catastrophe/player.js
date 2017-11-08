@@ -127,6 +127,15 @@ let Player = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
     /**
+     * Gets every structure owned by this player, including new structures
+     *
+     * @returns {Structure[]} - All of this player's structures
+     */
+    allStructures: function() {
+        return this.structures.concat(this.game.newStructures.filter(s => s.owner === this));
+    },
+
+    /**
      * Recalculates all squads for this player's units.
      * Unowned units just have squads with only themselves in it.
      */
