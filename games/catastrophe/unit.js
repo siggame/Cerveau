@@ -828,7 +828,7 @@ let Unit = Class(GameObject, {
      */
     invalidateRest: function(player, args) {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        const reason = this._invalidate(player, false, false);
+        const reason = this._invalidate(player, true, false);
         if(reason) {
             return reason;
         }
@@ -930,7 +930,7 @@ let Unit = Class(GameObject, {
      * @returns {Structure|undefined} the structure this unit is in range of, or undefined if none exist
      */
     inRange: function(type) {
-        return this.game.structures.find(structure => {
+        return this.game.structures.concat(this.game.newStructures).find(structure => {
             if(!structure.tile || structure.owner !== this.owner || structure.type !== type) {
                 return false;
             }
