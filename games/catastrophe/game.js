@@ -136,7 +136,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapHeight = data.mapHeight || 18;
         this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
 
-        // Variables that aren't in creer but should be added
+        // Variables that aren't in creer but will be added
         this.turnsToCreateHuman = data.turnsToCreateHuman || 30;
         this.turnsToLowerHarvest = data.turnsToLowerHarvest || 60;
         this.lowerHarvestAmount = data.lowerHarvestAmount || 10;
@@ -144,6 +144,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.minHarvestRate = data.minHarvestRate || 50;
         this.maxHarvestRate = data.maxHarvestRate || 150;
         this.monumentCostMult = data.monumentCostMult || 0.5;
+        this.neutralMaterials = data.neutralMaterials || 75;
+        this.wallMaterials = data.wallMaterials || 75;
+        this.shelterMaterials = data.shelterMaterials || 50;
+        this.monumentMaterials = data.monumentMaterials || 150;
 
         // Mapgen variables
         this.structureChance = 0.025;
@@ -438,19 +442,19 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     structureCost: function(structure) {
         if(structure === "neutral") {
-            return 75;
+            return this.neutralMaterials;
         }
         else if(structure === "road") {
             return 0;
         }
         else if(structure === "wall") {
-            return 75;
+            return this.wallMaterials;
         }
         else if(structure === "shelter") {
-            return 50;
+            return this.shelterMaterials;
         }
         else if(structure === "monument") {
-            return 150;
+            return this.monumentMaterials;
         }
     },
 

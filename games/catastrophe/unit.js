@@ -771,9 +771,15 @@ let Unit = Class(GameObject, {
             return `${this} can only pickup 'food' or 'materials', not ${resource}.`;
         }
 
-        amount = Math.min(amount, this.carryLeft(), Math.floor(this.energy));
+        // Make sure it picks up more than 0 resources
+        if(Math.floor(this.energy) <= 0) {
+            return `${this} doesn't have enough energy to pickup anything.`;
+        }
+        if(this.carryLeft() <= 0) {
+            return `${this} is already carrying as many resources as it can.`;
+        }
         if(amount <= 0) {
-            return `${this} can't pickup 0 resources.`;
+            return `There are no resources on ${tile} for ${this} to pickup.`;
         }
         // <<-- /Creer-Merge: invalidatePickup -->>
     },
