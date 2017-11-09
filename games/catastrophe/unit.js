@@ -761,10 +761,16 @@ let Unit = Class(GameObject, {
             if(amount < 1) {
                 amount = tile.food;
             }
+            else {
+                amount = Math.min(tile.food, amount);
+            }
         }
         else if(resource[0] === "m" || resource[0] === "M") {
             if(amount < 1) {
                 amount = tile.materials;
+            }
+            else {
+                amount = Math.min(tile.materials, amount);
             }
         }
         else {
