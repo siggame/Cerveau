@@ -37,6 +37,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
+    lowerHarvestAmount: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     mapHeight: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -52,6 +57,21 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 100,
     },
 
+    monumentCostMult: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
+    monumentMaterials: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    neutralMaterials: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     players: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
         defaultValue: [],
@@ -60,6 +80,11 @@ classes.Game._deltaMergeableProperties = {
     session: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
+    },
+
+    shelterMaterials: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
     starvingEnergyMult: {
@@ -77,9 +102,29 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
+    turnsBetweenHarvests: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    turnsToCreateHuman: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    turnsToLowerHarvest: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     units: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Unit", "valueType": null}},
         defaultValue: [],
+    },
+
+    wallMaterials: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
 };

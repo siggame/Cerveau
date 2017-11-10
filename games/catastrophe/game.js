@@ -65,6 +65,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.jobs = this.jobs || [];
 
         /**
+         * The amount that the harvest rate is lowered each season.
+         *
+         * @type {number}
+         */
+        this.lowerHarvestAmount = this.lowerHarvestAmount || 0;
+
+        /**
          * The number of Tiles in the map along the y (vertical) axis.
          *
          * @type {number}
@@ -86,6 +93,27 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.maxTurns = this.maxTurns || 0;
 
         /**
+         * The multiplier for the cost of actions when performing them in range of a monument. Does not effect pickup cost.
+         *
+         * @type {number}
+         */
+        this.monumentCostMult = this.monumentCostMult || 0;
+
+        /**
+         * The number of materials in a monument.
+         *
+         * @type {number}
+         */
+        this.monumentMaterials = this.monumentMaterials || 0;
+
+        /**
+         * The number of materials in a neutral Structure.
+         *
+         * @type {number}
+         */
+        this.neutralMaterials = this.neutralMaterials || 0;
+
+        /**
          * List of all the players in the game.
          *
          * @type {Array.<Player>}
@@ -98,6 +126,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {string}
          */
         this.session = this.session || "";
+
+        /**
+         * The number of materials in a shelter.
+         *
+         * @type {number}
+         */
+        this.shelterMaterials = this.shelterMaterials || 0;
 
         /**
          * The multiplier for the amount of energy regenerated when resting while starving.
@@ -121,11 +156,39 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.tiles = this.tiles || [];
 
         /**
+         * After a food tile is harvested, the number of turns before it can be harvested again.
+         *
+         * @type {number}
+         */
+        this.turnsBetweenHarvests = this.turnsBetweenHarvests || 0;
+
+        /**
+         * The number of turns between fresh humans being spawned on the road.
+         *
+         * @type {number}
+         */
+        this.turnsToCreateHuman = this.turnsToCreateHuman || 0;
+
+        /**
+         * The number of turns before the harvest rate is lowered (length of each season basically).
+         *
+         * @type {number}
+         */
+        this.turnsToLowerHarvest = this.turnsToLowerHarvest || 0;
+
+        /**
          * Every Unit in the game.
          *
          * @type {Array.<Unit>}
          */
         this.units = this.units || [];
+
+        /**
+         * The number of materials in a wall.
+         *
+         * @type {number}
+         */
+        this.wallMaterials = this.wallMaterials || 0;
 
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.

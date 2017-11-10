@@ -33,15 +33,24 @@
             "gameObjects",
             "harvestCooldown",
             "jobs",
+            "lowerHarvestAmount",
             "mapHeight",
             "mapWidth",
             "maxTurns",
+            "monumentCostMult",
+            "monumentMaterials",
+            "neutralMaterials",
             "players",
             "session",
+            "shelterMaterials",
             "starvingEnergyMult",
             "structures",
             "tiles",
-            "units"
+            "turnsBetweenHarvests",
+            "turnsToCreateHuman",
+            "turnsToLowerHarvest",
+            "units",
+            "wallMaterials"
         ],
         "attributes": {
             "catEnergyMult": {
@@ -122,6 +131,16 @@
                     }
                 }
             },
+            "lowerHarvestAmount": {
+                "default": null,
+                "description": "The amount that the harvest rate is lowered each season.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "mapHeight": {
                 "default": null,
                 "description": "The number of Tiles in the map along the y (vertical) axis.",
@@ -153,6 +172,36 @@
                     "valueType": null
                 }
             },
+            "monumentCostMult": {
+                "default": null,
+                "description": "The multiplier for the cost of actions when performing them in range of a monument. Does not effect pickup cost.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "monumentMaterials": {
+                "default": null,
+                "description": "The number of materials in a monument.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "neutralMaterials": {
+                "default": null,
+                "description": "The number of materials in a neutral Structure.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "players": {
                 "default": null,
                 "description": "List of all the players in the game.",
@@ -177,6 +226,16 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "string",
+                    "valueType": null
+                }
+            },
+            "shelterMaterials": {
+                "default": null,
+                "description": "The number of materials in a shelter.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
                     "valueType": null
                 }
             },
@@ -220,6 +279,36 @@
                     }
                 }
             },
+            "turnsBetweenHarvests": {
+                "default": null,
+                "description": "After a food tile is harvested, the number of turns before it can be harvested again.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "turnsToCreateHuman": {
+                "default": null,
+                "description": "The number of turns between fresh humans being spawned on the road.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "turnsToLowerHarvest": {
+                "default": null,
+                "description": "The number of turns before the harvest rate is lowered (length of each season basically).",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "units": {
                 "default": null,
                 "description": "Every Unit in the game.",
@@ -233,6 +322,16 @@
                         "name": "Unit",
                         "valueType": null
                     }
+                }
+            },
+            "wallMaterials": {
+                "default": null,
+                "description": "The number of materials in a wall.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
                 }
             }
         },
@@ -1280,7 +1379,7 @@
                             }
                         }
                     ],
-                    "description": "Attacks an adjacent Tile. Costs an action for each Unit in this Unit's squad. Units in the squad without an action don't participate in combat. Units in combat cannot move afterwards.",
+                    "description": "Attacks an adjacent Tile. Costs an action for each Unit in this Unit's squad. Units in the squad without an action don't participate in combat. Units in combat cannot move afterwards. Attacking structures will not give materials.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully attacked, false otherwise.",
@@ -1425,7 +1524,7 @@
                             }
                         }
                     ],
-                    "description": "Removes materials from an adjacent Tile's Structure. Soldiers do not gain materials from doing this, but can deconstruct friendly Structures as well.",
+                    "description": "Removes materials from an adjacent Tile's Structure. You cannot deconstruct friendly structures (see Unit.attack).",
                     "returns": {
                         "default": null,
                         "description": "True if successfully deconstructed, false otherwise.",

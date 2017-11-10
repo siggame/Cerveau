@@ -170,7 +170,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Attacks an adjacent Tile. Costs an action for each Unit in this Unit's squad. Units in the squad without an action don't participate in combat. Units in combat cannot move afterwards.
+     * Attacks an adjacent Tile. Costs an action for each Unit in this Unit's squad. Units in the squad without an action don't participate in combat. Units in combat cannot move afterwards. Attacking structures will not give materials.
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to attack.
@@ -481,7 +481,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Removes materials from an adjacent Tile's Structure. Soldiers do not gain materials from doing this, but can deconstruct friendly Structures as well.
+     * Removes materials from an adjacent Tile's Structure. You cannot deconstruct friendly structures (see Unit.attack).
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to deconstruct. It must have a Structure on it.
