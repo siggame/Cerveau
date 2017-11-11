@@ -415,7 +415,7 @@ let Unit = Class(GameObject, {
         if(!tile) {
             return `${this} can't convert a nonexistent tile to your cause.`;
         }
-        if(tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
+        if(tile !== this.tile && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileEast && tile !== this.tile.tileWest) {
             return `${this} can only convert units on adjacent tiles.`;
         }
         if(!tile.unit) {
@@ -483,7 +483,7 @@ let Unit = Class(GameObject, {
         else if(this.materials + this.food >= this.job.carryLimit) {
             return `${this} cannot carry any more materials.`;
         }
-        if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+        if(tile !== this.tile && tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
             return `${tile} is not adjacent to ${this}.`;
         }
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
