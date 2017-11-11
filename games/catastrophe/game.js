@@ -470,7 +470,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     job: this.jobs[0],
                     owner: null,
                     tile: tile,
-                    turnsToDie: tile.x,
+                    turnsToDie: tile.x + 1,
                     movementTarget: this.getTile(0, this.mapHeight / 2),
                 });
                 unit.tile.unit = unit;
