@@ -355,6 +355,12 @@ let Unit = Class(GameObject, {
             return `Unknown structure '${type}'. You can only build 'wall', 'shelter', or 'monument'.`;
         }
 
+        if(tile.unit && type !== "shelter") {
+            return `${this} can't construct on ${tile} because ${tile.unit} is there!`;
+        }
+        if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+            return `${tile} is not adjacent to ${this}.`;
+        }
         if(tile.materials < matsNeeded) {
             return `There aren't enough materials on ${tile}. You need ${matsNeeded} to construct a ${type}.`;
         }
@@ -476,6 +482,9 @@ let Unit = Class(GameObject, {
         }
         else if(this.materials + this.food >= this.job.carryLimit) {
             return `${this} cannot carry any more materials.`;
+        }
+        if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+            return `${tile} is not adjacent to ${this}.`;
         }
         // <<-- /Creer-Merge: invalidateDeconstruct -->>
     },
