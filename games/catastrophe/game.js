@@ -207,7 +207,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.minHarvestRate = data.minHarvestRate || 50;
         this.maxHarvestRate = data.maxHarvestRate || 150;
         this.monumentCostMult = data.monumentCostMult || 0.5;
-        this.neutralMaterials = data.neutralMaterials || 75;
+        this.neutralMaterials = data.neutralMaterials || 200;
         this.wallMaterials = data.wallMaterials || 75;
         this.shelterMaterials = data.shelterMaterials || 50;
         this.monumentMaterials = data.monumentMaterials || 150;
@@ -647,7 +647,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         const harvestRateRange = this.maxHarvestRate - this.minHarvestRate;
 
                         // Generate food spawner
-                        tile.harvestRate = this.minHarvestRate + harvestRateRange * Math.ceil(harvestRateMult);
+                        tile.harvestRate = this.minHarvestRate + Math.ceil(harvestRateRange * harvestRateMult);
                     }
                     else if(Math.random() < this.structureChance) {
                         // Generate neutral structures
