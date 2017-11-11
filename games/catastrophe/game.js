@@ -499,6 +499,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
             if(lowerHarvests && tile.harvestRate > 0) {
                 tile.harvestRate -= this.lowerHarvestAmount;
+                if(tile.harvestRate < 0) {
+                    tile.harvestRate = 0;
+                }
             }
         }
     },
