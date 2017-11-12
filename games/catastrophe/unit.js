@@ -854,7 +854,7 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        if(this.energy === 100) {
+        if(this.energy >= 100) {
             return "The unit has full energy!";
         }
         if(!this.inRange("shelter")) {
