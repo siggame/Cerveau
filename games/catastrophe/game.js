@@ -456,6 +456,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 });
                 unit.tile.unit = unit;
             }
+        }
+        else if(this.currentTurn % this.turnsToCreateHuman === 1) {
+            let tile;
 
             // Search for a valid spawning tile
             for(let x = this.mapWidth - 1; x >= 0; x--) {
