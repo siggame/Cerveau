@@ -25,10 +25,10 @@
         },
         "gatherer": {
             "carryLimit": 100,
-            "upkeep": 3
+            "upkeep": 1
         },
         "builder": {
-            "carryLimit": 50
+            "carryLimit": 75
         },
         "missionary": {}
     }

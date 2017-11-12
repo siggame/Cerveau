@@ -194,23 +194,24 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         this.maxTurns = data.maxTurns || 720;
         this.catEnergyMult = data.catEnergyMult || 2;
-        this.harvestCooldown = data.harvestCooldown || 1;
+        this.harvestCooldown = data.harvestCooldown || 10;
         this.mapWidth = data.mapWidth || 26;
         this.mapHeight = data.mapHeight || 18;
-        this.starvingEnergyMult = data.starvingEnergyMult || 0.5;
-
-        // Variables that aren't in creer but will be added
+        this.starvingEnergyMult = data.starvingEnergyMult || 0.25;
         this.turnsToCreateHuman = data.turnsToCreateHuman || 30;
         this.turnsToLowerHarvest = data.turnsToLowerHarvest || 60;
         this.lowerHarvestAmount = data.lowerHarvestAmount || 10;
         this.turnsBetweenHarvests = data.turnsBetweenHarvests || 10;
-        this.minHarvestRate = data.minHarvestRate || 50;
+        this.minHarvestRate = data.minHarvestRate || 30;
         this.maxHarvestRate = data.maxHarvestRate || 150;
         this.monumentCostMult = data.monumentCostMult || 0.5;
         this.neutralMaterials = data.neutralMaterials || 200;
         this.wallMaterials = data.wallMaterials || 75;
         this.shelterMaterials = data.shelterMaterials || 50;
-        this.monumentMaterials = data.monumentMaterials || 150;
+        this.monumentMaterials = data.monumentMaterials || 100;
+
+        // Not in creer, but whatever
+        this.startingFood = 50;
 
         // Mapgen variables
         this.structureChance = 0.025;
@@ -270,7 +271,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 player.upkeep += unit.job.upkeep;
             }
 
-            player.food = 100;
+            player.food = this.startingFood;
         }
         //<<-- /Creer-Merge: begin -->>
     },
