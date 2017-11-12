@@ -226,7 +226,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     aliases: [
         //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-##-Catastrophe",
+        "MegaMinerAI-20-Catastrophe",
         //<<-- /Creer-Merge: aliases -->>
     ],
 
