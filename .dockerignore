@@ -1,9 +1,27 @@
-# Editors & IDEs
-.idea/
+# Editors & Environment
+.vagrant/
 .vscode/
-
-# Git
-.git/
+.idea/
+.env
+.nvmrc
+tslint.json
 
 # NodeJS & NPM
 node_modules/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+.dockerignore
+Dockerfile
+
+*.log
+
+*.md
+LICENSE
+docs/
+release/
+tmp/
