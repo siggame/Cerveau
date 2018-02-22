@@ -8,6 +8,7 @@ tslint.json
 
 # NodeJS & NPM
 node_modules/
+output/
 
 # Git
 .git/
