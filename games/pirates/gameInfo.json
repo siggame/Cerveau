@@ -1,0 +1,1569 @@
+{
+    "AI": {
+        "description": "The AI competitors will add logic to this AI so its functions return valid and smart values.",
+        "function_names": [
+            "runTurn"
+        ],
+        "functions": {
+            "runTurn": {
+                "altersState": true,
+                "argument_names": [],
+                "arguments": [],
+                "description": "This is called every time it is this AI.player's turn.",
+                "returns": {
+                    "default": true,
+                    "description": "Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "serverPredefined": true
+            }
+        },
+        "serverParentClasses": []
+    },
+    "Game": {
+        "attribute_names": [
+            "crewCost",
+            "crewDamage",
+            "crewHealth",
+            "crewRange",
+            "currentPlayer",
+            "currentTurn",
+            "gameObjects",
+            "mapHeight",
+            "mapWidth",
+            "maxInterestDistance",
+            "maxInterestRate",
+            "maxTurns",
+            "players",
+            "port",
+            "portCost",
+            "portHealth",
+            "session",
+            "shipCost",
+            "shipDamage",
+            "shipHealth",
+            "shipRange",
+            "tiles",
+            "units"
+        ],
+        "attributes": {
+            "crewCost": {
+                "default": null,
+                "description": "How much gold it costs to construct a single crew.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "crewDamage": {
+                "default": null,
+                "description": "How much damage crew deal to each other.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "crewHealth": {
+                "default": null,
+                "description": "The maximum amount of health a crew member can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "crewRange": {
+                "default": null,
+                "description": "A crew's attack range. Range is circular.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "currentPlayer": {
+                "default": null,
+                "description": "The player whose turn it is currently. That player can send commands. Other players cannot.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": true,
+                    "keyType": null,
+                    "name": "Player",
+                    "valueType": null
+                }
+            },
+            "currentTurn": {
+                "default": 0,
+                "description": "The current turn number, starting at 0 for the first player's turn.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "gameObjects": {
+                "default": null,
+                "description": "A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    },
+                    "name": "dictionary",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "GameObject",
+                        "valueType": null
+                    }
+                }
+            },
+            "mapHeight": {
+                "default": null,
+                "description": "The number of Tiles in the map along the y (vertical) axis.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "mapWidth": {
+                "default": null,
+                "description": "The number of Tiles in the map along the x (horizontal) axis.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "maxInterestDistance": {
+                "default": null,
+                "description": "The Euclidean distance from a Player port required to reach maxInterestRate.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "maxInterestRate": {
+                "default": null,
+                "description": "The maximum rate buried gold can increase over time.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "maxTurns": {
+                "default": 100,
+                "description": "The maximum number of turns before the game will automatically end.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "players": {
+                "default": null,
+                "description": "List of all the players in the game.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                }
+            },
+            "port": {
+                "default": null,
+                "description": "Every Port in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
+                }
+            },
+            "portCost": {
+                "default": null,
+                "description": "How much gold it costs to construct a port.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "portHealth": {
+                "default": null,
+                "description": "The maximum amount of health a Port can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "session": {
+                "default": null,
+                "description": "A unique identifier for the game instance that is being played.",
+                "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "string",
+                    "valueType": null
+                }
+            },
+            "shipCost": {
+                "default": null,
+                "description": "How much gold it costs to construct a ship.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "shipDamage": {
+                "default": null,
+                "description": "How much damage ships deal to ships and ports.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "shipHealth": {
+                "default": null,
+                "description": "The maximum amount of health a ship can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "shipRange": {
+                "default": null,
+                "description": "A ship's attack range. Range is circular.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "tiles": {
+                "default": null,
+                "description": "All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
+            },
+            "units": {
+                "default": null,
+                "description": "Every Unit in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Unit",
+                        "valueType": null
+                    }
+                }
+            }
+        },
+        "description": "Steal from merchants and become the most infamous pirate.",
+        "function_names": [],
+        "functions": {},
+        "inheritedAttribute_names": [],
+        "inheritedAttributes": {},
+        "inheritedFunction_names": [],
+        "inheritedFunctions": {},
+        "name": "Pirates",
+        "numberOfPlayers": 2,
+        "parentClasses": [],
+        "serverParentClasses": [
+            "TwoPlayerGame",
+            "TurnBasedGame",
+            "TiledGame"
+        ]
+    },
+    "gameObjects": {
+        "GameObject": {
+            "attribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "attributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "description": "An object in the game. The most basic class that all game classes should inherit from automatically.",
+            "function_names": [
+                "log"
+            ],
+            "functions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "inheritedAttribute_names": [],
+            "inheritedAttributes": {},
+            "inheritedFunction_names": [],
+            "inheritedFunctions": {},
+            "parentClasses": [],
+            "serverParentClasses": [
+                "BaseGameObject"
+            ]
+        },
+        "Player": {
+            "attribute_names": [
+                "clientType",
+                "gold",
+                "infamy",
+                "lost",
+                "name",
+                "opponent",
+                "ports",
+                "reasonLost",
+                "reasonWon",
+                "startingPort",
+                "timeRemaining",
+                "units",
+                "won"
+            ],
+            "attributes": {
+                "clientType": {
+                    "default": null,
+                    "description": "What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "gold": {
+                    "default": null,
+                    "description": "The amount of gold this Player has in reserve.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "infamy": {
+                    "default": null,
+                    "description": "The amount of infamy this Player has.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "lost": {
+                    "default": false,
+                    "description": "If the player lost the game or not.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "name": {
+                    "default": "Anonymous",
+                    "description": "The name of the player.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "opponent": {
+                    "default": null,
+                    "description": "This player's opponent in the game.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "ports": {
+                    "default": null,
+                    "description": "The ports owned by this Player.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Port",
+                            "valueType": null
+                        }
+                    }
+                },
+                "reasonLost": {
+                    "default": null,
+                    "description": "The reason why the player lost the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "reasonWon": {
+                    "default": null,
+                    "description": "The reason why the player won the game.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "startingPort": {
+                    "default": null,
+                    "description": "This Player's starting port.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
+                },
+                "timeRemaining": {
+                    "default": null,
+                    "description": "The amount of time (in ns) remaining for this AI to send commands.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "float",
+                        "valueType": null
+                    }
+                },
+                "units": {
+                    "default": null,
+                    "description": "Every Unit owned by this Player.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Unit",
+                            "valueType": null
+                        }
+                    }
+                },
+                "won": {
+                    "default": false,
+                    "description": "If the player won the game or not.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A player in this game. Every AI controls one player.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Port": {
+            "attribute_names": [
+                "cooldown",
+                "destroyable",
+                "gold",
+                "health",
+                "investment",
+                "owner",
+                "tile"
+            ],
+            "attributes": {
+                "cooldown": {
+                    "default": null,
+                    "description": "Whether this Port has created a Unit this turn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "destroyable": {
+                    "default": null,
+                    "description": "Whether this Port can be destroyed.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gold": {
+                    "default": null,
+                    "description": "(Merchants only) How much gold this Port has accumulated. Once this port can afford to create a ship, it will spend gold to construct one.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "health": {
+                    "default": null,
+                    "description": "How much health this Port has.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "investment": {
+                    "default": null,
+                    "description": "(Merchants only) How much gold this Port accumulates each turn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The owner of this Port, or null if owned by merchants.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "tile": {
+                    "default": null,
+                    "description": "The Tile this Port is on.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A port on a Tile.",
+            "function_names": [
+                "spawn"
+            ],
+            "functions": {
+                "spawn": {
+                    "altersState": true,
+                    "argument_names": [
+                        "type"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "What type of Unit to create ('crew' or 'ship').",
+                            "name": "type",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Spawn a Unit on this port.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if Unit was created successfully, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        },
+        "Tile": {
+            "attribute_names": [
+                "gold",
+                "port",
+                "tileEast",
+                "tileNorth",
+                "tileSouth",
+                "tileWest",
+                "type",
+                "unit",
+                "x",
+                "y"
+            ],
+            "attributes": {
+                "gold": {
+                    "default": null,
+                    "description": "The amount of gold buried on this tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "port": {
+                    "default": null,
+                    "description": "The Port on this Tile if present, otherwise null.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
+                },
+                "tileEast": {
+                    "default": null,
+                    "description": "The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileNorth": {
+                    "default": null,
+                    "description": "The Tile to the 'North' of this one (x, y-1). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileSouth": {
+                    "default": null,
+                    "description": "The Tile to the 'South' of this one (x, y+1). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "tileWest": {
+                    "default": null,
+                    "description": "The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the map.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "type": {
+                    "default": null,
+                    "description": "The type of Tile this is ('water' or 'land').",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "unit": {
+                    "default": null,
+                    "description": "The Unit on this Tile if present, otherwise null.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Unit",
+                        "valueType": null
+                    }
+                },
+                "x": {
+                    "default": null,
+                    "description": "The x (horizontal) position of this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "y": {
+                    "default": null,
+                    "description": "The y (vertical) position of this Tile.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A Tile in the game that makes up the 2D map grid.",
+            "function_names": [],
+            "functions": {},
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": [
+                "TiledTile"
+            ]
+        },
+        "Unit": {
+            "attribute_names": [
+                "acted",
+                "crew",
+                "crewHealth",
+                "gold",
+                "moves",
+                "owner",
+                "path",
+                "shipHealth",
+                "tile"
+            ],
+            "attributes": {
+                "acted": {
+                    "default": null,
+                    "description": "Whether this Unit has performed its action this turn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
+                "crew": {
+                    "default": null,
+                    "description": "How many crew are on this Tile. This number will always be <= crewHealth.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "crewHealth": {
+                    "default": null,
+                    "description": "How much total health the crew on this Tile have.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "gold": {
+                    "default": null,
+                    "description": "How much gold this Unit is carrying.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "moves": {
+                    "default": null,
+                    "description": "How many more times this Unit may move this turn.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "owner": {
+                    "default": null,
+                    "description": "The Player that owns and can control this Unit, or null if the Unit is neutral.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Player",
+                        "valueType": null
+                    }
+                },
+                "path": {
+                    "default": null,
+                    "description": "(Merchants only) The path this Unit will follow. The first element is the Tile this Unit will move to next.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                },
+                "shipHealth": {
+                    "default": null,
+                    "description": "If a ship is on this Tile, how much health it has remaining. 0 for no ship.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
+                "tile": {
+                    "default": null,
+                    "description": "The Tile this Unit is on.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Tile",
+                        "valueType": null
+                    }
+                }
+            },
+            "description": "A unit group in the game. This may consist of a ship and any number of crew.",
+            "function_names": [
+                "attack",
+                "build",
+                "bury",
+                "deposit",
+                "dig",
+                "move",
+                "split",
+                "withdraw"
+            ],
+            "functions": {
+                "attack": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile",
+                        "target"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to attack.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": null,
+                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships and ports. Consumes any remaining moves.",
+                            "name": "target",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Attacks either crew, a ship, or a port on a Tile in range.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully attacked, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "build": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to build the Port on.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Builds a Port on the given Tile.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully constructed a Port, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "bury": {
+                    "altersState": true,
+                    "argument_names": [
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "How much gold this Unit should bury.",
+                            "name": "amount",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Buries gold on this Unit's Tile.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully buried, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "deposit": {
+                    "altersState": true,
+                    "argument_names": [
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": 0,
+                            "description": "The amount of gold to deposit. Amounts <= 0 will deposit all the gold on this Unit.",
+                            "name": "amount",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, adds to the investment.",
+                    "optionals": 1,
+                    "optionals_start_index": 0,
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully deposited, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "dig": {
+                    "altersState": true,
+                    "argument_names": [
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": 0,
+                            "description": "How much gold this Unit should take. Amounts <= 0 will dig up as much as possible.",
+                            "name": "amount",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Digs up gold on this Unit's Tile.",
+                    "optionals": 1,
+                    "optionals_start_index": 0,
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully dug up, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "move": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile this Unit should move to.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Moves this Unit from its current Tile to an adjacent Tile.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if it moved, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "split": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile",
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to move the crew to.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": 1,
+                            "description": "The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.",
+                            "name": "amount",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Move a number of crew to Tile. This will consume a move from those crew.",
+                    "optionals": 1,
+                    "optionals_start_index": 1,
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully split, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
+                "withdraw": {
+                    "altersState": true,
+                    "argument_names": [
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": 0,
+                            "description": "The amount of gold to withdraw. Amounts <= 0 will withdraw everything.",
+                            "name": "amount",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Takes gold from the Player. You can only withdraw from your main port.",
+                    "optionals": 1,
+                    "optionals_start_index": 0,
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully withdrawn, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                }
+            },
+            "inheritedAttribute_names": [
+                "gameObjectName",
+                "id",
+                "logs"
+            ],
+            "inheritedAttributes": {
+                "gameObjectName": {
+                    "default": null,
+                    "description": "String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "id": {
+                    "default": null,
+                    "description": "A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "string",
+                        "valueType": null
+                    }
+                },
+                "logs": {
+                    "default": null,
+                    "description": "Any strings logged will be stored here. Intended for debugging.",
+                    "inheritedFrom": "GameObject",
+                    "serverPredefined": true,
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "string",
+                            "valueType": null
+                        }
+                    }
+                }
+            },
+            "inheritedFunction_names": [
+                "log"
+            ],
+            "inheritedFunctions": {
+                "log": {
+                    "altersState": true,
+                    "argument_names": [
+                        "message"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "A string to add to this GameObject's log. Intended for debugging.",
+                            "name": "message",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "string",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Adds a message to this GameObject's logs. Intended for your own debugging purposes, as strings stored here are saved in the gamelog.",
+                    "inheritedFrom": "GameObject",
+                    "returns": null,
+                    "serverPredefined": true
+                }
+            },
+            "parentClasses": [
+                "GameObject"
+            ],
+            "serverParentClasses": []
+        }
+    }
+}
