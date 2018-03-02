@@ -247,8 +247,16 @@ let Unit = Class(GameObject, {
      */
     invalidateDig: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateDig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        
         // Developer: try to invalidate the game logic for Unit's dig function here
+        if(!(this.tile.type === "land"))
+        {
+            return "Avast ye, Ye Can't dig in the Sea!"
+        }
+        else if (!this.tile.gold)
+        {
+            return "Avest ye, there be no booty in ground!"
+        } 
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDig -->>
@@ -265,6 +273,18 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: dig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's dig function here
+        if(amount <= 0 || amount > this.tile.gold)
+        {
+            this.gold += this.tile.gold;
+            this.tile.gold = 0;
+            return true;
+        }
+        else if(amount > 0 && amount <= this.tile.gold)
+        {
+            this.gold += amount;
+            this.tile.gold -= amount;
+            return true;
+        }
         return false;
 
         // <<-- /Creer-Merge: dig -->>
