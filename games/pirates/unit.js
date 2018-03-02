@@ -249,10 +249,13 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateDig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         
         // Developer: try to invalidate the game logic for Unit's dig function here
+        
+        // Checking to see if the tile is anything other than a land type.
         if(!(this.tile.type === "land"))
         {
             return "Avast ye, Ye Can't dig in the Sea!"
         }
+        // Checking to see if the tile has gold to be dug up.
         else if (!this.tile.gold)
         {
             return "Avest ye, there be no booty in ground!"
@@ -273,12 +276,15 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: dig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's dig function here
+        
+        // If the amount requested is <= 0 or greater than what is current give all.
         if(amount <= 0 || amount > this.tile.gold)
         {
             this.gold += this.tile.gold;
             this.tile.gold = 0;
             return true;
         }
+        // Else if amount is less than what is there take that amount.
         else if(amount > 0 && amount <= this.tile.gold)
         {
             this.gold += amount;
