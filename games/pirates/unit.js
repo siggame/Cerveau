@@ -276,18 +276,22 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: dig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's dig function here
-        
+
         // If the amount requested is <= 0 or greater than what is current give all.
         if(amount <= 0 || amount > this.tile.gold)
         {
+            // Adds the amount of gold from the current tile to the Unit.
             this.gold += this.tile.gold;
+            // Sets the gold on tile to 0.
             this.tile.gold = 0;
             return true;
         }
         // Else if amount is less than what is there take that amount.
         else if(amount > 0 && amount <= this.tile.gold)
         {
+            // Adds amount requested to Unit.
             this.gold += amount;
+            // Subtracts amount from Tile's gold
             this.tile.gold -= amount;
             return true;
         }
