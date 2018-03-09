@@ -107,6 +107,19 @@ let Unit = Class(GameObject, {
     invalidateAttack: function(player, tile, target, args) {
         // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if(checkAction && this.acted) {
+            return `${this} cannot perform another action this turn.`;
+        }
+
+
         // Developer: try to invalidate the game logic for Unit's attack function here
         return undefined; // meaning valid
 
