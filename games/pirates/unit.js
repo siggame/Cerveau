@@ -320,6 +320,45 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateSplit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's split function here
+
+        // Check to see if player calling is the owner.
+        if(player != this.owner)
+        {
+            return "Avast Ye, Ye can't order the enemy!";
+        }
+
+        // Check to make sure target tile is a land tile
+        else if(tile.type != "land")
+        {
+            return "Avast Ye, Ye can't walk on water!";
+        }
+
+        // Check to see if it is not one of the tiles around in the current direction
+        else if
+        ( 
+            (
+                this.title.titleEast != title && 
+                this.title.titleNorth != title && 
+                this.title.titleWest != title &&
+                this.title.titleSouth != title
+            )
+         )
+         {
+             return "Avast Ye, It be too far to move there!";
+         }
+
+         // Check to see if there is enough crew to split
+         else if(this.crew < 1)
+         {
+             return "Avast Ye, Ye can't be splittin' an empty crew!";
+         }
+
+         // Check to make sure the target tile doesn't already have 
+         else if(tile.unit.owner === player.opponent)
+         {
+             return "Avast Ye, the enemy is already there!";
+         }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateSplit -->>
@@ -337,6 +376,58 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: split -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's split function here
+
+        // Set the owner of the new unit to current player
+        tile.unit.owner = this.owner;
+
+        // Moving all incase of amount < 0 or amount >= current crew total
+        if(amount <= 0 || this.crew <= amount)
+        {
+            // Move all crew to new tile.
+            tile.unit.crew += this.crew;
+            this.crew = 0;
+
+            // Give new Unit the health from old one.
+            tile.unit.crewHealth += this.crewHealth;
+            this.crewHealth = 0;
+
+            // Move all gold to new Unit
+            tile.unit.gold += this.gold;
+            this.gold = 0;
+
+            // Set Moves
+            tile.moves = this.moves - 1;
+            this.moves = 0;
+
+            // Disassociating from old Tile.
+            this.owner = null;
+
+        }
+        else
+        {
+            // Splits the crews
+            tile.unit.crew += amount;
+            this.crew -= amount;
+
+            // Find Health per crew
+            let splitHealth = this.crewHealth / crew;
+            // Find decimal and cut it off.
+            splitHealth -= splitHealth % 1;
+            // Apply Health/crew to amount to split
+            splitHealth  *= amount;
+
+            // Split health
+            this.crewHealth -= splitHealth;
+            tile.unit.crewHealth += splitHealth;
+
+            // Splits the gold 
+            tile.unit.gold += goldamount < 0 || goldamount > this.gold ? this.gold : goldamount;
+            this.gold = goldamount < 0 || goldamount > this.gold ? 0 : this.gold - goldamount;
+
+            // Split moves
+            tile.unit.moves = tile.unit.moves > this.moves ? this.moves -1 : tile.unit.moves;
+
+        }
         return false;
 
         // <<-- /Creer-Merge: split -->>
