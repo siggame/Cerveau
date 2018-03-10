@@ -421,11 +421,11 @@ let Unit = Class(GameObject, {
             tile.unit.crewHealth += splitHealth;
 
             // Splits the gold 
-            tile.unit.gold += goldamount < 0 || goldamount > this.gold ? this.gold : goldamount;
-            this.gold = goldamount < 0 || goldamount > this.gold ? 0 : this.gold - goldamount;
+            tile.unit.gold += goldamount < 0 ? 0 : goldamount > this.gold ? this.gold : goldamount;
+            this.gold = goldamount < 0 ? this.gold : goldamount > this.gold ? 0 : this.gold - goldamount;
 
             // Split moves
-            tile.unit.moves = tile.unit.moves > this.moves ? this.moves -1 : tile.unit.moves;
+            tile.unit.moves = tile.unit.moves > this.moves ? this.moves - 1 : tile.unit.moves;
 
         }
         return false;
