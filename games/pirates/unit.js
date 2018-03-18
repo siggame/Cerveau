@@ -229,11 +229,13 @@ let Unit = Class(GameObject, {
             dc = tile.unit.crew - tile.unit.crewHealth;
             tile.unit.crew = tile.unit.crewHealth;
           }
-          if(tile.unit && tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            tile.unit.crew = 0;
+          if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
             gold = tile.unit.gold;
             tile.unit.tile = null; // mark it is dead for easy removal.
             tile.unit = null; // Cleanup-ish
+          }
+          else if(tile.unit.shipHealth > 0 && tile.unit.crewHealth <= 0) {
+            tile.unit.owner = null;
           }
         }
         else if(type[0] === "s" || type[0] === "S") {
