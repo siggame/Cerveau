@@ -127,18 +127,14 @@ let Unit = Class(GameObject, {
           if(tile.unit.player === player) {
             return "We don't have time for a mutany! Don't attack your own men!";
           }
-          if(this.crew > 0) {
-            if(tile.unit.crew > 0) {
-              if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
-                  return `${tile} is not adjacent to ${this}.`;
-              }
-            }
-            else {
-              return "There is no crew for you to attack!";
-            }
-          }
-          else {
+          if(this.crew === 0) {
             return "You have no crew to perform the attack!";
+          }
+          if(tile.unit.crew > 0) {
+            return "There is no crew for you to attack!";
+          }
+          if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+              return `${tile} is not adjacent to ${this}.`;
           }
           if(tile.port) {
             if(!tile.port.destroyable)
@@ -156,27 +152,23 @@ let Unit = Class(GameObject, {
             return "We don't have time for a mutany! Don't attack your own ship!";
           }
           if(this.shipHealth > 0) {
-            if(tile.unit.shipHealth > 0) {
-              let dx = this.tile.x - tile.x;
-              let dy = this.tile.y - tile.y;
-              let distSq = dx * dx + dy * dy;
-              let dist = math.sqrt(distSq);
-              if(this.game.shipRange >= dist) {
-                  return `The ship isn't in range!`;
-              }
-              if(tile.port) {
-                if(!tile.port.destroyable)
-                {
-                  return "Units cannot be harmed when they are on a undestroyable port";
-                }
-              }
-            }
-            else {
-              return "There is no ship or port for you to attack!";
-            }
-          }
-          else {
             return "You have no ship to perform the attack!";
+          }
+          if(tile.unit.shipHealth > 0) {
+            return "There is no ship or port for you to attack!";
+          }
+          let dx = this.tile.x - tile.x;
+          let dy = this.tile.y - tile.y;
+          let distSq = dx * dx + dy * dy;
+          let dist = math.sqrt(distSq);
+          if(this.game.shipRange >= dist) {
+              return `The ship isn't in range!`;
+          }
+          if(tile.port) {
+            if(!tile.port.destroyable)
+            {
+              return "Units cannot be harmed when they are on a undestroyable port";
+            }
           }
         }
         else if(type[0] === "p" || type[0] === "P") {
@@ -226,10 +218,11 @@ let Unit = Class(GameObject, {
         let dc = 0; // dead crew counter
         let ds = 0; // dead ship counter
         let dp = 0; // dead ports
+        let gold = 0;
         if(type[0] === "c" || type[0] === "C") {
           tile.unit.crewHealth -= this.game.crewDamage*this.crew;
           if(tile.unit.crew > tile.unit.crewHealth) {
-            if(tile.unit.crewHealth < 0)
+            if(tile.unit.crewHealth < 0) // for counted the dead accuratly
             {
               tile.unit.crewHealth = 0;
             }
@@ -237,7 +230,9 @@ let Unit = Class(GameObject, {
             tile.unit.crew = tile.unit.crewHealth;
           }
           if(tile.unit && tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            tile.unit = null;
+            gold = tile.unit.gold;
+            tile.unit.tile = null; // mark it is dead for easy removal.
+            tile.unit = null; // Cleanup-ish
           }
         }
         else if(type[0] === "s" || type[0] === "S") {
@@ -253,6 +248,8 @@ let Unit = Class(GameObject, {
             }
           }
           if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
+            gold = tile.unit.gold;
+            tile.unit.tile = null; // mark it is dead for easy removal.
             tile.unit = null;
           }
         }
@@ -271,12 +268,55 @@ let Unit = Class(GameObject, {
               tile.unit.crew = 0;
             }
             if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
+              gold = tile.unit.gold;
               tile.unit = null;
             }
           }
         }
         this.acted = true;
-        awardInfamy(player, dc, ds, dp); // should give people infamy
+        this.gold += gold;
+        let oc = 0; // opponent crew
+        let os = 0; // oppenent ships
+        let ac = 0; // ally crew
+        let as = 0; // ally ships
+        for(let unit of player.opponent.units) {
+          oc += unit.crew;
+        }
+        if(oc === 0)
+        {
+          oc = 1;
+        }
+        for(let unit of player.opponent.units) {
+          if(unit.shipHealth > 0)
+          {
+            os++;
+          }
+        }
+        if(os === 0)
+        {
+          os = 1;
+        }
+        for(let unit of player.units) {
+          ac += unit.crew;
+        }
+        if(ac === 0)
+        {
+          ac = 1;
+        }
+        for(let unit of player.units) {
+          if(unit.shipHealth > 0)
+          {
+            as++;
+          }
+        }
+        if(as === 0)
+        {
+          as = 1;
+        }
+        let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
+                      (this.game.portInfamy*dp))*((oc/ac)*(os/as));
+        player.infamy += infamy;
+        player.opponent.infamy -= infamy;
 
         return false;
 
