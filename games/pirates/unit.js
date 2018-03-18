@@ -230,7 +230,7 @@ let Unit = Class(GameObject, {
             tile.unit.crew = tile.unit.crewHealth;
           }
           if(tile.unit && tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            tile.crew = 0;
+            tile.unit.crew = 0;
             gold = tile.unit.gold;
             tile.unit.tile = null; // mark it is dead for easy removal.
             tile.unit = null; // Cleanup-ish
@@ -249,7 +249,6 @@ let Unit = Class(GameObject, {
             }
           }
           if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            tile.crew = 0;
             gold = tile.unit.gold;
             tile.unit.tile = null; // mark it is dead for easy removal.
             tile.unit = null;
@@ -270,7 +269,6 @@ let Unit = Class(GameObject, {
               tile.unit.crew = 0;
             }
             if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-              tile.crew = 0;
               gold = tile.unit.gold;
               tile.unit = null;
             }
@@ -318,6 +316,10 @@ let Unit = Class(GameObject, {
         }
         let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
                       (this.game.portInfamy*dp))*((oc/ac)*(os/as));
+        if(infamy > player.opponent.infamy)
+        {
+          infamy = player.opponent.infamy;
+        }
         player.infamy += infamy;
         player.opponent.infamy -= infamy;
 
