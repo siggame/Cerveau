@@ -284,6 +284,40 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's move function here
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+        if(this.moves <= 0) {
+          return "Your crew are too tired to travel any further!";
+        }
+        if(checkAction && this.acted) {
+            return `${this} cannot move after acting! The men are too tired!`;
+        }
+        if(tile === null) {
+          return "You must have a destination! (no tile passed)";
+        }
+        if(tile.unit !== null) {
+          if(tile.unit.owner !== player && tile.unit.owner !== null) {
+            return "Your crew refuses to share the same ground with a living foe!";
+          }
+        }
+        if(this.shipHealth <= 0) {
+          if(tile.type === "water") {
+            return "Sea legs doesn't mean you can walk on water!";
+          }
+        }
+        if(this.shipHealth > 0) {
+          if(tile.type === "land") {
+            return "Ships belong in the sea! Use split if you want to move your crew ashore!";
+          }
+        }
+        if(tile.port.owner !== player)
+        {
+          return "You cannot enter an enemy port!";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateMove -->>
@@ -300,6 +334,40 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's move function here
+        if(tile.unit) {
+          let move = tile.unit.moves;
+          if(move > this.moves-1) {
+            move = this.moves-1;
+          }
+          tile.unit.moves = move;
+          if(tile.unit.crew === 0) {
+            tile.acted = true;
+            tile.unit.crew = this.crew;
+            tile.unit.crewHealth = this.crewHealth;
+            tile.unit.owner = player;
+            tile.unit.gold += this.gold;
+            this.tile = null;
+            this.crewHealth = 0;
+            this.tile.unit = null;
+          }
+          else {
+            tile.unit.crew += this.crew;
+            tile.unit.crewHealth += this.crewHealth;
+            tile.unit.gold += this.gold;
+            this.tile = null;
+            this.crewHealth = 0;
+            this.tile.unit = null;
+            if(tile.unit.shipHealth > 0)
+            {
+              tile.acted = true
+            }
+          }
+        }
+        else {
+          this.tile.unit = null;
+          tile.unit = this;
+          this.moves -= 1;
+        }
         return false;
 
         // <<-- /Creer-Merge: move -->>
