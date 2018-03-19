@@ -219,6 +219,7 @@ let Unit = Class(GameObject, {
         let ds = 0; // dead ship counter
         let dp = 0; // dead ports
         let gold = 0;
+        let merchant = tile.unit.isMerchant;
         if(type[0] === "c" || type[0] === "C") {
           tile.unit.crewHealth -= this.game.crewDamage*this.crew;
           if(tile.unit.crew > tile.unit.crewHealth) {
@@ -236,6 +237,7 @@ let Unit = Class(GameObject, {
           }
           else if(tile.unit.shipHealth > 0 && tile.unit.crewHealth <= 0) {
             tile.unit.owner = null;
+            tile.unit.isMerchant = false;
           }
         }
         else if(type[0] === "s" || type[0] === "S") {
@@ -282,23 +284,6 @@ let Unit = Class(GameObject, {
         let os = 0; // oppenent ships
         let ac = 0; // ally crew
         let as = 0; // ally ships
-        for(let unit of player.opponent.units) {
-          oc += unit.crew;
-        }
-        if(oc === 0)
-        {
-          oc = 1;
-        }
-        for(let unit of player.opponent.units) {
-          if(unit.shipHealth > 0)
-          {
-            os++;
-          }
-        }
-        if(os === 0)
-        {
-          os = 1;
-        }
         for(let unit of player.units) {
           ac += unit.crew;
         }
@@ -316,14 +301,36 @@ let Unit = Class(GameObject, {
         {
           as = 1;
         }
-        let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
-                      (this.game.portInfamy*dp))*((oc/ac)*(os/as));
-        if(infamy > player.opponent.infamy)
-        {
-          infamy = player.opponent.infamy;
+        if(!merchant) {
+          for(let unit of player.opponent.units) {
+            oc += unit.crew;
+          }
+          if(oc === 0)
+          {
+            oc = 1;
+          }
+          for(let unit of player.opponent.units) {
+            if(unit.shipHealth > 0)
+            {
+              os++;
+            }
+          }
+          if(os === 0)
+          {
+            os = 1;
+          }
+          let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
+                        (this.game.portInfamy*dp))*((oc/ac)*(os/as));
+          if(infamy > player.opponent.infamy)
+          {
+            infamy = player.opponent.infamy;
+          }
+          player.infamy += infamy;
+          player.opponent.infamy -= infamy;
         }
-        player.infamy += infamy;
-        player.opponent.infamy -= infamy;
+        else {
+          player.infamy += ((this.game.crewInfamy*dc)+(this.game.shipInfamy*ds))*((1/ac)*(1/as));
+        }
 
         return false;
 
