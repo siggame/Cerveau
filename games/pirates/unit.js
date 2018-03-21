@@ -256,7 +256,17 @@ let Unit = Class(GameObject, {
     deposit: function(player, amount) {
         // <<-- Creer-Merge: deposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's deposit function here
+        if(this.gold > 0 && amount < this.gold) {
+            player.gold += amount;
+            this.gold -= amount;
+            return true;
+        }
+        else if(this.gold > 0 && (amount === 0 || amount > this.gold)) {
+            player.gold += this.gold;
+            this.gold = 0;
+            return true;
+        }
+
         return false;
 
         // <<-- /Creer-Merge: deposit -->>
