@@ -213,7 +213,34 @@ let Unit = Class(GameObject, {
     invalidateDeposit: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateDeposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's deposit function here
+        if(this.player !== player) {
+            return "Ye can't just deposit gold from an enemy unit, ya landlubber!";
+        }
+
+        let adjacent = false;
+
+        for(let t of this.neighbors) {
+            if(t === player.home) {
+                adjacent = true;
+            }
+        }
+
+        if(this.tile === player.home) {
+            adjacent = true;
+        }
+
+        if(!adjacent) {
+            return "Arr, ye have to put gold in yer home port, matey!";
+        }
+
+        if(this.gold === 0) {
+            return "Shiver me timbers! Ye don't have any booty to deposit!";
+        }
+
+        if(amount < 0) {
+            return "Cor blimey, ye can't deposit a negative amount of yer plunder!";
+        }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDeposit -->>
