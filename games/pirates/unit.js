@@ -182,9 +182,9 @@ let Unit = Class(GameObject, {
             return "Arr, that tile be too far away, matey!";
         }
 
-        // Check if the player has enough gold
+        // Check if the unit has enough gold
         // I don't know what the cost is by the way
-        if(player.gold < 100) {
+        if(this.gold < 100) {
             return "Ye don't have enough booty, ye scalliwag!";
         }
 
@@ -203,8 +203,17 @@ let Unit = Class(GameObject, {
     build: function(player, tile) {
         // <<-- Creer-Merge: build -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's build function here
-        return false;
+        // Deduct the proper amount of gold from the unit
+        // Replace 100 with whatever the cost is
+        this.gold -= 100;
+
+        // Change the specified tile's type to port
+        tile.type = "port";
+
+        // Add the port to the array of the player's ports
+        player.ports.push(tile);
+
+        return true;
 
         // <<-- /Creer-Merge: build -->>
     },
