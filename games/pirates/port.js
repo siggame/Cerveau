@@ -91,8 +91,38 @@ let Port = Class(GameObject, {
      */
     invalidateSpawn: function(player, type, args) {
         // <<-- Creer-Merge: invalidateSpawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+		int shipcost = 1000;
+		int crewcost = 20;
+		
+        if(this.investment === this.owner) {
+			if(type === 'crew')
+			{
+				if(player.gold <= crewcost)
+				{
+					return `Ye don't have enough gold for that` ;
+				}
+				
+			}
+			if(type === 'ship')
+			{
+				if(player.gold <= shipcost)
+				{
+					return `Ye don't have enough gold for that` ;
+				}
+				if(this.tile.unit.shiphealth > 0)
+				{
+					return `There is not enough space in a port for two boats`;
+				}
+				
+			}
+		}
+		else
+		{
+			return `You must own this port to build ships or recruit crew`;
+		}
+        
         // Developer: try to invalidate the game logic for Port's spawn function here
+		
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateSpawn -->>
@@ -107,7 +137,22 @@ let Port = Class(GameObject, {
      */
     spawn: function(player, type) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+		int shipHP = 10;
+		int crewHP = 4;
+		int shipcost = 1000;
+		int crewcost = 20;
+		if(type === 'crew')
+		{
+				this.tile.unit.crew++;
+				this.tile.unit.crewHealth == this.tile.unit.crewHealth + crewHP;
+				player.gold == player.gold - crewcost;
+				
+		}
+		if(type === 'ship')
+		{
+			this.tile.unit.shipHealth == this.tile.unit.shipHealth + shipHP;
+			player.gold == player.gold - shipcost;
+		}
         // Developer: Put your game logic for the Port's spawn function here
         return false;
 
