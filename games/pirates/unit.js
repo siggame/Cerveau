@@ -213,19 +213,19 @@ let Unit = Class(GameObject, {
     invalidateDeposit: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateDeposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(this.player !== player) {
-            return "Ye can't just deposit gold from an enemy unit, ya landlubber!";
+        if(this.owner !== player) {
+            return "Ye can't just deposit gold from an enemy unit, ya scalliwag!";
         }
 
         let adjacent = false;
 
-        for(let t of this.neighbors) {
-            if(t === player.home) {
+        for(let t of this.tile.neighbors) {
+            if(t === player.startingPort) {
                 adjacent = true;
             }
         }
 
-        if(this.tile === player.home) {
+        if(this.tile === player.startingPort) {
             adjacent = true;
         }
 
