@@ -148,6 +148,11 @@ let Unit = Class(GameObject, {
             return "Arr, ye don't want the enemy creatin' more ports!";
         }
 
+        // Check if the unit has a move left
+        if(this.acted === true) {
+            return "Arr, yer crew already acted this turn, ya landlubber!";
+        }
+
         // Check if the tile is a water tile
         if(tile.type !== "water") {
             return "Ye can't be buildin' a port on land, ye scalliwag!";
@@ -207,8 +212,11 @@ let Unit = Class(GameObject, {
         // Replace 100 with whatever the cost is
         this.gold -= 100;
 
-        // Change the specified tile's type to port
-        tile.type = "port";
+        // Update that the tile contains a port.
+        tile.port = true;
+
+        // Update that the unit has acted this turn.
+        this.acted = true;
 
         // Add the port to the array of the player's ports
         player.ports.push(tile);
