@@ -321,16 +321,28 @@ let Unit = Class(GameObject, {
 
         // Developer: try to invalidate the game logic for Unit's split function here
 
-        // Check to see if player calling is the owner.
-        if(player != this.owner)
+        // Check to see if it is the player's Turn
+        if(!player || player !== this.game.currentPlayer)
         {
-            return "Avast Ye, Ye can't order the enemy!";
+            return `Avast Ye, It an't be yer turn, ${player}!`;
         }
 
-        // Check to make sure target tile is a land tile
-        else if(tile.type != "land")
+        // Check to see if player calling is the owner.
+        else if(player != this.owner)
         {
-            return "Avast Ye, Ye can't walk on water!";
+            return `Avast Ye, ${this} not be yers`;
+        }
+        
+        // Check to see if the crew has a move to move
+        else if(this.unit.moves == 0)
+        {
+            return "Avast Ye, Yer crew out of moves!";
+        }
+        
+        // Check to see if they have already acted.
+        else if(this.acted)
+        {
+            return "Avast Ye, Yer crew are too tired!";
         }
 
         // Check to see if it is not one of the tiles around in the current direction
@@ -342,14 +354,26 @@ let Unit = Class(GameObject, {
                 this.title.titleWest != title &&
                 this.title.titleSouth != title
             )
-         )
-         {
-             return "Avast Ye, It be too far to move there!";
-         }
+        )
+        {
+            return "Avast Ye, It be too far to move there!";
+        }
+        
+        // Check to make sure target tile is a valid tile
+        else if(tile.type != "land" && tile.unit.shipHealth <= 0 && tile.port == null)
+        {
+            return "Avast Ye, Ye can't split here!";
+        }
 
-         // Check to see if there is enough crew to split
-         else if(this.crew < 1)
-         {
+        //check if moving on ship need an action
+        else if(tile.unit.shipHealth > 0 && this.unit.acted)
+        {
+            return "Avast Ye, Ye already acted so yer can't be splittin'!";
+        }
+
+        // Check to see if there is enough crew to split
+        else if(this.crew < 1)
+        {
              return "Avast Ye, Ye can't be splittin' an empty crew!";
          }
 
@@ -377,9 +401,15 @@ let Unit = Class(GameObject, {
 
         // Developer: Put your game logic for the Unit's split function here
 
+        //TO-DO implement moving to ships and ports as well.
         // Set the owner of the new unit to current player
         tile.unit.owner = this.owner;
 
+        if(tile.type == "Water" && tile.unit.shipHealth > 0)
+        {
+            tile.unit.acted == true;
+        }
+        
         // Moving all incase of amount < 0 or amount >= current crew total
         if(amount <= 0 || this.crew <= amount)
         {
