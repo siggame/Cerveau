@@ -250,18 +250,24 @@ let Unit = Class(GameObject, {
         
         // Developer: try to invalidate the game logic for Unit's dig function here
         
-        // Checking to see if the player is the owner.
-        if(player != this.owner)
+        // Checking to make sure its the players turn
+        if(!player || player !== this.game.currentPlayer)
         {
-            return "Avast ye, ye can't order the enemy!";
+            return `Avast ye, its not yer turn, ${player}!`;
+        }
+
+        // Checking to see if the player is the owner.
+        if(player !== this.owner)
+        {
+            return `Avast ye, ${this} isnt yers!`;
         }
         // Checking to see if the tile is anything other than a land type.
-        if(!(this.tile.type === "land"))
+        if(this.tile.type !== "land")
         {
             return "Avast ye, Ye can't dig in the Sea!";
         }
         // Checking to see if the tile has gold to be dug up.
-        else if (!this.tile.gold)
+        else if (this.tile.gold === 0)
         {
             return "Avest ye, there be no booty in ground!";
         } 
