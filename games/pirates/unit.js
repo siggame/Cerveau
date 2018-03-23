@@ -293,7 +293,7 @@ let Unit = Class(GameObject, {
         if(this.moves <= 0) {
           return "Your crew are too tired to travel any further!";
         }
-        if(checkAction && this.acted) {
+        if(this.acted) {
             return `${this} cannot move after acting! The men are too tired!`;
         }
         if(tile === null) {
