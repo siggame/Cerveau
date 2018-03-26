@@ -1,53 +1,89 @@
 {
-  "name": "Cerveau",
-  "version": "1.0.0",
+  "name": "cerveau",
+  "version": "2.0.0",
   "description": "The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.",
   "repository": {
     "type": "git",
     "url": "git://github.com/siggame/Cerveau"
   },
+  "license": "MIT",
   "private": true,
   "dependencies": {
-    "argparse": "1.0.6",
-    "cadre-js-extensions": "siggame/Cadre-js-extensions",
-    "chess.js": "0.9.3",
-    "classe": "1.0.0",
-    "clone": "1.0.2",
-    "colors": "1.1.2",
-    "express": "4.13.4",
+    "@types/colors": "^1.1.3",
+    "@types/commander": "^2.9.2",
+    "@types/delay": "^2.0.1",
+    "@types/fs-extra": "^4.0.2",
+    "@types/joi": "^10.4.4",
+    "@types/node": "^8.0.28",
+    "@types/seedrandom": "^2.4.27",
+    "@types/uuid": "^3.4.2",
+    "@types/v8-profiler": "0.0.5",
+    "chess.js": "^0.10.2",
+    "colors": "^1.1.2",
+    "commander": "^2.11.0",
+    "delay": "^2.0.0",
+    "dotenv": "^4.0.0",
+    "express": "4.16.2",
     "express-handlebars": "3.0.0",
-    "extend": "3.0.0",
+    "fs-extra": "^4.0.2",
     "gaussian": "1.1.0",
     "git-rev": "0.2.1",
-    "hosted-git-info": "2.4.2",
+    "github": "^12.0.1",
+    "joi": "^13.0.1",
     "lark-websocket": "JacobFischer/lark-websocket",
-    "mathjs": "3.18.0",
-    "moment": "2.11.2",
-    "request": "2.81.0",
-    "sanitize-filename": "1.5.3",
+    "mathjs": "^3.16.3",
+    "module-alias": "^2.0.3",
+    "moment": "^2.18.1",
     "seedrandom": "2.4.2",
-    "simple-git": "1.70.0",
-    "uuid": "2.0.1"
+    "simple-git": "^1.77.0",
+    "ts-node": "^3.3.0",
+    "ts-typed-events": "^1.1.0",
+    "typescript": "^2.5.2",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
+    "@types/argparse": "^1.0.32",
+    "@types/dotenv": "^4.0.2",
+    "@types/express": "^4.11.0",
+    "@types/express-handlebars": "0.0.30",
+    "@types/sanitize-filename": "^1.1.28",
     "apidoc": "0.16.1",
+    "argparse": "^1.0.9",
     "eslint": "3.7.1",
-    "ghooks": "1.3.2"
+    "hosted-git-info": "^2.4.2",
+    "husky": "^0.14.3",
+    "nodemon": "^1.12.1",
+    "npm-run-all": "^4.1.2",
+    "rimraf": "^2.6.2",
+    "sanitize-filename": "^1.6.1",
+    "tsconfig-paths": "^2.4.0",
+    "tslint": "^5.7.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "tslint-no-math-random": "^1.0.0"
   },
-  "config": {
-    "ghooks": {
-      "pre-commit": "eslint --cache ./",
-      "post-merge": "npm install",
-      "post-rewrite": "npm install"
-    }
+  "optionalDependencies": {
+    "v8-profiler": "^5.7.0"
   },
   "engines": {
-    "node": "6.6.0"
+    "node": ">=9.0.0."
   },
   "scripts": {
-    "lint": "eslint --cache ./",
+    "app": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "npm-run-all clean build --parallel watch:build watch:server --print-label",
+    "watch:build": "tsc --watch --pretty",
+    "watch:server": "nodemon --delay 10000 npm run app",
+    "build": "tsc --pretty",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
     "apidoc": "apidoc -i ./website/ -o ./api-docs",
-    "fix": "eslint --cache ./ --fix"
+    "test": "npm run lint && npm run build",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "fix": "tslint -c tslint.json 'src/**/*.ts' --fix --force",
+    "precommit": "npm test",
+    "postmerge": "npm install",
+    "postrewrite": "npm install"
   },
-  "license": "MIT"
+  "_moduleAliases": {
+    "src": "dist/"
+  }
 }

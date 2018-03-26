@@ -20,7 +20,8 @@ coverage
 .lock-wscript
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
+build
+dist
 
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
@@ -34,6 +35,4 @@ output/logs
 # generated docs via apidoc or jsdoc
 docs
 api-docs
-
-# eslint cache
-.eslintcache
+dist
