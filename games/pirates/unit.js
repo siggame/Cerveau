@@ -418,7 +418,7 @@ let Unit = Class(GameObject, {
           this.shipHealth += Math.round(this.game.shipHealth*.25+ .5);
         }
         if(this.crew > 0) {
-          this.crewHealth += Math.round(this.game.crewHealth*.25 + .5)
+          this.crewHealth += (Math.round(this.game.crewHealth*.25 + .5)*this.crew);
         }
         this.acted = true;
         this.moves = 0;
