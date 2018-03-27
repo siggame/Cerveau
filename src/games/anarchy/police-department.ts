@@ -1,67 +1,65 @@
-// PoliceDepartment: Used to keep cities under control and raid Warehouses.
+import { IBaseGameObjectRequiredData } from "src/core/game";
+import { Building, Player, Warehouse } from "./";
+import { IPoliceDepartmentProperties } from "./game-interfaces";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const Building = require("./building");
+// <<-- Creer-Merge: requires -->>
+// <<-- /Creer-Merge: requires -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-const Warehouse = require("./warehouse");
-//<<-- /Creer-Merge: requires -->>
-
-// @class PoliceDepartment: Used to keep cities under control and raid Warehouses.
-let PoliceDepartment = Class(Building, {
+/**
+ * PoliceDepartment: Used to keep cities under control and raid Warehouses.
+ */
+export class PoliceDepartment extends Building {
     /**
      * Initializes PoliceDepartments.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param data - the data
+     * @param required omg
      */
-    init: function(data) {
-        Building.init.apply(this, arguments);
+    constructor(data: IPoliceDepartmentProperties, required: IBaseGameObjectRequiredData) {
+        super(data, required);
 
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // <<-- Creer-Merge: init -->>
 
         // put any initialization logic here. the base variables should be set from 'data' above
         // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "PoliceDepartment",
-
+        // <<-- /Creer-Merge: init -->>
+    }
 
     /**
      * Invalidation function for raid
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Try to find a reason why the passed in parameters are invalid,
+     * and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
      * @param {Warehouse} warehouse - The warehouse you want to raid.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns  a string that is the invalid reason, if the arguments are invalid.
+     * Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateRaid: function(player, warehouse, args) {
-        // <<-- Creer-Merge: invalidateRaid -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        if(!warehouse || !Class.isInstance(warehouse, Warehouse)) {
-            return `${warehouse} not a valid Warehouse to for ${this} to raid.`;
+    protected invalidateRaid(player: Player, warehouse?: Warehouse): string | IArguments {
+        // <<-- Creer-Merge: invalidateRaid -->>
+        const invalid = this.invalidateBribe(player);
+        if (invalid) {
+            return invalid;
         }
 
-        return this._invalidateBribe(player);
-
+        if (!warehouse) {
+            return `${warehouse} not a valid Warehouse to for ${this} to raid.`;
+        }
         // <<-- /Creer-Merge: invalidateRaid -->>
-    },
+        return arguments;
+    }
 
     /**
-     * Bribe the police to raid a Warehouse, dealing damage equal based on the Warehouse's current exposure, and then resetting it to 0.
-     *
+     * Bribe the police to raid a Warehouse, dealing damage equal based on the
+     * Warehouse's current exposure, and then resetting it to 0.
      * @param {Player} player - the player that called this.
      * @param {Warehouse} warehouse - The warehouse you want to raid.
      * @returns {number} The amount of damage dealt to the warehouse, or -1 if there was an error.
      */
-    raid: function(player, warehouse) {
-        // <<-- Creer-Merge: raid -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected raid(player: Player, warehouse: Warehouse): number {
+        // <<-- Creer-Merge: raid -->>
 
-        const oldHealth = warehouse.oldHealth;
+        const oldHealth = warehouse.health;
         warehouse.health = Math.max(warehouse.health - warehouse.exposure, 0);
         warehouse.exposure = 0;
 
@@ -71,15 +69,12 @@ let PoliceDepartment = Class(Building, {
         return oldHealth - warehouse.health;
 
         // <<-- /Creer-Merge: raid -->>
-    },
+    }
 
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: added-functions -->>
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- /Creer-Merge: added-functions -->>
 
-});
-
-module.exports = PoliceDepartment;
+}

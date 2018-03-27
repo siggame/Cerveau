@@ -1,63 +1,54 @@
 // Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
+import { IBaseGameObjectRequiredData } from "src/core/game";
+import { GameObject, Player } from "./";
+import { IForecastProperties } from "./game-interfaces";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be required here safely between cree runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * The weather effect that will be applied at the end of a turn, which causes fires to spread.
+ */
+export class Forecast extends GameObject {
+    /**
+     * The Player that can use WeatherStations to control this Forecast when its
+     * the nextForecast.
+     */
+    public controllingPlayer?: Player;
 
-// any additional requires you want can be required here safely between cree runs
-//<<-- /Creer-Merge: requires -->>
+    /**
+     * The direction the wind will blow fires in. Can be 'north', 'east',
+     * 'south', or 'west'.
+     */
+    public direction: string;
 
-// @class Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
-let Forecast = Class(GameObject, {
+    /**
+     * How much of a Building's fire that can be blown in the direction of this
+     * Forecast. Fire is duplicated (copied), not moved (transferred).
+     */
+    public intensity: number;
+
     /**
      * Initializes Forecasts.
      *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param {Object} data the initial Forecast properties (already hooked up)
+     * @param required - data required for this game object to be initialized correctly
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    constructor(data: IForecastProperties, required: IBaseGameObjectRequiredData) {
+        super(data, required);
 
-        /**
-         * The Player that can use WeatherStations to control this Forecast when its the nextForecast.
-         *
-         * @type {Player}
-         */
-        this.controllingPlayer = this.controllingPlayer || null;
-
-        /**
-         * The direction the wind will blow fires in. Can be 'north', 'east', 'south', or 'west'.
-         *
-         * @type {string}
-         */
-        this.direction = this.direction || "";
-
-        /**
-         * How much of a Building's fire that can be blown in the direction of this Forecast. Fire is duplicated (copied), not moved (transfered).
-         *
-         * @type {number}
-         */
-        this.intensity = this.intensity || 0;
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // <<-- Creer-Merge: init -->>
 
         // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- /Creer-Merge: init -->>
+    }
 
-    gameObjectName: "Forecast",
-
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: added-functions -->>
 
     // You can add additional functions here. These functions will not be directly callable by client AIs
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- /Creer-Merge: added-functions -->>
 
-});
-
-module.exports = Forecast;
+}

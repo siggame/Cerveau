@@ -1,159 +1,147 @@
-// Building: A basic building. It does nothing besides burn down. Other Buildings inherit from this class.
+import { IBaseGameObjectRequiredData } from "src/core/game";
+import { GameObject, Player } from "./";
+import { IBuildingProperties } from "./game-interfaces";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be required here safely between cree runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-// any additional requires you want can be required here safely between cree runs
-//<<-- /Creer-Merge: requires -->>
-
-// @class Building: A basic building. It does nothing besides burn down. Other Buildings inherit from this class.
-let Building = Class(GameObject, {
+/**
+ * A basic building. It does nothing besides burn down. Other Buildings inherit
+ * from this class.
+ */
+export class Building extends GameObject {
     /**
-     * Initializes Buildings.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * When true this building has already been bribed this turn and cannot be
+     * bribed again this turn.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public bribed: boolean;
 
-        /**
-         * When true this building has already been bribed this turn and cannot be bribed again this turn.
-         *
-         * @type {boolean}
-         */
-        this.bribed = this.bribed || false;
+    /**
+     * The Building directly to the east of this building, or null if not
+     * present.
+     */
+    public readonly buildingEast?: Building;
 
-        /**
-         * The Building directly to the east of this building, or null if not present.
-         *
-         * @type {Building}
-         */
-        this.buildingEast = this.buildingEast || null;
+    /**
+     * The Building directly to the north of this building, or null if not
+     * present.
+     *
+     * @type {Building}
+     */
+    public readonly buildingNorth?: Building;
 
-        /**
-         * The Building directly to the north of this building, or null if not present.
-         *
-         * @type {Building}
-         */
-        this.buildingNorth = this.buildingNorth || null;
+    /**
+     * The Building directly to the south of this building, or null if not
+     * present.
+     */
+    public readonly buildingSouth?: Building;
 
-        /**
-         * The Building directly to the south of this building, or null if not present.
-         *
-         * @type {Building}
-         */
-        this.buildingSouth = this.buildingSouth || null;
+    /**
+     * The Building directly to the west of this building, or null if not
+     * present.
+     */
+    public readonly buildingWest?: Building;
 
-        /**
-         * The Building directly to the west of this building, or null if not present.
-         *
-         * @type {Building}
-         */
-        this.buildingWest = this.buildingWest || null;
+    /**
+     * How much fire is currently burning the building, and thus how much damage
+     * it will take at the end of its owner's turn. 0 means no fire.
+     */
+    public fire: number;
 
-        /**
-         * How much fire is currently burning the building, and thus how much damage it will take at the end of its owner's turn. 0 means no fire.
-         *
-         * @type {number}
-         */
-        this.fire = this.fire || 0;
+    /**
+     * How much health this building currently has. When this reaches 0 the
+     * Building has been burned down.
+     */
+    public health: number;
 
-        /**
-         * How much health this building currently has. When this reaches 0 the Building has been burned down.
-         *
-         * @type {number}
-         */
-        this.health = this.health || 0;
+    /**
+     * True if this is the Headquarters of the owning player, false otherwise.
+     * Burning this down wins the game for the other Player.
+     */
+    public readonly isHeadquarters: boolean;
 
-        /**
-         * True if this is the Headquarters of the owning player, false otherwise. Burning this down wins the game for the other Player.
-         *
-         * @type {boolean}
-         */
-        this.isHeadquarters = this.isHeadquarters || false;
+    /**
+     * The player that owns this building. If it burns down (health reaches 0)
+     * that player gets an additional bribe(s).
+     */
+    public readonly owner: Player;
 
-        /**
-         * The player that owns this building. If it burns down (health reaches 0) that player gets an additional bribe(s).
-         *
-         * @type {Player}
-         */
-        this.owner = this.owner || null;
+    /**
+     * The location of the Building along the x-axis.
+     */
+    public x: number;
 
-        /**
-         * The location of the Building along the x-axis.
-         *
-         * @type {number}
-         */
-        this.x = this.x || 0;
+    /**
+     * The location of the Building along the y-axis.
+     */
+    public y: number;
 
-        /**
-         * The location of the Building along the y-axis.
-         *
-         * @type {number}
-         */
-        this.y = this.y || 0;
+    // <<-- Creer-Merge: added-properties -->>
+    public maxHealth: number = 100;
+    // <<== /Creer-Merge: added-properties -->>
 
+    /**
+     * Initializes Buildings
+     * @param data the initial data for this Building. These values are already
+     *             hooked up in the super method for you for this classes
+     *             member properties.
+     */
+    constructor(data: IBuildingProperties, required: IBaseGameObjectRequiredData) {
+        super(data, required);
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        // <<-- Creer-Merge: init -->>
 
         this.health = this.maxHealth;
 
-        if(this.isHeadquarters) {
-            this.makeHeadquarters();
+        if (this.isHeadquarters) {
+            this.isHeadquarters = true;
+            this.owner.headquarters = this;
+            this.health *= this.game.settings.headquartersHealthScalar;
+            (this as any).fireAdded = this.game.maxFire;
         }
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- /Creer-Merge: init -->>
+    }
 
-    gameObjectName: "Building",
+    // <<-- Creer-Merge: added-functions -->>
 
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-    maxHealth: 100,
+    public getNeighbor(direction: string): Building | undefined {
+        switch (direction.toLowerCase()) {
+            case "north":
+                return this.buildingNorth;
+            case "east":
+                return this.buildingEast;
+            case "south":
+                return this.buildingSouth;
+            case "west":
+                return this.buildingWest;
+        }
+    }
 
     /**
      * Tries to find a reason why the bribe (action) is invalid
      *
-     * @param {Player} player - the player trying to bribe this building
-     * @returns {Object|undefined} a game logic error is returned if the bribe is NOT valid, undefined otherwise
+     * @param player - the player trying to bribe this building
+     * @returns a game logic error is returned if the bribe is NOT valid, undefined otherwise
      */
-    _invalidateBribe: function(player) {
-        if(player !== this.game.currentPlayer) {
-            return `${player} is it not your turn.`;
-        }
-
-        if(player !== this.owner) {
+    protected invalidateBribe(player: Player): string | undefined {
+        if (player !== this.owner) {
             return `${this} is not owned by ${player} and cannot be bribed.`;
         }
 
-        if(player.bribesRemaining <= 0) {
+        if (player.bribesRemaining <= 0) {
             return `${player} has no bribes left to bribe ${this} with.`;
         }
 
-        if(this.health <= 0) {
+        if (this.health <= 0) {
             return `${this} has been burned down and cannot be bribed.`;
         }
 
-        if(this.bribed) {
+        if (this.bribed) {
             return `${this} has already been bribed this turn and cannot be bribed again.`;
         }
-    },
+    }
 
-    /**
-     * sets this building as the headquarters for its owner. This should only be called once per player, and only during game initialization
-     */
-    makeHeadquarters: function() {
-        this.isHeadquarters = true;
-        this.owner.headquarters = this;
-        this.health *= this.game.headquartersHealthScalar;
-    },
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Building;
+    // <<-- /Creer-Merge: added-functions -->>
+}
