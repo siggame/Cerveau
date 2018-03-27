@@ -1,82 +1,108 @@
-const utilities = require(__basedir + "/utilities/");
-const constants = require("./constants");
-const errors = require("./errors");
-const Class = utilities.Class;
-const GameLogger = require("./gameLogger");
-const Server = require("./server");
-const Session = require("./session");
-const Authenticator = require("./authenticator");
-const Updater = require("./updater");
-const log = require("./log");
+// internal imports
+import { Config } from "src/core/args";
+import { SHARED_CONSTANTS } from "src/core/constants";
+import { log } from "src/core/log";
+import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "src/utils";
+import { BaseClient, getClientByType, IPlayData } from "../clients";
+import { GameLogManager, IBaseGameNamespace } from "../game";
+import { Updater } from "../updater";
+import { Room } from "./lobby-room";
+import { SerialRoom } from "./lobby-room-serial";
+import { ThreadedRoom } from "./lobby-room-threaded";
 
-const extend = require("extend");
-const ws = require("lark-websocket");
-const fs = require("fs");
-const url = require("url");
-const net = require("net");
-const cluster = require("cluster");
-const readline = require("readline");
+const RoomClass: typeof Room = Config.SINGLE_THREADED
+    ? SerialRoom
+    : ThreadedRoom;
+
+// external imports
+import * as cluster from "cluster";
+import * as ws from "lark-websocket";
+import * as net from "net";
+import * as readline from "readline";
+import * as url from "url";
+
+cluster.setupMaster({
+    exec: Config.BASE_DIR + "/gameplay/worker.js",
+    args: [], // CLI args will be set via process.env variables
+});
+
+type createServerFunction = (callback: (socket: net.Socket) => void) => net.Server;
+
+/*
+    Clients connect like this:
+    Lobby -> Room -> new thread -> Session
+*/
 
 /**
- * @class Lobby: The server clients initially connect to before being moved to their game session. Basically creates and manages game sessions.
+ * The server that clients initially connect to before being moved to their game lobby.
+ * Basically creates and manages game sessions.
  */
-const Lobby = Class(Server, {
-    init: function(args) {
-        Server.init.call(this, args);
+export class Lobby {
+    public static getInstance(): Lobby {
+        if (!Lobby.instance) {
+            Lobby.instance = new Lobby();
+        }
 
-        this.name = "Lobby @ " + process.pid;
-        this.tcpPort = args.tcpPort;
-        this.wsPort = args.wsPort;
-        this._authenticate = Boolean(args.authenticate); // flag to see if the lobby should authenticate play requests with web server
-        this._allowGameSettings = Boolean(args.gameSettings);
-        this._profile = Boolean(args.profile);
-        this._sessions = {};
-        this._gameClasses = {};
+        return Lobby.instance;
+    }
 
-        this._authenticator = new Authenticator(this._authenticate);
-        this._runningSessions = {}; // indexed by (gameName + id)
-        this._nextGameNumber = 1;
-        this._isShuttingDown = false;
+    private static instance?: Lobby;
 
-        this._initializeGames();
+    public readonly name = `Lobby @ ${process.pid}`;
+    public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
+    public readonly gameLogger = new GameLogManager();
 
-        this.gameLogger = new GameLogger(args);
+    private nextRoomNumber = 1;
+    private isShuttingDown = false;
 
-        cluster.setupMaster({
-            exec: __basedir + "/gameplay/worker.js",
+    private readonly clients: BaseClient[] = [];
+    private readonly rooms = new Map<string, Map<string, Room>>();
+    private readonly roomsPlaying = new Map<string, Map<string, Room>>();
+    private readonly clientsRoom = new Map<BaseClient, Room>();
+
+    private readonly gameAliasToName = new Map<string, string>();
+
+    private readonly updater: Updater;
+
+    private readonly listenerServers = new Map<string, net.Server>();
+
+    private constructor() {
+        this.initializeGames().then(() => {
+            this.initializeListener("tcp", Config.TCP_PORT, net.createServer);
+            this.initializeListener("ws", Config.WS_PORT, ws.createServer);
         });
 
-        var self = this; // for async reference in passed listener functions below
-        cluster.on("exit", function(worker) {
-            self._sessionOver(worker.session);
-        });
-
-        this._listenerServer = {};
-        this._initializeListener("TCP", net, this.tcpPort);
-        this._initializeListener("WS", ws, this.wsPort);
-
-        var rl = readline.createInterface({
+        const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
 
         // ReadLine: listens for CTRL+C to kill off child threads gracefully (letting their games complete)
         rl.setPrompt("");
-        rl.on("SIGINT", function() {
-            if(!self._isShuttingDown) {
-                self._isShuttingDown = true;
+        rl.on("SIGINT", async () => {
+            if (!this.isShuttingDown) {
+                this.isShuttingDown = true;
                 log("Shutting down gracefully...");
 
-                var numCurrentGames = Object.keys(self._runningSessions).length;
-                log("{0} game{1} currently running{2}.".format(numCurrentGames, numCurrentGames === 1 ? "" : "s", numCurrentGames === 0 ? ", so we can shut down immediately" : ""));
-
-                var clients = self.clients.clone();
-                for(var i = 0; i < clients.length; i++) {
-                    var client = clients[i];
-                    client.disconnect("Sorry, the server is shutting down.");
+                const n = Array.from(this.roomsPlaying).reduce((sum, [name, rooms]) => sum + rooms.size, 0);
+                log(`${n} game${n > 1 ? "s" : ""} currently running`);
+                if (n === 0) {
+                    log("   ↳ We can shut down immediately, see you later!");
                 }
 
-                if(numCurrentGames > 0) {
+                try {
+                    // tell all clients we are shutting down, and asynchronously
+                    // wait for the socket to confirm the data was sent before
+                    // proceeding
+                    await Promise.all([...this.clients].map((client) => {
+                        client.disconnect("Sorry, the server is shutting down.");
+                    }));
+                }
+                catch (rejection) {
+                    // we don't care
+                }
+
+                if (n > 0) {
                     log("Waiting for them to exit before shutting down.");
                     log("^C again to force shutdown, which force disconnects clients.");
                 }
@@ -86,80 +112,14 @@ const Lobby = Class(Server, {
             }
             else {
                 log("Force shutting down.");
-                process.exit(1);
+                process.exit(0);
             }
         });
 
-        if(args.updater) {
-            this.updater = new Updater({
-                autoupdate: args.autoupdate,
-            });
+        if (Config.UPDATER_ENABLED) {
+            this.updater = new Updater();
         }
-    },
-
-    /**
-     * Creates and initializes a server that uses a listener pattern identical to net.Server
-     *
-     * @param {string} key - type of server and what type of clients to expect from it
-     * @param {Object} module - the required module that has a createServer method
-     * @param {number} port - port to listen on for this server
-     */
-    _initializeListener: function(key, module, port) {
-        var self = this;
-
-        var listener = module.createServer(function(socket) {
-            self.addSocket(socket, key);
-        });
-
-        listener.listen(port, "0.0.0.0", function() {
-            log("--- Lobby listening on port {0} for {1} Clients ---".format(port, key));
-        });
-
-        listener.on("error", function(err) {
-            self._socketError(err, port);
-        });
-
-        this._listenerServer[key] = listener;
-    },
-
-    /**
-     * Initializes all the games in the games/ folder
-     */
-    _initializeGames: function() {
-        var dirs = utilities.getDirs("./games");
-
-        for(var i = 0; i < dirs.length; i++) {
-            var dir = dirs[i];
-
-            log("» '" + dir.upcaseFirst() + "' game found.");
-
-            var path = __basedir + "/games/" + dir;
-            var gameClass = require(path + "/");
-            var gameName = gameClass.prototype.name;
-
-            // hook up all the ways to get index the game class by
-            var aliases = gameClass.aliases.concat(gameName);
-            for(var a = 0; a < aliases.length; a++) {
-                this._gameClasses[aliases[a].toLowerCase()] = gameClass;
-            }
-
-            this._sessions[gameName] = {};
-
-        }
-    },
-
-    /**
-     * listener for when a listener socket (that accepts incoming clients) errors out. This will probably only happen if it tries to listen on port already in use.
-     *
-     * @param {Error} err - the error the TCP socket threw
-     * @param {number} port - port errored on
-     */
-    _socketError: function(err, port) {
-        log.error(err.code !== "EADDRINUSE" ? err : "Lobby cannot listen on port " + port + " for game connections. Address in use.\nThere's probably another Cerveau server running on this same computer.");
-
-        process.exit(1);
-    },
-
+    }
 
     /**
      * Gets the session for gameAlias and session id, if it exists
@@ -168,257 +128,398 @@ const Lobby = Class(Server, {
      * @param {string} id - the session id of the gameName
      * @returns {Session} the session, if found
      */
-    getSession: function(gameAlias, id) {
-        if(typeof(gameAlias) === "string" && typeof(id) === "string") {
-            return this._sessions[this.getGameNameForAlias(gameAlias)][id]; // this if gameAlias is not valid this will throw and exception
+    public getRoom(gameAlias: string, id: string): Room | undefined {
+        const gameName = this.getGameNameForAlias(gameAlias);
+        if (gameName) {
+            const rooms = this.rooms.get(gameName);
+            if (rooms) {
+                return this.rooms.get(gameName)!.get(id);
+            }
         }
-    },
+        else {
+            throw new Error(`Game name '${gameAlias}' is not a valid game alias.`);
+        }
+    }
+
+    /**
+     * Gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers"
+     *
+     * @param {string} gameAlias - an alias for the game, not case sensitive
+     * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
+     */
+    public getGameNameForAlias(gameAlias: string): string | undefined {
+        return this.gameAliasToName.get(gameAlias.toLowerCase());
+    }
+
+    /**
+     * Gets the game class (constructor) for a given game alias
+     *
+     * @param {string} gameAlias - an alias for the game you want
+     * @returns {Class} the game class constructor, if found
+     */
+    public getGameNamespace(gameAlias: string): IBaseGameNamespace | undefined {
+        const gameName = this.getGameNameForAlias(gameAlias);
+        if (gameName) {
+            return this.gameNamespaces[gameName]!;
+        }
+    }
+
+    /**
+     * Invoked when a client disconnects from the lobby
+     *
+     * @override
+     * @param {BaseClient} client - the client that disconnected
+     */
+    private clientDisconnected(client: BaseClient, reason?: string): void {
+        ArrayUtils.removeElements(this.clients, client);
+
+        const room = this.clientsRoom.get(client);
+        if (room) {
+            // we need to remove the client from this room
+            room.removeClient(client);
+
+            if (room.clients.length === 0) {
+                // then that room is empty, no need to keep it around
+                this.rooms.get(room.gameNamespace.GameManager.gameName)!.delete(room.id);
+
+                if (Number(room.id) + 1 === this.nextRoomNumber) {
+                    // then the next game number was never used, so reuse it
+                    this.nextRoomNumber--;
+                }
+            }
+
+            this.clientsRoom.delete(client);
+        }
+    }
+
+    /**
+     * Adds a socket of some client class as a proper Client type
+     * @param socket the socket to bind the Client around
+     * @param clientClass the class constructor of the Client class
+     */
+    private addSocket(socket: net.Socket, clientClass: typeof BaseClient): void {
+        const client = new clientClass(socket);
+        this.clients.push(client);
+
+        client.sent.alias.on((data) => this.clientSentAlias(client, data));
+        client.sent.play.on((data) => this.clientSentPlay(client, data));
+        client.events.disconnected.on(() => this.clientDisconnected(client, "Disconnected unexpectedly"));
+        client.events.timedOut.on(() => this.clientDisconnected(client, "Timed out"));
+    }
+
+    /**
+     * Creates and initializes a server that uses a listener pattern identical to net.Server
+     *
+     * @param {string} type - type of server and what type of clients to expect from it
+     * @param {number} port - port to listen on for this server
+     * @param {Object} createServer - the required module's createServer method
+     */
+    private initializeListener(type: string, port: number, createServer: createServerFunction): void {
+        const clientClass = getClientByType(type);
+        if (!clientClass) {
+            throw new Error(`'${type}' is not a valid type of listener for clients.`);
+        }
+
+        const listener = createServer((socket) => {
+            this.addSocket(socket, clientClass);
+        });
+
+        listener.listen(port, "0.0.0.0", () => {
+            log(`--- Lobby listening on port ${port} for ${type} Clients ---`);
+        });
+
+        listener.on("error", (err) => {
+            log.error((err as any).code !== "EADDRINUSE"
+            ? err
+            : `Lobby cannot listen on port ${port} for game connections. Address in use.
+There's probably another Cerveau server running on this same computer.`);
+
+            process.exit(1);
+        });
+
+        this.listenerServers.set(type, listener);
+    }
+
+    /**
+     * Initializes all the games in the games/ folder
+     */
+    private async initializeGames(): Promise<void> {
+        const GAMES_DIR = "src/games/";
+        const dirs = await getDirs(GAMES_DIR);
+
+        for (const dir of dirs) {
+            log(`» ${capitalizeFirstLetter(dir)} game found.`);
+
+            let gameNamespace: IBaseGameNamespace | undefined;
+            try {
+                const data = await import(GAMES_DIR + dir);
+                gameNamespace = data.Namespace as IBaseGameNamespace;
+            }
+            catch (err) {
+                log.error(err, `Could not load game ${dir}`);
+                process.exit(1);
+                return;
+            }
+            const gameName = gameNamespace.GameManager.gameName;
+
+            // hook up all the ways to get the game class via an index
+            this.gameAliasToName.set(gameName.toLowerCase(), gameName);
+            for (const alias of gameNamespace.GameManager.aliases) {
+                this.gameAliasToName.set(alias.toLowerCase(), gameName);
+            }
+
+            this.gameNamespaces[gameName] = gameNamespace;
+
+            this.rooms.set(gameName, new Map());
+            this.roomsPlaying.set(gameName, new Map());
+
+            break; // should have parsed anarchy, the rest are not converted yet
+        }
+
+        Object.freeze(this.gameNamespaces); // no more games can be added,
+        // and it's public so we don't want people fucking with this object
+    }
 
     /**
      * Retrieves, or creates a new, session. For clients when saying what they want to play
      *
      * @param {string} gameName - key identifying the name of the game you want. Should exist in games/
-     * @param {string} [id] - basically a room id. Specifying an id can be used to join other players on purpose. "*" will join you to any open session or a new one, and "new" will always give you a brand new room even if there are open ones.
+     * @param {string} [id] - basically a room id. Specifying an id can be used
+     * to join other players on purpose. "*" will join you to any open session
+     * or a new one, and "new" will always give you a brand new room even if
+     * there are open ones.
      * @returns {Session} the game of gameName and id. If one does not exists a new instance will be created
      */
-    _getOrCreateSession: function(gameName, id) {
-        var session; // the session we are trying to get
+    private getOrCreateRoom(gameName: string, id: string): Room |string {
+        const rooms = this.rooms.get(gameName);
 
-        if(id !== "new") {
-            if(id === "*" || id === undefined) { // then they want to join any open game
+        if (!rooms) {
+            return `Game name ${gameName} is not a valid to get or create a Room for.`;
+        }
+
+        let room: Room | undefined;
+
+        if (id !== "new") {
+            if (id === "*" || id === undefined) { // then they want to join any open game
                 // try to find an open session
-                for(var sessionID in this._sessions[gameName]) {
-                    if(this._sessions[gameName].hasOwnProperty(sessionID)) {
-                        var otherSession = this._sessions[gameName][sessionID];
-                        if(otherSession.isOpen()) {
-                            session = otherSession;
-                            break;
-                        }
+                for (const [, theRoom] of rooms) {
+                    if (theRoom.isOpen() && theRoom.gameNamespace.GameManager.gameName === gameName) {
+                        room = theRoom;
+                        break;
                     }
                 }
 
-                if(!session) { // then there was no open game session to join, so they get a new session
+                if (!room) {
+                    // then there was no open room to join,
+                    // so they get a new room
                     id = "new";
                 }
             }
             else {
-                session = this.getSession(gameName, id);
+                // they requested to join a specific room
+                room = this.getRoom(gameName, id);
             }
         }
 
-        if(session) {
-            if(session.isRunning()) {
-                id = "new";
-                session = undefined;
+        if (room) {
+            if (room.isRunning()) {
+                // we can't put them in this game, so they get a new room
+                return `Room ${id} for game ${gameName} is full! Sorry.`;
             }
-            else if(session.isOver()) {
-                delete this._sessions[gameName][id]; // we will create a new session below to replace this one
-                session = undefined;
-            }
-        }
-
-        if(!session) { // then we couldn't find a session from the requested gameName + id, so they get a new one
-            if(id === "new" || id === undefined) {
-                id = String(this._nextGameNumber++);
-            }
-
-            session = new Session(id, this.getGameClass(gameName), this);
-
-            this._sessions[gameName][id] = session;
-        }
-
-        return session;
-    },
-
-    /**
-     * Gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers"
-     *
-     * @param {string} gameAlias - an alias for the game, not case senstive
-     * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
-     */
-    getGameNameForAlias: function(gameAlias) {
-        return this.getGameClass(gameAlias).prototype.name;
-    },
-
-    /**
-     * Gets the game class (constructor) for a given game alias
-     *
-     * @param {strnig} gameAlias - an alias for the game you want
-     * @returns {Class} the game class constructor, if found
-     */
-    getGameClass: function(gameAlias) {
-        if(gameAlias) {
-            var gameClass = this._gameClasses[gameAlias.toLowerCase()]; // don't use gameGameCLass() as that calls this function
-            if(gameClass) {
-                return gameClass;
+            else if (room.isOver()) {
+                // we need to clear out this Room as it's over and available to re-use
+                this.rooms.delete(id);
+                room = undefined;
             }
         }
 
-        throw new Error("String '{}' is no alias for any known games".format(gameAlias));
-    },
+        if (!room) { // then we couldn't find a room from the requested gameName + id, so they get a new one
+            if (!id || id === "new") {
+                id = String(this.nextRoomNumber++);
+            }
+
+            room = new RoomClass(id, this.getGameNamespace(gameName)!, this.gameLogger, this.updater);
+            rooms.set(id, room);
+        }
+
+        return room;
+    }
 
     /**
      * When a client sends the 'play' event, which tells the server what it wants to play and as who.
      *
-     * @param {Client} client - the client that send the 'play'
-     * @param {Object} data - information about what this client wants to play. should include 'playerName', 'clientType', 'gameName', and 'gameSession'
+     * @param {BaseClient} client - the client that send the 'play' event
+     * @param {IPlayData} data - the information about what this client wants to
+     * play.
      */
-    _clientSentPlay: function(client, data) {
-        var fatalMessage = this._validatePlayData(data);
-        if(fatalMessage) {
-            client.send("fatal", new errors.CerveauError(fatalMessage));
-            client.disconnect(); // no need to keep them connected, they want to play something we don't have
+    private async clientSentPlay(client: BaseClient, data: IPlayData): Promise<void> {
+        const playData = this.validatePlayData(data);
+
+        if (typeof(playData) === "string") {
+            // it did not validate, so playData is the invalid message
+            client.disconnect(playData);
             return;
         }
 
-        var self = this;
-        this._authenticator.authenticate({
-            gameName: data.gameName,
-            username: data.playerName,
-            password: data.password,
-            success: function() {
-                var session = self._getOrCreateSession(data.gameName, data.requestedSession);
-                var playerIndex = parseInt(data.playerIndex);
-
-                if(playerIndex && playerIndex < 0 || playerIndex >= session.numberOfPlayers) { // then the index is out of the range
-                    playerIndex = undefined;
-                }
-
-                if(playerIndex) { // then we need to check to make sure they did not request an already requested player index
-                    for(var i = 0; i < session.clients.length; i++) {
-                        var existingClient = session.clients[i];
-                        if(existingClient.playerIndex === playerIndex) {
-                            playerIndex = undefined;
-                            break;
-                        }
-                    }
-                }
-
-                client.setInfo({
-                    name: data.playerName,
-                    playerIndex: isNaN(playerIndex) ? undefined : playerIndex,
-                    type: data.clientType,
-                    spectating: Boolean(data.spectating),
-                    metaDeltas: Boolean(data.metaDeltas),
-                });
-
-                session.addClient(client);
-
-                if(data.gameSettings) {
-                    session.addGameSettings(data.gameSettings);
-                }
-
-                client.send("lobbied", {
-                    gameName: data.gameName,
-                    gameSession: session.id,
-                    constants: constants.shared,
-                });
-
-                if(session.canStart()) {
-                    session.start();
-                    self._runningSessions[session.gameName + session.id] = session;
-                }
-            },
-            failure: function() {
-                client.send("fatal", {
-                    message: "Unauthorized to play in this lobby with given name/password.",
-                    unauthorized: true,
-                });
-                client.disconnect();
-            },
-        });
-    },
-
-    /**
-     * When a client sends the 'alias' event, which tells use they want to know what this game alias really is
-     *
-     * @param {Client} client - the client that send the 'play'
-     * @param {string} alias - the alias they want named
-     */
-    _clientSentAlias: function(client, alias) {
-        var gameName;
+        let authenticationError: string | undefined;
         try {
-            gameName = this.getGameNameForAlias(alias);
+            authenticationError = await this.authenticate(playData.gameName, playData.playerName, playData.password);
         }
-        catch(err) {
-            client.disconnect("'{}' is no known alias for any game.".format(alias));
+        catch (error) {
+            authenticationError = error.message;
+        }
+
+        if (authenticationError) {
+            client.disconnect(`Authentication Error: '${authenticationError}'`);
             return;
         }
 
-        client.send("named", gameName);
-    },
+        const room = this.getOrCreateRoom(data.gameName, data.requestedSession);
+
+        if (typeof(room) === "string") {
+            client.disconnect(room);
+            return;
+        }
+
+        // we need to check to make sure they did not request an already requested player index
+        if (playData.playerIndex !== undefined) {
+            if (room.clients.find((c) => c.playerIndex === playData!.playerIndex)) {
+                // then there is already a client in this room that requested this player index
+                // so the existing client gets the index, this current client gets squat
+                playData.playerIndex = undefined;
+            }
+        }
+
+        client.setInfo(playData.playerName, playData.clientType, playData.playerIndex);
+
+        room.addClient(client);
+        this.clientsRoom.set(client, room);
+
+        if (Config.GAME_SETTINGS_ENABLED && data.gameSettings) {
+            room.addGameSettings(data.gameSettings);
+        }
+
+        client.send("lobbied", {
+            gameName: data.gameName,
+            gameSession: room.id,
+            constants: SHARED_CONSTANTS,
+        });
+
+        if (room.canStart()) {
+            this.unTrackClients(...room.clients);
+
+            const roomsPlayingThisGame = this.roomsPlaying.get(playData.gameName)!;
+            roomsPlayingThisGame.set(room.id, room);
+
+            room.events.over.on(() => {
+                roomsPlayingThisGame.delete(room.id);
+
+                if (this.isShuttingDown && this.roomsPlaying.size === 0) {
+                    log("Final game session exited. Shutdown complete.");
+                    process.exit(0);
+                }
+            });
+
+            room.start();
+        }
+    }
+
+    private async authenticate(gameName: string, playerName: string, password: string | undefined,
+    ): Promise<string | undefined> {
+        if (!Config.AUTH_PASSWORD) {
+            return undefined; // we do not need to authenticate them
+        }
+
+        if (Config.AUTH_PASSWORD !== password) {
+            return `Could not authenticate. '${password} is not a valid password to play on this server'`;
+        }
+
+        return undefined; // password was valid!
+    }
 
     /**
      * Validates that the data sent in a 'play' event from a client is valid
      *
      * @param {Object} data - the play event data to validate
      * @returns {string} human readable text why the data is not valid
+     * @throws {Error} if there is a validation error, human readable message as to why is thrown
      */
-    _validatePlayData: function(data) {
-        if(!data) {
+    private validatePlayData(data?: IPlayData): string | IPlayData {
+        if (!data) {
             return "Sent 'play' event with no data.";
         }
 
-        if(this._isShuttingDown) {
+        const validatedData = {...data};
+
+        if (this.isShuttingDown) {
             return "Game server is shutting down and not accepting new clients.";
         }
 
-        var gameAlias = String(data && data.gameName); // clients can send aliases of what they want to play
-        try {
-            data.gameName = this.getGameNameForAlias(gameAlias);
+        const gameAlias = String(data.gameName); // clients can send aliases of what they want to play
+        const gameNamespace = this.getGameNamespace(gameAlias);
+        if (!gameNamespace) {
+            return `Game alias '${data.gameName}' is not a known game.`;
         }
-        catch(err) {
-            return "Game of name '" + gameAlias + "' not found on this server.";
+        else {
+            validatedData.gameName = gameNamespace.GameManager.gameName;
         }
 
-        if(data && data.gameSettings && this._allowGameSettings) {
+        const n = gameNamespace.GameManager.requiredNumberOfPlayers;
+        if (typeof(data.playerIndex) === "number" && (data.playerIndex < 0 || data.playerIndex >= n)) {
+            return `playerIndex ${data.playerIndex} is out of range (max ${n} players).`;
+        }
+
+        if (data && data.gameSettings && Config.GAME_SETTINGS_ENABLED) {
             try {
-                data.gameSettings = url.parse("urlparms?" + data.gameSettings, true).query;
+                validatedData.gameSettings = unstringifyObject(
+                    url.parse(`url?${data.gameSettings}`, true).query,
+                ) as any; // any because null will not be valid, but unstringify has the option to make that valid
             }
-            catch(err) {
-                return "Game settings incorrectly formatted. Must be one string in the url parms format.";
+            catch (err) {
+                return `Game settings incorrectly formatted. Must be one string in the url parameters format.
+Available game settings:
+${gameNamespace.gameSettings.getHelp()}`;
             }
+
+            // this function might mutate the game settings to validate them
+            const sanitizedGameSettings = gameNamespace.gameSettings.sanitize(validatedData.gameSettings);
+            const invalidGameSettings = gameNamespace.gameSettings.invalidate(sanitizedGameSettings);
+            if (typeof invalidGameSettings === "string") {
+                return invalidGameSettings; // it did not validate, so return the validation error
+            }
+            validatedData.gameSettings = sanitizedGameSettings;
         }
-    },
+
+        return validatedData;
+    }
 
     /**
-     * Invoked when a client disconnects from the lobby
+     * When a client sends the 'alias' event, which tells use they want to know what this game alias really is
      *
-     * @override
-     * @param {Client} client - the client that disconnected
+     * @param {BaseClient} client - the client that send the 'play'
+     * @param {string} alias - the alias they want named
      */
-    clientDisconnected: function(client /* ... */) {
-        if(client.session) {
-            var session = client.session;
+    private async clientSentAlias(client: BaseClient, alias: string): Promise<void> {
+        const gameName = this.getGameNameForAlias(alias);
 
-            session.removeClient(client);
-
-            if(session.clients.length === 0) { // that session is empty, no need to keep it around
-                delete this._sessions[session.gameName][session.id];
-                delete client.session;
-
-                if(parseInt(session.id) + 1 === this._nextGameNumber) { // then the next game number was never used, so reuse it
-                    this._nextGameNumber--;
-                }
-            }
+        if (!gameName) {
+            client.disconnect(`${alias} is not a known game alias for any game.`);
+            return;
         }
 
-        return Server.clientDisconnected.apply(this, arguments);
-    },
+        client.send("named", gameName);
+    }
 
     /**
-     * Called when a session is over. This should only occur when a game ends
-     *
-     * @param {Session} session - the session that ended.
+     * Stops tracking clients
+     * @param clients the clients to stop tracking events for
      */
-    _sessionOver: function(session) {
-        delete this._runningSessions[session.gameName + session.id];
-
-        if(this._isShuttingDown && Object.keys(this._runningSessions).length === 0) {
-            log("Final game session exited. Shutdown complete.");
-            process.exit(0);
+    private unTrackClients(...clients: BaseClient[]): void {
+        for (const client of clients) {
+            client.events.disconnected.offAll();
+            client.events.timedOut.offAll();
         }
-    },
-});
 
-module.exports = Lobby;
+        ArrayUtils.removeElements(this.clients, ...clients);
+    }
+}

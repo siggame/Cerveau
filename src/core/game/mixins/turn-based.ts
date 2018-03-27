@@ -1,91 +1,167 @@
-var Class = require(__basedir + "/utilities/class");
-var BaseGame = require("./baseGame");
-var extend = require("extend");
-var serializer = require("../serializer");
-var log = require("../log");
+// tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
+// tslint:disable:no-empty-interface = because the some mixins have nothing to add
+
+import { BaseGameObject, IBaseGameSettings, IBasePlayer, IGameSettingsDescriptions } from "src/core/game";
+import { nextWrapAround } from "src/utils";
+import * as Base from "./base";
 
 /**
- * @class TurnBasedGame - a base game that is turn based, with helper functions that should be common between turn based games. defined in Creer data and implimented here so we don't have to re-code it all the time.
+ * Settings for a turn based game
  */
-var TurnBasedGame = Class(BaseGame, {
-    init: function(data /* ... */) {
-        // clients can request a different amount of time added after each time, in sec
-        if(data.turnTimeAdded) {
-            var num = Number(data.turnTimeAdded);
-            if(!isNaN(num) && num > 0) {
-                this._playerAdditionalTimePerTurn = num * 1e9; // convert sec to ns
+export interface ITurnBasedGameSettings extends IBaseGameSettings {
+    timeAddedPerTurn: number;
+    maxTurns: number;
+}
+
+export interface ITurnBasedPlayer extends IBasePlayer {
+}
+
+/**
+ * A base game that is turn based, with helper functions that should be common
+ * between turn based games. defined in Creer data and implemented here so we
+ * don't have to re-code it all the time.
+ * @mixin
+ * @param base the base classes to mixin turn based logic into
+ * @returns a new BaseGame class with TwoPlayerGame logic mixed in
+ */
+// tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
+export function mixTurnBased<
+    TBaseAI extends Base.BaseAIConstructor,
+    TBaseGame extends Base.BaseGameConstructor,
+    TBaseGameManager extends Base.BaseGameManagerConstructor,
+    TBaseGameObject extends Base.BaseGameObjectConstructor,
+    TBaseGameSettings extends Base.BaseGameSettingsConstructor
+>(base: {
+    AI: TBaseAI,
+    Game: TBaseGame,
+    GameManager: TBaseGameManager,
+    GameObject: TBaseGameObject,
+    GameSettings: TBaseGameSettings,
+}) {
+    class TurnBasedAI extends base.AI {
+        public async runTurn(): Promise<boolean> {
+            return await this.executeOrder<boolean>("runTurn");
+        }
+    }
+
+    class TurnBaseGameSettings extends base.GameSettings {
+        public get defaults(): ITurnBasedGameSettings {
+            return {
+                ...super.defaults,
+                timeAddedPerTurn: 1e9, // 1 sec in ns,
+                maxTurns: 200,
+            };
+        }
+
+        public get descriptions(): IGameSettingsDescriptions<ITurnBasedGameSettings> {
+            return {
+                ...super.descriptions,
+                timeAddedPerTurn: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                maxTurns: "The maximum number of turns before the game is force ended and a winner is determined.",
+            };
+        }
+
+        public invalidate(settings: ITurnBasedGameSettings): string | undefined {
+            const invalid = super.invalidate(settings);
+            if (invalid) {
+                return invalid;
+            }
+
+            const timeAddedPerTurn = Number(settings.timeAddedPerTurn);
+            if (isNaN(timeAddedPerTurn) || timeAddedPerTurn < 0) {
+                return `${timeAddedPerTurn} is not a valid amount of time to add per player's turn.`;
+            }
+        }
+    }
+
+    class TurnBasedGame extends base.Game {
+        /** The amount of time added to a player's timeRemaining at the end of each of their turns */
+        public readonly timeAddedPerTurn: number = 1e9; // 1 sec in ns
+
+        public currentPlayer: IBasePlayer;
+
+        public currentTurn: number = 0;
+
+        public readonly maxTurns: number = 500;
+    }
+
+    class TurnBasedGameManager extends base.GameManager {
+        public readonly game: TurnBasedGame;
+
+        /**
+         * begins the turn based game to the first player
+         * @param args all the args to pipe to our super
+         */
+        constructor(...args: any[]) {
+            super(...args);
+
+            this.game.currentPlayer = this.game.players[0];
+
+            this.beforeTurn(); // different from nextPlayer, this is called because their turn has not yet started
+        }
+
+        protected invalidateRun(
+            player: IBasePlayer,
+            gameObject: BaseGameObject,
+            functionName: string,
+            args: Map<string, any>,
+        ): string | undefined {
+            const invalid = super.invalidateRun(player, gameObject, functionName, args);
+            if (invalid) {
+                return invalid;
+            }
+
+            if (player !== this.game.currentPlayer) {
+                return "It is not your turn.";
             }
         }
 
-        return BaseGame.init.apply(this, arguments);
-    },
+        /**
+         * Called before a players turn, including the first turn.
+         */
+        protected async beforeTurn(): Promise<void> {
+            const done = await (this.game.currentPlayer.ai as TurnBasedAI).runTurn();
 
-    _playerAdditionalTimePerTurn: 1e9, // 1 sec in ns
-
-    /**
-     * begins the turn based game to the first player
-     */
-    begin: function() {
-        BaseGame.begin.apply(this, arguments);
-
-        this.currentPlayer = this.players[0];
-
-        this.beforeTurn(); // different from nextPlayer, this is called because their turn has not yet started
-    },
-
-    /**
-     * after the game has started we order the first player to runTurn
-     */
-    _started: function() {
-        BaseGame._started.apply(this, arguments);
-
-        this.order(this.currentPlayer, "runTurn");
-    },
-
-    /**
-     * Called when an AI has finished their turn, if they returned true from that then they want to end their turn.
-     *
-     * @param {Player} player - the player for the ai that finished a runTurn()
-     * @param {boolean} data - true when they finished their turn, false otherwise (which re-runs their turn)
-     */
-    aiFinishedRunTurn: function(player, data) {
-        if(data === true) { // ais that return true from runTurn() mean they ran their turn, and are done with it
-            this.nextTurn();
+            if (done) {
+                this.nextTurn();
+            }
+            else {
+                this.beforeTurn();
+            }
         }
 
-        this.order(this.currentPlayer, "runTurn"); // tell the current player to run their turn, because the passed in player may no longer be the current player as we ran game logic above
-    },
+        /**
+         * Transitions to the next turn, increasing turn and setting the currentPlayer to the next one.
+         */
+        protected nextTurn(): void {
+            console.log("NEXT TURN", this.game.currentTurn);
+            if (this.game.currentTurn + 1 >= this.game.maxTurns) {
+                this.maxTurnsReached();
+                return;
+            }
 
-    /**
-     * Transitions to the next turn, increasing turn and setting the currentPlayer to the next one.
-     */
-    nextTurn: function() {
-        if(this.currentTurn + 1 === this.maxTurns) {
-            this._maxTurnsReached();
-            return;
+            this.game.currentTurn++;
+            this.game.currentPlayer = nextWrapAround(this.game.players, this.game.currentPlayer)!;
+            this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
+
+            this.beforeTurn();
         }
 
-        this.currentTurn++;
-        this.currentPlayer = this.players.nextWrapAround(this.currentPlayer);
-        this.currentPlayer.timeRemaining += this._playerAdditionalTimePerTurn;
+        /**
+         * Intended to be inherited and then max turn victory conditions
+         * checked to find the winner/looser.
+         */
+        protected maxTurnsReached(): void {
+            console.log("max turns reached!", this.isGameOver());
+            this.endGame();
+        }
+    }
 
-        this.beforeTurn();
-    },
-
-    /**
-     * Called before a players turn, including the first turn.
-     * You don't have to call this base method if you don't want to, it does nothing without overriding it
-     */
-    beforeTurn: function() {
-        // intended to be overwritten by games that need this
-    },
-
-    /**
-     * Intended to be inherited and then max turn victory conditions checked to find the winner/looser.
-     */
-    _maxTurnsReached: function() {
-        this.isOver(true);
-    },
-});
-
-module.exports = TurnBasedGame;
+    return {
+        ...base,
+        AI: TurnBasedAI,
+        Game: TurnBasedGame,
+        GameManager: TurnBasedGameManager,
+        GameSettings: TurnBaseGameSettings,
+    };
+}

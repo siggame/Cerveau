@@ -1,84 +1,81 @@
-var Class = require(__basedir + "/utilities/class");
-var DeltaMergeable = require("./deltaMergeable");
+/*
+mport { ISanitizableType } from "src/core/type-sanitizer";
+import { IAnyObject, ITypedObject } from "src/utils";
+import { createDeltaMergeable } from "./create-delta-mergeable";
+import { DeltaMergeable } from "./delta-mergeable";
 
-/**
- * @class DeltaMergeableDictionary - A dictionary that manages its own delta states. Do not use the raw [] to add or remove items, as those have no hooks in JS to run code so we can delta update.
- */
-var DeltaMergeableDictionary = Class(DeltaMergeable, {
-    init: function(baseGame, pathInBaseGame, copyFrom, options) {
-        DeltaMergeable.init.call(this, baseGame, pathInBaseGame);
+export class DeltaMergeableMap<V> extends Map<string, V> {
+    private readonly container: DeltaMergeable<IAnyObject>;
+    private readonly children: ITypedObject<DeltaMergeable<V>> = {};
+    private readonly childCache: ITypedObject<DeltaMergeable<V>> = {};
 
-        this._keyType = options.keyType;
-        this._valueType = options.valueType;
+    constructor(
+        key: string,
+        private readonly valueType: ISanitizableType,
+        parent?: DeltaMergeable,
+    ) {
+        super();
 
-        if(copyFrom) {
-            this.extend(copyFrom);
-        }
-    },
-
-    /**
-     * Public setter override to make sure this DeltaMergeableDictionary is never overwritten
-     *
-     * @param {Object} newDict - the new object we are supposed to be "set" to, instead copy its key/values
-     */
-    replace: function(newDict) {
-        if(newDict === this) {
-            return;
-        }
-
-        var oldKeys = Object.keys(this._properties);
-
-        // add the new keys to this dict
-        for(var newKey in newDict) {
-            if(newDict.hasOwnProperty(newKey)) {
-                if(!this._hasProperty(newKey)) {
-                    this.add(newKey, newDict[newKey]);
+        this.container = new DeltaMergeable({
+            key,
+            parent,
+            transform: (newMap: Map<string, V>, currentValue) => {
+                // we won't allow people to re-set this array,
+                // instead we will mutate the current array to match `newArray`
+                currentValueblagr
+                for (const [key, value] of newMap.entries) {
+                    currentValue![i] = newArray[i];
                 }
+                currentValue!.length = newArray.length;
+                return currentValue;
+            },
+        });
+    }
 
-                // remove the newKey from the old keys so it is not removed
-                oldKeys.removeElement(newKey);
+    public set(key: string, value: V): this {
+        let child = this.children[key];
+
+        if (!child) {
+            // we do not have this key as an active child, check the cache
+            child = this.childCache[key];
+            if (child) {
+                // we are re-using a delta mergeable from the cache
+                this.container.adopt(child);
             }
-        }
+            else {
+                // we've never seen this key, so make a delta mergeable for it
+                child = createDeltaMergeable({
+                    key,
+                    parent: this.container,
+                    type: this.valueType,
+                });
 
-        // remove all the old keys that were not a new key
-        for(var i = 0; i < oldKeys.length; i++) {
-            this.remove(oldKeys[i]);
-        }
-    },
-
-    /**
-     * Registers a new key as a property. Use this instead of the traditional `this[key] = value;`
-     *
-     * @param {string} key - key you are adding
-     * @param {*} value - value you are adding
-     * @returns {*} value that was added
-     */
-    add: function(key, value) {
-        // TODO: keyType use
-        return this._addProperty(key, value, { type: this._valueType });
-    },
-
-    /**
-     * Removed a key from being a property. Use this instead of the traditional `delete this[key];`
-     *
-     * @param {string} key - key in this object
-     */
-    remove: function(key) {
-        this._removeProperty(key);
-    },
-
-    /**
-     * Convenience function like a traditional dictionary extend
-     *
-     * @param {Object|DeltaMergeableDictionary} copyFrom - other object to copy properties from
-     */
-    extend: function(copyFrom) {
-        for(var key in copyFrom) {
-            if(copyFrom.hasOwnProperty(key)) {
-                this.add(key, copyFrom[key]);
+                this.childCache[key] = child;
             }
-        }
-    },
-});
 
-module.exports = DeltaMergeableDictionary;
+            this.children[key] = child;
+        }
+
+        child.set(value);
+
+        return super.set(key, child.get()!);
+    }
+
+    public delete(key: string): boolean {
+        if (this.has(key)) {
+            const child = this.container.child(String(key))!; // TODO: type K is basically always strings at this point
+
+            child.delete();
+        }
+        return super.delete(key);
+    }
+}
+
+export function createMap<V>(
+    key: string,
+    valueType: ISanitizableType,
+    parent?: DeltaMergeable,
+): Map<string, V> {
+    return new DeltaMergeableMap<V>(key, valueType, parent);
+}
+*/

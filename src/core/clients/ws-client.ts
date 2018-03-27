@@ -1,85 +1,83 @@
-var log = require("./log");
-var Class = require(__basedir + "/utilities/class");
-var Client = require("./client");
-var net = require("net");
-var ws = require("lark-websocket");
+import * as ws from "lark-websocket";
+import * as net from "net";
+import { BaseClient } from "./base-client" ;
 
-/*
- * @class
- * @classdesc A client to the game server via a WS connection
- * @extends Client
- */
-var WSClient = Class(Client, {
-    init: function(socket /* , ... */) {
-        if(socket instanceof net.Socket) { // then we need to create a websocket interface wrapped around this net.Socket
-            socket = ws.createClient(socket);
-        }
-
-        Client.init.apply(this, arguments);
-    },
-
-    _onDataEventName: "message",
-
+/** A client to the game server via a WS connection */
+export class WSClient extends BaseClient {
     /**
-     * Invoked when the websocket gets data
-     *
-     * @override
-     * @param {Object} data - unparsed data from socket
+     * Creates a client connected to a server
+     * @param socket the socket this client communicates through
      */
-    _onSocketData: function(data) {
-        Client._onSocketData.apply(this, arguments);
-
-        var parsed = this._parseData(data);
-        if(!parsed) {
-            return; // because we got some invalid data, so we're going to fatally disconnect anyways
-        }
-
-        this.server.clientSentData(this, parsed);
-    },
-
-    /**
-     * Sends a raw string through the socket
-     *
-     * @override
-     * @param {string} str - string to send
-     */
-    _sendRaw: function(str) {
-        Client._sendRaw.apply(this, arguments);
-
-        this.socket.send(str);
-    },
-
-    /**
-     * Invoked when the other end of this socket disconnects
-     *
-     * @override
-     */
-    disconnected: function() {
-        Client.disconnected.apply(this, arguments);
-
-        this.socket.destroy();
-        delete this.socket;
-    },
+    constructor(socket: net.Socket) {
+        super(socket instanceof net.Socket
+            // hackish, we need to re - set socket before super is called,
+            // but the super method wants to be called first
+            ? ws.createClient(socket) // then we need to create a websocket interface wrapped around this net.Socket
+            : socket, // normal socket fail through
+        );
+    }
 
     /**
      * Gets the net module member of this socket for passing between threads
      *
      * @override
      */
-    getNetSocket: function() {
-        return this.socket._socket; // hackish, as we are grabbing a private socket out of the lark-websockets client, but works.
-    },
+    public getNetSocket(): net.Socket {
+        // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
+        return (this.socket as any)._socket;
+    }
 
-     /**
-      * Stops listening to the current socket, for passing to another thread
-      *
-      * @override
-      */
-    stopListeningToSocket: function() {
-        Client.stopListeningToSocket.apply(this, arguments);
-
+    /**
+     * Stops listening to the current socket, for passing to another thread
+     * @returns boolean indicating if it stopped listening
+     */
+    public stopListeningToSocket(): boolean {
+        const returned = super.stopListeningToSocket();
         this.socket.pause();
-    },
-});
+        return returned;
+    }
 
-module.exports = WSClient;
+    protected get onDataEventName(): string {
+        return "message";
+    }
+
+    /**
+     * Invoked when the tcp socket gets data
+     * @param data what the client send via the socket event listener
+     */
+    protected onSocketData(data: any): void {
+        super.onSocketData(data);
+
+        const parsed = this.parseData(data);
+        if (!parsed) {
+            return; // because we got some invalid data, so we're going to fatally disconnect anyways
+        }
+
+        this.handleSent(parsed);
+    }
+
+    /**
+     * Sends a the raw string to the remote client this class represents.
+     * Intended to be overridden to actually send through client...
+     * @param {string} str the raw string to send. Should be EOT_CHAR terminated.
+     * @returns after it it sends the data
+     */
+    protected sendRaw(str: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            super.sendRaw(str);
+
+            // this.socket.send(str);
+            this.socket.write(str, resolve);
+        });
+    }
+
+    /**
+     * Invoked when the other end of this socket disconnects
+     *
+     * @override
+     */
+    protected disconnected(): void {
+        this.socket.destroy();
+        super.disconnected();
+    }
+}

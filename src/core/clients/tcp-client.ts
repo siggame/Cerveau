@@ -1,65 +1,81 @@
-var log = require("./log");
-var Class = require(__basedir + "/utilities/class");
-var Client = require("./client");
-var EOT_CHAR = String.fromCharCode(4); // end of transmition character, used to signify the string we sent is the end of a transmition and to parse the json string before it, because some socket APIs for clients will concat what we send
+import { Socket } from "net";
+import { BaseClient } from "./base-client" ;
 
-/*
- * @class
- * @classdesc A client to the game server via a TCP socket
- * @extends Client
+/**
+ * The end of transmission character, used to signify the string we sent is the
+ * end of a transmission and to parse the json string before it, because some
+ * socket APIs for clients will concat what we send
  */
-var TCPClient = Class(Client, {
-    init: function(socket /* ,  ... */) {
-        this._buffer= ""; // TCP clients may send their json in parts, delimited by the EOT_CHAR. We buffer it here.
-        socket.setEncoding("utf8");
+const EOT_CHAR = String.fromCharCode(4);
 
-        Client.init.apply(this, arguments);
-    },
+/**
+ * A client to the game server via a TCP socket
+ */
+export class TCPClient extends BaseClient {
+    /**
+     * TCP clients may send their json in parts, delimited by the EOT_CHAR.
+     * We buffer it here.
+     */
+    private buffer: string = "";
+
+    /**
+     * Creates a client connected to a server
+     * @param socket the socket this client communicates through
+     * @param server the server this client is connected to
+     */
+    constructor(socket: Socket) {
+        super((() => {
+            socket.setEncoding("utf8");
+            return socket;
+        })());
+    }
 
     /**
      * Invoked when the tcp socket gets data
-     *
-     * @override
+     * @param data what the client send via the socket event listener
      */
-    _onSocketData: function(data) {
-        Client._onSocketData.apply(this, arguments);
+    protected onSocketData(data: any): void {
+        super.onSocketData(data);
 
-        this._buffer += data;
-        var split = this._buffer.split(EOT_CHAR); // split on "end of text" character (basically end of transmition)
-        this._buffer = split.pop(); // the last item will either be "" if the last char was an EOT_CHAR, or a partial data we need to store in the buffer anyways
+        this.buffer += data;
+        // split on "end of text" character (basically end of transmission)
+        const split = this.buffer.split(EOT_CHAR);
+        // the last item will either be "" if the last char was an EOT_CHAR,
+        // or a partial data we need to store in the buffer anyways
+        this.buffer = split.pop() || "";
 
-        for(var i = 0; i < split.length; i++) {
-            var parsed = this._parseData(split[i]);
-            if(!parsed) {
+        for (const line of split) {
+            const parsed = this.parseData(line);
+            if (!parsed) {
                 return; // because we got some invalid data, so we're going to fatally disconnect anyways
             }
 
-            this.server.clientSentData(this, parsed);
+            this.handleSent(parsed);
         }
-    },
+    }
 
     /**
-     * Sends a raw string through the socket
-     *
-     * @override
+     * Sends a the raw string to the remote client this class represents.
+     * Intended to be overridden to actually send through client...
+     * @param {string} str the raw string to send. Should be EOT_CHAR terminated.
+     * @returns a promise to resolve after data is sent
      */
-    _sendRaw: function(str) {
-        Client._sendRaw.apply(this, arguments);
+    protected sendRaw(str: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            super.sendRaw(str);
 
-        this.socket.write(str + EOT_CHAR);
-    },
+            // this.socket.send(str);
+            this.socket.write(str + EOT_CHAR, resolve);
+        });
+    }
 
     /**
      * Invoked when the other end of this socket disconnects
      *
      * @override
      */
-    disconnected: function() {
-        Client.disconnected.apply(this, arguments);
-
+    protected disconnected(): void {
         this.socket.destroy();
-        delete this.socket;
-    },
-});
-
-module.exports = TCPClient;
+        super.disconnected();
+    }
+}

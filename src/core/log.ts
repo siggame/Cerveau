@@ -1,19 +1,14 @@
-var colors = require("colors");
-var moment = require("moment");
-var utilities = require(__basedir + "/utilities");
-var server = process._gameplayServer;
-var fs = require("fs");
-var os = require("os");
-var util = require("util");
-var cluster = require("cluster");
-var _obj = {};
+// import { isMaster } from "cluster";
+import * as colors from "colors";
+// import { appendFile } from "fs";
+// import * as moment from "moment";
+// import { EOL } from "os";
 
 /**
- * Pairs of colors that cannot be foreground/backgrounsd together because it's too hard to read
- *
- * @type {Array.<Array<string>>} every element is a pair of two strings representing two colors that should never be paired for Instance color pairs, as they are too hard to read.
+ * Pairs of colors that cannot be foreground/background together because it's too hard to read
  */
-var _disallowedColorsPairs = [
+/*
+const disallowedColorsPairs: Array<[string, string]> = [
     [ "Magenta", "Red" ],
     [ "Magenta", "Red Bold" ],
     [ "Magenta", "Blue Bold" ],
@@ -32,62 +27,48 @@ var _disallowedColorsPairs = [
     [ "White", "Black Bold" ], // and this is too similar to above
 ];
 
-/**
- * logs variables, replaces console.log() -> log()
- *
- * @param {...*} arguments - anything you'd log just like console.log
- */
-var log = function(/* ... */) {
-    _obj.log(arguments);
-};
+const cached: {
+    filename?: string;
+    color?: colors.Color;
+} = {};
+*/
+
+interface ILogger {
+    /**
+     * Logs text to the terminal, as a replacement for console.log
+     */
+    (...args: any[]): void;
+
+    /** Logs text to the terminal, as a replacement for console.error */
+    error: (...args: any[]) => void;
+
+    /** Logs text to the terminal, as a replacement for console.debug */
+    debug: (...args: any[]) => void;
+
+    /** Logs text to the terminal, as a replacement for console.warning */
+    warning: (...args: any[]) => void;
+}
 
 /**
- * logs variables to the error steam, replaces console.error() -> log()
- *
- * @param {...*} arguments - anything you'd log just like console.log
+ * Basically a privately scoped log function that colors the log
+ * @param colorFunction the function that colors the text fragments
+ * @param args the augments to color
  */
-log.error = function(/* ... */) {
-    if(arguments[0] instanceof Error) {
-        var err = arguments[0];
-        /* eslint-disable no-console */
-        console.log(err.loc);
-        /* eslint-enable no-console */
-        arguments[0] = "Error logged:\n{name}\n---\n{message}\n---\n{stack}\n---\n{syscall}\n---".format(err);
-    }
-    _obj.log(arguments, colors.red.bold);
-};
+function coloredLog(colorFunction?: colors.Color, ...args: any[]): void {
+    // if (!cached.server) {
+    //     cached.server = process.
+    // }
+    // cached.server = cached.server || process._gameplayServer;
 
-/**
- * logs variables to the debug stream, replaces console.debug() -> log.debug()
- *
- * @param {...*} arguments - anything you'd log just like console.log
- */
-log.debug = function(/* ... */) {
-    _obj.log(arguments, colors.cyan);
-};
-
-/**
- * logs variables to the warn stream, replaces console.wan() -> log.warning()
- *
- * @param {...*} arguments - anything you'd log just like console.log
- */
-log.warning = function(/* ... */) {
-    _obj.log(arguments, colors.yellow);
-};
-
-/**
- * logs to stdio and/or files
- *
- * @param {Array} argsArray - arguments to log from another function
- * @param {colors.builder} [colorFunction] - text color using the colors module
- */
-_obj.log = function(argsArray, colorFunction) {
-    _obj.server = _obj.server || process._gameplayServer;
-
-    var str = util.format.apply(util, argsArray).replace(/\\/, os.EOL);
+    /*
+    var str = util.format.apply(util, argsArray).replace(/\\/, EOL);
     if(_obj.server && _obj.server.logging) {
-        _obj.filename = (_obj.filename || ("output/logs/log-" + _obj.server.name.replace(/ /g, ".") + "-" + utilities.momentString() + ".txt"));
-        fs.appendFile(_obj.filename, str + os.EOL);
+        _obj.filename = (_obj.filename ||
+            ("output/logs/log-" + _obj.server.name.replace(/ /g, ".")
+            + "-" + utilities.momentString() + ".txt"
+            )
+        );
+        appendFile(_obj.filename, str + EOL);
     }
 
     if(_obj.server) {
@@ -100,7 +81,7 @@ _obj.log = function(argsArray, colorFunction) {
                 var bgColor = "White";
                 var fgColor = "Black"; // default color for the Lobby
 
-                if(!cluster.isMaster) { // then we are a child thread (Instance), so make the color a random pair
+                if (!isMaster) { // then we are a child thread (Instance), so make the color a random pair
                     var colorsArray = ["Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White"];
                     colorsArray.shuffle();
 
@@ -118,8 +99,11 @@ _obj.log = function(argsArray, colorFunction) {
                         var pair = _disallowedColorsPairs[i];
 
                         var index = pair.indexOf(bgColor);
-                        if(index > -1) { // then one of the pairs is the bgColor, so remove the other so it can't be a foreground color
-                            colorsArray.removeElement(pair[1 - index]); // 1 - 0 == 1 and 1 - 1 === 0, so we basically flip the index to the other pair's index
+                        if(index > -1) { // then one of the pairs is the bgColor,
+                            so remove the other so it can't be a foreground color
+                            colorsArray.removeElement(pair[1 - index]);
+                            // 1 - 0 == 1 and 1 - 1 === 0, so we basically flip
+                            // the index to the other pair's index
                         }
                     }
 
@@ -135,20 +119,66 @@ _obj.log = function(argsArray, colorFunction) {
                 }
             }
 
-            /* eslint-disable no-console */
+            // tslint:disable-next-line:no-console
             console.log("[{time}] {colored} {str}".format({
                 time: colors.green(moment().format("HH:mm:ss.SSS")),
                 colored: _obj.nameColor ? _obj.nameColor(" " + _obj.server.name + " ") : "???",
                 str: str,
             }));
-            /* eslint-enable no-console */
         }
     }
     else { // they are using log before the server has been initialized
-        /* eslint-disable no-console */
+        // tslint:disable-next-line:no-console
         console.log.apply(console, argsArray);
-        /* eslint-enable no-console */
     }
+    */
+
+    // tslint:disable-next-line:no-console
+    console.log(...args);
+}
+
+export let log: ILogger;
+
+/**
+ * logs variables, replaces console.log() -> log()
+ * @param args anything you'd log just like console.log
+ */
+log = function normalLog(...args: any[]): void {
+    coloredLog(undefined, ...args);
+} as any;
+
+/**
+ * logs variables to the error steam, replaces console.error() -> log()
+ * @param args anything you'd log just like console.log
+ */
+log.error = function logError(...args: any[]): void {
+    const first = args[0];
+    if (first instanceof Error) {
+        args[0] = `Error logged:
+${first.name}
+---
+${first.message}
+---
+${first.stack}
+---
+${(first as any).syscall}
+---`;
+    }
+    coloredLog(colors.red.bold, ...args);
 };
 
-module.exports = log;
+/**
+ * logs variables to the debug stream, replaces console.debug() -> log.debug()
+ * @param args anything you'd log just like console.log
+ */
+log.debug = function logDebug(...args: any[]): void {
+    coloredLog(colors.cyan, ...args);
+};
+
+/**
+ * logs variables to the warn stream, replaces console.wan() -> log.warning()
+ * @param args anything you'd log just like console.log
+ */
+log.warning = function logWarning(...args: any[]): void {
+    coloredLog(colors.yellow, ...args);
+};

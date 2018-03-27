@@ -1,162 +1,114 @@
-var log = require("../log");
-var Class = require(__basedir + "/utilities/class");
-var DeltaMergeable = require("./deltaMergeable");
-var constants = require("../constants");
+import { SHARED_CONSTANTS } from "src/core/constants";
+import { ISanitizableType } from "src/core/type-sanitizer";
+import { createDeltaMergeable } from "./create-delta-mergeable";
+import { DeltaMergeable } from "./delta-mergeable";
 
-var prototype = {
-    init: function(baseGame, pathInBaseGame, copyFrom, options) {
-        DeltaMergeable.init.apply(this, arguments);
-
-        this._valueType = options.valueType;
-
-        var self = this;
-        self._addProperty("length", 0, {
-            deltaKey: constants.shared.DELTA_LIST_LENGTH,
-            setter: function(newValue) {
-                return self._resize(newValue);
-            },
-        });
-
-        if(copyFrom) {
-            this.push.apply(this, copyFrom);
-        }
-    },
-
-    /**
-     * given a new length this resizes the internal properties to that new size. Also does range checks.
-     *
-     * @param {number} newLength - the new length of the array
-     * @returns {number} actual new length, if you pass in negative values this will be 0
-     */
-    _resize: function(newLength) {
-        var newlength = Math.max(newLength, 0);
-        var currentLength = this.length;
-
-        while(currentLength > newlength) {
-            this._removeProperty(--currentLength);
-        }
-
-        while(currentLength < newlength) {
-            this._addProperty(currentLength++, undefined, { type: this._valueType });
-        }
-
-        return newLength;
-    },
-
-    /**
-     * Public setter override to make sure this DeltaMergeableArray is never overwritten
-     *
-     * @param {Array} newArray - the new array we are supposed to be "set" to, instead copy its elements
-     */
-    replace: function(newArray) {
-        if(newArray === this) {
-            return;
-        }
-
-        this.length = newArray.length;
-        for(var i = 0; i < this.length; i++) {
-            this[i] = newArray[i];
-        }
-    },
-
-    /**
-     * re-implementation of Array.push which registers pushed properties. Use this for expanding DeltaMergeableArrays instead of 'this[this.length] = newNum';
-     *
-     * @see Array.push
-     * @param {...*} var_args - any number of elements to push into this array.
-     * @returns {number} new length of this array
-     */
-    push: function(/* element1, element2, ..., elementN */) {
-        var oldLength = this.length;
-        this.length += arguments.length;
-
-        for(var i = 0; i < arguments.length; i++) {
-            this[oldLength + i] = arguments[i];
-        }
-        return this.length;
-    },
-
-    /**
-     * re-implementation of Array.pop which registers removes popped properties. Use this for removing DeltaMergeableArrays instead of 'delete this[this.length - 1]';
-     *
-     * @see Array.pop
-     * @returns {*} element popped from the end of the list
-     */
-    pop: function() {
-        var popping = this[this.length - 1];
-        this.length--;
-        return popping;
-    },
-
-    /**
-     * re-implementation of Array.unshift which registers pushed properties at the front. Use this for expanding DeltaMergeableArrays.
-     *
-     * @see Array.unshift
-     * @param {...*} var_args - any number of elements to push into this array at the front
-     * @returns {number} new length of this array
-     */
-    unshift: function(/* element1, element2, ..., elementN */) {
-        var clone = this.slice();
-        this.length = 0;
-        this.push.apply(this, arguments);
-        this.push.apply(this, clone);
-
-        return this.length;
-    },
-
-    /**
-     * re-implementation of Array.shift which pops the first element off the array, shift all elements down.
-     *
-     * @see Array.shift
-     * @returns {*} the element of the array that was shifted from the front.
-     */
-    shift: function() {
-        if(this.length > 0) {
-            var first = this[0];
-            for(var i = 0; i < (this.length - 1); i++) {
-                this[i] = this[i + 1];
+export function createArray<T = any>(args: {
+    key: string;
+    childType: ISanitizableType;
+    parent?: DeltaMergeable;
+}): DeltaMergeable<T[]> {
+    let oldLength = 0;
+    // let lengthUpdating = false;
+    const array: T[] = [];
+    const values = new Array<DeltaMergeable<T>>();
+    const container = new DeltaMergeable<T[]>({
+        key: args.key,
+        parent: args.parent,
+        initialValue: [],
+        transform: (newArray: T[] | undefined, currentValue) => {
+            newArray = newArray || [];
+            // we won't allow people to re-set this array,
+            // instead we will mutate the current array to match `newArray`
+            for (let i = 0; i < newArray.length; i++) {
+                currentValue![i] = newArray[i];
             }
-            this.pop();
-            return first;
-        }
-    },
+            currentValue!.length = newArray.length;
+            return currentValue;
+        },
+    });
 
-    /**
-     * re-implementation of Array.concat to also consider DeltaMergeable as arrays (and not a single object)
-     *
-     * @see Array.concat
-     * @returns {Array} the new concated Array (not DeltaMergeableArray)
-     */
-    concat: function(/* ... */) {
-        for(var i = 0; i < arguments.length; i++) {
-            var arg = arguments[i];
-            if(DeltaMergeable.isInstance(arg)) { // then we need to convert it to an array
-                arg = arg.slice();
+    const lengthDeltaMergeable = new DeltaMergeable<number>({
+        key: SHARED_CONSTANTS.DELTA_LIST_LENGTH,
+        parent: container,
+        initialValue: 0,
+    });
+
+    function checkIfUpdated(index?: number, value?: T): void {
+        let newLength = array.length;
+
+        if (index !== undefined && (index >= oldLength || index >= array.length)) {
+            newLength = index + 1;
+        }
+
+        if (newLength !== oldLength) {
+            if (newLength > oldLength) {
+                // the array grew in size, so we need some new delta mergeables
+
+                for (let i = oldLength; i < newLength; i++) {
+                    const currentValue = i === index ? value : undefined;
+
+                    if (values[i]) {
+                        container.adopt(values[i]);
+                        values[i].set(currentValue);
+                    }
+                    else {
+                        values[i] = createDeltaMergeable({
+                            key: String(i),
+                            parent: container,
+                            type: args.childType,
+                            initialValue: currentValue,
+                        });
+                    }
+
+                    array[i] = values[i].get()!;
+                }
             }
-            arguments[i] = arg;
+            else { // newLength < oldLength
+                for (let i = newLength; i >= oldLength; i--) {
+                    values[i].delete();
+                }
+            }
         }
-
-        var thisAsArray = this.slice();
-        return thisAsArray.concat.apply(thisAsArray, arguments);
-    },
-};
-
-// We copy all the functions from the Array prototype to this prototype so it can act like an array. They above functions have to be manually re-written so the properties get created correctly
-// NOTE: These functions SHOULD all work, because DeltaMergeableArrays function like a normal Array, but errors could happen. Be careful
-var arrayPrototypeKeys = Object.getOwnPropertyNames(Array.prototype).concat(Object.getOwnPropertySymbols(Array.prototype));
-for(var i = 0; i < arrayPrototypeKeys.length; i++) {
-    var property = arrayPrototypeKeys[i];
-    if(!prototype.hasOwnProperty(property)) {
-        (function(property) {
-            prototype[property] = function(/* ... */) {
-                return Array.prototype[property].apply(this, arguments);
-            };
-        })(property);
+        oldLength = array.length;
+        lengthDeltaMergeable.set(oldLength);
     }
-}
 
-/**
- * @class DeltaMergeableArray - a re-implementation of the native js Array that tracks its deltas
- */
-var DeltaMergeableArray = Class(DeltaMergeable, prototype);
-module.exports = DeltaMergeableArray;
+    const proxyArray = new Proxy(array, {
+        set(target: T[], property: string | number, value: T): boolean {
+            const index = Number(property);
+
+            if (isNaN(index)) {
+                if (property === "length") {
+                    Reflect.set(target, property, value);
+                    checkIfUpdated();
+                    return true;
+                }
+
+                return false; // all other strings are not able to be set on arrays
+            }
+
+            // if we got here, we know that the property being set is an index
+            checkIfUpdated(index, value);
+            values[index].set(value);
+            Reflect.set(target, property, values[index].get());
+
+            return true;
+        },
+        deleteProperty(target: T[], property: string | number): boolean {
+            const index = Number(property);
+
+            if (isNaN(index)) {
+                return false; // arrays can only delete numbers, not strings
+            }
+
+            values[index].delete();
+            Reflect.deleteProperty(target, property);
+            return true;
+        },
+    });
+
+    container.wrapper = proxyArray;
+
+    return container;
+}
