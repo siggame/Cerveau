@@ -1,29 +1,39 @@
 // Check for npm install first, as many devs forget this pre step
-var fs = require("fs");
+import { lstatSync } from "fs";
+
 try {
-    if(!fs.lstatSync("./node_modules/").isDirectory()) {
-        throw {};
+    if (!lstatSync("./node_modules/").isDirectory()) {
+        throw new Error(
+`ERROR: "node_modules/" not found.
+Did you forget to run 'npm install'?`,
+        );
     }
 }
-catch(e) {
-    /* eslint-disable no-console */
-    console.error("ERROR: \"node_modules/\" not found.\nDid you forget to run 'npm install'?");
-    /* eslint-enable no-console */
+catch (err) {
+    // tslint:disable-next-line no-console
+    console.error(err);
     process.exit(1);
 }
 
-process.title = "Cerveau Game Server";
-global.__basedir = __dirname + "/"; // hackish way to store the base directory we are in now so we don't need require("../../../../whatever") and instead require(__base + "root/path/to/whatever")
+import "tsconfig-paths/register";
+// import { join } from "path";
+// process.env.TS_NODE_PROJECT = join(__dirname, "tsconfig.json");
 
-require("cadre-js-extensions"); // extends built in JavaScript objects. Extend with care, prototypes can get funky if you are not careful
+// if we got here the node modules should be good to go
+// import "module-alias/register";
+import { Config } from "src/core/args";
+process.title = `${Config.MAIN_TITLE} Game Server`;
 
-var args = require("./args");
-var extend = require("extend");
+// import { log } from "./core/log";
+import { Lobby } from "src/core/server";
 
-var Lobby = require("./gameplay/lobby");
-var lobby = new Lobby(args); // the game server for clients to connect to
-var log = require("./gameplay/log");
+Lobby.getInstance(); // this will create the singleton Lobby instance
 
+if (Config.API_ENABLED || Config.WEB_ENABLED) {
+    // TODO: create the web server
+}
+
+/*
 var app = require("./website/app");
 if(args.api || args.web) {
     var http = require("http").Server(app);
@@ -32,10 +42,13 @@ if(args.api || args.web) {
     });
 
     server.on("error", function(err) {
-        log.error(err.code !== "EADDRINUSE" ? err : "Webinterface cannot listen on port " + args.httpPort + ". Address in use.");
+        log.error(err.code !== "EADDRINUSE"
+            ? err
+            : "Webinterface cannot listen on port " + args.httpPort + ". Address in use.");
     });
 }
 
 require("./website/")(extend({
     lobby: lobby,
 }, args));
+*/
