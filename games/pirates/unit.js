@@ -182,7 +182,7 @@ let Unit = Class(GameObject, {
 			return "Ahoy scallywag! Ye don't control this buccaneer! Ye can't make him dig.";
 		}else if(unit.gold<amount){
 			return "This buccaneer does not have enough booty to bury that amount!";
-		}else if(unit.tile.type!=="land"){
+		}else if(unit.tile.type!=="land"||unit.tile.port){
 			return "Ye can't bury gold here!";
 		}
         return undefined; // meaning valid
