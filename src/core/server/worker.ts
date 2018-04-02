@@ -8,7 +8,7 @@ import { Socket } from "net";
 import { Config } from "src/core/args";
 import { BaseClient, getClientByType } from "src/core/clients";
 import { IBaseGameSettings } from "src/core/game";
-import { log } from "src/core/log";
+import { logger } from "src/core/log";
 import { Session } from "src/core/server/session";
 
 export interface IClientInfo {
@@ -100,7 +100,7 @@ async function start(): Promise<void> {
                     let gamelog = {};
                     let errorCode = 0;
                     if (data instanceof Error) {
-                        log.error(data);
+                        logger.error(String(data));
                         errorCode = 1;
                     }
                     else {

@@ -2,7 +2,7 @@
 
 import { ArgumentOptions, ArgumentParser } from "argparse";
 import "dotenv"; // loads the config from an optional `.env` file
-import { IWorkerGameSessionData } from "src/core/worker";
+import { IWorkerGameSessionData } from "src/core/server/worker";
 import { IAnyObject, unstringify } from "src/utils";
 
 export interface IArgs {

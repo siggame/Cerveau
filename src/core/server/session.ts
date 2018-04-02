@@ -8,6 +8,7 @@ import { BaseClient } from "src/core/clients";
 import { DeltaManager } from "src/core/game/delta-manager";
 import { GameLogManager } from "src/core/game/game-log-manager";
 import { GameLogger } from "src/core/game/game-logger";
+import { logger } from "src/core/log";
 import { isObjectEmpty } from "src/utils";
 import { Event, events, Signal } from "ts-typed-events";
 // import { startProfiling, stopProfiling } from "v8-profiler";
@@ -15,7 +16,6 @@ import { Event, events, Signal } from "ts-typed-events";
 import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer,
     IBaseGameNamespace, IBaseGameSettings, IDelta, IFinishedDeltaData, IGamelog,
     IRanDeltaData } from "../game/";
-import { log } from "../log";
 
 /**
  * Session: the server that handles of communications between a game and its
@@ -95,7 +95,7 @@ export class Session {
         this.gameLogger = new GameLogger(this.game, this, playingClients, this.deltaManager);
         this.gameLogger.events.logged.on(this.sendDeltas);
 
-        log(`${this.gameName} game is starting.`);
+        logger.info(`${this.gameName} game is starting.`);
         this.events.start.emit();
 
         for (const client of this.clients) {
@@ -111,7 +111,7 @@ export class Session {
      * @returns once all the cleanup is done
      */
     public async kill(err: Error | string): Promise<void> {
-        log.error(err);
+        logger.error(String(err));
         this.fatal = typeof err === "string"
             ? new Error(err)
             : err;
@@ -135,7 +135,7 @@ export class Session {
         // and sit and listen forever
         await delay(1000); // 1 second delay to exit, to allow clients to disconnect.
 
-        log(`${this.gameName} Game is over, exiting.`);
+        logger.info(`${this.gameName} Game is over, exiting.`);
 
         this.events.ended.emit(this.fatal || gamelog!);
     }

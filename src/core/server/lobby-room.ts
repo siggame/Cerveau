@@ -1,5 +1,5 @@
-import { log } from "src/core/";
 import { GameLogManager, IBaseGameNamespace, IBaseGameSettings, IGamelog, IGamelogWinnerLoser } from "src/core/game";
+import { logger } from "src/core/log";
 import { IAnyObject, removeElements } from "src/utils";
 import { events, Signal } from "ts-typed-events";
 import { BaseClient } from "../clients/";
@@ -100,7 +100,7 @@ export class Room {
      */
     public start(): void {
         if (this.updater) { // && this.updater.foundUpdates()) {
-            log.warning("Starting a game session without updates!");
+            logger.warn("Starting a game session without updates!");
         }
 
         // super classes should inherit and do things

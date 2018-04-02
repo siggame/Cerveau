@@ -24,7 +24,6 @@ import "tsconfig-paths/register";
 import { Config } from "src/core/args";
 process.title = `${Config.MAIN_TITLE} Game Server`;
 
-// import { log } from "./core/log";
 import { Lobby } from "src/core/server";
 
 Lobby.getInstance(); // this will create the singleton Lobby instance

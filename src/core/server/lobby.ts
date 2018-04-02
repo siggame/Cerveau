@@ -1,7 +1,7 @@
 // internal imports
 import { Config } from "src/core/args";
 import { SHARED_CONSTANTS } from "src/core/constants";
-import { log } from "src/core/log";
+import { logger } from "src/core/log";
 import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "src/utils";
 import { BaseClient, getClientByType, IPlayData } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
@@ -82,12 +82,12 @@ export class Lobby {
         rl.on("SIGINT", async () => {
             if (!this.isShuttingDown) {
                 this.isShuttingDown = true;
-                log("Shutting down gracefully...");
+                logger.info("Ω Shutting down gracefully Ω");
 
                 const n = Array.from(this.roomsPlaying).reduce((sum, [name, rooms]) => sum + rooms.size, 0);
-                log(`${n} game${n > 1 ? "s" : ""} currently running`);
+                logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
                 if (n === 0) {
-                    log("   ↳ We can shut down immediately, see you later!");
+                    logger.info("     ↳ No one here, see you later!");
                 }
 
                 try {
@@ -103,15 +103,15 @@ export class Lobby {
                 }
 
                 if (n > 0) {
-                    log("Waiting for them to exit before shutting down.");
-                    log("^C again to force shutdown, which force disconnects clients.");
+                    logger.info("     Waiting for them to exit before shutting down.");
+                    logger.info("     ^C again to force shutdown, which force disconnects clients.");
                 }
                 else {
                     process.exit(0);
                 }
             }
             else {
-                log("Force shutting down.");
+                logger.info("╘ Force shutting down.");
                 process.exit(0);
             }
         });
@@ -225,12 +225,12 @@ export class Lobby {
         });
 
         listener.listen(port, "0.0.0.0", () => {
-            log(`--- Lobby listening on port ${port} for ${type} Clients ---`);
+            logger.info(`»» Listening on port ${port} for ${type} Clients ««`);
         });
 
         listener.on("error", (err) => {
-            log.error((err as any).code !== "EADDRINUSE"
-            ? err
+            logger.error((err as any).code !== "EADDRINUSE"
+            ? String(err)
             : `Lobby cannot listen on port ${port} for game connections. Address in use.
 There's probably another Cerveau server running on this same computer.`);
 
@@ -248,7 +248,7 @@ There's probably another Cerveau server running on this same computer.`);
         const dirs = await getDirs(GAMES_DIR);
 
         for (const dir of dirs) {
-            log(`» ${capitalizeFirstLetter(dir)} game found.`);
+            logger.info(`► ${capitalizeFirstLetter(dir)} game found ◄`);
 
             let gameNamespace: IBaseGameNamespace | undefined;
             try {
@@ -256,7 +256,7 @@ There's probably another Cerveau server running on this same computer.`);
                 gameNamespace = data.Namespace as IBaseGameNamespace;
             }
             catch (err) {
-                log.error(err, `Could not load game ${dir}`);
+                logger.error(String(err), `Could not load game ${dir}`);
                 process.exit(1);
                 return;
             }
@@ -415,7 +415,7 @@ There's probably another Cerveau server running on this same computer.`);
                 roomsPlayingThisGame.delete(room.id);
 
                 if (this.isShuttingDown && this.roomsPlaying.size === 0) {
-                    log("Final game session exited. Shutdown complete.");
+                    logger.info("Final game session exited. Shutdown complete.");
                     process.exit(0);
                 }
             });

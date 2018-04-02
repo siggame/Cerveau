@@ -1,4 +1,4 @@
-import { log } from "src/core";
+import { logger } from "src/core/log";
 import { events } from "ts-typed-events";
 import { Room } from "./lobby-room";
 import { Session } from "./session";
@@ -21,7 +21,7 @@ export class SerialRoom extends Room {
 
         this.session.events.ended.on(async (data) => {
             if (data instanceof Error) {
-                log.error("Session had a fatal error", data);
+                logger.error("Session had a fatal error", data);
             }
             else {
                 // we got the gamelog!

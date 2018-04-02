@@ -1,6 +1,8 @@
+import { logger } from "src/core/log";
 import { isObject, ITypedObject } from "src/utils";
 import { BaseGameObject } from "./game/base/base-game-object";
-import { log } from "./log";
+
+// Max/Min true int32 values for most programming languages
 const INT_MAX = 2147483647;
 const INT_MIN = -2147483648;
 
@@ -70,11 +72,11 @@ export function defaultInteger(i: any): number {
     let num = parseInt(i, 10) || 0;
 
     if (num > INT_MAX) {
-        log.warning(`Integer ${num} exceeds INT_MAX`);
+        logger.warn(`Integer ${num} exceeds INT_MAX`);
         num = INT_MAX;
     }
     else if (num < INT_MIN) {
-        log.warning(`Integer ${num} exceeds INT_MIN`);
+        logger.warn(`Integer ${num} exceeds INT_MIN`);
         num = INT_MIN;
     }
 
