@@ -20,17 +20,17 @@ const DIRECTIONAL_OFFSETS = {
  * player's buildings. Let it burn.
  */
 export class Game extends BaseClasses.Game {
-    public readonly manager: GameManager;
+    public readonly manager!: GameManager;
 
     /**
      * How many bribes players get at the beginning of their turn, not counting their burned down Buildings.
      */
-    public readonly baseBribesPerTurn: number;
+    public readonly baseBribesPerTurn!: number;
 
     /**
      * All the buildings in the game.
      */
-    public readonly buildings: Building[];
+    public readonly buildings!: Building[];
 
     /**
      * The current Forecast, which will be applied at the end of the turn.
@@ -40,37 +40,37 @@ export class Game extends BaseClasses.Game {
     /**
      * The player whose turn it is currently. That player can send commands. Other players cannot.
      */
-    public currentPlayer: Player;
+    public currentPlayer!: Player;
 
     /**
      * The current turn number, starting at 0 for the first player's turn.
      */
-    public currentTurn: number;
+    public currentTurn!: number;
 
     /**
      * All the forecasts in the game, indexed by turn number.
      */
-    public readonly forecasts: Forecast[];
+    public readonly forecasts!: Forecast[];
 
     /**
      * All the game objects in the game, indexed by id
      */
-    public readonly gameObjects: {[id: string]: GameObject | undefined};
+    public readonly gameObjects!: {[id: string]: GameObject | undefined};
 
     /**
      * The maximum amount of fire value for any Building.
      */
-    public readonly maxFire: number;
+    public readonly maxFire: number = this.maxFire || 0;
 
     /**
      * The maximum amount of intensity value for any Forecast.
      */
-    public readonly maxForecastIntensity: number;
+    public readonly maxForecastIntensity!: number;
 
     /**
      * The maximum number of turns before the game will automatically end.
      */
-    public readonly maxTurns: number;
+    public readonly maxTurns!: number;
 
     /**
      * The next Forecast, which will be applied at the end of your opponent's
@@ -78,17 +78,17 @@ export class Game extends BaseClasses.Game {
      */
     public nextForecast?: Forecast;
 
-    public readonly mapWidth: number;
-    public readonly mapHeight: number;
+    public readonly mapWidth!: number;
+    public readonly mapHeight!: number;
 
     public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
 
     /**
      * List of all the players in the game.
      */
-    public readonly players: Player[];
+    public readonly players!: Player[];
 
-    public readonly settings: Readonly<IAnarchyGameSettings>;
+    public readonly settings!: Readonly<IAnarchyGameSettings>;
 
     // creer-merge
     public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];

@@ -16,7 +16,7 @@ export interface IRunData {
 /**
  * Sent from a client to the Lobby about what that client wants to play
  */
-export interface IPlayData {
+export interface IBasePlayData {
     /** The name (id) of the game to play. Assume this is an alias before using. */
     gameName: string;
 
@@ -50,17 +50,24 @@ export interface IPlayData {
     password?: string;
 
     /**
+     * If set to true, then this client is treated as a spectator and will not
+     * play, but will still be sent information about the game as it progresses.
+     * Any other value will be treated as false (such as omitting the key).
+     */
+    spectating?: boolean;
+}
+
+export interface IPlayData extends IBasePlayData {
+    /** The un-parsed url parm game settings string */
+    gameSettings: string;
+}
+
+export interface IParsedPlayData extends IBasePlayData {
+    /**
      * Settings for the game. This varies based on each game and there is no
      * [current] way for a client to know which game settings are valid.
      * Instead send a Query string formatted string of the settings, and we'll
      * take what we can get.
      */
     gameSettings: IBaseGameSettings;
-
-    /**
-     * If set to true, then this client is treated as a spectator and will not
-     * play, but will still be sent information about the game as it progresses.
-     * Any other value will be treated as false (such as omitting the key).
-     */
-    spectating?: boolean;
 }

@@ -29,10 +29,10 @@ export class BaseAIManager {
     });
 
     /** **This must be set externally before use** */
-    public game: BaseGame;
+    public game!: BaseGame;
 
     /** **This one too** */
-    public invalidateRun: (
+    public invalidateRun!: (
         player: IBasePlayer,
         gameObject: BaseGameObject,
         functionName: string,

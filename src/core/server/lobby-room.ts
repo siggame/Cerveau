@@ -40,7 +40,7 @@ export class Room {
         public readonly id: string,
         public readonly gameNamespace: IBaseGameNamespace,
         protected readonly gameLogger: GameLogManager,
-        private readonly updater: Updater,
+        private readonly updater?: Updater,
     ) {
         this.gameSettings = {...gameNamespace.defaultGameSettings};
     }

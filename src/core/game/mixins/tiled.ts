@@ -69,8 +69,8 @@ export function mixTiled<
     }
 
     class TiledTile extends base.GameObject {
-        public x: number;
-        public y: number;
+        public x: number = 0;
+        public y: number = 0;
 
         public tileNorth?: TiledTile;
         public tileEast?: TiledTile;
@@ -146,9 +146,9 @@ export function mixTiled<
 
     class TiledGame extends base.Game {
         // client <--> server properties
-        public readonly tiles: TiledTile[];
-        public readonly mapWidth: number;
-        public readonly mapHeight: number;
+        public readonly tiles: TiledTile[] = [];
+        public readonly mapWidth: number = 40;
+        public readonly mapHeight: number = 20;
 
         // server-side only
         public readonly tileDirections = TILE_DIRECTIONS;

@@ -1,11 +1,21 @@
 // Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
 import { IBaseGameObjectRequiredData } from "src/core/game";
-import { GameObject, Player } from "./";
+import { GameObject, IGameObjectConstructorArgs, Player } from "./";
 import { IForecastProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be required here safely between cree runs
 // <<-- /Creer-Merge: imports -->>
+
+export interface IForecastConstructorArgs extends IForecastProperties, IGameObjectConstructorArgs {
+    // <<-- Creer-Merge: constructor-args -->>
+
+    // You can add more constructor args in here!
+    direction: string;
+    intensity: number;
+
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
 /**
  * The weather effect that will be applied at the end of a turn, which causes fires to spread.
@@ -21,13 +31,13 @@ export class Forecast extends GameObject {
      * The direction the wind will blow fires in. Can be 'north', 'east',
      * 'south', or 'west'.
      */
-    public direction: string;
+    public direction: string = "";
 
     /**
      * How much of a Building's fire that can be blown in the direction of this
      * Forecast. Fire is duplicated (copied), not moved (transferred).
      */
-    public intensity: number;
+    public intensity: number = 0;
 
     /**
      * Initializes Forecasts.
@@ -35,7 +45,7 @@ export class Forecast extends GameObject {
      * @param {Object} data the initial Forecast properties (already hooked up)
      * @param required - data required for this game object to be initialized correctly
      */
-    constructor(data: IForecastProperties, required: IBaseGameObjectRequiredData) {
+    constructor(data: IForecastConstructorArgs, required: IBaseGameObjectRequiredData) {
         super(data, required);
 
         // <<-- Creer-Merge: init -->>

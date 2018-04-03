@@ -24,8 +24,8 @@ export function createGameObject< T extends BaseGameObject>(args: {
 
 /** A factory that creates game objects in a game and hooks them up */
 export class BaseGameObjectFactory {
-    private game: BaseGame; // this will actually be set externally :P
-    private gameObjectsDeltaMergeable: DeltaMergeable;
+    private game!: BaseGame; // this will actually be set externally :P
+    private gameObjectsDeltaMergeable!: DeltaMergeable;
 
     constructor(
         private readonly namespace: IBaseGameNamespace,

@@ -1,11 +1,19 @@
 // FireDepartment: Can put out fires completely.
 import { IBaseGameObjectRequiredData } from "src/core/game";
-import { Building, Player } from "./";
+import { Building, IBuildingConstructorArgs, Player } from "./";
 import { IFireDepartmentProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: imports -->>
 import { clamp } from "src/utils";
 // <<-- /Creer-Merge: imports -->>
+
+export interface IFireDepartmentConstructorArgs extends IFireDepartmentProperties, IBuildingConstructorArgs {
+    // <<-- Creer-Merge: constructor-args -->>
+
+    // You can add more constructor args in here!
+
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
 /**
  * Can put out fires completely.
@@ -21,7 +29,7 @@ export class FireDepartment extends Building {
      * @param data initial values for the FireDepartment (automatically applied)
      * @param required d
      */
-    constructor(data: IFireDepartmentProperties, required: IBaseGameObjectRequiredData) {
+    constructor(data: IFireDepartmentConstructorArgs, required: IBaseGameObjectRequiredData) {
         super(data, required);
 
         // <<-- Creer-Merge: init -->>

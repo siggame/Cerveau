@@ -1,12 +1,20 @@
 // Warehouse: A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.
 
 import { IBaseGameObjectRequiredData } from "src/core/game";
-import { Building, Player } from "./";
+import { Building, IBuildingConstructorArgs, Player } from "./";
 import { IWarehouseProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: requires -->>
 import { clamp, manhattanDistance } from "src/utils";
 // <<-- /Creer-Merge: requires -->>
+
+export interface IWarehouseConstructorArgs extends IWarehouseProperties, IBuildingConstructorArgs {
+    // <<-- Creer-Merge: constructor-args -->>
+
+    // You can add more constructor args in here!
+
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
 /**
  * A typical abandoned warehouse... that anarchists hang out in and can be
@@ -18,7 +26,7 @@ export class Warehouse extends Building {
      * PoliceDepartments. Raises when bribed to ignite buildings, and drops
      * each turn if not bribed.
      */
-    public exposure: number;
+    public exposure: number = this.exposure || 0;
 
     /**
      * The amount of fire added to buildings when bribed to ignite a
@@ -33,12 +41,16 @@ export class Warehouse extends Building {
      * whatever you sent with it. GameSettings are in here by key/value as well.
      * @param required ha
      */
-    constructor(data: IWarehouseProperties, required: IBaseGameObjectRequiredData) {
+    constructor(data: IWarehouseConstructorArgs, required: IBaseGameObjectRequiredData) {
         super(data, required);
 
         // <<-- Creer-Merge: init -->>
 
         this.fireAdded = 3;
+
+        if (this.isHeadquarters) {
+            this.fireAdded = this.game.maxFire;
+        }
 
         // <<-- /Creer-Merge: init -->>
     }

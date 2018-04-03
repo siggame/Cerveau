@@ -1,6 +1,12 @@
 import { IBaseGameObjectRequiredData } from "src/core/game";
-import { GameObject, Player } from "./";
+import { GameObject, IGameObjectConstructorArgs, Player } from "./";
 import { IBuildingProperties } from "./game-interfaces";
+
+export interface IBuildingConstructorArgs extends IBuildingProperties, IGameObjectConstructorArgs {
+    // <<-- Creer-Merge: constructor-args -->>
+    owner: Player;
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be required here safely between cree runs
@@ -15,7 +21,7 @@ export class Building extends GameObject {
      * When true this building has already been bribed this turn and cannot be
      * bribed again this turn.
      */
-    public bribed: boolean;
+    public bribed!: boolean;
 
     /**
      * The Building directly to the east of this building, or null if not
@@ -47,7 +53,7 @@ export class Building extends GameObject {
      * How much fire is currently burning the building, and thus how much damage
      * it will take at the end of its owner's turn. 0 means no fire.
      */
-    public fire: number;
+    public fire!: number;
 
     /**
      * How much health this building currently has. When this reaches 0 the
@@ -59,7 +65,7 @@ export class Building extends GameObject {
      * True if this is the Headquarters of the owning player, false otherwise.
      * Burning this down wins the game for the other Player.
      */
-    public readonly isHeadquarters: boolean;
+    public readonly isHeadquarters!: boolean;
 
     /**
      * The player that owns this building. If it burns down (health reaches 0)
@@ -70,15 +76,15 @@ export class Building extends GameObject {
     /**
      * The location of the Building along the x-axis.
      */
-    public x: number;
+    public x!: number;
 
     /**
      * The location of the Building along the y-axis.
      */
-    public y: number;
+    public y!: number;
 
     // <<-- Creer-Merge: added-properties -->>
-    public maxHealth: number = 100;
+    public maxHealth!: number;
     // <<== /Creer-Merge: added-properties -->>
 
     /**
@@ -87,18 +93,17 @@ export class Building extends GameObject {
      *             hooked up in the super method for you for this classes
      *             member properties.
      */
-    constructor(data: IBuildingProperties, required: IBaseGameObjectRequiredData) {
+    constructor(data: IBuildingConstructorArgs, required: IBaseGameObjectRequiredData) {
         super(data, required);
 
         // <<-- Creer-Merge: init -->>
-
+        this.owner = data.owner;
+        this.maxHealth = 100;
         this.health = this.maxHealth;
 
         if (this.isHeadquarters) {
-            this.isHeadquarters = true;
             this.owner.headquarters = this;
             this.health *= this.game.settings.headquartersHealthScalar;
-            (this as any).fireAdded = this.game.maxFire;
         }
 
         // <<-- /Creer-Merge: init -->>

@@ -21,9 +21,9 @@ export interface IBaseGameObjectRequiredData {
  * the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
  */
 export class BaseGameObject extends BaseGameDeltaMergeables {
-    public readonly id: string;
-    public readonly gameObjectName: string;
-    public readonly logs: string[];
+    public readonly id: string = this.id || "";
+    public readonly gameObjectName: string = this.gameObjectName || "";
+    public readonly logs: string[] = this.logs || [];
 
     /** The game this game object is in, inheriting classes should specify the sub game type */
     protected readonly game: BaseGame;

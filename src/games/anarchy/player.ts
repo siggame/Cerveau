@@ -4,66 +4,64 @@ import { IBaseGameObjectRequiredData } from "src/core/game";
 import { AI, Building, FireDepartment, GameObject,
     IBaseAnarchyPlayer, PoliceDepartment, Warehouse, WeatherStation } from "./";
 
-// const ugh = BaseClasses.mixPlayer(GameObject);
-
 // <<-- Creer-Merge: requires -->>
 // any additional requires you want can be required here safely between cree runs
 // <<-- /Creer-Merge: requires -->>
 
 // @class Player: A player in this game. Every AI controls one player.
 export class Player extends GameObject implements IBaseAnarchyPlayer {
-    public readonly ai: AI;
+    public readonly ai!: AI;
 
-    public timeRemaining: number;
-    public readonly name: string;
-    public readonly clientType: string;
-    public lost: boolean;
-    public reasonLost: string;
-    public won: boolean;
-    public reasonWon: string;
+    public timeRemaining: number = this.timeRemaining || 0;
+    public readonly name: string = this.name || "";
+    public readonly clientType: string = this.clientType || "";
+    public lost: boolean = this.lost || false;
+    public reasonLost: string = this.reasonLost || "";
+    public won: boolean = this.won || false;
+    public reasonWon: string = this.reasonWon || "";
 
     /**
      * How many bribes this player has remaining to use during their turn. Each
      * action a Building does costs 1 bribe. Any unused bribes are lost at the
      * end of the player's turn.
      */
-    public bribesRemaining: number;
+    public bribesRemaining: number = this.bribesRemaining || 0;
 
     /**
      * All the buildings owned by this player.
      */
-    public readonly buildings: Building[];
+    public readonly buildings: Building[] = this.buildings || [];
 
     /**
      * All the FireDepartments owned by this player.
      */
-    public readonly fireDepartments: FireDepartment[];
+    public readonly fireDepartments: FireDepartment[] = this.fireDepartments || [];
 
     /**
      * The Warehouse that serves as this player's headquarters and has extra
      * health. If this gets destroyed they lose.
      */
-    public headquarters: Building;
+    public headquarters?: Building;
 
     /**
      * This player's opponent in the game.
      */
-    public readonly opponent: Player;
+    public readonly opponent!: Player;
 
     /**
      * All the PoliceDepartments owned by this player.
      */
-    public readonly policeDepartments: PoliceDepartment[];
+    public readonly policeDepartments: PoliceDepartment[] = this.policeDepartments || [];
 
     /**
      * All the warehouses owned by this player. Includes the Headquarters.
      */
-    public readonly warehouses: Warehouse[];
+    public readonly warehouses: Warehouse[] = this.warehouses || [];
 
     /**
      * All the WeatherStations owned by this player.
      */
-    public readonly weatherStations: WeatherStation[];
+    public readonly weatherStations: WeatherStation[] = this.weatherStations || [];
 
     /**
      * Initializes Players.

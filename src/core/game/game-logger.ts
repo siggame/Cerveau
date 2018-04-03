@@ -72,6 +72,7 @@ export class GameLogger {
 
     /**
      * Generates the game log from all the events that happened in this game.
+     * @param clients the list of clients that played this game
      * @returns the gamelog that was generated
      */
     private finalizeGamelog(clients: BaseClient[]): void {

@@ -78,7 +78,7 @@ export function mixTurnBased<
         /** The amount of time added to a player's timeRemaining at the end of each of their turns */
         public readonly timeAddedPerTurn: number = 1e9; // 1 sec in ns
 
-        public currentPlayer: IBasePlayer;
+        public currentPlayer!: IBasePlayer;
 
         public currentTurn: number = 0;
 
@@ -86,7 +86,7 @@ export function mixTurnBased<
     }
 
     class TurnBasedGameManager extends base.GameManager {
-        public readonly game: TurnBasedGame;
+        public readonly game!: TurnBasedGame;
 
         /**
          * begins the turn based game to the first player

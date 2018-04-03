@@ -1,10 +1,9 @@
-import { IBaseGameObjectData } from "src/core/game";
 import { Building, Player } from "./";
 
-export interface IGameObjectProperties extends IBaseGameObjectData {
+export interface IGameObjectProperties {
 }
 
-export interface IBuildingProperties extends IGameObjectProperties {
+export interface IBuildingProperties {
     bribed?: boolean;
     buildingEast?: Building;
     buildingNorth?: Building;
@@ -18,19 +17,19 @@ export interface IBuildingProperties extends IGameObjectProperties {
     y?: number;
 }
 
-export interface IFireDepartmentProperties extends IBuildingProperties {
+export interface IFireDepartmentProperties {
     fireExtinguished?: number;
 }
 
-export interface IPoliceDepartmentProperties extends IBuildingProperties {
+export interface IPoliceDepartmentProperties {
 }
 
-export interface IWarehouseProperties extends IBuildingProperties {
+export interface IWarehouseProperties {
     exposure?: number;
     fireAdded?: number;
 }
 
-export interface IWeatherStationProperties extends IBuildingProperties {
+export interface IWeatherStationProperties {
 }
 
 export interface IForecastProperties {

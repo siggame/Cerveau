@@ -1,9 +1,17 @@
 import { IBaseGameObjectRequiredData } from "src/core/game";
-import { Building, Player, Warehouse } from "./";
+import { Building, IBuildingConstructorArgs, Player, Warehouse } from "./";
 import { IPoliceDepartmentProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: requires -->>
 // <<-- /Creer-Merge: requires -->>
+
+export interface IPoliceDepartmentConstructorArgs extends IPoliceDepartmentProperties, IBuildingConstructorArgs {
+    // <<-- Creer-Merge: constructor-args -->>
+
+    // You can add more constructor args in here!
+
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
 /**
  * PoliceDepartment: Used to keep cities under control and raid Warehouses.
@@ -14,7 +22,7 @@ export class PoliceDepartment extends Building {
      * @param data - the data
      * @param required omg
      */
-    constructor(data: IPoliceDepartmentProperties, required: IBaseGameObjectRequiredData) {
+    constructor(data: IPoliceDepartmentConstructorArgs, required: IBaseGameObjectRequiredData) {
         super(data, required);
 
         // <<-- Creer-Merge: init -->>

@@ -18,8 +18,8 @@ export class GameManager extends BaseClasses.GameManager {
         ];
     }
 
-    public readonly game: Game;
-    public readonly create: AnarchyGameObjectFactory;
+    public readonly game!: Game;
+    public readonly create!: AnarchyGameObjectFactory;
 
     public createBuilding(
         type: "FireDepartment" | "PoliceDepartment" | "Warehouse" | "WeatherStation" | string,
@@ -108,7 +108,7 @@ export class GameManager extends BaseClasses.GameManager {
         let loser: Player | undefined;
         let gameOver = false;
         for (const player of this.game.players) {
-            if (player.headquarters.health <= 0) { // then it burned down, and they have lost
+            if (player.headquarters!.health <= 0) { // then it burned down, and they have lost
                 if (loser) {
                     // someone else already lost this turn...
                     // so they both lost their headquarters this turn,
@@ -159,7 +159,7 @@ export class GameManager extends BaseClasses.GameManager {
     private secondaryGameOver(reason: string): void {
         // 1. Check if one player's HQ has more heath than the other
         const headquarters = this.game.players
-            .map((p) => p.headquarters)
+            .map((p) => p.headquarters!)
             .sort((a, b) => b.health - a.health);
 
         if (headquarters[0].health !== headquarters[1].health) {

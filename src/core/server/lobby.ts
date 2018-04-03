@@ -3,7 +3,7 @@ import { Config } from "src/core/args";
 import { SHARED_CONSTANTS } from "src/core/constants";
 import { logger } from "src/core/log";
 import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "src/utils";
-import { BaseClient, getClientByType, IPlayData } from "../clients";
+import { BaseClient, getClientByType, IParsedPlayData, IPlayData } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
@@ -18,8 +18,8 @@ const RoomClass: typeof Room = Config.SINGLE_THREADED
 import * as cluster from "cluster";
 import * as ws from "lark-websocket";
 import * as net from "net";
+import * as querystring from "querystring";
 import * as readline from "readline";
-import * as url from "url";
 
 cluster.setupMaster({
     exec: Config.BASE_DIR + "/gameplay/worker.js",
@@ -62,7 +62,7 @@ export class Lobby {
 
     private readonly gameAliasToName = new Map<string, string>();
 
-    private readonly updater: Updater;
+    private readonly updater?: Updater;
 
     private readonly listenerServers = new Map<string, net.Server>();
 
@@ -225,7 +225,7 @@ export class Lobby {
         });
 
         listener.listen(port, "0.0.0.0", () => {
-            logger.info(`»» Listening on port ${port} for ${type} Clients ««`);
+            logger.info(`»» Listening on port ${port} for ${type.toUpperCase()} Clients ««`);
         });
 
         listener.on("error", (err) => {
@@ -396,7 +396,7 @@ There's probably another Cerveau server running on this same computer.`);
         this.clientsRoom.set(client, room);
 
         if (Config.GAME_SETTINGS_ENABLED && data.gameSettings) {
-            room.addGameSettings(data.gameSettings);
+            room.addGameSettings(playData.gameSettings);
         }
 
         client.send("lobbied", {
@@ -444,12 +444,16 @@ There's probably another Cerveau server running on this same computer.`);
      * @returns {string} human readable text why the data is not valid
      * @throws {Error} if there is a validation error, human readable message as to why is thrown
      */
-    private validatePlayData(data?: IPlayData): string | IPlayData {
+    private validatePlayData(data?: IPlayData): string | IParsedPlayData {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
 
-        const validatedData = {...data};
+        const { gameSettings, ...noGameSettings } = data;
+        const validatedData: IParsedPlayData = {
+            gameSettings: {} as any, // will be overwritten below
+            ...noGameSettings,
+        };
 
         if (this.isShuttingDown) {
             return "Game server is shutting down and not accepting new clients.";
@@ -472,7 +476,7 @@ There's probably another Cerveau server running on this same computer.`);
         if (data && data.gameSettings && Config.GAME_SETTINGS_ENABLED) {
             try {
                 validatedData.gameSettings = unstringifyObject(
-                    url.parse(`url?${data.gameSettings}`, true).query,
+                    querystring.parse(data.gameSettings) as any, // string[] is not valid, but we don't care
                 ) as any; // any because null will not be valid, but unstringify has the option to make that valid
             }
             catch (err) {
