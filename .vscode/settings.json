@@ -1,0 +1,23 @@
+{
+    "cSpell.words": [
+        "Cerveau",
+        "Creer",
+        "Mergeable",
+        "Sanitizable",
+        "Serializeable",
+        "argparse",
+        "cpuprofile",
+        "gamelog",
+        "gamelogs",
+        "gameplay",
+        "gunzipped",
+        "mergeables",
+        "mixins",
+        "nagle",
+        "prng",
+        "promisify",
+        "seedrandom",
+        "unsanitized",
+        "unstringify"
+    ]
+}
