@@ -69,8 +69,8 @@
     "node": ">=9.0.0."
   },
   "scripts": {
-    "app": "ts-node -r tsconfig-paths/register src/index.ts",
-    "start": "npm-run-all clean build --parallel watch:build watch:server --print-label",
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "watch:all": "npm-run-all clean build --parallel watch:build watch:server --print-label",
     "watch:build": "tsc --watch --pretty",
     "watch:server": "nodemon --delay 10000 npm run app",
     "build": "tsc --pretty",
