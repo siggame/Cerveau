@@ -196,6 +196,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Player,
                     },
                 },
+                playerStartingTime: {
+                    typeName: "float",
+                },
             },
             functions: {},
         },

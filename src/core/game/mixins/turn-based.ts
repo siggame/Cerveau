@@ -76,13 +76,13 @@ export function mixTurnBased<
 
     class TurnBasedGame extends base.Game {
         /** The amount of time added to a player's timeRemaining at the end of each of their turns */
-        public readonly timeAddedPerTurn: number = 1e9; // 1 sec in ns
+        public readonly timeAddedPerTurn: number = this.timeAddedPerTurn || 1e9; // 1 sec in ns
 
         public currentPlayer!: IBasePlayer;
 
-        public currentTurn: number = 0;
+        public currentTurn: number = this.currentTurn || 0;
 
-        public readonly maxTurns: number = 500;
+        public readonly maxTurns: number = this.maxTurns || 500;
     }
 
     class TurnBasedGameManager extends base.GameManager {
