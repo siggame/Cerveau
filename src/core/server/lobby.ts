@@ -1,8 +1,8 @@
 // internal imports
-import { Config } from "src/core/args";
-import { SHARED_CONSTANTS } from "src/core/constants";
-import { logger } from "src/core/log";
-import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "src/utils";
+import { Config } from "~/core/args";
+import { SHARED_CONSTANTS } from "~/core/constants";
+import { logger } from "~/core/log";
+import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "~/utils";
 import { BaseClient, getClientByType, IParsedPlayData, IPlayData } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";

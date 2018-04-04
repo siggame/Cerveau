@@ -9,7 +9,7 @@ import {
     BaseGameSettings, IBaseGameSettings, IBasePlayer,
     ITurnBasedGameSettings, ITurnBasedPlayer,
     ITwoPlayerGameSettings, ITwoPlayerPlayer, makeNamespace, mixTurnBased, mixTwoPlayer,
-} from "src/core/game";
+} from "~/core/game";
 
 import {
     IBuildingProperties,

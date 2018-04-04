@@ -2,8 +2,8 @@
 
 import { ArgumentOptions, ArgumentParser } from "argparse";
 import "dotenv"; // loads the config from an optional `.env` file
-import { IWorkerGameSessionData } from "src/core/server/worker";
-import { IAnyObject, unstringify } from "src/utils";
+import { IWorkerGameSessionData } from "~/core/server/worker";
+import { IAnyObject, unstringify } from "~/utils";
 
 export interface IArgs {
     /** port offset for the default port values */

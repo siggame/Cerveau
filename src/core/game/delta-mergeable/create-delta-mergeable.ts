@@ -1,5 +1,5 @@
-import { ISanitizableType, sanitizeType } from "src/core/type-sanitizer";
-import { ITypedObject } from "src/utils";
+import { ISanitizableType, sanitizeType } from "~/core/type-sanitizer";
+import { ITypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
 import { createObject } from "./delta-mergeable-object";

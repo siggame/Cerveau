@@ -1,11 +1,11 @@
 // Game: Two player grid based game where each player tries to burn down the other player's buildings. Let it burn.
 
-import { IBaseGameRequiredData } from "src/core/game";
+import { IBaseGameRequiredData } from "~/core/game";
 import { BaseClasses, Building, Forecast, GameManager, GameObject, Player } from "./";
 import { IAnarchyGameSettings } from "./game-settings";
 
 // <<-- Creer-Merge: requires -->>
-import { ArrayUtils, IPoint } from "src/utils";
+import { ArrayUtils, IPoint } from "~/utils";
 // <<-- /Creer-Merge: requires -->>
 
 const DIRECTIONAL_OFFSETS = {

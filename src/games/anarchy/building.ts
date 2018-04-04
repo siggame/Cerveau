@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "src/core/game";
+import { IBaseGameObjectRequiredData } from "~/core/game";
 import { GameObject, IGameObjectConstructorArgs, Player } from "./";
 import { IBuildingProperties } from "./game-interfaces";
 

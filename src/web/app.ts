@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as expressHandlebars from "express-handlebars";
-import { Config } from "src/core/args";
+import { Config } from "~/core/args";
 import * as helpers from "./view-helpers";
 
 export let app: express.Express | undefined;

@@ -1,6 +1,6 @@
-import { createDeltaMergeable, DeltaMergeable } from "src/core/game/delta-mergeable";
-import { ISanitizableType } from "src/core/type-sanitizer";
-import { IAnyObject, ITypedObject } from "src/utils";
+import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
+import { ISanitizableType } from "~/core/type-sanitizer";
+import { IAnyObject, ITypedObject } from "~/utils";
 
 export class BaseGameDeltaMergeables {
     private readonly deltaMergeable: DeltaMergeable;

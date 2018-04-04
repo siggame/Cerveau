@@ -1,5 +1,5 @@
-import { ISanitizableType, sanitizeType } from "src/core/type-sanitizer";
-import { IAnyObject, ITypedObject } from "src/utils";
+import { ISanitizableType, sanitizeType } from "~/core/type-sanitizer";
+import { IAnyObject, ITypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 
 // tslint:disable:variable-name

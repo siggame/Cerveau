@@ -1,6 +1,6 @@
 // Player: A player in this game. Every AI controls one player.
 
-import { IBaseGameObjectRequiredData } from "src/core/game";
+import { IBaseGameObjectRequiredData } from "~/core/game";
 import { AI, Building, FireDepartment, GameObject,
     IBaseAnarchyPlayer, PoliceDepartment, Warehouse, WeatherStation } from "./";
 

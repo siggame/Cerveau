@@ -1,7 +1,7 @@
-import { BaseClient } from "src/core/clients/";
-import { DeltaMergeable } from "src/core/game";
-import { RandomNumberGenerator } from "src/core/game/random-number-generator";
 import { Event } from "ts-typed-events";
+import { BaseClient } from "~/core/clients/";
+import { DeltaMergeable } from "~/core/game";
+import { RandomNumberGenerator } from "~/core/game/random-number-generator";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";

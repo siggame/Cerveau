@@ -1,6 +1,6 @@
-import { BaseClient } from "src/core/clients";
-import { DeltaMergeable } from "src/core/game/delta-mergeable";
 import { Event } from "ts-typed-events";
+import { BaseClient } from "~/core/clients";
+import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";

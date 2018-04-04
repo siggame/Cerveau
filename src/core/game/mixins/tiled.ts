@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
-import { IBaseGameSettings, IBasePlayer, IGameSettingsDescriptions } from "src/core/game";
+import { IBaseGameSettings, IBasePlayer, IGameSettingsDescriptions } from "~/core/game";
 import * as Base from "./base";
 
 export const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];

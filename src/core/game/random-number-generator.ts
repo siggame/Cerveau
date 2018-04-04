@@ -1,5 +1,5 @@
 import * as random from "seedrandom";
-import { shuffle } from "src/utils";
+import { shuffle } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {

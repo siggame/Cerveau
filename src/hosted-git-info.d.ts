@@ -7,10 +7,10 @@ declare module "hosted-git-info" {
             /** If true then committishes won't be included in generated URLs. */
             noCommittish: boolean;
             /** If true then git+ won't be prefixed on URLs. */
-            noGitPlus : boolean;
-        }
+            noGitPlus: boolean;
+        },
     ): {
-        /**  The short name of the service **/
+        /**  The short name of the service */
         type: string;
         /** The domain for git protocol use */
         domain: string;

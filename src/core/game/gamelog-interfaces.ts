@@ -1,4 +1,4 @@
-import { IOrderData, IRunData } from "src/core/clients";
+import { IOrderData, IRunData } from "~/core/clients";
 import { IBaseGameSettings } from "./base/base-game-settings";
 
 export interface IGamelog {

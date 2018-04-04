@@ -1,5 +1,5 @@
-import { defaultArray, sanitizeType } from "src/core/type-sanitizer";
-import { IAnyObject } from "src/utils";
+import { defaultArray, sanitizeType } from "~/core/type-sanitizer";
+import { IAnyObject } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 

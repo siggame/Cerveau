@@ -1,5 +1,5 @@
-import { ISanitizableType } from "src/core/type-sanitizer";
-import { Constructor } from "src/utils";
+import { ISanitizableType } from "~/core/type-sanitizer";
+import { Constructor } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";

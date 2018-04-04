@@ -1,4 +1,4 @@
-import { IAnyObject } from "src/utils";
+import { IAnyObject } from "~/utils";
 
 export type PossibleSettingValue = string | number | boolean | string[];
 

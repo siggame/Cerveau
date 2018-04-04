@@ -1,9 +1,9 @@
 import * as net from "net";
-import { Config } from "src/core/args";
-import { BaseAIManager, IBasePlayer, IDelta } from "src/core/game/";
-import { logger } from "src/core/log";
-import { isObject } from "src/utils";
 import { Event, events, Signal } from "ts-typed-events";
+import { Config } from "~/core/args";
+import { BaseAIManager, IBasePlayer, IDelta } from "~/core/game/";
+import { logger } from "~/core/log";
+import { isObject } from "~/utils";
 import * as ClientEvents from "./events-client";
 import * as ServerEvents from "./events-server";
 

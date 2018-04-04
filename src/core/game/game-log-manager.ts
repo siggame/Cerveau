@@ -1,10 +1,10 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as sanitizeFilename from "sanitize-filename";
-import { Config } from "src/core/args";
-import { IGamelog } from "src/core/game";
-import * as utils from "src/utils";
 import * as zlib from "zlib";
+import { Config } from "~/core/args";
+import { IGamelog } from "~/core/game";
+import * as utils from "~/utils";
 
 /** Represents information about an unloaded gamelog */
 export interface IGamelogInfo {

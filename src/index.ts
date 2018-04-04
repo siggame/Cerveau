@@ -30,10 +30,10 @@ register({
 
 // if we got here the node modules should be good to go
 // import "module-alias/register";
-import { Config } from "src/core/args";
+import { Config } from "~/core/args";
 process.title = `${Config.MAIN_TITLE} Game Server`;
 
-import { Lobby } from "src/core/server";
+import { Lobby } from "~/core/server";
 
 Lobby.getInstance(); // this will create the singleton Lobby instance
 
