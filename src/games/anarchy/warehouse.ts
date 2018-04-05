@@ -1,11 +1,11 @@
 // Warehouse: A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.
 
-import { IBaseGameObjectRequiredData } from "src/core/game";
+import { IBaseGameObjectRequiredData } from "~/core/game";
 import { Building, IBuildingConstructorArgs, Player } from "./";
 import { IWarehouseProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: requires -->>
-import { clamp, manhattanDistance } from "src/utils";
+import { clamp, manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: requires -->>
 
 export interface IWarehouseConstructorArgs extends IWarehouseProperties, IBuildingConstructorArgs {

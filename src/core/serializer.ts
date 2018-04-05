@@ -3,7 +3,7 @@
  * and from serialize-able objects when communicating between client <--> sever
  */
 
-import { IAnyObject, isEmptyExceptFor, isObject } from "src/utils";
+import { IAnyObject, isEmptyExceptFor, isObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 

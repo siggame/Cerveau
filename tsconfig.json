@@ -3,7 +3,6 @@
         "target": "esnext",
         "module": "commonjs",
         "moduleResolution": "node",
-        // "lib": ["es5", "es6"],
 
         "strict": true,
         "strictNullChecks": true,
@@ -20,8 +19,7 @@
         "outDir": "dist",
         "baseUrl": "./",
         "paths": {
-            // "~/*" : ["src/*"], // resolve any `~/foo/bar` to `<baseUrl>/src/foo/bar`
-            "src/*": ["src/*", "dist/*"] // dist for tsconfig-paths to resolve
+            "~/*": ["src/*", "dist/*"]  // dist for tsconfig-paths to resolve
         }
     },
     "include": [

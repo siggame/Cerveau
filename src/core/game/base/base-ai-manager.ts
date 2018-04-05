@@ -1,7 +1,7 @@
-import { BaseClient } from "src/core/clients";
-import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "src/core/game/";
-import { capitalizeFirstLetter, IAnyObject } from "src/utils";
 import { Event, events } from "ts-typed-events";
+import { BaseClient } from "~/core/clients";
+import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "~/core/game/";
+import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";

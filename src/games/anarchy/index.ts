@@ -9,7 +9,7 @@ import {
     BaseGameSettings, IBaseGameSettings, IBasePlayer,
     ITurnBasedGameSettings, ITurnBasedPlayer,
     ITwoPlayerGameSettings, ITwoPlayerPlayer, makeNamespace, mixTurnBased, mixTwoPlayer,
-} from "src/core/game";
+} from "~/core/game";
 
 import {
     IBuildingProperties,
@@ -195,6 +195,9 @@ export const Namespace = makeNamespace({
                         typeName: "gameObject",
                         gameObjectClass: Player,
                     },
+                },
+                playerStartingTime: {
+                    typeName: "float",
                 },
             },
             functions: {},

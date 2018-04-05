@@ -1,8 +1,8 @@
-import { BaseClient } from "src/core/clients";
-import { SHARED_CONSTANTS } from "src/core/constants";
-import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData, IFinishedDeltaData, IRanDeltaData } from "src/core/game";
-import { Session } from "src/core/server";
 import { Event, events } from "ts-typed-events";
+import { BaseClient } from "~/core/clients";
+import { SHARED_CONSTANTS } from "~/core/constants";
+import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData, IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";
 import { IGamelog } from "./gamelog-interfaces";
 

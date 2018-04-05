@@ -1,4 +1,4 @@
-import { IBaseGameSettings, IGameObjectReference } from "src/core/game/";
+import { IBaseGameSettings, IGameObjectReference } from "~/core/game/";
 
 // these are events the clients sends to the server (this)
 

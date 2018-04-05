@@ -1,4 +1,4 @@
-import { SHARED_CONSTANTS } from "src/core/constants";
+import { SHARED_CONSTANTS } from "~/core/constants";
 import { DeltaMergeable } from "./delta-mergeable/";
 
 /** Manages delta states on behalf of a game */

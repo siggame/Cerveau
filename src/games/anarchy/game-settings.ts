@@ -1,4 +1,4 @@
-import { IGameSettingsDescriptions } from "src/core/game";
+import { IGameSettingsDescriptions } from "~/core/game";
 import { BaseClasses, IBaseAnarchyGameSettings } from "./";
 
 export interface IAnarchyGameSettings extends IBaseAnarchyGameSettings {

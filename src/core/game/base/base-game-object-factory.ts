@@ -1,5 +1,5 @@
-import { DeltaMergeable } from "src/core/game/delta-mergeable";
 import { Event } from "ts-typed-events";
+import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";

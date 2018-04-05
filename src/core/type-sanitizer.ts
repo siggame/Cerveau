@@ -1,5 +1,5 @@
-import { logger } from "src/core/log";
-import { isObject, ITypedObject } from "src/utils";
+import { logger } from "~/core/log";
+import { isObject, ITypedObject } from "~/utils";
 import { BaseGameObject } from "./game/base/base-game-object";
 
 // Max/Min true int32 values for most programming languages

@@ -1,8 +1,8 @@
 import * as cluster from "cluster";
-import { Config } from "src/core";
-import { BaseClient } from "src/core/clients";
-import { IGamelog } from "src/core/game";
-import { IClientInfo, IWorkerGameSessionData } from "src/core/server/worker";
+import { Config } from "~/core";
+import { BaseClient } from "~/core/clients";
+import { IGamelog } from "~/core/game";
+import { IClientInfo, IWorkerGameSessionData } from "~/core/server/worker";
 import { Room } from "./lobby-room";
 
 /**

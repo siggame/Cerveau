@@ -1,4 +1,4 @@
-import { IAnyObject } from "src/utils";
+import { IAnyObject } from "~/utils";
 
 // These are events the server (this) sends to the client
 

@@ -5,11 +5,11 @@
 // this also loads the command line arguments from process.env
 import * as cluster from "cluster";
 import { Socket } from "net";
-import { Config } from "src/core/args";
-import { BaseClient, getClientByType } from "src/core/clients";
-import { IBaseGameSettings } from "src/core/game";
-import { logger } from "src/core/log";
-import { Session } from "src/core/server/session";
+import { Config } from "~/core/args";
+import { BaseClient, getClientByType } from "~/core/clients";
+import { IBaseGameSettings } from "~/core/game";
+import { logger } from "~/core/log";
+import { Session } from "~/core/server/session";
 
 export interface IClientInfo {
     index: number;

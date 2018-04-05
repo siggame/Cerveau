@@ -1,5 +1,5 @@
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject, BaseGameSettings } from "src/core/game/base";
-import { Constructor } from "src/utils";
+import { BaseAI, BaseGame, BaseGameManager, BaseGameObject, BaseGameSettings } from "~/core/game/base";
+import { Constructor } from "~/utils";
 
 export type BaseAIConstructor = Constructor<BaseAI>;
 export type BaseGameConstructor = Constructor<BaseGame>;

@@ -1,5 +1,5 @@
-import { logger } from "src/core/log";
 import { events } from "ts-typed-events";
+import { logger } from "~/core/log";
 import { Room } from "./lobby-room";
 import { Session } from "./session";
 

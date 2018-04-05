@@ -1,9 +1,9 @@
-import { IBaseGameObjectRequiredData } from "src/core/game";
+import { IBaseGameObjectRequiredData } from "~/core/game";
 import { Building, IBuildingConstructorArgs, Player } from "./";
 import { IWeatherStationProperties } from "./game-interfaces";
 
 // <<-- Creer-Merge: requires -->>
-import { nextWrapAround, previousWrapAround } from "src/utils";
+import { nextWrapAround, previousWrapAround } from "~/utils";
 // <<-- /Creer-Merge: requires -->>
 
 export interface IWeatherStationConstructorArgs extends IWeatherStationProperties, IBuildingConstructorArgs {

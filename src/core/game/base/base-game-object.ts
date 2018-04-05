@@ -1,5 +1,5 @@
-import { IBaseGameObjectSchema } from "src/core/game";
-import { DeltaMergeable } from "src/core/game/delta-mergeable";
+import { IBaseGameObjectSchema } from "~/core/game";
+import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";

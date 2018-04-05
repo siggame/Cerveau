@@ -3,14 +3,15 @@ import * as delay from "delay";
 // import * as moment from "moment";
 
 import { isMaster } from "cluster";
-import { Config } from "src/core/args";
-import { BaseClient } from "src/core/clients";
-import { DeltaManager } from "src/core/game/delta-manager";
-import { GameLogManager } from "src/core/game/game-log-manager";
-import { GameLogger } from "src/core/game/game-logger";
-import { logger } from "src/core/log";
-import { isObjectEmpty } from "src/utils";
 import { Event, events, Signal } from "ts-typed-events";
+import { Config } from "~/core/args";
+import { BaseClient } from "~/core/clients";
+import { DeltaManager } from "~/core/game/delta-manager";
+import { GameLogManager } from "~/core/game/game-log-manager";
+import { GameLogger } from "~/core/game/game-logger";
+import { logger } from "~/core/log";
+import { isObjectEmpty } from "~/utils";
+
 // import { startProfiling, stopProfiling } from "v8-profiler";
 // TODO: v8-profiler may be missing as it is optional...
 import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer,
