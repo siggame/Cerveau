@@ -13,6 +13,7 @@
         "no-constant-condition": [true, { "checkLoops": false }],
         "no-duplicate-case": true,
         "no-ex-assign": true,
+        "no-unnecessary-type-assertion": true,
         "ter-no-sparse-arrays": [true],
         "no-extra-boolean-cast": true,
         "no-extra-semi": true,

@@ -52,6 +52,7 @@ export class BaseGameManager {
         private readonly namespace: IBaseGameNamespace,
         settings: IBaseGameSettings,
         clients: BaseClient[],
+        rootDeltaMergeable: DeltaMergeable,
         private gameOverCallback: () => void,
     ) {
         if (!settings.randomSeed) {
@@ -72,7 +73,7 @@ export class BaseGameManager {
             client.aiManager!.invalidateRun = invalidateRun;
         }
 
-        const gameCreated = new Event<{game: BaseGame, gameObjects: DeltaMergeable}>();
+        const gameCreated = new Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>();
 
         gameCreated.once(({ game }) => {
             (this.game as any) = game; // will happen synchronously, but TS doesn't know
@@ -88,6 +89,7 @@ export class BaseGameManager {
         this.game = new this.namespace.Game(settings, {
             namespace,
             clients,
+            rootDeltaMergeable,
             manager: this,
             playerIDs: clients.map(() => this.generateNextGameObjectID()),
             schema: this.namespace.gameObjectsSchema.Game,

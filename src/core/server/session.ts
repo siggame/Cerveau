@@ -46,10 +46,10 @@ export class Session {
     private readonly deltaManager = new DeltaManager();
 
     constructor(args: {
-        id: string,
-        gameNamespace: IBaseGameNamespace,
-        gameSettings: IBaseGameSettings,
-        clients: BaseClient[],
+        id: string;
+        gameNamespace: IBaseGameNamespace;
+        gameSettings: IBaseGameSettings;
+        clients: BaseClient[];
     }) {
         this.id = args.id;
         this.gameName = args.gameNamespace.GameManager.gameName;
@@ -89,6 +89,7 @@ export class Session {
             args.gameNamespace,
             args.gameSettings,
             playingClients,
+            this.deltaManager.rootDeltaMergeable,
             () => this.handleGameOver(),
         );
         this.game = this.gameManager.game;

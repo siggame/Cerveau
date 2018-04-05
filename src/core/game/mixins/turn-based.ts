@@ -134,7 +134,6 @@ export function mixTurnBased<
          * Transitions to the next turn, increasing turn and setting the currentPlayer to the next one.
          */
         protected nextTurn(): void {
-            console.log("NEXT TURN", this.game.currentTurn);
             if (this.game.currentTurn + 1 >= this.game.maxTurns) {
                 this.maxTurnsReached();
                 return;
@@ -152,7 +151,6 @@ export function mixTurnBased<
          * checked to find the winner/looser.
          */
         protected maxTurnsReached(): void {
-            console.log("max turns reached!", this.isGameOver());
             this.endGame();
         }
     }

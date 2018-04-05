@@ -11,11 +11,12 @@ import { IBasePlayer, IBasePlayerData } from "./base-player";
 
 export interface IBaseGameRequiredData {
     clients: BaseClient[];
+    rootDeltaMergeable: DeltaMergeable;
     playerIDs: string[];
     namespace: IBaseGameNamespace;
     schema: IBaseGameObjectSchema;
     manager: BaseGameManager;
-    gameCreated: Event<{game: BaseGame, gameObjects: DeltaMergeable}>;
+    gameCreated: Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>;
 }
 
 export class BaseGame extends BaseGameDeltaMergeables {
@@ -24,24 +25,24 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
     public readonly name: string = this.name || "";
     public readonly session: string = this.session || "";
-    public readonly playerStartingTime: number = this.playerStartingTime || 0;
     public readonly gameObjects: {[id: string]: BaseGameObject | undefined} = this.gameObjects || {};
     public readonly players: IBasePlayer[] = this.players || [];
 
     constructor(settings: IBaseGameSettings, requiredData: IBaseGameRequiredData) {
         super({
             key: "game",
+            parent: requiredData.rootDeltaMergeable,
             attributesSchema: requiredData.schema.attributes,
             initialValues: settings,
         });
 
         // super has now created our delta mergeables, let's reach in and grab the game objects all hack-y like
-        const gameObjectsDeltaMergeable: DeltaMergeable = (this as any).deltaMergeable.child("gameObjects");
+        const gameObjectsDeltaMergeable = ((this as any).deltaMergeable as DeltaMergeable).child("gameObjects")!;
 
         this.settings = Object.freeze(settings);
         this.manager = requiredData.manager;
 
-        const clients = requiredData.clients as BaseClient[];
+        const clients = requiredData.clients;
 
         // const sanitizer = new BaseGameSanitizer(this.namespace);
         for (let i = 0; i < clients.length; i++) {
@@ -63,7 +64,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
                 data: playerData,
             });
 
-            player.timeRemaining = this.playerStartingTime;
+            player.timeRemaining = this.settings.playerStartingTime;
             player.ai = new requiredData.namespace.AI(client.aiManager!);
 
             client.setPlayer(player);
@@ -72,7 +73,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
         requiredData.gameCreated.emit({
             game: this,
-            gameObjects: gameObjectsDeltaMergeable,
+            gameObjectsDeltaMergeable,
         });
     }
 }

@@ -3,8 +3,8 @@ import { DeltaMergeable } from "./delta-mergeable/";
 
 /** Manages delta states on behalf of a game */
 export class DeltaManager {
-    private rootDeltaMergeable: DeltaMergeable<any>;
-    private delta: any;
+    public readonly rootDeltaMergeable: DeltaMergeable<any>;
+    private delta: any = {};
 
     constructor() {
         this.rootDeltaMergeable = new DeltaMergeable({
@@ -16,20 +16,14 @@ export class DeltaManager {
     }
 
     /**
-     * Clears the current delta data. Should be called by the instance once its
-     * done with the current delta of this game
-     */
-    public flush(): void {
-        this.delta = {};
-    }
-
-    /**
-     * Gets the true delta state of the game, with nothing hidden
+     * Gets the true delta state of the game, with nothing hidden, then resets the state
      * @returns {Object} delta formatted object representing the true delta
      * state of the game, with nothing hidden
      */
-    public get(): any {
-        return this.delta;
+    public pop(): any {
+        const popped = this.delta;
+        this.delta = {};
+        return popped;
     }
 
     /**

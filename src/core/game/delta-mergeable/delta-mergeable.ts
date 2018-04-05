@@ -1,4 +1,5 @@
 import { Event, events } from "ts-typed-events";
+import { IAnyObject } from "~/utils";
 
 export interface IDeltaMergeableOptions<T> {
     key: string;
@@ -97,5 +98,16 @@ export class DeltaMergeable<T = any> {
         return this.children.get(key);
     }
 
-    // Wrapper \\
+    public toTree(): any {
+        const obj: IAnyObject = {};
+        for (const [key, child] of this.children) {
+            obj[key] = child.toTree();
+        }
+
+        if (Object.keys(obj).length === 0) {
+            return this.get();
+        }
+
+        return obj;
+    }
 }

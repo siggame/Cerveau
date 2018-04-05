@@ -115,7 +115,7 @@ export class GameLogger {
         const delta: IDelta = {
             type,
             data,
-            game: this.deltaManager.get(),
+            game: this.deltaManager.pop(),
         };
         this.gamelog.deltas.push(delta);
         this.events.logged.emit(delta);
