@@ -38,7 +38,7 @@ export class DeltaMergeable<T = any> {
         this.value = options.initialValue; // so the setter has a current value to work with if transforms happen
         this.isDeltaReference = Boolean(options.deltaReference);
         this.transform = options.transform;
-        this.set(options.initialValue);
+        this.set(options.initialValue, false, true);
     }
 
     public getParent(): DeltaMergeable<T> | undefined {
@@ -49,12 +49,12 @@ export class DeltaMergeable<T = any> {
         return this.value;
     }
 
-    public set(value: any, deleted?: true): void {
+    public set(value: any, deleted?: boolean, forceSet?: true): void {
         if (this.transform) {
             value = this.transform(value, this.get());
         }
 
-        if (value !== this.value) {
+        if (value !== this.value || forceSet) {
             this.value = value;
 
             this.events.changed.emit(this);

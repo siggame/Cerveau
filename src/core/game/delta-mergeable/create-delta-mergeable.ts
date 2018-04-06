@@ -30,6 +30,7 @@ export function createDeltaMergeable(args: {
         case "gameObject":
             container = createObject({
                 key: args.key,
+                initialValue: args.initialValue,
                 parent: args.parent,
                 childTypes: args.childTypes,
                 transform: (val) => sanitizeType(args.type, val),

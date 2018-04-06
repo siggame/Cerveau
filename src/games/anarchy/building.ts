@@ -5,6 +5,8 @@ import { IBuildingProperties } from "./game-interfaces";
 export interface IBuildingConstructorArgs extends IBuildingProperties, IGameObjectConstructorArgs {
     // <<-- Creer-Merge: constructor-args -->>
     owner: Player;
+    x: number;
+    y: number;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 

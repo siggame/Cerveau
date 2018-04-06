@@ -1,8 +1,8 @@
 import { AnarchyGameObjectFactory, BaseClasses, Game } from "./";
 
 // creer merge
-import { Building, FireDepartment, Player, PoliceDepartment, Warehouse, WeatherStation } from "./";
-import { IBuildingProperties } from "./game-interfaces";
+import { Building, FireDepartment, IBuildingConstructorArgs,
+    Player, PoliceDepartment, Warehouse, WeatherStation } from "./";
 // /creer merge
 
 export class GameManager extends BaseClasses.GameManager {
@@ -23,7 +23,7 @@ export class GameManager extends BaseClasses.GameManager {
 
     public createBuilding(
         type: "FireDepartment" | "PoliceDepartment" | "Warehouse" | "WeatherStation" | string,
-        data: IBuildingProperties & { x: number, y: number }, // x and y are required
+        data: IBuildingConstructorArgs,
     ): Building {
         let building: Building | undefined;
         switch (type) {

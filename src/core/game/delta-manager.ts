@@ -1,4 +1,6 @@
 import { SHARED_CONSTANTS } from "~/core/constants";
+import { BaseGameObject } from "~/core/game";
+import { objectHasProperty } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
 
 /** Manages delta states on behalf of a game */
@@ -37,29 +39,34 @@ export class DeltaManager {
         let pathDeltaMergable = deltaMergeable;
         const path = new Array<DeltaMergeable<any>>();
         while (pathDeltaMergable.getParent() !== this.rootDeltaMergeable) {
-            path.push(pathDeltaMergable);
+            path.unshift(pathDeltaMergable);
             pathDeltaMergable = pathDeltaMergable.getParent()!;
         }
+
+        const stringPath = path.map((d) => d.key).join(".");
 
         let current = this.delta;
         // now go up the path to the deltaMergeable that changed to build up our delta
         for (let i = 0; i < path.length; i++) {
             const dm = path[i];
-            if (!Object.prototype.hasOwnProperty.call(current, dm.key)) {
+            if (!objectHasProperty(current, dm.key)) {
                 current[dm.key] = {};
             }
 
-            if (Array.isArray(dm.get())) {
+            let value = dm.get();
+            if (Array.isArray(value)) {
                 current[dm.key][SHARED_CONSTANTS.DELTA_LIST_LENGTH] = dm.get().length;
             }
 
             if (i === (path.length - 1)) {
-                let value = wasDeleted
-                    ? SHARED_CONSTANTS.DELTA_REMOVED
-                    : deltaMergeable.get();
+                value = wasDeleted ?
+                    SHARED_CONSTANTS.DELTA_REMOVED :
+                    deltaMergeable.get();
 
-                if (!wasDeleted && deltaMergeable.isDeltaReference) {
-                    value = { id: value.id };
+                if (!wasDeleted && value instanceof BaseGameObject) {
+                    value = (path.length === 2 && path[0].key === "gameObjects")
+                        ? {} // the actual game object (to be filled in with keys)
+                        : { id: value.id };
                 }
 
                 current[dm.key] = value;

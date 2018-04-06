@@ -1,4 +1,4 @@
-import { IBaseGameObjectSchema } from "~/core/game";
+import { IBaseGameObjectSchema, IBasePlayer } from "~/core/game";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
@@ -21,9 +21,9 @@ export interface IBaseGameObjectRequiredData {
  * the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
  */
 export class BaseGameObject extends BaseGameDeltaMergeables {
-    public readonly id: string = this.id || "";
-    public readonly gameObjectName: string = this.gameObjectName || "";
-    public readonly logs: string[] = this.logs || [];
+    public readonly id!: string;
+    public readonly gameObjectName!: string;
+    public readonly logs!: string[];
 
     /** The game this game object is in, inheriting classes should specify the sub game type */
     protected readonly game: BaseGame;
@@ -66,7 +66,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         if (this.gameObjectName === "Player") {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
-            return `Player "${(this as any).name}" #${this.id}`;
+            return `Player "${(this as any as IBasePlayer).name}" #${this.id}`;
         }
         return `${this.gameObjectName} #${this.id}`;
     }

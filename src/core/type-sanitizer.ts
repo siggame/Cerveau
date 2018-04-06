@@ -128,7 +128,7 @@ export function defaultGameObject(o: any, gameObjectClass?: typeof BaseGameObjec
         : undefined;
 
     if (gameObjectClass) {
-        return obj && obj instanceof gameObjectClass
+        return (obj && obj instanceof gameObjectClass)
             ? obj
             : undefined;
     }

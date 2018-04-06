@@ -118,6 +118,6 @@ export function isNil<T>(thing: T | undefined | null): thing is nil {
     return thing === undefined || thing === null;
 }
 
-export function objectHasProperty<T extends object>(obj: T, property: PropertyKey): obj is T {
-    return Object.prototype.hasOwnProperty.call(obj, property);
+export function objectHasProperty(obj: any, property: PropertyKey): obj is {[property: string]: any} {
+    return Boolean(obj) && Object.prototype.hasOwnProperty.call(obj, property);
 }

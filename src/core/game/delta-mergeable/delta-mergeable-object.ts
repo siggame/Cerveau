@@ -5,6 +5,7 @@ import { DeltaMergeable } from "./delta-mergeable";
 
 export function createObject(args: {
     key: string,
+    initialValue?: any,
     parent?: DeltaMergeable,
     childTypes?: ITypedObject<ISanitizableType>,
     childType?: ISanitizableType,
@@ -14,7 +15,7 @@ export function createObject(args: {
     const container = new DeltaMergeable<object>({
         key: args.key,
         parent: args.parent,
-        initialValue: {},
+        initialValue: args.initialValue || {},
         transform: args.transform || ((newObj?: any, currentValue?: IAnyObject): IAnyObject => {
             if (!newObj) {
                 newObj = {};

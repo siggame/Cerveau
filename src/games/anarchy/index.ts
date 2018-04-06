@@ -11,15 +11,6 @@ import {
     ITwoPlayerGameSettings, ITwoPlayerPlayer, makeNamespace, mixTurnBased, mixTwoPlayer,
 } from "~/core/game";
 
-import {
-    IBuildingProperties,
-    IFireDepartmentProperties,
-    IForecastProperties,
-    IPoliceDepartmentProperties,
-    IWarehouseProperties,
-    IWeatherStationProperties,
-} from "./game-interfaces";
-
 export interface IBaseAnarchyGameSettings extends IBaseGameSettings, ITurnBasedGameSettings, ITwoPlayerGameSettings {}
 export interface IBaseAnarchyPlayer extends IBasePlayer, ITurnBasedPlayer, ITwoPlayerPlayer {}
 
@@ -64,42 +55,42 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { Building } from "./building";
-import { FireDepartment } from "./fire-department";
-import { Forecast } from "./forecast";
+import { Building, IBuildingConstructorArgs } from "./building";
+import { FireDepartment, IFireDepartmentConstructorArgs } from "./fire-department";
+import { Forecast, IForecastConstructorArgs } from "./forecast";
 import { Game } from "./game";
 import { GameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { PoliceDepartment } from "./police-department";
-import { Warehouse } from "./warehouse";
-import { WeatherStation } from "./weather-station";
+import { IPoliceDepartmentConstructorArgs, PoliceDepartment } from "./police-department";
+import { IWarehouseConstructorArgs, Warehouse } from "./warehouse";
+import { IWeatherStationConstructorArgs, WeatherStation } from "./weather-station";
 
 import { AI } from "./ai";
 import { AnarchyGameSettings } from "./game-settings";
 
 export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
-    public Building(data: IBuildingProperties): Building {
+    public Building(data: IBuildingConstructorArgs): Building {
         return this.createGameObject("Building", Building, data);
     }
 
-    public FireDepartment(data: IFireDepartmentProperties): FireDepartment {
+    public FireDepartment(data: IFireDepartmentConstructorArgs): FireDepartment {
         return this.createGameObject("FireDepartment", FireDepartment, data);
     }
 
-    public Forecast(data: IForecastProperties): Forecast {
+    public Forecast(data: IForecastConstructorArgs): Forecast {
         return this.createGameObject("Forecast", Forecast, data);
     }
 
-    public PoliceDepartment(data: IPoliceDepartmentProperties): PoliceDepartment {
+    public PoliceDepartment(data: IPoliceDepartmentConstructorArgs): PoliceDepartment {
         return this.createGameObject("PoliceDepartment", PoliceDepartment, data);
     }
 
-    public Warehouse(data: IWarehouseProperties): Warehouse {
+    public Warehouse(data: IWarehouseConstructorArgs): Warehouse {
         return this.createGameObject("Warehouse", Warehouse, data);
     }
 
-    public WeatherStation(data: IWeatherStationProperties): WeatherStation {
+    public WeatherStation(data: IWeatherStationConstructorArgs): WeatherStation {
         return this.createGameObject("WeatherStation", WeatherStation, data);
     }
 }

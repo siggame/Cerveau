@@ -13,11 +13,12 @@ export class BaseGameDeltaMergeables {
     }) {
         this.deltaMergeable = createDeltaMergeable({
             key: args.key,
+            initialValue: this,
             parent: args.parent,
             childTypes: args.attributesSchema,
             type: {
                 typeName: "gameObject",
-                gameObjectClass: Object.getPrototypeOf(this),
+                gameObjectClass: Object.getPrototypeOf(this).constructor,
             },
         });
 
