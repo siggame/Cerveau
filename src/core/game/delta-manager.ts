@@ -97,9 +97,7 @@ export class DeltaManager {
                 }
             }
             else if (Array.isArray(changedValue)) {
-                // will always be 0, array was just initialized
-                // calls here to fill it should follow immediately though
-                changedValue = { [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: 0 };
+                changedValue = { [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: changedValue.length };
             }
             else if (typeof(changedValue) === "object") {
                 changedValue = {};

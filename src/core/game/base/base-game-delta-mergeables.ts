@@ -31,13 +31,17 @@ export class BaseGameDeltaMergeables {
             (this.deltaMergeable.wrapper as any)[key] = initialValue;
         }
 
-        for (const property of Object.keys(args.attributesSchema)) {
+        for (const [property, schema] of Object.entries(args.attributesSchema)) {
+            const dm = this.deltaMergeable.child(property)!;
+
             Object.defineProperty(this, property, {
                 enumerable: true, // show up in for of loops
                 configurable: false, // can't be deleted
                 // writable: true, // allow reassignment DOES NOT WORK WITH GETTER/SETTERS
-                get: () => this.deltaMergeable.child(property)!.get(),
-                set: (val: any) => this.deltaMergeable.child(property)!.set(val),
+                get: schema!.typeName === "list"
+                    ? () => dm.wrapper
+                    : () => dm.get(),
+                set: (val: any) => dm.set(val),
             });
         }
     }

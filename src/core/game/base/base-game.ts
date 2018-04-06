@@ -23,10 +23,10 @@ export class BaseGame extends BaseGameDeltaMergeables {
     public readonly manager: BaseGameManager;
     public readonly settings: Readonly<IBaseGameSettings>;
 
-    public readonly name: string = this.name || "";
-    public readonly session: string = this.session || "";
-    public readonly gameObjects: {[id: string]: BaseGameObject | undefined} = this.gameObjects || {};
-    public readonly players: IBasePlayer[] = this.players || [];
+    public readonly name!: string;
+    public readonly session!: string;
+    public readonly gameObjects!: {[id: string]: BaseGameObject | undefined};
+    public readonly players!: IBasePlayer[];
 
     constructor(settings: IBaseGameSettings, requiredData: IBaseGameRequiredData) {
         super({
