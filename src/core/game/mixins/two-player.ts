@@ -33,7 +33,7 @@ export function mixTwoPlayer<
     GameSettings: TBaseGameSettings,
 }) {
     class TwoPlayerGame extends base.Game {
-        public readonly players: ITwoPlayerPlayer[] = this.players || [];
+        public readonly players!: ITwoPlayerPlayer[];
 
         constructor(...args: any[]) {
             super(...args);

@@ -103,7 +103,8 @@ export class GameLogger {
         this.finalized = true;
     }
 
-    private add(type: "start" | "over"): void;
+    private add(type: "start"): void;
+    private add(type: "over"): void; // tslint:disable-line:unified-signatures
     private add(type: "disconnect", data: IDisconnectDeltaData): void;
     private add(type: "ran", data: IRanDeltaData): void;
     private add(type: "finished", data: IFinishedDeltaData): void;

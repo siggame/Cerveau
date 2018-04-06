@@ -30,13 +30,13 @@ export class DeltaManager {
 
     /**
      * Handles a change in game state by updating our delta
-     * @param deltaMergeable the delta mergeable that mutated
+     * @param changed the delta mergeable that mutated
      * @param wasDeleted a boolean indicating if the mutation was a deletion
      */
-    protected handleDelta(deltaMergeable: DeltaMergeable<any>, wasDeleted: boolean = false): void {
+    protected handleDelta(changed: DeltaMergeable<any>, wasDeleted: boolean = false): void {
         // pass
 
-        let pathDeltaMergable = deltaMergeable;
+        let pathDeltaMergable = changed;
         const path = new Array<DeltaMergeable<any>>();
         while (pathDeltaMergable.getParent() !== this.rootDeltaMergeable) {
             path.unshift(pathDeltaMergable);
@@ -49,15 +49,21 @@ export class DeltaManager {
         // now go up the path to the deltaMergeable that changed to build up our delta
         for (let i = 0; i < path.length; i++) {
             const dm = path[i];
+            const value = dm.get();
+
             if (!objectHasProperty(current, dm.key)) {
                 current[dm.key] = {};
             }
 
-            let value = dm.get();
             if (Array.isArray(value)) {
-                current[dm.key][SHARED_CONSTANTS.DELTA_LIST_LENGTH] = dm.get().length;
+                current[dm.key][SHARED_CONSTANTS.DELTA_LIST_LENGTH] = value.length;
             }
 
+            if (i !== (path.length - 1)) {
+                current = current[dm.key];
+            }
+
+            /*
             if (i === (path.length - 1)) {
                 value = wasDeleted ?
                     SHARED_CONSTANTS.DELTA_REMOVED :
@@ -73,7 +79,34 @@ export class DeltaManager {
             }
             else {
                 current = current[dm.key];
-            }
+            }*/
         }
+
+        // current should now be at the end of the path
+        let changedValue = changed.get();
+        if (wasDeleted) {
+            changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
+        }
+        else {
+            if (changedValue instanceof BaseGameObject) {
+                if (path.length === 2 && path[0].key === "gameObjects") {
+                    changedValue = {};
+                }
+                else {
+                    changedValue = { id: changedValue.id };
+                }
+            }
+            else if (Array.isArray(changedValue)) {
+                // will always be 0, array was just initialized
+                // calls here to fill it should follow immediately though
+                changedValue = { [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: 0 };
+            }
+            else if (typeof(changedValue) === "object") {
+                changedValue = {};
+            }
+            // else changed value is a primitive and is safe to copy
+        }
+
+        current[changed.key] = changedValue;
     }
 }
