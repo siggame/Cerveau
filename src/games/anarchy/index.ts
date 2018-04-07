@@ -170,6 +170,9 @@ export const Namespace = makeNamespace({
                 maxTurns: {
                     typeName: "int",
                 },
+                name: {
+                    typeName: "string",
+                },
                 nextForecast: {
                     typeName: "gameObject",
                     gameObjectClass: Forecast,
@@ -186,6 +189,9 @@ export const Namespace = makeNamespace({
                         typeName: "gameObject",
                         gameObjectClass: Player,
                     },
+                },
+                session: {
+                    typeName: "string",
                 },
             },
             functions: {},

@@ -53,6 +53,7 @@ export class BaseGameManager {
         settings: IBaseGameSettings,
         clients: BaseClient[],
         rootDeltaMergeable: DeltaMergeable,
+        sessionID: string,
         private gameOverCallback: () => void,
     ) {
         if (!settings.randomSeed) {
@@ -94,6 +95,7 @@ export class BaseGameManager {
             playerIDs: clients.map(() => this.generateNextGameObjectID()),
             schema: this.namespace.gameObjectsSchema.Game,
             gameCreated,
+            sessionID,
         });
 
         for (const client of clients) {

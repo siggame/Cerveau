@@ -17,6 +17,7 @@ export interface IBaseGameRequiredData {
     schema: IBaseGameObjectSchema;
     manager: BaseGameManager;
     gameCreated: Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>;
+    sessionID: string;
 }
 
 export class BaseGame extends BaseGameDeltaMergeables {
@@ -42,8 +43,10 @@ export class BaseGame extends BaseGameDeltaMergeables {
         this.settings = Object.freeze(settings);
         this.manager = requiredData.manager;
 
-        const clients = requiredData.clients;
+        this.name = requiredData.namespace.GameManager.gameName;
+        this.session = requiredData.sessionID;
 
+        const clients = requiredData.clients;
         // const sanitizer = new BaseGameSanitizer(this.namespace);
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];

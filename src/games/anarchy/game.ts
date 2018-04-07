@@ -20,6 +20,7 @@ const DIRECTIONAL_OFFSETS = {
  * player's buildings. Let it burn.
  */
 export class Game extends BaseClasses.Game {
+    /** The manager of this game, that controls everything around it */
     public readonly manager!: GameManager;
 
     /**

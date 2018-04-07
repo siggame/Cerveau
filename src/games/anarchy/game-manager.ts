@@ -10,6 +10,10 @@ export class GameManager extends BaseClasses.GameManager {
         return "Anarchy";
     }
 
+    public static get requiredNumberOfPlayers(): number {
+        return super.requiredNumberOfPlayers; // override this if you want to set a different number of players
+    }
+
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>

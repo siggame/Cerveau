@@ -90,6 +90,7 @@ export class Session {
             args.gameSettings,
             playingClients,
             this.deltaManager.rootDeltaMergeable,
+            this.id,
             () => this.handleGameOver(),
         );
         this.game = this.gameManager.game;
