@@ -125,7 +125,7 @@ export class ThreadedRoom extends Room {
         return clients.map<IClientInfo>((client, i) => ({
             index: i,
             name: client.name,
-            type: client.type,
+            type: client.programmingLanguage,
             connectionType: client.connectionType,
             spectating: client.isSpectating,
             metaDeltas: client.sendMetaDeltas,

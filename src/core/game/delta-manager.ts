@@ -36,14 +36,12 @@ export class DeltaManager {
     protected handleDelta(changed: DeltaMergeable<any>, wasDeleted: boolean = false): void {
         // pass
 
-        let pathDeltaMergable = changed;
+        let pathDeltaMergeable = changed;
         const path = new Array<DeltaMergeable<any>>();
-        while (pathDeltaMergable.getParent() !== this.rootDeltaMergeable) {
-            path.unshift(pathDeltaMergable);
-            pathDeltaMergable = pathDeltaMergable.getParent()!;
+        while (pathDeltaMergeable.getParent() !== this.rootDeltaMergeable) {
+            path.unshift(pathDeltaMergeable);
+            pathDeltaMergeable = pathDeltaMergeable.getParent()!;
         }
-
-        const stringPath = path.map((d) => d.key).join(".");
 
         let current = this.delta;
         // now go up the path to the deltaMergeable that changed to build up our delta

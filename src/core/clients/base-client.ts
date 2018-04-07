@@ -27,11 +27,6 @@ export class BaseClient {
         alias: new Event<string>(),
     });
 
-    /** The type of client this is, inheriting classes should override */
-    public get type(): string {
-        return DEFAULT_STR;
-    }
-
     /** The name of this client */
     public get name(): string {
         return this.ourName;

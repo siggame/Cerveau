@@ -54,7 +54,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
             const playerData: IBasePlayerData = {
                 name: settings.playerNames[i] || client.name || `Player ${i}`,
-                clientType: client.type || "Unknown",
+                clientType: client.programmingLanguage || "Unknown",
             };
 
             const player = createGameObject<IBasePlayer>({
