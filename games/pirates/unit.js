@@ -380,7 +380,26 @@ let Unit = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Tries to invalidate args for an action function
+     *
+     * @param {Player} player - the player commanding this Unit
+     * @param {boolean} [checkAction] - true to check if this Unit has an action
+     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
+     */
+    _invalidate: function(player, checkAction) {
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if(checkAction && this.acted) {
+            return `${this} cannot perform another action this turn.`;
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 
