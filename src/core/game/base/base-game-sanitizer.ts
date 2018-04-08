@@ -1,5 +1,5 @@
 import { defaultArray, sanitizeType } from "~/core/type-sanitizer";
-import { IAnyObject } from "~/utils";
+import { IAnyObject, objectHasProperty } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
@@ -10,34 +10,41 @@ export class BaseGameSanitizer {
     constructor(protected readonly namespace: IBaseGameNamespace) {
     }
 
-    public sanitizeOrderArgs(name: string, args: any[]): Error | any[] {
-        const schema = this.namespace.gameAISchema.orders[name];
+    public sanitizeOrderArgs(aiFunctionName: string,
+                             args: any[],
+    ): Error | any[] {
+        const schema = this.namespace.gameAISchema.orders[aiFunctionName];
         if (!schema) {
-            return new Error(`Order ${name} does not exist to sanitize args for`);
+            return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
         }
 
         const argsArray = defaultArray(args);
         return schema.args.map((t, i) => sanitizeType(t, argsArray[i]));
     }
 
-    public validateFinishedReturned(name: string, returned: any): any {
-        const schema = this.namespace.gameAISchema.orders[name];
+    public validateFinishedReturned(aiFunctionName: string,
+                                    returned: any,
+    ): any {
+        const schema = this.namespace.gameAISchema.orders[aiFunctionName];
         if (!schema) {
-            return new Error(`Order ${name} does not exist to sanitize returned for`);
+            return new Error(`Order ${aiFunctionName} does not exist to sanitize returned for`);
         }
 
         return sanitizeType(schema.returns, returned);
     }
 
-    public validateRunArgs(gameObject: BaseGameObject, name: string, args: IAnyObject): Error | Map<string, any> {
-        const schema = this.validateGameObject(gameObject, name);
+    public validateRunArgs(gameObject: BaseGameObject,
+                           functionName: string,
+                           args: IAnyObject,
+    ): Error | Map<string, any> {
+        const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
         }
 
         const sanitizedArgs = new Map<string, any>();
         for (const arg of schema.args) {
-            const value = Object.prototype.hasOwnProperty.apply(args, arg.argName)
+            const value = objectHasProperty(args, arg.argName)
                 ? args[arg.argName]
                 : arg.defaultValue;
 
@@ -48,8 +55,11 @@ export class BaseGameSanitizer {
         return sanitizedArgs;
     }
 
-    public validateRanReturned(gameObject: BaseGameObject, name: string, returned: any): any {
-        const schema = this.validateGameObject(gameObject, name);
+    public validateRanReturned(gameObject: BaseGameObject,
+                               functionName: string,
+                               returned: any,
+    ): any {
+        const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
         }
@@ -57,7 +67,9 @@ export class BaseGameSanitizer {
         return sanitizeType(schema.returns, returned);
     }
 
-    private validateGameObject(gameObject: BaseGameObject, name: string): Error | IBaseGameObjectFunctionSchema {
+    private validateGameObject(gameObject: BaseGameObject,
+                               functionName: string,
+    ): Error | IBaseGameObjectFunctionSchema {
         if (
             !gameObject ||
             !(gameObject instanceof BaseGameObject) ||
@@ -67,10 +79,10 @@ export class BaseGameSanitizer {
         }
 
         const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
-        if (!gameObjectSchema.functions[name]) {
-            return new Error(`${gameObject} does not have a method ${name}`);
+        if (!gameObjectSchema.functions[functionName]) {
+            return new Error(`${gameObject} does not have a method ${functionName}`);
         }
 
-        return gameObjectSchema.functions[name];
+        return gameObjectSchema.functions[functionName];
     }
 }

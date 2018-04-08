@@ -3,7 +3,7 @@
  * and from serialize-able objects when communicating between client <--> sever
  */
 
-import { IAnyObject, isEmptyExceptFor, isObject } from "~/utils";
+import { IAnyObject, isEmptyExceptFor, isObject, mapToObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
@@ -54,15 +54,18 @@ export function isDeltaArray(a: any): boolean {
  * This is required to avoid cycles and send lists correctly.
  * @param state  The variable you want to serialize.
  * Anything in the game should be Serializable, numbers, strings, BaseGameObjects, dicts, lists, nulls, etc.
- * @param game the game you are serializing things for
  * @returns the state, serialized. It will never be the same object if it is an object ({} or [])
  */
-export function serialize(state: any, game: BaseGame): any {
+export function serialize(state: any): any {
     if (!isObject(state)) {
         return state; // not an object, no need to further serialize
     }
     else if (state instanceof BaseGameObject) { // no need to serialize this whole thing
         return { id: state.id };
+    }
+
+    if (state instanceof Map) {
+        state = mapToObject(state);
     }
 
     const serialized: IAnyObject = {};
@@ -76,7 +79,7 @@ export function serialize(state: any, game: BaseGame): any {
         if (isSerializable(state, key)) {
             const value = state[key];
             if (isObject(value)) {
-                serialized[key] = serialize(value, game || state);
+                serialized[key] = serialize(value);
             }
             else {
                 serialized[key] = value;

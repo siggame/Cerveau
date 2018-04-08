@@ -4,6 +4,7 @@
         "Creer",
         "Mergeable",
         "Sanitizable",
+        "Serializable",
         "Serializeable",
         "argparse",
         "cpuprofile",

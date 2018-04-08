@@ -63,15 +63,15 @@ export function unstringify(value: string | number | boolean | null): string | n
  * Accepts an object of any key/values, and tries to unstringify each value,
  * and returns the new resulting object
  * @param obj the object to try to unstringify its children
- * @returns the unstringified object (a new object, obj is untouched)
+ * @returns the un-stringified object (a new object, obj is untouched)
  */
 export function unstringifyObject(obj: {[key: string]: string}): {[key: string]: string | number | boolean | null} {
-    const unstringified: {[key: string]: any} = {};
+    const unStringified: {[key: string]: any} = {};
     for (const key of Object.keys(obj)) {
-        unstringified[key] = unstringify(obj[key]);
+        unStringified[key] = unstringify(obj[key]);
     }
 
-    return unstringified;
+    return unStringified;
 }
 
 /**
@@ -120,4 +120,22 @@ export function isNil<T>(thing: T | undefined | null): thing is nil {
 
 export function objectHasProperty(obj: any, property: PropertyKey): obj is {[property: string]: any} {
     return Boolean(obj) && Object.prototype.hasOwnProperty.call(obj, property);
+}
+
+export function objectToMap<T>(obj: {[key: string]: T}): Map<string, T> {
+    const map = new Map<string, T>();
+    for (const [key, value] of Object.entries(obj)) {
+        map.set(key, value);
+    }
+
+    return map;
+}
+
+export function mapToObject<T>(map: Map<string, T>): {[key: string]: T} {
+    const obj: {[key: string]: T} = {};
+    for (const [key, value] of map) {
+        obj[key] = value;
+    }
+
+    return obj;
 }

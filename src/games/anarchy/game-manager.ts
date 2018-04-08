@@ -202,7 +202,7 @@ export class GameManager extends BaseClasses.GameManager {
 
         // else all their buildings are identical,
         // so they are probably the same AIs, so just random chance
-        this.makePlayerWinViaCoinFlip("AIs played the game.");
+        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }
 
     // TODO: add creer merge fields

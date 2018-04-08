@@ -394,9 +394,9 @@ export const Namespace = makeNamespace({
                             gameObjectClass: Warehouse,
                         },
                     ],
-                    invalidValue: undefined,
+                    invalidValue: -1,
                     returns: {
-                        typeName: "boolean",
+                        typeName: "int",
                     },
                 },
             },
@@ -411,7 +411,21 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {},
+            functions: {
+                ignite: {
+                    args: [
+                        {
+                            argName: "building",
+                            typeName: "gameObject",
+                            gameObjectClass: Building,
+                        },
+                    ],
+                    invalidValue: -1,
+                    returns: {
+                        typeName: "int",
+                    },
+                },
+            },
         },
         WeatherStation: {
             parentClassName: "Building",

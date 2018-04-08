@@ -1,6 +1,7 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "~/core/game/";
+import { serialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
@@ -138,7 +139,9 @@ export class BaseAIManager {
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
-            const validated: string | IArguments = (caller as any)[`invalidate${capitalizeFirstLetter(functionName)}`](
+            const validated: string | IArguments = (caller as any)[
+                `invalidate${capitalizeFirstLetter(functionName)}`
+            ](
                 this.client.player,
                 ...sanitizedArgs.values(),
             );
@@ -153,7 +156,7 @@ export class BaseAIManager {
             else {
                 // it's valid!
                 const unsanitizedReturned: any = await (caller as any)[functionName](...validated);
-                returned = this.gameSanitizer.validateRanReturned(caller, name, unsanitizedReturned);
+                returned = this.gameSanitizer.validateRanReturned(caller, functionName, unsanitizedReturned);
             }
         }
 
@@ -161,9 +164,9 @@ export class BaseAIManager {
             player: { id: this.client.player!.id },
             invalid,
             run: {
-                caller,
+                caller: { id: caller.id },
                 functionName,
-                args: sanitizedArgs,
+                args: serialize(sanitizedArgs),
             },
             returned,
         });

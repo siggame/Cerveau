@@ -1,10 +1,32 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData, IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+import { BaseGame, BaseGameObject, IDelta, IDeltaData, IDisconnectDeltaData,
+    IFinishedDeltaData, IRanDeltaData } from "~/core/game";
 import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";
 import { IGamelog } from "./gamelog-interfaces";
+
+/*
+function findBad(obj: any, path: string = ""): void {
+    if (typeof(obj) === "object" && obj !== null) {
+        for (const [key, value] of Object.entries(obj)) {
+            const current = `${path}.${key}`;
+
+            if (value instanceof BaseGameObject) {
+                console.log("Found bad game obj", current, String(value));
+            }
+            else if (value instanceof Map) {
+                console.log("Found a map at", current);
+            }
+            else {
+                // go deeper
+                findBad(value, current);
+            }
+        }
+    }
+}
+*/
 
 /** Observes a game and creates a gamelog from its events */
 export class GameLogger {
@@ -112,6 +134,8 @@ export class GameLogger {
         if (this.finalized) {
             return;
         }
+
+        // findBad(data, "data");
 
         const delta: IDelta = {
             type,

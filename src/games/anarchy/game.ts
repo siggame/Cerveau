@@ -15,6 +15,18 @@ const DIRECTIONAL_OFFSETS = {
     West: { x: -1, y: 0 },
 };
 
+function pointToKey(pt: IPoint): string {
+    return `${pt.x},${pt.y}`;
+}
+
+function keyToPoint(str: string): IPoint {
+    const split = str.split(",");
+    return {
+        x: Number(split[0]),
+        y: Number(split[1]),
+    };
+}
+
 /**
  * Two player grid based game where each player tries to burn down the other
  * player's buildings. Let it burn.
@@ -123,15 +135,15 @@ export class Game extends BaseClasses.Game {
                 : this.mapWidth / 2 - 1;
             const y = this.manager.random.int(this.mapHeight - 1, 0);
 
-            pointsSet.add(JSON.stringify({x, y}));
+            pointsSet.add(pointToKey({x, y}));
         }
 
         // now connect the points, after shuffling them
         let points = this.manager.random.shuffle(Array.from(pointsSet));
         const startingLength = points.length;
         for (let i = 0; i < startingLength; i++) {
-            let from: IPoint = JSON.parse(points[i]);
-            const to: IPoint = JSON.parse(points[i + 1]);
+            let from: IPoint = keyToPoint(points[i]);
+            const to: IPoint = keyToPoint(points[i + 1]);
 
             while (true) {
                 const changes: IPoint[] = [];
@@ -162,7 +174,7 @@ export class Game extends BaseClasses.Game {
                 };
 
                 from = connectedPoint;
-                points.push(JSON.stringify(connectedPoint));
+                points.push(pointToKey(connectedPoint));
             }
         }
         points = this.manager.random.shuffle(points);
@@ -193,7 +205,7 @@ export class Game extends BaseClasses.Game {
                 madeHQ = true;
             }
 
-            const {x, y} = JSON.parse(points[i]);
+            const { x, y } = keyToPoint(points[i]);
             originalBuildings.push(this.manager.createBuilding(buildingType, {
                 x,
                 y,

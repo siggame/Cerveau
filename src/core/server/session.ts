@@ -181,7 +181,7 @@ export class Session {
      * @param {Object} [data] - any additional data about what caused the delta
      */
     private readonly sendDeltas = (delta: IDelta) => {
-        if (!isObjectEmpty(delta)) {
+        if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
                 client.send("delta", client.sendMetaDeltas
