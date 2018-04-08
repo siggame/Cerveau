@@ -1,7 +1,7 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "~/core/game/";
-import { serialize } from "~/core/serializer";
+import { unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
@@ -110,7 +110,11 @@ export class BaseAIManager {
             return undefined;
         }
 
-        const sanitizedArgs = this.gameSanitizer.validateRunArgs(caller, functionName, unsanitizedArgs);
+        const sanitizedArgs = this.gameSanitizer.validateRunArgs(
+            caller,
+            functionName,
+            unSerialize(unsanitizedArgs, this.game),
+        );
 
         if (sanitizedArgs instanceof Error) {
             // the structure of their run command is so malformed we can't even run it,
@@ -164,9 +168,9 @@ export class BaseAIManager {
             player: { id: this.client.player!.id },
             invalid,
             run: {
-                caller: { id: caller.id },
+                caller: callerReference,
                 functionName,
-                args: serialize(sanitizedArgs),
+                args: unsanitizedArgs, // store the raw args in the gamelog for better debugging
             },
             returned,
         });
@@ -190,7 +194,11 @@ export class BaseAIManager {
             this.client.pauseTicking();
         }
 
-        const validated = this.gameSanitizer.validateFinishedReturned(order.name, unsanitizedReturned);
+        const validated = this.gameSanitizer.validateFinishedReturned(
+            order.name,
+            unSerialize(unsanitizedReturned, this.game),
+        );
+
         let invalid: Error | undefined;
         if (validated instanceof Error) {
             invalid = validated;
