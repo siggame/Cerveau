@@ -85,12 +85,15 @@ export class Session {
             // startProfiling();
         }
 
+        const started = new Signal();
+
         this.gameManager = new args.gameNamespace.GameManager(
             args.gameNamespace,
             args.gameSettings,
             playingClients,
             this.deltaManager.rootDeltaMergeable,
             this.id,
+            started,
             () => this.handleGameOver(),
         );
         this.game = this.gameManager.game;
@@ -106,6 +109,8 @@ export class Session {
                 playerID: client.player && client.player.id,
             });
         }
+
+        started.emit();
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Event } from "ts-typed-events";
+import { Event, Signal } from "ts-typed-events";
 import { BaseClient } from "~/core/clients/";
 import { DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
@@ -54,6 +54,7 @@ export class BaseGameManager {
         clients: BaseClient[],
         rootDeltaMergeable: DeltaMergeable,
         sessionID: string,
+        gameStarted: Signal,
         private gameOverCallback: () => void,
     ) {
         if (!settings.randomSeed) {
@@ -102,6 +103,8 @@ export class BaseGameManager {
             client.events.disconnected.once(() => this.playerDisconnected(client.player!));
             this.playerToClient.set(client.player!, client);
         }
+
+        gameStarted.once(() => this.start());
     }
 
     /**
@@ -180,6 +183,14 @@ export class BaseGameManager {
      */
     public isGameOver(): boolean {
         return this.isOver;
+    }
+
+    /**
+     * Invoked when the game starts and we should send orders.
+     * The Game and this GameManager will have already been constructed
+     */
+    protected start(): void {
+        // pass, intended to be overridden
     }
 
     /**

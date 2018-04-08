@@ -96,8 +96,11 @@ export function mixTurnBased<
             super(...args);
 
             this.game.currentPlayer = this.game.players[0];
+        }
 
-            this.beforeTurn(); // different from nextPlayer, this is called because their turn has not yet started
+        protected start(): void {
+            // different from nextTurn, this is called because their turn has not yet started
+            this.beforeTurn();
         }
 
         protected invalidateRun(
