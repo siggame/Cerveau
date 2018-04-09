@@ -480,16 +480,16 @@ let Unit = Class(GameObject, {
      */
     invalidateWithdraw: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateWithdraw -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		if (this.tile != player.startingPort) {
-			return "Argh, Yee cannot be takin gold from anywhere but yer starting port!";
-		}
-		if (typeof(amount) != "number") {
-			return "Argh, Amount is of the wrong type!";
-		}
-		if (typeof(player) != "player") {
-			return "That Player isn't of type player!";
-		}
-        // Developer: try to invalidate the game logic for Unit's withdraw function here
+
+        const reason = this._invalidate(player, true);
+        if(reason) {
+            return reason;
+        }
+
+        if(this.tile !== player.startingPort) {
+            return `Argh, ${this} cannot be takin' gold from anywhere but yer starting port!`;
+        }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateWithdraw -->>
@@ -504,20 +504,25 @@ let Unit = Class(GameObject, {
      */
     withdraw: function(player, amount) {
         // <<-- Creer-Merge: withdraw -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		if (this.tile == player.startingPort) {
-			if (amount <= 0) {
-				player.gold = 0;
-				return true;
-			} else if (player.gold >= amount) {
-				player.gold -= amount;
-				return true;
-			} else if (player.gold <= amount) {
-				player.gold = 0;
-				return true;
-			}
-		}
+
+        if(amount <= 0) {
+            // Take all the gold
+            this.gold += player.gold;
+            player.gold = 0;
+        }
+        else if(player.gold >= amount) {
+            // Take some of the gold
+            this.gold += amount;
+            player.gold -= amount;
+        }
+        else if(player.gold <= amount) {
+            // amount > player.gold, so just take it all
+            this.gold += player.gold;
+            player.gold = 0;
+        }
+
         // Developer: Put your game logic for the Unit's withdraw function here
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: withdraw -->>
     },
