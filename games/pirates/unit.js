@@ -283,40 +283,38 @@ let Unit = Class(GameObject, {
     invalidateMove: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's move function here
-        if(!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
+        const reason = this._invalidate(player, false);
+        if(reason) {
+            return reason;
         }
-        if(this.owner !== player) {
-            return `${this} isn't owned by you.`;
-        }
+
+        const ship = this.shipHealth > 0;
         if(this.moves <= 0) {
-          return "Your crew are too tired to travel any further!";
+            return `${this}'s crew are too tired to travel any further.`;
         }
         if(this.acted) {
-            return `${this} cannot move after acting! The men are too tired!`;
+            return `${this} cannot move after acting. The men are too tired!`;
         }
-        if(tile === null) {
-          return "You must have a destination! (no tile passed)";
+        if(!tile) {
+            return `${this} must have a destination. (Tile argument is null)`;
         }
-        if(tile.unit !== null) {
-          if(tile.unit.owner !== player && tile.unit.owner !== null) {
-            return "Your crew refuses to share the same ground with a living foe!";
-          }
+        if(tile.unit && tile.unit.owner !== player && tile.unit.owner !== null) {
+            return `${this} refuses to share the same ground with a living foe.`;
         }
-        if(this.shipHealth <= 0) {
-          if(tile.type === "water") {
-            return "Sea legs doesn't mean you can walk on water!";
-          }
+        if(!ship && tile.type === "water" && !tile.port) {
+            return `${this} has no ship and can't walk on water!`;
         }
-        if(this.shipHealth > 0) {
-          if(tile.type === "land") {
-            return "Ships belong in the sea! Use split if you want to move your crew ashore!";
-          }
+        if(ship && tile.type === "land") {
+            return `${this} belongs in the sea! Use 'Unit.split' if you want to move just your crew ashore.`;
         }
-        if(tile.port.owner !== player)
-        {
-          return "You cannot enter an enemy port!";
+        if(ship && tile.shipHealth > 0) {
+            return `There's a ship on ${tile} that ${this} refuses to collide with.`;
+        }
+        if(!ship && tile.ship && this.acted) {
+            return `${this} already acted and is too tired to board that ship.`;
+        }
+        if(tile.port && tile.port.owner !== player) {
+            return `${this} cannot enter an enemy port!`;
         }
         return undefined; // meaning valid
 
@@ -333,42 +331,37 @@ let Unit = Class(GameObject, {
     move: function(player, tile) {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's move function here
         if(tile.unit) {
-          let move = tile.unit.moves;
-          if(move > this.moves-1) {
-            move = this.moves-1;
-          }
-          tile.unit.moves = move;
-          if(tile.unit.crew === 0) {
-            tile.acted = true;
-            tile.unit.crew = this.crew;
-            tile.unit.crewHealth = this.crewHealth;
-            tile.unit.owner = player;
-            tile.unit.gold += this.gold;
-            this.tile = null;
-            this.crewHealth = 0;
-            this.tile.unit = null;
-          }
-          else {
+            // Calculate remaining moves
+            let move = tile.unit.moves;
+            if(move > this.moves - 1) {
+                move = this.moves - 1;
+            }
+            tile.unit.moves = move;
+
+            // Move over crew and gold
             tile.unit.crew += this.crew;
             tile.unit.crewHealth += this.crewHealth;
             tile.unit.gold += this.gold;
-            this.tile = null;
-            this.crewHealth = 0;
+
+            // Remove this crew
             this.tile.unit = null;
-            if(tile.unit.shipHealth > 0)
-            {
-              tile.acted = true
+            this.tile = null;
+
+            // If boarding a ship, consume an action
+            if(tile.unit.shipHealth > 0) {
+                tile.acted = true;
             }
-          }
         }
         else {
-          this.tile.unit = null;
-          tile.unit = this;
-          this.moves -= 1;
+            // Move this unit to that tile
+            this.tile.unit = null;
+            this.tile = tile;
+            tile.unit = this;
+            this.moves -= 1;
         }
-        return false;
+
+        return true;
 
         // <<-- /Creer-Merge: move -->>
     },
