@@ -42,6 +42,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: {},
     },
 
+    healFactor: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
     mapHeight: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,

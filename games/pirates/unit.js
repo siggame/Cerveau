@@ -380,27 +380,26 @@ let Unit = Class(GameObject, {
     invalidateRest: function(player, tile, amount, args) {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's rest function here
-        if(!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
+        const reason = this._invalidate(player, true);
+        if(reason) {
+            return reason;
         }
-        if(this.owner !== player) {
-            return `${this} isn't among your crew`;
-        }
-        if(this.acted) {
-            return `${this} doesn't have time to rest after attacking!`;
-        }
-        let found = false;
-        found = this.game.port.find(port => {
-            if(!port.tile || port.owner !== this.owner) {
+
+        // Search for a nearby port
+        const found = this.owner.ports.find(port => {
+            // Make sure port isn't destroyed
+            if(!port.tile) {
                 return false;
             }
+
+            // Check if it's in range
             const radius = this.game.restRange;
-            return Math.abs(this.tile.x - port.tile.x) <= radius && Math.abs(this.tile.y - port.tile.y) <= radius;
+            return Math.pow(this.tile.x - port.tile.x, 2) + Math.pow(this.tile.y - port.tile.y, 2) <= radius * radius;
         }, this);
         if(!found) {
-            return "There is no nearby port to rest at! No home tavern means no free rum!";
+            return `${this} has no nearby port to rest at. No home tavern means no free rum!`;
         }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateRest -->>
@@ -417,17 +416,17 @@ let Unit = Class(GameObject, {
     rest: function(player, tile, amount) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's rest function here
+        // Heal the units
+        this.crewHealth += Math.ceil(this.game.crewHealth * this.game.healFactor) * this.crew;
         if(this.shipHealth > 0) {
-            this.shipHealth += Math.round(this.game.shipHealth*0.25+ 0.5);
+            this.shipHealth += Math.ceil(this.game.shipHealth * this.game.healFactor);
         }
-        if(this.crew > 0) {
-            this.crewHealth += (Math.round(this.game.crewHealth*0.25 + 0.5)*this.crew);
-        }
+
+        // Make sure the unit can't do anything else this turn
         this.acted = true;
         this.moves = 0;
 
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: rest -->>
     },
@@ -520,7 +519,7 @@ let Unit = Class(GameObject, {
         }
 
         if(this.owner !== player) {
-            return `${this} isn't owned by you.`;
+            return `${this} isn't among your crew.`;
         }
 
         if(checkAction && this.acted) {

@@ -74,6 +74,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.gameObjects = this.gameObjects || {};
 
         /**
+         * How much health a Unit recovers when they rest.
+         *
+         * @type {number}
+         */
+        this.healFactor = this.healFactor || 0;
+
+        /**
          * The number of Tiles in the map along the y (vertical) axis.
          *
          * @type {number}
