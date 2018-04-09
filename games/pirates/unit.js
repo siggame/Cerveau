@@ -381,6 +381,26 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: try to invalidate the game logic for Unit's rest function here
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+        if(this.owner !== player) {
+            return `${this} isn't among your crew`;
+        }
+        if(this.acted) {
+            return `${this} doesn't have time to rest after attacking!`;
+        }
+        let found = false;
+        found = this.game.port.find(port => {
+            if(!port.tile || port.owner !== this.owner) {
+                return false;
+            }
+            const radius = this.game.restRange;
+            return Math.abs(this.tile.x - port.tile.x) <= radius && Math.abs(this.tile.y - port.tile.y) <= radius;
+        }, this);
+        if(!found) {
+            return "There is no nearby port to rest at! No home tavern means no free rum!";
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateRest -->>
@@ -398,6 +418,15 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's rest function here
+        if(this.shipHealth > 0) {
+            this.shipHealth += Math.round(this.game.shipHealth*0.25+ 0.5);
+        }
+        if(this.crew > 0) {
+            this.crewHealth += (Math.round(this.game.crewHealth*0.25 + 0.5)*this.crew);
+        }
+        this.acted = true;
+        this.moves = 0;
+
         return false;
 
         // <<-- /Creer-Merge: rest -->>
