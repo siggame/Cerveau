@@ -1100,6 +1100,7 @@
                 "owner",
                 "path",
                 "shipHealth",
+                "targetPort",
                 "tile"
             ],
             "attributes": {
@@ -1180,6 +1181,16 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "int",
+                        "valueType": null
+                    }
+                },
+                "targetPort": {
+                    "default": null,
+                    "description": "(Merchants only) The Port this Unit is moving to.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
                         "valueType": null
                     }
                 },

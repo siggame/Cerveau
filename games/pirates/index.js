@@ -437,6 +437,11 @@ classes.Unit._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    targetPort: {
+        type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
+        defaultValue: null,
+    },
+
     tile: {
         type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         defaultValue: null,

@@ -216,6 +216,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.portHealth = data.portHealth || 20;
         this.crewRange = data.crewRange || 1;
         this.shipRange = data.shipRange || 4;
+        this.crewMoves = data.crewMoves || 2;
+        this.shipMoves = data.shipMoves || 3;
 
         this.restRange = data.restRange || 1.5;
         this.healFactor = data.healFactor || 0.25;
@@ -323,7 +325,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
      * @override
      */
     _maxTurnsReached: function() {
-        this.checkForWinner("Max turns reached");
+        this.checkForWinner("Avast! Ye ran outta turns");
     },
 
     updateArrays: function() {
@@ -376,9 +378,107 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    checkWinner: function(maxTurns) {
+    updateUnits: function() {
+        for(let unit of this.units) {
+            // Reset the unit
+            if(!unit.owner || unit.owner === this.currentPlayer) {
+                unit.acted = false;
+                unit.moves = Math.max(this.crewMoves, unit.shipHealth > 0 ? this.shipMoves : 0);
+                unit.starving = false;
+            }
+
+            // Move merchant units
+            if(!unit.owner) {
+                // Check current path
+                let pathValid = true;
+                if(unit.path) {
+                    for(let tile of unit.path) {
+                        if(tile.unit) {
+                            pathValid = false;
+                        }
+                    }
+                }
+                else {
+                    pathValid = false;
+                }
+
+                // Find path to target port (BFS)
+                if(!pathValid) {
+                    let open = [{
+                        tile: unit.tile,
+                        g: 0,
+                        parent: null,
+                    }];
+                    let closed = {};
+
+                    unit.path = [];
+                    while(open.length > 0) {
+                        // Pop the first open element (lowest distance)
+                        let cur = open.shift();
+                        if(cur.tile.id in closed) {
+                            continue;
+                        }
+
+                        // Check if at the target
+                        if(cur.tile === unit.targetPort) {
+                            while(cur) {
+                                if(cur.tile !== unit.tile) {
+                                    unit.path.unshift(cur.tile);
+                                }
+                                cur = cur.parent;
+                            }
+
+                            break;
+                        }
+
+                        // Add neighbors
+                        let neighbors = [];
+                        if(cur.tile.tileNorth) {
+                            neighbors.push(cur.tile.tileNorth);
+                        }
+                        if(cur.tile.tileEast) {
+                            neighbors.push(cur.tile.tileEast);
+                        }
+                        if(cur.tile.tileSouth) {
+                            neighbors.push(cur.tile.tileSouth);
+                        }
+                        if(cur.tile.tileWest) {
+                            neighbors.push(cur.tile.tileWest);
+                        }
+
+                        for(let neighbor of neighbors) {
+                            open.push({
+                                tile: neighbor,
+                                g: cur.g + 1,
+                                parent: cur,
+                            });
+                        }
+
+                        // Sort open list
+                        if(neighbors.length > 0) {
+                            open.sort((a, b) => a.g - b.g);
+                        }
+                    }
+                }
+
+                // Move the merchant
+                if(unit.path.length > 0) {
+                    const tile = unit.path.shift();
+                    unit.tile.unit = null;
+                    unit.tile = tile;
+                    tile.unit = unit;
+                }
+            }
+        }
+    },
+
+    updateMerchants: function() {
+        // TODO
+    },
+
+    checkWinner: function(secondaryReason) {
         // No win conditions before the max turns are reached
-        if(maxTurns) {
+        if(secondaryReason) {
             // Check who has the most infamy
 
             // Check who has the most units
@@ -388,6 +488,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             // Check who has the most gold
 
             // Coin toss
+            this._endGameViaCoinFlip(secondaryReason);
+            return true;
         }
     },
 
@@ -408,8 +510,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         const radiusRange = maxRadius - minRadius;
 
         // Initial ball (top island)
-        let islandX = Math.floor(this.mapWidth / 4);
-        let islandY = Math.floor(this.mapHeight / 4);
+        let islandX = Math.floor(this.mapWidth / 4) + 0.5;
+        let islandY = Math.floor(this.mapHeight / 4) + 0.5;
         balls.push({
             x: islandX,
             y: islandY,
@@ -426,7 +528,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Initial ball (bottom island)
-        islandY = Math.floor(3 * this.mapHeight / 4);
+        islandY = Math.floor(3 * this.mapHeight / 4) + 0.5;
         balls.push({
             x: islandX,
             y: islandY,

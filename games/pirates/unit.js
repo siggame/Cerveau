@@ -77,6 +77,13 @@ let Unit = Class(GameObject, {
         this.shipHealth = this.shipHealth || 0;
 
         /**
+         * (Merchants only) The Port this Unit is moving to.
+         *
+         * @type {Port}
+         */
+        this.targetPort = this.targetPort || null;
+
+        /**
          * The Tile this Unit is on.
          *
          * @type {Tile}
@@ -308,7 +315,7 @@ let Unit = Class(GameObject, {
             return `${this} has no ship and can't walk on water!`;
         }
         if(ship && tile.type === "land") {
-            return `${this} belongs in the sea! Use 'Unit.split' if you want to move just your crew ashore.`;
+            return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if you want to move just your crew ashore.`;
         }
         if(ship && tile.shipHealth > 0) {
             return `There's a ship on ${tile} that ${this} refuses to collide with.`;
