@@ -87,6 +87,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    restRange: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
     session: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
@@ -522,6 +527,26 @@ classes.Unit.move.cerveau = {
         {
             name: "tile",
             type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        },
+    ],
+    returns: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+    invalidValue: false,
+};
+
+classes.Unit.rest.cerveau = {
+    invalidate: classes.Unit.invalidateRest,
+    args: [
+        {
+            name: "tile",
+            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
+        },
+        {
+            name: "amount",
+            type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+            defaultValue: 1,
         },
     ],
     returns: {

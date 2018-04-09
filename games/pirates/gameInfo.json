@@ -43,6 +43,7 @@
             "port",
             "portCost",
             "portHealth",
+            "restRange",
             "session",
             "shipCost",
             "shipDamage",
@@ -234,6 +235,16 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "int",
+                    "valueType": null
+                }
+            },
+            "restRange": {
+                "default": null,
+                "description": "How far a Unit can be from a Port to rest. Range is circular.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
                     "valueType": null
                 }
             },
@@ -1180,6 +1191,7 @@
                 "deposit",
                 "dig",
                 "move",
+                "rest",
                 "split",
                 "withdraw"
             ],
@@ -1399,6 +1411,54 @@
                     },
                     "serverPredefined": false
                 },
+                "rest": {
+                    "altersState": true,
+                    "argument_names": [
+                        "tile",
+                        "amount"
+                    ],
+                    "arguments": [
+                        {
+                            "default": null,
+                            "description": "The Tile to move the crew to.",
+                            "name": "tile",
+                            "optional": false,
+                            "type": {
+                                "is_game_object": true,
+                                "keyType": null,
+                                "name": "Tile",
+                                "valueType": null
+                            }
+                        },
+                        {
+                            "default": 1,
+                            "description": "The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.",
+                            "name": "amount",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
+                        }
+                    ],
+                    "description": "Regenerates this Unit's health. Must be used in range of a port.",
+                    "optionals": 1,
+                    "optionals_start_index": 1,
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully split, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
                 "split": {
                     "altersState": true,
                     "argument_names": [
@@ -1431,7 +1491,7 @@
                             }
                         }
                     ],
-                    "description": "Move a number of crew to Tile. This will consume a move from those crew.",
+                    "description": "Moves a number of crew to Tile. This will consume a move from those crew.",
                     "optionals": 1,
                     "optionals_start_index": 1,
                     "returns": {

@@ -368,6 +368,43 @@ let Unit = Class(GameObject, {
 
 
     /**
+     * Invalidation function for rest
+     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to move the crew to.
+     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
+     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    invalidateRest: function(player, tile, amount, args) {
+        // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        // Developer: try to invalidate the game logic for Unit's rest function here
+        return undefined; // meaning valid
+
+        // <<-- /Creer-Merge: invalidateRest -->>
+    },
+
+    /**
+     * Regenerates this Unit's health. Must be used in range of a port.
+     *
+     * @param {Player} player - the player that called this.
+     * @param {Tile} tile - The Tile to move the crew to.
+     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
+     * @returns {boolean} True if successfully split, false otherwise.
+     */
+    rest: function(player, tile, amount) {
+        // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+
+        // Developer: Put your game logic for the Unit's rest function here
+        return false;
+
+        // <<-- /Creer-Merge: rest -->>
+    },
+
+
+    /**
      * Invalidation function for split
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
@@ -387,7 +424,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Move a number of crew to Tile. This will consume a move from those crew.
+     * Moves a number of crew to Tile. This will consume a move from those crew.
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to move the crew to.

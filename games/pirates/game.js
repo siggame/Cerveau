@@ -137,6 +137,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.portHealth = this.portHealth || 0;
 
         /**
+         * How far a Unit can be from a Port to rest. Range is circular.
+         *
+         * @type {number}
+         */
+        this.restRange = this.restRange || 0;
+
+        /**
          * A unique identifier for the game instance that is being played.
          *
          * @type {string}
