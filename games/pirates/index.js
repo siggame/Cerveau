@@ -77,11 +77,6 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: [],
     },
 
-    port: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
-        defaultValue: [],
-    },
-
     portCost: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -90,6 +85,11 @@ classes.Game._deltaMergeableProperties = {
     portHealth: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
+    },
+
+    ports: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
+        defaultValue: [],
     },
 
     restRange: {

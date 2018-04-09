@@ -72,7 +72,13 @@ let Port = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.cooldown = data.cooldown || false;
+        this.destroyable = data.destroyable || false;
+        this.gold = data.gold || 0;
+        this.health = data.health || this.game.portHealth;
+        this.investment = data.investment || 0;
+        this.owner = data.owner || null;
+        this.tile = data.tile || null;
 
         //<<-- /Creer-Merge: init -->>
     },

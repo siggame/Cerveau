@@ -123,13 +123,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.players = this.players || [];
 
         /**
-         * Every Port in the game.
-         *
-         * @type {Array.<Port>}
-         */
-        this.port = this.port || [];
-
-        /**
          * How much gold it costs to construct a port.
          *
          * @type {number}
@@ -142,6 +135,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {number}
          */
         this.portHealth = this.portHealth || 0;
+
+        /**
+         * Every Port in the game.
+         *
+         * @type {Array.<Port>}
+         */
+        this.ports = this.ports || [];
 
         /**
          * How far a Unit can be from a Port to rest. Range is circular.
@@ -202,8 +202,32 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
+        this.maxTurns = data.maxTurns || 720;
+        this.mapWidth = data.mapWidth || 40;
+        this.mapHeight = data.mapHeight || 28;
+
+        this.crewCost = data.crewCost || 200;
+        this.shipCost = data.shipCost || 1000;
+        this.portCost = data.portCost || 2000;
+        this.crewDamage = data.crewDamage || 1;
+        this.shipDamage = data.shipDamage || 2;
+        this.crewHealth = data.crewHealth || 4;
+        this.shipHealth = data.shipHealth || 10;
+        this.portHealth = data.portHealth || 20;
+        this.crewRange = data.crewRange || 1;
+        this.shipRange = data.shipRange || 4;
+
+        this.restRange = data.restRange || 1.5;
+        this.healFactor = data.healFactor || 0.25;
+
+        // Mapgen variables
+        this.startingGold = data.startingGold || 3000;
+        this.merchantStartingGold = data.merchantStartingGold || 0;
+        this.merchantStartingInvestment = data.merchantStartingInvestment || 1000;
+
+        // For units and structures created during a turn
+        this.newUnits = [];
+        this.newPorts = [];
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -227,7 +251,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TwoPlayerGame.begin.apply(this, arguments);
 
         //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic after init can be put here
+
+        // Initialize the map and creates all the tiles
+        TiledGame._initMap.call(this);
+
+        // Generate the map
+        this.generateIslands();
+
+        // Give players their starting gold
+        for(let player of this.players) {
+            player.gold = 3000;
+        }
+
         //<<-- /Creer-Merge: begin -->>
     },
 
@@ -247,7 +282,256 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Invoked before the current player starts their turn
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    beforeTurn: function() {
+        // Update all arrays
+        this.updateArrays();
+
+        // Call base class' beforeTurn function
+        return TurnBasedGame.beforeTurn.apply(this, arguments);
+    },
+
+    /**
+     * Invoked when the current player ends their turn. Perform in between game logic here
+     *
+     * @override
+     * @returns {*} passes through the default return value
+     */
+    nextTurn: function() {
+        // Update all arrays
+        this.updateArrays();
+        this.updateUnits();
+        this.updateMerchants();
+
+        if(this.checkForWinner(false)) {
+            // If somebody won, don't continue to the next turn
+            return;
+        }
+
+        // Continue to the next player (normal next turn logic)
+        return TurnBasedGame.nextTurn.apply(this, arguments);
+    },
+
+    /**
+     * invoked when max turns are reached
+     *
+     * @override
+     */
+    _maxTurnsReached: function() {
+        this.checkForWinner("Max turns reached");
+    },
+
+    updateArrays: function() {
+        // Properly add all new units
+        for(let unit of this.newUnits) {
+            this.units.push(unit);
+            if(unit.owner) {
+                unit.owner.units.push(unit);
+            }
+        }
+        this.newUnits = [];
+
+        // Properly add all new ports
+        for(let port of this.newPorts) {
+            this.ports.push(port);
+            if(port.owner) {
+                port.owner.ports.push(port);
+            }
+        }
+        this.newPorts = [];
+
+        // Remove all invalid units
+        for(let i = 0; i < this.units.length; i++) {
+            const unit = this.units[i];
+            if(!unit.tile) {
+                if(unit.owner) {
+                    // Remove this unit from its owner's units array
+                    unit.owner.units.removeElement(unit);
+                }
+
+                // Remove this unit from the game's units array
+                this.units.splice(i, 1);
+                i--;
+            }
+        }
+
+        // Remove all invalid ports
+        for(let i = 0; i < this.ports.length; i++) {
+            const port = this.ports[i];
+            if(!port.tile) {
+                if(port.owner) {
+                    // Remove this port from its owner's ports array
+                    port.owner.ports.removeElement(port);
+                }
+
+                // Remove this port from the game's ports array
+                this.ports.splice(i, 1);
+                i--;
+            }
+        }
+    },
+
+    checkWinner: function(maxTurns) {
+        // No win conditions before the max turns are reached
+        if(maxTurns) {
+            // Check who has the most infamy
+
+            // Check who has the most units
+
+            // Check who has the most ports
+
+            // Check who has the most gold
+
+            // Coin toss
+        }
+    },
+
+    generateIslands: function() {
+        // Flood the map
+        for(let tile of this.tiles) {
+            tile.type = "water";
+        }
+
+        // Generate some metaballs for the islands
+        let balls = [];
+        const minRadius = 0.5;
+        const maxRadius = 2.5;
+        const maxOffset = 2.0;
+        const additionalBalls = 5;
+        const gooeyness = 1.0;
+        const threshold = 3.5;
+        const radiusRange = maxRadius - minRadius;
+
+        // Initial ball (top island)
+        let islandX = Math.floor(this.mapWidth / 4);
+        let islandY = Math.floor(this.mapHeight / 4);
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (top island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY - Math.random() * maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        // Initial ball (bottom island)
+        islandY = Math.floor(3 * this.mapHeight / 4);
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (bottom island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY - Math.random() * maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        // Generate the islands from the metaballs
+        for(let x = 0; x < this.mapWidth / 2; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let tile = this.getTile(x, y);
+                let energy = 0;
+                for(const ball of balls) {
+                    let r = ball.r;
+                    let dist = Math.sqrt(Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2));
+                    let d = Math.max(0.0001, Math.pow(dist, gooeyness)); // Can't be 0
+                    energy += r / d;
+                }
+
+                if(energy > threshold) {
+                    tile.type = "land";
+                }
+            }
+        }
+
+        // Find all possible port locations
+        let portTiles = [];
+        portTiles = this.tiles.filter(t => {
+            // Check type
+            if(t.type !== "water") {
+                return false;
+            }
+
+            // Check neighbors
+            if(t.tileNorth && t.tileNorth.type === "land") {
+                return true;
+            }
+            if(t.tileEast && t.tileEast.type === "land") {
+                return true;
+            }
+            if(t.tileSouth && t.tileSouth.type === "land") {
+                return true;
+            }
+            if(t.tileWest && t.tileWest.type === "land") {
+                return true;
+            }
+
+            return false;
+        }, this);
+
+        // Place the starting port
+        let selected = Math.floor(Math.random() * portTiles.length);
+        let port = this.create("Port", {
+            owner: this.players[0],
+            tile: portTiles[selected],
+            destroyable: false,
+        });
+        portTiles.splice(selected, 1);
+
+        // Place merchant ports
+        const minMerchants = 1;
+        const maxMerchants = 3;
+        let merchantPorts = minMerchants + Math.round(Math.random() * (maxMerchants - minMerchants));
+        for(; merchantPorts > 0; merchantPorts--) {
+            let selected = Math.floor(Math.random() * portTiles.length);
+            let port = this.create("Port", {
+                owner: this.players[0],
+                tile: portTiles[selected],
+                destroyable: false,
+                gold: this.merchantStartingGold,
+                investment: this.merchantStartingInvestment,
+            });
+            portTiles.splice(selected, 1);
+        }
+
+        // Mirror the map
+        for(let x = 0; x < Math.floor(this.mapWidth / 2); x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                let orig = this.getTile(x, y);
+                let target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+
+                // Copy tile data
+                target.type = orig.type;
+
+                // Clone ports
+                if(orig.port) {
+                    target.port = this.create("Port", {
+                        tile: target,
+                        owner: orig.port.owner && orig.port.owner.opponent,
+                        destroyable: false,
+                        gold: orig.port.gold,
+                        investment: orig.port.investment,
+                    });
+                }
+            }
+        }
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

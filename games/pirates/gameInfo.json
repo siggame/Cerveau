@@ -41,9 +41,9 @@
             "maxInterestRate",
             "maxTurns",
             "players",
-            "port",
             "portCost",
             "portHealth",
+            "ports",
             "restRange",
             "session",
             "shipCost",
@@ -214,21 +214,6 @@
                     }
                 }
             },
-            "port": {
-                "default": null,
-                "description": "Every Port in the game.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "list",
-                    "valueType": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Port",
-                        "valueType": null
-                    }
-                }
-            },
             "portCost": {
                 "default": null,
                 "description": "How much gold it costs to construct a port.",
@@ -247,6 +232,21 @@
                     "keyType": null,
                     "name": "int",
                     "valueType": null
+                }
+            },
+            "ports": {
+                "default": null,
+                "description": "Every Port in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
                 }
             },
             "restRange": {
