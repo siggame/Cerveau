@@ -26,13 +26,13 @@ export class Warehouse extends Building {
      * PoliceDepartments. Raises when bribed to ignite buildings, and drops
      * each turn if not bribed.
      */
-    public exposure: number = this.exposure || 0;
+    public exposure!: number;
 
     /**
      * The amount of fire added to buildings when bribed to ignite a
      * building. Headquarters add more fire than normal Warehouses.
      */
-    public readonly fireAdded: number;
+    public readonly fireAdded!: number;
 
     /**
      * Initializes Warehouses.

@@ -31,13 +31,13 @@ export class Forecast extends GameObject {
      * The direction the wind will blow fires in. Can be 'north', 'east',
      * 'south', or 'west'.
      */
-    public direction: string = "";
+    public direction!: string;
 
     /**
      * How much of a Building's fire that can be blown in the direction of this
      * Forecast. Fire is duplicated (copied), not moved (transferred).
      */
-    public intensity: number = 0;
+    public intensity!: number;
 
     /**
      * Initializes Forecasts.
