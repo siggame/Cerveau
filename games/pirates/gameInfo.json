@@ -1474,7 +1474,8 @@
                     "altersState": true,
                     "argument_names": [
                         "tile",
-                        "amount"
+                        "amount",
+                        "gold"
                     ],
                     "arguments": [
                         {
@@ -1500,10 +1501,22 @@
                                 "name": "int",
                                 "valueType": null
                             }
+                        },
+                        {
+                            "default": 0,
+                            "description": "The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.",
+                            "name": "gold",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
                         }
                     ],
-                    "description": "Moves a number of crew to Tile. This will consume a move from those crew.",
-                    "optionals": 1,
+                    "description": "Moves a number of crew from this Unit to the given Tile. This will consume a move from those crew.",
+                    "optionals": 2,
                     "optionals_start_index": 1,
                     "returns": {
                         "default": null,

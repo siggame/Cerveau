@@ -573,6 +573,11 @@ classes.Unit.split.cerveau = {
             type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
             defaultValue: 1,
         },
+        {
+            name: "gold",
+            type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+            defaultValue: 0,
+        },
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},

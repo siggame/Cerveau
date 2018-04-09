@@ -296,7 +296,10 @@ let Unit = Class(GameObject, {
             return `${this} cannot move after acting. The men are too tired!`;
         }
         if(!tile) {
-            return `${this} must have a destination. (Tile argument is null)`;
+            return `${this} must have a destination to move to.`;
+        }
+        if(this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+            return `${tile} be too far for ${this} to move to.`;
         }
         if(tile.unit && tile.unit.owner !== player && tile.unit.owner !== null) {
             return `${this} refuses to share the same ground with a living foe.`;
@@ -439,75 +442,37 @@ let Unit = Class(GameObject, {
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to move the crew to.
      * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
+     * @param {number} gold - The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateSplit: function(player, tile, amount, args) {
+    invalidateSplit: function(player, tile, amount, gold, args) {
         // <<-- Creer-Merge: invalidateSplit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's split function here
-
-        // Check to see if it is the player's Turn
-        if(!player || player !== this.game.currentPlayer)
-        {
-            return `Avast Ye, It an't be yer turn, ${player}!`;
+        const reason = this._invalidate(player, true);
+        if(reason) {
+            return reason;
         }
 
-        // Check to see if player calling is the owner.
-        else if(player != this.owner)
-        {
-            return `Avast Ye, ${this} not be yers`;
-        }
-        
         // Check to see if the crew has a move to move
-        else if(this.unit.moves == 0)
-        {
-            return "Avast Ye, Yer crew out of moves!";
+        if(this.unit.moves === 0) {
+            return `${this} can't split cause they be out of moves.`;
         }
-        
+
         // Check to see if they have already acted.
-        else if(this.acted)
-        {
-            return "Avast Ye, Yer crew are too tired!";
+        if(this.acted) {
+            return `${this} crew are too tired to split!`;
         }
 
         // Check to see if it is not one of the tiles around in the current direction
-        else if
-        ( 
-            (
-                this.title.titleEast != title && 
-                this.title.titleNorth != title && 
-                this.title.titleWest != title &&
-                this.title.titleSouth != title
-            )
-        )
-        {
-            return "Avast Ye, It be too far to move there!";
+        if(this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+            return `${tile} be too far for ${this} to split to.`;
         }
-        
+
         // Check to make sure target tile is a valid tile
-        else if(tile.type != "land" && tile.unit.shipHealth <= 0 && tile.port == null)
-        {
-            return "Avast Ye, Ye can't split here!";
+        if(tile.type !== "land" && tile.unit.shipHealth <= 0 && tile.port === null) {
+            return `${this} can't split here!`;
         }
-
-        //check if moving on ship need an action
-        else if(tile.unit.shipHealth > 0 && this.unit.acted)
-        {
-            return "Avast Ye, Ye already acted so yer can't be splittin'!";
-        }
-
-        // Check to see if there is enough crew to split
-        else if(this.crew < 1)
-        {
-             return "Avast Ye, Ye can't be splittin' an empty crew!";
-         }
-
-         // Check to make sure the target tile doesn't already have 
-         else if(tile.unit.owner === player.opponent)
-         {
-             return "Avast Ye, the enemy is already there!";
-         }
 
         return undefined; // meaning valid
 
@@ -515,76 +480,71 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Moves a number of crew to Tile. This will consume a move from those crew.
+     * Moves a number of crew from this Unit to the given Tile. This will consume a move from those crew.
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to move the crew to.
      * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
+     * @param {number} gold - The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.
      * @returns {boolean} True if successfully split, false otherwise.
      */
-    split: function(player, tile, amount) {
+    split: function(player, tile, amount, gold) {
         // <<-- Creer-Merge: split -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's split function here
-
-        //TO-DO implement moving to ships and ports as well.
+        // TO-DO implement moving to ships and ports as well.
         // Set the owner of the new unit to current player
         tile.unit.owner = this.owner;
 
-        if(tile.type == "Water" && tile.unit.shipHealth > 0)
-        {
-            tile.unit.acted == true;
+        if(tile.type === "water" && tile.unit.shipHealth > 0) {
+            tile.unit.acted = true;
         }
-        
-        // Moving all incase of amount < 0 or amount >= current crew total
-        if(amount <= 0 || this.crew <= amount)
-        {
-            // Move all crew to new tile.
-            tile.unit.crew += this.crew;
-            this.crew = 0;
 
-            // Give new Unit the health from old one.
-            tile.unit.crewHealth += this.crewHealth;
-            this.crewHealth = 0;
+        // Adjust the amount of crew to split
+        if(amount <= 0) {
+            amount = this.crew;
+        }
+        else {
+            amount = Math.min(amount, this.crew);
+        }
 
-            // Move all gold to new Unit
-            tile.unit.gold += this.gold;
-            this.gold = 0;
+        // Adjust the amount of gold to move
+        if(gold < 0) {
+            gold = this.gold;
+        }
+        else {
+            gold = Math.min(gold, this.gold);
+        }
 
-            // Set Moves
-            tile.moves = this.moves - 1;
-            this.moves = 0;
+        // Some helpful constants
+        const movePercent = amount / this.crew;
+        const stayPercent = 1 - movePercent;
 
-            // Disassociating from old Tile.
+        // Move crew to new tile
+        tile.unit.crew += this.crew;
+        this.crew -= amount;
+
+        // Give new Unit health from old one
+        tile.unit.crewHealth += Math.ceil(this.crewHealth * movePercent);
+        this.crewHealth = Math.floor(this.crewHealth * stayPercent);
+
+        // Move gold to new Unit
+        tile.unit.gold += gold;
+        this.gold -= gold;
+
+        // Set moves for the units that moved
+        tile.moves = Math.min(this.moves - 1, tile.moves);
+
+        if(movePercent >= 1) {
+            // Disassociating from old Tile if all the crew moved
             this.owner = null;
-
+            if(this.shipHealth <= 0) {
+                // If no units are left over, remove the unit
+                this.tile.unit = null;
+                this.tile = null;
+            }
         }
-        else
-        {
-            // Splits the crews
-            tile.unit.crew += amount;
-            this.crew -= amount;
 
-            // Find Health per crew
-            let splitHealth = this.crewHealth / crew;
-            // Find decimal and cut it off.
-            splitHealth -= splitHealth % 1;
-            // Apply Health/crew to amount to split
-            splitHealth  *= amount;
-
-            // Split health
-            this.crewHealth -= splitHealth;
-            tile.unit.crewHealth += splitHealth;
-
-            // Splits the gold 
-            tile.unit.gold += goldamount < 0 ? 0 : goldamount > this.gold ? this.gold : goldamount;
-            this.gold = goldamount < 0 ? this.gold : goldamount > this.gold ? 0 : this.gold - goldamount;
-
-            // Split moves
-            tile.unit.moves = tile.unit.moves > this.moves ? this.moves - 1 : tile.unit.moves;
-
-        }
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: split -->>
     },
@@ -660,15 +620,15 @@ let Unit = Class(GameObject, {
      */
     _invalidate: function(player, checkAction) {
         if(!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
+            return `Avast ye, it ain't yer turn, ${player}.`;
         }
 
         if(this.owner !== player) {
-            return `${this} isn't among your crew.`;
+            return `${this} ain't among yer crew.`;
         }
 
         if(checkAction && this.acted) {
-            return `${this} cannot perform another action this turn.`;
+            return `${this} can't perform another action this turn.`;
         }
     },
 
