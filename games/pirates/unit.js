@@ -327,7 +327,7 @@ let Unit = Class(GameObject, {
             return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if you want to move just your crew ashore.`;
         }
         if(ship && tile.shipHealth > 0) {
-            return `There's a ship on ${tile} that ${this} refuses to collide with.`;
+            return `There's a ship there. If ye move ${this} to ${tile}, ye'll scuttle yer ship!`;
         }
         if(!ship && tile.ship && this.acted) {
             return `${this} already acted and is too tired to board that ship.`;

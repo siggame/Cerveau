@@ -97,38 +97,35 @@ let Port = Class(GameObject, {
      */
     invalidateSpawn: function(player, type, args) {
         // <<-- Creer-Merge: invalidateSpawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		int shipcost = 1000;
-		int crewcost = 20;
-		
-        if(this.investment === this.owner) {
-			if(type === 'crew')
-			{
-				if(player.gold <= crewcost)
-				{
-					return `Ye don't have enough gold for that` ;
-				}
-				
-			}
-			if(type === 'ship')
-			{
-				if(player.gold <= shipcost)
-				{
-					return `Ye don't have enough gold for that` ;
-				}
-				if(this.tile.unit.shiphealth > 0)
-				{
-					return `There is not enough space in a port for two boats`;
-				}
-				
-			}
-		}
-		else
-		{
-			return `You must own this port to build ships or recruit crew`;
-		}
-        
-        // Developer: try to invalidate the game logic for Port's spawn function here
-		
+
+        if(this.owner !== player) {
+            return "This ain't yer port.";
+        }
+
+        if(player !== this.game.currentPlayer) {
+            return `Avast ye, it ain't yer turn, ${player}.`;
+        }
+
+        let t = type.slice(1).toUpperCase();
+
+        if(t === "C") {
+            if(player.gold <= this.game.crewCost) {
+                return "Ye don't have enough gold to spawn a crew." ;
+            }
+        }
+        else if(t === "ship") {
+            if(player.gold <= this.game.shipCost) {
+                return "Ye don't have enough gold to spawn a ship." ;
+            }
+
+            if(this.tile.unit && this.tile.unit.shipHealth > 0) {
+                return "There don't be enough space in a port for two ships";
+            }
+        }
+        else {
+            return `${type} ain't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
+        }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateSpawn -->>
@@ -143,24 +140,34 @@ let Port = Class(GameObject, {
      */
     spawn: function(player, type) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-		int shipHP = 10;
-		int crewHP = 4;
-		int shipcost = 1000;
-		int crewcost = 20;
-		if(type === 'crew')
-		{
-				this.tile.unit.crew++;
-				this.tile.unit.crewHealth == this.tile.unit.crewHealth + crewHP;
-				player.gold == player.gold - crewcost;
-				
-		}
-		if(type === 'ship')
-		{
-			this.tile.unit.shipHealth == this.tile.unit.shipHealth + shipHP;
-			player.gold == player.gold - shipcost;
-		}
-        // Developer: Put your game logic for the Port's spawn function here
-        return false;
+
+        type = type.slice(1).toUpperCase();
+
+        // Make sure there's a unit on this tile
+        if(!this.tile.unit) {
+            this.tile.unit = this.game.create("Unit", {
+                owner: player,
+                tile: this.tile,
+            });
+            this.game.newUnits.push(this.tile.unit);
+        }
+
+        if(type === "C")		{
+            this.tile.unit.crew++;
+            this.tile.unit.crewHealth += this.game.crewHealth;
+            this.tile.unit.acted = true;
+            this.tile.unit.moves = 0;
+            player.gold -= this.game.crewCost;
+
+        }
+        if(type === "S")		{
+            this.tile.unit.shipHealth = this.game.shipHealth;
+            this.tile.unit.acted = true;
+            this.tile.unit.moves = 0;
+            player.gold -= this.game.shipCost;
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: spawn -->>
     },
