@@ -1190,10 +1190,15 @@
                     "default": null,
                     "description": "(Merchants only) The path this Unit will follow. The first element is the Tile this Unit will move to next.",
                     "type": {
-                        "is_game_object": true,
+                        "is_game_object": false,
                         "keyType": null,
-                        "name": "Tile",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Tile",
+                            "valueType": null
+                        }
                     }
                 },
                 "shipHealth": {

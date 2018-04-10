@@ -65,9 +65,9 @@ let Unit = Class(GameObject, {
         /**
          * (Merchants only) The path this Unit will follow. The first element is the Tile this Unit will move to next.
          *
-         * @type {Tile}
+         * @type {Array.<Tile>}
          */
-        this.path = this.path || null;
+        this.path = this.path || [];
 
         /**
          * If a ship is on this Tile, how much health it has remaining. 0 for no ship.

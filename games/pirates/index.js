@@ -438,8 +438,8 @@ classes.Unit._deltaMergeableProperties = {
     },
 
     path: {
-        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
-        defaultValue: null,
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null}},
+        defaultValue: [],
     },
 
     shipHealth: {
