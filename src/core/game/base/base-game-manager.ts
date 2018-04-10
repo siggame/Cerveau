@@ -235,7 +235,7 @@ export class BaseGameManager {
                 // then only one player is left in the game, he wins!
 
                 // and this is them!
-                const winner = this.game.players.find((p) => !p.lost);
+                const winner = this.game.players.find((p) => !p.lost)!;
 
                 const allLosersDisconnected = losers
                     .filter(
@@ -257,9 +257,8 @@ export class BaseGameManager {
                     reasonWon = "All other players timed out.";
                 }
 
-                if (winner) {
-                    this.declareWinner(reasonWon, winner);
-                }
+                this.declareWinner(reasonWon, winner);
+                this.endGame();
             }
         }
     }
