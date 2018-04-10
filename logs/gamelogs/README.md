@@ -1,4 +1,4 @@
-# output/gamelogs/
+# logs/gamelogs/
 
 Gamelogs will be auto generated here in a gzipped json format (.jzon.gz), for easy use in anything.
 
