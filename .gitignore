@@ -27,11 +27,6 @@ dist
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
-# directories where logs are stored
-output/gamelogs
-output/profiles
-output/logs
-
 # generated docs via apidoc or jsdoc
 docs
 api-docs

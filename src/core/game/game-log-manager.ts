@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as sanitizeFilename from "sanitize-filename";
-import * as zlib from "zlib";
+import { createGzip } from "zlib";
 import { Config } from "~/core/args";
 import { IGamelog } from "~/core/game";
 import * as utils from "~/utils";
@@ -47,11 +47,11 @@ export class GameLogManager {
      */
     constructor(
         /** The directory where this will save gamelog files to */
-        public readonly gamelogDirectory: string = "output/gamelogs/",
+        public readonly gamelogDirectory = path.join(Config.LOGS_DIR, "gamelogs"),
     ) {
-
         if (Config.ARENA_MODE) {
-            // TODO: upgrade arena so it can get the "real" filename with the moment string in it via REST API
+            // TODO: upgrade arena so it can get the "real" filename with
+            //       the moment string in it via REST API
             this.filenameFormat = (n, s, m) => `${n}-${s}`;
         }
     }
@@ -66,7 +66,7 @@ export class GameLogManager {
         const filename = this.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch);
 
         const writeSteam = fs.createWriteStream(this.gamelogDirectory + filename + this.gamelogExtension, "utf8");
-        const gzip = zlib.createGzip();
+        const gzip = createGzip();
 
         return new Promise((resolve, reject) => {
             gzip.on("error", (err) => {
@@ -87,7 +87,7 @@ export class GameLogManager {
     }
 
     /**
-     * Gets ALL the gamelogs in output/gamelogs.
+     * Gets ALL the gamelogs in LOGS_DIR/gamelogs.
      * The gamelogs are not complete, but rather a "shallow" gamelog.
      * @returns a promise for the list of gamelogs information
      */
@@ -120,7 +120,7 @@ export class GameLogManager {
 
     /**
      * Gets the first gamelog matching the filename, without the extension
-     * @param filename the base filename (without gamelog extension) you want in output/gamelogs/
+     * @param filename the base filename (without gamelog extension) you want in LOGS_DIR/gamelogs/
      * @returns a promise to a gamelog matching passed in parameters, or undefined if no gamelog. second arg is error.
      */
     public async getGamelog(filename: string): Promise<any> {
@@ -134,7 +134,7 @@ export class GameLogManager {
 
     /**
      * Deletes the first gamelog matching the filename, without the extension
-     * @param filename the base filename (without gamelog extension) you want in output/gamelogs/
+     * @param filename the base filename (without gamelog extension) you want in LOGS_DIR/gamelogs
      * @returns the a boolean if it was successfully deleted
      */
     public async deleteGamelog(filename: string): Promise<boolean> {
@@ -210,7 +210,7 @@ export class GameLogManager {
 
     /**
      * checks to see if the filename maps to a gamelog on disk
-     * @param filename the base filename (without gamelog extension) you want in output/gamelogs/
+     * @param filename the base filename (without gamelog extension) you want in LOGS_DIR/gamelogs/
      * @returns a promise of the path to the game log if it exists, undefined otherwise
      */
     private async checkGamelog(filename: string): Promise<string | undefined> {

@@ -27,8 +27,11 @@ export interface IArgs {
     /** run the v8 profilers against threaded game sessions */
     RUN_PROFILER: boolean;
 
-    /** store all logged strings to text files in output/logs/ */
+    /** store all logged console strings to text files in LOGS_DIR */
     LOG_TO_FILES: boolean;
+
+    /** The directory to store generated logs (e.g. gamelogs) in. */
+    LOGS_DIR: string;
 
     /** log will not print anything to the console */
     SILENT: boolean;
@@ -93,15 +96,19 @@ const parserArgs: Array<[string[], ArgumentOptions]> = [
         help: "the title of this game sever for the web interface"}],
 
     [["--password"], {action: "store", dest: "authenticate", defaultValue: "",
-        help: "forces clients to authenticate against the authentication server with the following password"}],
+        help: "forces clients to send a valid password to be able to play"}],
 
     [["--profile"], {action: "storeTrue", dest: "RUN_PROFILER",
         help: "run the v8 profilers against threaded game sessions"}],
 
     [["--log"], {action: "storeTrue", dest: "LOG_TO_FILES",
-        help: "store all logged strings to text files in output/logs/"}],
+        help: "store all logged strings to text files in LOGS_DIR/console/"}],
 
-    [["--silent"], {action: "storeTrue", dest: "SILENT", help: "log will not print anything to the console"}],
+    [["--logs-dir"], {action: "store", dest: "LOGS_DIR", defaultValue: "logs/",
+        help: "The directory to store generated logs (e.g. gamelogs) in."}],
+
+    [["--silent"], {action: "storeTrue", dest: "SILENT",
+        help: "log will not print anything to the console"}],
 
     [["--single-threaded"], {action: "storeTrue", dest: "SINGLE_THREADED",
         help: "If game sessions should be ran on the master thread, for easier debugging of game logic"}],
@@ -118,7 +125,8 @@ const parserArgs: Array<[string[], ArgumentOptions]> = [
     [["--timeout"], {action: "store", dest: "TIMEOUT_TIME",
         help: "(debugging) override for how long clients have before a timeout occurs", defaultValue: true}],
 
-    [["--no-timeout"], {action: "storeFalse", dest: "TIMEOUT_TIME", help: "(debugging) clients cannot time out"}],
+    [["--no-timeout"], {action: "storeFalse", dest: "TIMEOUT_TIME",
+        help: "(debugging) clients cannot time out"}],
 
     [["--no-game-settings"], {action: "storeFalse", dest: "GAME_SETTINGS_ENABLED",
         help: "ignores any requested game settings from clients", defaultValue: true}],
@@ -135,8 +143,8 @@ const parserArgs: Array<[string[], ArgumentOptions]> = [
     [["--no-updater"], {action: "storeFalse", dest: "UPDATER_ENABLED",
         help: "does not run the update checker", defaultValue: true}],
 
-    [["--no-auto-update"], {action: "storeFalse", dest: "AUTO_UPDATE_ENABLED",
-        help: "the updater will not try to autoUpdate when updates are found", defaultValue: true}],
+    [["--no-auto-update"], {action: "storeFalse", dest: "AUTO_UPDATE_ENABLED", defaultValue: true,
+        help: "the updater will not try to autoUpdate when updates are found"}],
 ];
 
 const parser = new ArgumentParser({description:

@@ -159,7 +159,7 @@ export class Session {
             profile.export((error, result) => {
                 const dateTime = moment().format("YYYY.MM.DD.HH.mm.ss.SSS");
                 writeFile(
-                    `output/profiles/profile-${this.gameName}-${this.id}-${dateTime}.cpuprofile`,
+                    `logs/profiles/profile-${this.gameName}-${this.id}-${dateTime}.cpuprofile`,
                     result,
                     (err) => {
                         profile.delete();
