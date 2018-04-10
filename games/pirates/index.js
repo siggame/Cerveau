@@ -22,6 +22,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    crewMoves: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     crewRange: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
@@ -113,6 +118,11 @@ classes.Game._deltaMergeableProperties = {
     },
 
     shipHealth: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    shipMoves: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },

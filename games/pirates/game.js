@@ -46,6 +46,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.crewHealth = this.crewHealth || 0;
 
         /**
+         * The number of moves Units with only crew are given each turn.
+         *
+         * @type {number}
+         */
+        this.crewMoves = this.crewMoves || 0;
+
+        /**
          * A crew's attack range. Range is circular.
          *
          * @type {number}
@@ -177,6 +184,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {number}
          */
         this.shipHealth = this.shipHealth || 0;
+
+        /**
+         * The number of moves Units with ships are given each turn.
+         *
+         * @type {number}
+         */
+        this.shipMoves = this.shipMoves || 0;
 
         /**
          * A ship's attack range. Range is circular.
@@ -595,6 +609,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             destroyable: false,
         });
         portTiles.splice(selected, 1);
+        port.tile.port = port;
+        this.ports.push(port);
+        port.owner.push(port);
 
         // Place merchant ports
         const minMerchants = 1;
@@ -603,13 +620,15 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(; merchantPorts > 0; merchantPorts--) {
             let selected = Math.floor(Math.random() * portTiles.length);
             let port = this.create("Port", {
-                owner: this.players[0],
+                owner: null,
                 tile: portTiles[selected],
                 destroyable: false,
                 gold: this.merchantStartingGold,
                 investment: this.merchantStartingInvestment,
             });
+            port.tile.port = port;
             portTiles.splice(selected, 1);
+            this.ports.push(port);
         }
 
         // Mirror the map
@@ -630,6 +649,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         gold: orig.port.gold,
                         investment: orig.port.investment,
                     });
+                    port.tile.port = port;
+                    this.ports.push(port);
+                    if(port.owner) {
+                        port.owner.push(port);
+                    }
                 }
             }
         }

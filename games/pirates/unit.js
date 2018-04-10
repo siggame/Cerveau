@@ -93,7 +93,16 @@ let Unit = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.acted = data.acted || true;
+        this.crew = data.crew || 0;
+        this.crewHealth = data.crewHealth || this.crew * this.game.crewHealth;
+        this.gold = data.gold || 0;
+        this.moves = data.moves || 0;
+        this.owner = data.owner || null;
+        this.path = data.path || [];
+        this.shipHealth = data.shipHealth || this.game.shipHealth;
+        this.targetPort = data.targetPort || null;
+        this.tile = data.tile || null;
 
         //<<-- /Creer-Merge: init -->>
     },

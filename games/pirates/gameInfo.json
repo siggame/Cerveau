@@ -30,6 +30,7 @@
             "crewCost",
             "crewDamage",
             "crewHealth",
+            "crewMoves",
             "crewRange",
             "currentPlayer",
             "currentTurn",
@@ -49,6 +50,7 @@
             "shipCost",
             "shipDamage",
             "shipHealth",
+            "shipMoves",
             "shipRange",
             "tiles",
             "units"
@@ -77,6 +79,16 @@
             "crewHealth": {
                 "default": null,
                 "description": "The maximum amount of health a crew member can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "crewMoves": {
+                "default": null,
+                "description": "The number of moves Units with only crew are given each turn.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -293,6 +305,16 @@
             "shipHealth": {
                 "default": null,
                 "description": "The maximum amount of health a ship can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "shipMoves": {
+                "default": null,
+                "description": "The number of moves Units with ships are given each turn.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
