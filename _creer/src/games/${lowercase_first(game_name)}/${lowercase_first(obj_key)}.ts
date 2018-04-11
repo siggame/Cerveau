@@ -23,7 +23,7 @@ let ${obj_key} = Class(${", ".join(all_parent_classes) + "," if all_parent_class
     /**
      * Initializes ${obj_key}s.
      *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
      */
     init: function(data) {
 % for parent_class in reversed(parent_classes):
@@ -105,14 +105,14 @@ else:
      * Invalidation function for ${function_name}
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
-     * @param {Player} player - the player that called this.
+     * @param player - the player that called this.
 % if 'arguments' in function_parms:
 % for arg_parms in function_parms['arguments']:
-     * @param {${shared['cerveau']['type'](arg_parms['type'])}} ${arg_parms['name']} - ${arg_parms['description']}
+     * @param ${arg_parms['name']} - ${arg_parms['description']}
 % endfor
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @param args - a key value table of keys to the arg (passed into this function)
 % endif
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
     ${"invalidate" + upcase_first(function_name)}: function(player${", ".join([""] + function_parms["argument_names"])}, args) {
 ${merge("        // ", "invalidate" + upcase_first(function_name), (
@@ -129,14 +129,14 @@ ${merge("        // ", "invalidate" + upcase_first(function_name), (
     /**
      * ${function_parms['description']}
      *
-     * @param {Player} player - the player that called this.
+     * @param player - the player that called this.
 % if 'arguments' in function_parms:
 % for arg_parms in function_parms['arguments']:
-     * @param {${shared['cerveau']['type'](arg_parms['type'])}} ${arg_parms['name']} - ${arg_parms['description']}
+     * @param ${arg_parms['name']} - ${arg_parms['description']}
 % endfor
 % endif
 % if function_parms['returns']:
-     * @returns {${shared['cerveau']['type'](function_parms['returns']['type'])}} ${function_parms['returns']['description']}
+     * @returns
 % endif
      */
     ${("aiFinished" + upcase_first(function_name)) if 'order' in function_holder else function_name}: function(player${", ".join([""] + function_parms["argument_names"])}) {

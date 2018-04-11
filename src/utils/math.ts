@@ -1,9 +1,9 @@
 /**
  * wraps an index around a given range
  *
- * @param {number} index - the number to wrap within 0 to length, so if this was -1 the result would be length-1
- * @param {number} length - the right bound to wrap around back to 0 from
- * @returns {number} the index "wrapped around" 0 to length. 0 <= result < length
+ * @param index - the number to wrap within 0 to length, so if this was -1 the result would be length-1
+ * @param length - the right bound to wrap around back to 0 from
+ * @returns the index "wrapped around" 0 to length. 0 <= result < length
  */
 export function wrapAround(index: number, length: number): number {
     return (index % length + length) % length;
@@ -57,7 +57,7 @@ export function manhattanDistance(x1: number, y1: number, x2: number, y2: number
  * the distance between two points measured along axes at right angles.
  *
  * @param args - points either in the format [x1, y1, x2, y2], [{x1, y1}, {x1, y2}], or [ [x1, y1], [x1, y2] ]
- * @returns {number} the manhattan distance between the two points.
+ * @returns the manhattan distance between the two points.
  */
 export function manhattanDistance(...args: any[]): number {
     const points = makePoints(...args);
@@ -73,7 +73,7 @@ export function euclideanDistance(x1: number, y1: number, x2: number, y2: number
  * Pythagorean theorem: The distance between two points is the length of the path connecting them.
  *
  * @param args - points either in the format [x1, y1, x2, y2], [{x1, y1}, {x1, y2}], or [ [x1, y1], [x1, y2] ]
- * @returns {number} the euclidean distance between the two points
+ * @returns the euclidean distance between the two points
  */
 export function euclideanDistance(...args: any[]): number {
     const points = makePoints(...args);

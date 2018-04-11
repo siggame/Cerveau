@@ -19,7 +19,7 @@ export class DeltaManager {
 
     /**
      * Gets the true delta state of the game, with nothing hidden, then resets the state
-     * @returns {Object} delta formatted object representing the true delta
+     * @returns delta formatted object representing the true delta
      * state of the game, with nothing hidden
      */
     public pop(): any {

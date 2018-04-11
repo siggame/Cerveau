@@ -42,7 +42,7 @@ export class Forecast extends GameObject {
     /**
      * Initializes Forecasts.
      *
-     * @param {Object} data the initial Forecast properties (already hooked up)
+     * @param data the initial Forecast properties (already hooked up)
      * @param required - data required for this game object to be initialized correctly
      */
     constructor(data: IForecastConstructorArgs, required: IBaseGameObjectRequiredData) {

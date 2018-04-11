@@ -24,6 +24,7 @@
         "no-inner-declarations": [ true, "both" ],
         "no-invalid-regexp": true,
         "no-multi-spaces": true,
+        "no-redundant-jsdoc": true,
         "import-spacing": true,
         // "no-parameter-reassignment": true,
         "no-unused-expression": [true, "allow-new"],

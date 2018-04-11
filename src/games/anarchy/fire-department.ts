@@ -43,9 +43,9 @@ export class FireDepartment extends Building {
      * Invalidation function for extinguish
      * Try to find a reason why the passed in parameters are invalid, and return
      * a human readable string telling them why it is invalid if it is invalid
-     * @param {Player} player - the player invoking this function
-     * @param {Object} building da building the extinguish
-     * @returns {string|undefined} a string that is the invalid reason,
+     * @param player - the player invoking this function
+     * @param building da building the extinguish
+     * @returns a string that is the invalid reason,
      * if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
     protected invalidateExtinguish(player: Player, building: Building): string | IArguments {
@@ -65,9 +65,9 @@ export class FireDepartment extends Building {
 
     /**
      * Bribes this FireDepartment to extinguish the some of the fire in a building.
-     * @param {Player} player - the player that called this.
-     * @param {Building} building - The Building you want to extinguish.
-     * @returns {boolean} True if the bribe worked, false otherwise.
+     * @param player - the player that called this.
+     * @param building - The Building you want to extinguish.
+     * @returns True if the bribe worked, false otherwise.
      */
     protected async extinguish(player: Player, building: Building): Promise<boolean> {
         // <<-- Creer-Merge: extinguish -->>

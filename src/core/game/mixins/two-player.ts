@@ -13,9 +13,8 @@ export interface ITwoPlayerPlayer extends IBasePlayer {
 /**
  * A base game that will only ever have two players in it, so they explicitly know
  * their singular opponent
- * @mixin
+ *
  * @param base The BaseGame (or sub BaseGame) to mix in two player logic
- * @param TBasePlayer the base player
  * @returns a new BaseGame class with TwoPlayer logic mixed in
  */
 // tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement

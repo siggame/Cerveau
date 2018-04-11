@@ -124,9 +124,9 @@ export class Lobby {
     /**
      * Gets the session for gameAlias and session id, if it exists
      *
-     * @param {string} gameAlias - The name alias of the game for this session
-     * @param {string} id - the session id of the gameName
-     * @returns {Session} the session, if found
+     * @param gameAlias - The name alias of the game for this session
+     * @param id - the session id of the gameName
+     * @returns the session, if found
      */
     public getRoom(gameAlias: string, id: string): Room | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
@@ -144,8 +144,8 @@ export class Lobby {
     /**
      * Gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers"
      *
-     * @param {string} gameAlias - an alias for the game, not case sensitive
-     * @returns {string|undefined} the actual game name of the aliased game, or undefined if not valid
+     * @param gameAlias - an alias for the game, not case sensitive
+     * @returns the actual game name of the aliased game, or undefined if not valid
      */
     public getGameNameForAlias(gameAlias: string): string | undefined {
         return this.gameAliasToName.get(gameAlias.toLowerCase());
@@ -154,8 +154,8 @@ export class Lobby {
     /**
      * Gets the game class (constructor) for a given game alias
      *
-     * @param {string} gameAlias - an alias for the game you want
-     * @returns {Class} the game class constructor, if found
+     * @param gameAlias - an alias for the game you want
+     * @returns the game class constructor, if found
      */
     public getGameNamespace(gameAlias: string): IBaseGameNamespace | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
@@ -167,8 +167,9 @@ export class Lobby {
     /**
      * Invoked when a client disconnects from the lobby
      *
-     * @override
-     * @param {BaseClient} client - the client that disconnected
+     * @param client - the client that disconnected
+     * @param reason the reason the client disconnected, if we know why
+     *               (e.g. timed out)
      */
     private clientDisconnected(client: BaseClient, reason?: string): void {
         ArrayUtils.removeElements(this.clients, client);
@@ -210,9 +211,9 @@ export class Lobby {
     /**
      * Creates and initializes a server that uses a listener pattern identical to net.Server
      *
-     * @param {string} type - type of server and what type of clients to expect from it
-     * @param {number} port - port to listen on for this server
-     * @param {Object} createServer - the required module's createServer method
+     * @param type - type of server and what type of clients to expect from it
+     * @param port - port to listen on for this server
+     * @param createServer - the required module's createServer method
      */
     private initializeListener(type: string, port: number, createServer: createServerFunction): void {
         const clientClass = getClientByType(type);
@@ -283,12 +284,12 @@ There's probably another Cerveau server running on this same computer.`);
     /**
      * Retrieves, or creates a new, session. For clients when saying what they want to play
      *
-     * @param {string} gameName - key identifying the name of the game you want. Should exist in games/
-     * @param {string} [id] - basically a room id. Specifying an id can be used
+     * @param gameName - key identifying the name of the game you want. Should exist in games/
+     * @param [id] - basically a room id. Specifying an id can be used
      * to join other players on purpose. "*" will join you to any open session
      * or a new one, and "new" will always give you a brand new room even if
      * there are open ones.
-     * @returns {Session} the game of gameName and id. If one does not exists a new instance will be created
+     * @returns the game of gameName and id. If one does not exists a new instance will be created
      */
     private getOrCreateRoom(gameName: string, id: string): Room |string {
         const rooms = this.rooms.get(gameName);
@@ -348,8 +349,8 @@ There's probably another Cerveau server running on this same computer.`);
     /**
      * When a client sends the 'play' event, which tells the server what it wants to play and as who.
      *
-     * @param {BaseClient} client - the client that send the 'play' event
-     * @param {IPlayData} data - the information about what this client wants to
+     * @param client - the client that send the 'play' event
+     * @param data - the information about what this client wants to
      * play.
      */
     private async clientSentPlay(client: BaseClient, data: IPlayData): Promise<void> {
@@ -440,8 +441,8 @@ There's probably another Cerveau server running on this same computer.`);
     /**
      * Validates that the data sent in a 'play' event from a client is valid
      *
-     * @param {Object} data - the play event data to validate
-     * @returns {string} human readable text why the data is not valid
+     * @param data - the play event data to validate
+     * @returns human readable text why the data is not valid
      * @throws {Error} if there is a validation error, human readable message as to why is thrown
      */
     private validatePlayData(data?: IPlayData): string | IParsedPlayData {
@@ -500,8 +501,8 @@ ${gameNamespace.gameSettings.getHelp()}`;
     /**
      * When a client sends the 'alias' event, which tells use they want to know what this game alias really is
      *
-     * @param {BaseClient} client - the client that send the 'play'
-     * @param {string} alias - the alias they want named
+     * @param client - the client that send the 'play'
+     * @param alias - the alias they want named
      */
     private async clientSentAlias(client: BaseClient, alias: string): Promise<void> {
         const gameName = this.getGameNameForAlias(alias);

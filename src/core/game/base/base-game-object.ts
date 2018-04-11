@@ -58,9 +58,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
 
     /**
      * String coercion override, handles players by default as every game has them
-     *
-     * @override
-     * @returns {string} formatted string for this name
+     * @returns formatted string for this name
      */
     public toString(): string {
         if (this.gameObjectName === "Player") {
@@ -74,8 +72,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
     /**
      * logs a string to this BaseGameObject's log array, for debugging purposes. This is called from a 'run' event.
      *
-     * @param {Player} player - the player requesting to log the string to this game object
-     * @param {string} message - string to log
+     * @param player - the player requesting to log the string to this game object
+     * @param message - string to log
      */
     protected invalidateLog(player: any, message: string): string | undefined {
         // NOTE: may be a good idea to make sure the messages are not too long,
@@ -86,8 +84,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
     /**
      * logs a string to this BaseGameObject's log array, for debugging purposes. This is called from a 'run' event.
      *
-     * @param {Player} player - the player requesting to log the string to this game object
-     * @param {string} message - string to log
+     * @param player - the player requesting to log the string to this game object
+     * @param message - string to log
      */
     protected async log(player: any, message: string): Promise<void> {
         this.logs.push(message);

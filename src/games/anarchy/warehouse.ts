@@ -37,7 +37,7 @@ export class Warehouse extends Building {
     /**
      * Initializes Warehouses.
      *
-     * @param {Object} data a simple mapping passed in to the constructor with
+     * @param data a simple mapping passed in to the constructor with
      * whatever you sent with it. GameSettings are in here by key/value as well.
      * @param required ha
      */
@@ -60,9 +60,9 @@ export class Warehouse extends Building {
      * Try to find a reason why the passed in parameters are invalid, and
      * return a human readable string telling them why it is invalid
      *
-     * @param {Player} player - the player that called this.
-     * @param {Building} building - The Building you want to light on fire.
-     * @returns {string|undefined} a string that is the invalid reason, if the
+     * @param player - the player that called this.
+     * @param building - The Building you want to light on fire.
+     * @returns a string that is the invalid reason, if the
      * arguments are invalid. Otherwise undefined (nothing) if the inputs are
      * valid.
      */
@@ -90,9 +90,9 @@ export class Warehouse extends Building {
      * Bribes the Warehouse to light a Building on fire. This adds this
      * building's fireAdded to their fire, and then this building's exposure is
      * increased based on the Manhattan distance between the two buildings.
-     * @param {Player} player - the player that called this.
-     * @param {Building} building - The Building you want to light on fire.
-     * @returns {number} The exposure added to this Building's exposure. -1 is returned if there was an error.
+     * @param player - the player that called this.
+     * @param building - The Building you want to light on fire.
+     * @returns The exposure added to this Building's exposure. -1 is returned if there was an error.
      */
     protected ignite(player: Player, building: Building): number {
         // <<-- Creer-Merge: ignite -->>

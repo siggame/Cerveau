@@ -79,7 +79,7 @@
     "apidoc": "apidoc -i ./website/ -o ./api-docs",
     "test": "npm run lint && npm run build",
     "check-updates": "npm-check-updates -u",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "lint": "tslint --config tslint.json --exclude 'src/web/**/*.ts' 'src/**/*.ts'",
     "fix": "tslint -c tslint.json 'src/**/*.ts' --fix --force",
     "precommit": "npm test",
     "postmerge": "npm install",

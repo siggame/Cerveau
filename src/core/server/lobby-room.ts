@@ -52,7 +52,7 @@ export class Room {
     /**
      * Adds a client to this session
      *
-     * @param {BaseClient} client - the client to add to this session
+     * @param client - the client to add to this session
      */
     public addClient(client: BaseClient): void {
         this.clients.push(client);
@@ -61,7 +61,7 @@ export class Room {
     /**
      * Removes a client from this session
      *
-     * @param {BaseClient} client - the client to remove from this session
+     * @param client - the client to remove from this session
      */
     public removeClient(client: BaseClient): void {
         removeElements(this.clients, client);
@@ -69,7 +69,7 @@ export class Room {
 
     /**
      * Checks if the game for this session is over
-     * @returns {boolean} True if the game is over, false otherwise
+     * @returns True if the game is over, false otherwise
      */
     public isOver(): boolean {
         return this.over;
@@ -78,7 +78,7 @@ export class Room {
     /**
      * If this session is open to more clients joining
      *
-     * @returns {boolean} true if open, false otherwise
+     * @returns true if open, false otherwise
      */
     public isOpen(): boolean {
         return !this.isOver() && !this.isRunning() && !this.canStart();
@@ -87,7 +87,7 @@ export class Room {
     /**
      * If this session has enough playing clients in it to start running. Lobby starts sessions.
      *
-     * @returns {boolean} true if ready to start running, false otherwise
+     * @returns true if ready to start running, false otherwise
      */
     public canStart(): boolean {
         return !this.isOver()
@@ -108,7 +108,7 @@ export class Room {
 
     /**
      * If this session has a game instance running on a worker thread.
-     * @returns {boolean} true if it is running, false otherwise
+     * @returns true if it is running, false otherwise
      */
     public isRunning(): boolean {
         return false; // super lobbies should do the thing
@@ -117,7 +117,7 @@ export class Room {
     /**
      * Adds game settings to this game instance, parsing them from strings to correct types
      *
-     * @param {Object} settings - the key/value pair settings to add
+     * @param settings - the key/value pair settings to add
      */
     public addGameSettings(settings: IAnyObject): void {
         for (const key of Object.keys(settings)) {

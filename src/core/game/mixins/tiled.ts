@@ -18,7 +18,6 @@ export interface ITiledGameSettings extends IBaseGameSettings {
 /**
  * A game that has a grid based map of tiles. This handles creating that initial
  * map and hooking it up. That's it
- * @mixin
  * @param base The BaseGame (or sub BaseGame) to mix in tiled logic
  * @returns a new BaseGame class with Tiled logic mixed in
  */
@@ -80,8 +79,8 @@ export function mixTiled<
         /**
          * gets the adjacent direction between this tile and an adjacent tile (if one exists)
          *
-         * @param {Tile} adjacentTile - A tile that should be adjacent to this tile
-         * @returns {string|undefined} The string direction, or undefined if the
+         * @param adjacentTile - A tile that should be adjacent to this tile
+         * @returns The string direction, or undefined if the
          * tile is invalid, or there is no adjacent direction between this tile
          * and that tile
          * ("North", "East", "South", or "West") if found in that direction,
@@ -100,7 +99,7 @@ export function mixTiled<
         /**
          * Gets a list of all the neighbors of this tile
          *
-         * @returns {Array.<Tile>} array of all adjacent tiles. Should be between 2 to 4 tiles.
+         * @returns array of all adjacent tiles. Should be between 2 to 4 tiles.
          */
         public getNeighbors(): TiledTile[] {
             const neighbors = new Array<TiledTile>();
@@ -118,9 +117,9 @@ export function mixTiled<
         /**
          * Gets a neighbor in a particular direction
          *
-         * @param {string} direction - the direction you want, must be "North",
+         * @param direction - the direction you want, must be "North",
          * "East", "South", or "West"
-         * @returns {Tile|null} The Tile in that direction, null if none
+         * @returns The Tile in that direction, null if none
          */
         public getNeighbor(direction: "North" | "South" | "East" | "West"): TiledTile | undefined {
             return (this as any)["tile" + direction];
@@ -128,8 +127,8 @@ export function mixTiled<
 
         /**
          * Checks if a Tile has another tile as its neighbor
-         * @param {Tile} tile - tile to check
-         * @returns {Boolean} true if neighbor, false otherwise
+         * @param tile - tile to check
+         * @returns true if neighbor, false otherwise
          */
         public hasNeighbor(tile: TiledTile | undefined): boolean {
             return Boolean(this.getAdjacentDirection(tile));
@@ -137,7 +136,7 @@ export function mixTiled<
 
         /**
          * toString() override
-         * @returns {string} a string representation of the tile
+         * @returns a string representation of the tile
          */
         public toString(): string {
             return `${this.gameObjectName} (${this.x}, ${this.y}) #${this.id}`;
@@ -183,9 +182,9 @@ export function mixTiled<
         /**
          * Gets the tile at (x, y), or undefined if the co-ordinates are off-map
          *
-         * @param {number} x the x position of the desired tile
-         * @param {number} y the y position of the desired tile
-         * @returns {Tile|undefined} the Tile at (x, y) if valid, null otherwise
+         * @param x the x position of the desired tile
+         * @param y the y position of the desired tile
+         * @returns the Tile at (x, y) if valid, null otherwise
          */
         public getTile(x: number, y: number): TiledTile | undefined {
             return this.tiles[x + y * this.mapWidth];
@@ -194,8 +193,8 @@ export function mixTiled<
         /**
          * Inverts a direction string, e.g. "North" -> "South"
          *
-         * @param {string} direction - the direction string to invert
-         * @returns {string|undefined} the direction inverted,
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid direction string
          */
         public invertTileDirection(

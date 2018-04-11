@@ -112,7 +112,7 @@ export class BaseGameManager {
      * the rest could still be competing to win.
      * @param reason the reason they lost
      * @param loser the player that lost the game
-     * @param {Player} losers additional player(s) that lost the game
+     * @param losers additional player(s) that lost the game
      */
     public declareLoser(reason: string, loser: IBasePlayer, ...losers: IBasePlayer[]): void {
         losers.push(loser);
@@ -126,7 +126,7 @@ export class BaseGameManager {
      * rest have lost if they have not won already
      * @param reason the reason they won
      * @param winner the winner of the game
-     * @param {Player} winners additional the player(s) that won the game
+     * @param winners additional the player(s) that won the game
      */
     public declareWinner(reason: string, winner: IBasePlayer, ...winners: IBasePlayer[]): void {
         winners.push(winner);
@@ -143,7 +143,7 @@ export class BaseGameManager {
     /**
      * End the game via coin flip (1 random winner, the rest lose)
      *
-     * @param {string} [reason="Draw"] - optional reason why win via coin flip is happening
+     * @param [reason="Draw"] - optional reason why win via coin flip is happening
      */
     public makePlayerWinViaCoinFlip(reason: string = "Draw"): void {
         // Win via coin flip - if we got here no player won via game rules.
@@ -179,7 +179,7 @@ export class BaseGameManager {
 
     /**
      * Checks if the game is over
-     * @returns {boolean} true if the game is over, false otherwise
+     * @returns true if the game is over, false otherwise
      */
     public isGameOver(): boolean {
         return this.isOver;
@@ -224,7 +224,7 @@ export class BaseGameManager {
     /**
      * Called when a client disconnected to remove the client from the game and
      * check if they have a player and if removing them alters the game
-     * @param {Player} player - the player whose client disconnected
+     * @param player - the player whose client disconnected
      */
     private playerDisconnected(player: IBasePlayer): void {
         if (player && !this.isOver) {

@@ -21,9 +21,9 @@ interface IRoomInfo {
 /**
  * Gets the info for some session of some game
  *
- * @param {string} gameName - name of the game
- * @param {string} id - id of the session of that gameName
- * @returns {Object} information about the session for the api
+ * @param gameName - name of the game
+ * @param id - id of the session of that gameName
+ * @returns information about the session for the api
  */
 function getRoomInfo(gameName: string, id: string): {
 

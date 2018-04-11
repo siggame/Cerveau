@@ -39,7 +39,7 @@ export class SerialRoom extends Room {
 
     /**
      * If this session has a game instance running on a worker thread.
-     * @returns {boolean} true if it is running, false otherwise
+     * @returns true if it is running, false otherwise
      */
     public isRunning(): boolean {
         return Boolean(this.session);

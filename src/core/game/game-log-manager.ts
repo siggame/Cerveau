@@ -47,7 +47,7 @@ export class GameLogManager {
      */
     constructor(
         /** The directory where this will save gamelog files to */
-        public readonly gamelogDirectory = path.join(Config.LOGS_DIR, "gamelogs"),
+        public readonly gamelogDirectory: string = path.join(Config.LOGS_DIR, "gamelogs"),
     ) {
         if (Config.ARENA_MODE) {
             // TODO: upgrade arena so it can get the "real" filename with

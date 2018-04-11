@@ -19,7 +19,7 @@ export class WeatherStation extends Building {
     /**
      * Initializes WeatherStations.
      *
-     * @param {Object} data - a thing
+     * @param data - a thing
      * @param required ot
      */
     constructor(data: IWeatherStationConstructorArgs, required: IBaseGameObjectRequiredData) {
@@ -34,10 +34,10 @@ export class WeatherStation extends Building {
      * Invalidation function for intensify
      * Try to find a reason why the passed in parameters are invalid, and return
      * a human readable string telling them why it is invalid
-     * @param {Player} player - the player that called this.
-     * @param {boolean} negative - By default the intensity will be increased by
+     * @param player - the player that called this.
+     * @param negative - By default the intensity will be increased by
      * 1, setting this to true decreases the intensity by 1.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
+     * @param args - a key value table of keys to the arg (passed into this function)
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -70,10 +70,10 @@ export class WeatherStation extends Building {
     /**
      * Bribe the weathermen to intensity the next Forecast by 1 or -1
      *
-     * @param {Player} player - the player that called this.
-     * @param {boolean} negative - By default the intensity will be increased by
+     * @param player - the player that called this.
+     * @param negative - By default the intensity will be increased by
      * 1, setting this to true decreases the intensity by 1.
-     * @returns {boolean} True if the intensity was changed, false otherwise.
+     * @returns True if the intensity was changed, false otherwise.
      */
     protected intensify(player: Player, negative: boolean = true): boolean {
         // <<-- Creer-Merge: intensify -->>
@@ -92,10 +92,10 @@ export class WeatherStation extends Building {
      * Invalidation function for rotate
      * Try to find a reason why the passed in parameters are invalid, and return
      * a human readable string telling them why it is invalid
-     * @param {Player} player - the player that called this.
-     * @param {boolean} counterclockwise - By default the direction will be
+     * @param player - the player that called this.
+     * @param counterclockwise - By default the direction will be
      * rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.
-     * @returns {string|undefined} a string that is the invalid reason, if the
+     * @returns a string that is the invalid reason, if the
      * arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
     protected invalidateRotate(player: Player, counterclockwise: boolean = false): string | IArguments {
@@ -116,10 +116,10 @@ export class WeatherStation extends Building {
     /**
      * Bribe the weathermen to change the direction of the next Forecast by
      * rotating it clockwise or counterclockwise.
-     * @param {Player} player - the player that called this.
-     * @param {boolean} counterclockwise - By default the direction will be
+     * @param player - the player that called this.
+     * @param counterclockwise - By default the direction will be
      * rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.
-     * @returns {boolean} True if the rotation worked, false otherwise.
+     * @returns True if the rotation worked, false otherwise.
      */
     protected rotate(player: Player, counterclockwise: boolean = false): boolean {
         // <<-- Creer-Merge: rotate -->>

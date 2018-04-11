@@ -5,9 +5,9 @@ import * as zlib from "zlib";
 
 /**
  * simple function to get director names in a directory.
- * @param {string} sourcePath - path to check in
+ * @param sourcePath - path to check in
  * @param onlyDirs set to true for only directories, false for only files
- * @returns {Array.<string>} array of strings representing all directory names in a directory (not recursive).
+ * @returns array of strings representing all directory names in a directory (not recursive).
  */
 async function getDirsOrFiles(sourcePath: string, onlyDirs: boolean = false): Promise<string[]> {
     const files = await promisify(fs.readdir)(sourcePath);

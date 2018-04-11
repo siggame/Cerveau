@@ -12,9 +12,9 @@ export class RandomNumberGenerator {
     /**
      * returns a random integer within the range of upper to lower (inclusive). lower defaults to 0.
      *
-     * @param {number} upper - the upper range, this number is NOT valid as a random return value
-     * @param {number} [lower] - the lower range, defaults to 0
-     * @returns {number} a random integer within the range lower to upper
+     * @param upper - the upper range, this number is NOT valid as a random return value
+     * @param [lower] - the lower range, defaults to 0
+     * @returns a random integer within the range lower to upper
      */
     public int(upper: number = 1, lower: number = 0): number {
         const max = Math.round(Math.max(upper, lower));
@@ -25,9 +25,9 @@ export class RandomNumberGenerator {
     /**
      * returns a random floating point number within the range of upper to lower (inclusive). lower defaults to 0.
      *
-     * @param {number} upper - the upper range, this number is NOT valid as a random return value
-     * @param {number} lower - the lower range, defaults to 0
-     * @returns {number} a random integer within the range lower to upper
+     * @param upper - the upper range, this number is NOT valid as a random return value
+     * @param lower - the lower range, defaults to 0
+     * @returns a random integer within the range lower to upper
      */
     public float(upper: number = 1, lower: number = 0): number {
         const max = Math.max(upper, lower);

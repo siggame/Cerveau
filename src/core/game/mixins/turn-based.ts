@@ -20,7 +20,7 @@ export interface ITurnBasedPlayer extends IBasePlayer {
  * A base game that is turn based, with helper functions that should be common
  * between turn based games. defined in Creer data and implemented here so we
  * don't have to re-code it all the time.
- * @mixin
+ *
  * @param base the base classes to mixin turn based logic into
  * @returns a new BaseGame class with TwoPlayerGame logic mixed in
  */

@@ -57,7 +57,7 @@ export class TCPClient extends BaseClient {
     /**
      * Sends a the raw string to the remote client this class represents.
      * Intended to be overridden to actually send through client...
-     * @param {string} str the raw string to send. Should be EOT_CHAR terminated.
+     * @param str the raw string to send. Should be EOT_CHAR terminated.
      * @returns a promise to resolve after data is sent
      */
     protected sendRaw(str: string): Promise<void> {
@@ -75,8 +75,6 @@ export class TCPClient extends BaseClient {
 
     /**
      * Invoked when the other end of this socket disconnects
-     *
-     * @override
      */
     protected disconnected(): void {
         this.socket.destroy();

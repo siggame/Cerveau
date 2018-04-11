@@ -13,7 +13,7 @@ export class ThreadedRoom extends Room {
 
     /**
      * If this session has a game instance running on a worker thread.
-     * @returns {boolean} true if it is running, false otherwise
+     * @returns true if it is running, false otherwise
      */
     public isRunning(): boolean {
         return Boolean(this.worker);
@@ -71,7 +71,7 @@ export class ThreadedRoom extends Room {
 
     /**
      * Generates the info of the clients in playerIndex order for thread safe passing, also re-sorts this.clients
-     * @returns {Array.<Object>} an array of client like objects that can be
+     * @returns an array of client like objects that can be
      * passed to a thread via json, then turned back to a client on that thread
      */
     protected generateClientInfos(): IClientInfo[] {

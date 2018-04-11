@@ -5,9 +5,9 @@ var extend = require("extend");
 /**
  * Sorts names in ascending order
  *
- * @param {Object} a - game with name
- * @param {Object} b - game with name
- * @returns {number} direction for sorting
+ * @param a - game with name
+ * @param b - game with name
+ * @returns direction for sorting
  */
 function _sortNames(a, b) {
     return a.name.toLowerCase() > b.name.toLowerCase();
@@ -16,8 +16,8 @@ function _sortNames(a, b) {
 /**
  * Formats an object into a string for the docs
  *
- * @param {Object} typeObj - the type object for docs, must contain the name of the type
- * @returns {string} the type formatted to a human readable string
+ * @param typeObj - the type object for docs, must contain the name of the type
+ * @returns the type formatted to a human readable string
  */
 function _formatType(typeObj) {
     var baseType = typeObj.name;
@@ -34,8 +34,8 @@ function _formatType(typeObj) {
 /**
  * Checks if a key/value object's keys are not private (underscored) and adds them to the array
  *
- * @param {Array} array - array to add keys to
- * @param {Object} dict - Object with key value pairs
+ * @param array - array to add keys to
+ * @param dict - Object with key value pairs
  */
 function _addTo(array, dict) {
     for(var key in dict) {
@@ -48,7 +48,7 @@ function _addTo(array, dict) {
 /**
  * Formats a variable into a string for the docs
  *
- * @param {Object} variable - creer variable to format for the docs, will contain nested objects
+ * @param variable - creer variable to format for the docs, will contain nested objects
  */
 function _formatVariable(variable) {
     if(variable.type) {
@@ -69,8 +69,8 @@ var docDatas = {};
 /**
  * Gets the docs data for the documentaion view for a specific game
  *
- * @param {string} gameName - name of the game to get the data for, case sensitive
- * @returns {Object} data for the documentation.hbs view
+ * @param gameName - name of the game to get the data for, case sensitive
+ * @returns data for the documentation.hbs view
  */
 function getDocsData(gameName) {
     var gameInfos = getGameInfos();

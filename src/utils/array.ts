@@ -23,8 +23,8 @@ export function removeElements<T>(array: T[], ...elements: T[]): number {
 /**
  * pushes elements into the array only if they are not already present
  * @param array the array to push elements into
- * @param {...*} elements to try to push.
- * @returns {number} new length of this array
+ * @param elements to try to push.
+ * @returns new length of this array
  */
 export function pushIfAbsent<T>(array: T[], ...elements: T[]): number {
     return array.push(...elements.filter((e) => !array.includes(e)));
@@ -35,10 +35,10 @@ export function pushIfAbsent<T>(array: T[], ...elements: T[]): number {
  * last element, and length would warp to 0.
  *
  * @param array the array to use to get items from
- * @param {number} index - index to get in this array, if it is out of bounds
+ * @param index - index to get in this array, if it is out of bounds
  * (index < 0 or index >= this.length), we will "wrap" that index around to be
  * in range
- * @returns {*} element at the index, wrapped around when out of range
+ * @returns element at the index, wrapped around when out of range
  */
 export function getWrapAroundAt<T>(array: T[], index: number): T {
     return array[MathUtils.wrapAround(index, array.length)];
@@ -48,9 +48,9 @@ export function getWrapAroundAt<T>(array: T[], index: number): T {
  * returns the next element in the array by some offset,, wrapping around if it would walk off the array
  *
  * @param array the array to get something in wrapping around
- * @param {*} element - element in the array to find the index of
- * @param {number} offset - from the element's position where to move, up or down and will wrap around
- * @returns {*|undefined} undefined if the element was not in this array, or the
+ * @param element - element in the array to find the index of
+ * @param offset - from the element's position where to move, up or down and will wrap around
+ * @returns undefined if the element was not in this array, or the
  * element at the offset from the passed in element in the array, wrapping
  * around
  */

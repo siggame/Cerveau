@@ -38,8 +38,8 @@ export class PoliceDepartment extends Building {
      * Try to find a reason why the passed in parameters are invalid,
      * and return a human readable string telling them why it is invalid
      *
-     * @param {Player} player - the player that called this.
-     * @param {Warehouse} warehouse - The warehouse you want to raid.
+     * @param player - the player that called this.
+     * @param warehouse - The warehouse you want to raid.
      * @returns  a string that is the invalid reason, if the arguments are invalid.
      * Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -60,9 +60,9 @@ export class PoliceDepartment extends Building {
     /**
      * Bribe the police to raid a Warehouse, dealing damage equal based on the
      * Warehouse's current exposure, and then resetting it to 0.
-     * @param {Player} player - the player that called this.
-     * @param {Warehouse} warehouse - The warehouse you want to raid.
-     * @returns {number} The amount of damage dealt to the warehouse, or -1 if there was an error.
+     * @param player - the player that called this.
+     * @param warehouse - The warehouse you want to raid.
+     * @returns The amount of damage dealt to the warehouse, or -1 if there was an error.
      */
     protected raid(player: Player, warehouse: Warehouse): number {
         // <<-- Creer-Merge: raid -->>

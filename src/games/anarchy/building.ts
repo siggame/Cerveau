@@ -34,8 +34,6 @@ export class Building extends GameObject {
     /**
      * The Building directly to the north of this building, or null if not
      * present.
-     *
-     * @type {Building}
      */
     public readonly buildingNorth?: Building;
 

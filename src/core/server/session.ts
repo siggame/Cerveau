@@ -115,7 +115,7 @@ export class Session {
 
     /**
      * When a fatal (unhandled) error occurs we need to exit and kill all clients. this does that
-     * @param {Error | string} err - the unhandled error
+     * @param err - the unhandled error
      * @returns once all the cleanup is done
      */
     public async kill(err: Error | string): Promise<void> {
@@ -177,8 +177,8 @@ export class Session {
     /**
      * When the game state changes the clients need to know, and we need to
      * check if that game ended when its state changed.
-     * @param {string} type - the type of delta that ocurred
-     * @param {Object} [data] - any additional data about what caused the delta
+     * @param type - the type of delta that ocurred
+     * @param [data] - any additional data about what caused the delta
      */
     private readonly sendDeltas = (delta: IDelta) => {
         if (!isObjectEmpty(delta.game)) {

@@ -20,7 +20,7 @@ export class WSClient extends BaseClient {
     /**
      * Gets the net module member of this socket for passing between threads
      *
-     * @override
+     * @returns The net socket used for WS communications
      */
     public getNetSocket(): net.Socket {
         // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
@@ -59,7 +59,7 @@ export class WSClient extends BaseClient {
     /**
      * Sends a the raw string to the remote client this class represents.
      * Intended to be overridden to actually send through client...
-     * @param {string} str the raw string to send. Should be EOT_CHAR terminated.
+     * @param str the raw string to send. Should be EOT_CHAR terminated.
      * @returns after it it sends the data
      */
     protected sendRaw(str: string): Promise<void> {
@@ -73,8 +73,6 @@ export class WSClient extends BaseClient {
 
     /**
      * Invoked when the other end of this socket disconnects
-     *
-     * @override
      */
     protected disconnected(): void {
         this.socket.destroy();
