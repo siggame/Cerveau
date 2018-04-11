@@ -41,6 +41,9 @@
             "maxInterestDistance",
             "maxInterestRate",
             "maxTurns",
+            "merchantCrewCost",
+            "merchantInvestmentRate",
+            "merchantShipCost",
             "players",
             "portCost",
             "portHealth",
@@ -181,7 +184,7 @@
             },
             "maxInterestDistance": {
                 "default": null,
-                "description": "The Euclidean distance from a Player port required to reach maxInterestRate.",
+                "description": "The Euclidean distance from a Player Port required to reach maxInterestRate.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -203,6 +206,36 @@
                 "default": 100,
                 "description": "The maximum number of turns before the game will automatically end.",
                 "serverPredefined": true,
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "merchantCrewCost": {
+                "default": null,
+                "description": "How much gold it costs a merchant Port to create a crew member.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "merchantInvestmentRate": {
+                "default": null,
+                "description": "How much gold merchant Ports get per turn. They gain (Port.investment * merchantInvestmentRate) gold each turn.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "merchantShipCost": {
+                "default": null,
+                "description": "How much gold it costs a merchant Port to create a ship.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -1266,7 +1299,7 @@
                         },
                         {
                             "default": null,
-                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships and ports. Consumes any remaining moves.",
+                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.",
                             "name": "target",
                             "optional": false,
                             "type": {
@@ -1313,7 +1346,7 @@
                     "description": "Builds a Port on the given Tile.",
                     "returns": {
                         "default": null,
-                        "description": "True if successfully constructed a Port, false otherwise.",
+                        "description": "True if successfully built a Port, false otherwise.",
                         "invalidValue": false,
                         "type": {
                             "is_game_object": false,
@@ -1332,7 +1365,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "How much gold this Unit should bury.",
+                            "description": "How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.",
                             "name": "amount",
                             "optional": false,
                             "type": {
@@ -1376,7 +1409,7 @@
                             }
                         }
                     ],
-                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, adds to the investment.",
+                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.",
                     "optionals": 1,
                     "optionals_start_index": 0,
                     "returns": {
@@ -1462,42 +1495,12 @@
                 },
                 "rest": {
                     "altersState": true,
-                    "argument_names": [
-                        "tile",
-                        "amount"
-                    ],
-                    "arguments": [
-                        {
-                            "default": null,
-                            "description": "The Tile to move the crew to.",
-                            "name": "tile",
-                            "optional": false,
-                            "type": {
-                                "is_game_object": true,
-                                "keyType": null,
-                                "name": "Tile",
-                                "valueType": null
-                            }
-                        },
-                        {
-                            "default": 1,
-                            "description": "The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.",
-                            "name": "amount",
-                            "optional": true,
-                            "type": {
-                                "is_game_object": false,
-                                "keyType": null,
-                                "name": "int",
-                                "valueType": null
-                            }
-                        }
-                    ],
+                    "argument_names": [],
+                    "arguments": [],
                     "description": "Regenerates this Unit's health. Must be used in range of a port.",
-                    "optionals": 1,
-                    "optionals_start_index": 1,
                     "returns": {
                         "default": null,
-                        "description": "True if successfully split, false otherwise.",
+                        "description": "True if successfully rested, false otherwise.",
                         "invalidValue": false,
                         "type": {
                             "is_game_object": false,

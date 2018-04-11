@@ -102,7 +102,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.mapWidth = this.mapWidth || 0;
 
         /**
-         * The Euclidean distance from a Player port required to reach maxInterestRate.
+         * The Euclidean distance from a Player Port required to reach maxInterestRate.
          *
          * @type {number}
          */
@@ -121,6 +121,27 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {number}
          */
         this.maxTurns = this.maxTurns || 0;
+
+        /**
+         * How much gold it costs a merchant Port to create a crew member.
+         *
+         * @type {number}
+         */
+        this.merchantCrewCost = this.merchantCrewCost || 0;
+
+        /**
+         * How much gold merchant Ports get per turn. They gain (Port.investment * merchantInvestmentRate) gold each turn.
+         *
+         * @type {number}
+         */
+        this.merchantInvestmentRate = this.merchantInvestmentRate || 0;
+
+        /**
+         * How much gold it costs a merchant Port to create a ship.
+         *
+         * @type {number}
+         */
+        this.merchantShipCost = this.merchantShipCost || 0;
 
         /**
          * List of all the players in the game.

@@ -77,6 +77,21 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 100,
     },
 
+    merchantCrewCost: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    merchantInvestmentRate: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
+    merchantShipCost: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     players: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
         defaultValue: [],
@@ -559,15 +574,6 @@ classes.Unit.move.cerveau = {
 classes.Unit.rest.cerveau = {
     invalidate: classes.Unit.invalidateRest,
     args: [
-        {
-            name: "tile",
-            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
-        },
-        {
-            name: "amount",
-            type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-            defaultValue: 1,
-        },
     ],
     returns: {
         type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},

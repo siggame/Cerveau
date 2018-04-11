@@ -116,7 +116,7 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships and ports. Consumes any remaining moves.
+     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -218,7 +218,7 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships and ports. Consumes any remaining moves.
+     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.
      * @returns {boolean} True if successfully attacked, false otherwise.
      */
     attack: function(player, tile, target) {
@@ -442,7 +442,7 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to build the Port on.
-     * @returns {boolean} True if successfully constructed a Port, false otherwise.
+     * @returns {boolean} True if successfully built a Port, false otherwise.
      */
     build: function(player, tile) {
         // <<-- Creer-Merge: build -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
@@ -475,7 +475,7 @@ let Unit = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should bury.
+     * @param {number} amount - How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -500,7 +500,7 @@ let Unit = Class(GameObject, {
      * Buries gold on this Unit's Tile.
      *
      * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should bury.
+     * @param {number} amount - How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.
      * @returns {boolean} True if successfully buried, false otherwise.
      */
     bury: function(player, amount) {
@@ -558,7 +558,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, adds to the investment.
+     * Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.
      *
      * @param {Player} player - the player that called this.
      * @param {number} amount - The amount of gold to deposit. Amounts <= 0 will deposit all the gold on this Unit.
@@ -749,12 +749,10 @@ let Unit = Class(GameObject, {
      * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to move the crew to.
-     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateRest: function(player, tile, amount, args) {
+    invalidateRest: function(player, args) {
         // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         const reason = this._invalidate(player, true);
@@ -786,11 +784,9 @@ let Unit = Class(GameObject, {
      * Regenerates this Unit's health. Must be used in range of a port.
      *
      * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to move the crew to.
-     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
-     * @returns {boolean} True if successfully split, false otherwise.
+     * @returns {boolean} True if successfully rested, false otherwise.
      */
-    rest: function(player, tile, amount) {
+    rest: function(player) {
         // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Heal the units
