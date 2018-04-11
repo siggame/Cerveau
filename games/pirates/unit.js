@@ -159,29 +159,22 @@ let Unit = Class(GameObject, {
     invalidateBuild: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateBuild -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Check if the player actually owns this unit
-        if(player !== this.owner) {
-            return "Arr, ye don't want the enemy creatin' more ports!";
-        }
-
-        // Check if the unit has a move left
-        if(this.acted === true) {
-            return "Arr, yer crew already acted this turn, ya landlubber!";
+        const reason = this._invalidate(player, true);
+        if(reason) {
+            return reason;
         }
 
         // Check if the tile is a water tile
         if(tile.type !== "water") {
-            return "Ye can't be buildin' a port on land, ye scalliwag!";
+            return `${this} can't be buildin' a port on land, ye scallywag!`;
         }
 
         // Checks if the tile is connected to land on at least 1 side
         // Also checks if the unit is adjacent at the same time
         let connected = false;
         let adjacent = false;
-
-        // Assuming that tile.neighbors is an array of the tile's neignbors
-        // or something...
-        for(let t of tile.neighbors) {
+        let neighbors = [tile.tileNorth, tile.tileEast, tile.tileSouth, tile.tileWest, tile];
+        for(let t of neighbors) {
             if(t.type === "land") {
                 connected = true;
             }
@@ -191,22 +184,17 @@ let Unit = Class(GameObject, {
             }
         }
 
-        if(this.tile === tile) {
-            adjacent = true;
-        }
-
         if(!connected) {
-            return "Shiver me timbers! Ye can't be havin' a port floatin' in the middle of the ocean!";
+            return `Shiver me timbers! ${this} can't be havin' a port floatin' in the middle of the ocean!`;
         }
 
         if(!adjacent) {
-            return "Arr, that tile be too far away, matey!";
+            return `Arr, ${tile} be too far away for ${this} to build a port on, matey!`;
         }
 
         // Check if the unit has enough gold
-        // I don't know what the cost is by the way
-        if(this.gold < 100) {
-            return "Ye don't have enough booty, ye scalliwag!";
+        if(this.gold < this.game.portCost) {
+            return `Ye don't have enough booty for ${this} to build a port, ye scalliwag!`;
         }
 
         return undefined; // meaning valid
@@ -225,17 +213,21 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: build -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Deduct the proper amount of gold from the unit
-        // Replace 100 with whatever the cost is
-        this.gold -= 100;
+        this.gold -= this.game.portCost;
 
         // Update that the tile contains a port.
-        tile.port = true;
+        tile.port = this.game.create("Port", {
+            tile: tile,
+            owner: player,
+            destroyable: true,
+            cooldown: true,
+        });
 
         // Update that the unit has acted this turn.
         this.acted = true;
 
-        // Add the port to the array of the player's ports
-        player.ports.push(tile);
+        // Add the port to the array of the player's ports (happens at end of turn)
+        this.game.newPorts.push(tile.port);
 
         return true;
 
@@ -317,7 +309,7 @@ let Unit = Class(GameObject, {
             return `Arr, ${this} has to deposit yer booty in yer home port, matey!`;
         }
 
-        if(this.gold === 0) {
+        if(this.gold <= 0) {
             return `Shiver me timbers! ${this} doesn't have any booty to deposit!`;
         }
 
@@ -340,18 +332,16 @@ let Unit = Class(GameObject, {
     deposit: function(player, amount) {
         // <<-- Creer-Merge: deposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(this.gold > 0 && amount < this.gold) {
+        if(amount > 0 && amount < this.gold) {
             player.gold += amount;
             this.gold -= amount;
             return true;
         }
-        else if(this.gold > 0 && (amount === 0 || amount > this.gold)) {
+        else {
             player.gold += this.gold;
             this.gold = 0;
             return true;
         }
-
-        return false;
 
         // <<-- /Creer-Merge: deposit -->>
     },
