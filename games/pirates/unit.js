@@ -246,32 +246,22 @@ let Unit = Class(GameObject, {
     invalidateDeposit: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateDeposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(this.owner !== player) {
-            return "Ye can't just deposit gold from an enemy unit, ya scalliwag!";
+        const reason = this._invalidate(player, false);
+        if(reason) {
+            return reason;
         }
 
-        let adjacent = false;
-
-        for(let t of this.tile.neighbors) {
-            if(t === player.startingPort) {
-                adjacent = true;
-            }
-        }
-
-        if(this.tile === player.startingPort) {
-            adjacent = true;
-        }
-
-        if(!adjacent) {
-            return "Arr, ye have to put gold in yer home port, matey!";
+        const tile = player.startingPort.tile;
+        if(this.tile !== tile && this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+            return `Arr, ${this} has to deposit yer booty in yer home port, matey!`;
         }
 
         if(this.gold === 0) {
-            return "Shiver me timbers! Ye don't have any booty to deposit!";
+            return `Shiver me timbers! ${this} doesn't have any booty to deposit!`;
         }
 
         if(amount < 0) {
-            return "Cor blimey, ye can't deposit a negative amount of yer plunder!";
+            return `Cor blimey, ${this} can't deposit a negative amount of yer plunder! If ye wanna withdraw gold, then ye gotta use 'Unit.withdraw'.`;
         }
 
         return undefined; // meaning valid
@@ -391,7 +381,7 @@ let Unit = Class(GameObject, {
             return `${this}'s crew are too tired to travel any further.`;
         }
         if(this.acted) {
-            return `${this} cannot move after acting. The men are too tired!`;
+            return `${this} can't move after acting. The men are too tired!`;
         }
         if(!tile) {
             return `${this} must have a destination to move to.`;
@@ -406,16 +396,16 @@ let Unit = Class(GameObject, {
             return `${this} has no ship and can't walk on water!`;
         }
         if(ship && tile.type === "land") {
-            return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if you want to move just your crew ashore.`;
+            return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if ye want to move just yer crew ashore.`;
         }
         if(ship && tile.shipHealth > 0) {
-            return `There's a ship there. If ye move ${this} to ${tile}, ye'll scuttle yer ship!`;
+            return `There be a ship there. If ye move ${this} to ${tile}, ye'll scuttle yer ship!`;
         }
         if(!ship && tile.ship && this.acted) {
-            return `${this} already acted and is too tired to board that ship.`;
+            return `${this} already acted, and it be too tired to board that ship.`;
         }
         if(tile.port && tile.port.owner !== player) {
-            return `${this} cannot enter an enemy port!`;
+            return `${this} can't enter an enemy port!`;
         }
         return undefined; // meaning valid
 
@@ -605,17 +595,17 @@ let Unit = Class(GameObject, {
             amount = Math.min(amount, this.crew);
         }
 
+        // Some helpful constants
+        const movePercent = amount / this.crew;
+        const stayPercent = 1 - movePercent;
+
         // Adjust the amount of gold to move
-        if(gold < 0) {
+        if(gold < 0 || (movePercent >= 1 && this.shipHealth <= 0)) {
             gold = this.gold;
         }
         else {
             gold = Math.min(gold, this.gold);
         }
-
-        // Some helpful constants
-        const movePercent = amount / this.crew;
-        const stayPercent = 1 - movePercent;
 
         // Move crew to new tile
         tile.unit.crew += this.crew;
@@ -666,7 +656,7 @@ let Unit = Class(GameObject, {
         }
 
         if(this.tile !== player.startingPort) {
-            return `Argh, ${this} cannot be takin' gold from anywhere but yer starting port!`;
+            return `Arr, ${this} can't be takin' gold from anywhere but yer starting port!`;
         }
 
         return undefined; // meaning valid
