@@ -123,6 +123,96 @@ let Unit = Class(GameObject, {
     invalidateAttack: function(player, tile, target, args) {
         // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
+        if(!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+        if(this.owner !== player) {
+            return `${this} isn't owned by you.`;
+        }
+        if(this.acted) {
+            return `${this} already action this turn.`;
+        }
+        if(!tile) {
+            return `${this} needs to know which tile to attack!`;
+        }
+        if(type[0] === 'c' || type[0] === 'C') {
+          if(!tile.unit)
+          {
+            return "There is nothing to attack!";
+          }
+          if(tile.unit.player === player) {
+            return "We don't have time for a mutany! Don't attack your own men!";
+          }
+          if(this.crew === 0) {
+            return "You have no crew to perform the attack!";
+          }
+          if(tile.unit.crew > 0) {
+            return "There is no crew for you to attack!";
+          }
+          if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
+              return `${tile} is not adjacent to ${this}.`;
+          }
+          if(tile.port) {
+            if(!tile.port.destroyable)
+            {
+              return "Units cannot be harmed when they are on a undestroyable port";
+            }
+          }
+        }
+        else if(type[0] === 'S' || type[0] === 'S') {
+          if(!tile.unit)
+          {
+            return "There is nothing to attack!";
+          }
+          if(tile.unit.player === player) {
+            return "We don't have time for a mutany! Don't attack your own ship!";
+          }
+          if(this.shipHealth > 0) {
+            return "You have no ship to perform the attack!";
+          }
+          if(tile.unit.shipHealth > 0) {
+            return "There is no ship or port for you to attack!";
+          }
+          let dx = this.tile.x - tile.x;
+          let dy = this.tile.y - tile.y;
+          let distSq = dx * dx + dy * dy;
+          let dist = math.sqrt(distSq);
+          if(this.game.shipRange >= dist) {
+              return `The ship isn't in range!`;
+          }
+          if(tile.port) {
+            if(!tile.port.destroyable)
+            {
+              return "Units cannot be harmed when they are on a undestroyable port";
+            }
+          }
+        }
+        else if(type[0] === "p" || type[0] === "P") {
+          if(!tile.port) {
+            return "There is no port to target!";
+          }
+          if(tile.port.player === player) {
+            return "We don't have time for a mutany! Don't attack your own port!";
+          }
+          if(!tile.port.destroyable)
+          {
+            return "This port cannot be damaged!";
+          }
+          if(this.shipHealth > 0) {
+            return "You have no ship to perform the attack!";
+          }
+          let dx = this.tile.x - tile.x;
+          let dy = this.tile.y - tile.y;
+          let distSq = dx * dx + dy * dy;
+          let dist = math.sqrt(distSq);
+          if(this.game.shipRange >= dist) {
+              return `The ship isn't in range!`;
+          }
+        }
+        else {
+          return "You need to attack something";
+        }
+
         // Developer: try to invalidate the game logic for Unit's attack function here
         return undefined; // meaning valid
 
@@ -141,6 +231,123 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's attack function here
+        let dc = 0; // dead crew counter
+        let ds = 0; // dead ship counter
+        let dp = 0; // dead ports
+        let gold = 0;
+        let merchant = tile.unit.isMerchant;
+        if(type[0] === "c" || type[0] === "C") {
+          tile.unit.crewHealth -= this.game.crewDamage*this.crew;
+          if(tile.unit.crew > tile.unit.crewHealth) {
+            if(tile.unit.crewHealth < 0) // for counted the dead accuratly
+            {
+              tile.unit.crewHealth = 0;
+            }
+            dc = tile.unit.crew - tile.unit.crewHealth;
+            tile.unit.crew = tile.unit.crewHealth;
+          }
+          if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
+            gold = tile.unit.gold;
+            tile.unit.tile = null; // mark it is dead for easy removal.
+            tile.unit = null; // Cleanup-ish
+          }
+          else if(tile.unit.shipHealth > 0 && tile.unit.crewHealth <= 0) {
+            tile.unit.owner = null;
+            tile.unit.isMerchant = false;
+          }
+        }
+        else if(type[0] === "s" || type[0] === "S") {
+          tile.unit.shipHealth -= this.game.shipDamage;
+          if(tile.unit.shipHealth <= 0) {
+            ds = 1;
+            if(!this.port) {
+              if(tile.unit.crew > 0) {
+                tile.unit.crewHealth = 0;
+                dc = tile.unit.crew;
+                tile.unit.crew = 0;
+              }
+            }
+          }
+          if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
+            gold = tile.unit.gold;
+            tile.unit.tile = null; // mark it is dead for easy removal.
+            tile.unit = null;
+          }
+        }
+        else if(type[0] === "p" || type[0] === "P") {
+          tile.port.portHealth -= this.game.shipDamage;
+          if(tile.port.portHealth <= 0)
+          {
+            dp = 1;
+            tile.port = null;
+          }
+          if(tile.unit)
+          {
+            if(tile.unit.shipHealth <= 0 && tile.unit.crew > 0) {
+              tile.unit.crewHealth = 0;
+              dc = tile.unit.crew;
+              tile.unit.crew = 0;
+            }
+            if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
+              gold = tile.unit.gold;
+              tile.unit = null;
+            }
+          }
+        }
+        this.acted = true;
+        this.gold += gold;
+        let oc = 0; // opponent crew
+        let os = 0; // oppenent ships
+        let ac = 0; // ally crew
+        let as = 0; // ally ships
+        for(let unit of player.units) {
+          ac += unit.crew;
+        }
+        if(ac === 0)
+        {
+          ac = 1;
+        }
+        for(let unit of player.units) {
+          if(unit.shipHealth > 0)
+          {
+            as++;
+          }
+        }
+        if(as === 0)
+        {
+          as = 1;
+        }
+        if(!merchant) {
+          for(let unit of player.opponent.units) {
+            oc += unit.crew;
+          }
+          if(oc === 0)
+          {
+            oc = 1;
+          }
+          for(let unit of player.opponent.units) {
+            if(unit.shipHealth > 0)
+            {
+              os++;
+            }
+          }
+          if(os === 0)
+          {
+            os = 1;
+          }
+          let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
+                        (this.game.portInfamy*dp))*((oc/ac)*(os/as));
+          if(infamy > player.opponent.infamy)
+          {
+            infamy = player.opponent.infamy;
+          }
+          player.infamy += infamy;
+          player.opponent.infamy -= infamy;
+        }
+        else {
+          player.infamy += ((this.game.crewInfamy*dc)+(this.game.shipInfamy*ds))*((1/ac)*(1/as));
+        }
+
         return false;
 
         // <<-- /Creer-Merge: attack -->>
