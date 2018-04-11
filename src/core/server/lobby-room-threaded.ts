@@ -1,9 +1,14 @@
 import * as cluster from "cluster";
+import * as path from "path";
 import { Config } from "~/core";
 import { BaseClient } from "~/core/clients";
 import { IGamelog } from "~/core/game";
 import { IClientInfo, IWorkerGameSessionData } from "~/core/server/worker";
 import { Room } from "./lobby-room";
+
+cluster.setupMaster({
+    exec: path.join(__dirname, "worker"),
+});
 
 /**
  * A LobbyRoom that in intended to be ran in serial (on one thread with the master lobby)
@@ -41,7 +46,6 @@ export class ThreadedRoom extends Room {
                 mainDebugPort: (process as any)._debugPort, // non-standard, used for chrome debug tools
                 sessionID: this.id,
                 gameName: this.gameNamespace.GameManager.gameName,
-                profile: Config.RUN_PROFILER,
                 clientInfos,
                 gameSettings: this.gameSettings,
             } as IWorkerGameSessionData),
@@ -134,6 +138,6 @@ export class ThreadedRoom extends Room {
 
     protected async cleanUp(gamelog: IGamelog): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
-        return await super.cleanUp(gamelog);
+        await super.cleanUp(gamelog);
     }
 }

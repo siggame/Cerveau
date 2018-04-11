@@ -1,5 +1,5 @@
 // Check for npm install first, as many devs forget this pre step
-import { lstatSync, readFileSync } from "fs";
+import { lstatSync } from "fs";
 
 try {
     if (!lstatSync("./node_modules/").isDirectory()) {
@@ -15,31 +15,17 @@ catch (err) {
     process.exit(1);
 }
 
-// we need to register the typescript paths so we can load from the root
-import { parse } from "json5";
-import { register } from "tsconfig-paths";
-const tsconfig = parse(readFileSync("tsconfig.json").toString());
+// if we get here then the node_modules should be installed, let's go!
 
-register({
-    baseUrl: "./",
-    paths: tsconfig.compilerOptions.paths,
-});
+import "./core/setup-thread";
 
-// import { join } from "path";
-// process.env.TS_NODE_PROJECT = join(__dirname, "tsconfig.json");
-
-// if we got here the node modules should be good to go
-// import "module-alias/register";
-import { Config } from "~/core/args";
-process.title = `${Config.MAIN_TITLE} Game Server`;
-
-import { Lobby } from "~/core/server";
+import { Lobby } from "./core/server";
 
 Lobby.getInstance(); // this will create the singleton Lobby instance
 
-if (Config.API_ENABLED || Config.WEB_ENABLED) {
+// if (Config.API_ENABLED || Config.WEB_ENABLED) {
     // TODO: create the web server
-}
+// }
 
 /*
 var app = require("./website/app");

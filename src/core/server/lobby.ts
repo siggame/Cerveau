@@ -15,16 +15,10 @@ const RoomClass: typeof Room = Config.SINGLE_THREADED
     : ThreadedRoom;
 
 // external imports
-import * as cluster from "cluster";
 import * as ws from "lark-websocket";
 import * as net from "net";
 import * as querystring from "querystring";
 import * as readline from "readline";
-
-cluster.setupMaster({
-    exec: Config.BASE_DIR + "/gameplay/worker.js",
-    args: [], // CLI args will be set via process.env variables
-});
 
 type createServerFunction = (callback: (socket: net.Socket) => void) => net.Server;
 

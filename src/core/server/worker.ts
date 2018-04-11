@@ -2,6 +2,8 @@
 // thread that spins up a game session into an Instance using true
 // multi-threading
 
+import "../setup-thread";
+
 // this also loads the command line arguments from process.env
 import * as cluster from "cluster";
 import { Socket } from "net";
