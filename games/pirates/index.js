@@ -22,6 +22,11 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    crewMoves: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     crewRange: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
@@ -40,6 +45,11 @@ classes.Game._deltaMergeableProperties = {
     gameObjects: {
         type: {"is_game_object": false, "keyType": {"is_game_object": false, "keyType": null, "name": "string", "valueType": null}, "name": "dictionary", "valueType": {"is_game_object": true, "keyType": null, "name": "GameObject", "valueType": null}},
         defaultValue: {},
+    },
+
+    healFactor: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
     },
 
     mapHeight: {
@@ -67,13 +77,23 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 100,
     },
 
-    players: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
-        defaultValue: [],
+    merchantCrewCost: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
     },
 
-    port: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
+    merchantInvestmentRate: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
+    merchantShipCost: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    players: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
         defaultValue: [],
     },
 
@@ -84,6 +104,16 @@ classes.Game._deltaMergeableProperties = {
 
     portHealth: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    ports: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
+        defaultValue: [],
+    },
+
+    restRange: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
     },
 
@@ -103,6 +133,11 @@ classes.Game._deltaMergeableProperties = {
     },
 
     shipHealth: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
+    shipMoves: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -418,13 +453,18 @@ classes.Unit._deltaMergeableProperties = {
     },
 
     path: {
-        type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
-        defaultValue: null,
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null}},
+        defaultValue: [],
     },
 
     shipHealth: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
+    },
+
+    targetPort: {
+        type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
+        defaultValue: null,
     },
 
     tile: {
@@ -531,6 +571,17 @@ classes.Unit.move.cerveau = {
     invalidValue: false,
 };
 
+classes.Unit.rest.cerveau = {
+    invalidate: classes.Unit.invalidateRest,
+    args: [
+    ],
+    returns: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+    invalidValue: false,
+};
+
 classes.Unit.split.cerveau = {
     invalidate: classes.Unit.invalidateSplit,
     args: [
@@ -542,6 +593,11 @@ classes.Unit.split.cerveau = {
             name: "amount",
             type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
             defaultValue: 1,
+        },
+        {
+            name: "gold",
+            type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+            defaultValue: 0,
         },
     ],
     returns: {

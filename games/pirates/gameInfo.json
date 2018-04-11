@@ -30,23 +30,30 @@
             "crewCost",
             "crewDamage",
             "crewHealth",
+            "crewMoves",
             "crewRange",
             "currentPlayer",
             "currentTurn",
             "gameObjects",
+            "healFactor",
             "mapHeight",
             "mapWidth",
             "maxInterestDistance",
             "maxInterestRate",
             "maxTurns",
+            "merchantCrewCost",
+            "merchantInvestmentRate",
+            "merchantShipCost",
             "players",
-            "port",
             "portCost",
             "portHealth",
+            "ports",
+            "restRange",
             "session",
             "shipCost",
             "shipDamage",
             "shipHealth",
+            "shipMoves",
             "shipRange",
             "tiles",
             "units"
@@ -75,6 +82,16 @@
             "crewHealth": {
                 "default": null,
                 "description": "The maximum amount of health a crew member can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "crewMoves": {
+                "default": null,
+                "description": "The number of moves Units with only crew are given each turn.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -135,6 +152,16 @@
                     }
                 }
             },
+            "healFactor": {
+                "default": null,
+                "description": "How much health a Unit recovers when they rest.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
             "mapHeight": {
                 "default": null,
                 "description": "The number of Tiles in the map along the y (vertical) axis.",
@@ -157,7 +184,7 @@
             },
             "maxInterestDistance": {
                 "default": null,
-                "description": "The Euclidean distance from a Player port required to reach maxInterestRate.",
+                "description": "The Euclidean distance from a Player Port required to reach maxInterestRate.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -186,6 +213,36 @@
                     "valueType": null
                 }
             },
+            "merchantCrewCost": {
+                "default": null,
+                "description": "How much gold it costs a merchant Port to create a crew member.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "merchantInvestmentRate": {
+                "default": null,
+                "description": "How much gold merchant Ports get per turn. They gain (Port.investment * merchantInvestmentRate) gold each turn.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "merchantShipCost": {
+                "default": null,
+                "description": "How much gold it costs a merchant Port to create a ship.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
             "players": {
                 "default": null,
                 "description": "List of all the players in the game.",
@@ -198,21 +255,6 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
-                        "valueType": null
-                    }
-                }
-            },
-            "port": {
-                "default": null,
-                "description": "Every Port in the game.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "list",
-                    "valueType": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Port",
                         "valueType": null
                     }
                 }
@@ -234,6 +276,31 @@
                     "is_game_object": false,
                     "keyType": null,
                     "name": "int",
+                    "valueType": null
+                }
+            },
+            "ports": {
+                "default": null,
+                "description": "Every Port in the game.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
+                }
+            },
+            "restRange": {
+                "default": null,
+                "description": "How far a Unit can be from a Port to rest. Range is circular.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
                     "valueType": null
                 }
             },
@@ -271,6 +338,16 @@
             "shipHealth": {
                 "default": null,
                 "description": "The maximum amount of health a ship can have.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "int",
+                    "valueType": null
+                }
+            },
+            "shipMoves": {
+                "default": null,
+                "description": "The number of moves Units with ships are given each turn.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -1078,6 +1155,7 @@
                 "owner",
                 "path",
                 "shipHealth",
+                "targetPort",
                 "tile"
             ],
             "attributes": {
@@ -1145,10 +1223,15 @@
                     "default": null,
                     "description": "(Merchants only) The path this Unit will follow. The first element is the Tile this Unit will move to next.",
                     "type": {
-                        "is_game_object": true,
+                        "is_game_object": false,
                         "keyType": null,
-                        "name": "Tile",
-                        "valueType": null
+                        "name": "list",
+                        "valueType": {
+                            "is_game_object": true,
+                            "keyType": null,
+                            "name": "Tile",
+                            "valueType": null
+                        }
                     }
                 },
                 "shipHealth": {
@@ -1158,6 +1241,16 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "int",
+                        "valueType": null
+                    }
+                },
+                "targetPort": {
+                    "default": null,
+                    "description": "(Merchants only) The Port this Unit is moving to.",
+                    "type": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
                         "valueType": null
                     }
                 },
@@ -1180,6 +1273,7 @@
                 "deposit",
                 "dig",
                 "move",
+                "rest",
                 "split",
                 "withdraw"
             ],
@@ -1205,7 +1299,7 @@
                         },
                         {
                             "default": null,
-                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships and ports. Consumes any remaining moves.",
+                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.",
                             "name": "target",
                             "optional": false,
                             "type": {
@@ -1252,7 +1346,7 @@
                     "description": "Builds a Port on the given Tile.",
                     "returns": {
                         "default": null,
-                        "description": "True if successfully constructed a Port, false otherwise.",
+                        "description": "True if successfully built a Port, false otherwise.",
                         "invalidValue": false,
                         "type": {
                             "is_game_object": false,
@@ -1271,7 +1365,7 @@
                     "arguments": [
                         {
                             "default": null,
-                            "description": "How much gold this Unit should bury.",
+                            "description": "How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.",
                             "name": "amount",
                             "optional": false,
                             "type": {
@@ -1315,7 +1409,7 @@
                             }
                         }
                     ],
-                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, adds to the investment.",
+                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.",
                     "optionals": 1,
                     "optionals_start_index": 0,
                     "returns": {
@@ -1399,11 +1493,30 @@
                     },
                     "serverPredefined": false
                 },
+                "rest": {
+                    "altersState": true,
+                    "argument_names": [],
+                    "arguments": [],
+                    "description": "Regenerates this Unit's health. Must be used in range of a port.",
+                    "returns": {
+                        "default": null,
+                        "description": "True if successfully rested, false otherwise.",
+                        "invalidValue": false,
+                        "type": {
+                            "is_game_object": false,
+                            "keyType": null,
+                            "name": "boolean",
+                            "valueType": null
+                        }
+                    },
+                    "serverPredefined": false
+                },
                 "split": {
                     "altersState": true,
                     "argument_names": [
                         "tile",
-                        "amount"
+                        "amount",
+                        "gold"
                     ],
                     "arguments": [
                         {
@@ -1429,10 +1542,22 @@
                                 "name": "int",
                                 "valueType": null
                             }
+                        },
+                        {
+                            "default": 0,
+                            "description": "The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.",
+                            "name": "gold",
+                            "optional": true,
+                            "type": {
+                                "is_game_object": false,
+                                "keyType": null,
+                                "name": "int",
+                                "valueType": null
+                            }
                         }
                     ],
-                    "description": "Move a number of crew to Tile. This will consume a move from those crew.",
-                    "optionals": 1,
+                    "description": "Moves a number of crew from this Unit to the given Tile. This will consume a move from those crew.",
+                    "optionals": 2,
                     "optionals_start_index": 1,
                     "returns": {
                         "default": null,
