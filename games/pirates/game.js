@@ -216,7 +216,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.maxTurns = data.maxTurns || 720;
+        this.maxTurns = data.maxTurns || 360;
         this.mapWidth = data.mapWidth || 40;
         this.mapHeight = data.mapHeight || 28;
 
@@ -490,7 +490,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // TODO
     },
 
-    checkWinner: function(secondaryReason) {
+    checkForWinner: function(secondaryReason) {
         // No win conditions before the max turns are reached
         if(secondaryReason) {
             // Check who has the most infamy
@@ -515,10 +515,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Generate some metaballs for the islands
         let balls = [];
-        const minRadius = 0.5;
-        const maxRadius = 2.5;
-        const maxOffset = 2.0;
-        const additionalBalls = 5;
+        const minRadius = 0.1;
+        const maxRadius = 1.0;
+        const maxOffset = 5.0;
+        const additionalBalls = 20;
         const gooeyness = 1.0;
         const threshold = 3.5;
         const radiusRange = maxRadius - minRadius;
@@ -610,8 +610,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         });
         portTiles.splice(selected, 1);
         port.tile.port = port;
-        this.ports.push(port);
-        port.owner.push(port);
+        port.owner.startingPort = port;
+        this.newPorts.push(port);
 
         // Place merchant ports
         const minMerchants = 1;
@@ -628,7 +628,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             });
             port.tile.port = port;
             portTiles.splice(selected, 1);
-            this.ports.push(port);
+            this.newPorts.push(port);
         }
 
         // Mirror the map
@@ -642,17 +642,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 // Clone ports
                 if(orig.port) {
-                    target.port = this.create("Port", {
+                    port = this.create("Port", {
                         tile: target,
                         owner: orig.port.owner && orig.port.owner.opponent,
                         destroyable: false,
                         gold: orig.port.gold,
                         investment: orig.port.investment,
                     });
+                    target.port = port;
                     port.tile.port = port;
-                    this.ports.push(port);
+                    this.newPorts.push(port);
                     if(port.owner) {
-                        port.owner.push(port);
+                        port.owner.startingPort = port;
                     }
                 }
             }

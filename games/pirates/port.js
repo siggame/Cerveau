@@ -106,14 +106,15 @@ let Port = Class(GameObject, {
             return `Avast ye, it ain't yer turn, ${player}.`;
         }
 
-        let t = type.slice(1).toUpperCase();
+        let t = type.charAt(0).toUpperCase();
+        console.log(`invalidateSpawn: '${type}' (${t})`);
 
         if(t === "C") {
             if(player.gold <= this.game.crewCost) {
                 return "Ye don't have enough gold to spawn a crew." ;
             }
         }
-        else if(t === "ship") {
+        else if(t === "S") {
             if(player.gold <= this.game.shipCost) {
                 return "Ye don't have enough gold to spawn a ship." ;
             }
@@ -123,7 +124,7 @@ let Port = Class(GameObject, {
             }
         }
         else {
-            return `${type} ain't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
+            return `'${type}' ain't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
         }
 
         return undefined; // meaning valid
@@ -141,7 +142,7 @@ let Port = Class(GameObject, {
     spawn: function(player, type) {
         // <<-- Creer-Merge: spawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        type = type.slice(1).toUpperCase();
+        type = type.charAt(0).toUpperCase();
 
         // Make sure there's a unit on this tile
         if(!this.tile.unit) {
