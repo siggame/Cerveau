@@ -159,7 +159,56 @@ let Unit = Class(GameObject, {
     invalidateBuild: function(player, tile, args) {
         // <<-- Creer-Merge: invalidateBuild -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: try to invalidate the game logic for Unit's build function here
+        // Check if the player actually owns this unit
+        if(player !== this.owner) {
+            return "Arr, ye don't want the enemy creatin' more ports!";
+        }
+
+        // Check if the unit has a move left
+        if(this.acted === true) {
+            return "Arr, yer crew already acted this turn, ya landlubber!";
+        }
+
+        // Check if the tile is a water tile
+        if(tile.type !== "water") {
+            return "Ye can't be buildin' a port on land, ye scalliwag!";
+        }
+
+        // Checks if the tile is connected to land on at least 1 side
+        // Also checks if the unit is adjacent at the same time
+        let connected = false;
+        let adjacent = false;
+
+        // Assuming that tile.neighbors is an array of the tile's neignbors
+        // or something...
+        for(let t of tile.neighbors) {
+            if(t.type === "land") {
+                connected = true;
+            }
+
+            if(this.tile === t) {
+                adjacent = true;
+            }
+        }
+
+        if(this.tile === tile) {
+            adjacent = true;
+        }
+
+        if(!connected) {
+            return "Shiver me timbers! Ye can't be havin' a port floatin' in the middle of the ocean!";
+        }
+
+        if(!adjacent) {
+            return "Arr, that tile be too far away, matey!";
+        }
+
+        // Check if the unit has enough gold
+        // I don't know what the cost is by the way
+        if(this.gold < 100) {
+            return "Ye don't have enough booty, ye scalliwag!";
+        }
+
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateBuild -->>
@@ -175,8 +224,20 @@ let Unit = Class(GameObject, {
     build: function(player, tile) {
         // <<-- Creer-Merge: build -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's build function here
-        return false;
+        // Deduct the proper amount of gold from the unit
+        // Replace 100 with whatever the cost is
+        this.gold -= 100;
+
+        // Update that the tile contains a port.
+        tile.port = true;
+
+        // Update that the unit has acted this turn.
+        this.acted = true;
+
+        // Add the port to the array of the player's ports
+        player.ports.push(tile);
+
+        return true;
 
         // <<-- /Creer-Merge: build -->>
     },
