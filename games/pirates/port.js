@@ -107,14 +107,12 @@ let Port = Class(GameObject, {
         }
 
         let t = type.charAt(0).toUpperCase();
-        console.log(`invalidateSpawn: '${type}' (${t})`);
-
-        if(t === "C") {
+        if(t === "C") { // Crew
             if(player.gold <= this.game.crewCost) {
                 return "Ye don't have enough gold to spawn a crew." ;
             }
         }
-        else if(t === "S") {
+        else if(t === "S") { // Ships
             if(player.gold <= this.game.shipCost) {
                 return "Ye don't have enough gold to spawn a ship." ;
             }
@@ -123,7 +121,7 @@ let Port = Class(GameObject, {
                 return "There don't be enough space in a port for two ships";
             }
         }
-        else {
+        else { // Invalid
             return `'${type}' ain't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
         }
 
