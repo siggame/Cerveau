@@ -100,7 +100,7 @@ let Unit = Class(GameObject, {
         this.moves = data.moves || 0;
         this.owner = data.owner || null;
         this.path = data.path || [];
-        this.shipHealth = data.shipHealth || this.game.shipHealth;
+        this.shipHealth = data.shipHealth || 0;
         this.targetPort = data.targetPort || null;
         this.tile = data.tile || null;
 

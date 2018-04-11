@@ -385,9 +385,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
         this.newPorts = [];
 
-        // Remove all invalid units
         for(let i = 0; i < this.units.length; i++) {
             const unit = this.units[i];
+
+            // Remove all invalid units
             if(!unit.tile) {
                 if(unit.owner) {
                     // Remove this unit from its owner's units array
@@ -397,6 +398,24 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 // Remove this unit from the game's units array
                 this.units.splice(i, 1);
                 i--;
+            }
+
+            // Make sure player units arrays are correct
+            for(let player of this.players) {
+                if(unit.owner) {
+                    // Just to make sure
+                    unit.targetPort = null;
+                    unit.path = [];
+
+                    // Owned units should in a player array
+                    if(!player.units.find(u => u.id === unit.id)) {
+                        player.units.push(unit);
+                    }
+                }
+                else {
+                    // Unowned units should not be in a player array
+                    player.units.removeElement(unit);
+                }
             }
         }
 
@@ -425,7 +444,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             }
 
             // Move merchant units
-            if(unit.targetPort) {
+            if(!unit.owner && unit.targetPort) {
                 // Check current path
                 let pathValid = true;
                 if(unit.path) {
@@ -456,6 +475,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         if(cur.tile.id in closed) {
                             continue;
                         }
+                        closed[cur.tile.id] = true;
 
                         // Check if at the target
                         if(cur.tile === unit.targetPort) {
@@ -471,31 +491,47 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                         // Add neighbors
                         let neighbors = [];
-                        if(cur.tile.tileNorth) {
-                            neighbors.push(cur.tile.tileNorth);
-                        }
-                        if(cur.tile.tileEast) {
-                            neighbors.push(cur.tile.tileEast);
-                        }
-                        if(cur.tile.tileSouth) {
-                            neighbors.push(cur.tile.tileSouth);
-                        }
-                        if(cur.tile.tileWest) {
-                            neighbors.push(cur.tile.tileWest);
-                        }
+                        neighbors.push(cur.tile.tileNorth);
+                        neighbors.push(cur.tile.tileEast);
+                        neighbors.push(cur.tile.tileSouth);
+                        neighbors.push(cur.tile.tileWest);
 
+                        let unsorted = false;
                         for(let neighbor of neighbors) {
-                            open.push({
-                                tile: neighbor,
-                                g: cur.g + 1,
-                                parent: cur,
-                            });
+                            if(neighbor) {
+                                open.push({
+                                    tile: neighbor,
+                                    g: cur.g + 1,
+                                    parent: cur,
+                                });
+                                unsorted = true;
+                            }
                         }
 
                         // Sort open list
-                        if(neighbors.length > 0) {
+                        if(unsorted) {
                             open.sort((a, b) => a.g - b.g);
                         }
+                    }
+                }
+
+                // Make the merchant attack this turn's player if they have a unit in range
+                let target = this.currentPlayer.units.find(u => {
+                    // Only attack ships
+                    if(u.shipHealth <= 0) {
+                        return false;
+                    }
+
+                    // Check if in range
+                    return Math.pow(unit.tile.x - u.tile.x, 2) + Math.pow(unit.tile.y - u.tile.y, 2) <= this.shipRange * this.shipRange;
+                }, this);
+
+                if(target) {
+                    // Attack the target
+                    target.shipHealth -= this.shipDamage;
+                    if(target.shipHealth <= 0) {
+                        target.tile.unit = null;
+                        target.tile = null;
                     }
                 }
 
@@ -512,7 +548,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     updateMerchants: function() {
         // Create units as needed
-        for(let port of this.ports) {
+        let merchantPorts = this.ports.filter(p => !p.owner);
+        for(let port of merchantPorts) {
             // Skip player-owned ports
             if(port.owner) {
                 continue;
@@ -528,14 +565,21 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 let crew = Math.floor(port.gold / this.merchantCrewCost);
                 port.gold -= this.merchantCrewCost * crew;
 
+                // Pick a random port to move to
+                let targetPort = merchantPorts[Math.floor(Math.random() * merchantPorts.length)];
+
                 // Spawn the unit
                 let unit = this.create("Unit", {
                     owner: null,
                     tile: port.tile,
                     crew: crew,
-                    shipHealth: this.game.shipHealth,
+                    shipHealth: this.shipHealth,
                     gold: port.investment,
+                    targetPort: targetPort,
                 });
+
+                unit.tile.unit = unit;
+                this.newUnits.push(unit);
             }
         }
     },

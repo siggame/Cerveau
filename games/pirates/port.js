@@ -99,26 +99,26 @@ let Port = Class(GameObject, {
         // <<-- Creer-Merge: invalidateSpawn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         if(this.owner !== player) {
-            return "This ain't yer port.";
+            return `${this} isn't yer port.`;
         }
 
         if(player !== this.game.currentPlayer) {
-            return `Avast ye, it ain't yer turn, ${player}.`;
+            return `Avast, it ain't yer turn, ${player}.`;
         }
 
         let t = type.charAt(0).toUpperCase();
         if(t === "C") { // Crew
-            if(player.gold <= this.game.crewCost) {
-                return "Ye don't have enough gold to spawn a crew." ;
+            if(player.gold < this.game.crewCost) {
+                return `Ye don't have enough gold to spawn a crew at ${this}.`;
             }
         }
         else if(t === "S") { // Ships
-            if(player.gold <= this.game.shipCost) {
-                return "Ye don't have enough gold to spawn a ship." ;
+            if(player.gold < this.game.shipCost) {
+                return `Ye don't have enough gold to spawn a ship at ${this}.`;
             }
 
             if(this.tile.unit && this.tile.unit.shipHealth > 0) {
-                return "There don't be enough space in a port for two ships";
+                return `There isn't enough space in ${this} to spawn a ship.`;
             }
         }
         else { // Invalid
