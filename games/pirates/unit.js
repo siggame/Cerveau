@@ -123,94 +123,88 @@ let Unit = Class(GameObject, {
     invalidateAttack: function(player, tile, target, args) {
         // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
+        const reason = this._invalidate(player, true);
+        if(reason) {
+            return reason;
         }
-        if(this.owner !== player) {
-            return `${this} isn't owned by you.`;
-        }
-        if(this.acted) {
-            return `${this} already action this turn.`;
-        }
+
         if(!tile) {
             return `${this} needs to know which tile to attack!`;
         }
-        if(type[0] === 'c' || type[0] === 'C') {
-          if(!tile.unit)
-          {
-            return "There is nothing to attack!";
-          }
-          if(tile.unit.player === player) {
-            return "We don't have time for a mutany! Don't attack your own men!";
-          }
-          if(this.crew === 0) {
-            return "You have no crew to perform the attack!";
-          }
-          if(tile.unit.crew > 0) {
-            return "There is no crew for you to attack!";
-          }
-          if(tile !== this.tile.tileEast && tile !== this.tile.tileNorth && tile !== this.tile.tileSouth && tile !== this.tile.tileWest) {
-              return `${tile} is not adjacent to ${this}.`;
-          }
-          if(tile.port) {
-            if(!tile.port.destroyable)
-            {
-              return "Units cannot be harmed when they are on a undestroyable port";
+
+        let t = target.charAt(0).toUpperCase();
+        if(t === "C") {
+            if(!tile.unit) {
+                return `There be nothin' for ${this} to attack on ${tile}!`;
             }
-          }
-        }
-        else if(type[0] === 'S' || type[0] === 'S') {
-          if(!tile.unit)
-          {
-            return "There is nothing to attack!";
-          }
-          if(tile.unit.player === player) {
-            return "We don't have time for a mutany! Don't attack your own ship!";
-          }
-          if(this.shipHealth > 0) {
-            return "You have no ship to perform the attack!";
-          }
-          if(tile.unit.shipHealth > 0) {
-            return "There is no ship or port for you to attack!";
-          }
-          let dx = this.tile.x - tile.x;
-          let dy = this.tile.y - tile.y;
-          let distSq = dx * dx + dy * dy;
-          let dist = math.sqrt(distSq);
-          if(this.game.shipRange >= dist) {
-              return `The ship isn't in range!`;
-          }
-          if(tile.port) {
-            if(!tile.port.destroyable)
-            {
-              return "Units cannot be harmed when they are on a undestroyable port";
+            if(tile.unit.player === player) {
+                return `${this} doesn't have time for a mutany! Don't be attackin' yer own men!`;
             }
-          }
+            if(tile.unit.crew <= 0) {
+                return `${tile} has got no crew for you to attack!`;
+            }
+
+            let dx = this.tile.x - tile.x;
+            let dy = this.tile.y - tile.y;
+            let distSq = dx * dx + dy * dy;
+            if(distSq > this.game.crewRange * this.game.crewRange) {
+                return `${this} isn't in range for that attack. Yer swords don't reach off yonder!`;
+            }
+
+            if(tile.port) {
+                return `${tile}'s crew be under the protection of ${tile.port}!` + (tile.port.destroyable ? " Ye gotta take it down first. Attack that port, matey!" : "");
+            }
         }
-        else if(type[0] === "p" || type[0] === "P") {
-          if(!tile.port) {
-            return "There is no port to target!";
-          }
-          if(tile.port.player === player) {
-            return "We don't have time for a mutany! Don't attack your own port!";
-          }
-          if(!tile.port.destroyable)
-          {
-            return "This port cannot be damaged!";
-          }
-          if(this.shipHealth > 0) {
-            return "You have no ship to perform the attack!";
-          }
-          let dx = this.tile.x - tile.x;
-          let dy = this.tile.y - tile.y;
-          let distSq = dx * dx + dy * dy;
-          let dist = math.sqrt(distSq);
-          if(this.game.shipRange >= dist) {
-              return `The ship isn't in range!`;
-          }
+        else if(t === "S") {
+            if(!tile.unit) {
+                return `There be nothin' for ${this} to attack on ${tile}!`;
+            }
+            if(tile.unit.shipHealth <= 0) {
+                return `There be no ship for ${this} to attack.`;
+            }
+            if(this.shipHealth <= 0) {
+                return `${this} has no ship to perform the attack.`;
+            }
+            if(tile.unit.player === player) {
+                return `${this} doesn't have time for a mutany! Don't be attackin' yer own ship!`;
+            }
+
+            let dx = this.tile.x - tile.x;
+            let dy = this.tile.y - tile.y;
+            let distSq = dx * dx + dy * dy;
+            if(distSq > this.game.shipRange * this.game.shipRange) {
+                return `${this} isn't in range for that attack. Ye don't wanna fire blindly into the wind!`;
+            }
+
+            if(tile.port) {
+                return `${tile}'s ship be under the protection of ${tile.port}!` + (tile.port.destroyable ? " Ye gotta take it down first. Attack that port, matey!" : "");
+            }
+        }
+        else if(t === "P") {
+            if(!tile.port) {
+                return `There be no port on ${tile} for ${this} to plunder.`;
+            }
+            if(tile.port.player === player) {
+                return `${this} doesn't have time for a mutany! Don't be attackin' yer own port!`;
+            }
+            if(!tile.port.destroyable) {
+                return `Attackin' ${tile.port} will send ${this} to Davy Jones' locker! Ye don't wanna do that.`;
+            }
+
+            // Figure out which unit type is attacking
+            let dx = this.tile.x - tile.x;
+            let dy = this.tile.y - tile.y;
+            let distSq = dx * dx + dy * dy;
+            let shipAttack = this.shipHealth > 0 && distSq <= this.game.shipRange * this.game.shipRange;
+            let crewAttack = distSq <= this.game.crewRange * this.game.crewRange;
+
+            // Make sure a unit is attacking to start with
+            if(!shipAttack && !crewAttack) {
+                return `${this} isn't in range of ${tile.port}.`;
+            }
         }
         else {
-          return "You need to attack something";
+            return `${this} needs to attack somethin' valid ('port', 'ship', 'crew'), not '${target}'.`;
         }
 
         // Developer: try to invalidate the game logic for Unit's attack function here
@@ -230,125 +224,155 @@ let Unit = Class(GameObject, {
     attack: function(player, tile, target) {
         // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // Developer: Put your game logic for the Unit's attack function here
-        let dc = 0; // dead crew counter
-        let ds = 0; // dead ship counter
-        let dp = 0; // dead ports
+        target = target.charAt(0).toUpperCase();
+
+        let deadCrew = 0;
+        let deadShips = 0;
+        let deadPorts = 0;
         let gold = 0;
-        let merchant = tile.unit.isMerchant;
-        if(type[0] === "c" || type[0] === "C") {
-          tile.unit.crewHealth -= this.game.crewDamage*this.crew;
-          if(tile.unit.crew > tile.unit.crewHealth) {
-            if(tile.unit.crewHealth < 0) // for counted the dead accuratly
-            {
-              tile.unit.crewHealth = 0;
+        let merchant = tile.unit.targetPort !== null;
+        if(target === "C") {
+            // Crew attacking crew
+            tile.unit.crewHealth -= this.game.crewDamage * this.crew;
+            tile.unit.crewHealth = Math.max(0, tile.unit.crewHealth);
+
+            // For counting the dead accurately
+            if(tile.unit.crew > tile.unit.crewHealth) {
+                deadCrew = tile.unit.crew - tile.unit.crewHealth;
+                tile.unit.crew = tile.unit.crewHealth;
             }
-            dc = tile.unit.crew - tile.unit.crewHealth;
-            tile.unit.crew = tile.unit.crewHealth;
-          }
-          if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            gold = tile.unit.gold;
-            tile.unit.tile = null; // mark it is dead for easy removal.
-            tile.unit = null; // Cleanup-ish
-          }
-          else if(tile.unit.shipHealth > 0 && tile.unit.crewHealth <= 0) {
-            tile.unit.owner = null;
-            tile.unit.isMerchant = false;
-          }
-        }
-        else if(type[0] === "s" || type[0] === "S") {
-          tile.unit.shipHealth -= this.game.shipDamage;
-          if(tile.unit.shipHealth <= 0) {
-            ds = 1;
-            if(!this.port) {
-              if(tile.unit.crew > 0) {
-                tile.unit.crewHealth = 0;
-                dc = tile.unit.crew;
-                tile.unit.crew = 0;
-              }
+
+            // Check if the crew was completely destroyed
+            if(tile.unit.crewHealth <= 0) {
+                if(tile.unit.shipHealth <= 0) {
+                    gold += tile.unit.gold;
+
+                    // Mark it as dead
+                    tile.unit.tile = null;
+                    tile.unit = null;
+                }
+                else {
+                    tile.unit.owner = null;
+
+                    // Make sure it's not a merchant ship anymore either
+                    tile.unit.targetPort = null;
+                    tile.unit.path = [];
+                }
             }
-          }
-          if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-            gold = tile.unit.gold;
-            tile.unit.tile = null; // mark it is dead for easy removal.
-            tile.unit = null;
-          }
         }
-        else if(type[0] === "p" || type[0] === "P") {
-          tile.port.portHealth -= this.game.shipDamage;
-          if(tile.port.portHealth <= 0)
-          {
-            dp = 1;
-            tile.port = null;
-          }
-          if(tile.unit)
-          {
-            if(tile.unit.shipHealth <= 0 && tile.unit.crew > 0) {
-              tile.unit.crewHealth = 0;
-              dc = tile.unit.crew;
-              tile.unit.crew = 0;
+        else if(target === "S") {
+            // Ship attacking ship
+            tile.unit.shipHealth -= this.game.shipDamage;
+            tile.unit.shipHealth = Math.max(0, tile.unit.shipHealth);
+
+            // Check if ship was destroyed
+            if(tile.unit.shipHealth <= 0) {
+                deadShips += 1;
+                gold += tile.unit.gold;
+
+                // Mark it as dead
+                tile.unit.tile = null;
+                tile.unit = null;
             }
-            if(tile.unit.shipHealth <= 0 && tile.unit.crewHealth <= 0) {
-              gold = tile.unit.gold;
-              tile.unit = null;
-            }
-          }
-        }
-        this.acted = true;
-        this.gold += gold;
-        let oc = 0; // opponent crew
-        let os = 0; // oppenent ships
-        let ac = 0; // ally crew
-        let as = 0; // ally ships
-        for(let unit of player.units) {
-          ac += unit.crew;
-        }
-        if(ac === 0)
-        {
-          ac = 1;
-        }
-        for(let unit of player.units) {
-          if(unit.shipHealth > 0)
-          {
-            as++;
-          }
-        }
-        if(as === 0)
-        {
-          as = 1;
-        }
-        if(!merchant) {
-          for(let unit of player.opponent.units) {
-            oc += unit.crew;
-          }
-          if(oc === 0)
-          {
-            oc = 1;
-          }
-          for(let unit of player.opponent.units) {
-            if(unit.shipHealth > 0)
-            {
-              os++;
-            }
-          }
-          if(os === 0)
-          {
-            os = 1;
-          }
-          let infamy = ((this.game.crewInfamy*dc) + (this.game.shipInfamy*ds) +
-                        (this.game.portInfamy*dp))*((oc/ac)*(os/as));
-          if(infamy > player.opponent.infamy)
-          {
-            infamy = player.opponent.infamy;
-          }
-          player.infamy += infamy;
-          player.opponent.infamy -= infamy;
         }
         else {
-          player.infamy += ((this.game.crewInfamy*dc)+(this.game.shipInfamy*ds))*((1/ac)*(1/as));
+            // Figure out which unit type is attacking
+            let dx = this.tile.x - tile.x;
+            let dy = this.tile.y - tile.y;
+            let distSq = dx * dx + dy * dy;
+            let shipAttack = this.shipHealth > 0 && distSq <= this.game.shipRange * this.game.shipRange;
+            let crewAttack = distSq <= this.game.crewRange * this.game.crewRange;
+
+            // Deal damage
+            if(shipAttack) {
+                tile.port.portHealth -= this.game.shipDamage;
+            }
+            if(crewAttack) {
+                tile.port.portHealth -= this.game.crewDamage * this.crew;
+            }
+
+            // Check if the port was destroyed
+            if(tile.port.portHealth <= 0) {
+                deadPorts += 1;
+
+                // Mark it as destroyed
+                tile.port.tile = null;
+                tile.port = null;
+            }
+
+            // Kill the crew if there's no ship
+            if(tile.unit && tile.unit.shipHealth <= 0) {
+                deadCrew += tile.unit.crew;
+                gold += tile.unit.gold;
+
+                // Mark it as dead
+                tile.unit.tile = null;
+                tile.unit = null;
+            }
         }
 
-        return false;
+        // Infamy
+
+        this.acted = true;
+        this.gold += gold;
+        let opponentCrew = 0;
+        let opponentShips = 0;
+        let allyCrew = 0;
+        let allyShips = 0;
+
+        // Count ally units
+        for(let unit of player.units) {
+            if(unit.crew > 0) {
+                allyCrew += unit.crew;
+                if(unit.shipHealth > 0) {
+                    allyShips++;
+                }
+            }
+        }
+
+        // Make sure these values are at least 1 to avoid dividing by 0
+        allyCrew = Math.max(1, allyCrew);
+        allyShips = Math.max(1, allyShips);
+
+        if(!merchant) {
+            // Count opponent units
+            for(let unit of player.opponent.units) {
+                if(unit.crew > 0) {
+                    opponentCrew += unit.crew;
+                    if(unit.shipHealth > 0) {
+                        opponentShips++;
+                    }
+                }
+            }
+        }
+        else {
+            // Calculate infamy
+            // player.infamy += ((this.game.crewInfamy*deadCrew)+(this.game.shipInfamy*deadShips))*((1/allyCrew)*(1/allyShips));
+        }
+
+        // Make sure these values are at least 1 to avoid dividing by 0
+        opponentCrew = Math.max(1, opponentCrew);
+        opponentShips = Math.max(1, opponentShips);
+
+        // Calculate infamy
+        let crewRatio = opponentCrew / allyCrew;
+        let shipRatio = opponentShips / allyShips;
+        let crewInfamy = this.game.crewInfamy * deadCrew;
+        let shipInfamy = this.game.shipInfamy * deadShips;
+        let portInfamy = this.game.portInfamy * deadPorts;
+        let totalInfamy = crewInfamy + shipInfamy + portInfamy;
+        let infamy = totalInfamy * crewRatio * shipRatio;
+        if(infamy > player.opponent.infamy) {
+            infamy = player.opponent.infamy;
+        }
+
+        player.infamy += infamy;
+        if(!merchant) {
+            // Take the infamy from the opponent
+            player.opponent.infamy -= infamy;
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: attack -->>
     },
@@ -369,6 +393,10 @@ let Unit = Class(GameObject, {
         const reason = this._invalidate(player, true);
         if(reason) {
             return reason;
+        }
+
+        if(!tile) {
+            return `${this} be tryin' to build a port in the middle of nowhere. Make sure yer tile ain't null.`;
         }
 
         // Check if the tile is a water tile
@@ -966,15 +994,19 @@ let Unit = Class(GameObject, {
      */
     _invalidate: function(player, checkAction) {
         if(!player || player !== this.game.currentPlayer) {
-            return `Avast ye, it ain't yer turn, ${player}.`;
+            return `Avast, it isn't yer turn, ${player}.`;
         }
 
         if(this.owner !== player) {
-            return `${this} ain't among yer crew.`;
+            return `${this} isn't among yer crew.`;
         }
 
         if(checkAction && this.acted) {
             return `${this} can't perform another action this turn.`;
+        }
+
+        if(!this.tile || this.crew === 0) {
+            return `Ye can't control ${this}. Yer crew are swimmin' down in Davy Jones' locker!`;
         }
     },
 

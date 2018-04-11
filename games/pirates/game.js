@@ -240,6 +240,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.startingGold = data.startingGold || 3000;
         this.merchantStartingGold = data.merchantStartingGold || 0;
         this.merchantStartingInvestment = data.merchantStartingInvestment || 1000;
+        this.merchantInvestmentRate = data.merchantStartingInvestment || 0.1;
+        this.merchantShipCost = data.merchantShipCost || 1000;
+        this.merchantCrewCost = data.merchantCrewCost || 100;
 
         // For units and structures created during a turn
         this.newUnits = [];
@@ -398,16 +401,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             if(!unit.owner || unit.owner === this.currentPlayer) {
                 unit.acted = false;
                 unit.moves = Math.max(this.crewMoves, unit.shipHealth > 0 ? this.shipMoves : 0);
-                unit.starving = false;
             }
 
             // Move merchant units
-            if(!unit.owner) {
+            if(unit.targetPort) {
                 // Check current path
                 let pathValid = true;
                 if(unit.path) {
+                    // Make sure each tile along this path is open
                     for(let tile of unit.path) {
-                        if(tile.unit) {
+                        if(tile.unit || (tile.port && tile.port.owner)) {
                             pathValid = false;
                         }
                     }
@@ -487,7 +490,33 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     updateMerchants: function() {
-        // TODO
+        // Create units as needed
+        for(let port of this.ports) {
+            // Skip player-owned ports
+            if(port.owner) {
+                continue;
+            }
+
+            // Add gold to the port
+            port.gold += port.investment * this.merchantInvestmentRate;
+
+            // Try to spawn a ship
+            if(!port.tile.unit && port.gold >= this.merchantShipCost + this.merchantCrewCost) {
+                // Deduct gold
+                port.gold -= this.merchantShipCost;
+                let crew = Math.floor(port.gold / this.merchantCrewCost);
+                port.gold -= this.merchantCrewCost * crew;
+
+                // Spawn the unit
+                let unit = this.create("Unit", {
+                    owner: null,
+                    tile: port.tile,
+                    crew: crew,
+                    shipHealth: this.game.shipHealth,
+                    gold: port.investment,
+                });
+            }
+        }
     },
 
     checkForWinner: function(secondaryReason) {
@@ -626,6 +655,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 gold: this.merchantStartingGold,
                 investment: this.merchantStartingInvestment,
             });
+
+            // If it's a merchant port, stagger the starting gold so they don't all spawn units on the same turn
+            if(!port.owner) {
+                port.gold += port.investment * this.merchantInvestmentRate;
+            }
+
+            // Add the port to the game
             port.tile.port = port;
             portTiles.splice(selected, 1);
             this.newPorts.push(port);
