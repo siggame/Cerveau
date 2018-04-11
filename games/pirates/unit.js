@@ -193,8 +193,14 @@ let Unit = Class(GameObject, {
      */
     invalidateBury: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateBury -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
         // Developer: try to invalidate the game logic for Unit's bury function here
+		if(player !== this.owner){
+			return "Ahoy scallywag! Ye don't control this buccaneer! Ye can't make him dig.";
+		}else if(unit.gold<amount){
+			return "This buccaneer does not have enough booty to bury that amount!";
+		}else if(unit.tile.type!=="land"||unit.tile.port){
+			return "Ye can't bury gold here!";
+		}
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateBury -->>
@@ -209,9 +215,13 @@ let Unit = Class(GameObject, {
      */
     bury: function(player, amount) {
         // <<-- Creer-Merge: bury -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
         // Developer: Put your game logic for the Unit's bury function here
-        return false;
+		if(amount<=0){
+			amount=unit.gold;
+		}
+		unit.tile.gold+=amount;
+		unit.gold-=amount;
+        return true;
 
         // <<-- /Creer-Merge: bury -->>
     },
