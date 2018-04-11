@@ -280,8 +280,30 @@ let Unit = Class(GameObject, {
      */
     invalidateDig: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateDig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
+        
         // Developer: try to invalidate the game logic for Unit's dig function here
+        
+        // Checking to make sure its the players turn
+        if(!player || player !== this.game.currentPlayer)
+        {
+            return `Avast ye, its not yer turn, ${player}!`;
+        }
+
+        // Checking to see if the player is the owner.
+        if(player !== this.owner)
+        {
+            return `Avast ye, ${this} isnt yers!`;
+        }
+        // Checking to see if the tile is anything other than a land type.
+        if(this.tile.type !== "land")
+        {
+            return "Avast ye, Ye can't dig in the Sea!";
+        }
+        // Checking to see if the tile has gold to be dug up.
+        else if (this.tile.gold === 0)
+        {
+            return "Avest ye, there be no booty in ground!";
+        } 
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateDig -->>
@@ -298,6 +320,25 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: dig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Developer: Put your game logic for the Unit's dig function here
+
+        // If the amount requested is <= 0 or greater than what is current give all.
+        if(amount <= 0 || amount > this.tile.gold)
+        {
+            // Adds the amount of gold from the current tile to the Unit.
+            this.gold += this.tile.gold;
+            // Sets the gold on tile to 0.
+            this.tile.gold = 0;
+            return true;
+        }
+        // Else if amount is less than what is there take that amount.
+        else if(amount > 0 && amount <= this.tile.gold)
+        {
+            // Adds amount requested to Unit.
+            this.gold += amount;
+            // Subtracts amount from Tile's gold
+            this.tile.gold -= amount;
+            return true;
+        }
         return false;
 
         // <<-- /Creer-Merge: dig -->>
