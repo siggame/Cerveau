@@ -247,8 +247,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.crewDamage = data.crewDamage || 1;
         this.shipDamage = data.shipDamage || 2;
         this.crewHealth = data.crewHealth || 4;
-        this.shipHealth = data.shipHealth || 10;
-        this.portHealth = data.portHealth || 20;
+        this.shipHealth = data.shipHealth || 20;
+        this.portHealth = data.portHealth || 40;
         this.crewRange = data.crewRange || 1;
         this.shipRange = data.shipRange || 4;
         this.crewMoves = data.crewMoves || 2;
@@ -268,6 +268,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // For units and structures created during a turn
         this.newUnits = [];
         this.newPorts = [];
+        this.stunTime = {};
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -416,19 +417,20 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 i--;
                 continue;
             }
+            else {
+                // Make sure player units arrays are correct
+                // I know this hurts to read...
+                for(let player of this.players) {
+                    let found = player.units.find(u => u.id === unit.id);
 
-            // Make sure player units arrays are correct
-            // I know this hurts to read...
-            for(let player of this.players) {
-                let found = player.units.find(u => u.id === unit.id);
-
-                if(unit.owner !== player && found) {
-                    // Remove the unit from the player's unit array if it's not their unit
-                    player.units.removeElement(unit);
-                }
-                else if(unit.owner === player && !found) {
-                    // Add the unit to the player's unit array if it is their unit
-                    player.units.push(unit);
+                    if(unit.owner !== player && found) {
+                        // Remove the unit from the player's unit array if it's not their unit
+                        player.units.removeElement(unit);
+                    }
+                    else if(unit.owner === player && !found) {
+                        // Add the unit to the player's unit array if it is their unit
+                        player.units.push(unit);
+                    }
                 }
             }
         }
@@ -442,31 +444,22 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 unit.moves = Math.max(this.crewMoves, unit.shipHealth > 0 ? this.shipMoves : 0);
             }
 
+            // Decrease turns stunned
+            if(unit.id in this.stunTime) {
+                if(this.stunTime[unit.id]-- <= 0) {
+                    this.stunTime[unit.id] = null;
+                }
+            }
+
             // Move merchant units
-            if(!unit.owner && unit.targetPort) {
+            if(!unit.owner && unit.targetPort && !(unit.id in this.stunTime)) {
                 // Check current path
                 let pathValid = true;
                 if(unit.path && unit.path.length > 0) {
                     const next = unit.path[0];
                     if(next.unit || (next.port && next.owner)) {
                         pathValid = false;
-                    }/*
-                    else {
-                        // Make sure each tile along this path is open
-                        for(let tile of unit.path) {
-                            // Owned ports are obstacles
-                            if(tile.port && tile.port.owner) {
-                                pathValid = false;
-                            }
-
-                            if(tile.unit) {
-                                // Owned units and units not in ports are obstacles
-                                if(tile.unit.owner || !tile.port) {
-                                    pathValid = false;
-                                }
-                            }
-                        }
-                    }*/
+                    }
                 }
                 else {
                     pathValid = false;
@@ -611,7 +604,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     owner: null,
                     tile: port.tile,
                     crew: crew,
-                    shipHealth: this.shipHealth,
+                    shipHealth: this.shipHealth / 4,
                     gold: port.investment * port.investmentRate * (crew + 1),
                     targetPort: targetPort,
                 });
@@ -652,7 +645,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Pick a metaball generator
         let ballInfo = ballGens[Math.floor(Math.random() * ballGens.length)].call(this);
-        // let ballInfo = this.islandBalls();
 
         // Generate the islands from the metaballs
         let q = ballInfo.quads ? 2 : 1;
@@ -668,10 +660,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 }
 
                 if(energy > ballInfo.threshold) {
-                    tile.type = "land";
+                    tile.type = ballInfo.inverted ? "water" : "land";
                 }
                 else {
-                    tile.type = "water";
+                    tile.type = ballInfo.inverted ? "land" : "water";
                 }
             }
         }
@@ -853,8 +845,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     islandBalls: function() {
         let balls = [];
         const minRadius = 0.5;
-        const maxRadius = 2.0;
-        const maxOffset = this.mapWidth / 4;
+        const maxRadius = 1.5;
+        const maxOffset = this.mapWidth * 0.2;
         const additionalBalls = 20;
         const gooeyness = 1.0;
         const threshold = 3.5;
@@ -968,46 +960,33 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     lakeBalls: function() {
+        // This is too inconsistent, it needs to always be one huge lake instead
+
         let balls = [];
-        const minRadius = 0.75;
-        const maxRadius = 1.25;
-        const maxOffset = 10.0;
-        const additionalBalls = 20;
+        const minRadius = 1.75;
+        const maxRadius = 1.75;
+        const minOffset = Math.min(this.mapWidth, this.mapHeight) * 0.25;
+        const maxOffset = Math.min(this.mapWidth, this.mapHeight) * 0.75;
+        const offsetRange = maxOffset - minOffset;
+        const additionalBalls = 10;
         const gooeyness = 1.0;
-        const threshold = 4.0;
+        const threshold = 1.0;
         const radiusRange = maxRadius - minRadius;
 
-        // Initial ball (top island)
-        let islandX = 0.5;
-        let islandY = 0.5;
+        // Initial ball (center)
+        let lakeX = this.mapWidth / 2 + 0.5;
+        let lakeY = this.mapHeight / 2 + 0.5;
         balls.push({
-            x: islandX,
-            y: islandY,
+            x: lakeX,
+            y: lakeY,
             r: Math.random() * radiusRange + minRadius,
         });
 
-        // Extra balls (top island)
+        // Extra balls
         for(let i = 0; i < additionalBalls; i++) {
             balls.push({
-                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
-                r: Math.random() * radiusRange + minRadius,
-            });
-        }
-
-        // Initial ball (bottom island)
-        islandY = this.mapHeight - 0.5;
-        balls.push({
-            x: islandX,
-            y: islandY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls (bottom island)
-        for(let i = 0; i < additionalBalls; i++) {
-            balls.push({
-                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY - Math.random() * maxOffset,
+                x: lakeX + Math.random() * offsetRange * 2 - offsetRange + minOffset,
+                y: lakeY + Math.random() * offsetRange * 2 - offsetRange + minOffset,
                 r: Math.random() * radiusRange + minRadius,
             });
         }
@@ -1016,7 +995,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
-            quads: false,
+            quads: true,
+            inverted: true,
         };
     },
 

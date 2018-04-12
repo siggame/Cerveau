@@ -284,11 +284,12 @@ let Unit = Class(GameObject, {
             let crewAttack = distSq <= this.game.crewRange * this.game.crewRange;
 
             // Deal damage
+            let damage = 0;
             if(shipAttack) {
-                tile.port.portHealth -= this.game.shipDamage;
+                damage = Math.max(damage, this.game.shipDamage);
             }
             if(crewAttack) {
-                tile.port.portHealth -= this.game.crewDamage * this.crew;
+                damage = Math.max(damage, this.game.crewDamage * this.crew);
             }
 
             // Check if the port was destroyed
@@ -370,6 +371,9 @@ let Unit = Class(GameObject, {
         if(!merchant) {
             // Take the infamy from the opponent
             player.opponent.infamy -= infamy;
+        }
+        else if(tile.unit) {
+            this.game.stunTime[tile.unit.id] = 2;
         }
 
         return true;
