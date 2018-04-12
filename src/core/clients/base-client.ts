@@ -53,8 +53,6 @@ export class BaseClient {
     /** If this client is a spectator */
     public isSpectating: boolean = false;
 
-    public readonly connectionType: string = "";
-
     /** The socket this communicates through */
     protected socket: net.Socket;
 
@@ -250,10 +248,7 @@ export class BaseClient {
      * @param data the object to send about the event being sent
      * @returns after the data is sent
      */
-    public send(
-        event: "over" | "fatal" | "start" | "order" | "invalid" | "ran" | "named" | "lobbied" | "delta",
-        data: any,
-    ): Promise<void> {
+    public send(event: string, data: any): Promise<void> {
         return this.sendRaw(JSON.stringify({event, data}));
     }
 

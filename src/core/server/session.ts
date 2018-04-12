@@ -143,7 +143,7 @@ export class Session {
         // and sit and listen forever
         await delay(1000); // 1 second delay to exit, to allow clients to disconnect.
 
-        logger.info(`${this.gameName} Game is over, exiting.`);
+        logger.info(`${this.gameName} game is over, exiting.`);
 
         this.events.ended.emit(this.fatal || gamelog!);
     }

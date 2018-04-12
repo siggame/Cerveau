@@ -1,10 +1,10 @@
 import * as cluster from "cluster";
 import * as path from "path";
+import { events } from "ts-typed-events";
 import { Config } from "~/core";
-import { BaseClient } from "~/core/clients";
 import { IGamelog } from "~/core/game";
-import { IClientInfo, IWorkerGameSessionData } from "~/core/server/worker";
 import { Room } from "./lobby-room";
+import { IWorkerGameSessionData, MessageFromMainThread } from "./worker";
 
 cluster.setupMaster({
     exec: path.join(__dirname, "worker"),
@@ -35,20 +35,47 @@ export class ThreadedRoom extends Room {
      * We start the on a separate "worker" thread, for true multi-threading via cluster
      */
     protected threadInstance(): void {
-        const clientInfos = this.generateClientInfos();
-
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
-        // TODO: this whole section is bad
         this.worker = cluster.fork({
             ...Config, // so that the worker thread will see these in its process.env
             WORKER_GAME_SESSION_DATA: JSON.stringify({
                 mainDebugPort: (process as any)._debugPort, // non-standard, used for chrome debug tools
                 sessionID: this.id,
                 gameName: this.gameNamespace.GameManager.gameName,
-                clientInfos,
                 gameSettings: this.gameSettings,
             } as IWorkerGameSessionData),
+        });
+
+        this.worker.on("online", () => {
+            for (const client of this.clients) {
+                // we are about to send it, so we don't want this client object
+                // listening to it, as we no longer care.
+                client.stopListeningToSocket();
+
+                this.worker!.send({
+                    type: "client",
+                    clientInfo: {
+                        className: Object.getPrototypeOf(client).constructor.name,
+                        index: client.playerIndex,
+                        name: client.name,
+                        type: client.programmingLanguage,
+                        spectating: client.isSpectating,
+                        metaDeltas: client.sendMetaDeltas,
+                    },
+                } as MessageFromMainThread, client.getNetSocket(),
+                );
+            }
+
+            // Tell the worker thread we are done sending client + sockets to them
+            this.worker!.send({ type: "done"} as MessageFromMainThread);
+
+            // And remove the clients from us, they are no longer ours to care
+            // about; instead the worker thread will handle them from here-on.
+            for (const client of this.clients) {
+                events.offAll(client.events);
+            }
+            this.clients.length = 0;
         });
 
         this.worker.on("message", async (data) => { // this message should only happen once, when the game is over
@@ -57,83 +84,9 @@ export class ThreadedRoom extends Room {
             }
         });
 
-        this.worker.on("online", () => {
-            for (const client of this.clients) {
-                // we are about to send it, so we don't want this client object
-                // listening to it, as we no longer care.
-                client.stopListeningToSocket();
-                this.worker!.send("socket", client.getNetSocket());
-            }
-
-            this.clients.length = 0;
-        });
-
         this.worker.on("exit", () => {
             this.handleOver();
         });
-    }
-
-    /**
-     * Generates the info of the clients in playerIndex order for thread safe passing, also re-sorts this.clients
-     * @returns an array of client like objects that can be
-     * passed to a thread via json, then turned back to a client on that thread
-     */
-    protected generateClientInfos(): IClientInfo[] {
-        // each client sent their info with the 'play' event already, we need to send that to the new thread
-        let numberOfPlayers = 0;
-        const clients = new Array<BaseClient>();
-        const unplacedPlayers = new Array<BaseClient>();
-        const spectators = new Array<BaseClient>();
-
-        // place players where they want to be based on playerIndex
-        for (const client of this.clients) {
-            if (client.isSpectating) {
-                spectators.push(client);
-            }
-            else {
-                numberOfPlayers++;
-
-                if (client.playerIndex !== undefined && !clients[client.playerIndex]) {
-                    clients[client.playerIndex] = client;
-                }
-                else {
-                    unplacedPlayers.push(client);
-                }
-            }
-        }
-
-        // place clients after all the players, so the clients array will look
-        // like: [player1, player2, ..., playerN, spectator1, spectator2, ..., spectatorN]
-        for (let i = numberOfPlayers; i < this.clients.length; i++) {
-            clients[i] = spectators[i - numberOfPlayers];
-        }
-
-        // finally, find a spot for the unplaced players
-        let nextPlayerIndex = 0;
-        for (const unplacedPlayer of unplacedPlayers) {
-            while (clients[nextPlayerIndex]) {
-                nextPlayerIndex++;
-            }
-
-            clients[nextPlayerIndex] = unplacedPlayer;
-        }
-
-        // update the playerIndexes for all the clients here on the lobby
-        for (let i = 0; i < clients.length; i++) {
-            const client = clients[i];
-            if (!client.isSpectating) {
-                client.setInfo(client.name, client.programmingLanguage, i);
-            }
-        }
-
-        return clients.map<IClientInfo>((client, i) => ({
-            index: i,
-            name: client.name,
-            type: client.programmingLanguage,
-            connectionType: client.connectionType,
-            spectating: client.isSpectating,
-            metaDeltas: client.sendMetaDeltas,
-        }));
     }
 
     protected async cleanUp(gamelog: IGamelog): Promise<void> {

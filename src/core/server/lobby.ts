@@ -3,7 +3,7 @@ import { Config } from "~/core/args";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
 import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "~/utils";
-import { BaseClient, getClientByType, IParsedPlayData, IPlayData } from "../clients";
+import { BaseClient, IParsedPlayData, IPlayData, TCPClient, WSClient } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
@@ -58,12 +58,12 @@ export class Lobby {
 
     private readonly updater?: Updater;
 
-    private readonly listenerServers = new Map<string, net.Server>();
+    private readonly listenerServers: net.Server[] = [];
 
     private constructor() {
         this.initializeGames().then(() => {
-            this.initializeListener("tcp", Config.TCP_PORT, net.createServer);
-            this.initializeListener("ws", Config.WS_PORT, ws.createServer);
+            this.initializeListener(Config.TCP_PORT, net.createServer, TCPClient);
+            this.initializeListener(Config.WS_PORT, ws.createServer, WSClient);
         });
 
         const rl = readline.createInterface({
@@ -205,22 +205,21 @@ export class Lobby {
     /**
      * Creates and initializes a server that uses a listener pattern identical to net.Server
      *
-     * @param type - type of server and what type of clients to expect from it
-     * @param port - port to listen on for this server
-     * @param createServer - the required module's createServer method
+     * @param port The port to listen on for this server
+     * @param createServer The required module's createServer method
+     * @param clientClass The class constructor for clients of this listener
      */
-    private initializeListener(type: string, port: number, createServer: createServerFunction): void {
-        const clientClass = getClientByType(type);
-        if (!clientClass) {
-            throw new Error(`'${type}' is not a valid type of listener for clients.`);
-        }
-
+    private initializeListener(
+        port: number,
+        createServer: createServerFunction,
+        clientClass: typeof BaseClient,
+    ): void {
         const listener = createServer((socket) => {
             this.addSocket(socket, clientClass);
         });
 
         listener.listen(port, "0.0.0.0", () => {
-            logger.info(`»» Listening on port ${port} for ${type.toUpperCase()} Clients ««`);
+            logger.info(`»» Listening on port ${port} for ${clientClass.name}s ««`);
         });
 
         listener.on("error", (err) => {
@@ -232,7 +231,7 @@ There's probably another Cerveau server running on this same computer.`);
             process.exit(1);
         });
 
-        this.listenerServers.set(type, listener);
+        this.listenerServers.push(listener);
     }
 
     /**
