@@ -476,7 +476,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(!pathValid) {
                     let open = [{
                         tile: unit.tile,
-                        g: 0,
+                        g: 1,
                         parent: null,
                     }];
                     let closed = {};
@@ -505,9 +505,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         // Add neighbors
                         let neighbors = [];
                         neighbors.push({tile: cur.tile.tileNorth, cost: 1});
-                        neighbors.push({tile: cur.tile.tileEast, cost: 1 + 1 / (10 * cur.g)});
+                        neighbors.push({tile: cur.tile.tileEast, cost: 1 + 1 / Math.min(10 * cur.g, 1000)});
                         neighbors.push({tile: cur.tile.tileSouth, cost: 1});
-                        neighbors.push({tile: cur.tile.tileWest, cost: 1 + 1 / (10 * cur.g)});
+                        neighbors.push({tile: cur.tile.tileWest, cost: 1 + 1 / Math.min(10 * cur.g, 1000)});
 
                         let unsorted = false;
                         for(let neighbor of neighbors) {
@@ -648,14 +648,16 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Generate some metaballs for the islands
-        let ballGens = [this.islandBalls, this.cornerBalls, this.riverBalls];
+        const ballGens = [this.cornerBalls, this.riverBalls, this.islandBalls];
 
         // Pick a metaball generator
-        let ballInfo = this.riverBalls();
+        let ballInfo = ballGens[Math.floor(Math.random() * ballGens.length)].call(this);
+        // let ballInfo = this.islandBalls();
 
         // Generate the islands from the metaballs
+        let q = ballInfo.quads ? 2 : 1;
         for(let x = 0; x < this.mapWidth / 2; x++) {
-            for(let y = 0; y < this.mapHeight; y++) {
+            for(let y = 0; y < this.mapHeight / q; y++) {
                 let tile = this.getTile(x, y);
                 let energy = 0;
                 for(const ball of ballInfo.balls) {
@@ -670,6 +672,17 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 }
                 else {
                     tile.type = "water";
+                }
+            }
+        }
+
+        // If the generator only generates one corner of the map, mirror vertically
+        if(ballInfo.quads) {
+            for(let x = 0; x < this.mapWidth / 2; x++) {
+                for(let y = 0; y < this.mapHeight / 2; y++) {
+                    let orig = this.getTile(x, y);
+                    let target = this.getTile(x, this.mapHeight - y - 1);
+                    target.type = orig.type;
                 }
             }
         }
@@ -840,44 +853,19 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     islandBalls: function() {
         let balls = [];
         const minRadius = 0.5;
-        const maxRadius = 1.5;
-        const maxOffset = 10.0;
+        const maxRadius = 2.0;
+        const maxOffset = this.mapWidth / 4;
         const additionalBalls = 20;
         const gooeyness = 1.0;
-        const threshold = 4.5;
+        const threshold = 3.5;
         const radiusRange = maxRadius - minRadius;
 
-        // Initial ball (top island)
+        // Generate balls
         let islandX = this.mapWidth * 0.25 + 0.5;
-        let islandY = this.mapHeight * 0.25 + 0.5;
-        balls.push({
-            x: islandX,
-            y: islandY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls (top island)
         for(let i = 0; i < additionalBalls; i++) {
             balls.push({
                 x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
-                r: Math.random() * radiusRange + minRadius,
-            });
-        }
-
-        // Initial ball (bottom island)
-        islandY = this.mapHeight * 0.75 + 0.5;
-        balls.push({
-            x: islandX,
-            y: islandY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls (bottom island)
-        for(let i = 0; i < additionalBalls; i++) {
-            balls.push({
-                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY - Math.random() * maxOffset,
+                y: Math.random() * (this.mapHeight - 1) + 0.5,
                 r: Math.random() * radiusRange + minRadius,
             });
         }
@@ -886,22 +874,23 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            quads: false,
         };
     },
 
     riverBalls: function() {
         let balls = [];
-        const minRadius = 1.5;
-        const maxRadius = 2.0;
-        const maxOffset = 5.0;
-        const additionalBalls = 20;
-        const gooeyness = 1.0;
-        const threshold = 3.5;
+        const minRadius = 0.5;
+        const maxRadius = 4.0;
+        const maxOffset = this.mapHeight / 2;
+        const additionalBalls = 8;
+        const gooeyness = 0.95;
+        const threshold = 2.0;
         const radiusRange = maxRadius - minRadius;
 
         // Initial ball
         let islandX = 0.5;
-        let islandY = Math.random() < 0.5 ? 0.5 : (this.mapHeight - 0.5);
+        let islandY = (Math.random() < 0.5) ? 0.5 : (this.mapHeight - 0.5);
         balls.push({
             x: islandX,
             y: islandY,
@@ -921,6 +910,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            quads: false,
         };
     },
 
@@ -973,6 +963,60 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            quads: false,
+        };
+    },
+
+    lakeBalls: function() {
+        let balls = [];
+        const minRadius = 0.75;
+        const maxRadius = 1.25;
+        const maxOffset = 10.0;
+        const additionalBalls = 20;
+        const gooeyness = 1.0;
+        const threshold = 4.0;
+        const radiusRange = maxRadius - minRadius;
+
+        // Initial ball (top island)
+        let islandX = 0.5;
+        let islandY = 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (top island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        // Initial ball (bottom island)
+        islandY = this.mapHeight - 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (bottom island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY - Math.random() * maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        return {
+            balls: balls,
+            gooeyness: gooeyness,
+            threshold: threshold,
+            quads: false,
         };
     },
 
