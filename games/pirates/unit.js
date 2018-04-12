@@ -713,26 +713,9 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         if(tile.unit) {
-            // Calculate remaining moves
-            let move = tile.unit.moves;
-            if(move > this.moves - 1) {
-                move = this.moves - 1;
-            }
-            tile.unit.moves = move;
 
-            // Move over crew and gold
-            tile.unit.crew += this.crew;
-            tile.unit.crewHealth += this.crewHealth;
-            tile.unit.gold += this.gold;
-
-            // Remove this crew
-            this.tile.unit = null;
-            this.tile = null;
-
-            // If boarding a ship, consume an action
-            if(tile.unit.shipHealth > 0) {
-                tile.acted = true;
-            }
+            this.moves--;
+            this.mergeOnto(tile.unit);
         }
         else {
             // Move this unit to that tile
@@ -795,8 +778,10 @@ let Unit = Class(GameObject, {
 
         // Heal the units
         this.crewHealth += Math.ceil(this.game.crewHealth * this.game.healFactor) * this.crew;
+        this.crewHealth = Math.min(this.crewHealth, this.crew * this.game.crewHealth);
         if(this.shipHealth > 0) {
             this.shipHealth += Math.ceil(this.game.shipHealth * this.game.healFactor);
+            this.shipHealth = Math.min(this.shipHealth, this.game.shipHealth);
         }
 
         // Make sure the unit can't do anything else this turn
@@ -1006,8 +991,21 @@ let Unit = Class(GameObject, {
         }
 
         if(!this.tile || this.crew === 0) {
-            return `Ye can't control ${this}. Yer crew are swimmin' down in Davy Jones' locker!`;
+            return `Ye can't control ${this}.`;
         }
+    },
+
+    mergeOnto: function(other) {
+        this.tile = other.tile;
+        this.tile.unit = this;
+        other.tile = null;
+
+        this.crew += other.crew;
+        this.crewHealth += other.crewHealth;
+        this.shipHealth += other.shipHealth;
+        this.gold += other.gold;
+        this.acted &= other.acted;
+        this.moves = Math.min(this.moves, other.moves);
     },
 
     //<<-- /Creer-Merge: added-functions -->>

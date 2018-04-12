@@ -145,7 +145,7 @@ let Port = Class(GameObject, {
         // Make sure there's a unit on this tile
         if(!this.tile.unit) {
             this.tile.unit = this.game.create("Unit", {
-                owner: player,
+                owner: null,
                 tile: this.tile,
             });
             this.game.newUnits.push(this.tile.unit);
@@ -156,6 +156,7 @@ let Port = Class(GameObject, {
             this.tile.unit.crewHealth += this.game.crewHealth;
             this.tile.unit.acted = true;
             this.tile.unit.moves = 0;
+            this.tile.unit.owner = player;
             player.gold -= this.game.crewCost;
 
         }
