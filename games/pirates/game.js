@@ -385,6 +385,22 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
         this.newPorts = [];
 
+        // Remove all invalid ports
+        for(let i = 0; i < this.ports.length; i++) {
+            const port = this.ports[i];
+            if(!port.tile) {
+                if(port.owner) {
+                    // Remove this port from its owner's ports array
+                    port.owner.ports.removeElement(port);
+                }
+
+                // Remove this port from the game's ports array
+                this.ports.splice(i, 1);
+                i--;
+            }
+        }
+
+        // Unit arrays cleanup
         for(let i = 0; i < this.units.length; i++) {
             const unit = this.units[i];
 
@@ -398,39 +414,22 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 // Remove this unit from the game's units array
                 this.units.splice(i, 1);
                 i--;
+                continue;
             }
 
             // Make sure player units arrays are correct
+            // I know this hurts to read...
             for(let player of this.players) {
-                if(unit.owner) {
-                    // Just to make sure
-                    unit.targetPort = null;
-                    unit.path = [];
+                let found = player.units.find(u => u.id === unit.id);
 
-                    // Owned units should in a player array
-                    if(!player.units.find(u => u.id === unit.id)) {
-                        player.units.push(unit);
-                    }
-                }
-                else {
-                    // Unowned units should not be in a player array
+                if(unit.owner !== player && found) {
+                    // Remove the unit from the player's unit array if it's not their unit
                     player.units.removeElement(unit);
                 }
-            }
-        }
-
-        // Remove all invalid ports
-        for(let i = 0; i < this.ports.length; i++) {
-            const port = this.ports[i];
-            if(!port.tile) {
-                if(port.owner) {
-                    // Remove this port from its owner's ports array
-                    port.owner.ports.removeElement(port);
+                else if(unit.owner === player && !found) {
+                    // Add the unit to the player's unit array if it is their unit
+                    player.units.push(unit);
                 }
-
-                // Remove this port from the game's ports array
-                this.ports.splice(i, 1);
-                i--;
             }
         }
     },
@@ -447,11 +446,24 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             if(!unit.owner && unit.targetPort) {
                 // Check current path
                 let pathValid = true;
-                if(unit.path) {
-                    // Make sure each tile along this path is open
-                    for(let tile of unit.path) {
-                        if(tile.unit || (tile.port && tile.port.owner)) {
-                            pathValid = false;
+                if(unit.path && unit.path.length > 0) {
+                    if(unit.path[0].unit) {
+                        pathValid = false;
+                    }
+                    else {
+                        // Make sure each tile along this path is open
+                        for(let tile of unit.path) {
+                            // Owned ports are obstacles
+                            if(tile.port && tile.port.owner) {
+                                pathValid = false;
+                            }
+
+                            if(tile.unit) {
+                                // Owned units and units not in ports are obstacles
+                                if(tile.unit.owner || !tile.port) {
+                                    pathValid = false;
+                                }
+                            }
                         }
                     }
                 }
@@ -478,7 +490,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         closed[cur.tile.id] = true;
 
                         // Check if at the target
-                        if(cur.tile === unit.targetPort) {
+                        if(cur.tile === unit.targetPort.tile) {
                             while(cur) {
                                 if(cur.tile !== unit.tile) {
                                     unit.path.unshift(cur.tile);
@@ -499,6 +511,21 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         let unsorted = false;
                         for(let neighbor of neighbors) {
                             if(neighbor) {
+                                // Don't path through land
+                                if(neighbor.type === "land") {
+                                    continue;
+                                }
+
+                                // Don't path through player ports
+                                if(neighbor.port && neighbor.port.owner) {
+                                    continue;
+                                }
+
+                                // Don't path through friendly units unless it's a port
+                                if(neighbor.unit && !neighbor.port) {
+                                    continue;
+                                }
+
                                 open.push({
                                     tile: neighbor,
                                     g: cur.g + 1,
@@ -537,10 +564,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 // Move the merchant
                 if(unit.path.length > 0) {
-                    const tile = unit.path.shift();
-                    unit.tile.unit = null;
-                    unit.tile = tile;
-                    tile.unit = unit;
+                    // Check if it's at its destination
+                    if(unit.path[0].port === unit.targetPort) {
+                        // Mark it as dead
+                        unit.tile.unit = null;
+                        unit.tile = null;
+                    }
+                    else {
+                        const tile = unit.path.shift();
+                        unit.tile.unit = null;
+                        unit.tile = tile;
+                        tile.unit = unit;
+                    }
                 }
             }
         }
@@ -549,7 +584,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateMerchants: function() {
         // Create units as needed
         let merchantPorts = this.ports.filter(p => !p.owner);
-        for(let port of merchantPorts) {
+        for(let i = 0; i < merchantPorts.length; i++) {
+            const port = merchantPorts[i];
+
             // Skip player-owned ports
             if(port.owner) {
                 continue;
@@ -566,7 +603,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 port.gold -= this.merchantCrewCost * crew;
 
                 // Pick a random port to move to
-                let targetPort = merchantPorts[Math.floor(Math.random() * merchantPorts.length)];
+                let targetPorts = merchantPorts.filter(p => p !== port);
+                let targetPort = Math.floor(Math.random() * (targetPorts.length));
 
                 // Spawn the unit
                 let unit = this.create("Unit", {
@@ -575,7 +613,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     crew: crew,
                     shipHealth: this.shipHealth,
                     gold: port.investment,
-                    targetPort: targetPort,
+                    targetPort: targetPorts[targetPort],
                 });
 
                 unit.tile.unit = unit;
@@ -585,7 +623,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     },
 
     checkForWinner: function(secondaryReason) {
-        // No win conditions before the max turns are reached
+        // End the game if either player is out of units and can't afford any
+
+        // Max turns reached
         if(secondaryReason) {
             // Check who has the most infamy
 
