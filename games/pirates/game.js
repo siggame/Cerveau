@@ -260,8 +260,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Mapgen variables
         this.startingGold = data.startingGold || 3000;
         this.merchantStartingGold = data.merchantStartingGold || 0;
-        this.merchantStartingInvestment = data.merchantStartingInvestment || 1000;
-        this.merchantInvestmentRate = data.merchantStartingInvestment || 0.1;
+        this.merchantStartingInvestment = data.merchantStartingInvestment || 500;
+        this.merchantInvestmentRate = data.merchantStartingInvestment || 0.05;
         this.merchantShipCost = data.merchantShipCost || 1000;
         this.merchantCrewCost = data.merchantCrewCost || 100;
 
@@ -276,7 +276,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     aliases: [
         //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-##-Pirates",
+        "MegaMinerAI-21-Pirates",
         //<<-- /Creer-Merge: aliases -->>
     ],
 
@@ -296,7 +296,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         TiledGame._initMap.call(this);
 
         // Generate the map
-        this.generateIslands();
+        this.generateMap();
 
         // Give players their starting gold
         for(let player of this.players) {
@@ -447,9 +447,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 // Check current path
                 let pathValid = true;
                 if(unit.path && unit.path.length > 0) {
-                    if(unit.path[0].unit) {
+                    const next = unit.path[0];
+                    if(next.unit || (next.port && next.owner)) {
                         pathValid = false;
-                    }
+                    }/*
                     else {
                         // Make sure each tile along this path is open
                         for(let tile of unit.path) {
@@ -465,7 +466,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
                 else {
                     pathValid = false;
@@ -503,32 +504,32 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                         // Add neighbors
                         let neighbors = [];
-                        neighbors.push(cur.tile.tileNorth);
-                        neighbors.push(cur.tile.tileEast);
-                        neighbors.push(cur.tile.tileSouth);
-                        neighbors.push(cur.tile.tileWest);
+                        neighbors.push({tile: cur.tile.tileNorth, cost: 1});
+                        neighbors.push({tile: cur.tile.tileEast, cost: 1 + 1 / (10 * cur.g)});
+                        neighbors.push({tile: cur.tile.tileSouth, cost: 1});
+                        neighbors.push({tile: cur.tile.tileWest, cost: 1 + 1 / (10 * cur.g)});
 
                         let unsorted = false;
                         for(let neighbor of neighbors) {
-                            if(neighbor) {
+                            if(neighbor.tile) {
                                 // Don't path through land
-                                if(neighbor.type === "land") {
+                                if(neighbor.tile.type === "land") {
                                     continue;
                                 }
 
                                 // Don't path through player ports
-                                if(neighbor.port && neighbor.port.owner) {
+                                if(neighbor.tile.port && neighbor.tile.port.owner) {
                                     continue;
                                 }
 
                                 // Don't path through friendly units unless it's a port
-                                if(neighbor.unit && !neighbor.port) {
+                                if(neighbor.tile.unit && !neighbor.tile.port) {
                                     continue;
                                 }
 
                                 open.push({
-                                    tile: neighbor,
-                                    g: cur.g + 1,
+                                    tile: neighbor.tile,
+                                    g: cur.g + neighbor.cost,
                                     parent: cur,
                                 });
                                 unsorted = true;
@@ -602,9 +603,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 let crew = Math.floor(port.gold / this.merchantCrewCost);
                 port.gold -= this.merchantCrewCost * crew;
 
-                // Pick a random port to move to
-                let targetPorts = merchantPorts.filter(p => p !== port);
-                let targetPort = Math.floor(Math.random() * (targetPorts.length));
+                // Get the opposite port of this one
+                let targetPort = this.getTile(this.mapWidth - port.tile.x - 1, this.mapHeight - port.tile.y - 1).port;
 
                 // Spawn the unit
                 let unit = this.create("Unit", {
@@ -612,8 +612,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     tile: port.tile,
                     crew: crew,
                     shipHealth: this.shipHealth,
-                    gold: port.investment,
-                    targetPort: targetPorts[targetPort],
+                    gold: port.investment * port.investmentRate * (crew + 1),
+                    targetPort: targetPort,
                 });
 
                 unit.tile.unit = unit;
@@ -641,74 +641,41 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    generateIslands: function() {
-        // Flood the map
+    generateMap: function() {
+        // Fill the map
         for(let tile of this.tiles) {
             tile.type = "water";
         }
 
         // Generate some metaballs for the islands
-        let balls = [];
-        const minRadius = 0.1;
-        const maxRadius = 1.0;
-        const maxOffset = 5.0;
-        const additionalBalls = 20;
-        const gooeyness = 1.0;
-        const threshold = 3.5;
-        const radiusRange = maxRadius - minRadius;
+        let ballGens = [this.islandBalls, this.cornerBalls, this.riverBalls];
 
-        // Initial ball (top island)
-        let islandX = Math.floor(this.mapWidth / 4) + 0.5;
-        let islandY = Math.floor(this.mapHeight / 4) + 0.5;
-        balls.push({
-            x: islandX,
-            y: islandY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls (top island)
-        for(let i = 0; i < additionalBalls; i++) {
-            balls.push({
-                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY - Math.random() * maxOffset,
-                r: Math.random() * radiusRange + minRadius,
-            });
-        }
-
-        // Initial ball (bottom island)
-        islandY = Math.floor(3 * this.mapHeight / 4) + 0.5;
-        balls.push({
-            x: islandX,
-            y: islandY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls (bottom island)
-        for(let i = 0; i < additionalBalls; i++) {
-            balls.push({
-                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
-                y: islandY - Math.random() * maxOffset,
-                r: Math.random() * radiusRange + minRadius,
-            });
-        }
+        // Pick a metaball generator
+        let ballInfo = this.riverBalls();
 
         // Generate the islands from the metaballs
         for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
                 let tile = this.getTile(x, y);
                 let energy = 0;
-                for(const ball of balls) {
+                for(const ball of ballInfo.balls) {
                     let r = ball.r;
                     let dist = Math.sqrt(Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2));
-                    let d = Math.max(0.0001, Math.pow(dist, gooeyness)); // Can't be 0
+                    let d = Math.max(0.0001, Math.pow(dist, ballInfo.gooeyness)); // Can't be 0
                     energy += r / d;
                 }
 
-                if(energy > threshold) {
+                if(energy > ballInfo.threshold) {
                     tile.type = "land";
+                }
+                else {
+                    tile.type = "water";
                 }
             }
         }
+
+        // Make sure there's only one main body of water, no extra smaller ones
+        this.fillLakes();
 
         // Find all possible port locations
         let portTiles = [];
@@ -773,7 +740,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
 
         // Mirror the map
-        for(let x = 0; x < Math.floor(this.mapWidth / 2); x++) {
+        for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
                 let orig = this.getTile(x, y);
                 let target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
@@ -799,6 +766,214 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 }
             }
         }
+    },
+
+    fillLakes: function() {
+        // Find the largest body of water and fill the rest
+        let checked = {};
+        let bodies = [];
+        for(let x = 0; x < this.mapWidth / 2; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                const tile = this.getTile(x, y);
+
+                // Only looking for bodies of water
+                if(tile.type !== "water") {
+                    continue;
+                }
+
+                // Don't check the same body twice
+                if(checked[tile.id]) {
+                    continue;
+                }
+
+                // Use BFS(ish) to find all the connected water
+                let body = [];
+                let open = [tile];
+                while(open.length > 0) {
+                    const cur = open.shift();
+
+                    // Only add water to the body
+                    if(cur.type !== "water") {
+                        continue;
+                    }
+
+                    // Only check for bodies on half of the map
+                    if(cur.x >= this.mapWidth / 2) {
+                        continue;
+                    }
+
+                    // Make sure this tile only gets checked once
+                    if(checked[cur.id]) {
+                        continue;
+                    }
+                    checked[cur.id] = true;
+
+                    // Add it to the current body of water
+                    body.push(cur);
+
+                    // Add its neighbors to get checked
+                    let neighbors = [cur.tileNorth, cur.tileEast, cur.tileSouth, cur.tileWest];
+                    for(let neighbor of neighbors) {
+                        if(neighbor) {
+                            open.push(neighbor);
+                        }
+                    }
+                }
+
+                // Add the current body to the list of bodies
+                bodies.push(body);
+            }
+        }
+
+        // Sort bodies by size (largest first), then remove the first element
+        bodies.sort((a, b) => b.length - a.length);
+        bodies.shift();
+
+        // Fill the rest of the bodies
+        for(let body of bodies) {
+            for(let tile of body) {
+                tile.type = "land";
+            }
+        }
+    },
+
+    islandBalls: function() {
+        let balls = [];
+        const minRadius = 0.5;
+        const maxRadius = 1.5;
+        const maxOffset = 10.0;
+        const additionalBalls = 20;
+        const gooeyness = 1.0;
+        const threshold = 4.5;
+        const radiusRange = maxRadius - minRadius;
+
+        // Initial ball (top island)
+        let islandX = this.mapWidth * 0.25 + 0.5;
+        let islandY = this.mapHeight * 0.25 + 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (top island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        // Initial ball (bottom island)
+        islandY = this.mapHeight * 0.75 + 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (bottom island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY - Math.random() * maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        return {
+            balls: balls,
+            gooeyness: gooeyness,
+            threshold: threshold,
+        };
+    },
+
+    riverBalls: function() {
+        let balls = [];
+        const minRadius = 1.5;
+        const maxRadius = 2.0;
+        const maxOffset = 5.0;
+        const additionalBalls = 20;
+        const gooeyness = 1.0;
+        const threshold = 3.5;
+        const radiusRange = maxRadius - minRadius;
+
+        // Initial ball
+        let islandX = 0.5;
+        let islandY = Math.random() < 0.5 ? 0.5 : (this.mapHeight - 0.5);
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX,
+                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        return {
+            balls: balls,
+            gooeyness: gooeyness,
+            threshold: threshold,
+        };
+    },
+
+    cornerBalls: function() {
+        let balls = [];
+        const minRadius = 0.75;
+        const maxRadius = 1.25;
+        const maxOffset = 10.0;
+        const additionalBalls = 20;
+        const gooeyness = 1.0;
+        const threshold = 4.0;
+        const radiusRange = maxRadius - minRadius;
+
+        // Initial ball (top island)
+        let islandX = 0.5;
+        let islandY = 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (top island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY + Math.random() * maxOffset * 2 - maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        // Initial ball (bottom island)
+        islandY = this.mapHeight - 0.5;
+        balls.push({
+            x: islandX,
+            y: islandY,
+            r: Math.random() * radiusRange + minRadius,
+        });
+
+        // Extra balls (bottom island)
+        for(let i = 0; i < additionalBalls; i++) {
+            balls.push({
+                x: islandX + Math.random() * maxOffset * 2 - maxOffset,
+                y: islandY - Math.random() * maxOffset,
+                r: Math.random() * radiusRange + minRadius,
+            });
+        }
+
+        return {
+            balls: balls,
+            gooeyness: gooeyness,
+            threshold: threshold,
+        };
     },
 
     //<<-- /Creer-Merge: added-functions -->>
