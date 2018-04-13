@@ -117,7 +117,22 @@ let Player = Class(GameObject, {
 
     //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    netWorth: function() {
+        let worth = this.gold;
+        for(let unit of this.units) {
+            // Ignore dead units
+            if(!unit.tile) {
+                continue;
+            }
+
+            // Calculate net worth of unit
+            if(unit.shipHealth > 0) {
+                worth += this.game.shipCost;
+            }
+            worth += unit.crew * this.game.crewCost;
+        }
+        return worth;
+    },
 
     //<<-- /Creer-Merge: added-functions -->>
 

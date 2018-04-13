@@ -42,9 +42,9 @@
             "maxTurns",
             "merchantGoldRate",
             "merchantInterestRate",
-            "merchantPorts",
             "minInterestDistance",
             "players",
+            "ports",
             "restRange",
             "session",
             "shipCost",
@@ -220,21 +220,6 @@
                     "valueType": null
                 }
             },
-            "merchantPorts": {
-                "default": null,
-                "description": "Every Port in the game. Merchant ports have owner set to null.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "list",
-                    "valueType": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Port",
-                        "valueType": null
-                    }
-                }
-            },
             "minInterestDistance": {
                 "default": null,
                 "description": "The Euclidean distance buried gold must be from the Player's Port to accumulate interest.",
@@ -257,6 +242,21 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
+                        "valueType": null
+                    }
+                }
+            },
+            "ports": {
+                "default": null,
+                "description": "Every Port in the game. Merchant ports have owner set to null.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
                         "valueType": null
                     }
                 }

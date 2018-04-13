@@ -82,11 +82,6 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    merchantPorts: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
-        defaultValue: [],
-    },
-
     minInterestDistance: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
@@ -94,6 +89,11 @@ classes.Game._deltaMergeableProperties = {
 
     players: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
+        defaultValue: [],
+    },
+
+    ports: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
         defaultValue: [],
     },
 

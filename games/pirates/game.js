@@ -130,13 +130,6 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.merchantInterestRate = this.merchantInterestRate || 0;
 
         /**
-         * Every Port in the game. Merchant ports have owner set to null.
-         *
-         * @type {Array.<Port>}
-         */
-        this.merchantPorts = this.merchantPorts || [];
-
-        /**
          * The Euclidean distance buried gold must be from the Player's Port to accumulate interest.
          *
          * @type {number}
@@ -149,6 +142,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
          * @type {Array.<Player>}
          */
         this.players = this.players || [];
+
+        /**
+         * Every Port in the game. Merchant ports have owner set to null.
+         *
+         * @type {Array.<Port>}
+         */
+        this.ports = this.ports || [];
 
         /**
          * How far a Unit can be from a Port to rest. Range is circular.
@@ -236,15 +236,14 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         this.merchantGoldRate = data.merchantGoldRate || 100;
         this.buryInterestRate = data.buryInterestRate || 1.1;
+        this.merchantInvestmentRate = data.merchantStartingInvestment || 1.1;
         this.minInterestDistance = data.minInterestDistance || 10;
 
         // Not visible to players
         this.merchantGold = this.shipCost;
         this.merchantBaseCrew = 3;
-
-        // Mapgen variables
+        this.merchantCost = this.shipCost * 4;
         this.startingGold = data.startingGold || 2400;
-        this.merchantInvestmentRate = data.merchantStartingInvestment || 1.1;
 
         // For units and structures created during a turn
         this.newUnits = [];
@@ -327,7 +326,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.updateArrays();
         this.updateUnits();
         this.updateMerchants();
-        this.updateBuried();
+        this.updateOtherStuff();
 
         if(this.checkForWinner(false)) {
             // If somebody won, don't continue to the next turn
@@ -543,9 +542,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             port.gold += this.merchantGoldRate;
 
             // Try to spawn a ship
-            if(!port.tile.unit && port.gold >= this.shipCost) {
+            if(!port.tile.unit && port.gold >= this.merchantCost) {
                 // Deduct gold
-                port.gold -= this.shipCost;
+                port.gold -= this.merchantCost;
 
                 // Calculate crew and gold
                 let gold = this.merchantGold + port.investment * this.merchantInterestRate;
@@ -571,22 +570,59 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    updateBuried: function() {
+    updateOtherStuff: function() {
         for(let tile of this.tiles) {
             tile.gold *= this.buryInterestRate;
         }
+
+        this.currentPlayer.port.gold = this.shipCost;
     },
 
     checkForWinner: function(secondaryReason) {
-        // End the game if either player is out of units and can't afford any
+        let players = this.players.slice();
+
+        // Primary win conditions: destroy your enemy's units and rob them of enough of their gold
+        const loseReasons = players.reduce(((loseReasons, p) => {
+            if(p.gold < this.shipCost && p.units.length === 0) {
+                loseReasons[p.id] = "Crew be in Davy Jones' locker, and can't build a ship";
+            }
+            return loseReasons;
+        }).bind(this), {});
+
+        const losers = Object.keys(loseReasons);
+        if(losers.length === players.length) {
+            // Both players lost
+            secondaryReason = "Ye killed each other";
+        }
+        else if(losers.length > 0) {
+            // One player lost
+            const loser = players.find(p => p.id === losers[0]);
+            const reason = loseReasons[loser.id];
+            this.declareWinner(loser.opponent, `Opponent lost: ${reason}`);
+            this.declareLoser(loser, reason);
+            return true;
+        }
 
         // Max turns reached
         if(secondaryReason) {
-            // Check who has the most infamy
+            // Secondary win conditions
+            // 1. Most infamy
+            players.sort((a, b) => b.infamy - a.infamy);
+            if(players[0].infamy > players[1].infamy) {
+                this.declareWinner(players[0], `${secondaryReason}: Had the most infamy`);
+                this.declareLoser(players[1], `${secondaryReason}: Had the least infamy`);
+                return true;
+            }
 
-            // Check who has the most net worth
+            // 2. Most net worth
+            players.sort((a, b) => b.netWorth() - a.netWorth());
+            if(players[0].netWorth() > players[1].netWorth()) {
+                this.declareWinner(players[0], `${secondaryReason}: Had the highest net worth`);
+                this.declareLoser(players[1], `${secondaryReason}: Had the lowest net worth`);
+                return true;
+            }
 
-            // Coin toss
+            // 3. Coin toss
             this._endGameViaCoinFlip(secondaryReason);
             return true;
         }
@@ -597,18 +633,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Make sure there's enough tiles for all the ports to spawn on
         while(portTiles.length < 3) {
-        // Fill the map
+            // Fill the map
             for(let tile of this.tiles) {
                 tile.type = "water";
             }
 
-        // Generate some metaballs for the islands
+            // Generate some metaballs for the islands
             const ballGens = [this.cornerBalls, this.riverBalls, this.islandBalls];
 
-        // Pick a metaball generator
+            // Pick a metaball generator
             let ballInfo = ballGens[Math.floor(Math.random() * ballGens.length)].call(this);
 
-        // Generate the islands from the metaballs
+            // Generate the islands from the metaballs
             let q = ballInfo.quads ? 2 : 1;
             for(let x = 0; x < this.mapWidth / 2; x++) {
                 for(let y = 0; y < this.mapHeight / q; y++) {
@@ -621,16 +657,22 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                         energy += r / d;
                     }
 
-                    if(energy > ballInfo.threshold) {
-                        tile.type = ballInfo.inverted ? "water" : "land";
+                    if(energy >= ballInfo.threshold) {
+                        tile.type = "land";
+                        if(energy >= ballInfo.grassThreshold) {
+                            tile.decoration = true;
+                        }
                     }
                     else {
-                        tile.type = ballInfo.inverted ? "land" : "water";
+                        tile.type = "water";
+                        if(energy <= ballInfo.seaThreshold) {
+                            tile.decoration = true;
+                        }
                     }
                 }
             }
 
-        // If the generator only generates one corner of the map, mirror vertically
+            // If the generator only generates one corner of the map, mirror vertically
             if(ballInfo.quads) {
                 for(let x = 0; x < this.mapWidth / 2; x++) {
                     for(let y = 0; y < this.mapHeight / 2; y++) {
@@ -641,17 +683,17 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 }
             }
 
-        // Make sure there's only one main body of water, no extra smaller ones
+            // Make sure there's only one main body of water, no extra smaller ones
             this.fillLakes();
 
-        // Find all possible port locations
+            // Find all possible port locations
             portTiles = this.tiles.filter(t => {
-            // Check type
+                // Check type
                 if(t.type !== "water") {
                     return false;
                 }
 
-            // Check neighbors
+                // Check neighbors
                 if(t.tileNorth && t.tileNorth.type === "land") {
                     return true;
                 }
@@ -690,7 +732,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         // Add the port to the game
         port.tile.port = port;
         portTiles.splice(selected, 1);
-        this.newPorts.push(port);
+        this.ports.push(port);
 
         // Mirror the map
         for(let x = 0; x < this.mapWidth / 2; x++) {
@@ -799,6 +841,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         const additionalBalls = 20;
         const gooeyness = 1.0;
         const threshold = 3.5;
+        const grassThreshold = 4.25;
+        const seaThreshold = 2.0;
         const radiusRange = maxRadius - minRadius;
 
         // Generate balls
@@ -815,6 +859,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            grassThreshold: grassThreshold,
+            seaThreshold: seaThreshold,
             quads: false,
         };
     },
@@ -827,6 +873,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         const additionalBalls = 8;
         const gooeyness = 0.95;
         const threshold = 2.0;
+        const grassThreshold = 2.4;
+        const seaThreshold = 1.5;
         const radiusRange = maxRadius - minRadius;
 
         // Initial ball
@@ -851,6 +899,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            grassThreshold: grassThreshold,
+            seaThreshold: seaThreshold,
             quads: false,
         };
     },
@@ -863,6 +913,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         const additionalBalls = 20;
         const gooeyness = 1.0;
         const threshold = 4.0;
+        const grassThreshold = 5.0;
+        const seaThreshold = 2.75;
         const radiusRange = maxRadius - minRadius;
 
         // Initial ball (top island)
@@ -904,48 +956,9 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
             balls: balls,
             gooeyness: gooeyness,
             threshold: threshold,
+            grassThreshold: grassThreshold,
+            seaThreshold: seaThreshold,
             quads: false,
-        };
-    },
-
-    lakeBalls: function() {
-        // This is too inconsistent, it needs to always be one huge lake instead
-
-        let balls = [];
-        const minRadius = 1.75;
-        const maxRadius = 1.75;
-        const minOffset = Math.min(this.mapWidth, this.mapHeight) * 0.25;
-        const maxOffset = Math.min(this.mapWidth, this.mapHeight) * 0.75;
-        const offsetRange = maxOffset - minOffset;
-        const additionalBalls = 10;
-        const gooeyness = 1.0;
-        const threshold = 1.0;
-        const radiusRange = maxRadius - minRadius;
-
-        // Initial ball (center)
-        let lakeX = this.mapWidth / 2 + 0.5;
-        let lakeY = this.mapHeight / 2 + 0.5;
-        balls.push({
-            x: lakeX,
-            y: lakeY,
-            r: Math.random() * radiusRange + minRadius,
-        });
-
-        // Extra balls
-        for(let i = 0; i < additionalBalls; i++) {
-            balls.push({
-                x: lakeX + Math.random() * offsetRange * 2 - offsetRange + minOffset,
-                y: lakeY + Math.random() * offsetRange * 2 - offsetRange + minOffset,
-                r: Math.random() * radiusRange + minRadius,
-            });
-        }
-
-        return {
-            balls: balls,
-            gooeyness: gooeyness,
-            threshold: threshold,
-            quads: true,
-            inverted: true,
         };
     },
 

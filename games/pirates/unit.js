@@ -261,8 +261,8 @@ let Unit = Class(GameObject, {
         let factor = 1;
         if(!merchant) {
             // Calculate each player's net worth
-            let allyWorth = player.units.reduce(this.netWorthReducer.bind(this), 0) + player.gold;
-            let opponentWorth = player.opponent.units.reduce(this.netWorthReducer.bind(this), 0) + player.opponent.gold;
+            let allyWorth = player.netWorth() + player.gold;
+            let opponentWorth = player.opponent.netWorth() + player.opponent.gold;
             opponentWorth += deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
 
             if(allyWorth > opponentWorth) {
@@ -374,7 +374,7 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        const tile = player.startingPort.tile;
+        const tile = player.port.tile;
         if(this.tile !== tile && this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
             return `Arr, ${this} has to deposit yer booty in yer home port, matey!`;
         }
@@ -577,18 +577,9 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        // Search for a nearby port
-        const found = this.owner.ports.find(port => {
-            // Make sure port isn't destroyed
-            if(!port.tile) {
-                return false;
-            }
-
-            // Check if it's in range
-            const radius = this.game.restRange;
-            return Math.pow(this.tile.x - port.tile.x, 2) + Math.pow(this.tile.y - port.tile.y, 2) <= radius * radius;
-        }, this);
-        if(!found) {
+        // Check if it's in range
+        const radius = this.game.restRange;
+        if(Math.pow(this.tile.x - player.port.tile.x, 2) + Math.pow(this.tile.y - player.port.tile.y, 2) > radius * radius) {
             return `${this} has no nearby port to rest at. No home tavern means no free rum!`;
         }
 
@@ -768,7 +759,7 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        if(this.tile !== player.startingPort) {
+        if(this.tile !== player.port) {
             return `Arr, ${this} can't be takin' gold from anywhere but yer starting port!`;
         }
 
@@ -842,8 +833,9 @@ let Unit = Class(GameObject, {
             other.shipHealth = 1;
         }
 
+        this.tile.unit = null;
+        other.tile.unit = this;
         this.tile = other.tile;
-        this.tile.unit = this;
         other.tile = null;
 
         this.crew += other.crew;
@@ -852,20 +844,6 @@ let Unit = Class(GameObject, {
         this.gold += other.gold;
         this.acted &= other.acted;
         this.moves = Math.min(this.moves, other.moves);
-    },
-
-    netWorthReducer: function(worth, unit) {
-        // Ignore dead units
-        if(!unit.tile) {
-            return worth;
-        }
-
-        // Add this unit's net worth
-        worth += unit.crew * this.game.crewCost;
-        if(unit.shipHealth > 0) {
-            worth += this.game.shipCost;
-        }
-        return worth;
     },
 
     //<<-- /Creer-Merge: added-functions -->>
