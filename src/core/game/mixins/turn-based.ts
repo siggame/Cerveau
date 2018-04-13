@@ -153,7 +153,16 @@ export function mixTurnBased<
          * checked to find the winner/looser.
          */
         protected maxTurnsReached(): void {
+            this.secondaryGameOver(`Max turns reached (${this.game.maxTurns})`);
             this.endGame();
+        }
+
+        /**
+         * Intended to be inherited with secondary win condition checking.
+         * @param reason The reason why a secondary victory condition is being checked
+         */
+        protected secondaryGameOver(reason: string): void {
+            this.makePlayerWinViaCoinFlip(`${reason}, Identical AIs played the game`);
         }
     }
 

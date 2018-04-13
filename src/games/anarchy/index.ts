@@ -94,8 +94,8 @@ export * from "./ai";
 import { Building, IBuildingConstructorArgs } from "./building";
 import { FireDepartment, IFireDepartmentConstructorArgs } from "./fire-department";
 import { Forecast, IForecastConstructorArgs } from "./forecast";
-import { Game } from "./game";
-import { GameManager } from "./game-manager";
+import { AnarchyGame } from "./game";
+import { AnarchyGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { IPoliceDepartmentConstructorArgs, PoliceDepartment } from "./police-department";
@@ -133,8 +133,8 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
 
 export const Namespace = makeNamespace({
     AI,
-    Game,
-    GameManager,
+    Game: AnarchyGame,
+    GameManager: AnarchyGameManager,
     GameObjectFactory: AnarchyGameObjectFactory,
     GameSettingsManager: AnarchyGameSettingsManager,
     Player,

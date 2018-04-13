@@ -1,11 +1,11 @@
-import { AnarchyGameObjectFactory, BaseClasses, Game } from "./";
+import { AnarchyGame, AnarchyGameObjectFactory, BaseClasses } from "./";
 
 // creer merge
 import { Building, FireDepartment, IBuildingConstructorArgs,
     Player, PoliceDepartment, Warehouse, WeatherStation } from "./";
 // /creer merge
 
-export class GameManager extends BaseClasses.GameManager {
+export class AnarchyGameManager extends BaseClasses.GameManager {
     public static get gameName(): string {
         return "Anarchy";
     }
@@ -22,7 +22,7 @@ export class GameManager extends BaseClasses.GameManager {
         ];
     }
 
-    public readonly game!: Game;
+    public readonly game!: AnarchyGame;
     public readonly create!: AnarchyGameObjectFactory;
 
     public createBuilding(
@@ -155,20 +155,15 @@ export class GameManager extends BaseClasses.GameManager {
         super.nextTurn();
     }
 
-    protected maxTurnsReached(): void {
-        this.secondaryGameOver(`Max turns reached (${this.game.maxTurns}).`);
-        super.maxTurnsReached();
-    }
-
-    private secondaryGameOver(reason: string): void {
+    protected secondaryGameOver(reason: string): void {
         // 1. Check if one player's HQ has more heath than the other
         const headquarters = this.game.players
             .map((p) => p.headquarters!)
             .sort((a, b) => b.health - a.health);
 
         if (headquarters[0].health !== headquarters[1].health) {
-            this.declareWinner("Your headquarters had the most health remaining.", headquarters[0].owner);
-            this.declareLoser("Your headquarters had less health remaining than another player.",
+            this.declareWinner(`${reason} – Your headquarters had the most health remaining.`, headquarters[0].owner);
+            this.declareLoser(`${reason} – Your headquarters had less health remaining than another player.`,
                               headquarters[1].owner);
             return;
         }
@@ -181,8 +176,8 @@ export class GameManager extends BaseClasses.GameManager {
         if (buildingsAlive[0].length !== buildingsAlive[1].length) {
             // store the winner as the loser could be lost in this scope if their array is empty
             const winner = buildingsAlive[0][0].owner;
-            this.declareWinner("You had the most buildings not burned down.", winner);
-            this.declareLoser("You had more buildings burned down than another player.", winner.opponent);
+            this.declareWinner(`${reason} – You had the most buildings not burned down.`, winner);
+            this.declareLoser(`${reason} – You had more buildings burned down than another player.`, winner.opponent);
             return;
         }
 
@@ -195,14 +190,14 @@ export class GameManager extends BaseClasses.GameManager {
                 ? 0
                 : 1
             ];
-            this.declareWinner("You had the highest health sum among your Buildings.", winner);
-            this.declareLoser("You had a lower health sum than the other player.", winner.opponent);
+            this.declareWinner(`${reason} – You had the highest health sum among your Buildings.`, winner);
+            this.declareLoser(`${reason} – You had a lower health sum than the other player.`, winner.opponent);
             return;
         }
 
         // else all their buildings are identical,
         // so they are probably the same AIs, so just random chance
-        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
+        super.secondaryGameOver(reason);
     }
 
     // TODO: add creer merge fields

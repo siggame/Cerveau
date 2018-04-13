@@ -1,7 +1,7 @@
 // Game: Two player grid based game where each player tries to burn down the other player's buildings. Let it burn.
 
 import { IBaseGameRequiredData } from "~/core/game";
-import { BaseClasses, Building, Forecast, GameManager, GameObject, Player } from "./";
+import { AnarchyGameManager, BaseClasses, Building, Forecast, GameObject, Player } from "./";
 import { AnarchyGameSettingsManager } from "./game-settings";
 
 // <<-- Creer-Merge: requires -->>
@@ -31,9 +31,9 @@ function keyToPoint(str: string): IPoint {
  * Two player grid based game where each player tries to burn down the other
  * player's buildings. Let it burn.
  */
-export class Game extends BaseClasses.Game {
+export class AnarchyGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it */
-    public readonly manager!: GameManager;
+    public readonly manager!: AnarchyGameManager;
 
     /**
      * How many bribes players get at the beginning of their turn, not counting their burned down Buildings.
