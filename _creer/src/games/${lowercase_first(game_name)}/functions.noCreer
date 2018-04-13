@@ -1,63 +1,183 @@
 <%
+from textwrap import TextWrapper
+import operator
+
 if not 'cerveau' in shared:
     shared['cerveau'] = {}
+    shared['cerveau']['TextWrapper'] = TextWrapper
 
-    def cerveau_default(type_obj, default=None):
+    """
+    def cerveau_default(type_obj):
         base_type = type_obj['name']
-        if default == None:
-            if base_type == "string":
-                return '""'
-            elif base_type == "dictionary":
-                return '{}'
-            elif base_type == "list":
-                return '[]'
-            elif base_type == "int" or base_type == "float":
-                return '0'
-            elif base_type == "boolean":
-                return 'false'
-            else:
-                return "null"
+        if base_type == "string":
+            return "''"
+        elif base_type == "dictionary":
+            return '{}'
+        elif base_type == "list":
+            return '[]'
+        elif base_type == "int" or base_type == "float":
+            return '0'
+        elif base_type == "boolean":
+            return 'false'
         else:
-            if base_type == "string":
-                return '"' + default + '"'
-            elif base_type == "boolean":
-                return str(default).lower()
-            else:
-                return default
+            return "undefined"
     shared['cerveau']['default'] = cerveau_default
+    """
 
-
-    def cerveau_type(type_obj):
+    def cerveau_type(type_obj, allow_undefined = True):
         base_type = type_obj['name']
 
         if base_type == "dictionary":
-            return "Object.<" + cerveau_type(type_obj['keyType']) + ", " + cerveau_type(type_obj['valueType']) + ">"
+            return "{[id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + "}"
         elif base_type == "list":
-            return "Array.<" + cerveau_type(type_obj['valueType']) + ">"
+            ret = cerveau_type(type_obj['valueType'], False)
+            if ' ' in ret:
+                ret = '(' + ret + ')'
+            return ret + "[]"
         elif base_type == "int" or base_type == "float":
             return "number"
-        else:
+        elif type_obj['is_game_object']:
+            ret = base_type
+            if allow_undefined:
+                ret += " | undefined"
+            return ret
+        else: # string, boolean, or GameObject(s)
             return base_type
     shared['cerveau']['type'] = cerveau_type
 
-
-    def cerveau_cast(type_obj):
+    def cerveau_value(type_obj, default):
         base_type = type_obj['name']
-
         if base_type == "string":
-            return "serializer.defaultString"
-        elif base_type == "int":
-            return "serializer.defaultInteger"
-        elif base_type == "float":
-            return "serializer.defaultNumber"
+            return '"' + default + '"'
         elif base_type == "boolean":
-            return "serializer.defaultBoolean"
-        elif base_type == "list":
-            return "serializer.defaultArray"
-        elif base_type == "dictionary":
-            return "serializer.defaultObject"
+            return str(default).lower()
+        elif base_type == "int" or base_type == "float":
+            return str(default)
         else:
-            return "serializer.defaultGameObject"
-    shared['cerveau']['cast'] = cerveau_cast
+            return "undefined"
+    shared['cerveau']['value'] = cerveau_value
 
+    def cerveau_properties(obj):
+        attrs = dict(obj['attributes'], **obj['inheritedAttributes']) # merge the two attributes
+
+        properties = []
+        for attr_name in sort_dict_keys(attrs):
+            attr = attrs[attr_name]
+            properties.append({
+                'name': attr_name,
+                'type': cerveau_type(attr['type']),
+                'description': attr["description"]
+            })
+        return properties
+    shared['cerveau']['properties'] = cerveau_properties
+
+    def cerveau_block_comment(prefix, doc):
+        wrapper = TextWrapper(
+            initial_indent=prefix+' * ',
+            subsequent_indent=prefix+' * ',
+            width=80,
+        )
+        if isinstance(doc, str):
+            doc = {'description': doc}
+
+        description = doc['description']
+        lines = wrapper.wrap(doc['description'])
+
+        if 'arguments' in doc and doc['arguments']:
+            for arg in doc['arguments']:
+                lines += wrapper.wrap('@param ' + arg['name'] + ' ' + arg['description'])
+        if 'returns' in doc and doc['returns']:
+            lines += wrapper.wrap('@returns ' + doc['returns']['description'])
+
+        lines.insert(0, prefix+'/**')
+        lines.append(prefix+' */')
+        return '\n'.join(lines)
+    shared['cerveau']['block_comment'] = cerveau_block_comment
+
+    def cerveau_imports(imports):
+        pairs = sorted(imports.items(), key=operator.itemgetter(0))
+        index = -1
+        for i, item in enumerate(pairs):
+            if item[0][0] != '.':
+                index = i
+                break
+        if index > -1:
+            p = pairs[index:] + pairs[:index]
+            pairs = p
+
+        doc = ''
+        for pair in pairs:
+            doc += 'import { '+(', '.join(sorted(pair[1])))+' } from "'+pair[0]+'";\n'
+        return doc
+    shared['cerveau']['imports'] = cerveau_imports
+
+    def cerveau_generate_imports(obj_key, obj, imports):
+        if imports == None:
+            imports = {}
+        used_types = []
+
+        def gen_used_types(type_obj):
+            deep_obj = False
+            for key in ['keyType', 'valueType']:
+                if type_obj[key]:
+                    gen_used_types(type_obj[key])
+                    deep_obj = True
+            if not deep_obj:
+                used_types.append(type_obj)
+
+        # AI does not have attributes at this time
+        if 'attributes' in obj:
+            for attr_name, attr_parms in obj['attributes'].items():
+                gen_used_types(attr_parms['type'])
+
+        # AI and all game objects share functions
+        for function_name, function_parms in obj['functions'].items():
+            for arg in function_parms['arguments']:
+                gen_used_types(arg['type'])
+            if function_parms['returns']:
+                gen_used_types(function_parms['returns']['type'])
+
+        for used_type in used_types:
+            if used_type['is_game_object']:
+                name = used_type['name']
+                key = './' + str(hyphenate(name))
+                if name != obj_key:
+                    if key in imports:
+                        if not name in imports[key]:
+                            imports[key].append(name)
+                        #else:
+                    else:
+                        imports[key] = [name]
+        return imports
+    shared['cerveau']['generate_imports'] = cerveau_generate_imports
+
+    def cerveau_formatted_function_top(function_name, obj):
+        function_parms = dict(obj['functions'][function_name])
+        docstring =cerveau_block_comment('    ', function_parms)
+
+        returns = 'void'
+        if function_parms['returns']:
+            returns = shared['cerveau']['type'](function_parms['returns']['type'])
+
+        formatted_name = '    public async '+function_name+'('
+        formatted_args = ', '.join(
+            [(a['name']+': '+shared['cerveau']['type'](a['type'])+(
+                (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
+            )) for a in function_parms['arguments']]
+        ) + '): Promise<' + returns + '> {'
+
+
+        wrapper = TextWrapper(
+            initial_indent=formatted_name,
+            subsequent_indent=' ' * len(formatted_name),
+            width=80,
+        )
+
+        formatted_function_signature = '\n'.join(wrapper.wrap(formatted_args))
+
+        if '\n' in formatted_args:
+            formatted_args += ',\n    '
+
+        return docstring + "\n" + formatted_function_signature
+    shared['cerveau']['formatted_function_top'] = cerveau_formatted_function_top
 %>
