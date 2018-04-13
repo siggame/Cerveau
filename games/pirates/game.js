@@ -693,21 +693,47 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     return false;
                 }
 
-                // Check neighbors
+                // Check neighbors - make sure there's land and enough water
+                let land = false;
+                let water = 0;
                 if(t.tileNorth && t.tileNorth.type === "land") {
-                    return true;
+                    land = true;
+                }
+                else {
+                    water += 1;
+                    if(t.tileNorth.tileEast && t.tileNorth.tileEast.type === "water") {
+                        water += 1;
+                    }
+                    if(t.tileNorth.tileWest && t.tileNorth.tileWest.type === "water") {
+                        water += 1;
+                    }
                 }
                 if(t.tileEast && t.tileEast.type === "land") {
-                    return true;
+                    land = true;
+                }
+                else {
+                    water += 1;
                 }
                 if(t.tileSouth && t.tileSouth.type === "land") {
-                    return true;
+                    land = true;
+                }
+                else {
+                    water += 1;
+                    if(t.tileSouth.tileEast && t.tileSouth.tileEast.type === "water") {
+                        water += 1;
+                    }
+                    if(t.tileSouth.tileWest && t.tileSouth.tileWest.type === "water") {
+                        water += 1;
+                    }
                 }
                 if(t.tileWest && t.tileWest.type === "land") {
-                    return true;
+                    land = true;
+                }
+                else {
+                    water += 1;
                 }
 
-                return false;
+                return land && water > 5;
             }, this);
         }
 
