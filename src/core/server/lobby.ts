@@ -469,21 +469,25 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         if (data && data.gameSettings && Config.GAME_SETTINGS_ENABLED) {
+            const footer = `
+---
+Available game settings:
+${gameNamespace.gameSettingsManager.getHelp()}`;
+
             let settings: IAnyObject = {};
             try {
                 settings = (querystring.parse(data.gameSettings));
             }
             catch (err) {
-                return `Game settings incorrectly formatted. Must be one string in the url parameters format.
-Available game settings:
-${gameNamespace.gameSettingsManager.getHelp()}`;
+                return "Game settings incorrectly formatted. "
+                + "Must be one string in the url parameters format." + footer;
             }
 
             // this function might mutate the game settings to validate them
             gameNamespace.gameSettingsManager.reset();
             const invalid = gameNamespace.gameSettingsManager.addSettings(settings);
             if (invalid) {
-                return invalid.message;
+                return invalid.message + footer;
             }
 
             validatedData.validGameSettings = gameNamespace.gameSettingsManager.values;

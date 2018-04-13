@@ -111,11 +111,17 @@ export class BaseGameSettingsManager {
         const lines: string[] = [];
 
         for (const [key, schema] of Object.entries(this.schema)) {
-            const type = Array.isArray(schema)
+            let type = Array.isArray(schema.default)
                 ? "string[]"
                 : typeof(schema.default);
 
-            lines.push(`- ${key} {${key}}: ${schema.default} (default ${type})`);
+            if (schema.default !== "" &&
+               (!Array.isArray(schema.default) || schema.default.length > 0)
+            ) {
+                type += ` = ${schema.default}`;
+            }
+
+            lines.push(`- ${key} (${type}): ${schema.description}`);
         }
 
         return lines.join("\n");
