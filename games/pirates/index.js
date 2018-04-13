@@ -7,6 +7,11 @@ var classes = {};
 classes.Game = require("./game");
 
 classes.Game._deltaMergeableProperties = {
+    buryInterestRate: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
     crewCost: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -62,53 +67,33 @@ classes.Game._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
-    maxInterestDistance: {
-        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
-        defaultValue: 0,
-    },
-
-    maxInterestRate: {
-        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
-        defaultValue: 0,
-    },
-
     maxTurns: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 100,
     },
 
-    merchantCrewCost: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
-    merchantInvestmentRate: {
+    merchantGoldRate: {
         type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
     },
 
-    merchantShipCost: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+    merchantInterestRate: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
+        defaultValue: 0,
+    },
+
+    merchantPorts: {
+        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
+        defaultValue: [],
+    },
+
+    minInterestDistance: {
+        type: {"is_game_object": false, "keyType": null, "name": "float", "valueType": null},
         defaultValue: 0,
     },
 
     players: {
         type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Player", "valueType": null}},
-        defaultValue: [],
-    },
-
-    portCost: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
-    portHealth: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
-    ports: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
         defaultValue: [],
     },
 
@@ -249,8 +234,8 @@ classes.Player._deltaMergeableProperties = {
     },
 
     ports: {
-        type: {"is_game_object": false, "keyType": null, "name": "list", "valueType": {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null}},
-        defaultValue: [],
+        type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
+        defaultValue: null,
     },
 
     reasonLost: {
@@ -261,11 +246,6 @@ classes.Player._deltaMergeableProperties = {
     reasonWon: {
         type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
         defaultValue: "",
-    },
-
-    startingPort: {
-        type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
-        defaultValue: null,
     },
 
     timeRemaining: {
@@ -296,22 +276,7 @@ classes.Player._deltaMergeableProperties = {
 classes.Port = require("./port");
 
 classes.Port._deltaMergeableProperties = {
-    cooldown: {
-        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
-        defaultValue: false,
-    },
-
-    destroyable: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
     gold: {
-        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
-        defaultValue: 0,
-    },
-
-    health: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
     },
@@ -359,6 +324,11 @@ classes.Port.spawn.cerveau = {
 classes.Tile = require("./tile");
 
 classes.Tile._deltaMergeableProperties = {
+    decoration: {
+        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
+        defaultValue: false,
+    },
+
     gold: {
         type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
         defaultValue: 0,
@@ -462,6 +432,11 @@ classes.Unit._deltaMergeableProperties = {
         defaultValue: 0,
     },
 
+    stunTurns: {
+        type: {"is_game_object": false, "keyType": null, "name": "int", "valueType": null},
+        defaultValue: 0,
+    },
+
     targetPort: {
         type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
         defaultValue: null,
@@ -485,21 +460,6 @@ classes.Unit.attack.cerveau = {
         {
             name: "target",
             type: {"is_game_object": false, "keyType": null, "name": "string", "valueType": null},
-        },
-    ],
-    returns: {
-        type: {"is_game_object": false, "keyType": null, "name": "boolean", "valueType": null},
-        defaultValue: false,
-    },
-    invalidValue: false,
-};
-
-classes.Unit.build.cerveau = {
-    invalidate: classes.Unit.invalidateBuild,
-    args: [
-        {
-            name: "tile",
-            type: {"is_game_object": true, "keyType": null, "name": "Tile", "valueType": null},
         },
     ],
     returns: {

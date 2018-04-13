@@ -21,35 +21,14 @@ let Port = Class(GameObject, {
         GameObject.init.apply(this, arguments);
 
         /**
-         * Whether this Port has created a Unit this turn.
-         *
-         * @type {boolean}
-         */
-        this.cooldown = this.cooldown || false;
-
-        /**
-         * Whether this Port can be destroyed.
-         *
-         * @type {number}
-         */
-        this.destroyable = this.destroyable || 0;
-
-        /**
-         * (Merchants only) How much gold this Port has accumulated. Once this port can afford to create a ship, it will spend gold to construct one.
+         * For players, how much more gold this Port can spend this turn. For merchants, how much gold this Port has accumulated (it will spawn a ship when the Port can afford one).
          *
          * @type {number}
          */
         this.gold = this.gold || 0;
 
         /**
-         * How much health this Port has.
-         *
-         * @type {number}
-         */
-        this.health = this.health || 0;
-
-        /**
-         * (Merchants only) How much gold this Port accumulates each turn.
+         * (Merchants only) How much gold was invested into this Port. Investment determines the strength and value of the next ship.
          *
          * @type {number}
          */
@@ -72,10 +51,7 @@ let Port = Class(GameObject, {
 
         //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        this.cooldown = data.cooldown || false;
-        this.destroyable = data.destroyable || false;
         this.gold = data.gold || 0;
-        this.health = data.health || this.game.portHealth;
         this.investment = data.investment || 0;
         this.owner = data.owner || null;
         this.tile = data.tile || null;
@@ -111,18 +87,26 @@ let Port = Class(GameObject, {
             if(player.gold < this.game.crewCost) {
                 return `Ye don't have enough gold to spawn a crew at ${this}.`;
             }
+
+            if(this.gold < this.game.crewCost) {
+                return `${this} can't spend enough gold to spawn a crew this turn! Ye gotta wait til next turn.`;
+            }
         }
         else if(t === "S") { // Ships
             if(player.gold < this.game.shipCost) {
                 return `Ye don't have enough gold to spawn a ship at ${this}.`;
             }
 
+            if(this.gold < this.game.crewCost) {
+                return `${this} can't spend enough gold to spawn a ship this turn! Ye gotta wait til next turn.`;
+            }
+
             if(this.tile.unit && this.tile.unit.shipHealth > 0) {
-                return `There isn't enough space in ${this} to spawn a ship.`;
+                return `Blimey! There isn't enough space in ${this} to spawn a ship.`;
             }
         }
         else { // Invalid
-            return `'${type}' ain't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
+            return `'${type}' isn't a unit type, scallywag! Ye gotta use 'crew' or 'ship'.`;
         }
 
         return undefined; // meaning valid
@@ -158,13 +142,14 @@ let Port = Class(GameObject, {
             this.tile.unit.moves = 0;
             this.tile.unit.owner = player;
             player.gold -= this.game.crewCost;
-
+            this.gold -= this.game.crewCost;
         }
-        if(type === "S")		{
+        else {
             this.tile.unit.shipHealth = this.game.shipHealth;
             this.tile.unit.acted = true;
             this.tile.unit.moves = 0;
             player.gold -= this.game.shipCost;
+            this.gold -= this.game.crewCost;
         }
 
         return true;

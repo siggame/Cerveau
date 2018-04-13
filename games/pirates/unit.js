@@ -77,6 +77,13 @@ let Unit = Class(GameObject, {
         this.shipHealth = this.shipHealth || 0;
 
         /**
+         * (Merchants only) The number of turns this merchant ship won't be able to move. They will still attack. Merchant ships are stunned when they're attacked.
+         *
+         * @type {number}
+         */
+        this.stunTurns = this.stunTurns || 0;
+
+        /**
          * (Merchants only) The Port this Unit is moving to.
          *
          * @type {Port}
@@ -103,6 +110,7 @@ let Unit = Class(GameObject, {
         this.shipHealth = data.shipHealth || 0;
         this.targetPort = data.targetPort || null;
         this.tile = data.tile || null;
+        this.stunTurns = data.stunTurns || 0;
 
         //<<-- /Creer-Merge: init -->>
     },
@@ -116,7 +124,7 @@ let Unit = Class(GameObject, {
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.
+     * @param {string} target - Whether to attack 'crew' or 'ship'. Crew deal damage to crew and ships deal damage to ships. Consumes any remaining moves.
      * @param {Object} args - a key value table of keys to the arg (passed into this function)
      * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -150,10 +158,6 @@ let Unit = Class(GameObject, {
             if(distSq > this.game.crewRange * this.game.crewRange) {
                 return `${this} isn't in range for that attack. Yer swords don't reach off yonder!`;
             }
-
-            if(tile.port) {
-                return `${tile}'s crew be under the protection of ${tile.port}!` + (tile.port.destroyable ? " Ye gotta take it down first. Attack that port, matey!" : "");
-            }
         }
         else if(t === "S") {
             if(!tile.unit) {
@@ -175,36 +179,9 @@ let Unit = Class(GameObject, {
             if(distSq > this.game.shipRange * this.game.shipRange) {
                 return `${this} isn't in range for that attack. Ye don't wanna fire blindly into the wind!`;
             }
-
-            if(tile.port) {
-                return `${tile}'s ship be under the protection of ${tile.port}!` + (tile.port.destroyable ? " Ye gotta take it down first. Attack that port, matey!" : "");
-            }
-        }
-        else if(t === "P") {
-            if(!tile.port) {
-                return `There be no port on ${tile} for ${this} to plunder.`;
-            }
-            if(tile.port.player === player) {
-                return `${this} doesn't have time for a mutany! Don't be attackin' yer own port!`;
-            }
-            if(!tile.port.destroyable) {
-                return `Attackin' ${tile.port} will send ${this} to Davy Jones' locker! Ye don't wanna do that.`;
-            }
-
-            // Figure out which unit type is attacking
-            let dx = this.tile.x - tile.x;
-            let dy = this.tile.y - tile.y;
-            let distSq = dx * dx + dy * dy;
-            let shipAttack = this.shipHealth > 0 && distSq <= this.game.shipRange * this.game.shipRange;
-            let crewAttack = distSq <= this.game.crewRange * this.game.crewRange;
-
-            // Make sure a unit is attacking to start with
-            if(!shipAttack && !crewAttack) {
-                return `${this} isn't in range of ${tile.port}.`;
-            }
         }
         else {
-            return `${this} needs to attack somethin' valid ('port', 'ship', 'crew'), not '${target}'.`;
+            return `${this} needs to attack somethin' valid ('ship' or 'crew'), not '${target}'.`;
         }
 
         // Developer: try to invalidate the game logic for Unit's attack function here
@@ -214,11 +191,11 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Attacks either crew, a ship, or a port on a Tile in range.
+     * Attacks either the 'crew' or 'ship' on a Tile in range.
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.
+     * @param {string} target - Whether to attack 'crew' or 'ship'. Crew deal damage to crew and ships deal damage to ships. Consumes any remaining moves.
      * @returns {boolean} True if successfully attacked, false otherwise.
      */
     attack: function(player, tile, target) {
@@ -228,7 +205,6 @@ let Unit = Class(GameObject, {
 
         let deadCrew = 0;
         let deadShips = 0;
-        let deadPorts = 0;
         let gold = 0;
         let merchant = tile.unit.targetPort !== null;
         if(target === "C") {
@@ -260,7 +236,7 @@ let Unit = Class(GameObject, {
                 }
             }
         }
-        else if(target === "S") {
+        else {
             // Ship attacking ship
             tile.unit.shipHealth -= this.game.shipDamage;
             tile.unit.shipHealth = Math.max(0, tile.unit.shipHealth);
@@ -275,202 +251,46 @@ let Unit = Class(GameObject, {
                 tile.unit = null;
             }
         }
-        else {
-            // Figure out which unit type is attacking
-            let dx = this.tile.x - tile.x;
-            let dy = this.tile.y - tile.y;
-            let distSq = dx * dx + dy * dy;
-            let shipAttack = this.shipHealth > 0 && distSq <= this.game.shipRange * this.game.shipRange;
-            let crewAttack = distSq <= this.game.crewRange * this.game.crewRange;
-
-            // Deal damage
-            let damage = 0;
-            if(shipAttack) {
-                damage = Math.max(damage, this.game.shipDamage);
-            }
-            if(crewAttack) {
-                damage = Math.max(damage, this.game.crewDamage * this.crew);
-            }
-
-            // Check if the port was destroyed
-            if(tile.port.portHealth <= 0) {
-                deadPorts += 1;
-
-                // Mark it as destroyed
-                tile.port.tile = null;
-                tile.port = null;
-            }
-
-            // Kill the crew if there's no ship
-            if(tile.unit && tile.unit.shipHealth <= 0) {
-                deadCrew += tile.unit.crew;
-                gold += tile.unit.gold;
-
-                // Mark it as dead
-                tile.unit.tile = null;
-                tile.unit = null;
-            }
-        }
 
         // Infamy
 
         this.acted = true;
         this.gold += gold;
-        let opponentCrew = 0;
-        let opponentShips = 0;
-        let allyCrew = 0;
-        let allyShips = 0;
 
-        // Count ally units
-        for(let unit of player.units) {
-            if(unit.crew > 0) {
-                allyCrew += unit.crew;
-                if(unit.shipHealth > 0) {
-                    allyShips++;
-                }
-            }
-        }
-
-        // Make sure these values are at least 1 to avoid dividing by 0
-        allyCrew = Math.max(1, allyCrew);
-        allyShips = Math.max(1, allyShips);
-
+        // Calculate the infamy factor
+        let factor = 1;
         if(!merchant) {
-            // Count opponent units
-            for(let unit of player.opponent.units) {
-                if(unit.crew > 0) {
-                    opponentCrew += unit.crew;
-                    if(unit.shipHealth > 0) {
-                        opponentShips++;
-                    }
-                }
+            // Calculate each player's net worth
+            let allyWorth = player.units.reduce(this.netWorthReducer.bind(this), 0) + player.gold;
+            let opponentWorth = player.opponent.units.reduce(this.netWorthReducer.bind(this), 0) + player.opponent.gold;
+            opponentWorth += deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
+
+            if(allyWorth > opponentWorth) {
+                factor = 0.5;
+            }
+            else if(allyWorth < opponentWorth) {
+                factor = 2;
             }
         }
-        else {
-            // Calculate infamy
-            // player.infamy += ((this.game.crewInfamy*deadCrew)+(this.game.shipInfamy*deadShips))*((1/allyCrew)*(1/allyShips));
-        }
-
-        // Make sure these values are at least 1 to avoid dividing by 0
-        opponentCrew = Math.max(1, opponentCrew);
-        opponentShips = Math.max(1, opponentShips);
 
         // Calculate infamy
-        let crewRatio = opponentCrew / allyCrew;
-        let shipRatio = opponentShips / allyShips;
-        let crewInfamy = this.game.crewInfamy * deadCrew;
-        let shipInfamy = this.game.shipInfamy * deadShips;
-        let portInfamy = this.game.portInfamy * deadPorts;
-        let totalInfamy = crewInfamy + shipInfamy + portInfamy;
-        let infamy = totalInfamy * crewRatio * shipRatio;
-        if(infamy > player.opponent.infamy) {
-            infamy = player.opponent.infamy;
+        let infamy = deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
+        infamy *= factor;
+
+        if(!merchant) {
+            infamy = Math.min(infamy, player.opponent.infamy);
+            player.opponent.infamy -= infamy;
         }
 
         player.infamy += infamy;
-        if(!merchant) {
-            // Take the infamy from the opponent
-            player.opponent.infamy -= infamy;
-        }
-        else if(tile.unit) {
-            this.game.stunTime[tile.unit.id] = 2;
+
+        if(merchant && tile.unit) {
+            tile.unit.stunTurns = 2;
         }
 
         return true;
 
         // <<-- /Creer-Merge: attack -->>
-    },
-
-
-    /**
-     * Invalidation function for build
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
-     *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to build the Port on.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
-     */
-    invalidateBuild: function(player, tile, args) {
-        // <<-- Creer-Merge: invalidateBuild -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        const reason = this._invalidate(player, true);
-        if(reason) {
-            return reason;
-        }
-
-        if(!tile) {
-            return `${this} be tryin' to build a port in the middle of nowhere. Make sure yer tile ain't null.`;
-        }
-
-        // Check if the tile is a water tile
-        if(tile.type !== "water") {
-            return `${this} can't be buildin' a port on land, ye scallywag!`;
-        }
-
-        // Checks if the tile is connected to land on at least 1 side
-        // Also checks if the unit is adjacent at the same time
-        let connected = false;
-        let adjacent = false;
-        let neighbors = [tile.tileNorth, tile.tileEast, tile.tileSouth, tile.tileWest, tile];
-        for(let t of neighbors) {
-            if(t.type === "land") {
-                connected = true;
-            }
-
-            if(this.tile === t) {
-                adjacent = true;
-            }
-        }
-
-        if(!connected) {
-            return `Shiver me timbers! ${this} can't be havin' a port floatin' in the middle of the ocean!`;
-        }
-
-        if(!adjacent) {
-            return `Arr, ${tile} be too far away for ${this} to build a port on, matey!`;
-        }
-
-        // Check if the unit has enough gold
-        if(this.gold < this.game.portCost) {
-            return `Ye don't have enough booty for ${this} to build a port, ye scalliwag!`;
-        }
-
-        return undefined; // meaning valid
-
-        // <<-- /Creer-Merge: invalidateBuild -->>
-    },
-
-    /**
-     * Builds a Port on the given Tile.
-     *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to build the Port on.
-     * @returns {boolean} True if successfully built a Port, false otherwise.
-     */
-    build: function(player, tile) {
-        // <<-- Creer-Merge: build -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Deduct the proper amount of gold from the unit
-        this.gold -= this.game.portCost;
-
-        // Update that the tile contains a port.
-        tile.port = this.game.create("Port", {
-            tile: tile,
-            owner: player,
-            destroyable: true,
-            cooldown: true,
-        });
-
-        // Update that the unit has acted this turn.
-        this.acted = true;
-
-        // Add the port to the array of the player's ports (happens at end of turn)
-        this.game.newPorts.push(tile.port);
-
-        return true;
-
-        // <<-- /Creer-Merge: build -->>
     },
 
 
@@ -491,8 +311,19 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        if(this.tile.type !== "land" || this.tile.port) {
-            return `Ye can't bury gold at ${this.tile}!`;
+        if(this.tile.type !== "land") {
+            return `${this} can't bury gold on the sea.`;
+        }
+
+        if(this.tile.port) {
+            return `${this} can't bury gold in ports.`;
+        }
+
+        let dx = this.x - player.port.x;
+        let dy = this.y - player.port.y;
+        let distSq = dx * dx + dy * dy;
+        if(distSq < this.game.minInterestDistance) {
+            return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
         }
 
         return undefined; // meaning valid
@@ -501,7 +332,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Buries gold on this Unit's Tile.
+     * Buries gold on this Unit's Tile. Gold must be a certain distance away for it to get interest (Game.minInterestDistance).
      *
      * @param {Player} player - the player that called this.
      * @param {number} amount - How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.
@@ -562,7 +393,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.
+     * Puts gold into an adjacent Port. If that Port is the Player's port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.
      *
      * @param {Player} player - the player that called this.
      * @param {number} amount - The amount of gold to deposit. Amounts <= 0 will deposit all the gold on this Unit.
@@ -703,7 +534,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Moves this Unit from its current Tile to an adjacent Tile.
+     * Moves this Unit from its current Tile to an adjacent Tile. If this Unit merges with another one, the other Unit will be destroyed and its tile will be set to null. Make sure to check that your Unit's tile is not null before doing things with it.
      *
      * @param {Player} player - the player that called this.
      * @param {Tile} tile - The Tile this Unit should move to.
@@ -713,7 +544,6 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         if(tile.unit) {
-
             this.moves--;
             this.mergeOnto(tile.unit);
         }
@@ -936,7 +766,7 @@ let Unit = Class(GameObject, {
     },
 
     /**
-     * Takes gold from the Player. You can only withdraw from your main port.
+     * Takes gold from the Player. You can only withdraw from your own Port.
      *
      * @param {Player} player - the player that called this.
      * @param {number} amount - The amount of gold to withdraw. Amounts <= 0 will withdraw everything.
@@ -996,6 +826,10 @@ let Unit = Class(GameObject, {
     },
 
     mergeOnto: function(other) {
+        if(!other.owner && other.shipHealth > 0) {
+            other.shipHealth = 1;
+        }
+
         this.tile = other.tile;
         this.tile.unit = this;
         other.tile = null;
@@ -1006,6 +840,20 @@ let Unit = Class(GameObject, {
         this.gold += other.gold;
         this.acted &= other.acted;
         this.moves = Math.min(this.moves, other.moves);
+    },
+
+    netWorthReducer: function(worth, unit) {
+        // Ignore dead units
+        if(!unit.tile) {
+            return worth;
+        }
+
+        // Add this unit's net worth
+        worth += unit.crew * this.game.crewCost;
+        if(unit.shipHealth > 0) {
+            worth += this.game.shipCost;
+        }
+        return worth;
     },
 
     //<<-- /Creer-Merge: added-functions -->>

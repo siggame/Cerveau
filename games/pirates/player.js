@@ -63,11 +63,11 @@ let Player = Class(GameObject, {
         this.opponent = this.opponent || null;
 
         /**
-         * The ports owned by this Player.
+         * The Port owned by this Player.
          *
-         * @type {Array.<Port>}
+         * @type {Port}
          */
-        this.ports = this.ports || [];
+        this.ports = this.ports || null;
 
         /**
          * The reason why the player lost the game.
@@ -82,13 +82,6 @@ let Player = Class(GameObject, {
          * @type {string}
          */
         this.reasonWon = this.reasonWon || "";
-
-        /**
-         * This Player's starting port.
-         *
-         * @type {Port}
-         */
-        this.startingPort = this.startingPort || null;
 
         /**
          * The amount of time (in ns) remaining for this AI to send commands.

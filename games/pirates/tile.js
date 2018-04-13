@@ -22,6 +22,13 @@ let Tile = Class(GameObject, TiledTile, {
         GameObject.init.apply(this, arguments);
 
         /**
+         * (Visualizer only) Whether this tile is deep sea or grassy. This has no effect on gameplay, but feel free to use it if you want.
+         *
+         * @type {boolean}
+         */
+        this.decoration = this.decoration || false;
+
+        /**
          * The amount of gold buried on this tile.
          *
          * @type {number}

@@ -27,6 +27,7 @@
     },
     "Game": {
         "attribute_names": [
+            "buryInterestRate",
             "crewCost",
             "crewDamage",
             "crewHealth",
@@ -38,16 +39,12 @@
             "healFactor",
             "mapHeight",
             "mapWidth",
-            "maxInterestDistance",
-            "maxInterestRate",
             "maxTurns",
-            "merchantCrewCost",
-            "merchantInvestmentRate",
-            "merchantShipCost",
+            "merchantGoldRate",
+            "merchantInterestRate",
+            "merchantPorts",
+            "minInterestDistance",
             "players",
-            "portCost",
-            "portHealth",
-            "ports",
             "restRange",
             "session",
             "shipCost",
@@ -59,6 +56,16 @@
             "units"
         ],
         "attributes": {
+            "buryInterestRate": {
+                "default": null,
+                "description": "The rate buried gold increases each turn.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
+                    "valueType": null
+                }
+            },
             "crewCost": {
                 "default": null,
                 "description": "How much gold it costs to construct a single crew.",
@@ -182,26 +189,6 @@
                     "valueType": null
                 }
             },
-            "maxInterestDistance": {
-                "default": null,
-                "description": "The Euclidean distance from a Player Port required to reach maxInterestRate.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "float",
-                    "valueType": null
-                }
-            },
-            "maxInterestRate": {
-                "default": null,
-                "description": "The maximum rate buried gold can increase over time.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "float",
-                    "valueType": null
-                }
-            },
             "maxTurns": {
                 "default": 100,
                 "description": "The maximum number of turns before the game will automatically end.",
@@ -213,19 +200,9 @@
                     "valueType": null
                 }
             },
-            "merchantCrewCost": {
+            "merchantGoldRate": {
                 "default": null,
-                "description": "How much gold it costs a merchant Port to create a crew member.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
-                }
-            },
-            "merchantInvestmentRate": {
-                "default": null,
-                "description": "How much gold merchant Ports get per turn. They gain (Port.investment * merchantInvestmentRate) gold each turn.",
+                "description": "How much gold merchant Ports get each turn.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -233,13 +210,38 @@
                     "valueType": null
                 }
             },
-            "merchantShipCost": {
+            "merchantInterestRate": {
                 "default": null,
-                "description": "How much gold it costs a merchant Port to create a ship.",
+                "description": "When a merchant ship spawns, the amount of additional gold it has relative to the Port's investment.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
-                    "name": "int",
+                    "name": "float",
+                    "valueType": null
+                }
+            },
+            "merchantPorts": {
+                "default": null,
+                "description": "Every Port in the game. Merchant ports have owner set to null.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "list",
+                    "valueType": {
+                        "is_game_object": true,
+                        "keyType": null,
+                        "name": "Port",
+                        "valueType": null
+                    }
+                }
+            },
+            "minInterestDistance": {
+                "default": null,
+                "description": "The Euclidean distance buried gold must be from the Player's Port to accumulate interest.",
+                "type": {
+                    "is_game_object": false,
+                    "keyType": null,
+                    "name": "float",
                     "valueType": null
                 }
             },
@@ -255,41 +257,6 @@
                         "is_game_object": true,
                         "keyType": null,
                         "name": "Player",
-                        "valueType": null
-                    }
-                }
-            },
-            "portCost": {
-                "default": null,
-                "description": "How much gold it costs to construct a port.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
-                }
-            },
-            "portHealth": {
-                "default": null,
-                "description": "The maximum amount of health a Port can have.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "int",
-                    "valueType": null
-                }
-            },
-            "ports": {
-                "default": null,
-                "description": "Every Port in the game.",
-                "type": {
-                    "is_game_object": false,
-                    "keyType": null,
-                    "name": "list",
-                    "valueType": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Port",
                         "valueType": null
                     }
                 }
@@ -382,7 +349,7 @@
             },
             "units": {
                 "default": null,
-                "description": "Every Unit in the game.",
+                "description": "Every Unit in the game. Merchant units have targetPort set to a port.",
                 "type": {
                     "is_game_object": false,
                     "keyType": null,
@@ -508,7 +475,6 @@
                 "ports",
                 "reasonLost",
                 "reasonWon",
-                "startingPort",
                 "timeRemaining",
                 "units",
                 "won"
@@ -576,17 +542,12 @@
                 },
                 "ports": {
                     "default": null,
-                    "description": "The ports owned by this Player.",
+                    "description": "The Port owned by this Player.",
                     "type": {
-                        "is_game_object": false,
+                        "is_game_object": true,
                         "keyType": null,
-                        "name": "list",
-                        "valueType": {
-                            "is_game_object": true,
-                            "keyType": null,
-                            "name": "Port",
-                            "valueType": null
-                        }
+                        "name": "Port",
+                        "valueType": null
                     }
                 },
                 "reasonLost": {
@@ -606,16 +567,6 @@
                         "is_game_object": false,
                         "keyType": null,
                         "name": "string",
-                        "valueType": null
-                    }
-                },
-                "startingPort": {
-                    "default": null,
-                    "description": "This Player's starting port.",
-                    "type": {
-                        "is_game_object": true,
-                        "keyType": null,
-                        "name": "Port",
                         "valueType": null
                     }
                 },
@@ -742,48 +693,15 @@
         },
         "Port": {
             "attribute_names": [
-                "cooldown",
-                "destroyable",
                 "gold",
-                "health",
                 "investment",
                 "owner",
                 "tile"
             ],
             "attributes": {
-                "cooldown": {
-                    "default": null,
-                    "description": "Whether this Port has created a Unit this turn.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "boolean",
-                        "valueType": null
-                    }
-                },
-                "destroyable": {
-                    "default": null,
-                    "description": "Whether this Port can be destroyed.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
                 "gold": {
                     "default": null,
-                    "description": "(Merchants only) How much gold this Port has accumulated. Once this port can afford to create a ship, it will spend gold to construct one.",
-                    "type": {
-                        "is_game_object": false,
-                        "keyType": null,
-                        "name": "int",
-                        "valueType": null
-                    }
-                },
-                "health": {
-                    "default": null,
-                    "description": "How much health this Port has.",
+                    "description": "For players, how much more gold this Port can spend this turn. For merchants, how much gold this Port has accumulated (it will spawn a ship when the Port can afford one).",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -793,7 +711,7 @@
                 },
                 "investment": {
                     "default": null,
-                    "description": "(Merchants only) How much gold this Port accumulates each turn.",
+                    "description": "(Merchants only) How much gold was invested into this Port. Investment determines the strength and value of the next ship.",
                     "type": {
                         "is_game_object": false,
                         "keyType": null,
@@ -945,6 +863,7 @@
         },
         "Tile": {
             "attribute_names": [
+                "decoration",
                 "gold",
                 "port",
                 "tileEast",
@@ -957,6 +876,16 @@
                 "y"
             ],
             "attributes": {
+                "decoration": {
+                    "default": null,
+                    "description": "(Visualizer only) Whether this tile is deep sea or grassy. This has no effect on gameplay, but feel free to use it if you want.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "boolean",
+                        "valueType": null
+                    }
+                },
                 "gold": {
                     "default": null,
                     "description": "The amount of gold buried on this tile.",
@@ -1155,6 +1084,7 @@
                 "owner",
                 "path",
                 "shipHealth",
+                "stunTurns",
                 "targetPort",
                 "tile"
             ],
@@ -1244,6 +1174,16 @@
                         "valueType": null
                     }
                 },
+                "stunTurns": {
+                    "default": null,
+                    "description": "(Merchants only) The number of turns this merchant ship won't be able to move. They will still attack. Merchant ships are stunned when they're attacked.",
+                    "type": {
+                        "is_game_object": false,
+                        "keyType": null,
+                        "name": "int",
+                        "valueType": null
+                    }
+                },
                 "targetPort": {
                     "default": null,
                     "description": "(Merchants only) The Port this Unit is moving to.",
@@ -1268,7 +1208,6 @@
             "description": "A unit group in the game. This may consist of a ship and any number of crew.",
             "function_names": [
                 "attack",
-                "build",
                 "bury",
                 "deposit",
                 "dig",
@@ -1299,7 +1238,7 @@
                         },
                         {
                             "default": null,
-                            "description": "Whether to attack 'crew', 'ship', or 'port'. Crew deal damage to crew, and ships deal damage to ships. Both can attack ports as well. Units cannot attack other units in ports. Consumes any remaining moves.",
+                            "description": "Whether to attack 'crew' or 'ship'. Crew deal damage to crew and ships deal damage to ships. Consumes any remaining moves.",
                             "name": "target",
                             "optional": false,
                             "type": {
@@ -1310,43 +1249,10 @@
                             }
                         }
                     ],
-                    "description": "Attacks either crew, a ship, or a port on a Tile in range.",
+                    "description": "Attacks either the 'crew' or 'ship' on a Tile in range.",
                     "returns": {
                         "default": null,
                         "description": "True if successfully attacked, false otherwise.",
-                        "invalidValue": false,
-                        "type": {
-                            "is_game_object": false,
-                            "keyType": null,
-                            "name": "boolean",
-                            "valueType": null
-                        }
-                    },
-                    "serverPredefined": false
-                },
-                "build": {
-                    "altersState": true,
-                    "argument_names": [
-                        "tile"
-                    ],
-                    "arguments": [
-                        {
-                            "default": null,
-                            "description": "The Tile to build the Port on.",
-                            "name": "tile",
-                            "optional": false,
-                            "type": {
-                                "is_game_object": true,
-                                "keyType": null,
-                                "name": "Tile",
-                                "valueType": null
-                            }
-                        }
-                    ],
-                    "description": "Builds a Port on the given Tile.",
-                    "returns": {
-                        "default": null,
-                        "description": "True if successfully built a Port, false otherwise.",
                         "invalidValue": false,
                         "type": {
                             "is_game_object": false,
@@ -1376,7 +1282,7 @@
                             }
                         }
                     ],
-                    "description": "Buries gold on this Unit's Tile.",
+                    "description": "Buries gold on this Unit's Tile. Gold must be a certain distance away for it to get interest (Game.minInterestDistance).",
                     "returns": {
                         "default": null,
                         "description": "True if successfully buried, false otherwise.",
@@ -1409,7 +1315,7 @@
                             }
                         }
                     ],
-                    "description": "Puts gold into an adjacent Port. If that Port is the Player's main port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.",
+                    "description": "Puts gold into an adjacent Port. If that Port is the Player's port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.",
                     "optionals": 1,
                     "optionals_start_index": 0,
                     "returns": {
@@ -1479,7 +1385,7 @@
                             }
                         }
                     ],
-                    "description": "Moves this Unit from its current Tile to an adjacent Tile.",
+                    "description": "Moves this Unit from its current Tile to an adjacent Tile. If this Unit merges with another one, the other Unit will be destroyed and its tile will be set to null. Make sure to check that your Unit's tile is not null before doing things with it.",
                     "returns": {
                         "default": null,
                         "description": "True if it moved, false otherwise.",
@@ -1591,7 +1497,7 @@
                             }
                         }
                     ],
-                    "description": "Takes gold from the Player. You can only withdraw from your main port.",
+                    "description": "Takes gold from the Player. You can only withdraw from your own Port.",
                     "optionals": 1,
                     "optionals_start_index": 0,
                     "returns": {
