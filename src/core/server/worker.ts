@@ -9,9 +9,10 @@ import * as cluster from "cluster";
 import { Socket } from "net";
 import { Config } from "~/core/args";
 import * as Clients from "~/core/clients";
-import { IBaseGameNamespace, IBaseGameSettings } from "~/core/game";
+import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
+import { IAnyObject } from "~/utils";
 
 export interface IClientInfo {
     className: string;
@@ -31,7 +32,7 @@ export interface IWorkerGameSessionData {
     mainDebugPort: number;
     sessionID: string;
     gameName: string;
-    gameSettings: IBaseGameSettings;
+    gameSettings: IAnyObject;
 }
 
 if (cluster.isMaster) {
@@ -92,7 +93,7 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
             id: workerData.sessionID,
             clients,
             gameNamespace,
-            gameSettings: workerData.gameSettings,
+            gameSettingsManager: new gameNamespace.GameSettingsManager(workerData.gameSettings),
         });
 
         process.on("unhandledRejection", (reason, p) => {

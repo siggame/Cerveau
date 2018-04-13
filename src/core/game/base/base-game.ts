@@ -6,7 +6,7 @@ import { BaseGameManager } from "./base-game-manager";
 import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { createGameObject } from "./base-game-object-factory";
-import { IBaseGameSettings } from "./base-game-settings";
+import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer, IBasePlayerData } from "./base-player";
 
 export interface IBaseGameRequiredData {
@@ -22,25 +22,24 @@ export interface IBaseGameRequiredData {
 
 export class BaseGame extends BaseGameDeltaMergeables {
     public readonly manager: BaseGameManager;
-    public readonly settings: Readonly<IBaseGameSettings>;
+    public readonly settings = Object.freeze(this.settingsManager.values);
 
     public readonly name!: string;
     public readonly session!: string;
     public readonly gameObjects!: {[id: string]: BaseGameObject | undefined};
     public readonly players!: IBasePlayer[];
 
-    constructor(settings: IBaseGameSettings, requiredData: IBaseGameRequiredData) {
+    constructor(protected settingsManager: BaseGameSettingsManager, requiredData: IBaseGameRequiredData) {
         super({
             key: "game",
             parent: requiredData.rootDeltaMergeable,
             attributesSchema: requiredData.schema.attributes,
-            initialValues: settings,
+            initialValues: settingsManager.values,
         });
 
         // super has now created our delta mergeables, let's reach in and grab the game objects all hack-y like
         const gameObjectsDeltaMergeable = ((this as any).deltaMergeable as DeltaMergeable).child("gameObjects")!;
 
-        this.settings = Object.freeze(settings);
         this.manager = requiredData.manager;
 
         this.name = requiredData.namespace.GameManager.gameName;
@@ -53,7 +52,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
             client.aiManager!.game = this; // kind of hack-y, we are hooking this up here
 
             const playerData: IBasePlayerData = {
-                name: settings.playerNames[i] || client.name || `Player ${i}`,
+                name: this.settings.playerNames[i] || client.name || `Player ${i}`,
                 clientType: client.programmingLanguage || "Unknown",
             };
 

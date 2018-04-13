@@ -1,17 +1,9 @@
 // tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
-import { BaseGameObject, IBaseGameSettings, IBasePlayer, IGameSettingsDescriptions } from "~/core/game";
-import { nextWrapAround } from "~/utils";
+import { BaseGameObject, IBasePlayer } from "~/core/game";
+import { IAnyObject, nextWrapAround } from "~/utils";
 import * as Base from "./base";
-
-/**
- * Settings for a turn based game
- */
-export interface ITurnBasedGameSettings extends IBaseGameSettings {
-    timeAddedPerTurn: number;
-    maxTurns: number;
-}
 
 export interface ITurnBasedPlayer extends IBasePlayer {
 }
@@ -30,7 +22,7 @@ export function mixTurnBased<
     TBaseGame extends Base.BaseGameConstructor,
     TBaseGameManager extends Base.BaseGameManagerConstructor,
     TBaseGameObject extends Base.BaseGameObjectConstructor,
-    TBaseGameSettings extends Base.BaseGameSettingsConstructor
+    TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
     AI: TBaseAI,
     Game: TBaseGame,
@@ -45,32 +37,39 @@ export function mixTurnBased<
     }
 
     class TurnBaseGameSettings extends base.GameSettings {
-        public get defaults(): ITurnBasedGameSettings {
-            return {
-                ...super.defaults,
-                timeAddedPerTurn: 1e9, // 1 sec in ns,
-                maxTurns: 200,
-            };
-        }
+        public schema = this.makeSchema({
+            ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+            timeAddedPerTurn: {
+                default: 1e9, // 1 sec in ns,
+                min: 0,
+                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+            },
+            maxTurns: {
+                default: 200,
+                min: 1,
+                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+            },
+        });
 
-        public get descriptions(): IGameSettingsDescriptions<ITurnBasedGameSettings> {
-            return {
-                ...super.descriptions,
-                timeAddedPerTurn: "The amount of time (in nano-seconds) to add after each player performs a turn.",
-                maxTurns: "The maximum number of turns before the game is force ended and a winner is determined.",
-            };
-        }
+        public values = this.initialValues(this.schema);
 
-        public invalidate(settings: ITurnBasedGameSettings): string | undefined {
-            const invalid = super.invalidate(settings);
-            if (invalid) {
-                return invalid;
+        protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+            const invalidated = super.invalidate(someSettings);
+            if (invalidated instanceof Error) {
+                return invalidated;
             }
 
-            const timeAddedPerTurn = Number(settings.timeAddedPerTurn);
-            if (isNaN(timeAddedPerTurn) || timeAddedPerTurn < 0) {
-                return `${timeAddedPerTurn} is not a valid amount of time to add per player's turn.`;
+            const settings = { ...this.values, ...someSettings, ...invalidated };
+
+            if (settings.maxTurns <= 0) {
+                return new Error(`Max turns invalid: ${settings.maxTurns}. Must be > 0`);
             }
+
+            if (settings.timeAddedPerTurn < 0) {
+                return new Error(`time added per turn invalid: ${settings.timeAddedPerTurn}. Must be >= 0`);
+            }
+
+            return settings;
         }
     }
 

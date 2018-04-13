@@ -43,7 +43,7 @@ export class ThreadedRoom extends Room {
                 mainDebugPort: (process as any)._debugPort, // non-standard, used for chrome debug tools
                 sessionID: this.id,
                 gameName: this.gameNamespace.GameManager.gameName,
-                gameSettings: this.gameSettings,
+                gameSettings: this.gameSettingsManager.values,
             } as IWorkerGameSessionData),
         });
 

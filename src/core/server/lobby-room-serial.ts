@@ -15,7 +15,7 @@ export class SerialRoom extends Room {
         this.session = new Session({
             id: this.id,
             clients: this.clients,
-            gameSettings: this.gameSettings,
+            gameSettingsManager: this.gameSettingsManager,
             gameNamespace: this.gameNamespace,
         });
 

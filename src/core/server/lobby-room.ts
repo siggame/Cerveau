@@ -1,5 +1,6 @@
 import { events, Signal } from "ts-typed-events";
-import { GameLogManager, IBaseGameNamespace, IBaseGameSettings, IGamelog, IGamelogWinnerLoser } from "~/core/game";
+import { BaseGameSettingsManager, GameLogManager, IBaseGameNamespace, IGamelog,
+    IGamelogWinnerLoser } from "~/core/game";
 import { logger } from "~/core/log";
 import { IAnyObject, removeElements } from "~/utils";
 import { BaseClient } from "../clients/";
@@ -30,8 +31,8 @@ export class Room {
     /** Once the game is over, this will exist and be the list of losers */
     public losers?: IGamelogWinnerLoser[];
 
-    // private clientInfos: IClientInfo[] = [];
-    protected readonly gameSettings: IBaseGameSettings;
+    /** The manager we use to validate game settings against */
+    protected readonly gameSettingsManager: BaseGameSettingsManager;
 
     /** If the game this room is playing has been ran and it is over */
     private over: boolean = false;
@@ -42,7 +43,7 @@ export class Room {
         protected readonly gameLogger: GameLogManager,
         private readonly updater?: Updater,
     ) {
-        this.gameSettings = {...gameNamespace.defaultGameSettings};
+        this.gameSettingsManager = new gameNamespace.GameSettingsManager();
     }
 
     public getClientsPlaying(): BaseClient[] {
@@ -118,11 +119,10 @@ export class Room {
      * Adds game settings to this game instance, parsing them from strings to correct types
      *
      * @param settings - the key/value pair settings to add
+     * @returns An error if the settings were invalid, otherwise nothing
      */
-    public addGameSettings(settings: IAnyObject): void {
-        for (const key of Object.keys(settings)) {
-            (this.gameSettings as IAnyObject)[key] = settings[key];
-        }
+    public addGameSettings(settings: IAnyObject): void | Error {
+        return this.gameSettingsManager.addSettings(settings);
     }
 
     protected async handleOver(): Promise<void> {

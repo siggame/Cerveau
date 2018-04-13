@@ -1,63 +1,68 @@
-import { IGameSettingsDescriptions } from "~/core/game";
-import { BaseClasses, IBaseAnarchyGameSettings } from "./";
+import { IAnyObject } from "~/utils";
+import { BaseClasses } from "./";
 
-export interface IAnarchyGameSettings extends IBaseAnarchyGameSettings {
-    // creer merge
-    mapWidth: number;
-    mapHeight: number;
-    maxFire: number;
-    baseBribesPerTurn: number;
-    headquartersHealthScalar: number;
-    maxForecastIntensity: number;
-    firePerTurnReduction: number;
-    exposurePerTurnReduction: number;
-    // /creer merge
-}
+export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
+    public schema = this.makeSchema({
+        ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
 
-export class AnarchyGameSettings extends BaseClasses.GameSettings {
-    public get defaults(): IAnarchyGameSettings {
-        return {
-            ...super.defaults,
-            // creer merge
-            // TurnBased Game
-            maxTurns: 500,
+        // creer-merge
+        mapWidth: {
+            default: 40,
+            min: 2,
+            description: "The width (in Buildings) for the game map to be initialized to.",
+        },
+        mapHeight: {
+            default: 20,
+            min: 2,
+            description: "The height (in Buildings) for the game map to be initialized to.",
+        },
+        maxFire: {
+            default: 20,
+            min: 1,
+            description: "The maximum amount of fire value for any Building.",
+        },
+        baseBribesPerTurn: {
+            default: 10,
+            min: 1,
+            description: "How many bribes players get at the beginning of "
+            + "their turn, not counting their burned down Buildings.",
+        },
+        headquartersHealthScalar: {
+            default: 3,
+            min: 1,
+            description: "How much health to scale (multiply a Headquarters health by",
+        },
+        maxForecastIntensity: {
+            default: 10,
+            min: 1,
+            description: "The maximum intensity to allow Forecasts to have.",
+        },
+        firePerTurnReduction: {
+            default: 1,
+            min: 0,
+            description: "How much fire to remove per turn.",
+        },
+        exposurePerTurnReduction: {
+            default: 10,
+            min: 0,
+            description: "How much exposure to remove per turn.",
+        },
+        // /creer-merge
+    });
 
-            mapWidth: 40,
-            mapHeight: 20,
-            maxFire: 20,
-            baseBribesPerTurn: 10,
+    public values = this.initialValues(this.schema);
 
-            // not exposed to clients
-            headquartersHealthScalar: 3,
-            maxForecastIntensity: 10,
-            firePerTurnReduction: 1,
-            exposurePerTurnReduction: 10,
-            // /creer merge
-        };
-    }
-
-    public get descriptions(): IGameSettingsDescriptions<IAnarchyGameSettings> {
-        return {
-            ...super.descriptions,
-            mapWidth: "The width (in Buildings) for the game map to be initialized to.",
-            mapHeight: "The height (in Buildings) for the game map to be initialized to.",
-            maxFire: "The maximum amount of fire value for any Building.",
-            baseBribesPerTurn: "How many bribes players get at the beginning of their turn, "
-                             + "not counting their burned down Buildings.",
-            headquartersHealthScalar: "How much health to scale (multiply a Headquarters health by",
-            maxForecastIntensity: "The maximum intensity to allow Forecasts to have.",
-            firePerTurnReduction: "How much fire to remove per turn.",
-            exposurePerTurnReduction: "How much exposure to remove per turn.",
-        };
-    }
-
-    public invalidate(settings: IAnarchyGameSettings): string | undefined {
-        const invalid = super.invalidate(settings);
-        if (invalid) {
-            return invalid;
+    protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+        const invalidated = super.invalidate(someSettings);
+        if (invalidated instanceof Error) {
+            return invalidated;
         }
+
+        const settings = { ...this.values, ...someSettings, ...invalidated };
 
         // creer merge
         // /creer merge
+
+        return settings;
     }
 }

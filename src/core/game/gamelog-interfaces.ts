@@ -1,5 +1,5 @@
 import { IOrderData, IRunData } from "~/core/clients";
-import { IBaseGameSettings } from "./base/base-game-settings";
+import { IAnyObject } from "~/utils";
 
 export interface IGamelog {
     /**
@@ -17,7 +17,7 @@ export interface IGamelog {
     epoch: number;
 
     /** The value used to seed the random number generator server side */
-    settings: IBaseGameSettings;
+    settings: IAnyObject;
 
     /** The list of all players that won this game (normally just one) */
     winners: IGamelogWinnerLoser[];
@@ -26,7 +26,7 @@ export interface IGamelog {
     losers: IGamelogWinnerLoser[];
 
     /** Lookup of constants used to parse game server <-> client IO */
-    constants: {[key: string]: any};
+    constants: IAnyObject;
 
     /**
      * The list of all deltas in the game. The first delta being the initial

@@ -2,7 +2,7 @@
 
 import { IBaseGameRequiredData } from "~/core/game";
 import { BaseClasses, Building, Forecast, GameManager, GameObject, Player } from "./";
-import { IAnarchyGameSettings } from "./game-settings";
+import { AnarchyGameSettingsManager } from "./game-settings";
 
 // <<-- Creer-Merge: requires -->>
 import { ArrayUtils, IPoint } from "~/utils";
@@ -101,7 +101,7 @@ export class Game extends BaseClasses.Game {
      */
     public readonly players!: Player[];
 
-    public readonly settings!: Readonly<IAnarchyGameSettings>;
+    public readonly settings = Object.freeze(this.settingsManager.values);
 
     // creer-merge
     public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];
@@ -113,8 +113,8 @@ export class Game extends BaseClasses.Game {
      * Initializes Games.
      * @param data - the game settings
      */
-    constructor(settings: IAnarchyGameSettings, required: IBaseGameRequiredData) {
-        super(settings, required);
+    constructor(protected settingsManager: AnarchyGameSettingsManager, required: IBaseGameRequiredData) {
+        super(settingsManager, required);
 
         // <<-- Creer-Merge: init -->>
 

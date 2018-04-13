@@ -1,12 +1,11 @@
 import { Event, Signal } from "ts-typed-events";
 import { BaseClient } from "~/core/clients/";
-import { DeltaMergeable } from "~/core/game";
+import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
-import { IBaseGameSettings } from "./base-game-settings";
 import { IBasePlayer } from "./base-player";
 
 /**
@@ -50,13 +49,15 @@ export class BaseGameManager {
 
     constructor(
         private readonly namespace: IBaseGameNamespace,
-        settings: IBaseGameSettings,
+        settingsManager: BaseGameSettingsManager,
         clients: BaseClient[],
         rootDeltaMergeable: DeltaMergeable,
         sessionID: string,
         gameStarted: Signal,
         private gameOverCallback: () => void,
     ) {
+        const settings = settingsManager.values;
+
         if (!settings.randomSeed) {
             // tslint:disable-next-line:no-math-random - because this is the only place we use old random
             settings.randomSeed = Math.random().toString(36).substring(2);
@@ -88,7 +89,7 @@ export class BaseGameManager {
             gameCreated,
         );
 
-        this.game = new this.namespace.Game(settings, {
+        this.game = new this.namespace.Game(settingsManager, {
             namespace,
             clients,
             rootDeltaMergeable,

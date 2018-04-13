@@ -2,8 +2,8 @@
 import { Config } from "~/core/args";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
-import { ArrayUtils, capitalizeFirstLetter, getDirs, ITypedObject, unstringifyObject } from "~/utils";
-import { BaseClient, IParsedPlayData, IPlayData, TCPClient, WSClient } from "../clients";
+import { ArrayUtils, capitalizeFirstLetter, getDirs, IAnyObject, ITypedObject } from "~/utils";
+import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
@@ -390,7 +390,7 @@ There's probably another Cerveau server running on this same computer.`);
         this.clientsRoom.set(client, room);
 
         if (Config.GAME_SETTINGS_ENABLED && data.gameSettings) {
-            room.addGameSettings(playData.gameSettings);
+            room.addGameSettings(playData.validGameSettings);
         }
 
         client.send("lobbied", {
@@ -438,14 +438,15 @@ There's probably another Cerveau server running on this same computer.`);
      * @returns human readable text why the data is not valid
      * @throws {Error} if there is a validation error, human readable message as to why is thrown
      */
-    private validatePlayData(data?: IPlayData): string | IParsedPlayData {
+    private validatePlayData(data?: IPlayData): string | (IPlayData & { validGameSettings: IAnyObject}) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
 
         const { gameSettings, ...noGameSettings } = data;
-        const validatedData: IParsedPlayData = {
-            gameSettings: {} as any, // will be overwritten below
+        const validatedData = {
+            validGameSettings: {} as IAnyObject, // will be overwritten below
+            gameSettings,
             ...noGameSettings,
         };
 
@@ -468,24 +469,24 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         if (data && data.gameSettings && Config.GAME_SETTINGS_ENABLED) {
+            let settings: IAnyObject = {};
             try {
-                validatedData.gameSettings = unstringifyObject(
-                    querystring.parse(data.gameSettings) as any, // string[] is not valid, but we don't care
-                ) as any; // any because null will not be valid, but unstringify has the option to make that valid
+                settings = (querystring.parse(data.gameSettings));
             }
             catch (err) {
                 return `Game settings incorrectly formatted. Must be one string in the url parameters format.
 Available game settings:
-${gameNamespace.gameSettings.getHelp()}`;
+${gameNamespace.gameSettingsManager.getHelp()}`;
             }
 
             // this function might mutate the game settings to validate them
-            const sanitizedGameSettings = gameNamespace.gameSettings.sanitize(validatedData.gameSettings);
-            const invalidGameSettings = gameNamespace.gameSettings.invalidate(sanitizedGameSettings);
-            if (typeof invalidGameSettings === "string") {
-                return invalidGameSettings; // it did not validate, so return the validation error
+            gameNamespace.gameSettingsManager.reset();
+            const invalid = gameNamespace.gameSettingsManager.addSettings(settings);
+            if (invalid) {
+                return invalid.message;
             }
-            validatedData.gameSettings = sanitizedGameSettings;
+
+            validatedData.validGameSettings = gameNamespace.gameSettingsManager.values;
         }
 
         return validatedData;

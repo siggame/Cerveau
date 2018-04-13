@@ -14,9 +14,9 @@ import { isObjectEmpty } from "~/utils";
 
 // import { startProfiling, stopProfiling } from "v8-profiler";
 // TODO: v8-profiler may be missing as it is optional...
-import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer,
-    IBaseGameNamespace, IBaseGameSettings, IDelta, IFinishedDeltaData, IGamelog,
-    IRanDeltaData } from "../game/";
+import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer, BaseGameSettingsManager,
+    IBaseGameNamespace, IDelta, IFinishedDeltaData, IGamelog, IRanDeltaData,
+} from "../game/";
 
 /**
  * Session: the server that handles of communications between a game and its
@@ -48,7 +48,7 @@ export class Session {
     constructor(args: {
         id: string;
         gameNamespace: IBaseGameNamespace;
-        gameSettings: IBaseGameSettings;
+        gameSettingsManager: BaseGameSettingsManager;
         clients: BaseClient[];
     }) {
         this.id = args.id;
@@ -89,7 +89,7 @@ export class Session {
 
         this.gameManager = new args.gameNamespace.GameManager(
             args.gameNamespace,
-            args.gameSettings,
+            args.gameSettingsManager,
             playingClients,
             this.deltaManager.rootDeltaMergeable,
             this.id,

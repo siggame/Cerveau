@@ -1,91 +1,170 @@
-import { IAnyObject } from "~/utils";
+import { defaultBoolean } from "~/core";
+import { IAnyObject, objectHasProperty } from "~/utils";
 
 export type PossibleSettingValue = string | number | boolean | string[];
 
-export interface IBaseGameSettings {
-    // [key: string]: PossibleSettingValue;
-    playerStartingTime: number;
-    playerNames: string[];
-    randomSeed: string;
+export interface ISettingsSchema<T> {
+    readonly default: T;
+    readonly description: string;
+    readonly min?: T extends number ? number : never;
+    readonly max?: T extends number ? number : never;
 }
 
-export type IGameSettingsDescriptions<T> = {
-    readonly [P in keyof T]: string;
-};
+export interface ISettingsSchemas {
+    [key: string]: ISettingsSchema<PossibleSettingValue>;
+}
 
-export class BaseGameSettings<ISettings extends IBaseGameSettings = IBaseGameSettings> {
-    public get defaults(): ISettings {
-        return {
-            playerNames: [] as string[],
-            playerStartingTime: 6e10,
-            randomSeed: "",
-        } as ISettings;
+export class BaseGameSettingsManager {
+    /**
+     * The schema used to build and validate settings' values.
+     */
+    public readonly schema = this.makeSchema({
+        playerStartingTime: {
+            default: 6e10,
+            min: 0,
+            description: "The starting time (in ns) for each player.",
+        },
+        playerNames: {
+            default: [],
+            description: "The names of the players (overrides strings they send).",
+        },
+        randomSeed: {
+            default: "",
+            description: "The random seed, or empty for a random seed.",
+        },
+    });
+
+    /**
+     * The current settings' values
+     */
+    public values = this.initialValues(this.schema);
+
+    /**
+     * Creates a game settings manager with optional initial values
+     * @param values Optional initial values for the settings
+     */
+    public constructor(values?: IAnyObject) {
+        if (values) {
+            this.addSettings(values);
+        }
     }
 
-    public get descriptions(): IGameSettingsDescriptions<ISettings> {
-        return {
-            playerNames: "The names of the players (overrides strings they send).",
-            playerStartingTime: "The starting time (in ns) for each player.",
-            randomSeed: "The random seed, or empty for a random seed.",
-        } as IGameSettingsDescriptions<ISettings>;
-    }
+    /**
+     * Attempts to add settings to this instance, or returns an Error
+     * @param invalidatedSettings key values pairs to attempt to validate, and
+     * then if valid to be added to our settings
+     * @returns An error if the settings were invalid, otherwise nothing and
+     * the settings are added to this instances values
+     */
+    public addSettings(invalidatedSettings: IAnyObject): void | Error {
+        const sanitized: IAnyObject = {};
 
-    public invalidate(settings: ISettings): string | undefined {
-        settings = this.sanitize(settings);
+        for (let [key, value] of Object.entries(invalidatedSettings)) {
+            if (!objectHasProperty(this.schema, key)) {
+                return new Error(`Unknown setting '${key}'.`);
+            }
 
-        if (isNaN(settings.playerStartingTime) || settings.playerStartingTime < 1) {
-            return `${settings.playerStartingTime} is not a valid starting time, must be >= 1.`;
+            const schema = (this.schema as ISettingsSchemas)[key];
+            switch (typeof schema.default) {
+                case "number":
+                    value = Number(value) || 0;
+                    if (schema.min !== undefined && value < schema.min) {
+                        return new Error(`${key} setting is invalid (${value}). Must be >= ${schema.min}`);
+                    }
+                    if (schema.max !== undefined && value > schema.max) {
+                        return new Error(`${key} setting is invalid (${value}). Must be <= ${schema.max}`);
+                    }
+                    break;
+                case "string":
+                    value = String(value);
+                    break;
+                case "boolean":
+                    value = value === "" // special case from url parm, means key was present with no value
+                        ? true
+                        : defaultBoolean(value);
+                    break;
+                case "object": // string array is this case
+                    value = Array.isArray(value)
+                        ? value.map((item) => String(item))
+                        : [];
+                    break;
+            }
         }
 
-        // otherwise' it's valid!
-    }
+        // now we've sanitized all the inputs, so see if they all are valid
+        const invalidated = this.invalidate(sanitized);
 
-    public sanitize(settings: IAnyObject): ISettings {
-        const sanitized: any = {};
-        const defaults = this.defaults;
-
-        for (const [key, def] of Object.entries(defaults)) {
-            if (key in settings) {
-                // sanitize it
-                switch (typeof def) {
-                    case "number":
-                        sanitized[key] = Number(def);
-                        break;
-                    case "string":
-                        sanitized[key] = String(def);
-                        break;
-                    case "boolean":
-                        sanitized[key] = Boolean(def);
-                        break;
-                    case "object": // string array is this case
-                        sanitized[key] = Array.isArray(def)
-                            ? def.map((item) => String(item))
-                            : [] as string[];
-                        break;
-                }
-            }
-            else {
-                sanitized[key] = def;
-            }
+        if (invalidated instanceof Error) {
+            return invalidated;
         }
 
-        return sanitized;
+        // else if appears to be valid!
+        this.values = invalidated as any;
     }
 
+    /**
+     * Gets the help string to send to clients that do not know what valid
+     * settings are
+     * @returns a string formatted in a human readable fashion
+     */
     public getHelp(): string {
-        const lines = new Array<string>();
+        const lines: string[] = [];
 
-        const defaults: any = this.defaults;
-        const descriptions: any = this.descriptions;
-        for (const key of Object.keys(defaults).sort()) {
-            const def = defaults[key];
-            const type = Array.isArray(def)
+        for (const [key, schema] of Object.entries(this.schema)) {
+            const type = Array.isArray(schema)
                 ? "string[]"
-                : typeof(def);
+                : typeof(schema.default);
 
-            lines.push(`- ${key} {${key}}: ${descriptions[key]} (default ${type})`);
+            lines.push(`- ${key} {${key}}: ${schema.default} (default ${type})`);
         }
 
         return lines.join("\n");
+    }
+
+    /** resets the values to their initial (default) values */
+    public reset(): void {
+        this.values = this.initialValues(this.schema);
+    }
+
+    /**
+     * Makes a schema object from an interface
+     * @param schema The schema to make it from
+     * @returns the schema, now frozen
+     */
+    protected makeSchema<T extends ISettingsSchemas>(schema: T): T {
+        return Object.freeze(schema);
+    }
+
+    /**
+     * Generates initial values from defaults in a settings schema
+     * @param schema The schema to build defaults from
+     * @returns The defaults from that schema
+     */
+    protected initialValues<T extends ISettingsSchemas>(
+        schema: T,
+    ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W> ? (W extends never[] ? string[] : W) : never} {
+        const values = {} as IAnyObject;
+        for (const [key, value] of Object.entries(this.schema)) {
+            values[key] = value.default;
+        }
+
+        return values as any; // lol, try accurately casting to that monstrosity of a type
+    }
+
+    /**
+     * Attempts to invalidate some settings sent to us
+     * @param someSettings a subset of the valid settings to attempt to validate
+     * @returns an Error if invalid, otherwise the validated settings
+     */
+    protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+        // Use our current values and the new ones to form a settings
+        // object to try to validate against
+        const settings = { ...this.values, ...someSettings };
+
+        if (settings.playerStartingTime <= 0) {
+            return new Error(`player starting time is invalid: ${settings.playerStartingTime}. Must be > 0.`);
+        }
+
+        return settings;
     }
 }

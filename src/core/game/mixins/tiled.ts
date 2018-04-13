@@ -1,17 +1,13 @@
 // tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
-import { IBaseGameSettings, IBasePlayer, IGameSettingsDescriptions } from "~/core/game";
+import { IBasePlayer } from "~/core/game";
+import { IAnyObject } from "~/utils";
 import * as Base from "./base";
 
 export const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];
 
 export interface ITiledPlayer extends IBasePlayer {}
-
-export interface ITiledGameSettings extends IBaseGameSettings {
-    mapWidth: number;
-    mapHeight: number;
-}
 
 // TODO: map width/height game setting
 
@@ -27,7 +23,7 @@ export function mixTiled<
     TBaseGame extends Base.BaseGameConstructor,
     TBaseGameManager extends Base.BaseGameManagerConstructor,
     TBaseGameObject extends Base.BaseGameObjectConstructor,
-    TBaseGameSettings extends Base.BaseGameSettingsConstructor
+    TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
     AI: TBaseAI,
     Game: TBaseGame,
@@ -36,34 +32,39 @@ export function mixTiled<
     GameSettings: TBaseGameSettings,
 }) {
     class TiledGameSettings extends base.GameSettings {
-        public get defaults(): ITiledGameSettings {
-            return {
-                ...super.defaults,
-                mapWidth: 32,
-                mapHeight: 16,
-            };
-        }
+        public schema = this.makeSchema({
+            ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+            mapWidth: {
+                default: 32,
+                min: 2,
+                description: "The width (in Tiles) for the game map to be initialized to.",
+            },
+            mapHeight: {
+                default: 16,
+                min: 2,
+                description: "The height (in Tiles) for the game map to be initialized to.",
+            },
+        });
 
-        public get descriptions(): IGameSettingsDescriptions<ITiledGameSettings> {
-            return {
-                ...super.descriptions,
-                mapWidth: "The width (in Tiles) for the game map to be initialized to.",
-                mapHeight: "The height (in Tiles) for the game map to be initialized to.",
-            };
-        }
+        public values = this.initialValues(this.schema);
 
-        public invalidate(settings: ITiledGameSettings): string | undefined {
-            const invalid = super.invalidate(settings);
-            if (invalid) {
-                return invalid;
+        protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+            const invalidated = super.invalidate(someSettings);
+            if (invalidated instanceof Error) {
+                return invalidated;
             }
 
-            for (const dim of ["Width", "Height"]) {
-                const size = Number((settings as any)[`map${dim}`]);
-                if (isNaN(size) || size < 0) {
-                    return `${size} is not a valid size for the map's ${dim.toLowerCase()}.`;
-                }
+            const settings = { ...this.values, ...someSettings, ...invalidated };
+
+            if (settings.mapWidth < 1) {
+                return new Error(`Map height invalid: ${settings.mapWidth}. Must be > 1`);
             }
+
+            if (settings.mapHeight < 1) {
+                return new Error(`Map width invalid: ${settings.mapHeight}. Must be > 1`);
+            }
+
+            return settings;
         }
     }
 

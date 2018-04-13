@@ -6,26 +6,24 @@
 
 import {
     BaseAI, BaseGame, BaseGameManager, BaseGameObject, BaseGameObjectFactory,
-    BaseGameSettings, IBaseGameSettings, IBasePlayer,
-    ITurnBasedGameSettings, ITurnBasedPlayer,
-    ITwoPlayerGameSettings, ITwoPlayerPlayer, makeNamespace, mixTurnBased, mixTwoPlayer,
+    BaseGameSettingsManager, IBasePlayer, ITurnBasedPlayer,
+    ITwoPlayerPlayer, makeNamespace, mixTurnBased, mixTwoPlayer,
 } from "~/core/game";
 
-export interface IBaseAnarchyGameSettings extends IBaseGameSettings, ITurnBasedGameSettings, ITwoPlayerGameSettings {}
 export interface IBaseAnarchyPlayer extends IBasePlayer, ITurnBasedPlayer, ITwoPlayerPlayer {}
 
-const baseA = {
+const base1 = {
     AI: BaseAI,
     Game: BaseGame,
     GameManager: BaseGameManager,
     GameObject: BaseGameObject,
-    GameSettings: BaseGameSettings,
+    GameSettings: BaseGameSettingsManager,
 };
 
-const baseB = mixTurnBased(baseA);
-const baseC = mixTwoPlayer(baseB);
+const base2 = mixTurnBased(base1);
+const base3 = mixTwoPlayer(base2);
 
-const mixed = baseC;
+const mixed = base3;
 
 export class BaseAnarchyAI extends mixed.AI {}
 class BaseAnarchyGame extends mixed.Game {}
@@ -67,7 +65,7 @@ import { IWarehouseConstructorArgs, Warehouse } from "./warehouse";
 import { IWeatherStationConstructorArgs, WeatherStation } from "./weather-station";
 
 import { AI } from "./ai";
-import { AnarchyGameSettings } from "./game-settings";
+import { AnarchyGameSettingsManager } from "./game-settings";
 
 export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     public Building(data: IBuildingConstructorArgs): Building {
@@ -95,21 +93,18 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     }
 }
 
-const gameSettings = new AnarchyGameSettings();
-
 export const Namespace = makeNamespace({
     AI,
     Game,
     GameManager,
     GameObjectFactory: AnarchyGameObjectFactory,
+    GameSettingsManager: AnarchyGameSettingsManager,
     Player,
-
-    gameSettings,
-    defaultGameSettings: gameSettings.defaults,
 
     // these are generated metadata that allow delta-merging values from clients
     // they are never intended to be directly interfaced with outside of
     // Cerveau core developers
+    gameSettingsManager: new AnarchyGameSettingsManager(),
     gameAISchema: {
         orders: {
             runTurn: {

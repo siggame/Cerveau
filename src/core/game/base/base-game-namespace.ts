@@ -3,9 +3,8 @@ import { Constructor } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";
-// import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
-import { BaseGameSettings, IBaseGameSettings } from "./base-game-settings";
+import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer } from "./base-player";
 
 export interface IBaseGameObjectSchema {
@@ -40,14 +39,14 @@ export interface IBaseGameNamespace {
     Game: typeof BaseGame;
     GameManager: typeof BaseGameManager;
     GameObjectFactory: typeof BaseGameObjectFactory;
+    GameSettingsManager: typeof BaseGameSettingsManager;
     Player: Constructor<IBasePlayer>;
 
-    gameSettings: BaseGameSettings;
-    defaultGameSettings: IBaseGameSettings;
     gameAISchema: IBaseAISchema;
     gameObjectsSchema: {
         [gameObjectName: string]: IBaseGameObjectSchema;
     };
+    gameSettingsManager: BaseGameSettingsManager;
 }
 
 export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace {
