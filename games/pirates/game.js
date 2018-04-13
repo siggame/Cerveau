@@ -699,7 +699,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(t.tileNorth && t.tileNorth.type === "land") {
                     land = true;
                 }
-                else {
+                else if(t.tileNorth) {
                     water += 1;
                     if(t.tileNorth.tileEast && t.tileNorth.tileEast.type === "water") {
                         water += 1;
@@ -711,13 +711,13 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(t.tileEast && t.tileEast.type === "land") {
                     land = true;
                 }
-                else {
+                else if(t.tileEast) {
                     water += 1;
                 }
                 if(t.tileSouth && t.tileSouth.type === "land") {
                     land = true;
                 }
-                else {
+                else if(t.tileSouth) {
                     water += 1;
                     if(t.tileSouth.tileEast && t.tileSouth.tileEast.type === "water") {
                         water += 1;
@@ -729,7 +729,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(t.tileWest && t.tileWest.type === "land") {
                     land = true;
                 }
-                else {
+                else if(t.tileWest) {
                     water += 1;
                 }
 
@@ -855,6 +855,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(let body of bodies) {
             for(let tile of body) {
                 tile.type = "land";
+                tile.decoration = false;
             }
         }
     },

@@ -322,7 +322,7 @@ let Unit = Class(GameObject, {
         let dx = this.x - player.port.x;
         let dy = this.y - player.port.y;
         let distSq = dx * dx + dy * dy;
-        if(distSq < this.game.minInterestDistance) {
+        if(distSq < this.game.minInterestDistance * this.game.minInterestDistance) {
             return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
         }
 
