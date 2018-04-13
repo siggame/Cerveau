@@ -1,6 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { GameObject, IGameObjectConstructorArgs, Player } from "./";
-import { IBuildingProperties } from "./game-interfaces";
+import { GameObject, IBuildingProperties, IGameObjectConstructorArgs, Player } from "./";
 
 export interface IBuildingConstructorArgs extends IBuildingProperties, IGameObjectConstructorArgs {
     // <<-- Creer-Merge: constructor-args -->>

@@ -1,7 +1,6 @@
 // FireDepartment: Can put out fires completely.
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, Player } from "./";
-import { IFireDepartmentProperties } from "./game-interfaces";
+import { Building, IBuildingConstructorArgs, IFireDepartmentProperties, Player } from "./";
 
 // <<-- Creer-Merge: imports -->>
 import { clamp } from "~/utils";

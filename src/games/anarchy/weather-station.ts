@@ -1,6 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, Player } from "./";
-import { IWeatherStationProperties } from "./game-interfaces";
+import { Building, IBuildingConstructorArgs, IWeatherStationProperties, Player } from "./";
 
 // <<-- Creer-Merge: requires -->>
 import { nextWrapAround, previousWrapAround } from "~/utils";

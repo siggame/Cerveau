@@ -1,7 +1,6 @@
 // Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { GameObject, IGameObjectConstructorArgs, Player } from "./";
-import { IForecastProperties } from "./game-interfaces";
+import { GameObject, IForecastProperties, IGameObjectConstructorArgs, Player } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be required here safely between cree runs

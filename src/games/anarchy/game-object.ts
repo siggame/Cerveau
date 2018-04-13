@@ -1,7 +1,6 @@
 // GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
 
-import { BaseClasses, Game, GameManager } from "./";
-import { IGameObjectProperties } from "./game-interfaces";
+import { BaseClasses, Game, GameManager, IGameObjectProperties } from "./";
 
 export interface IGameObjectConstructorArgs extends IGameObjectProperties {
     // <<-- Creer-Merge: constructor-args -->>

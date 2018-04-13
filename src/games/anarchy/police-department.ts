@@ -1,6 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, Player, Warehouse } from "./";
-import { IPoliceDepartmentProperties } from "./game-interfaces";
+import { Building, IBuildingConstructorArgs, IPoliceDepartmentProperties, Player, Warehouse } from "./";
 
 // <<-- Creer-Merge: requires -->>
 // <<-- /Creer-Merge: requires -->>
