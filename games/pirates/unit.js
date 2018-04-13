@@ -680,12 +680,15 @@ let Unit = Class(GameObject, {
     split: function(player, tile, amount, gold) {
         // <<-- Creer-Merge: split -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        // TO-DO implement moving to ships and ports as well.
-        // Set the owner of the new unit to current player
-        tile.unit.owner = this.owner;
+        // Create a new unit
+        let newUnit = this.game.create("Unit", {
+            owner: player,
+            tile: tile,
+        });
 
+        // Check if boarding a ship
         if(tile.type === "water" && tile.unit.shipHealth > 0) {
-            tile.unit.acted = true;
+            newUnit.acted = true;
         }
 
         // Adjust the amount of crew to split
@@ -709,19 +712,19 @@ let Unit = Class(GameObject, {
         }
 
         // Move crew to new tile
-        tile.unit.crew += this.crew;
+        newUnit.crew += this.crew;
         this.crew -= amount;
 
         // Give new Unit health from old one
-        tile.unit.crewHealth += Math.ceil(this.crewHealth * movePercent);
+        newUnit.crewHealth += Math.ceil(this.crewHealth * movePercent);
         this.crewHealth = Math.floor(this.crewHealth * stayPercent);
 
         // Move gold to new Unit
-        tile.unit.gold += gold;
+        newUnit.gold += gold;
         this.gold -= gold;
 
         // Set moves for the units that moved
-        tile.moves = Math.min(this.moves - 1, tile.moves);
+        newUnit.moves = this.moves - 1;
 
         if(movePercent >= 1) {
             // Disassociating from old Tile if all the crew moved
@@ -731,6 +734,15 @@ let Unit = Class(GameObject, {
                 this.tile.unit = null;
                 this.tile = null;
             }
+        }
+
+        // Check if merging with another unit
+        if(tile.unit) {
+            tile.unit.mergeOnto(newUnit);
+        }
+        else {
+            tile.unit = newUnit;
+            this.game.newUnits.push(newUnit);
         }
 
         return true;
