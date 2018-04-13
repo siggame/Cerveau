@@ -67,7 +67,7 @@ let Player = Class(GameObject, {
          *
          * @type {Port}
          */
-        this.ports = this.ports || null;
+        this.port = this.port || null;
 
         /**
          * The reason why the player lost the game.

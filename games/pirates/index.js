@@ -233,7 +233,7 @@ classes.Player._deltaMergeableProperties = {
         defaultValue: null,
     },
 
-    ports: {
+    port: {
         type: {"is_game_object": true, "keyType": null, "name": "Port", "valueType": null},
         defaultValue: null,
     },

@@ -472,7 +472,7 @@
                 "lost",
                 "name",
                 "opponent",
-                "ports",
+                "port",
                 "reasonLost",
                 "reasonWon",
                 "timeRemaining",
@@ -540,7 +540,7 @@
                         "valueType": null
                     }
                 },
-                "ports": {
+                "port": {
                     "default": null,
                     "description": "The Port owned by this Player.",
                     "type": {
