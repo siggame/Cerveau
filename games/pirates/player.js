@@ -129,7 +129,8 @@ let Player = Class(GameObject, {
             if(unit.shipHealth > 0) {
                 worth += this.game.shipCost;
             }
-            worth += unit.crew * this.game.crewCost;
+
+            worth += unit.crew * this.game.crewCost + unit.gold;
         }
         return worth;
     },

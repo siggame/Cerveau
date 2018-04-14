@@ -97,7 +97,7 @@ let Port = Class(GameObject, {
                 return `Ye don't have enough gold to spawn a ship at ${this}.`;
             }
 
-            if(this.gold < this.game.crewCost) {
+            if(this.gold < this.game.shipCost) {
                 return `${this} can't spend enough gold to spawn a ship this turn! Ye gotta wait til next turn.`;
             }
 

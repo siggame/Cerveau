@@ -262,8 +262,8 @@ let Unit = Class(GameObject, {
         let factor = 1;
         if(!merchant) {
             // Calculate each player's net worth
-            let allyWorth = player.netWorth() + player.gold;
-            let opponentWorth = player.opponent.netWorth() + player.opponent.gold;
+            let allyWorth = player.netWorth() + player.gold - gold;
+            let opponentWorth = player.opponent.netWorth() + player.opponent.gold + gold;
             opponentWorth += deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
 
             if(allyWorth > opponentWorth) {
@@ -375,17 +375,15 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        const tile = player.port.tile;
-        if(this.tile !== tile && this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
-            return `Arr, ${this} has to deposit yer booty in yer home port, matey!`;
+        let neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        let found = neighbors.find(t => t && t.port && t.port.owner !== player.opponent);
+
+        if(!found) {
+            return `Arr, ${this} has to deposit yer booty in yer home port or a merchant port, matey!`;
         }
 
         if(this.gold <= 0) {
             return `Shiver me timbers! ${this} doesn't have any booty to deposit!`;
-        }
-
-        if(amount < 0) {
-            return `Cor blimey, ${this} can't deposit a negative amount of yer plunder! If ye wanna withdraw gold, then ye gotta use 'Unit.withdraw'.`;
         }
 
         return undefined; // meaning valid
@@ -403,16 +401,24 @@ let Unit = Class(GameObject, {
     deposit: function(player, amount) {
         // <<-- Creer-Merge: deposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        if(amount > 0 && amount < this.gold) {
+        // Adjust amount
+        amount = Math.min(Math.max(amount, 0), this.gold);
+        this.gold -= amount;
+
+        // Check for this player's port
+        let neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        let tile = neighbors.find(t => t && t.port && t.port.owner === player, this);
+
+        if(tile) {
             player.gold += amount;
-            this.gold -= amount;
-            return true;
         }
         else {
-            player.gold += this.gold;
-            this.gold = 0;
-            return true;
+            // Get the merchant's port
+            tile = neighbors.find(t => t && t.port && !t.port.owner, this);
+            tile.port.investment += amount;
         }
+
+        return true;
 
         // <<-- /Creer-Merge: deposit -->>
     },
@@ -630,7 +636,7 @@ let Unit = Class(GameObject, {
     invalidateSplit: function(player, tile, amount, gold, args) {
         // <<-- Creer-Merge: invalidateSplit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        const reason = this._invalidate(player, true);
+        const reason = this._invalidate(player, false);
         if(reason) {
             return reason;
         }
@@ -759,17 +765,14 @@ let Unit = Class(GameObject, {
     invalidateWithdraw: function(player, amount, args) {
         // <<-- Creer-Merge: invalidateWithdraw -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
-        const reason = this._invalidate(player, true);
+        const reason = this._invalidate(player, false);
         if(reason) {
             return reason;
         }
 
-        if(!this.tile.port) {
-            return `Arr, there be no port on the tile ${this} is on.`;
-        }
-
-        if(this.tile.port !== player.port) {
-            return `Arr, ${this} can't be takin' gold from anywhere but yer starting port!`;
+        const tile = player.port.tile;
+        if(this.tile !== tile && this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+            return `${this} has to withdraw yer booty from yer home port, matey!`;
         }
 
         return undefined; // meaning valid
