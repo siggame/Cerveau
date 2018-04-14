@@ -852,6 +852,7 @@ let Unit = Class(GameObject, {
         other.tile.unit = this;
         this.tile = other.tile;
         other.tile = null;
+        this.owner = other.owner || this.owner;
 
         this.crew += other.crew;
         this.crewHealth += other.crewHealth;

@@ -755,6 +755,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.ports.push(port);
 
         // Place merchant port
+        portTiles = portTiles.filter(t => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 4);
         selected = Math.floor(Math.random() * portTiles.length);
         port = this.create("Port", {
             owner: null,
