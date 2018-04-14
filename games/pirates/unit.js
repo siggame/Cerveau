@@ -702,6 +702,8 @@ let Unit = Class(GameObject, {
         let newUnit = this.game.create("Unit", {
             owner: player,
             tile: tile,
+            moves: this.moves - 1,
+
         });
 
         // Check if boarding a ship
@@ -737,16 +739,9 @@ let Unit = Class(GameObject, {
         newUnit.crewHealth += Math.ceil(this.crewHealth * movePercent);
         this.crewHealth = Math.floor(this.crewHealth * stayPercent);
 
-        if(this.crew === 0) {
-            this.owner = null;
-        }
-
         // Move gold to new Unit
         newUnit.gold += gold;
         this.gold -= gold;
-
-        // Set moves for the units that moved
-        newUnit.moves = this.moves - 1;
 
         if(movePercent >= 1) {
             // Disassociating from old Tile if all the crew moved
@@ -762,12 +757,20 @@ let Unit = Class(GameObject, {
         if(tile.unit) {
             let other = tile.unit;
             other.owner = player;
-            other.gold += this.gold;
-            other.crew += this.crew;
-            other.crewHealth += this.crewHealth;
-            other.shipHealth += this.shipHealth;
-            other.acted &= this.acted || other.shipHealth > 0;
-            other.moves = Math.min(this.moves - 1, other.moves);
+            other.gold += newUnit.gold;
+            other.crew += newUnit.crew;
+            other.crewHealth += newUnit.crewHealth;
+            other.acted &= other.shipHealth > 0;
+            other.moves = Math.min(newUnit.moves, other.moves);
+
+            if(this.crew === 0) {
+                this.owner = null;
+
+                if(this.shipHealth <= 0) {
+                    this.tile.unit = null;
+                    this.tile = null;
+                }
+            }
         }
         else {
             tile.unit = newUnit;
