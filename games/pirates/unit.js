@@ -703,11 +703,10 @@ let Unit = Class(GameObject, {
             owner: player,
             tile: tile,
             moves: this.moves - 1,
-
         });
 
         // Check if boarding a ship
-        if(tile.type === "water" && tile.unit.shipHealth > 0) {
+        if(tile.unit.shipHealth > 0) {
             newUnit.acted = true;
         }
 
@@ -719,31 +718,30 @@ let Unit = Class(GameObject, {
             amount = Math.min(amount, this.crew);
         }
 
-        // Some helpful constants
-        const movePercent = amount / this.crew;
-        const stayPercent = 1 - movePercent;
-
-        // Adjust the amount of gold to move
-        if(gold < 0 || (movePercent >= 1 && this.shipHealth <= 0)) {
-            gold = this.gold;
+        // Adjust the amount of gold to split
+        if(amount === this.crew) {
+            newUnit.gold = this.gold;
         }
         else {
-            gold = Math.min(gold, this.gold);
+            newUnit.gold = Math.min(gold, this.gold);
         }
+        this.gold -= newUnit.gold;
 
-        // Move crew to new tile
+        // Move the crew
         newUnit.crew += amount;
         this.crew -= amount;
 
-        // Give new Unit health from old one
-        newUnit.crewHealth += Math.ceil(this.crewHealth * movePercent);
-        this.crewHealth = Math.floor(this.crewHealth * stayPercent);
+        // Crew health
+        if(amount === this.crew) {
+            newUnit.crewHealth = this.crewHealth;
+        }
+        else {
+            newUnit.crewHealth = Math.ceil(amount / this.crewHealth);
+        }
+        this.crewHealth -= newUnit.crewHealth;
 
-        // Move gold to new Unit
-        newUnit.gold += gold;
-        this.gold -= gold;
-
-        if(movePercent >= 1) {
+        // Ownership
+        if(amount === this.crew) {
             // Disassociating from old Tile if all the crew moved
             this.owner = null;
             if(this.shipHealth <= 0) {
@@ -762,19 +760,19 @@ let Unit = Class(GameObject, {
             other.crewHealth += newUnit.crewHealth;
             other.acted &= other.shipHealth > 0;
             other.moves = Math.min(newUnit.moves, other.moves);
-
-            if(this.crew === 0) {
-                this.owner = null;
-
-                if(this.shipHealth <= 0) {
-                    this.tile.unit = null;
-                    this.tile = null;
-                }
-            }
         }
         else {
             tile.unit = newUnit;
             this.game.newUnits.push(newUnit);
+        }
+
+        if(this.crew === 0) {
+            this.owner = null;
+
+            if(this.shipHealth <= 0) {
+                this.tile.unit = null;
+                this.tile = null;
+            }
         }
 
         return true;
