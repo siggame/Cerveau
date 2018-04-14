@@ -728,6 +728,10 @@ let Unit = Class(GameObject, {
         newUnit.crewHealth += Math.ceil(this.crewHealth * movePercent);
         this.crewHealth = Math.floor(this.crewHealth * stayPercent);
 
+        if(this.crew === 0) {
+            this.owner = null;
+        }
+
         // Move gold to new Unit
         newUnit.gold += gold;
         this.gold -= gold;
@@ -748,6 +752,7 @@ let Unit = Class(GameObject, {
         // Check if merging with another unit
         if(tile.unit) {
             tile.unit.mergeOnto(newUnit);
+            tile.unit.owner = player;
         }
         else {
             tile.unit = newUnit;
