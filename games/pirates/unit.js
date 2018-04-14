@@ -707,7 +707,7 @@ let Unit = Class(GameObject, {
         }
 
         // Move crew to new tile
-        newUnit.crew += this.crew;
+        newUnit.crew += amount;
         this.crew -= amount;
 
         // Give new Unit health from old one
@@ -767,7 +767,7 @@ let Unit = Class(GameObject, {
             return `Arr, there be no port on the tile ${this} is on.`;
         }
 
-        if(this.tile.port.owner !== player.port) {
+        if(this.tile.port !== player.port) {
             return `Arr, ${this} can't be takin' gold from anywhere but yer starting port!`;
         }
 
