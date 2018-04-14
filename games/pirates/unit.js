@@ -634,8 +634,12 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
+        if(!tile) {
+            return `${this} can't split onto null!`;
+        }
+
         // Check to see if the crew has a move to move
-        if(this.unit.moves === 0) {
+        if(this.moves <= 0) {
             return `${this} can't split cause they be out of moves.`;
         }
 
@@ -759,7 +763,11 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        if(this.tile !== player.port) {
+        if(!this.tile.port) {
+            return `Arr, there be no port on the tile ${this} is on.`;
+        }
+
+        if(this.tile.port.owner !== player.port) {
             return `Arr, ${this} can't be takin' gold from anywhere but yer starting port!`;
         }
 

@@ -742,6 +742,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         let port = this.create("Port", {
             owner: this.players[0],
             tile: portTiles[selected],
+            gold: this.shipCost,
         });
         portTiles.splice(selected, 1);
         port.tile.port = port;
@@ -775,6 +776,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     port = this.create("Port", {
                         tile: target,
                         owner: orig.port.owner && orig.port.owner.opponent,
+                        gold: orig.port.gold,
                     });
                     target.port = port;
                     this.ports.push(port);
