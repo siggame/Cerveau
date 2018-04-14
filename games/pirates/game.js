@@ -693,6 +693,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     return false;
                 }
 
+                // Make sure it's not too close to the center
+                if(t.x > this.mapWidth / 4) {
+                    return false;
+                }
+
                 // Check neighbors - make sure there's land and enough water
                 let land = false;
                 let water = 0;

@@ -375,7 +375,7 @@ let Unit = Class(GameObject, {
             return reason;
         }
 
-        let neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        let neighbors = [this.tile, this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
         let found = neighbors.find(t => t && t.port && t.port.owner !== player.opponent);
 
         if(!found) {
@@ -406,7 +406,7 @@ let Unit = Class(GameObject, {
         this.gold -= amount;
 
         // Check for this player's port
-        let neighbors = [this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
+        let neighbors = [this.tile, this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
         let tile = neighbors.find(t => t && t.port && t.port.owner === player, this);
 
         if(tile) {
