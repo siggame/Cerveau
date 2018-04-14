@@ -774,7 +774,7 @@ let Unit = Class(GameObject, {
                 this.tile = null;
             }
         }
-
+        tile.unit.owner = player;
         return true;
 
         // <<-- /Creer-Merge: split -->>
