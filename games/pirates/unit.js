@@ -558,8 +558,17 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         if(tile.unit) {
-            this.moves--;
-            this.mergeOnto(tile.unit);
+            let other = tile.unit;
+            other.tile = null;
+            tile.unit = this;
+            this.tile = tile;
+
+            this.gold += other.gold;
+            this.crew += other.crew;
+            this.crewHealth += other.crewHealth;
+            this.shipHealth += other.shipHealth;
+            this.acted &= other.acted || other.shipHealth > 0;
+            this.moves = Math.min(this.moves - 1, other.moves);
         }
         else {
             // Move this unit to that tile
@@ -751,8 +760,14 @@ let Unit = Class(GameObject, {
 
         // Check if merging with another unit
         if(tile.unit) {
-            tile.unit.mergeOnto(newUnit);
-            tile.unit.owner = player;
+            let other = tile.unit;
+            other.owner = player;
+            other.gold += this.gold;
+            other.crew += this.crew;
+            other.crewHealth += this.crewHealth;
+            other.shipHealth += this.shipHealth;
+            other.acted &= this.acted || other.shipHealth > 0;
+            other.moves = Math.min(this.moves - 1, other.moves);
         }
         else {
             tile.unit = newUnit;
@@ -850,21 +865,6 @@ let Unit = Class(GameObject, {
         if(!this.tile || this.crew === 0) {
             return `Ye can't control ${this}.`;
         }
-    },
-
-    mergeOnto: function(other) {
-        this.tile.unit = null;
-        other.tile.unit = this;
-        this.tile = other.tile;
-        other.tile = null;
-        this.owner = other.owner || this.owner;
-
-        this.crew += other.crew;
-        this.crewHealth += other.crewHealth;
-        this.shipHealth += other.shipHealth;
-        this.gold += other.gold;
-        this.acted &= other.acted || this.shipHealth > 0;
-        this.moves = Math.min(this.moves, other.moves);
     },
 
     //<<-- /Creer-Merge: added-functions -->>
