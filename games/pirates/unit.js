@@ -229,6 +229,7 @@ let Unit = Class(GameObject, {
                 }
                 else {
                     tile.unit.owner = null;
+                    tile.unit.shipHealth = 1;
 
                     // Make sure it's not a merchant ship anymore either
                     tile.unit.targetPort = null;
@@ -837,10 +838,6 @@ let Unit = Class(GameObject, {
     },
 
     mergeOnto: function(other) {
-        if(!other.owner && other.shipHealth > 0) {
-            other.shipHealth = 1;
-        }
-
         this.tile.unit = null;
         other.tile.unit = this;
         this.tile = other.tile;
