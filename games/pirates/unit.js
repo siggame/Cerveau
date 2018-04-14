@@ -406,6 +406,10 @@ let Unit = Class(GameObject, {
 
         // Adjust amount
         amount = Math.min(Math.max(amount, 0), this.gold);
+        if(amount <= 0) {
+            amount = this.gold;
+        }
+
         this.gold -= amount;
 
         // Check for this player's port
