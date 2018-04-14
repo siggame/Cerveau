@@ -853,7 +853,7 @@ let Unit = Class(GameObject, {
         this.crewHealth += other.crewHealth;
         this.shipHealth += other.shipHealth;
         this.gold += other.gold;
-        this.acted &= other.acted;
+        this.acted &= other.acted || this.shipHealth > 0;
         this.moves = Math.min(this.moves, other.moves);
     },
 
