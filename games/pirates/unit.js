@@ -542,6 +542,10 @@ let Unit = Class(GameObject, {
         if(tile.port && tile.port.owner !== player) {
             return `${this} can't enter an enemy port!`;
         }
+        if(ship && tile.port && tile.shipHealth > 0)
+        {
+            return `${this} can't move into yer port, ye'll scuttle yer ship!`;
+        }
         return undefined; // meaning valid
 
         // <<-- /Creer-Merge: invalidateMove -->>
