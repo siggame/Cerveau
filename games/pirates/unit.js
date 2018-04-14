@@ -207,6 +207,7 @@ let Unit = Class(GameObject, {
         let deadShips = 0;
         let gold = 0;
         let merchant = tile.unit.targetPort !== null;
+        let neutral = !merchant && !tile.owner;
         if(target === "C") {
             // Crew attacking crew
             tile.unit.crewHealth -= this.game.crewDamage * this.crew;
@@ -278,12 +279,14 @@ let Unit = Class(GameObject, {
         let infamy = deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
         infamy *= factor;
 
-        if(!merchant) {
-            infamy = Math.min(infamy, player.opponent.infamy);
-            player.opponent.infamy -= infamy;
-        }
+        if(!neutral) {
+            if(!merchant) {
+                infamy = Math.min(infamy, player.opponent.infamy);
+                player.opponent.infamy -= infamy;
+            }
 
-        player.infamy += infamy;
+            player.infamy += infamy;
+        }
 
         if(merchant && tile.unit) {
             tile.unit.stunTurns = 2;
