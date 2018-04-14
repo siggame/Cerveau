@@ -243,7 +243,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.merchantGold = this.shipCost;
         this.merchantBaseCrew = 3;
         this.merchantCost = this.shipCost * 4;
-        this.startingGold = data.startingGold || 2400;
+        this.startingGold = data.startingGold || 3 * this.crewCost + 3 * this.shipCost;
 
         // For units and structures created during a turn
         this.newUnits = [];
@@ -279,7 +279,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
         // Give players their starting gold
         for(let player of this.players) {
-            player.gold = 3000;
+            player.gold = this.startingGold;
         }
 
         //<<-- /Creer-Merge: begin -->>

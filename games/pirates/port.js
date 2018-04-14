@@ -149,7 +149,7 @@ let Port = Class(GameObject, {
             this.tile.unit.acted = true;
             this.tile.unit.moves = 0;
             player.gold -= this.game.shipCost;
-            this.gold -= this.game.crewCost;
+            this.gold -= this.game.shipCost;
         }
 
         return true;
