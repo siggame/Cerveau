@@ -680,8 +680,16 @@ let Unit = Class(GameObject, {
         }
 
         // Check to make sure target tile is a valid tile
-        if(tile.type !== "land" && tile.unit.shipHealth <= 0 && tile.port === null) {
-            return `${this} can't split here!`;
+        if(tile.type === "water" && !tile.unit && !tile.port) {
+            return `${this} can't split onto water!`;
+        }
+
+        if(tile.unit && (tile.unit.owner === player.opponent || tile.unit.targetPort)) {
+            return `${this} can't split onto enemy pirates!`;
+        }
+
+        if(tile.port && tile.port.owner !== player) {
+            return `${this} can't split onto enemy ports!`;
         }
 
         return undefined; // meaning valid
