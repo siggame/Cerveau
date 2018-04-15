@@ -246,14 +246,12 @@ let Unit = Class(GameObject, {
             // Check if ship was destroyed
             if(tile.unit.shipHealth <= 0) {
                 deadShips += 1;
-                if(tile.port == null) {
-                  gold += tile.unit.gold;
-                  deadCrew += tile.unit.crew;
+                gold += tile.unit.gold;
+                deadCrew += tile.unit.crew;
 
-                  // Mark it as dead
-                  tile.unit.tile = null;
-                  tile.unit = null;
-                }
+                // Mark it as dead
+                tile.unit.tile = null;
+                tile.unit = null;
             }
         }
 
