@@ -221,7 +221,8 @@ let Unit = Class(GameObject, {
 
             // Check if the crew was completely destroyed
             if(tile.unit.crewHealth <= 0) {
-                if(tile.unit.shipHealth <= 0) {
+                if(tile.unit.shipHealth <= 0 || (tile.port && !tile.port.owner)) {
+                    deadShips += (tile.port && !tile.port.owner) ? 1 : 0;
                     gold += tile.unit.gold;
 
                     // Mark it as dead
