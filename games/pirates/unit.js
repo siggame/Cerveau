@@ -533,10 +533,10 @@ let Unit = Class(GameObject, {
         if(ship && tile.type === "land") {
             return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if ye want to move just yer crew ashore.`;
         }
-        if(ship && tile.shipHealth > 0) {
+        if(ship && tile.unit && tile.unit.shipHealth > 0) {
             return `There be a ship there. If ye move ${this} to ${tile}, ye'll scuttle yer ship!`;
         }
-        if(!ship && tile.ship && this.acted) {
+        if(!ship && tile.unit && tile.unit.ship && this.acted) {
             return `${this} already acted, and it be too tired to board that ship.`;
         }
         if(tile.port && tile.port.owner !== player) {
