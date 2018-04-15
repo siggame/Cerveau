@@ -722,7 +722,7 @@ let Unit = Class(GameObject, {
         }
 
         // Adjust the amount of crew to split
-        let OrigonalCrew = this.crew;
+        let OriginalCrew = this.crew;
         if(amount <= 0) {
             amount = this.crew;
         }
@@ -748,7 +748,7 @@ let Unit = Class(GameObject, {
             newUnit.crewHealth = this.crewHealth;
         }
         else {
-            newUnit.crewHealth = Math.ceil((this.crewHealth / OrigonalCrew)*amount);
+            newUnit.crewHealth = Math.ceil((this.crewHealth / OriginalCrew)*amount);
         }
         this.crewHealth -= newUnit.crewHealth;
 
