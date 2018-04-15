@@ -162,7 +162,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, {
         TurnBasedGame._initPlayers.apply(this, arguments);
 
         // we can assume there are only 2 players (it's set above), no need to loop through them
-        this.players[0].yDirection = 1;  // they are on top, and move down the board until kinged
+        this.players[0].yDirection = 1; // they are on top, and move down the board until kinged
         this.players[1].yDirection = -1; // they are on bottom, and move up the board until kinged
     },
 

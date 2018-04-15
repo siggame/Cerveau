@@ -117,7 +117,7 @@ let Spitter = Class(Spiderling, {
         this.spittingWebToNest = null;
     },
 
-     /**
+    /**
      * Finishes the actions of the Spitter
      *
      * @override

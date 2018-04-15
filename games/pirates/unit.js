@@ -542,8 +542,7 @@ let Unit = Class(GameObject, {
         if(tile.port && tile.port.owner !== player) {
             return `${this} can't enter an enemy port!`;
         }
-        if(ship && tile.port && tile.shipHealth > 0)
-        {
+        if(ship && tile.port && tile.shipHealth > 0) {
             return `${this} can't move into yer port, ye'll scuttle yer ship!`;
         }
         return undefined; // meaning valid
@@ -571,7 +570,7 @@ let Unit = Class(GameObject, {
             this.crew += other.crew;
             this.crewHealth += other.crewHealth;
             this.shipHealth += other.shipHealth;
-            this.acted &= other.acted || other.shipHealth > 0;
+            this.acted = this.acted || other.acted || other.shipHealth > 0;
             this.moves = Math.min(this.moves - 1, other.moves);
         }
         else {
@@ -710,7 +709,7 @@ let Unit = Class(GameObject, {
         });
 
         // Check if boarding a ship
-        if(tile.unit.shipHealth > 0) {
+        if(tile.unit && tile.unit.shipHealth > 0) {
             newUnit.acted = true;
         }
 
@@ -722,18 +721,18 @@ let Unit = Class(GameObject, {
             amount = Math.min(amount, this.crew);
         }
 
+        // Move the crew
+        newUnit.crew += amount;
+        this.crew -= amount;
+
         // Adjust the amount of gold to split
-        if(amount === this.crew) {
+        if((amount === this.crew && this.shipHealth <= 0) || gold < 0) {
             newUnit.gold = this.gold;
         }
         else {
             newUnit.gold = Math.min(gold, this.gold);
         }
         this.gold -= newUnit.gold;
-
-        // Move the crew
-        newUnit.crew += amount;
-        this.crew -= amount;
 
         // Crew health
         if(amount === this.crew) {
@@ -745,7 +744,7 @@ let Unit = Class(GameObject, {
         this.crewHealth -= newUnit.crewHealth;
 
         // Ownership
-        if(amount === this.crew) {
+        if(this.crew <= 0) {
             // Disassociating from old Tile if all the crew moved
             this.owner = null;
             if(this.shipHealth <= 0) {
@@ -762,7 +761,7 @@ let Unit = Class(GameObject, {
             other.gold += newUnit.gold;
             other.crew += newUnit.crew;
             other.crewHealth += newUnit.crewHealth;
-            other.acted &= other.shipHealth > 0;
+            other.acted = other.acted || other.shipHealth > 0;
             other.moves = Math.min(newUnit.moves, other.moves);
         }
         else {
@@ -770,14 +769,6 @@ let Unit = Class(GameObject, {
             this.game.newUnits.push(newUnit);
         }
 
-        if(this.crew === 0) {
-            this.owner = null;
-
-            if(this.shipHealth <= 0) {
-                this.tile.unit = null;
-                this.tile = null;
-            }
-        }
         tile.unit.owner = player;
         return true;
 

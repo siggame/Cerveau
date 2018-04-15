@@ -112,7 +112,7 @@ let Cutter = Class(Spiderling, {
         this.cuttingWeb = null;
     },
 
-     /**
+    /**
      * Finishes the actions of the Cutter
      *
      * @override

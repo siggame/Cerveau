@@ -502,10 +502,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(target) {
                     // Attack the target
                     target.shipHealth -= this.shipDamage;
-                    if(target.shipHealth <= 0) {
+                    if(target.shipHealth <= 0 && !target.tile.port) {
                         target.tile.unit = null;
                         target.tile = null;
                     }
+
+                    target.shipHealth = Math.max(0, target.shipHealth);
                 }
 
                 // Move the merchant

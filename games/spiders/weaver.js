@@ -180,7 +180,7 @@ let Weaver = Class(Spiderling, {
         this.weakeningWeb = null;
     },
 
-     /**
+    /**
      * Finishes the actions of the Weaver
      *
      * @override

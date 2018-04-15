@@ -270,7 +270,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, {
                     break;
                 }
                 ++buildingIndex;
-              // just to be safe
+                // just to be safe
                 buildingIndex %= 4;
             }
             // how many buildings are left to be generated

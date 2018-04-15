@@ -211,7 +211,7 @@ var Client = Class({
         return this.socket;
     },
 
-     /**
+    /**
       * Tries to parse json data from the client, and disconnects them fatally if it is malformed.
       *
       * @param {string} json - the json formatted string to parse

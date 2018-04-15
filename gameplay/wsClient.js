@@ -70,7 +70,7 @@ var WSClient = Class(Client, {
         return this.socket._socket; // hackish, as we are grabbing a private socket out of the lark-websockets client, but works.
     },
 
-     /**
+    /**
       * Stops listening to the current socket, for passing to another thread
       *
       * @override
