@@ -207,7 +207,7 @@ let Unit = Class(GameObject, {
         let deadShips = 0;
         let gold = 0;
         let merchant = tile.unit.targetPort !== null;
-        let neutral = !merchant && !tile.owner;
+        let neutral = !merchant && !tile.unit.owner;
         if(target === "C") {
             // Crew attacking crew
             tile.unit.crewHealth -= this.game.crewDamage * this.crew;
@@ -221,7 +221,7 @@ let Unit = Class(GameObject, {
 
             // Check if the crew was completely destroyed
             if(tile.unit.crewHealth <= 0) {
-                if(tile.unit.shipHealth <= 0 || (tile.port && !tile.port.owner)) {
+                if(tile.unit.shipHealth <= 0) {
                     gold += tile.unit.gold;
 
                     // Mark it as dead
@@ -246,11 +246,14 @@ let Unit = Class(GameObject, {
             // Check if ship was destroyed
             if(tile.unit.shipHealth <= 0) {
                 deadShips += 1;
-                gold += tile.unit.gold;
+                if(tile.port == null) {
+                  gold += tile.unit.gold;
+                  deadCrew += tile.unit.crew;
 
-                // Mark it as dead
-                tile.unit.tile = null;
-                tile.unit = null;
+                  // Mark it as dead
+                  tile.unit.tile = null;
+                  tile.unit = null;
+                }
             }
         }
 
