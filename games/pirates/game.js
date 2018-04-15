@@ -640,9 +640,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     generateMap: function() {
         let portTiles = [];
+        let failed = true;
 
         // Make sure there's enough tiles for all the ports to spawn on
-        while(portTiles.length < 3) {
+        while(failed) {
+            failed = false;
+
             // Fill the map
             for(let tile of this.tiles) {
                 tile.type = "water";
@@ -750,32 +753,43 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 return land && water > 5;
             }, this);
+
+            if(portTiles.length === 0) {
+                failed = true;
+                continue;
+            }
+
+            // Place the starting port
+            let selected = Math.floor(Math.random() * portTiles.length);
+            let port = this.create("Port", {
+                owner: this.players[0],
+                tile: portTiles[selected],
+                gold: this.shipCost,
+            });
+            portTiles.splice(selected, 1);
+            port.tile.port = port;
+            port.owner.port = port;
+            this.ports.push(port);
+
+            // Find merchant port locations
+            portTiles = portTiles.filter(t => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 9);
+            if(portTiles.length === 0) {
+                failed = true;
+                continue;
+            }
+
+            // Place merchant port
+            selected = Math.floor(Math.random() * portTiles.length);
+            port = this.create("Port", {
+                owner: null,
+                tile: portTiles[selected],
+            });
+
+            // Add the port to the game
+            port.tile.port = port;
+            portTiles.splice(selected, 1);
+            this.ports.push(port);
         }
-
-        // Place the starting port
-        let selected = Math.floor(Math.random() * portTiles.length);
-        let port = this.create("Port", {
-            owner: this.players[0],
-            tile: portTiles[selected],
-            gold: this.shipCost,
-        });
-        portTiles.splice(selected, 1);
-        port.tile.port = port;
-        port.owner.port = port;
-        this.ports.push(port);
-
-        // Place merchant port
-        portTiles = portTiles.filter(t => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 9);
-        selected = Math.floor(Math.random() * portTiles.length);
-        port = this.create("Port", {
-            owner: null,
-            tile: portTiles[selected],
-        });
-
-        // Add the port to the game
-        port.tile.port = port;
-        portTiles.splice(selected, 1);
-        this.ports.push(port);
 
         // Mirror the map
         for(let x = 0; x < this.mapWidth / 2; x++) {
@@ -789,7 +803,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 // Clone ports
                 if(orig.port) {
-                    port = this.create("Port", {
+                    let port = this.create("Port", {
                         tile: target,
                         owner: orig.port.owner && orig.port.owner.opponent,
                         gold: orig.port.gold,
