@@ -527,7 +527,7 @@ let Unit = Class(GameObject, {
         if(tile.unit && tile.unit.owner !== player && tile.unit.owner !== null) {
             return `${this} refuses to share the same ground with a living foe.`;
         }
-        if(!ship && tile.type === "water" && !tile.port) {
+        if(!ship && tile.type === "water" && !tile.port && !(tile.unit && tile.unit.shipHealth > 0)) {
             return `${this} has no ship and can't walk on water!`;
         }
         if(ship && tile.type === "land") {
