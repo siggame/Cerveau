@@ -18,16 +18,7 @@ export interface IBaseGameObjectFunctionSchema {
     // run: (instance: BaseGameObject, ...args: any[]) => Promise<any>;
     args: Array<ISanitizableType & { argName: string, defaultValue?: any }>;
     returns: ISanitizableType;
-    invalidValue: any;
-}
-
-export interface IBaseAISchema {
-    orders: {
-        [orderName: string]: {
-            args: ISanitizableType[];
-            returns: ISanitizableType;
-        };
-    };
+    invalidValue?: any;
 }
 
 export interface IBaseGameSchema {
@@ -42,8 +33,9 @@ export interface IBaseGameNamespace {
     GameSettingsManager: typeof BaseGameSettingsManager;
     Player: Constructor<IBasePlayer>;
 
-    gameAISchema: IBaseAISchema;
     gameObjectsSchema: {
+        AI: IBaseGameObjectSchema;
+        Game: IBaseGameObjectSchema;
         [gameObjectName: string]: IBaseGameObjectSchema;
     };
     gameSettingsManager: BaseGameSettingsManager;

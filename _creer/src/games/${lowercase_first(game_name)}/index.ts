@@ -123,358 +123,56 @@ export const Namespace = makeNamespace({
     // they are never intended to be directly interfaced with outside of
     // Cerveau core developers
     gameSettingsManager: new ${game_name}GameSettingsManager(),
-    gameAISchema: {
-        orders: {
-            runTurn: {
-                args: [],
-                returns: {
-                    typeName: "boolean",
-                },
-            },
-        },
-    },
     gameObjectsSchema: {
-        Game: {
+% for obj_name in (['AI', 'Game'] + sort_dict_keys(game_objs)):
+<%
+obj = None
+if obj_name == 'AI':
+    obj = ai
+elif obj_name == 'Game':
+    obj = game
+else:
+    obj = game_objs[obj_name]
+
+
+%>        ${obj_name}: {
             attributes: {
-                baseBribesPerTurn: {
-                    typeName: "int",
+%   if 'attributes' in obj:
+%           for attr_name in sort_dict_keys(obj['attributes']):
+                ${attr_name}: {
+${shared['cerveau']['schema_type'](obj['attributes'][attr_name]['type'], 5)}
                 },
-                buildings: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Building,
-                    },
-                },
-                currentForecast: {
-                    typeName: "gameObject",
-                    gameObjectClass: Forecast,
-                },
-                currentPlayer: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                },
-                currentTurn: {
-                    typeName: "int",
-                },
-                forecasts: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Forecast,
-                    },
-                },
-                gameObjects: {
-                    typeName: "dictionary",
-                    keyType: {
-                        typeName: "string",
-                    },
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: GameObject,
-                    },
-                },
-                maxFire: {
-                    typeName: "int",
-                },
-                maxForecastIntensity: {
-                    typeName: "int",
-                },
-                maxTurns: {
-                    typeName: "int",
-                },
-                name: {
-                    typeName: "string",
-                },
-                nextForecast: {
-                    typeName: "gameObject",
-                    gameObjectClass: Forecast,
-                },
-                mapWidth: {
-                    typeName: "int",
-                },
-                mapHeight: {
-                    typeName: "int",
-                },
-                players: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Player,
-                    },
-                },
-                session: {
-                    typeName: "string",
-                },
-                timeAddedPerTurn: {
-                    typeName: "float",
-                },
-            },
-            functions: {},
-        },
-        GameObject: {
-            attributes: {
-                gameObjectName: {
-                    typeName: "string",
-                },
-                id: {
-                    typeName: "string",
-                },
-                logs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "string",
-                    },
-                },
+%       endfor
+%   endif
             },
             functions: {
-                log: {
+%   if 'functions' in obj:
+%       for function_name in sort_dict_keys(obj['functions']):
+<%
+    function_parms = obj['functions'][function_name]
+    returns = function_parms['returns']
+%>                ${function_name}: {
                     args: [
+%           for arg in function_parms['arguments']:
                         {
-                            argName: "message",
-                            typeName: "string",
+                            argName: "${arg['name']}",
+${shared['cerveau']['schema_type'](arg['type'], 7)}
                         },
+%           endfor
                     ],
-                    invalidValue: undefined,
+%           if returns:
+%               if 'invalidValue' in returns:
+                    invalidValue: ${shared['cerveau']['value'](returns['type'], returns['invalidValue']) if returns else 'undefined'},
+%               endif
                     returns: {
-                        typeName: "void",
+${shared['cerveau']['schema_type'](returns['type'], 6)}
                     },
+%           endif
                 },
+%       endfor
             },
+%   endif
         },
-        Building: {
-            parentClassName: "GameObject",
-            attributes: {
-                bribed: {
-                    typeName: "boolean",
-                },
-                buildingEast: {
-                    typeName: "gameObject",
-                    gameObjectClass: Building,
-                },
-                buildingNorth: {
-                    typeName: "gameObject",
-                    gameObjectClass: Building,
-                },
-                buildingSouth: {
-                    typeName: "gameObject",
-                    gameObjectClass: Building,
-                },
-                buildingWest: {
-                    typeName: "gameObject",
-                    gameObjectClass: Building,
-                },
-                fire: {
-                    typeName: "int",
-                },
-                health: {
-                    typeName: "int",
-                },
-                isHeadquarters: {
-                    typeName: "boolean",
-                },
-                owner: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                },
-                x: {
-                    typeName: "int",
-                },
-                y: {
-                    typeName: "int",
-                },
-            },
-            functions: {},
-        },
-        FireDepartment: {
-            parentClassName: "Building",
-            attributes: {
-                fireExtinguished: {
-                    typeName: "int",
-                },
-            },
-            functions: {
-                extinguish: {
-                    args: [
-                        {
-                            argName: "building",
-                            typeName: "gameObject",
-                            gameObjectClass: Building,
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-            },
-        },
-        Forecast: {
-            parentClassName: "GameObject",
-            attributes: {
-                controllingPlayer: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                },
-                direction: {
-                    typeName: "string",
-                },
-                intensity: {
-                    typeName: "int",
-                },
-            },
-            functions: {},
-        },
-        Player: {
-            parentClassName: "GameObject",
-            attributes: {
-                timeRemaining: {
-                    typeName: "float",
-                },
-                name: {
-                    typeName: "string",
-                },
-                clientType: {
-                    typeName: "string",
-                },
-                lost: {
-                    typeName: "boolean",
-                },
-                reasonLost: {
-                    typeName: "string",
-                },
-                won: {
-                    typeName: "boolean",
-                },
-                reasonWon: {
-                    typeName: "string",
-                },
-                bribesRemaining: {
-                    typeName: "int",
-                },
-                buildings: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Building,
-                    },
-                },
-                fireDepartments: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: FireDepartment,
-                    },
-                },
-                headquarters: {
-                    typeName: "gameObject",
-                    gameObjectClass: Building,
-                },
-                opponent: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                },
-                policeDepartments: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: PoliceDepartment,
-                    },
-                },
-                warehouses: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Warehouse,
-                    },
-                },
-                weatherStations: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: WeatherStation,
-                    },
-                },
-            },
-            functions: {},
-        },
-        PoliceDepartment: {
-            parentClassName: "Building",
-            attributes: {},
-            functions: {
-                raid: {
-                    args: [
-                        {
-                            argName: "warehouse",
-                            typeName: "gameObject",
-                            gameObjectClass: Warehouse,
-                        },
-                    ],
-                    invalidValue: -1,
-                    returns: {
-                        typeName: "int",
-                    },
-                },
-            },
-        },
-        Warehouse: {
-            parentClassName: "Building",
-            attributes: {
-                exposure: {
-                    typeName: "int",
-                },
-                fireAdded: {
-                    typeName: "int",
-                },
-            },
-            functions: {
-                ignite: {
-                    args: [
-                        {
-                            argName: "building",
-                            typeName: "gameObject",
-                            gameObjectClass: Building,
-                        },
-                    ],
-                    invalidValue: -1,
-                    returns: {
-                        typeName: "int",
-                    },
-                },
-            },
-        },
-        WeatherStation: {
-            parentClassName: "Building",
-            attributes: {
-            },
-            functions: {
-                intensify: {
-                    args: [
-                        {
-                            argName: "negative",
-                            typeName: "boolean",
-                            defaultValue: true,
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-                rotate: {
-                    args: [
-                        {
-                            argName: "counterClockwise",
-                            typeName: "boolean",
-                            defaultValue: false,
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-            },
-        },
+% endfor
     },
-});
+);

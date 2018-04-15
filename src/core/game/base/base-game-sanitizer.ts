@@ -13,7 +13,7 @@ export class BaseGameSanitizer {
     public sanitizeOrderArgs(aiFunctionName: string,
                              args: any[],
     ): Error | any[] {
-        const schema = this.namespace.gameAISchema.orders[aiFunctionName];
+        const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
         }
@@ -25,7 +25,7 @@ export class BaseGameSanitizer {
     public validateFinishedReturned(aiFunctionName: string,
                                     returned: any,
     ): any {
-        const schema = this.namespace.gameAISchema.orders[aiFunctionName];
+        const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize returned for`);
         }

@@ -143,17 +143,18 @@ export const Namespace = makeNamespace({
     // they are never intended to be directly interfaced with outside of
     // Cerveau core developers
     gameSettingsManager: new AnarchyGameSettingsManager(),
-    gameAISchema: {
-        orders: {
-            runTurn: {
-                args: [],
-                returns: {
-                    typeName: "boolean",
+    gameObjectsSchema: {
+        AI: {
+            attributes: {},
+            functions: {
+                runTurn: {
+                    args: [],
+                    returns: {
+                        typeName: "boolean",
+                    },
                 },
             },
         },
-    },
-    gameObjectsSchema: {
         Game: {
             attributes: {
                 baseBribesPerTurn: {

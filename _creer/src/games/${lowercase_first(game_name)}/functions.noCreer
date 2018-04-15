@@ -45,6 +45,35 @@ if not 'cerveau' in shared:
             return base_type
     shared['cerveau']['type'] = cerveau_type
 
+    def cerveau_schema_type(type_obj, depth=1):
+        base_type = type_obj['name']
+        string = ''
+        typeName = ('    ' * depth) + 'typeName: "{}",'
+
+        if type_obj['is_game_object']:
+            typeName = typeName.format('gameObject') + '\n' + (
+                ('    ' * depth) + 'gameObjectClass: ' + base_type + ','
+            )
+        else:
+            typeName = typeName.format(base_type)
+
+        string = string + typeName
+
+        if 'keyType' in type_obj and type_obj['keyType']:
+                string = string + """
+{indent}keyType: {{
+{type}
+{indent}}},""".format(indent=('    ' * depth), type=cerveau_schema_type(type_obj['keyType'], depth + 1))
+
+        if 'valueType' in type_obj and type_obj['valueType']:
+                string = string + """
+{indent}valueType: {{
+{type}
+{indent}}},""".format(indent=('    ' * depth), type=cerveau_schema_type(type_obj['valueType'], depth + 1))
+
+        return string
+    shared['cerveau']['schema_type'] = cerveau_schema_type
+
     def cerveau_value(type_obj, default):
         base_type = type_obj['name']
         if base_type == "string":
