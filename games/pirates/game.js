@@ -646,6 +646,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         while(failed) {
             failed = false;
 
+            // Remove any current ports
+            for(let p of this.ports) {
+                p.tile.port = null;
+            }
+            this.ports = [];
+
             // Fill the map
             for(let tile of this.tiles) {
                 tile.type = "water";
