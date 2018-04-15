@@ -244,6 +244,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.merchantBaseCrew = 3;
         this.merchantCost = this.shipCost * 4;
         this.startingGold = data.startingGold || 3 * this.crewCost + 3 * this.shipCost;
+        this.maxTileGold = 10000;
 
         // For units and structures created during a turn
         this.newUnits = [];
@@ -575,6 +576,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateOtherStuff: function() {
         for(let tile of this.tiles) {
             tile.gold *= this.buryInterestRate;
+            tile.gold = Math.min(tile.gold, this.maxTileGold);
         }
 
         this.currentPlayer.port.gold = this.shipCost;

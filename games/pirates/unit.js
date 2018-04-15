@@ -324,6 +324,10 @@ let Unit = Class(GameObject, {
             return `${this} can't bury gold in ports.`;
         }
 
+        if(this.tile.gold >= this.game.maxTileGold) {
+            return `${this} can't bury loot on a tile with the max amount of booty (${this.game.maxTileGold}).`;
+        }
+
         let dx = this.tile.x - player.port.tile.x;
         let dy = this.tile.y - player.port.tile.y;
         let distSq = dx * dx + dy * dy;
@@ -352,6 +356,8 @@ let Unit = Class(GameObject, {
         else {
             amount = Math.min(this.gold, amount);
         }
+
+        amount = Math.min(this.game.maxTileGold - this.tile.gold, amount);
 
         this.tile.gold += amount;
         this.gold -= amount;
