@@ -747,7 +747,7 @@ let Unit = Class(GameObject, {
             newUnit.crewHealth = this.crewHealth;
         }
         else {
-            newUnit.crewHealth = Math.ceil(amount / this.crewHealth);
+            newUnit.crewHealth = Math.ceil((this.crewHealth / this.crew)*amount);
         }
         this.crewHealth -= newUnit.crewHealth;
 
