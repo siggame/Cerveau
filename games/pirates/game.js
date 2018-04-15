@@ -374,6 +374,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 continue;
             }
             else {
+                unit.tile.unit = unit;
+
                 // Make sure player units arrays are correct
                 // I know this hurts to read...
                 for(let player of this.players) {
@@ -577,6 +579,10 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         for(let tile of this.tiles) {
             tile.gold *= this.buryInterestRate;
             tile.gold = Math.min(tile.gold, this.maxTileGold);
+
+            if(tile.unit && tile.unit.tile !== tile) {
+                tile.unit = null;
+            }
         }
 
         this.currentPlayer.port.gold = this.shipCost;

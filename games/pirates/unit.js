@@ -717,11 +717,11 @@ let Unit = Class(GameObject, {
         // <<-- Creer-Merge: split -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 
         // Create a new unit
-        let newUnit = this.game.create("Unit", {
+        let newUnit = {
             owner: player,
             tile: tile,
             moves: this.moves - 1,
-        });
+        };
 
         // Check if boarding a ship
         if(tile.unit && tile.unit.shipHealth > 0) {
@@ -729,7 +729,7 @@ let Unit = Class(GameObject, {
         }
 
         // Adjust the amount of crew to split
-        let OriginalCrew = this.crew;
+        let originalCrew = this.crew;
         if(amount <= 0) {
             amount = this.crew;
         }
@@ -738,7 +738,7 @@ let Unit = Class(GameObject, {
         }
 
         // Move the crew
-        newUnit.crew += amount;
+        newUnit.crew = amount;
         this.crew -= amount;
 
         // Adjust the amount of gold to split
@@ -755,9 +755,9 @@ let Unit = Class(GameObject, {
             newUnit.crewHealth = this.crewHealth;
         }
         else {
-            newUnit.crewHealth = Math.ceil((this.crewHealth / OriginalCrew)*amount);
+            newUnit.crewHealth = Math.ceil((this.crewHealth / originalCrew)*amount);
         }
-        this.crewHealth -= newUnit.crewHealth;
+        this.crewHealth -= newUnit.crewHealth || 0;
 
         // Ownership
         if(this.crew <= 0) {
@@ -774,14 +774,15 @@ let Unit = Class(GameObject, {
         if(tile.unit) {
             let other = tile.unit;
             other.owner = player;
-            other.gold += newUnit.gold;
-            other.crew += newUnit.crew;
-            other.crewHealth += newUnit.crewHealth;
+            other.gold += newUnit.gold || 0;
+            other.crew += newUnit.crew || 0;
+            other.crewHealth += newUnit.crewHealth || 0;
             other.acted = other.acted || other.shipHealth > 0;
-            other.moves = Math.min(newUnit.moves, other.moves);
+            other.moves = Math.min(newUnit.moves || 0, other.moves);
         }
         else {
-            tile.unit = newUnit;
+            newUnit = this.game.create("Unit", newUnit);
+            newUnit.tile.unit = newUnit;
             this.game.newUnits.push(newUnit);
         }
 
