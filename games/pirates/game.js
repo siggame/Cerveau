@@ -552,7 +552,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 port.gold -= this.merchantCost;
 
                 // Calculate crew and gold
-                let gold = this.merchantGold + port.investment * this.merchantInterestRate;
+                let gold = this.merchantGold + (port.investment * this.merchantInterestRate);
                 let crew = this.merchantBaseCrew + Math.floor((port.investment * this.merchantInterestRate) / this.crewCost);
 
                 // Get the opposite port of this one
@@ -563,6 +563,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     owner: null,
                     tile: port.tile,
                     crew: crew,
+                    crewHealth: crew * this.crewHealth,
                     shipHealth: this.shipHealth / 2,
                     gold: gold,
                     targetPort: targetPort,
