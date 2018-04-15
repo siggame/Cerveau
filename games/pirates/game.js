@@ -235,7 +235,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.healFactor = data.healFactor || 0.25;
 
         this.merchantGoldRate = data.merchantGoldRate || 100;
-        this.buryInterestRate = data.buryInterestRate || 1.1;
+        this.buryInterestRate = data.buryInterestRate || 1.025;
         this.merchantInvestmentRate = data.merchantStartingInvestment || 1.1;
         this.minInterestDistance = data.minInterestDistance || 10;
 
