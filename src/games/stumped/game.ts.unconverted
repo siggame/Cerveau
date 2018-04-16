@@ -731,7 +731,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         }
     },
 
-    /*createFractal: function(points, index, depth) {
+    /* createFractal: function(points, index, depth) {
         let a = points[index];
         let b = points[index + 1];
         let center = {

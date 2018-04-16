@@ -235,7 +235,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.healFactor = data.healFactor || 0.25;
 
         this.merchantGoldRate = data.merchantGoldRate || 100;
-        this.buryInterestRate = data.buryInterestRate || 1.1;
+        this.buryInterestRate = data.buryInterestRate || 1.025;
         this.merchantInvestmentRate = data.merchantStartingInvestment || 1.1;
         this.minInterestDistance = data.minInterestDistance || 10;
 
@@ -244,6 +244,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         this.merchantBaseCrew = 3;
         this.merchantCost = this.shipCost * 4;
         this.startingGold = data.startingGold || 3 * this.crewCost + 3 * this.shipCost;
+        this.maxTileGold = 10000;
 
         // For units and structures created during a turn
         this.newUnits = [];
@@ -373,6 +374,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 continue;
             }
             else {
+                unit.tile.unit = unit;
+
                 // Make sure player units arrays are correct
                 // I know this hurts to read...
                 for(let player of this.players) {
@@ -502,10 +505,12 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 if(target) {
                     // Attack the target
                     target.shipHealth -= this.shipDamage;
-                    if(target.shipHealth <= 0) {
+                    if(target.shipHealth <= 0 && !target.tile.port) {
                         target.tile.unit = null;
                         target.tile = null;
                     }
+
+                    target.shipHealth = Math.max(0, target.shipHealth);
                 }
 
                 // Move the merchant
@@ -547,8 +552,8 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                 port.gold -= this.merchantCost;
 
                 // Calculate crew and gold
-                let gold = this.merchantGold + port.investment * this.merchantInterestRate;
-                let crew = this.merchantBaseCrew + Math.floor((port.investment * this.merchantInterestRate) / this.crewCost);
+                let gold = this.merchantGold + (port.investment * this.merchantInvestmentRate);
+                let crew = this.merchantBaseCrew + Math.floor((port.investment * this.merchantInvestmentRate) / this.crewCost);
 
                 // Get the opposite port of this one
                 let targetPort = this.getTile(this.mapWidth - port.tile.x - 1, this.mapHeight - port.tile.y - 1).port;
@@ -558,6 +563,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
                     owner: null,
                     tile: port.tile,
                     crew: crew,
+                    crewHealth: crew * this.crewHealth,
                     shipHealth: this.shipHealth / 2,
                     gold: gold,
                     targetPort: targetPort,
@@ -573,6 +579,11 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     updateOtherStuff: function() {
         for(let tile of this.tiles) {
             tile.gold *= this.buryInterestRate;
+            tile.gold = Math.min(tile.gold, this.maxTileGold);
+
+            if(tile.unit && tile.unit.tile !== tile) {
+                tile.unit = null;
+            }
         }
 
         this.currentPlayer.port.gold = this.shipCost;
@@ -630,9 +641,18 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
     generateMap: function() {
         let portTiles = [];
+        let failed = true;
 
         // Make sure there's enough tiles for all the ports to spawn on
-        while(portTiles.length < 3) {
+        while(failed) {
+            failed = false;
+
+            // Remove any current ports
+            for(let p of this.ports) {
+                p.tile.port = null;
+            }
+            this.ports = [];
+
             // Fill the map
             for(let tile of this.tiles) {
                 tile.type = "water";
@@ -740,31 +760,43 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 return land && water > 5;
             }, this);
+
+            if(portTiles.length === 0) {
+                failed = true;
+                continue;
+            }
+
+            // Place the starting port
+            let selected = Math.floor(Math.random() * portTiles.length);
+            let port = this.create("Port", {
+                owner: this.players[0],
+                tile: portTiles[selected],
+                gold: this.shipCost,
+            });
+            portTiles.splice(selected, 1);
+            port.tile.port = port;
+            port.owner.port = port;
+            this.ports.push(port);
+
+            // Find merchant port locations
+            portTiles = portTiles.filter(t => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 9);
+            if(portTiles.length === 0) {
+                failed = true;
+                continue;
+            }
+
+            // Place merchant port
+            selected = Math.floor(Math.random() * portTiles.length);
+            port = this.create("Port", {
+                owner: null,
+                tile: portTiles[selected],
+            });
+
+            // Add the port to the game
+            port.tile.port = port;
+            portTiles.splice(selected, 1);
+            this.ports.push(port);
         }
-
-        // Place the starting port
-        let selected = Math.floor(Math.random() * portTiles.length);
-        let port = this.create("Port", {
-            owner: this.players[0],
-            tile: portTiles[selected],
-            gold: this.shipCost,
-        });
-        portTiles.splice(selected, 1);
-        port.tile.port = port;
-        port.owner.port = port;
-        this.ports.push(port);
-
-        // Place merchant port
-        selected = Math.floor(Math.random() * portTiles.length);
-        port = this.create("Port", {
-            owner: null,
-            tile: portTiles[selected],
-        });
-
-        // Add the port to the game
-        port.tile.port = port;
-        portTiles.splice(selected, 1);
-        this.ports.push(port);
 
         // Mirror the map
         for(let x = 0; x < this.mapWidth / 2; x++) {
@@ -778,7 +810,7 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
 
                 // Clone ports
                 if(orig.port) {
-                    port = this.create("Port", {
+                    let port = this.create("Port", {
                         tile: target,
                         owner: orig.port.owner && orig.port.owner.opponent,
                         gold: orig.port.gold,
