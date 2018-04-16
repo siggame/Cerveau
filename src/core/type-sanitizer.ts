@@ -152,13 +152,13 @@ export function sanitizeType(type: ISanitizableType, obj: any): any {
         case "dictionary":
             const asObj = defaultObject(obj);
             for (const key of Object.keys(asObj)) {
-                asObj[key] = sanitizeType(type.valueType!, asObj[key]);
+                asObj[key] = sanitizeType(type.valueType, asObj[key]);
             }
             return asObj;
         case "list":
             const asArray = defaultArray(obj);
             for (let i = 0; i < asArray.length; i++) {
-                asArray[i] = sanitizeType(type.valueType!, asArray[i]);
+                asArray[i] = sanitizeType(type.valueType, asArray[i]);
             }
             return asArray;
         case "gameObject": // assume game object

@@ -204,7 +204,7 @@ export class Session {
     private handleGameOver(): void {
         this.events.gameOver.emit();
 
-        const gamelog = this.gameLogger!.gamelog;
+        const gamelog = this.gameLogger.gamelog;
 
         const gamelogFilename = this.gameLogManager.filenameFor(gamelog);
         const gamelogURL = this.gameLogManager.getURL(gamelogFilename);

@@ -149,7 +149,7 @@ export class BaseGameManager {
     public makePlayerWinViaCoinFlip(reason: string = "Draw"): void {
         // Win via coin flip - if we got here no player won via game rules.
         // They probably played identically to each other.
-        const players = this.game!.players.filter((p) => !p.won && !p.lost);
+        const players = this.game.players.filter((p) => !p.won && !p.lost);
 
         const winnerIndex = this.random.int(players.length);
         for (let i = 0; i < players.length; i++) {
@@ -285,7 +285,7 @@ export class BaseGameManager {
         if (this.game.players.find((p) => p.won)) { // someone has won, so let's end this
             this.isOver = true;
 
-            for (const player of this.game!.players) {
+            for (const player of this.game.players) {
                 if (!player.won && !player.lost) { // then they are going to loose
                     this.setPlayerLost(player, "Other player won");
                 }

@@ -178,7 +178,7 @@ for (const key of Object.keys(parsedArgs)) {
 args.BASE_DIR = args.BASE_DIR || __dirname;
 
 if (process.env.WORKER_GAME_SESSION_DATA) {
-    args.WORKER_DATA = JSON.parse(process.env.WORKER_GAME_SESSION_DATA!);
+    args.WORKER_DATA = JSON.parse(process.env.WORKER_GAME_SESSION_DATA);
 }
 
 if (args.RUN_PROFILER) {

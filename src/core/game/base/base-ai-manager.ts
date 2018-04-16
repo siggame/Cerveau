@@ -165,7 +165,7 @@ export class BaseAIManager {
         }
 
         this.events.ran.emit({
-            player: { id: this.client.player!.id },
+            player: { id: this.client.player.id },
             invalid,
             run: {
                 caller: callerReference,

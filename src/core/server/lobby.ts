@@ -377,7 +377,7 @@ There's probably another Cerveau server running on this same computer.`);
 
         // we need to check to make sure they did not request an already requested player index
         if (playData.playerIndex !== undefined) {
-            if (room.clients.find((c) => c.playerIndex === playData!.playerIndex)) {
+            if (room.clients.find((c) => c.playerIndex === playData.playerIndex)) {
                 // then there is already a client in this room that requested this player index
                 // so the existing client gets the index, this current client gets squat
                 playData.playerIndex = undefined;
