@@ -6,7 +6,6 @@ if not 'cerveau' in shared:
     shared['cerveau'] = {}
     shared['cerveau']['TextWrapper'] = TextWrapper
 
-    """
     def cerveau_default(type_obj):
         base_type = type_obj['name']
         if base_type == "string":
@@ -22,7 +21,6 @@ if not 'cerveau' in shared:
         else:
             return "undefined"
     shared['cerveau']['default'] = cerveau_default
-    """
 
     def cerveau_type(type_obj, allow_undefined = True):
         base_type = type_obj['name']
@@ -112,6 +110,9 @@ if not 'cerveau' in shared:
         description = doc['description']
         lines = wrapper.wrap(doc['description'])
 
+        if ('arguments' in doc and doc['arguments']) or 'returns' in doc and doc['returns']:
+            lines.append(prefix+' *')
+
         if 'arguments' in doc and doc['arguments']:
             for arg in doc['arguments']:
                 lines += wrapper.wrap('@param ' + arg['name'] + ' ' + arg['description'])
@@ -180,20 +181,20 @@ if not 'cerveau' in shared:
         return imports
     shared['cerveau']['generate_imports'] = cerveau_generate_imports
 
-    def cerveau_formatted_function_top(function_name, obj):
+    def cerveau_formatted_function_top(function_name, obj, promise=True):
         function_parms = dict(obj['functions'][function_name])
-        docstring =cerveau_block_comment('    ', function_parms)
+        docstring = cerveau_block_comment('    ', function_parms)
 
         returns = 'void'
         if function_parms['returns']:
             returns = shared['cerveau']['type'](function_parms['returns']['type'])
 
-        formatted_name = '    public async '+function_name+'('
+        formatted_name = '    protected '+('async ' if promise else '')+function_name+'('
         formatted_args = ', '.join(
             [(a['name']+': '+shared['cerveau']['type'](a['type'])+(
                 (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
             )) for a in function_parms['arguments']]
-        ) + '): Promise<' + returns + '> {'
+        ) + '): '+ ('Promise<{}>' if promise else '{}').format(returns) +' {'
 
 
         wrapper = TextWrapper(
