@@ -75,7 +75,7 @@ if attr_name in ['gameObjectName', 'id', 'logs']:
     continue
 
 attr = game_obj['attributes'][attr_name]
-%>    ${attr_name}?: ${shared['cerveau']['type'](attr['type'], allow_undefined=False)};
+%>    ${attr_name}?: ${shared['cerveau']['type'](attr['type'], nullable=False)};
 %   endfor
 }
 

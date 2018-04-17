@@ -22,7 +22,7 @@ if not 'cerveau' in shared:
             return "undefined"
     shared['cerveau']['default'] = cerveau_default
 
-    def cerveau_type(type_obj, allow_undefined = True):
+    def cerveau_type(type_obj, nullable=None):
         base_type = type_obj['name']
 
         if base_type == "dictionary":
@@ -36,8 +36,9 @@ if not 'cerveau' in shared:
             return "number"
         elif type_obj['is_game_object']:
             ret = base_type
-            if allow_undefined:
-                ret += " | undefined"
+            if nullable is not None:
+                if nullable and type_obj['nullable']:
+                    ret += " | undefined"
             return ret
         else: # string, boolean, or GameObject(s)
             return base_type

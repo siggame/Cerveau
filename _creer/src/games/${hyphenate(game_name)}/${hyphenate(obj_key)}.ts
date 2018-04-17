@@ -6,7 +6,7 @@ imports['~/core/game'] = [ 'IBaseGameRequiredData' if obj_key == 'Game' else 'IB
 
 if obj_key == 'Game':
     imports['./game-settings'] = [ game_name + 'GameSettingsManager' ]
-    imports['./game-manager.ts'] = [ game_name + 'GameManager' ]
+    imports['./game-manager'] = [ game_name + 'GameManager' ]
 else:
     imports['./'].append('I{}Properties'.format(obj_key))
     if len(obj['function_names']) > 0:
@@ -38,8 +38,9 @@ for parent_class in obj['parentClasses']:
 ${merge('// ', 'imports', """// any additional imports you want can be placed here safely between creer runs
 """, optional=True, help=False)}
 % if obj_key != 'Game':
+
 export interface I${obj_key}ConstructorArgs
-    extends ${', '.join([ 'I{}ConstructorArgs'.format(p) for p in obj['parentClasses'] ] + [''])}I${obj_key}Properties {
+extends ${', '.join([ 'I{}ConstructorArgs'.format(p) for p in obj['parentClasses'] ] + [''])}I${obj_key}Properties {
 ${merge('    // ', 'constructor-args', """    // You can add more constructor args in here
 """, optional=True, help=False)}
 }
@@ -58,10 +59,29 @@ export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends $
 % for attr_name in obj['attribute_names']:
 <%
 attr_parms = obj['attributes'][attr_name]
+attr_type =  attr_parms['type']
+
+readonly = 'readonly ' if attr_type['const'] else ''
+
+if attr_type['is_game_object']:
+    nullable = '?' if attr_type['nullable'] else ''
+
+    if 'serverPredefined' in attr_parms and attr_parms['serverPredefined'] and not attr_type['nullable']:
+        nullable = '!' # because a base class will make sure it exists
+else:
+    nullable = '!'
+
 %>${shared['cerveau']['block_comment']('    ', attr_parms)}
-    public readonly ${attr_name}!: ${shared['cerveau']['type'](attr_parms['type'])};
+    public ${readonly}${attr_name}${nullable}: ${shared['cerveau']['type'](attr_type)};
 
 % endfor
+${merge('    // ', 'attributes', """
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+""", optional=True, help=False)}
+
     /**
      * Called when a ${obj_key} is created.
      *
@@ -81,7 +101,7 @@ attr_parms = obj['attributes'][attr_name]
         required: IBaseGameObjectRequiredData,
 % endif
     ) {
-        super(${'settingsManager' if game_obj == 'Game' else 'data'}, required);
+        super(${'settingsManager' if (obj_key == 'Game') else 'data'}, required);
 
 ${merge('        // ', 'constructor', """        // setup any thing you need here
 """, optional=True, help=False)}
@@ -147,6 +167,8 @@ ${merge('        // ', function_name, """
     }
 % endfor
 
-${merge('    // ', 'protected-private-functions', """    // Any additional protected or pirate methods can go here.
+${merge('    // ', 'functions', """
+    // Any additional protected or pirate methods can go here.
+
 """, optional=True, help=False)}
 }
