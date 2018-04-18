@@ -1,49 +1,62 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, IPoliceDepartmentProperties, Player, Warehouse } from "./";
+import { IPoliceDepartmentProperties } from "./";
+import { Building, IBuildingConstructorArgs } from "./building";
+import { Player } from "./player";
+import { Warehouse } from "./warehouse";
 
-// <<-- Creer-Merge: requires -->>
-// <<-- /Creer-Merge: requires -->>
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-export interface IPoliceDepartmentConstructorArgs extends IPoliceDepartmentProperties, IBuildingConstructorArgs {
+export interface IPoliceDepartmentConstructorArgs
+extends IBuildingConstructorArgs, IPoliceDepartmentProperties {
     // <<-- Creer-Merge: constructor-args -->>
-
-    // You can add more constructor args in here!
-
+    // You can add more constructor args in here
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
 /**
- * PoliceDepartment: Used to keep cities under control and raid Warehouses.
+ * Used to keep cities under control and raid Warehouses.
  */
 export class PoliceDepartment extends Building {
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
     /**
-     * Initializes PoliceDepartments.
-     * @param data - the data
-     * @param required omg
+     * Called when a PoliceDepartment is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
      */
-    constructor(data: IPoliceDepartmentConstructorArgs, required: IBaseGameObjectRequiredData) {
+    constructor(
+        data: IPoliceDepartmentConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
-
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // NOTE: no players are connected (nor created) at this point. For that logic use 'begin()'
-
-        // <<-- /Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
     }
-
     /**
-     * Invalidation function for raid
-     * Try to find a reason why the passed in parameters are invalid,
-     * and return a human readable string telling them why it is invalid
+     * Invalidation function for raid. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param player - the player that called this.
-     * @param warehouse - The warehouse you want to raid.
-     * @returns  a string that is the invalid reason, if the arguments are invalid.
-     * Otherwise undefined (nothing) if the inputs are valid.
+     * @param player The player that called this.
+     * @param warehouse The warehouse you want to raid.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateRaid(player: Player, warehouse?: Warehouse): string | IArguments {
-        // <<-- Creer-Merge: invalidateRaid -->>
+    protected invalidateRaid(player: Player, warehouse: Warehouse): string |
+                             IArguments {
+        // <<-- Creer-Merge: invalidate-raid -->>
+
         const invalid = this.invalidateBribe(player);
         if (invalid) {
             return invalid;
@@ -52,18 +65,22 @@ export class PoliceDepartment extends Building {
         if (!warehouse) {
             return `${warehouse} not a valid Warehouse to for ${this} to raid.`;
         }
-        // <<-- /Creer-Merge: invalidateRaid -->>
+
+        // <<-- /Creer-Merge: invalidate-raid -->>
         return arguments;
     }
 
     /**
      * Bribe the police to raid a Warehouse, dealing damage equal based on the
      * Warehouse's current exposure, and then resetting it to 0.
-     * @param player - the player that called this.
-     * @param warehouse - The warehouse you want to raid.
-     * @returns The amount of damage dealt to the warehouse, or -1 if there was an error.
+     *
+     * @param player The player that called this.
+     * @param warehouse The warehouse you want to raid.
+     * @returns The amount of damage dealt to the warehouse, or -1 if there was
+     * an error.
      */
-    protected raid(player: Player, warehouse: Warehouse): number {
+    protected async raid(player: Player, warehouse: Warehouse): Promise<number>
+                         {
         // <<-- Creer-Merge: raid -->>
 
         const oldHealth = warehouse.health;
@@ -78,10 +95,9 @@ export class PoliceDepartment extends Building {
         // <<-- /Creer-Merge: raid -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: added-functions -->>
-
+    // <<-- /Creer-Merge: functions -->>
 }

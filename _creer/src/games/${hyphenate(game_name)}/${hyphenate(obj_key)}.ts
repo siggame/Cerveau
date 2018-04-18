@@ -4,12 +4,27 @@ imports = shared['cerveau']['generate_imports'](obj_key, obj, {})
 imports['./'] = []
 imports['~/core/game'] = [ 'IBaseGameRequiredData' if obj_key == 'Game' else 'IBaseGameObjectRequiredData' ]
 
+i_base_player = 'IBase{}Player'.format(game_name)
+
 if obj_key == 'Game':
     imports['./game-settings'] = [ game_name + 'GameSettingsManager' ]
     imports['./game-manager'] = [ game_name + 'GameManager' ]
 else:
-    imports['./'].append('I{}Properties'.format(obj_key))
-    if len(obj['function_names']) > 0:
+    if obj_key == 'GameObject':
+        imports['./game-manager'] = [ game_name + 'GameManager' ]
+        imports['./game'] = [ game_name + 'Game' ]
+
+    if obj_key == 'Player':
+        imports['./'].append(i_base_player)
+        imports['./ai'] = [ 'AI' ]
+    else:
+        imports['./'].append('I{}Properties'.format(obj_key))
+
+    functions = list(obj['function_names'])
+    if 'log' in functions: # log is server implimented
+        functions.remove('log')
+
+    if len(functions) > 0:
         # then there will be an invalidate function, which requires player
         if not './player' in imports:
             imports['./player'] = []
@@ -30,14 +45,18 @@ for parent_class in obj['parentClasses']:
     if not parent_class in imports[filename]:
         imports[filename].append(parent_class)
 
-    constructor_args = 'I{}ConstructorArgs'.format(parent_class)
-    if not constructor_args in imports[filename]:
-        imports[filename].append(constructor_args)
+    if obj_key != 'Player':
+        constructor_args = 'I{}ConstructorArgs'.format(parent_class)
+        if not constructor_args in imports[filename]:
+            imports[filename].append(constructor_args)
+
+if obj_key == 'Player':
+    extends = extends + ' implements ' + i_base_player
 
 %>${shared['cerveau']['imports'](imports)}
 ${merge('// ', 'imports', """// any additional imports you want can be placed here safely between creer runs
 """, optional=True, help=False)}
-% if obj_key != 'Game':
+% if obj_key != 'Game' and obj_key != 'Player':
 
 export interface I${obj_key}ConstructorArgs
 extends ${', '.join([ 'I{}ConstructorArgs'.format(p) for p in obj['parentClasses'] ] + [''])}I${obj_key}Properties {
@@ -52,8 +71,19 @@ export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends $
     /** The manager of this game, that controls everything around it */
     public readonly manager!: AnarchyGameManager;
 
-    /** The settings used to initialize the game, as set by plaeyrs */
-    public readonly values = Object.freeze(this.settingsManager.values);
+    /** The settings used to initialize the game, as set by players */
+    public readonly settings = Object.freeze(this.settingsManager.values);
+
+% elif obj_key == 'Player':
+    /** The AI controlling this Player */
+    public readonly ai!: AI;
+
+% elif obj_key == 'GameObject':
+    /** The game this game object is in */
+    public readonly game!: ${game_name}Game;
+
+    /** The manager of the game that controls this */
+    public readonly manager!: ${game_name}GameManager;
 
 % endif
 % for attr_name in obj['attribute_names']:
@@ -63,7 +93,7 @@ attr_type =  attr_parms['type']
 
 readonly = 'readonly ' if attr_type['const'] else ''
 
-if attr_type['is_game_object']:
+if attr_type['is_game_object'] and obj_key != 'Player':
     nullable = '?' if attr_type['nullable'] else ''
 
     if 'serverPredefined' in attr_parms and attr_parms['serverPredefined'] and not attr_type['nullable']:
@@ -97,7 +127,7 @@ ${merge('    // ', 'attributes', """
         protected settingsManager: ${game_name}GameSettingsManager,
         required: IBaseGameRequiredData,
 % else:
-        data: I${obj_key}ConstructorArgs,
+        data: ${'I{}ConstructorArgs'.format(obj_key) if obj_key != 'Player' else '{}'},
         required: IBaseGameObjectRequiredData,
 % endif
     ) {
@@ -145,7 +175,8 @@ ${merge('        // ', 'constructor', """        // setup any thing you need her
         }
     }
 
-%>${shared['cerveau']['formatted_function_top'](invalidate_function_name, temp, promise=False)}
+%>
+${shared['cerveau']['formatted_function_top'](invalidate_function_name, temp, promise=False)}
 ${merge('        // ', 'invalidate-' + function_name, """
         // Check all the arguments for {} here and try to
         // return a string explaining why the input is wrong.

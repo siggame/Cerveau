@@ -1,24 +1,23 @@
-// Player: A player in this game. Every AI controls one player.
-
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { AI, Building, FireDepartment, GameObject,
-    IBaseAnarchyPlayer, PoliceDepartment, Warehouse, WeatherStation } from "./";
+import { IBaseAnarchyPlayer } from "./";
+import { AI } from "./ai";
+import { Building } from "./building";
+import { FireDepartment } from "./fire-department";
+import { GameObject } from "./game-object";
+import { PoliceDepartment } from "./police-department";
+import { Warehouse } from "./warehouse";
+import { WeatherStation } from "./weather-station";
 
-// <<-- Creer-Merge: requires -->>
-// any additional requires you want can be required here safely between cree runs
-// <<-- /Creer-Merge: requires -->>
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-// @class Player: A player in this game. Every AI controls one player.
+/**
+ * A player in this game. Every AI controls one player.
+ */
 export class Player extends GameObject implements IBaseAnarchyPlayer {
+    /** The AI controlling this Player */
     public readonly ai!: AI;
-
-    public timeRemaining!: number;
-    public readonly name!: string;
-    public readonly clientType!: string;
-    public lost!: boolean;
-    public reasonLost!: string;
-    public won!: boolean;
-    public reasonWon!: string;
 
     /**
      * How many bribes this player has remaining to use during their turn. Each
@@ -30,18 +29,34 @@ export class Player extends GameObject implements IBaseAnarchyPlayer {
     /**
      * All the buildings owned by this player.
      */
-    public readonly buildings!: Building[];
+    public buildings!: Building[];
+
+    /**
+     * What type of client this is, e.g. 'Python', 'JavaScript', or some other
+     * language. For potential data mining purposes.
+     */
+    public readonly clientType!: string;
 
     /**
      * All the FireDepartments owned by this player.
      */
-    public readonly fireDepartments!: FireDepartment[];
+    public fireDepartments!: FireDepartment[];
 
     /**
      * The Warehouse that serves as this player's headquarters and has extra
      * health. If this gets destroyed they lose.
      */
-    public headquarters?: Building;
+    public headquarters!: Warehouse;
+
+    /**
+     * If the player lost the game or not.
+     */
+    public lost!: boolean;
+
+    /**
+     * The name of the player.
+     */
+    public readonly name!: string;
 
     /**
      * This player's opponent in the game.
@@ -51,37 +66,66 @@ export class Player extends GameObject implements IBaseAnarchyPlayer {
     /**
      * All the PoliceDepartments owned by this player.
      */
-    public readonly policeDepartments!: PoliceDepartment[];
+    public policeDepartments!: PoliceDepartment[];
+
+    /**
+     * The reason why the player lost the game.
+     */
+    public reasonLost!: string;
+
+    /**
+     * The reason why the player won the game.
+     */
+    public reasonWon!: string;
+
+    /**
+     * The amount of time (in ns) remaining for this AI to send commands.
+     */
+    public timeRemaining!: number;
 
     /**
      * All the warehouses owned by this player. Includes the Headquarters.
      */
-    public readonly warehouses!: Warehouse[];
+    public warehouses!: Warehouse[];
 
     /**
      * All the WeatherStations owned by this player.
      */
-    public readonly weatherStations!: WeatherStation[];
+    public weatherStations!: WeatherStation[];
 
     /**
-     * Initializes Players.
-     * @param data the data
-     * @param required iot
+     * If the player won the game or not.
      */
-    constructor(data: {}, required: IBaseGameObjectRequiredData) { // players can never be created with custom data
+    public won!: boolean;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Player is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        data: {},
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
-
-        // put any initialization logic here. the base variables should be set from 'data' above
-
-        // <<-- /Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: added-functions -->>
-
+    // <<-- /Creer-Merge: functions -->>
 }

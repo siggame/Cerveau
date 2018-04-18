@@ -95,10 +95,16 @@ for game_obj_name in sort_dict_keys(game_objs):
     )
 
     context.write(shared['cerveau']['imports'](imports))
-%>import { ${game_name}Game } from "./game";
-import { ${game_name}GameManager } from "./game-manager";
+%>
+% if game_name > 'AI':
 import { AI } from "./ai";
+% endif
+import { ${game_name}Game } from "./game";
+import { ${game_name}GameManager } from "./game-manager";
 import { ${game_name}GameSettingsManager } from "./game-settings";
+% if game_name <= 'AI':
+import { AI } from "./ai";
+% endif
 
 export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
 % for game_obj_name in sort_dict_keys(game_objs):
@@ -136,6 +142,9 @@ else:
 
 
 %>        ${obj_name}: {
+%   if 'parentClasses' in obj and len(obj['parentClasses']) > 0:
+            parentClassName: "${obj['parentClasses'][0]}",
+%   endif
             attributes: {
 %   if 'attributes' in obj:
 %           for attr_name in sort_dict_keys(obj['attributes']):
@@ -157,17 +166,22 @@ ${shared['cerveau']['schema_type'](obj['attributes'][attr_name]['type'], 5)}
                         {
                             argName: "${arg['name']}",
 ${shared['cerveau']['schema_type'](arg['type'], 7)}
+%               if arg['optional']:
+                            defaultValue: ${shared['cerveau']['value'](arg['type'], arg['default'])},
+%               endif
                         },
 %           endfor
                     ],
-%           if returns:
-%               if 'invalidValue' in returns:
+%           if returns and 'invalidValue' in returns:
                     invalidValue: ${shared['cerveau']['value'](returns['type'], returns['invalidValue']) if returns else 'undefined'},
-%               endif
-                    returns: {
-${shared['cerveau']['schema_type'](returns['type'], 6)}
-                    },
 %           endif
+                    returns: {
+%           if returns:
+${shared['cerveau']['schema_type'](returns['type'], 6)}
+%           else:
+                        typeName: "void",
+%           endif
+                    },
                 },
 %       endfor
             },
@@ -175,4 +189,4 @@ ${shared['cerveau']['schema_type'](returns['type'], 6)}
         },
 % endfor
     },
-);
+});

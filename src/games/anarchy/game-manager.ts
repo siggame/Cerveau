@@ -1,19 +1,31 @@
+// This file is where you should put logic to control the game and everything
+// around it.
 import { AnarchyGame, AnarchyGameObjectFactory, BaseClasses } from "./";
 
-// creer merge
-import { Building, FireDepartment, IBuildingConstructorArgs,
-    Player, PoliceDepartment, Warehouse, WeatherStation } from "./";
-// /creer merge
+// <<-- Creer-Merge: imports -->>
+import { Building, IBuildingConstructorArgs } from "./building";
+import { FireDepartment } from "./fire-department";
+import { Player } from "./player";
+import { PoliceDepartment } from "./police-department";
+import { Warehouse } from "./warehouse";
+import { WeatherStation } from "./weather-station";
+// <<-- /Creer-Merge: imports -->>
 
 export class AnarchyGameManager extends BaseClasses.GameManager {
+    /** The name of this game (used as an ID internally) */
     public static get gameName(): string {
         return "Anarchy";
     }
 
+    /** The number of players that must connect to play this game */
     public static get requiredNumberOfPlayers(): number {
-        return super.requiredNumberOfPlayers; // override this if you want to set a different number of players
+        // <<-- Creer-Merge: required-number-of-players -->>
+        // override this if you want to set a different number of players
+        return super.requiredNumberOfPlayers;
+        // <<-- /Creer-Merge: required-number-of-players -->>
     }
 
+    /** Other strings (case insensitive) that can be used as an ID */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -22,8 +34,13 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         ];
     }
 
+    /** The game this GameManager is managing */
     public readonly game!: AnarchyGame;
+
+    /** The factory that must be used to initialize new game objects */
     public readonly create!: AnarchyGameObjectFactory;
+
+    // <<-- Creer-Merge: public-methods -->>
 
     public createBuilding(
         type: "FireDepartment" | "PoliceDepartment" | "Warehouse" | "WeatherStation" | string,
@@ -58,15 +75,33 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         return building;
     }
 
+    // <<-- /Creer-Merge: public-methods -->>
+
+    /**
+     * This is called BEFORE each player's runTun function is called
+     * (including the first turn).
+     * This is a good place to get their player ready for their turn.
+     */
     protected async beforeTurn(): Promise<void> {
         super.beforeTurn();
+
+        // <<-- Creer-Merge: before-turn -->>
 
         for (const player of this.game.players) {
             player.bribesRemaining = this.game.baseBribesPerTurn;
         }
+
+        // <<-- /Creer-Merge: before-turn -->>
     }
 
+    /**
+     * This is called AFTER each player's turn ends. Before the turn counter
+     * increases.
+     * This is a good place to check if they won the game during their turn,
+     * and do end-of-turn effects.
+     */
     protected async nextTurn(): Promise<void> {
+        // <<-- Creer-Merge: next-turn -->>
         const playersBurnedDownBuildings = new Map<Player, number>();
         const fireSpreads: Array<{
             building: Building;
@@ -152,13 +187,23 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             }
         }
 
-        super.nextTurn();
+        // <<-- /Creer-Merge: next-turn -->>
+
+        super.nextTurn(); // this actually makes their turn end
     }
 
+    /**
+     * Called when the game needs to end, but primary game ending conditions
+     * are not met (like max turns reached). Use this to check for secondary
+     * game win conditions to crown a winner.
+     * @param reason The reason why a secondary victory condition is happening
+     */
     protected secondaryGameOver(reason: string): void {
+        // <<-- Creer-Merge: secondary-game-over -->>
+
         // 1. Check if one player's HQ has more heath than the other
         const headquarters = this.game.players
-            .map((p) => p.headquarters!)
+            .map((p) => p.headquarters)
             .sort((a, b) => b.health - a.health);
 
         if (headquarters[0].health !== headquarters[1].health) {
@@ -197,8 +242,15 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
 
         // else all their buildings are identical,
         // so they are probably the same AIs, so just random chance
-        super.secondaryGameOver(reason);
+
+        // <<-- /Creer-Merge: secondary-game-over -->>
+
+        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }
 
-    // TODO: add creer merge fields
+    // <<-- Creer-Merge: protected-private-methods -->>
+
+    // any additional protected/private methods you need can be added here
+
+    // <<-- /Creer-Merge: protected-private-methods -->>
 }

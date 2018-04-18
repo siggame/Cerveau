@@ -1,12 +1,14 @@
-// Game: Two player grid based game where each player tries to burn down the other player's buildings. Let it burn.
-
 import { IBaseGameRequiredData } from "~/core/game";
-import { AnarchyGameManager, BaseClasses, Building, Forecast, GameObject, Player } from "./";
+import { BaseClasses } from "./";
+import { Building } from "./building";
+import { Forecast } from "./forecast";
+import { AnarchyGameManager } from "./game-manager";
+import { GameObject } from "./game-object";
 import { AnarchyGameSettingsManager } from "./game-settings";
+import { Player } from "./player";
 
-// <<-- Creer-Merge: requires -->>
+// <<-- Creer-Merge: imports -->>
 import { ArrayUtils, IPoint } from "~/utils";
-// <<-- /Creer-Merge: requires -->>
 
 const DIRECTIONAL_OFFSETS = {
     North: { x: 0, y: -1 },
@@ -27,6 +29,8 @@ function keyToPoint(str: string): IPoint {
     };
 }
 
+// <<-- /Creer-Merge: imports -->>
+
 /**
  * Two player grid based game where each player tries to burn down the other
  * player's buildings. Let it burn.
@@ -35,15 +39,19 @@ export class AnarchyGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it */
     public readonly manager!: AnarchyGameManager;
 
+    /** The settings used to initialize the game, as set by players */
+    public readonly settings = this.settingsManager.values;
+
     /**
-     * How many bribes players get at the beginning of their turn, not counting their burned down Buildings.
+     * How many bribes players get at the beginning of their turn, not counting
+     * their burned down Buildings.
      */
     public readonly baseBribesPerTurn!: number;
 
     /**
      * All the buildings in the game.
      */
-    public readonly buildings!: Building[];
+    public buildings!: Building[];
 
     /**
      * The current Forecast, which will be applied at the end of the turn.
@@ -51,7 +59,8 @@ export class AnarchyGame extends BaseClasses.Game {
     public currentForecast: Forecast;
 
     /**
-     * The player whose turn it is currently. That player can send commands. Other players cannot.
+     * The player whose turn it is currently. That player can send commands.
+     * Other players cannot.
      */
     public currentPlayer!: Player;
 
@@ -63,17 +72,28 @@ export class AnarchyGame extends BaseClasses.Game {
     /**
      * All the forecasts in the game, indexed by turn number.
      */
-    public readonly forecasts!: Forecast[];
+    public forecasts!: Forecast[];
 
     /**
-     * All the game objects in the game, indexed by id
+     * A mapping of every game object's ID to the actual game object. Primarily
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public readonly gameObjects!: {[id: string]: GameObject | undefined};
+    public gameObjects!: {[id: string]: GameObject};
+
+    /**
+     * The width of the entire map along the vertical (y) axis.
+     */
+    public readonly mapHeight!: number;
+
+    /**
+     * The width of the entire map along the horizontal (x) axis.
+     */
+    public readonly mapWidth!: number;
 
     /**
      * The maximum amount of fire value for any Building.
      */
-    public readonly maxFire: number = this.maxFire || 0;
+    public readonly maxFire!: number;
 
     /**
      * The maximum amount of intensity value for any Forecast.
@@ -91,34 +111,38 @@ export class AnarchyGame extends BaseClasses.Game {
      */
     public nextForecast?: Forecast;
 
-    public readonly mapWidth!: number;
-    public readonly mapHeight!: number;
-
-    public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
-
     /**
      * List of all the players in the game.
      */
-    public readonly players!: Player[];
-
-    public readonly settings = Object.freeze(this.settingsManager.values);
-
-    // creer-merge
-    public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];
-
-    // private readonly buildingsGrid = make2D<Building>(this.mapWidth, this.mapHeight);
-    // /creer-merge
+    public players!: Player[];
 
     /**
-     * Initializes Games.
-     * @param data - the game settings
+     * A unique identifier for the game instance that is being played.
      */
-    constructor(protected settingsManager: AnarchyGameSettingsManager, required: IBaseGameRequiredData) {
+    public readonly session!: string;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
+
+    public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Game is created.
+     *
+     * @param settingsManager The settings manager that holds initial settings.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        protected settingsManager: AnarchyGameSettingsManager,
+        required: IBaseGameRequiredData,
+    ) {
         super(settingsManager, required);
 
-        // <<-- Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
 
-        // Some configuration parameters to change map generation
         const MIN_NUM_POINTS = 8;
         const MAX_NUM_POINTS = 15;
         const NUM_POINTS = this.manager.random.int(MAX_NUM_POINTS, MIN_NUM_POINTS);
@@ -261,12 +285,16 @@ export class AnarchyGame extends BaseClasses.Game {
         this.currentForecast = this.forecasts[0];
         this.nextForecast = this.forecasts[1];
 
-        // <<-- /Creer-Merge: init -->>
+        // <<-- /Creer-Merge: constructor -->>
     }
+
+    // <<-- Creer-Merge: functions -->>
 
     public getBuildingAt(x: number, y: number): Building | undefined {
         if (x >= 0 && y >= 0 && x < this.mapWidth && y < this.mapHeight) {
             return this.buildingsGrid[x][y];
         }
     }
+
+    // <<-- /Creer-Merge: functions -->>
 }

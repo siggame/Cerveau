@@ -1,47 +1,62 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, IWeatherStationProperties, Player } from "./";
+import { IWeatherStationProperties } from "./";
+import { Building, IBuildingConstructorArgs } from "./building";
+import { Player } from "./player";
 
-// <<-- Creer-Merge: requires -->>
+// <<-- Creer-Merge: imports -->>
 import { nextWrapAround, previousWrapAround } from "~/utils";
-// <<-- /Creer-Merge: requires -->>
+// <<-- /Creer-Merge: imports -->>
 
-export interface IWeatherStationConstructorArgs extends IWeatherStationProperties, IBuildingConstructorArgs {
+export interface IWeatherStationConstructorArgs
+extends IBuildingConstructorArgs, IWeatherStationProperties {
     // <<-- Creer-Merge: constructor-args -->>
-
-    // You can add more constructor args in here!
-
+    // You can add more constructor args in here
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
-// @class WeatherStation: Can be bribed to change the next Forecast in some way.
+/**
+ * Can be bribed to change the next Forecast in some way.
+ */
 export class WeatherStation extends Building {
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
     /**
-     * Initializes WeatherStations.
+     * Called when a WeatherStation is created.
      *
-     * @param data - a thing
-     * @param required ot
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
      */
-    constructor(data: IWeatherStationConstructorArgs, required: IBaseGameObjectRequiredData) {
+    constructor(
+        data: IWeatherStationConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
-        // put any initialization logic here. the base variables should be set from 'data' above
-        // <<-- /Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
     }
-
     /**
-     * Invalidation function for intensify
-     * Try to find a reason why the passed in parameters are invalid, and return
-     * a human readable string telling them why it is invalid
-     * @param player - the player that called this.
-     * @param negative - By default the intensity will be increased by
-     * 1, setting this to true decreases the intensity by 1.
-     * @param args - a key value table of keys to the arg (passed into this function)
+     * Invalidation function for intensify. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player The player that called this.
+     * @param negative By default the intensity will be increased by 1, setting
+     * this to true decreases the intensity by 1.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateIntensify(player: Player, negative: boolean = true): string | IArguments {
-        // <<-- Creer-Merge: invalidateIntensify -->>
+    protected invalidateIntensify(player: Player, negative: boolean = false):
+                                  string | IArguments {
+        // <<-- Creer-Merge: invalidate-intensify -->>
+
         const invalid = this.invalidateBribe(player);
         if (invalid) {
             return invalid;
@@ -62,19 +77,20 @@ export class WeatherStation extends Building {
             return `${this} cannot intensify the next Forecast${this.game.nextForecast} below 0.`;
         }
 
-        // <<-- /Creer-Merge: invalidateIntensify -->>
+        // <<-- /Creer-Merge: invalidate-intensify -->>
         return arguments;
     }
 
     /**
      * Bribe the weathermen to intensity the next Forecast by 1 or -1
      *
-     * @param player - the player that called this.
-     * @param negative - By default the intensity will be increased by
-     * 1, setting this to true decreases the intensity by 1.
+     * @param player The player that called this.
+     * @param negative By default the intensity will be increased by 1, setting
+     * this to true decreases the intensity by 1.
      * @returns True if the intensity was changed, false otherwise.
      */
-    protected intensify(player: Player, negative: boolean = true): boolean {
+    protected async intensify(player: Player, negative: boolean = false):
+                              Promise<boolean> {
         // <<-- Creer-Merge: intensify -->>
 
         this.game.nextForecast!.intensity += (negative ? -1 : 1);
@@ -86,19 +102,22 @@ export class WeatherStation extends Building {
 
         // <<-- /Creer-Merge: intensify -->>
     }
-
     /**
-     * Invalidation function for rotate
-     * Try to find a reason why the passed in parameters are invalid, and return
-     * a human readable string telling them why it is invalid
-     * @param player - the player that called this.
-     * @param counterclockwise - By default the direction will be
-     * rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.
-     * @returns a string that is the invalid reason, if the
-     * arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * Invalidation function for rotate. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player The player that called this.
+     * @param counterclockwise By default the direction will be rotated
+     * clockwise. If you set this to true we will rotate the forecast
+     * counterclockwise instead.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateRotate(player: Player, counterclockwise: boolean = false): string | IArguments {
-        // <<-- Creer-Merge: invalidateRotate -->>
+    protected invalidateRotate(player: Player, counterclockwise: boolean =
+                               false): string | IArguments {
+        // <<-- Creer-Merge: invalidate-rotate -->>
+
         const invalid = this.invalidateBribe(player);
         if (invalid) {
             return invalid;
@@ -108,19 +127,22 @@ export class WeatherStation extends Building {
             return `${this} cannot rotate the next Forecast as it is the last turn and there is no next Forecast.`;
         }
 
-        // <<-- /Creer-Merge: invalidateRotate -->>
+        // <<-- /Creer-Merge: invalidate-rotate -->>
         return arguments;
     }
 
     /**
      * Bribe the weathermen to change the direction of the next Forecast by
      * rotating it clockwise or counterclockwise.
-     * @param player - the player that called this.
-     * @param counterclockwise - By default the direction will be
-     * rotated clockwise. If you set this to true we will rotate the forecast counterclockwise instead.
+     *
+     * @param player The player that called this.
+     * @param counterclockwise By default the direction will be rotated
+     * clockwise. If you set this to true we will rotate the forecast
+     * counterclockwise instead.
      * @returns True if the rotation worked, false otherwise.
      */
-    protected rotate(player: Player, counterclockwise: boolean = false): boolean {
+    protected async rotate(player: Player, counterclockwise: boolean = false):
+                           Promise<boolean> {
         // <<-- Creer-Merge: rotate -->>
 
         const wrapAround = counterclockwise
@@ -137,7 +159,9 @@ export class WeatherStation extends Building {
         // <<-- /Creer-Merge: rotate -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
-    // You can add additional functions here. These functions will not be directly callable by client AIs
-    // <<-- /Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: functions -->>
 }

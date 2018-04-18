@@ -1,11 +1,23 @@
 import { IAnyObject } from "~/utils";
 import { BaseClasses } from "./";
 
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
+
+/**
+ * The settings manager for the Anarchy game.
+ */
 export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
+    /**
+     * This describes the structure of the game settings, and is used to
+     * generate the values, as well as basic type and range checking.
+     */
     public schema = this.makeSchema({
         ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
 
-        // creer-merge
+        // <<-- Creer-Merge: schema -->>
+
         mapWidth: {
             default: 40,
             min: 2,
@@ -27,6 +39,11 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
             description: "How many bribes players get at the beginning of "
             + "their turn, not counting their burned down Buildings.",
         },
+        buildingStartingHealth: {
+            default: 100,
+            min: 1,
+            description: "The amount of health buildings start the game with.",
+        },
         headquartersHealthScalar: {
             default: 3,
             min: 1,
@@ -47,11 +64,22 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
             min: 0,
             description: "How much exposure to remove per turn.",
         },
-        // /creer-merge
+
+        // <<-- /Creer-Merge: schema -->>
+
     });
 
+    /**
+     * The current values for the game's settings
+     */
     public values = this.initialValues(this.schema);
 
+    /**
+     * Try to invalidate all the game settings here, so invalid values do not
+     * reach the game.
+     * @param someSettings A subset of settings that will be tested
+     * @returns An error if the settings fail to validate.
+     */
     protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
         const invalidated = super.invalidate(someSettings);
         if (invalidated instanceof Error) {
@@ -60,8 +88,13 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
 
         const settings = { ...this.values, ...someSettings, ...invalidated };
 
-        // creer merge
-        // /creer merge
+        // <<-- Creer-Merge: invalidate -->>
+
+        // Write logic here to check the values in `settings`. If there is a
+        // problem with the values a player sent, return an error with a string
+        // describing why their value(s) are wrong
+
+        // <<-- /Creer-Merge: invalidate -->>
 
         return settings;
     }

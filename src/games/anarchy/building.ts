@@ -1,17 +1,20 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { GameObject, IBuildingProperties, IGameObjectConstructorArgs, Player } from "./";
+import { IBuildingProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
 
-export interface IBuildingConstructorArgs extends IBuildingProperties, IGameObjectConstructorArgs {
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
+
+export interface IBuildingConstructorArgs
+extends IGameObjectConstructorArgs, IBuildingProperties {
     // <<-- Creer-Merge: constructor-args -->>
     owner: Player;
     x: number;
     y: number;
     // <<-- /Creer-Merge: constructor-args -->>
 }
-
-// <<-- Creer-Merge: imports -->>
-// any additional imports you want can be required here safely between cree runs
-// <<-- /Creer-Merge: imports -->>
 
 /**
  * A basic building. It does nothing besides burn down. Other Buildings inherit
@@ -58,7 +61,7 @@ export class Building extends GameObject {
      * How much health this building currently has. When this reaches 0 the
      * Building has been burned down.
      */
-    public health: number;
+    public health!: number;
 
     /**
      * True if this is the Headquarters of the owning player, false otherwise.
@@ -70,46 +73,53 @@ export class Building extends GameObject {
      * The player that owns this building. If it burns down (health reaches 0)
      * that player gets an additional bribe(s).
      */
-    public readonly owner: Player;
+    public owner: Player;
 
     /**
      * The location of the Building along the x-axis.
      */
-    public x!: number;
+    public readonly x!: number;
 
     /**
      * The location of the Building along the y-axis.
      */
-    public y!: number;
+    public readonly y!: number;
 
-    // <<-- Creer-Merge: added-properties -->>
-    public maxHealth!: number;
-    // <<== /Creer-Merge: added-properties -->>
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
 
     /**
-     * Initializes Buildings
-     * @param data the initial data for this Building. These values are already
-     *             hooked up in the super method for you for this classes
-     *             member properties.
+     * Called when a Building is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
      */
-    constructor(data: IBuildingConstructorArgs, required: IBaseGameObjectRequiredData) {
+    constructor(
+        data: IBuildingConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
+
         this.owner = data.owner;
-        this.maxHealth = 100;
-        this.health = this.maxHealth;
+        this.health = this.game.settings.buildingStartingHealth;
 
-        if (this.isHeadquarters) {
-            this.owner.headquarters = this;
-            this.health *= this.game.settings.headquartersHealthScalar;
-        }
-
-        // <<-- /Creer-Merge: init -->>
+        // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
 
+    /**
+     * Gets the neighbor in a direction of the building.
+     * @param direction The direction to get at
+     * @returns THe building in that direction, if there is one.
+     */
     public getNeighbor(direction: string): Building | undefined {
         switch (direction.toLowerCase()) {
             case "north":
@@ -147,5 +157,5 @@ export class Building extends GameObject {
         }
     }
 
-    // <<-- /Creer-Merge: added-functions -->>
+    // <<-- /Creer-Merge: functions -->>
 }

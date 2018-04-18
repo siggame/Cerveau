@@ -1,17 +1,16 @@
-// Warehouse: A typical abandoned warehouse... that anarchists hang out in and can be bribed to burn down Buildings.
-
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { Building, IBuildingConstructorArgs, IWarehouseProperties, Player } from "./";
+import { IWarehouseProperties } from "./";
+import { Building, IBuildingConstructorArgs } from "./building";
+import { Player } from "./player";
 
-// <<-- Creer-Merge: requires -->>
+// <<-- Creer-Merge: imports -->>
 import { clamp, manhattanDistance } from "~/utils";
-// <<-- /Creer-Merge: requires -->>
+// <<-- /Creer-Merge: imports -->>
 
-export interface IWarehouseConstructorArgs extends IWarehouseProperties, IBuildingConstructorArgs {
+export interface IWarehouseConstructorArgs
+extends IBuildingConstructorArgs, IWarehouseProperties {
     // <<-- Creer-Merge: constructor-args -->>
-
-    // You can add more constructor args in here!
-
+    // You can add more constructor args in here
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -21,52 +20,63 @@ export interface IWarehouseConstructorArgs extends IWarehouseProperties, IBuildi
  */
 export class Warehouse extends Building {
     /**
-     * How exposed the anarchists in this warehouse are to
-     * PoliceDepartments. Raises when bribed to ignite buildings, and drops
-     * each turn if not bribed.
+     * How exposed the anarchists in this warehouse are to PoliceDepartments.
+     * Raises when bribed to ignite buildings, and drops each turn if not
+     * bribed.
      */
     public exposure!: number;
 
     /**
-     * The amount of fire added to buildings when bribed to ignite a
-     * building. Headquarters add more fire than normal Warehouses.
+     * The amount of fire added to buildings when bribed to ignite a building.
+     * Headquarters add more fire than normal Warehouses.
      */
     public readonly fireAdded!: number;
 
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
     /**
-     * Initializes Warehouses.
+     * Called when a Warehouse is created.
      *
-     * @param data a simple mapping passed in to the constructor with
-     * whatever you sent with it. GameSettings are in here by key/value as well.
-     * @param required ha
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
      */
-    constructor(data: IWarehouseConstructorArgs, required: IBaseGameObjectRequiredData) {
+    constructor(
+        data: IWarehouseConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
 
         this.fireAdded = 3;
 
         if (this.isHeadquarters) {
-            this.fireAdded = this.game.maxFire;
+            this.owner.headquarters = this;
+            this.health *= this.game.settings.headquartersHealthScalar;
+            this.fireAdded = this.game.settings.maxFire;
         }
 
-        // <<-- /Creer-Merge: init -->>
+        // <<-- /Creer-Merge: constructor -->>
     }
-
     /**
-     * Invalidation function for ignite
-     * Try to find a reason why the passed in parameters are invalid, and
-     * return a human readable string telling them why it is invalid
+     * Invalidation function for ignite. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param player - the player that called this.
-     * @param building - The Building you want to light on fire.
-     * @returns a string that is the invalid reason, if the
-     * arguments are invalid. Otherwise undefined (nothing) if the inputs are
-     * valid.
+     * @param player The player that called this.
+     * @param building The Building you want to light on fire.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateIgnite(player: Player, building?: Building): string | IArguments {
-        // <<-- Creer-Merge: invalidateIgnite -->>
+    protected invalidateIgnite(player: Player, building: Building): string |
+                               IArguments {
+        // <<-- Creer-Merge: invalidate-ignite -->>
 
         const invalid = this.invalidateBribe(player);
         if (invalid) {
@@ -81,19 +91,22 @@ export class Warehouse extends Building {
             return `${building} Headquarters cannot be targeted by Warehouses directly.`;
         }
 
-        // <<-- /Creer-Merge: invalidateIgnite -->>
+        // <<-- /Creer-Merge: invalidate-ignite -->>
         return arguments;
     }
 
     /**
      * Bribes the Warehouse to light a Building on fire. This adds this
      * building's fireAdded to their fire, and then this building's exposure is
-     * increased based on the Manhattan distance between the two buildings.
-     * @param player - the player that called this.
-     * @param building - The Building you want to light on fire.
-     * @returns The exposure added to this Building's exposure. -1 is returned if there was an error.
+     * increased based on the Manhatten distance between the two buildings.
+     *
+     * @param player The player that called this.
+     * @param building The Building you want to light on fire.
+     * @returns The exposure added to this Building's exposure. -1 is returned
+     * if there was an error.
      */
-    protected ignite(player: Player, building: Building): number {
+    protected async ignite(player: Player, building: Building): Promise<number>
+                           {
         // <<-- Creer-Merge: ignite -->>
 
         building.fire = clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
@@ -108,7 +121,9 @@ export class Warehouse extends Building {
         // <<-- /Creer-Merge: ignite -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
-    // <<-- /Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
 
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: functions -->>
 }

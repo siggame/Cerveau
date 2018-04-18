@@ -1,30 +1,31 @@
-// Forecast: The weather effect that will be applied at the end of a turn, which causes fires to spread.
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { GameObject, IForecastProperties, IGameObjectConstructorArgs, Player } from "./";
+import { IForecastProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be required here safely between cree runs
+// any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
-export interface IForecastConstructorArgs extends IForecastProperties, IGameObjectConstructorArgs {
+export interface IForecastConstructorArgs
+extends IGameObjectConstructorArgs, IForecastProperties {
     // <<-- Creer-Merge: constructor-args -->>
-
-    // You can add more constructor args in here!
     direction: string;
     intensity: number;
-
+    controllingPlayer: Player;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
 /**
- * The weather effect that will be applied at the end of a turn, which causes fires to spread.
+ * The weather effect that will be applied at the end of a turn, which causes
+ * fires to spread.
  */
 export class Forecast extends GameObject {
     /**
      * The Player that can use WeatherStations to control this Forecast when its
      * the nextForecast.
      */
-    public controllingPlayer?: Player;
+    public readonly controllingPlayer: Player;
 
     /**
      * The direction the wind will blow fires in. Can be 'north', 'east',
@@ -34,30 +35,40 @@ export class Forecast extends GameObject {
 
     /**
      * How much of a Building's fire that can be blown in the direction of this
-     * Forecast. Fire is duplicated (copied), not moved (transferred).
+     * Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     public intensity!: number;
 
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
     /**
-     * Initializes Forecasts.
+     * Called when a Forecast is created.
      *
-     * @param data the initial Forecast properties (already hooked up)
-     * @param required - data required for this game object to be initialized correctly
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
      */
-    constructor(data: IForecastConstructorArgs, required: IBaseGameObjectRequiredData) {
+    constructor(
+        data: IForecastConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
         super(data, required);
 
-        // <<-- Creer-Merge: init -->>
+        // <<-- Creer-Merge: constructor -->>
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+        this.controllingPlayer = data.controllingPlayer;
 
-        // <<-- /Creer-Merge: init -->>
+        // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: added-functions -->>
-
+    // <<-- /Creer-Merge: functions -->>
 }

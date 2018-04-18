@@ -26,7 +26,7 @@ ${merge('        // ', 'required-number-of-players', """        // override this
     /** Other strings (case insensitive) that can be used as an ID */
     public static get aliases(): string[] {
         return [
-${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\"
+${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
 """.format(game['name']), optional=True, help=False)}
         ];
     }
@@ -34,7 +34,7 @@ ${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\"
     /** The game this GameManager is managing */
     public readonly game!: ${game['name']}Game;
 
-    /** The factory that must be used to initialize new game objects **/
+    /** The factory that must be used to initialize new game objects */
     public readonly create!: ${game['name']}GameObjectFactory;
 
 ${merge('    // ', 'public-methods', """

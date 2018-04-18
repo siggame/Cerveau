@@ -36,6 +36,8 @@ ${merge('        // ', 'schema', """
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
+     * @param someSettings A subset of settings that will be tested
+     * @returns An error if the settings fail to validate.
      */
     protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
         const invalidated = super.invalidate(someSettings);
