@@ -129,3 +129,11 @@ export function make2D<T>(width: number, height: number): Array<Array<T | undefi
     }
     return array;
 }
+
+export function filterInPlace<T>(array: T[], filter: (element: T) => boolean): void {
+    const filtered = array.filter(filter);
+    array.length = filtered.length;
+    for (let i = filtered.length; i--;) {
+        array[i] = filtered[i];
+    }
+}

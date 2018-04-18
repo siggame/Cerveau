@@ -57,7 +57,6 @@
     "npm-run-all": "4.1.2",
     "rimraf": "2.6.2",
     "sanitize-filename": "1.6.1",
-    "tsconfig-paths": "3.2.0",
     "tslint": "5.9.1",
     "tslint-eslint-rules": "5.1.0",
     "tslint-no-math-random": "1.0.1"

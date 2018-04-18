@@ -1,97 +1,100 @@
-// Furnishing: An furnishing in the Saloon that must be pathed around, or destroyed.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IFurnishingProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+export interface IFurnishingConstructorArgs
+extends IGameObjectConstructorArgs, IFurnishingProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Furnishing: An furnishing in the Saloon that must be pathed around, or destroyed.
-let Furnishing = Class(GameObject, {
+/**
+ * An furnishing in the Saloon that must be pathed around, or destroyed.
+ */
+export class Furnishing extends GameObject {
     /**
-     * Initializes Furnishings.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * How much health this Furnishing currently has.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public health!: number;
 
-        /**
-         * How much health this Furnishing currently has.
-         *
-         * @type {number}
-         */
-        this.health = this.health || 0;
+    /**
+     * If this Furnishing has been destroyed, and has been removed from the
+     * game.
+     */
+    public isDestroyed!: boolean;
 
-        /**
-         * If this Furnishing has been destroyed, and has been removed from the game.
-         *
-         * @type {boolean}
-         */
-        this.isDestroyed = this.isDestroyed || false;
+    /**
+     * True if this Furnishing is a piano and can be played, False otherwise.
+     */
+    public readonly isPiano!: boolean;
 
-        /**
-         * True if this Furnishing is a piano and can be played, False otherwise.
-         *
-         * @type {boolean}
-         */
-        this.isPiano = this.isPiano || false;
+    /**
+     * If this is a piano and a Cowboy is playing it this turn.
+     */
+    public isPlaying!: boolean;
 
-        /**
-         * If this is a piano and a Cowboy is playing it this turn.
-         *
-         * @type {boolean}
-         */
-        this.isPlaying = this.isPlaying || false;
+    /**
+     * The Tile that this Furnishing is located on.
+     */
+    public tile?: Tile;
 
-        /**
-         * The Tile that this Furnishing is located on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Furnishing is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        data: IFurnishingConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
 
         this.game.furnishings.push(this);
         this.health = this.isPiano ? 48 : 16;
         this.tile.furnishing = this;
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Furnishing",
-
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: functions -->>
 
     /**
      * Damages this Furnishing for some amount of damage, setting isDestroyed if it dies
      *
-     * @param {number} damage - how much damage to do to this
+     * @param damage How much damage to do to this.
      */
-    damage: function(damage) {
+    public damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);
+
         if(this.health === 0) { // it has been destroyed
             this.isDestroyed = true;
             this.isPlaying = false;
             this.tile.furnishing = null;
             this.tile = null;
 
-            if(this.isPiano) {
+            if (this.isPiano) {
                 // then we may have been the last piano getting destroyed, so check to end the game
                 this.game.checkForWinner();
             }
         }
-    },
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Furnishing;
+    // <<-- /Creer-Merge: functions -->>
+}

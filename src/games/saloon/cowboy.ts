@@ -132,16 +132,20 @@ export class Cowboy extends GameObject {
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-act -->>
 
-        const invalid = this.invalidate(player, tile);
-        if(invalid) {
+        let invalid = this.invalidate(player, tile);
+        if (invalid) {
             return invalid;
         }
 
-        if(this.turnsBusy > 0) {
+        if (this.turnsBusy > 0) {
             return `${this} is busy and cannot act this turn for ${this.turnsBusy} more turns.`;
         }
 
         // job specific acts
+        switch (this.job) {
+            case "Brawler":
+                return `${this} is a Brawler and cannot act`;
+        }
         return this["invalidate" + this.job.replace(" ", "")].apply(this, arguments);
 
         // <<-- /Creer-Merge: invalidate-act -->>
@@ -485,16 +489,6 @@ export class Cowboy extends GameObject {
      */
     invalidateBrawler: function() {
         return "Brawlers cannot act.";
-    },
-
-    /**
-     * Called when a brawler wants to act
-     *
-     * @see Cowboy#act
-     * @returns {boolean} false, Brawlers cannot act
-     */
-    actBrawler: function() {
-        return false;
     },
 
     /**

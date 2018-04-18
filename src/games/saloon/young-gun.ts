@@ -1,99 +1,104 @@
-// YoungGun: An eager young person that wants to join your gang, and will call in the veteran Cowboys you need to win the brawl in the saloon.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IYoungGunProperties } from "./";
+import { Cowboy } from "./cowboy";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+export interface IYoungGunConstructorArgs
+extends IGameObjectConstructorArgs, IYoungGunProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class YoungGun: An eager young person that wants to join your gang, and will call in the veteran Cowboys you need to win the brawl in the saloon.
-let YoungGun = Class(GameObject, {
+/**
+ * An eager young person that wants to join your gang, and will call in the
+ * veteran Cowboys you need to win the brawl in the saloon.
+ */
+export class YoungGun extends GameObject {
     /**
-     * Initializes YoungGuns.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The Tile that a Cowboy will be called in on if this YoungGun calls in a
+     * Cowboy.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
-
-        /**
-         * The Tile that a Cowboy will be called in on if this YoungGun calls in a Cowboy.
-         *
-         * @type {Tile}
-         */
-        this.callInTile = this.callInTile || null;
-
-        /**
-         * True if the YoungGun can call in a Cowboy, false otherwise.
-         *
-         * @type {boolean}
-         */
-        this.canCallIn = this.canCallIn || false;
-
-        /**
-         * The Player that owns and can control this YoungGun.
-         *
-         * @type {Player}
-         */
-        this.owner = this.owner || null;
-
-        /**
-         * The Tile this YoungGun is currently on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // put any initialization logic here. the base variables should be set from 'data' above
-
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "YoungGun",
-
+    public callInTile: Tile;
 
     /**
-     * Invalidation function for callIn
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
-     *
-     * @param {Player} player - the player that called this.
-     * @param {string} job - The job you want the Cowboy being brought to have.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * True if the YoungGun can call in a Cowboy, false otherwise.
      */
-    invalidateCallIn: function(player, job, args) {
-        // <<-- Creer-Merge: invalidateCallIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    public canCallIn!: boolean;
 
-        if(player !== this.game.currentPlayer) {
+    /**
+     * The Player that owns and can control this YoungGun.
+     */
+    public readonly owner: Player;
+
+    /**
+     * The Tile this YoungGun is currently on.
+     */
+    public tile: Tile;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    /** The previous tile this Young Gun came from */
+    public previousTile: Tile;
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a YoungGun is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        data: IYoungGunConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
+
+    /**
+     * Invalidation function for callIn. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player The player that called this.
+     * @param job The job you want the Cowboy being brought to have.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    protected invalidateCallIn(
+        player: Player,
+        job: string,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-callIn -->>
+
+        if (player !== this.game.currentPlayer) {
             return `${player} it is not your turn.`;
         }
 
-        if(!this.canCallIn) {
+        if (!this.canCallIn) {
             return `${this} cannot call in any more Cowboys this turn.`;
         }
 
-        let actualJob; // make sure the job is valid
-        for(const j of this.game.jobs) {
-            if(job.toLowerCase() === j.toLowerCase()) {
-                actualJob = j;
-                break;
-            }
-        }
+        const actualJob = this.game.jobs.find((j) => j.toLowerCase() === job.toLowerCase());
 
-        if(!actualJob) {
+        if (!actualJob) {
             return `${job} is not a valid job to send in.`;
         }
 
         // make sure they are not trying to go above the limit
-        let count = 0;
-        for(const cowboy of this.owner.cowboys) {
+        let count = this.owner.cowboys.filter((c) => c.job === actualJob).length;
+        for (const cowboy of this.owner.cowboys) {
             if(cowboy.job === actualJob) {
                 count++; // yes you could add the boolean value (coerced to 0 or 1), but that reads weird
             }
@@ -104,20 +109,23 @@ let YoungGun = Class(GameObject, {
         }
 
         // make the job arg the correct job, as it looks valid!
-        args.job = actualJob;
+        job = actualJob;
 
-        // <<-- /Creer-Merge: invalidateCallIn -->>
-    },
+        // <<-- /Creer-Merge: invalidate-callIn -->>
+        return arguments;
+    }
 
     /**
-     * Tells the YoungGun to call in a new Cowboy of the given job to the open Tile nearest to them.
+     * Tells the YoungGun to call in a new Cowboy of the given job to the open
+     * Tile nearest to them.
      *
-     * @param {Player} player - the player that called this.
-     * @param {string} job - The job you want the Cowboy being brought to have.
-     * @returns {Cowboy} The new Cowboy that was called in if valid. They will not be added to any `cowboys` lists until the turn ends. Null otherwise.
+     * @param player The player that called this.
+     * @param job The job you want the Cowboy being brought to have.
+     * @returns The new Cowboy that was called in if valid. They will not be
+     * added to any `cowboys` lists until the turn ends. Null otherwise.
      */
-    callIn: function(player, job) {
-        // <<-- Creer-Merge: callIn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async callIn(player: Player, job: string): Promise<Cowboy> {
+        // <<-- Creer-Merge: callIn -->>
 
         // clear the open tile before moving the young gun to it
         if(this.callInTile.cowboy) {
@@ -146,17 +154,12 @@ let YoungGun = Class(GameObject, {
 
         return cowboy;
 
-
         // <<-- /Creer-Merge: callIn -->>
-    },
+    }
 
+    // <<-- Creer-Merge: functions -->>
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any additional protected or pirate methods can go here.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = YoungGun;
+    // <<-- /Creer-Merge: functions -->>
+}
