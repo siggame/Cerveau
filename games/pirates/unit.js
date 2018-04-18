@@ -695,7 +695,7 @@ let Unit = Class(GameObject, {
             return `${this} can't split onto enemy pirates!`;
         }
 
-        if(tile.port && tile.port !== player) {
+        if(tile.port && tile.port.owner !== player) {
             return `${this} can't split onto enemy ports!`;
         }
 
