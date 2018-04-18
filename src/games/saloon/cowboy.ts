@@ -1,132 +1,138 @@
-// Cowboy: A person on the map that can move around and interact within the saloon.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { ICowboyProperties } from "./";
+import { Furnishing } from "./furnishing";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+export interface ICowboyConstructorArgs
+extends IGameObjectConstructorArgs, ICowboyProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Cowboy: A person on the map that can move around and interact within the saloon.
-let Cowboy = Class(GameObject, {
+/**
+ * A person on the map that can move around and interact within the saloon.
+ */
+export class Cowboy extends GameObject {
     /**
-     * Initializes Cowboys.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * If the Cowboy can be moved this turn via its owner.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public canMove!: boolean;
 
-        /**
-         * If the Cowboy can be moved this turn via its owner.
-         *
-         * @type {boolean}
-         */
-        this.canMove = this.canMove || false;
+    /**
+     * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
+     * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+     */
+    public drunkDirection!: string;
 
-        /**
-         * The direction this Cowboy is moving while drunk. Will be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string) when not drunk.
-         *
-         * @type {string}
-         */
-        this.drunkDirection = this.drunkDirection || "";
+    /**
+     * How much focus this Cowboy has. Different Jobs do different things with
+     * their Cowboy's focus.
+     */
+    public focus!: number;
 
-        /**
-         * How much focus this Cowboy has. Different Jobs do different things with their Cowboy's focus.
-         *
-         * @type {number}
-         */
-        this.focus = this.focus || 0;
+    /**
+     * How much health this Cowboy currently has.
+     */
+    public health!: number;
 
-        /**
-         * How much health this Cowboy currently has.
-         *
-         * @type {number}
-         */
-        this.health = this.health || 0;
+    /**
+     * If this Cowboy is dead and has been removed from the game.
+     */
+    public isDead!: boolean;
 
-        /**
-         * If this Cowboy is dead and has been removed from the game.
-         *
-         * @type {boolean}
-         */
-        this.isDead = this.isDead || false;
+    /**
+     * If this Cowboy is drunk, and will automatically walk.
+     */
+    public isDrunk!: boolean;
 
-        /**
-         * If this Cowboy is drunk, and will automatically walk.
-         *
-         * @type {boolean}
-         */
-        this.isDrunk = this.isDrunk || false;
+    /**
+     * The job that this Cowboy does, and dictates how they fight and interact
+     * within the Saloon.
+     */
+    public readonly job!: string;
 
-        /**
-         * The job that this Cowboy does, and dictates how they fight and interact within the Saloon.
-         *
-         * @type {string}
-         */
-        this.job = this.job || "";
+    /**
+     * The Player that owns and can control this Cowboy.
+     */
+    public readonly owner: Player;
 
-        /**
-         * The Player that owns and can control this Cowboy.
-         *
-         * @type {Player}
-         */
-        this.owner = this.owner || null;
+    /**
+     * The Tile that this Cowboy is located on.
+     */
+    public tile?: Tile;
 
-        /**
-         * The Tile that this Cowboy is located on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
+    /**
+     * How many times this unit has been drunk before taking their siesta and
+     * reseting this to 0.
+     */
+    public tolerance!: number;
 
-        /**
-         * How many times this unit has been drunk before taking their siesta and reseting this to 0.
-         *
-         * @type {number}
-         */
-        this.tolerance = this.tolerance || 0;
+    /**
+     * How many turns this unit has remaining before it is no longer busy and
+     * can `act()` or `play()` again.
+     */
+    public turnsBusy!: number;
 
-        /**
-         * How many turns this unit has remaining before it is no longer busy and can `act()` or `play()` again.
-         *
-         * @type {number}
-         */
-        this.turnsBusy = this.turnsBusy || 0;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Cowboy is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        data: ICowboyConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
 
         this.canMove = true;
         this.health = 10;
         this.tile.cowboy = this;
 
-        // NOTE: don't add to the cowboys arrays so they don't resize during a turn
+        // NOTE: don't add to the cowboys arrays so it doesn't resize during a 
+        // player's turn
         this.game.spawnedCowboys.push(this); // just tell the game we spawned
 
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "Cowboy",
-
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
     /**
-     * Invalidation function for act
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for act. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile you want this Cowboy to act on.
-     * @param {string} drunkDirection - The direction the bottle will cause drunk cowboys to be in, can be 'North', 'East', 'South', or 'West'.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player The player that called this.
+     * @param tile The Tile you want this Cowboy to act on.
+     * @param drunkDirection The direction the bottle will cause drunk cowboys
+     * to be in, can be 'North', 'East', 'South', or 'West'.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateAct: function(player, tile, drunkDirection, args) {
-        // <<-- Creer-Merge: invalidateAct -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateAct(
+        player: Player,
+        tile: Tile,
+        drunkDirection: string = "",
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-act -->>
 
-        const invalid = this._invalidate(player, tile);
+        const invalid = this.invalidate(player, tile);
         if(invalid) {
             return invalid;
         }
@@ -138,39 +144,45 @@ let Cowboy = Class(GameObject, {
         // job specific acts
         return this["invalidate" + this.job.replace(" ", "")].apply(this, arguments);
 
-        // <<-- /Creer-Merge: invalidateAct -->>
-    },
+        // <<-- /Creer-Merge: invalidate-act -->>
+        return arguments;
+    }
 
     /**
      * Does their job's action on a Tile.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile you want this Cowboy to act on.
-     * @param {string} drunkDirection - The direction the bottle will cause drunk cowboys to be in, can be 'North', 'East', 'South', or 'West'.
-     * @returns {boolean} True if the act worked, false otherwise.
+     * @param player The player that called this.
+     * @param tile The Tile you want this Cowboy to act on.
+     * @param drunkDirection The direction the bottle will cause drunk cowboys
+     * to be in, can be 'North', 'East', 'South', or 'West'.
+     * @returns True if the act worked, false otherwise.
      */
-    act: function(player, tile, drunkDirection) {
-        // <<-- Creer-Merge: act -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async act(
+        player: Player,
+        tile: Tile,
+        drunkDirection: string = "",
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: act -->>
 
         return this["act" + this.job.replace(" ", "")].apply(this, arguments);
 
         // <<-- /Creer-Merge: act -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for move
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for move. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile you want to move this Cowboy to.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player The player that called this.
+     * @param tile The Tile you want to move this Cowboy to.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateMove: function(player, tile, args) {
-        // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateMove(player: Player, tile: Tile): string | IArguments {
+        // <<-- Creer-Merge: invalidate-move -->>
 
-        const invalid = this._invalidate(player, tile);
+        const invalid = this.invalidate(player, tile);
         if(invalid) {
             return invalid;
         }
@@ -194,18 +206,20 @@ let Cowboy = Class(GameObject, {
             }
         }
 
-        // <<-- /Creer-Merge: invalidateMove -->>
-    },
+        // <<-- /Creer-Merge: invalidate-move -->>
+        return arguments;
+    }
 
     /**
      * Moves this Cowboy from its current Tile to an adjacent Tile.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile you want to move this Cowboy to.
-     * @returns {boolean} True if the move worked, false otherwise.
+     * @param player The player that called this.
+     * @param tile The Tile you want to move this Cowboy to.
+     * @returns True if the move worked, false otherwise.
      */
-    move: function(player, tile) {
-        // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async move(player: Player, tile: Tile): Promise<boolean> {
+        // <<-- Creer-Merge: move -->>
+
 
         this.tile.cowboy = null; // remove me from the tile I was on
         tile.cowboy = this;
@@ -223,23 +237,27 @@ let Cowboy = Class(GameObject, {
 
         return true;
 
-        // <<-- /Creer-Merge: move -->>
-    },
 
+        // <<-- /Creer-Merge: move -->>
+    }
 
     /**
-     * Invalidation function for play
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for play. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Furnishing} piano - The Furnishing that is a piano you want to play.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player The player that called this.
+     * @param piano The Furnishing that is a piano you want to play.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidatePlay: function(player, piano, args) {
-        // <<-- Creer-Merge: invalidatePlay -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidatePlay(
+        player: Player,
+        piano: Furnishing,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-play -->>
 
-        const invalid = this._invalidate(player, this.tile);
+        const invalid = this.invalidate(player, this.tile);
         if(invalid) {
             return invalid;
         }
@@ -264,18 +282,19 @@ let Cowboy = Class(GameObject, {
             return `${piano} is not adjacent to ${this}`;
         }
 
-        // <<-- /Creer-Merge: invalidatePlay -->>
-    },
+        // <<-- /Creer-Merge: invalidate-play -->>
+        return arguments;
+    }
 
     /**
      * Sits down and plays a piano.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Furnishing} piano - The Furnishing that is a piano you want to play.
-     * @returns {boolean} True if the play worked, false otherwise.
+     * @param player The player that called this.
+     * @param piano The Furnishing that is a piano you want to play.
+     * @returns True if the play worked, false otherwise.
      */
-    play: function(player, piano) {
-        // <<-- Creer-Merge: play -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async play(player: Player, piano: Furnishing): Promise<boolean> {
+        // <<-- Creer-Merge: play -->>
 
         piano.isPlaying = true;
         this.turnsBusy = 1;
@@ -285,44 +304,40 @@ let Cowboy = Class(GameObject, {
         return true;
 
         // <<-- /Creer-Merge: play -->>
-    },
+    }
 
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: functions -->>
 
     /**
      * Checks if this Cowboy can do things based on the player and tile (can move, can act, acn play, etc)
-     * @param {Player} player - the player commanding this Cowboy
-     * @param {Tile} tile - the tile trying to do something to
-     * @returns {string|undefined} the reason this is invalid (still in need of formatting), undefined if valid
+     * @param player - the player commanding this Cowboy
+     * @param tile - the tile trying to do something to
+     * @returns the reason this is invalid (still in need of formatting), undefined if valid
      */
-    _invalidate: function(player, tile) {
-        if(!player || player !== this.game.currentPlayer) {
-            return "{player} it is not your turn.";
+    private invalidate(player: Player, tile: Tile): string | undefined {
+        if (this.owner !== player) {
+            return `${this} is not owned by you.`;
         }
-        else if(this.owner !== player) {
-            return "{this} is not owned by you.";
+        if (this.isDead) {
+            return `${this} is dead.`;
         }
-        else if(this.isDead) {
-            return "{this} is dead.";
+        if (this.isDrunk) {
+            return `${this} is drunk, can cannot be directly controlled by you.`;
         }
-        else if(this.isDrunk) {
-            return "{this} is drunk, can cannot be directly controlled by you.";
+        if (this.siesta > 0) {
+            return `${this} is asleep because of their siesta and cannot be controlled by you.`;
         }
-        else if(this.siesta > 0) {
-            return "{this} is asleep because of their siesta and cannot be controlled by you.";
+        if (!tile) {
+            return `${tile} is not a valid Tile.`;
         }
-        else if(!tile) {
-            return "{tile} is not a valid Tile.";
-        }
-    },
+    }
 
     /**
      * Damages this cowboy for some amount of damage, setting isDead if it dies
      *
-     * @param {number} damage - how much damage to do to this
+     * @param damage How much damage to do to this
      */
-    damage: function(damage) {
+    private damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);
         if(this.health === 0) {
             this.isDead = true;
@@ -331,53 +346,53 @@ let Cowboy = Class(GameObject, {
             this.tile = null;
             this.owner.opponent.kills++;
         }
-    },
+    }
 
     /**
      * Tries to invalidate the args for the Sharpshooter's act
      *
      * @see Cowboy#act
-     * @param {Player} player - the player making the cowboy act
-     * @param {Tile} tile - the tile the cowboy wants to act on
-     * @returns {string|undefined} the invalid reason if invalid (format not invoked against it), undefined if valid
+     * @param player The player making the cowboy act
+     * @param tile The tile the cowboy wants to act on
+     * @returns The invalid reason if invalid (format not invoked against it), undefined if valid
      */
-    invalidateSharpshooter: function(player, tile) {
-        if(this.focus < 1) {
+    private invalidateSharpshooter(player: Player, tile: Tile): string | undefined {
+        if (this.focus < 1) {
             return `${this} needs focus to act. Currently has ${this.focus} focus.`;
         }
 
-        if(!this.tile.adjacentDirection(tile)) {
+        if (!this.tile.adjacentDirection(tile)) {
             return `${tile} is not adjacent to the Tile that {this} is on (${this.tile}).`;
         }
-    },
+    }
 
     /**
-     * makes a Sharpshooter cowboy act
+     * Makes a Sharpshooter cowboy act
      *
      * @see Cowboy#act
-     * @param {Player} player - the player making the cowboy act
-     * @param {Tile} tile - the tile the cowboy wants to act on
-     * @returns {boolean} true because it worked
+     * @param player The player making the cowboy act
+     * @param tile The tile the cowboy wants to act on
+     * @returns true because it worked
      */
-    actSharpshooter: function(player, tile) {
-        var shot = tile;
-        var distance = this.focus;
-        while(shot && distance > 0) { // shoot things
+    private actSharpshooter(player: Player, tile: Tile): true {
+        let shot = tile;
+        let distance = this.focus;
+        while (shot && distance > 0) { // shoot things
             distance--; // yes we could do this above but it reads stupid
 
-            if(!shot || shot.isBalcony) {
+            if (!shot || shot.isBalcony) {
                 break; // we are done
             }
 
-            if(shot.cowboy) {
+            if (shot.cowboy) {
                 shot.cowboy.damage(this.game.sharpshooterDamage);
             }
 
-            if(shot.furnishing) {
+            if (shot.furnishing) {
                 shot.furnishing.damage(this.game.sharpshooterDamage);
             }
 
-            if(shot.bottle) {
+            if (shot.bottle) {
                 shot.bottle.break();
             }
 
@@ -388,24 +403,28 @@ let Cowboy = Class(GameObject, {
         this.turnsBusy = 1;
 
         return true;
-    },
+    }
 
     /**
      * Tries to invalidate the args for the Bartender's act
      *
      * @see Cowboy#act
-     * @param {Player} player - the player making the cowboy act
-     * @param {Tile} tile - the tile the cowboy wants to act on
-     * @param {string} drunkDirection - the direction the player wants drunks hit by the bottle to go
-     * @param {Object} args - dictionary of actual args to update
-     * @returns {string|undefined} the invalid reason if invalid (format not invoked against it), undefined if valid
+     * @param player The player making the cowboy act
+     * @param tile The tile the cowboy wants to act on
+     * @param drunkDirection The direction the player wants drunks hit by the bottle to go
+     * @param args Dictionary of actual args to update
+     * @returns The invalid reason if invalid (format not invoked against it), undefined if valid
      */
-    invalidateBartender: function(player, tile, drunkDirection, args) {
+    private invalidateBartender(
+        player: Player,
+        tile: Tile,
+        drunkDirection: string,
+    ): string | Error {
         let validDrunkDirection = false;
-        var simple = drunkDirection[0].toLowerCase();
+        const simple = drunkDirection[0].toLowerCase();
         for(var i = 0; i < this.game.tileDirections.length; i++) {
-            var direction = this.game.tileDirections[i];
-            var dir = direction[0].toLowerCase(); // so we can check just the first two letters if they are the same, so we can be lax on input
+            const direction = this.game.tileDirections[i];
+            const dir = direction[0].toLowerCase(); // so we can check just the first two letters if they are the same, so we can be lax on input
 
             if(simple === dir) {
                 validDrunkDirection = direction;
@@ -493,20 +512,17 @@ let Cowboy = Class(GameObject, {
             this.focus = 0;
             this.canMove = false;
         }
-    },
+    }
 
     /**
-     * string coercion override
+     * String coercion override
      *
      * @override
-     * @returns {string} string stating what this cowboy is
+     * @returns string stating what this cowboy is
      */
-    toString: function() {
-        return "'{job}' {gameObjectName} #{id}".format(this);
-    },
+    public toString(): string {
+        return `'{this.job}' {gameObjectName} #{id}".format(this)`;
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Cowboy;
+    // <<-- /Creer-Merge: functions -->>
+}
