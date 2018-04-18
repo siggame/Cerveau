@@ -18,14 +18,41 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
 
         // <<-- Creer-Merge: schema -->>
 
-        // you can add settings here, e.g.:
-        /*
-        someVariableLikeUnitHealth: {
-            default: 1337,
-            min: 1,
-            description: "Describe what this setting does for the players.",
+        turnsDrunk: {
+            description: "The number of turns a cowboy is busy being drunk, after it first gets drunk.",
+            default: 5,
+            min: 0,
         },
-        */
+        bartenderCooldown: {
+            description: "How many turns a Bartender is busy after throwing a bottle.",
+            default: 5,
+            min: 0,
+        },
+        rowdinessToSiesta: {
+            description: "How much rowdiness a player must get to force a siesta.",
+            default: 8,
+            min: 1,
+        },
+        siestaLength: {
+            description: "How many turns a siesta lasts",
+            default: 8,
+            min: 0,
+        },
+        maxCowboysPerJob: {
+            description: "Maximum number of cowboys that can be called in per job.",
+            default: 2,
+            min: 1,
+        },
+        sharpshooterDamage: {
+            description: "How much damage a Sharpshooter does to everything it hits.",
+            default: 2,
+            min: 0,
+        },
+        brawlerDamage: {
+            description: "How much damage a Brawler does to its surroundings.",
+            default: 1,
+            min: 0,
+        },
 
         // <<-- /Creer-Merge: schema -->>
 

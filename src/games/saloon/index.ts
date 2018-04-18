@@ -12,7 +12,8 @@ import {
 } from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled, mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer,
+    mixTiled, mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
 
 export interface IBaseSaloonPlayer extends IBasePlayer, ITwoPlayerPlayer, ITurnBasedPlayer, ITiledPlayer {}
 

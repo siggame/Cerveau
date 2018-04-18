@@ -21,7 +21,7 @@ import * as gaussian from "gaussian";
  */
 export class SaloonGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it */
-    public readonly manager!: AnarchyGameManager;
+    public readonly manager!: SaloonGameManager;
 
     /** The settings used to initialize the game, as set by players */
     public readonly settings = Object.freeze(this.settingsManager.values);
@@ -132,12 +132,6 @@ export class SaloonGame extends BaseClasses.Game {
      */
     public readonly turnsDrunk!: number;
 
-    // <<-- Creer-Merge: attributes -->>
-
-
-
-    // <<-- /Creer-Merge: attributes -->>
-
     /**
      * Called when a Game is created.
      *
@@ -155,44 +149,37 @@ export class SaloonGame extends BaseClasses.Game {
         this.jobs.push(
             "Sharpshooter",
             "Bartender",
-            "Brawler"
+            "Brawler",
         );
 
         const minFurnishings = 0;
         const maxFurnishings = 5;
-        const minPianos = 2;
         const minHazards = 0;
         const maxHazards = 12;
 
-        // the max number of pianos is the same as the number of jobs,
-        // therefore at least half the cowboys spawned can't play pianos as
-        // there will always be more possible cowboys than pianos
-        const maxPianos = this.jobs.length + 1;
-
-
         // make top and bottom sides walls
         for (let x = 0; x < this.mapWidth; x++) {
-            this.getTile(x, 0).isBalcony = true;
-            this.getTile(x, this.mapHeight - 1).isBalcony = true;
+            this.getTile(x, 0)!.isBalcony = true;
+            this.getTile(x, this.mapHeight - 1)!.isBalcony = true;
         }
 
         // make left and right sides walls
         for (let y = 0; y < this.mapHeight; y++) {
-            this.getTile(0, y).isBalcony = true;
-            this.getTile(this.mapWidth - 1, y).isBalcony = true;
+            this.getTile(0, y)!.isBalcony = true;
+            this.getTile(this.mapWidth - 1, y)!.isBalcony = true;
         }
 
         // spawn some random furnishings in quadrants
-        var numFurnishings = this.manager.random.int(maxFurnishings, minFurnishings) * 2; // *2 for each side
+        let numFurnishings = this.manager.random.int(maxFurnishings, minFurnishings) * 2; // *2 for each side
 
-        var rand = Math.random();
-        var numPianos = 2;
+        const rand = this.manager.random.float();
+        let numPianos = 2;
         // 80% of the time, have 4 pianos
-        if(rand < 0.80) {
+        if (rand < 0.80) {
             numPianos = 4;
         }
         // the other 15% of the time have 6
-        else if(rand < 0.95) {
+        else if (rand < 0.95) {
             numPianos = 6;
         }
         // and 5% of the time have 8
@@ -200,8 +187,8 @@ export class SaloonGame extends BaseClasses.Game {
             numPianos = 8;
         }
 
-        const distributionX = gaussian(this.mapWidth/2, this.mapWidth/3);
-        const distributionY = gaussian(this.mapHeight/2, this.mapHeight/3);
+        const distributionX = gaussian(this.mapWidth / 2, this.mapWidth / 3);
+        const distributionY = gaussian(this.mapHeight / 2, this.mapHeight / 3);
 
         let numHazards = this.manager.random.int(maxHazards, minHazards) * 2;
 
@@ -231,7 +218,7 @@ export class SaloonGame extends BaseClasses.Game {
 
                 if (numHazards > 0) { // if there are hazards to spawn
                     numHazards--;
-                    this.getTile(x, y).hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
+                    this.getTile(x, y)!.hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
                 }
                 else { // need to spawn a furnishing
                     this.manager.create.Furnishing({
@@ -251,7 +238,7 @@ export class SaloonGame extends BaseClasses.Game {
         }
 
         // create the players' Young Guns
-        for(var i = 0; i < this.players.length; i++) {
+        for (let i = 0; i < this.players.length; i++) {
             const player = this.players[i];
 
             let x = 0;
@@ -263,20 +250,29 @@ export class SaloonGame extends BaseClasses.Game {
                 dy = -1;
             }
 
-            player.youngGun = this.create.YoungGun({
+            (player.youngGun as any) = this.manager.create.YoungGun({
                 owner: player,
-                tile: this.getTile(x, y + dy),
+                tile: this.getTile(x, y + dy)!,
                 canCallIn: true,
+
+                // used for moving the young guns around the map,
+                // but not a property exposed to clients
+                previousTile: this.getTile(x, y + dy * 2)!,
             });
-
-            // used for moving the young guns around the map,
-            // but not a property exposed to clients
-            player.youngGun.previousTile = this.getTile(x, y + dy * 2);
-
-            this.manager.doYoungGunFor(player);
         }
 
         // <<-- /Creer-Merge: constructor -->>
+    }
+
+    /**
+     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map
+     *
+     * @param x the x position of the desired tile
+     * @param y the y position of the desired tile
+     * @returns the Tile at (x, y) if valid, null otherwise
+     */
+    public getTile(x: number, y: number): Tile | undefined {
+        return super.getTile(x, y) as Tile | undefined;
     }
 
     // <<-- Creer-Merge: functions -->>

@@ -6,7 +6,6 @@ import { BaseClasses, SaloonGame, SaloonGameObjectFactory } from "./";
 import { filterInPlace } from "~/utils";
 import { Bottle } from "./bottle";
 import { Cowboy } from "./cowboy";
-import { Player } from "./player";
 import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
@@ -53,14 +52,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
      * @returns True if there was a winner and the game is over, false otherwise
      */
     public checkForWinner(): boolean {
-        let numberOfPianos = 0;
-        for (const furnishing of this.game.furnishings) {
-            if (!furnishing.isDead && furnishing.isPiano) {
-                numberOfPianos++;
-            }
-        }
+        const alivePianos = this.game.furnishings.filter((f) => !f.isDestroyed && f.isPiano);
 
-        if (numberOfPianos === 0) { // game over
+        if (alivePianos.length === 0) { // game over
             this.secondaryGameOver("all pianos destroyed.");
         }
 
@@ -71,17 +65,17 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
         // this assumes they play every piano on every remaining turn
         const remainingTurns = this.game.maxTurns - this.game.currentTurn;
-        const maxAdditionalScore = Math.ceil(numberOfPianos * remainingTurns / 2);
+        const maxAdditionalScore = Math.ceil(alivePianos.length * remainingTurns / 2);
         if (winning.score > winning.opponent.score + maxAdditionalScore) {
             // then the losing player can't catch up to the winner's score,
             // so end the game early
-            this.declareWinners(
+            this.declareWinner(
                 `Score (${winning.score}) high enough that the opponent can't `
                 + `win in the remaining turns (${remainingTurns}).`,
                 winning,
             );
 
-            this.declareLosers(
+            this.declareLoser(
                 "Score too low to catch up to the winner in the number of remaining turns.",
                 winning.opponent,
             );
@@ -91,45 +85,6 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         }
 
         return false;
-    }
-
-    /**
-     * Does Young Gun related logic: moving them clockwise
-     *
-     * @param player The player to apply Young Gun logic to
-     */
-    public doYoungGunFor(player: Player): void {
-        const youngGun = player.youngGun; // shorthand
-        youngGun.canCallIn = true; // they can call in a cowboy on their next turn
-
-        // find the adjacent tile that they were not on last turn,
-        //   this way all YoungGuns continue walking clockwise
-        const tiles = youngGun.tile.getNeighbors();
-        const moveTo = tiles.find((tile) => tile.isBalcony && youngGun.previousTile !== tile);
-
-        // do a quick BFS to find the callInTile
-        var searchTiles = [ moveTo ];
-        var searched = new Set();
-        while (searchTiles.length > 0) {
-            const searchTile = searchTiles.shift();
-
-            if (!searched.contains(searchTile)) {
-                searched.add(searchTile);
-
-                if (searchTile.isBalcony) { // add its neighbors to be searched
-                    searchTiles = searchTiles.concat(searchTile.getNeighbors());
-                }
-                else {
-                    youngGun.callInTile = searchTile;
-                    break; // we found it
-                }
-            }
-        }
-
-        youngGun.previousTile = youngGun.tile;
-        youngGun.tile.youngGun = undefined;
-        youngGun.tile = moveTo;
-        moveTo.youngGun = youngGun;
     }
 
     // <<-- /Creer-Merge: public-methods -->>
@@ -167,7 +122,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         filterInPlace(this.game.furnishings, (f) => !f.isDestroyed);
         filterInPlace(this.game.bottles, (b) => !b.isDestroyed);
 
-        this.doYoungGunFor(this.game.currentPlayer);
+        this.game.currentPlayer.youngGun.update();
 
         if (this.checkForWinner()) {
             return;
@@ -186,22 +141,23 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     protected secondaryGameOver(reason: string): void {
         // <<-- Creer-Merge: secondary-game-over -->>
 
+        const { players } = this.game;
         if (players[0].score !== players[1].score) { // someone won with a higher score
-            const winner = this.game.players[0].score > this.game.players[1].score
-                ? this.game.players[0]
-                : this.game.players[1];
+            const winner = players[0].score > players[1].score
+                ? players[0]
+                : players[1];
 
-            this.declareWinners(`${reason} - Has highest score (${winner.score}).`, winner);
-            this.declareLosers("Lower score than winner", winner.opponent);
+            this.declareWinner(`${reason} - Has highest score (${winner.score}).`, winner);
+            this.declareLoser("Lower score than winner", winner.opponent);
         }
 
         if (players[0].kills !== players[1].kills) { // someone won with a higher kills
-            const winner = this.game.players[0].kills > this.game.players[1].kills
-                ? this.game.players[0]
-                : this.game.players[1];
+            const winner = players[0].kills > players[1].kills
+                ? players[0]
+                : players[1];
 
-            this.declareWinners(`${reason} - Has the most kills (${winner.kills}).`, winner);
-            this.declareLosers("Less kills than winner", winner.opponent);
+            this.declareWinner(`${reason} - Has the most kills (${winner.kills}).`, winner);
+            this.declareLoser("Less kills than winner", winner.opponent);
         }
 
         // <<-- /Creer-Merge: secondary-game-over -->>
@@ -232,7 +188,11 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
             if (cowboy.isDrunk) {
                 if (cowboy.drunkDirection !== "") { // then they are not drunk because of a siesta, so move them
-                    const next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
+                    const next = cowboy.tile!.getNeighbor(cowboy.drunkDirection);
+                    if (!next) {
+                        throw new Error(`${this} somehow is trying to walk off the map!`);
+                    }
+
                     if (next.isBalcony || next.cowboy || next.furnishing) { // then something is in the way
                         if (next.cowboy) {
                             next.cowboy.focus = 0;
@@ -246,7 +206,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
                         }
                     }
                     else { // the next tile is valid
-                        cowboy.tile.cowboy = undefined;
+                        cowboy.tile!.cowboy = undefined;
                         cowboy.tile = next;
                         next.cowboy = cowboy;
 
@@ -272,12 +232,12 @@ export class SaloonGameManager extends BaseClasses.GameManager {
             cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
 
             if (cowboy.job === "Brawler") { // damage surroundings
-                for (const neighbor of cowboy.tile.getNeighbors()) {
+                for (const neighbor of cowboy.tile!.getNeighbors()) {
                     if (neighbor.cowboy) { // if there is a cowboy, damage them
-                        neighbor.cowboy.damage(this.game.settings.brawlerDamage);
+                        neighbor.cowboy.damage(this.game.brawlerDamage);
                     }
                     if (neighbor.furnishing) { // if there is a furnishing, damage it
-                        neighbor.furnishing.damage(this.game.settings.brawlerDamage);
+                        neighbor.furnishing.damage(this.game.brawlerDamage);
                     }
                 }
             }
@@ -299,10 +259,10 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
             bottle.advance();
             if (!bottle.isDestroyed) {
-                let bottles = bottlesAtTile.get(bottle.tile);
+                let bottles = bottlesAtTile.get(bottle.tile!);
                 if (!bottles) {
                     bottles = [];
-                    bottlesAtTile.set(bottle.tile, bottles);
+                    bottlesAtTile.set(bottle.tile!, bottles);
                 }
                 bottles.push(bottle);
             }
@@ -319,7 +279,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
                 tile.bottle = bottles[0];
             }
 
-            tile.bottle = tile.bottle || null;
+            tile.bottle = tile.bottle || undefined;
         }
     }
 

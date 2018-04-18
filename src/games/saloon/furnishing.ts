@@ -68,7 +68,7 @@ export class Furnishing extends GameObject {
 
         this.game.furnishings.push(this);
         this.health = this.isPiano ? 48 : 16;
-        this.tile.furnishing = this;
+        this.tile!.furnishing = this;
 
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -83,15 +83,15 @@ export class Furnishing extends GameObject {
     public damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);
 
-        if(this.health === 0) { // it has been destroyed
+        if (this.health === 0) { // it has been destroyed
             this.isDestroyed = true;
             this.isPlaying = false;
-            this.tile.furnishing = null;
-            this.tile = null;
+            this.tile!.furnishing = undefined;
+            this.tile = undefined;
 
             if (this.isPiano) {
                 // then we may have been the last piano getting destroyed, so check to end the game
-                this.game.checkForWinner();
+                this.manager.checkForWinner();
             }
         }
     }

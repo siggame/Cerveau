@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
-import { IBasePlayer } from "~/core/game";
+import { BaseGameObject, IBasePlayer } from "~/core/game";
 import { IAnyObject } from "~/utils";
 import * as Base from "./base";
 
@@ -9,7 +9,73 @@ export const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", 
 
 export interface ITiledPlayer extends IBasePlayer {}
 
-// TODO: map width/height game setting
+export abstract class BaseTile extends BaseGameObject {
+    public readonly x!: number;
+    public readonly y!: number;
+
+    public readonly tileNorth?: BaseTile;
+    public readonly tileEast?: BaseTile;
+    public readonly tileSouth?: BaseTile;
+    public readonly tileWest?: BaseTile;
+
+    /**
+     * gets the adjacent direction between this tile and an adjacent tile (if one exists)
+     *
+     * @param adjacentTile A tile that should be adjacent to this tile
+     * @returns The string direction, or undefined if the
+     * tile is invalid, or there is no adjacent direction between this tile
+     * and that tile
+     * ("North", "East", "South", or "West") if found in that direction,
+     * undefined otherwise
+     */
+    public getAdjacentDirection(adjacentTile: BaseTile | undefined): string | undefined {
+        if (adjacentTile) {
+            for (const direction of TILE_DIRECTIONS) {
+                if (this.getNeighbor(direction) === adjacentTile) {
+                    return direction;
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets a list of all the neighbors of this tile
+     *
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     */
+    public getNeighbors(): BaseTile[] {
+        const neighbors = new Array<BaseTile>();
+
+        for (const direction of TILE_DIRECTIONS) {
+            const neighbor = this.getNeighbor(direction);
+            if (neighbor) {
+                neighbors.push(neighbor);
+            }
+        }
+
+        return neighbors;
+    }
+
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction The direction you want, must be "North", "East", "South", or "West"
+     * @returns The Tile in that direction, null if none
+     */
+    public getNeighbor(direction: "North" | "South" | "East" | "West"): BaseTile {
+        return (this as any)[`tile${direction}`];
+    }
+
+    /**
+     * Checks if a Tile has another tile as its neighbor
+     *
+     * @param tile - tile to check
+     * @returns true if neighbor, false otherwise
+     */
+    public hasNeighbor(tile: BaseTile | undefined): boolean {
+        return Boolean(this.getAdjacentDirection(tile));
+    }
+}
 
 /**
  * A game that has a grid based map of tiles. This handles creating that initial
@@ -68,87 +134,11 @@ export function mixTiled<
         }
     }
 
-    class TiledTile extends base.GameObject {
-        public x: number = 0;
-        public y: number = 0;
-
-        public tileNorth?: TiledTile;
-        public tileEast?: TiledTile;
-        public tileSouth?: TiledTile;
-        public tileWest?: TiledTile;
-
-        /**
-         * gets the adjacent direction between this tile and an adjacent tile (if one exists)
-         *
-         * @param adjacentTile - A tile that should be adjacent to this tile
-         * @returns The string direction, or undefined if the
-         * tile is invalid, or there is no adjacent direction between this tile
-         * and that tile
-         * ("North", "East", "South", or "West") if found in that direction,
-         * undefined otherwise
-         */
-        public getAdjacentDirection(adjacentTile: TiledTile | undefined): string | undefined {
-            if (adjacentTile) {
-                for (const direction of TILE_DIRECTIONS) {
-                    if (this.getNeighbor(direction) === adjacentTile) {
-                        return direction;
-                    }
-                }
-            }
-        }
-
-        /**
-         * Gets a list of all the neighbors of this tile
-         *
-         * @returns array of all adjacent tiles. Should be between 2 to 4 tiles.
-         */
-        public getNeighbors(): TiledTile[] {
-            const neighbors = new Array<TiledTile>();
-
-            for (const direction of TILE_DIRECTIONS) {
-                const neighbor = this.getNeighbor(direction);
-                if (neighbor) {
-                    neighbors.push(neighbor);
-                }
-            }
-
-            return neighbors;
-        }
-
-        /**
-         * Gets a neighbor in a particular direction
-         *
-         * @param direction - the direction you want, must be "North",
-         * "East", "South", or "West"
-         * @returns The Tile in that direction, null if none
-         */
-        public getNeighbor(direction: "North" | "South" | "East" | "West"): TiledTile | undefined {
-            return (this as any)["tile" + direction];
-        }
-
-        /**
-         * Checks if a Tile has another tile as its neighbor
-         * @param tile - tile to check
-         * @returns true if neighbor, false otherwise
-         */
-        public hasNeighbor(tile: TiledTile | undefined): boolean {
-            return Boolean(this.getAdjacentDirection(tile));
-        }
-
-        /**
-         * toString() override
-         * @returns a string representation of the tile
-         */
-        public toString(): string {
-            return `${this.gameObjectName} (${this.x}, ${this.y}) #${this.id}`;
-        }
-    }
-
     class TiledGame extends base.Game {
         // client <--> server properties
-        public readonly tiles: TiledTile[] = [];
-        public readonly mapWidth: number = 40;
-        public readonly mapHeight: number = 20;
+        public readonly tiles!: BaseTile[];
+        public readonly mapWidth!: number;
+        public readonly mapHeight!: number;
 
         // server-side only
         public readonly tileDirections = TILE_DIRECTIONS;
@@ -170,7 +160,7 @@ export function mixTiled<
             // now hook up their neighbors
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
-                    const tile = this.getTile(x, y) as TiledTile;
+                    const tile = this.getTile(x, y) as any;
 
                     tile.tileNorth = this.getTile(x, y - 1);
                     tile.tileEast = this.getTile(x + 1, y);
@@ -187,7 +177,7 @@ export function mixTiled<
          * @param y the y position of the desired tile
          * @returns the Tile at (x, y) if valid, null otherwise
          */
-        public getTile(x: number, y: number): TiledTile | undefined {
+        public getTile(x: number, y: number): BaseTile | undefined {
             return this.tiles[x + y * this.mapWidth];
         }
 
@@ -214,6 +204,5 @@ export function mixTiled<
         ...base,
         Game: TiledGame,
         GameSettings: TiledGameSettings,
-        Tile: TiledTile,
     };
 }

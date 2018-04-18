@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/delay": "2.0.1",
     "@types/fs-extra": "5.0.1",
+    "@types/gaussian": "1.1.1",
     "@types/joi": "13.0.7",
     "@types/node": "9.6.1",
     "@types/seedrandom": "2.4.27",

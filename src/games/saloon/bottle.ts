@@ -4,13 +4,14 @@ import { GameObject, IGameObjectConstructorArgs } from "./game-object";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
+import { Cowboy } from "./cowboy";
 // <<-- /Creer-Merge: imports -->>
 
 export interface IBottleConstructorArgs
 extends IGameObjectConstructorArgs, IBottleProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    tile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -63,6 +64,8 @@ export class Bottle extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
 
+        this.tile = data.tile;
+
         this.game.bottles.push(this);
         this.tile.bottle = this;
 
@@ -79,8 +82,12 @@ export class Bottle extends GameObject {
         // We won't update this.tile.bottle to us, as the game will handle
         // bottle <--> bottle collisions after all bottles have advanced
 
-        this.tile.bottle = null; // we moved off it
-        this.tile = this.tile.getNeighbor(this.direction);
+        if (!this.tile) {
+            return; // can't advance without a tile
+        }
+
+        this.tile.bottle = undefined; // we moved off it
+        this.tile = this.tile.getNeighbor(this.direction)!;
 
         if (!this.tile.isPathableToBottles()) {
             this.break(); // hit something
@@ -92,8 +99,8 @@ export class Bottle extends GameObject {
      *
      * @param cowboy The cowboy to break on
      */
-    public break(cowboy): void {
-        if (this.isDestroyed) {
+    public break(cowboy?: Cowboy): void {
+        if (this.isDestroyed || !this.tile) {
             return; // we're already broken :(
         }
 
@@ -104,9 +111,9 @@ export class Bottle extends GameObject {
         }
 
         this.isDestroyed = true;
-        this.tile.bottle = null;
-        this.tile = null;
-        this.game.bottles.removeElement(this);
+        this.tile.bottle = undefined;
+        this.tile = undefined;
+        removeElements(this.game.bottles, this);
     }
 
     // <<-- /Creer-Merge: functions -->>

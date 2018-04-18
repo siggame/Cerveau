@@ -12,7 +12,8 @@ import { Tile } from "./tile";
 export interface ICowboyConstructorArgs
 extends IGameObjectConstructorArgs, ICowboyProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    owner: Player;
+    tile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -102,15 +103,64 @@ export class Cowboy extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
 
+        this.owner = data.owner;
+        this.tile = data.tile;
+
         this.canMove = true;
         this.health = 10;
         this.tile.cowboy = this;
 
-        // NOTE: don't add to the cowboys arrays so it doesn't resize during a 
+        // NOTE: don't add to the cowboys arrays so it doesn't resize during a
         // player's turn
-        this.game.spawnedCowboys.push(this); // just tell the game we spawned
+        this.manager.spawnedCowboys.push(this); // just tell the game we spawned
 
         // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // TODO: public methods creer merge
+
+    /**
+     * String coercion override
+     *
+     * @returns string stating what this cowboy is
+     */
+    public toString(): string {
+        return `'${this.job}' ${this.gameObjectName} #${this.id}`;
+    }
+
+    /**
+     * Damages this cowboy for some amount of damage, setting isDead if it dies
+     *
+     * @param damage How much damage to do to this
+     */
+    public damage(damage: number): void {
+        this.health = Math.max(0, this.health - damage);
+        if (this.health === 0) {
+            this.isDead = true;
+            this.canMove = false;
+            if (this.tile) {
+                this.tile.cowboy = undefined;
+            }
+            this.tile = undefined;
+            this.owner.opponent.kills++;
+        }
+    }
+
+    /**
+     * Gets this cowboy drunk
+     *
+     * @param drunkDirection The valid string direction to set this.drunkDirection
+     */
+    public getDrunk(drunkDirection: string): void {
+        this.owner.addRowdiness(1);
+
+        if (this.owner.siesta === 0) { // then they did not start a siesta, so they actually get drunk
+            this.isDrunk = true;
+            this.turnsBusy = this.game.turnsDrunk;
+            this.drunkDirection = drunkDirection;
+            this.focus = 0;
+            this.canMove = false;
+        }
     }
 
     /**
@@ -143,10 +193,27 @@ export class Cowboy extends GameObject {
 
         // job specific acts
         switch (this.job) {
+            case "Bartender":
+                const bar = this.invalidateBartender(player, tile, drunkDirection);
+                if (typeof(bar) === "object") {
+                    drunkDirection = bar.validDrunkDirection;
+                    invalid = undefined;
+                }
+                else {
+                    invalid = bar;
+                }
+
+                break;
             case "Brawler":
                 return `${this} is a Brawler and cannot act`;
+            case "Sharpshooter":
+                invalid = this.invalidateSharpshooter(player, tile);
+                break;
         }
-        return this["invalidate" + this.job.replace(" ", "")].apply(this, arguments);
+
+        if (invalid) {
+            return invalid;
+        }
 
         // <<-- /Creer-Merge: invalidate-act -->>
         return arguments;
@@ -168,7 +235,14 @@ export class Cowboy extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: act -->>
 
-        return this["act" + this.job.replace(" ", "")].apply(this, arguments);
+        switch (this.job) {
+            case "Sharpshooter":
+                return this.actSharpshooter(player, tile);
+            case "Bartender":
+                return this.actBartender(player, tile, drunkDirection);
+        }
+
+        throw new Error("cowboy.act should not reach this point!");
 
         // <<-- /Creer-Merge: act -->>
     }
@@ -187,25 +261,25 @@ export class Cowboy extends GameObject {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, tile);
-        if(invalid) {
+        if (invalid) {
             return invalid;
         }
 
-        if(!this.canMove) {
+        if (!this.canMove) {
             return `${this} has already moved.`;
         }
 
-        if(tile) { // check if blocked or not adjacent
-            if(this.tile && !this.tile.hasNeighbor(tile)) {
+        if (tile) { // check if blocked or not adjacent
+            if (this.tile && !this.tile.hasNeighbor(tile)) {
                 return `${tile} is not adjacent to ${this.tile}`;
             }
-            else if(tile.isBalcony) {
+            else if (tile.isBalcony) {
                 return `${tile} is a balcony and cannot be moved onto.`;
             }
-            else if(tile.cowboy) {
+            else if (tile.cowboy) {
                 return `${tile} is blocked by ${tile.cowboy} and cannot be moved into.`;
             }
-            else if(tile.furnishing) {
+            else if (tile.furnishing) {
                 return `${tile} is blocked by ${tile.furnishing} and cannot be moved into.`;
             }
         }
@@ -224,23 +298,21 @@ export class Cowboy extends GameObject {
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
 
-
-        this.tile.cowboy = null; // remove me from the tile I was on
+        this.tile!.cowboy = undefined; // remove me from the tile I was on
         tile.cowboy = this;
         this.tile = tile; // and move me to the new tile
         this.canMove = false; // and mark me as having moved this turn
 
-        if(this.tile.bottle) {
+        if (this.tile.bottle) {
             this.tile.bottle.break();
         }
 
         // sharpshooters loose focus when they move
-        if(this.job === "Sharpshooter") {
+        if (this.job === "Sharpshooter") {
             this.focus = 0;
         }
 
         return true;
-
 
         // <<-- /Creer-Merge: move -->>
     }
@@ -262,27 +334,27 @@ export class Cowboy extends GameObject {
         // <<-- Creer-Merge: invalidate-play -->>
 
         const invalid = this.invalidate(player, this.tile);
-        if(invalid) {
+        if (invalid) {
             return invalid;
         }
 
-        if(this.turnsBusy > 0) {
+        if (this.turnsBusy > 0) {
             return `${this} is busy and cannot act this turn for ${this.turnsBusy} more turns.`;
         }
 
-        if(!piano || !piano.isPiano) {
+        if (!piano || !piano.isPiano) {
             return `${piano} is not a piano to play`;
         }
 
-        if(piano.isPlaying) {
+        if (piano.isPlaying) {
             return `${piano} is already playing music this turn.`;
         }
 
-        if(piano.isDestroyed) {
+        if (piano.isDestroyed) {
             return `${piano} is destroyed and cannot be played.`;
         }
 
-        if(!piano || !piano.tile || !piano.tile.hasNeighbor(this.tile)) {
+        if (!piano || !piano.tile || !piano.tile.hasNeighbor(this.tile)) {
             return `${piano} is not adjacent to ${this}`;
         }
 
@@ -318,7 +390,7 @@ export class Cowboy extends GameObject {
      * @param tile - the tile trying to do something to
      * @returns the reason this is invalid (still in need of formatting), undefined if valid
      */
-    private invalidate(player: Player, tile: Tile): string | undefined {
+    private invalidate(player: Player, tile: Tile | undefined): string | undefined {
         if (this.owner !== player) {
             return `${this} is not owned by you.`;
         }
@@ -328,27 +400,11 @@ export class Cowboy extends GameObject {
         if (this.isDrunk) {
             return `${this} is drunk, can cannot be directly controlled by you.`;
         }
-        if (this.siesta > 0) {
+        if (this.owner.siesta > 0) {
             return `${this} is asleep because of their siesta and cannot be controlled by you.`;
         }
         if (!tile) {
             return `${tile} is not a valid Tile.`;
-        }
-    }
-
-    /**
-     * Damages this cowboy for some amount of damage, setting isDead if it dies
-     *
-     * @param damage How much damage to do to this
-     */
-    private damage(damage: number): void {
-        this.health = Math.max(0, this.health - damage);
-        if(this.health === 0) {
-            this.isDead = true;
-            this.canMove = false;
-            this.tile.cowboy = null;
-            this.tile = null;
-            this.owner.opponent.kills++;
         }
     }
 
@@ -365,7 +421,7 @@ export class Cowboy extends GameObject {
             return `${this} needs focus to act. Currently has ${this.focus} focus.`;
         }
 
-        if (!this.tile.adjacentDirection(tile)) {
+        if (!this.tile!.getAdjacentDirection(tile)) {
             return `${tile} is not adjacent to the Tile that {this} is on (${this.tile}).`;
         }
     }
@@ -400,7 +456,7 @@ export class Cowboy extends GameObject {
                 shot.bottle.break();
             }
 
-            shot = shot.getNeighbor(this.tile.adjacentDirection(tile));
+            shot = shot.getNeighbor(this.tile!.getAdjacentDirection(tile)!)!;
         }
 
         this.focus = 0;
@@ -423,99 +479,64 @@ export class Cowboy extends GameObject {
         player: Player,
         tile: Tile,
         drunkDirection: string,
-    ): string | Error {
-        let validDrunkDirection = false;
+    ): string | { validDrunkDirection: string } {
+        let validDrunkDirection = "";
         const simple = drunkDirection[0].toLowerCase();
-        for(var i = 0; i < this.game.tileDirections.length; i++) {
-            const direction = this.game.tileDirections[i];
-            const dir = direction[0].toLowerCase(); // so we can check just the first two letters if they are the same, so we can be lax on input
+        for (const direction of this.game.tileDirections) {
+            // so we can check just the first two letters if they are the same,
+            // so we can be lax on input
+            const dir = direction[0].toLowerCase();
 
-            if(simple === dir) {
+            if (simple === dir) {
                 validDrunkDirection = direction;
                 break;
             }
         }
 
-        if(!validDrunkDirection) {
-            return `${drunkDirection} is not a valid direction to send drunk Cowboys hit by ${this}'s Bottles.`.format({this: this, drunkDirection});
+        if (!validDrunkDirection) {
+            return `${drunkDirection} is not a valid direction to send drunk Cowboys hit by ${this}'s Bottles.`;
         }
 
         // make sure the tile is an adjacent tile
-        if(!this.tile.adjacentDirection(tile)) {
+        if (!this.tile!.hasNeighbor(tile)) {
             return `${tile} is not adjacent to the Tile that {this} is on (${this.tile}).`;
         }
 
-        args.drunkDirection = validDrunkDirection;
-    },
+        return { validDrunkDirection };
+    }
 
     /**
      * makes a Bartender cowboy act
      *
      * @see Cowboy#act
-     * @param {Player} player - the player making the cowboy act
-     * @param {Tile} tile - the tile the cowboy wants to act on
-     * @param {string} drunkDirection - the direction the player wants drunks hit by the bottle to go
-     * @returns {boolean} true because it worked
+     * @param player The player making the cowboy act
+     * @param tile The tile the cowboy wants to act on
+     * @param drunkDirection The direction the player wants drunks hit by the bottle to go
+     * @returns true because it worked
      */
-    actBartender: function(player, tile, drunkDirection) {
+    private actBartender(player: Player, tile: Tile, drunkDirection: string): true {
         // check to make sure the tile the bottle spawns on would not cause it to instantly break
         // because if so, don't create it, just instantly get the cowboy there drunk
-        if(!tile.isPathableToBottles() || tile.bottle) { // don't spawn a bottle, just splash the beer at them
-            if(tile.cowboy) {
+        if (!tile.isPathableToBottles() || tile.bottle) { // don't spawn a bottle, just splash the beer at them
+            if (tile.cowboy) {
                 tile.cowboy.getDrunk(drunkDirection);
             }
 
-            if(tile.bottle) {
+            if (tile.bottle) {
                 tile.bottle.break();
             }
         }
         else { // the adjacent tile is empty, so spawn one
-            var bottle = this.game.create("Bottle", {
-                tile: tile,
-                drunkDirection: drunkDirection,
-                direction: this.tile.adjacentDirection(tile),
+            this.manager.create.Bottle({
+                tile,
+                drunkDirection,
+                direction: this.tile!.getAdjacentDirection(tile)!,
             });
         }
 
         this.turnsBusy = this.game.bartenderCooldown;
 
         return true;
-    },
-
-    /**
-     * Tries to invalidate the args for the Bartender's act
-     *
-     * @returns {string} it's always invalid
-     */
-    invalidateBrawler: function() {
-        return "Brawlers cannot act.";
-    },
-
-    /**
-     * Gets this cowboy drunk
-     *
-     * @param {string} drunkDirection - the valid string direction to set this.drunkDirection
-     */
-    getDrunk: function(drunkDirection) {
-        this.owner.addRowdiness(1);
-
-        if(this.owner.siesta === 0) { // then they did not start a siesta, so they actually get drunk
-            this.isDrunk = true;
-            this.turnsBusy = this.game.turnsDrunk;
-            this.drunkDirection = drunkDirection;
-            this.focus = 0;
-            this.canMove = false;
-        }
-    }
-
-    /**
-     * String coercion override
-     *
-     * @override
-     * @returns string stating what this cowboy is
-     */
-    public toString(): string {
-        return `'{this.job}' {gameObjectName} #{id}".format(this)`;
     }
 
     // <<-- /Creer-Merge: functions -->>

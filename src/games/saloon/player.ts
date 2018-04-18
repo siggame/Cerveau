@@ -1,167 +1,148 @@
-// Player: A player in this game. Every AI controls one player.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IBaseSaloonPlayer } from "./";
+import { AI } from "./ai";
+import { Cowboy } from "./cowboy";
+import { GameObject } from "./game-object";
+import { YoungGun } from "./young-gun";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * A player in this game. Every AI controls one player.
+ */
+export class Player extends GameObject implements IBaseSaloonPlayer {
+    /** The AI controlling this Player */
+    public readonly ai!: AI;
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Player: A player in this game. Every AI controls one player.
-let Player = Class(GameObject, {
     /**
-     * Initializes Players.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * What type of client this is, e.g. 'Python', 'JavaScript', or some other
+     * language. For potential data mining purposes.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public readonly clientType!: string;
 
-        /**
-         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
-         *
-         * @type {string}
-         */
-        this.clientType = this.clientType || "";
+    /**
+     * Every Cowboy owned by this Player.
+     */
+    public cowboys!: Cowboy[];
 
-        /**
-         * Every Cowboy owned by this Player.
-         *
-         * @type {Array.<Cowboy>}
-         */
-        this.cowboys = this.cowboys || [];
+    /**
+     * How many enemy Cowboys this player's team has killed.
+     */
+    public kills!: number;
 
-        /**
-         * How many enemy Cowboys this player's team has killed.
-         *
-         * @type {number}
-         */
-        this.kills = this.kills || 0;
+    /**
+     * If the player lost the game or not.
+     */
+    public lost!: boolean;
 
-        /**
-         * If the player lost the game or not.
-         *
-         * @type {boolean}
-         */
-        this.lost = this.lost || false;
+    /**
+     * The name of the player.
+     */
+    public readonly name!: string;
 
-        /**
-         * The name of the player.
-         *
-         * @type {string}
-         */
-        this.name = this.name || "";
+    /**
+     * This player's opponent in the game.
+     */
+    public readonly opponent!: Player;
 
-        /**
-         * This player's opponent in the game.
-         *
-         * @type {Player}
-         */
-        this.opponent = this.opponent || null;
+    /**
+     * The reason why the player lost the game.
+     */
+    public reasonLost!: string;
 
-        /**
-         * The reason why the player lost the game.
-         *
-         * @type {string}
-         */
-        this.reasonLost = this.reasonLost || "";
+    /**
+     * The reason why the player won the game.
+     */
+    public reasonWon!: string;
 
-        /**
-         * The reason why the player won the game.
-         *
-         * @type {string}
-         */
-        this.reasonWon = this.reasonWon || "";
+    /**
+     * How rowdy their team is. When it gets too high their team takes a
+     * collective siesta.
+     */
+    public rowdiness!: number;
 
-        /**
-         * How rowdy their team is. When it gets too high their team takes a collective siesta.
-         *
-         * @type {number}
-         */
-        this.rowdiness = this.rowdiness || 0;
+    /**
+     * How many times their team has played a piano.
+     */
+    public score!: number;
 
-        /**
-         * How many times their team has played a piano.
-         *
-         * @type {number}
-         */
-        this.score = this.score || 0;
+    /**
+     * 0 when not having a team siesta. When greater than 0 represents how many
+     * turns left for the team siesta to complete.
+     */
+    public siesta!: number;
 
-        /**
-         * 0 when not having a team siesta. When greater than 0 represents how many turns left for the team siesta to complete.
-         *
-         * @type {number}
-         */
-        this.siesta = this.siesta || 0;
+    /**
+     * The amount of time (in ns) remaining for this AI to send commands.
+     */
+    public timeRemaining!: number;
 
-        /**
-         * The amount of time (in ns) remaining for this AI to send commands.
-         *
-         * @type {number}
-         */
-        this.timeRemaining = this.timeRemaining || 0;
+    /**
+     * If the player won the game or not.
+     */
+    public won!: boolean;
 
-        /**
-         * If the player won the game or not.
-         *
-         * @type {boolean}
-         */
-        this.won = this.won || false;
+    /**
+     * The YoungGun this Player uses to call in new Cowboys.
+     */
+    public readonly youngGun!: YoungGun;
 
-        /**
-         * The YoungGun this Player uses to call in new Cowboys.
-         *
-         * @type {YoungGun}
-         */
-        this.youngGun = this.youngGun || null;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+    /**
+     * Called when a Player is created.
+     *
+     * @param data Initial value(s) to set member variables to.
+     * @param required Data required to initialize this (ignore it)
+     */
+    constructor(
+        data: {},
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Player",
-
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: functions -->>
 
     /**
      * Adds rowdiness to the player, which may cause a siesta
      *
-     * @param {number} num - amount of rowdiness to add
+     * @param rowdiness The amount of rowdiness to add
      */
-    addRowdiness: function(num) {
-        this.rowdiness += num;
+    public addRowdiness(rowdiness: number): void {
+        this.rowdiness += rowdiness;
 
-        if(this.rowdiness >= this.game.rowdinessToSiesta) {
+        if (this.rowdiness >= this.game.rowdinessToSiesta) {
             this.rowdiness = 0;
             this.siesta = this.game.siestaLength;
 
             // siesta!
-            for(var i = 0; i < this.cowboys.length; i++) {
-                var cowboy = this.cowboys[i];
-
-                if(cowboy.isDead) {
+            for (const cowboy of this.cowboys) {
+                if (cowboy.isDead) {
                     continue;
                 }
 
                 cowboy.turnsBusy = this.game.siestaLength;
                 cowboy.isDrunk = true;
-                cowboy.drunkDirection = ""; // they don't move in a direction during a siesta
-                cowboy.hasMoved = true;
+                // they don't move in a direction during a siesta
+                cowboy.drunkDirection = "";
+                cowboy.canMove = false;
                 cowboy.focus = 0;
             }
         }
-    },
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Player;
+    // <<-- /Creer-Merge: functions -->>
+}

@@ -6,6 +6,8 @@ import { Furnishing } from "./furnishing";
 import { GameObject, IGameObjectConstructorArgs } from "./game-object";
 import { YoungGun } from "./young-gun";
 
+import { BaseTile } from "~/core/game/mixins/tiled";
+
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
@@ -20,7 +22,7 @@ extends IGameObjectConstructorArgs, ITileProperties {
 /**
  * A Tile in the game that makes up the 2D map grid.
  */
-export class Tile extends GameObject {
+export class Tile extends GameObject implements BaseTile {
     /**
      * The beer Bottle currently flying over this Tile, null otherwise.
      */
@@ -112,9 +114,62 @@ export class Tile extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
+    /**
+     * gets the adjacent direction between this tile and an adjacent tile (if one exists)
+     *
+     * @param adjacentTile A tile that should be adjacent to this tile
+     * @returns The string direction, or undefined if the
+     * tile is invalid, or there is no adjacent direction between this tile
+     * and that tile
+     * ("North", "East", "South", or "West") if found in that direction,
+     * undefined otherwise
+     */
+    public getAdjacentDirection(adjacentTile: Tile | undefined): string | undefined {
+        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+    }
+
+    /**
+     * Gets a list of all the neighbors of this tile
+     *
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     */
+    public getNeighbors(): Tile[] {
+        return BaseTile.prototype.getNeighbors.call(this);
+    }
+
+    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
+    public getNeighbor(direction: string): Tile | undefined;
+
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction The direction you want, must be "North", "East", "South", or "West"
+     * @returns The Tile in that direction, null if none
+     */
+    public getNeighbor(direction: string): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction);
+    }
+
+    /**
+     * Checks if a Tile has another tile as its neighbor
+     *
+     * @param tile - tile to check
+     * @returns true if neighbor, false otherwise
+     */
+    public hasNeighbor(tile: Tile | undefined): boolean {
+        return BaseTile.prototype.hasNeighbor.call(this);
+    }
+
     // <<-- Creer-Merge: functions -->>
 
-    // Any additional protected or pirate methods can go here.
+    /**
+     * Checks if this tile would cause a Bottle moving to it to break
+     *
+     * @return True if bottle break on this tile, false otherwise
+     */
+    public isPathableToBottles(): boolean {
+        return Boolean(!this.isBalcony && !this.furnishing && !this.cowboy);
+    }
 
     // <<-- /Creer-Merge: functions -->>
 }

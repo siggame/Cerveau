@@ -12,7 +12,9 @@ import { Tile } from "./tile";
 export interface IYoungGunConstructorArgs
 extends IGameObjectConstructorArgs, IYoungGunProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    owner: Player;
+    tile: Tile;
+    previousTile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -62,8 +64,50 @@ export class YoungGun extends GameObject {
         super(data, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+        this.owner = data.owner;
+        this.tile = data.tile;
+        this.previousTile = data.previousTile;
+        this.callInTile = data.tile; // will be over-ridden next
+        this.update();
         // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // TODO: public creer
+
+    /**
+     * Updates Young Gun related logic: moving them clockwise
+     */
+    public update(): void {
+        this.canCallIn = true; // they can call in a cowboy on their next turn
+
+        // find the adjacent tile that they were not on last turn,
+        //   this way all YoungGuns continue walking clockwise
+        const tiles = this.tile.getNeighbors();
+        const moveTo = tiles.find((tile) => tile.isBalcony && this.previousTile !== tile)!;
+
+        // do a quick BFS to find the callInTile
+        const searchTiles = [ moveTo ];
+        const searched = new Set();
+        while (searchTiles.length > 0) {
+            const searchTile = searchTiles.shift()!; // will exist because above check
+
+            if (!searched.has(searchTile)) {
+                searched.add(searchTile);
+
+                if (searchTile.isBalcony) { // add its neighbors to be searched
+                    searchTiles.push(...searchTile.getNeighbors());
+                }
+                else {
+                    this.callInTile = searchTile;
+                    break; // we found it
+                }
+            }
+        }
+
+        this.previousTile = this.tile;
+        this.tile.youngGun = undefined;
+        this.tile = moveTo;
+        moveTo.youngGun = this;
     }
 
     /**
@@ -99,12 +143,12 @@ export class YoungGun extends GameObject {
         // make sure they are not trying to go above the limit
         let count = this.owner.cowboys.filter((c) => c.job === actualJob).length;
         for (const cowboy of this.owner.cowboys) {
-            if(cowboy.job === actualJob) {
+            if (cowboy.job === actualJob) {
                 count++; // yes you could add the boolean value (coerced to 0 or 1), but that reads weird
             }
         }
 
-        if(count >= this.game.maxCowboysPerJob) {
+        if (count >= this.game.maxCowboysPerJob) {
             return `You cannot call in any more '${actualJob}' (max of ${this.game.maxCowboysPerJob})`;
         }
 
@@ -128,24 +172,24 @@ export class YoungGun extends GameObject {
         // <<-- Creer-Merge: callIn -->>
 
         // clear the open tile before moving the young gun to it
-        if(this.callInTile.cowboy) {
+        if (this.callInTile.cowboy) {
             this.callInTile.cowboy.damage(Infinity);
         }
 
-        if(this.callInTile.furnishing) {
+        if (this.callInTile.furnishing) {
             this.callInTile.furnishing.damage(Infinity);
         }
 
         this.canCallIn = false;
 
-        let cowboy = this.game.create("Cowboy", {
+        const cowboy = this.manager.create.Cowboy({
             owner: this.owner,
-            job: job,
+            job,
             tile: this.callInTile,
             canMove: false,
         });
 
-        if(this.callInTile.bottle) {
+        if (this.callInTile.bottle) {
             // then break the bottle on this new cowboy, so he immediately gets drunk
             this.callInTile.bottle.break(cowboy);
         }

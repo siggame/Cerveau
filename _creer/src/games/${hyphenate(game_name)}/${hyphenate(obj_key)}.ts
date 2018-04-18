@@ -69,7 +69,7 @@ ${shared['cerveau']['block_comment']('', obj)}
 export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends ${extends} {
 % if obj_key == 'Game':
     /** The manager of this game, that controls everything around it */
-    public readonly manager!: AnarchyGameManager;
+    public readonly manager!: ${game_name}GameManager;
 
     /** The settings used to initialize the game, as set by players */
     public readonly settings = Object.freeze(this.settingsManager.values);
