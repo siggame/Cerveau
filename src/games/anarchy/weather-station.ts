@@ -42,6 +42,7 @@ export class WeatherStation extends Building {
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
+
     /**
      * Invalidation function for intensify. Try to find a reason why the passed
      * in parameters are invalid, and return a human readable string telling
@@ -53,8 +54,10 @@ export class WeatherStation extends Building {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateIntensify(player: Player, negative: boolean = false):
-                                  string | IArguments {
+    protected invalidateIntensify(
+        player: Player,
+        negative: boolean = false,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-intensify -->>
 
         const invalid = this.invalidateBribe(player);
@@ -89,8 +92,10 @@ export class WeatherStation extends Building {
      * this to true decreases the intensity by 1.
      * @returns True if the intensity was changed, false otherwise.
      */
-    protected async intensify(player: Player, negative: boolean = false):
-                              Promise<boolean> {
+    protected async intensify(
+        player: Player,
+        negative: boolean = false,
+    ): Promise<boolean> {
         // <<-- Creer-Merge: intensify -->>
 
         this.game.nextForecast!.intensity += (negative ? -1 : 1);
@@ -102,6 +107,7 @@ export class WeatherStation extends Building {
 
         // <<-- /Creer-Merge: intensify -->>
     }
+
     /**
      * Invalidation function for rotate. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -114,8 +120,10 @@ export class WeatherStation extends Building {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateRotate(player: Player, counterclockwise: boolean =
-                               false): string | IArguments {
+    protected invalidateRotate(
+        player: Player,
+        counterclockwise: boolean = false,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-rotate -->>
 
         const invalid = this.invalidateBribe(player);
@@ -141,8 +149,10 @@ export class WeatherStation extends Building {
      * counterclockwise instead.
      * @returns True if the rotation worked, false otherwise.
      */
-    protected async rotate(player: Player, counterclockwise: boolean = false):
-                           Promise<boolean> {
+    protected async rotate(
+        player: Player,
+        counterclockwise: boolean = false,
+    ): Promise<boolean> {
         // <<-- Creer-Merge: rotate -->>
 
         const wrapAround = counterclockwise

@@ -64,6 +64,7 @@ export class Warehouse extends Building {
 
         // <<-- /Creer-Merge: constructor -->>
     }
+
     /**
      * Invalidation function for ignite. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -74,8 +75,10 @@ export class Warehouse extends Building {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateIgnite(player: Player, building: Building): string |
-                               IArguments {
+    protected invalidateIgnite(
+        player: Player,
+        building: Building,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-ignite -->>
 
         const invalid = this.invalidateBribe(player);
@@ -105,8 +108,10 @@ export class Warehouse extends Building {
      * @returns The exposure added to this Building's exposure. -1 is returned
      * if there was an error.
      */
-    protected async ignite(player: Player, building: Building): Promise<number>
-                           {
+    protected async ignite(
+        player: Player,
+        building: Building,
+    ): Promise<number> {
         // <<-- Creer-Merge: ignite -->>
 
         building.fire = clamp(building.fire + this.fireAdded, 0, this.game.maxFire);

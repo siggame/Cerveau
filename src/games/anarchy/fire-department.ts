@@ -48,6 +48,7 @@ export class FireDepartment extends Building {
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
+
     /**
      * Invalidation function for extinguish. Try to find a reason why the passed
      * in parameters are invalid, and return a human readable string telling
@@ -58,8 +59,10 @@ export class FireDepartment extends Building {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateExtinguish(player: Player, building: Building): string |
-                                   IArguments {
+    protected invalidateExtinguish(
+        player: Player,
+        building: Building,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-extinguish -->>
 
         const invalid = this.invalidateBribe(player);
@@ -83,8 +86,10 @@ export class FireDepartment extends Building {
      * @param building The Building you want to extinguish.
      * @returns True if the bribe worked, false otherwise.
      */
-    protected async extinguish(player: Player, building: Building):
-                               Promise<boolean> {
+    protected async extinguish(
+        player: Player,
+        building: Building,
+    ): Promise<boolean> {
         // <<-- Creer-Merge: extinguish -->>
 
         building.fire = clamp(

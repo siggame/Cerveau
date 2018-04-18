@@ -147,7 +147,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         let loser: Player | undefined;
         let gameOver = false;
         for (const player of this.game.players) {
-            if (player.headquarters!.health <= 0) { // then it burned down, and they have lost
+            if (player.headquarters.health <= 0) { // then it burned down, and they have lost
                 if (loser) {
                     // someone else already lost this turn...
                     // so they both lost their headquarters this turn,
@@ -207,8 +207,8 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             .sort((a, b) => b.health - a.health);
 
         if (headquarters[0].health !== headquarters[1].health) {
-            this.declareWinner(`${reason} – Your headquarters had the most health remaining.`, headquarters[0].owner);
-            this.declareLoser(`${reason} – Your headquarters had less health remaining than another player.`,
+            this.declareWinner(`${reason} - Your headquarters had the most health remaining.`, headquarters[0].owner);
+            this.declareLoser(`${reason} - Your headquarters had less health remaining than another player.`,
                               headquarters[1].owner);
             return;
         }
@@ -221,8 +221,8 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         if (buildingsAlive[0].length !== buildingsAlive[1].length) {
             // store the winner as the loser could be lost in this scope if their array is empty
             const winner = buildingsAlive[0][0].owner;
-            this.declareWinner(`${reason} – You had the most buildings not burned down.`, winner);
-            this.declareLoser(`${reason} – You had more buildings burned down than another player.`, winner.opponent);
+            this.declareWinner(`${reason} - You had the most buildings not burned down.`, winner);
+            this.declareLoser(`${reason} - You had more buildings burned down than another player.`, winner.opponent);
             return;
         }
 
@@ -235,8 +235,8 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
                 ? 0
                 : 1
             ];
-            this.declareWinner(`${reason} – You had the highest health sum among your Buildings.`, winner);
-            this.declareLoser(`${reason} – You had a lower health sum than the other player.`, winner.opponent);
+            this.declareWinner(`${reason} - You had the highest health sum among your Buildings.`, winner);
+            this.declareLoser(`${reason} - You had a lower health sum than the other player.`, winner.opponent);
             return;
         }
 

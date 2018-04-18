@@ -502,7 +502,7 @@ export const Namespace = makeNamespace({
                 rotate: {
                     args: [
                         {
-                            argName: "counterClockwise",
+                            argName: "counterclockwise",
                             typeName: "boolean",
                             defaultValue: false,
                         },

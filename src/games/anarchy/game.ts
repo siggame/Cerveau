@@ -40,7 +40,7 @@ export class AnarchyGame extends BaseClasses.Game {
     public readonly manager!: AnarchyGameManager;
 
     /** The settings used to initialize the game, as set by players */
-    public readonly settings = this.settingsManager.values;
+    public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
      * How many bribes players get at the beginning of their turn, not counting

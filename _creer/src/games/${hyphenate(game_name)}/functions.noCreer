@@ -191,23 +191,29 @@ if not 'cerveau' in shared:
             returns = shared['cerveau']['type'](function_parms['returns']['type'])
 
         formatted_name = '    protected '+('async ' if promise else '')+function_name+'('
-        formatted_args = ', '.join(
+        unformatted_args = (
             [(a['name']+': '+shared['cerveau']['type'](a['type'])+(
                 (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
             )) for a in function_parms['arguments']]
-        ) + '): '+ ('Promise<{}>' if promise else '{}').format(returns) +' {'
-
-
-        wrapper = TextWrapper(
-            initial_indent=formatted_name,
-            subsequent_indent=' ' * len(formatted_name),
-            width=80,
         )
 
-        formatted_function_signature = '\n'.join(wrapper.wrap(formatted_args))
+        formatted_return = '): '+ ('Promise<{}>' if promise else '{}').format(returns) +' {'
+        formatted_args = ', '.join(unformatted_args)
 
-        if '\n' in formatted_args:
-            formatted_args += ',\n    '
+        formatted_function_signature = None
+        as_one_line = formatted_name + formatted_args + formatted_return
+        if len(as_one_line) < 80:
+            formatted_function_signature = as_one_line
+        else:
+            # it does not all fit on one line, so split up by arg
+            formatted_function_signature = "".join([
+                formatted_name,
+                '\n        ',
+                ',\n        '.join(unformatted_args),
+                ',\n    ',
+                formatted_return
+            ])
+
 
         return docstring + "\n" + formatted_function_signature
     shared['cerveau']['formatted_function_top'] = cerveau_formatted_function_top

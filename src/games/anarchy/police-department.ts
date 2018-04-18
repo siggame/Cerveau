@@ -43,6 +43,7 @@ export class PoliceDepartment extends Building {
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
+
     /**
      * Invalidation function for raid. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -53,8 +54,10 @@ export class PoliceDepartment extends Building {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateRaid(player: Player, warehouse: Warehouse): string |
-                             IArguments {
+    protected invalidateRaid(
+        player: Player,
+        warehouse: Warehouse,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-raid -->>
 
         const invalid = this.invalidateBribe(player);
@@ -79,8 +82,10 @@ export class PoliceDepartment extends Building {
      * @returns The amount of damage dealt to the warehouse, or -1 if there was
      * an error.
      */
-    protected async raid(player: Player, warehouse: Warehouse): Promise<number>
-                         {
+    protected async raid(
+        player: Player,
+        warehouse: Warehouse,
+    ): Promise<number> {
         // <<-- Creer-Merge: raid -->>
 
         const oldHealth = warehouse.health;
