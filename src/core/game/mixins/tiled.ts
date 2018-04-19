@@ -75,6 +75,15 @@ export abstract class BaseTile extends BaseGameObject {
     public hasNeighbor(tile: BaseTile | undefined): boolean {
         return Boolean(this.getAdjacentDirection(tile));
     }
+
+    /**
+     * toString override
+     *
+     * @returns a string representation of the Tile
+     */
+    public toString(): string {
+        return `${this.gameObjectName} #${this.id} at (${this.x}, ${this.y})`;
+    }
 }
 
 /**

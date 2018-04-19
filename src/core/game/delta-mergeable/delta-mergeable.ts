@@ -86,6 +86,10 @@ export class DeltaMergeable<T = any> {
         };
         child.events.changed.on(onChanged);
 
+        // TODO: this is borked
+        // currently if a child gets deleted, we delete the entire tree
+        // BAD!!!
+        // instead the parent needs to delete that leaf, then notify upstream
         child.events.deleted.once((deleted) => {
             this.events.deleted.emit(deleted);
 

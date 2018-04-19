@@ -157,7 +157,16 @@ export class Tile extends GameObject implements BaseTile {
      * @returns true if neighbor, false otherwise
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
-        return BaseTile.prototype.hasNeighbor.call(this);
+        return BaseTile.prototype.hasNeighbor.call(this, tile);
+    }
+
+    /**
+     * toString override
+     *
+     * @returns a string representation of the Tile
+     */
+    public toString(): string {
+        return BaseTile.prototype.toString.call(this);
     }
 
     // <<-- Creer-Merge: functions -->>

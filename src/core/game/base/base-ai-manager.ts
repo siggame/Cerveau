@@ -1,7 +1,7 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "~/core/game/";
-import { unSerialize } from "~/core/serializer";
+import { serialize, unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
@@ -163,6 +163,8 @@ export class BaseAIManager {
                 returned = this.gameSanitizer.validateRanReturned(caller, functionName, unsanitizedReturned);
             }
         }
+
+        returned = serialize(returned);
 
         this.events.ran.emit({
             player: { id: this.client.player.id },

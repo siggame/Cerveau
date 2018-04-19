@@ -141,15 +141,9 @@ export class YoungGun extends GameObject {
         }
 
         // make sure they are not trying to go above the limit
-        let count = this.owner.cowboys.filter((c) => c.job === actualJob).length;
-        for (const cowboy of this.owner.cowboys) {
-            if (cowboy.job === actualJob) {
-                count++; // yes you could add the boolean value (coerced to 0 or 1), but that reads weird
-            }
-        }
-
+        const count = this.owner.cowboys.filter((c) => c.job === actualJob && !c.isDead).length;
         if (count >= this.game.maxCowboysPerJob) {
-            return `You cannot call in any more '${actualJob}' (max of ${this.game.maxCowboysPerJob})`;
+            return `You cannot call in any more '${actualJob}' Cowboys (max of ${this.game.maxCowboysPerJob})`;
         }
 
         // make the job arg the correct job, as it looks valid!

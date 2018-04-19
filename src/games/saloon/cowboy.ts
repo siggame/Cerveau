@@ -422,7 +422,7 @@ export class Cowboy extends GameObject {
         }
 
         if (!this.tile!.getAdjacentDirection(tile)) {
-            return `${tile} is not adjacent to the Tile that {this} is on (${this.tile}).`;
+            return `${tile} is not adjacent to the Tile that ${this} is on (${this.tile}).`;
         }
     }
 
@@ -480,6 +480,10 @@ export class Cowboy extends GameObject {
         tile: Tile,
         drunkDirection: string,
     ): string | { validDrunkDirection: string } {
+        if (!drunkDirection) {
+            return `drunkDirection cannot be empty for a Bartender to act.`;
+        }
+
         let validDrunkDirection = "";
         const simple = drunkDirection[0].toLowerCase();
         for (const direction of this.game.tileDirections) {
@@ -499,7 +503,7 @@ export class Cowboy extends GameObject {
 
         // make sure the tile is an adjacent tile
         if (!this.tile!.hasNeighbor(tile)) {
-            return `${tile} is not adjacent to the Tile that {this} is on (${this.tile}).`;
+            return `${tile} is not adjacent to the Tile that ${this} is on (${this.tile}).`;
         }
 
         return { validDrunkDirection };

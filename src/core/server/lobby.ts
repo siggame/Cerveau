@@ -242,7 +242,6 @@ There's probably another Cerveau server running on this same computer.`);
         const dirs = await getDirs(GAMES_DIR);
 
         for (const dir of dirs) {
-            logger.info(`► ${capitalizeFirstLetter(dir)} game found ◄`);
 
             let gameNamespace: IBaseGameNamespace | undefined;
             try {
@@ -250,11 +249,13 @@ There's probably another Cerveau server running on this same computer.`);
                 gameNamespace = data.Namespace as IBaseGameNamespace;
             }
             catch (err) {
-                logger.error(String(err), `Could not load game ${dir}`);
+                logger.error(`⚠ Could not load game ${capitalizeFirstLetter(dir)} ⚠`);
+                continue; // For now while we have unconverted games
                 process.exit(1);
                 return;
             }
             const gameName = gameNamespace.GameManager.gameName;
+            logger.info(`► ${gameName} game loaded ◄`);
 
             // hook up all the ways to get the game class via an index
             this.gameAliasToName.set(gameName.toLowerCase(), gameName);
@@ -266,8 +267,6 @@ There's probably another Cerveau server running on this same computer.`);
 
             this.rooms.set(gameName, new Map());
             this.roomsPlaying.set(gameName, new Map());
-
-            break; // should have parsed anarchy, the rest are not converted yet
         }
 
         Object.freeze(this.gameNamespaces); // no more games can be added,
