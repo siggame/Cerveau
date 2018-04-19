@@ -122,6 +122,12 @@ export function shuffle<T>(array: T[], rng?: () => number): T[] { // from http:/
     return array;
 }
 
+/**
+ * Creates a 2D array (array of arrays).
+ * @param width The width of the [first] array.
+ * @param height The height of the [second] arrays in the first.
+ * @returns a 2D array, all empty.
+ */
 export function make2D<T>(width: number, height: number): Array<Array<T | undefined>> {
     const array = new Array<Array<T | undefined>>(width);
     for (let i = 0; i < array.length; i++) {
@@ -130,10 +136,15 @@ export function make2D<T>(width: number, height: number): Array<Array<T | undefi
     return array;
 }
 
+/**
+ * Filters an array IN PLACE, as opposed to returning a new array.
+ * @param array The array to filter, it will be mutated.
+ * @param filter The filter function, return true on elements to keep.
+ */
 export function filterInPlace<T>(array: T[], filter: (element: T) => boolean): void {
     const filtered = array.filter(filter);
     array.length = filtered.length;
-    for (let i = filtered.length; i--;) {
+    for (let i = 0; i < filtered.length; i++) {
         array[i] = filtered[i];
     }
 }

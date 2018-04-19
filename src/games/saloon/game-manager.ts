@@ -27,7 +27,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-Saloon",
+            "MegaMinerAI-18-Saloon",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }

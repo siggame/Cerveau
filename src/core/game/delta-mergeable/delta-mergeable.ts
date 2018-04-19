@@ -91,10 +91,14 @@ export class DeltaMergeable<T = any> {
         // BAD!!!
         // instead the parent needs to delete that leaf, then notify upstream
         child.events.deleted.once((deleted) => {
-            this.events.deleted.emit(deleted);
+            if (deleted === child) {
+                // our child has been deleted :(
+                deleted.events.changed.off(onChanged);
+                this.children.delete(deleted.key);
+            }
 
-            this.children.delete(child.key);
-            child.events.changed.off(onChanged);
+            // notify upstream
+            this.events.deleted.emit(deleted);
         });
     }
 
