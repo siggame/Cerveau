@@ -101,7 +101,7 @@ export class Session {
         this.gameLogger = new GameLogger(this.game, this, playingClients, this.deltaManager);
         this.gameLogger.events.logged.on(this.sendDeltas);
 
-        logger.info(`${this.gameName} game is starting.`);
+        logger.info(`${this.gameName} - ${this.id} is starting.`);
         this.events.start.emit();
 
         for (const client of this.clients) {
@@ -143,7 +143,7 @@ export class Session {
         // and sit and listen forever
         await delay(1000); // 1 second delay to exit, to allow clients to disconnect.
 
-        logger.info(`${this.gameName} game is over, exiting.`);
+        logger.info(`${this.gameName} - ${this.id} is over, exiting.`);
 
         this.events.ended.emit(this.fatal || gamelog!);
     }
