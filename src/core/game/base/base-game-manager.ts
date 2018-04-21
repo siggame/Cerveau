@@ -62,7 +62,7 @@ export class BaseGameManager {
             // tslint:disable-next-line:no-math-random - because this is the only place we use old random
             settings.randomSeed = Math.random().toString(36).substring(2);
         }
-        this.random = new RandomNumberGenerator(settings.randomSeed);
+        this.random = new RandomNumberGenerator("wdf5pxhsqh"); // was settings.randomSeed
 
         const invalidateRun = (player: IBasePlayer,
                                gameObject: BaseGameObject,

@@ -138,6 +138,10 @@ export class Cowboy extends GameObject {
         if (this.health === 0) {
             this.isDead = true;
             this.canMove = false;
+            this.drunkDirection = "";
+            this.isDrunk = false;
+            this.turnsBusy = this.game.maxTurns;
+
             if (this.tile) {
                 this.tile.cowboy = undefined;
             }
@@ -154,12 +158,13 @@ export class Cowboy extends GameObject {
     public getDrunk(drunkDirection: string): void {
         this.owner.addRowdiness(1);
 
+        this.canMove = false;
+
         if (this.owner.siesta === 0) { // then they did not start a siesta, so they actually get drunk
             this.isDrunk = true;
             this.turnsBusy = this.game.turnsDrunk;
             this.drunkDirection = drunkDirection;
             this.focus = 0;
-            this.canMove = false;
         }
     }
 

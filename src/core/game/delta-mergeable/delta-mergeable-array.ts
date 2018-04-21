@@ -15,7 +15,7 @@ export function createArray<T = any>(args: {
     const container = new DeltaMergeable<T[]>({
         key: args.key,
         parent: args.parent,
-        initialValue: [],
+        initialValue: array,
         transform: (newArray: T[] | undefined, currentValue) => {
             newArray = newArray || [];
             // we won't allow people to re-set this array,
