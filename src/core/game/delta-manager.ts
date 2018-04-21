@@ -65,6 +65,15 @@ export class DeltaManager {
 
         // current should now be at the end of the path
         let changedValue = changed.get();
+        if (changedValue === undefined && !wasDeleted) {
+            // Do not use `undefined` in this case.
+            // When JSON serializing, keys with the value `undefined` will be
+            // dropped, however we want to tell clients/gamelogs that this key
+            // still exists, but with no value.
+            // `null` is the correct value in this case.
+            changedValue = null;
+        }
+
         if (wasDeleted) {
             changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
         }
@@ -80,7 +89,7 @@ export class DeltaManager {
             else if (Array.isArray(changedValue)) {
                 changedValue = { [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: changedValue.length };
             }
-            else if (typeof(changedValue) === "object") {
+            else if (typeof(changedValue) === "object" && changedValue !== null) {
                 changedValue = {};
             }
             // else changed value is a primitive and is safe to copy
