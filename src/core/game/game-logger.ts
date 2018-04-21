@@ -1,11 +1,11 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
+import { BaseGame, BaseGameObject, IDelta, IDeltaData, IDisconnectDeltaData,
     IFinishedDeltaData, IRanDeltaData } from "~/core/game";
 import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";
-import { IGamelog } from "./gamelog-interfaces";
+import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
 
 /*
 function findBad(obj: any, path: string = ""): void {
@@ -64,22 +64,16 @@ export class GameLogger {
             this.finalizeGamelog(clients);
         });
 
+        session.events.aiOrdered.on((ordered) => {
+            this.add("order", ordered);
+        });
+
         session.events.aiFinished.on((finished) => {
-            this.add("finished", {
-                invalid: finished.invalid,
-                player: { id: finished.player.id },
-                order: finished.order,
-                returned: finished.returned,
-            });
+            this.add("finished", finished);
         });
 
         session.events.aiRan.on((ran) => {
-            this.add("ran", {
-                invalid: ran.invalid,
-                player: { id: ran.player.id },
-                run: ran.run,
-                returned: ran.returned,
-            });
+            this.add("ran", ran);
         });
 
         for (const client of clients) {
@@ -128,6 +122,7 @@ export class GameLogger {
     private add(type: "start"): void;
     private add(type: "over"): void; // tslint:disable-line:unified-signatures
     private add(type: "disconnect", data: IDisconnectDeltaData): void;
+    private add(type: "order", data: IOrderedDeltaData): void;
     private add(type: "ran", data: IRanDeltaData): void;
     private add(type: "finished", data: IFinishedDeltaData): void;
     private add(type: string, data?: IDeltaData): void {

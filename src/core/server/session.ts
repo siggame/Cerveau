@@ -14,8 +14,10 @@ import { isObjectEmpty } from "~/utils";
 
 // import { startProfiling, stopProfiling } from "v8-profiler";
 // TODO: v8-profiler may be missing as it is optional...
+
+// TODO: break this up to be more sensible
 import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer, BaseGameSettingsManager,
-    IBaseGameNamespace, IDelta, IFinishedDeltaData, IGamelog, IRanDeltaData,
+    IBaseGameNamespace, IDelta, IFinishedDeltaData, IGamelog, IOrderedDeltaData, IRanDeltaData,
 } from "../game/";
 
 /**
@@ -28,6 +30,7 @@ export class Session {
         start: new Signal(),
         gameOver: new Signal(),
         ended: new Event<Error | IGamelog>(),
+        aiOrdered: new Event<IOrderedDeltaData>(),
         aiRan: new Event<IRanDeltaData>(),
         aiFinished: new Event<IFinishedDeltaData>(),
     });
@@ -71,6 +74,10 @@ export class Session {
         const gameSanitizer = new BaseGameSanitizer(args.gameNamespace);
         for (const client of playingClients) {
             client.aiManager = new BaseAIManager(client, gameSanitizer, args.gameNamespace);
+
+            client.aiManager.events.ordered.on((ordered) => {
+                this.events.aiOrdered.emit(ordered);
+            });
 
             client.aiManager.events.finished.on((finished) => {
                 this.events.aiFinished.emit(finished);
@@ -141,7 +148,7 @@ export class Session {
         // TODO: find a way to make this delay un-needed.
         // As it stands without it some clients won't get the last event "over"
         // and sit and listen forever
-        await delay(1000); // 1 second delay to exit, to allow clients to disconnect.
+        await delay(1000); // 1 second
 
         logger.info(`${this.gameName} - ${this.id} is over, exiting.`);
 

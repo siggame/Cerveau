@@ -1,6 +1,6 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
-import { IFinishedDeltaData, IGameObjectReference, IRanDeltaData } from "~/core/game/";
+import { IFinishedDeltaData, IGameObjectReference, IOrderedDeltaData, IRanDeltaData } from "~/core/game/";
 import { serialize, unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
@@ -25,6 +25,7 @@ interface IOrder {
  */
 export class BaseAIManager {
     public readonly events = events({
+        ordered: new Event<IOrderedDeltaData>(),
         finished: new Event<IFinishedDeltaData>(),
         ran: new Event<IRanDeltaData>(),
     });
@@ -71,6 +72,16 @@ export class BaseAIManager {
                 resolve, // when the client sends back that they resolved this order we will resolve this
                 reject,
             };
+
+            // this is basically to notify upstream for the gamelog manager and session to record/send these
+            this.events.ordered.emit({
+                player: { id: this.client.player!.id },
+                order: {
+                    name,
+                    args: args.map((a) => serialize(a)),
+                    index,
+                },
+            });
 
             this.client.send("order", { name, args, index });
 
@@ -143,12 +154,13 @@ export class BaseAIManager {
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
-            const validated: string | IArguments = (caller as any)[
-                `invalidate${capitalizeFirstLetter(functionName)}`
-            ](
+            const invalidateFunction = (caller as any)[`invalidate${capitalizeFirstLetter(functionName)}`];
+            const validated: string | IArguments = invalidateFunction.call(
+                caller,
                 this.client.player,
                 ...sanitizedArgs.values(),
             );
+
             invalid = typeof validated === "string"
                 ? validated
                 : undefined;
@@ -166,6 +178,7 @@ export class BaseAIManager {
 
         returned = serialize(returned);
 
+        // this is basically to notify upstream for the gamelog manager and session to record/send these
         this.events.ran.emit({
             player: { id: this.client.player.id },
             invalid,
@@ -207,13 +220,14 @@ export class BaseAIManager {
             this.client.disconnect(`Return value of ${unsanitizedReturned} could not be validated.`);
         }
 
+        // this is basically to notify upstream for the gamelog manager and session to record/send these
         this.events.finished.emit({
             player: { id: this.client.player!.id },
             invalid: invalid && invalid.message,
             order: {
                 name: order.name,
                 index: order.index,
-                args: order.args,
+                args: order.args.map((a) => serialize(a)),
             },
             returned: unsanitizedReturned,
         });

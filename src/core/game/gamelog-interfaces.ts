@@ -66,6 +66,11 @@ export interface IRanDeltaData extends IDeltaData {
     returned: any;
 }
 
+export interface IOrderedDeltaData extends IDeltaData {
+    player: IGameObjectReference;
+    order: IOrderData;
+}
+
 export interface IFinishedDeltaData extends IDeltaData {
     player: IGameObjectReference;
     order: IOrderData;
