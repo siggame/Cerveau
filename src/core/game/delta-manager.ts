@@ -2,6 +2,7 @@ import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGameObject } from "~/core/game";
 import { objectHasProperty } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
+import { inspect } from "util";
 
 /** Manages delta states on behalf of a game */
 export class DeltaManager {
@@ -60,24 +61,6 @@ export class DeltaManager {
             if (i !== (path.length - 1)) {
                 current = current[dm.key];
             }
-
-            /*
-            if (i === (path.length - 1)) {
-                value = wasDeleted ?
-                    SHARED_CONSTANTS.DELTA_REMOVED :
-                    deltaMergeable.get();
-
-                if (!wasDeleted && value instanceof BaseGameObject) {
-                    value = (path.length === 2 && path[0].key === "gameObjects")
-                        ? {} // the actual game object (to be filled in with keys)
-                        : { id: value.id };
-                }
-
-                current[dm.key] = value;
-            }
-            else {
-                current = current[dm.key];
-            }*/
         }
 
         // current should now be at the end of the path
