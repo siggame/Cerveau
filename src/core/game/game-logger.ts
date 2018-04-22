@@ -1,7 +1,7 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGame, BaseGameObject, IDelta, IDeltaData, IDisconnectDeltaData,
+import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
     IFinishedDeltaData, IRanDeltaData } from "~/core/game";
 import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";

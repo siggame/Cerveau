@@ -251,8 +251,7 @@ There's probably another Cerveau server running on this same computer.`);
             catch (err) {
                 logger.error(`⚠ Could not load game ${capitalizeFirstLetter(dir)} ⚠`);
                 continue; // For now while we have unconverted games
-                process.exit(1);
-                return;
+                // return process.exit(1);
             }
             const gameName = gameNamespace.GameManager.gameName;
             logger.info(`► ${gameName} game loaded ◄`);
