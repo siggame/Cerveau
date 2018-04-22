@@ -2,7 +2,6 @@ import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGameObject } from "~/core/game";
 import { objectHasProperty } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
-import { inspect } from "util";
 
 /** Manages delta states on behalf of a game */
 export class DeltaManager {
