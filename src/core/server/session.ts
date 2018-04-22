@@ -6,19 +6,23 @@ import { isMaster } from "cluster";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/args";
 import { BaseClient } from "~/core/clients";
+import { BaseAIManager } from "~/core/game/base/base-ai-manager";
+import { BaseGame } from "~/core/game/base/base-game";
+import { BaseGameManager } from "~/core/game/base/base-game-manager";
+import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
+import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
+import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { GameLogManager } from "~/core/game/game-log-manager";
 import { GameLogger } from "~/core/game/game-logger";
+import { IDelta, IFinishedDeltaData, IGamelog,
+         IOrderedDeltaData, IRanDeltaData,
+       } from "~/core/game/gamelog-interfaces";
 import { logger } from "~/core/log";
 import { isObjectEmpty } from "~/utils";
 
 // import { startProfiling, stopProfiling } from "v8-profiler";
 // TODO: v8-profiler may be missing as it is optional...
-
-// TODO: break this up to be more sensible
-import { BaseAIManager, BaseGame, BaseGameManager, BaseGameSanitizer, BaseGameSettingsManager,
-    IBaseGameNamespace, IDelta, IFinishedDeltaData, IGamelog, IOrderedDeltaData, IRanDeltaData,
-} from "../game/";
 
 /**
  * Session: the server that handles of communications between a game and its
