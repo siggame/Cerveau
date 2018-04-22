@@ -49,8 +49,10 @@ export class Session {
     private readonly gameLogger: GameLogger;
     private readonly gameLogManager = new GameLogManager();
     private readonly gameManager: BaseGameManager;
+    private readonly gameNamespace: IBaseGameNamespace;
     private readonly game?: BaseGame;
     private readonly deltaManager = new DeltaManager();
+    private timeout?: NodeJS.Timer;
 
     constructor(args: {
         id: string;
@@ -59,6 +61,7 @@ export class Session {
         clients: BaseClient[];
     }) {
         this.id = args.id;
+        this.gameNamespace = args.gameNamespace;
         this.gameName = args.gameNamespace.GameManager.gameName;
         this.name = `${this.gameName} - ${this.id}`;
         this.clients = args.clients;
@@ -94,6 +97,10 @@ export class Session {
 
         if (Config.RUN_PROFILER) {
             // startProfiling();
+        }
+
+        if (Config.SESSION_TIMEOUTS_ENABLED) {
+            this.startTimeout(args.gameSettingsManager);
         }
 
         const started = new Signal();
@@ -136,7 +143,9 @@ export class Session {
             : err;
 
         await Promise.all([...this.clients].map((client) => {
-            return client.disconnect("An unhandled fatal error occurred on the server.");
+            return client.disconnect(`An unhandled fatal error occurred on the server:
+
+${this.fatal!.message}`);
         }));
 
         return await this.end();
@@ -147,6 +156,11 @@ export class Session {
      * @param gamelog the gamelog we made to send back to the master thread
      */
     private async end(gamelog?: IGamelog): Promise<void> {
+        if (this.timeout) {
+            // then we are done, so we cannot timeout
+            clearTimeout(this.timeout);
+        }
+
         await this.stopProfiler();
 
         // TODO: find a way to make this delay un-needed.
@@ -181,6 +195,36 @@ export class Session {
             */
             return resolve();
         });
+    }
+
+    /**
+     * Starts a timeout to automatically kill this game session if the game
+     * goes on too long. Useful for game servers hosted over long periods of
+     * time so they clean up zombie sessions.
+     *
+     * @param gameSettingsManager The game settings for this session
+     */
+    private startTimeout(gameSettingsManager: BaseGameSettingsManager): void {
+        const maxTimePerPlayer = gameSettingsManager.getMaxPlayerTime();
+        const maxTime = maxTimePerPlayer * this.gameNamespace.GameManager.requiredNumberOfPlayers;
+
+        // We now know the maximum number amount of time that all clients
+        // can use accumulatively. However we need to account for server-side
+        // processing time, so do a rough approximation and double it.
+        let timeoutTime = maxTime * 2 * 1e-6; // convert ns to ms
+
+        if (timeoutTime <= 0) {
+            // it is invalid, so they probably set a custom timeout time of 0
+            // so we'll default to 30min as that is a reasonable amount of
+            // debug time
+            timeoutTime = 1.8e6; // 30 minutes as ms
+        }
+
+        this.timeout = setTimeout(() => {
+            this.timeout = undefined;
+            // if this triggers the game of this session timed out, so kill it
+            this.kill(`Game session timed out after ${timeoutTime} ms.`);
+        }, timeoutTime);
     }
 
     // private updateDeltas(type: "over", data?: undefined): void;

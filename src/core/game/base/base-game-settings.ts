@@ -133,6 +133,15 @@ export class BaseGameSettingsManager {
     }
 
     /**
+     * Gets the hypothetical max amount of time (in ns) that a player can use
+     * doing client side logic.
+     * @returns the number representing how much time they can use, in ns.
+     */
+    public getMaxPlayerTime(): number {
+        return this.values.playerStartingTime;
+    }
+
+    /**
      * Makes a schema object from an interface
      * @param schema The schema to make it from
      * @returns the schema, now frozen

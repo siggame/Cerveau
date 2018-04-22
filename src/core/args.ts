@@ -75,6 +75,9 @@ export interface IArgs {
     /** The base directory to include files from */
     BASE_DIR: string;
 
+    /** If sessions should time out, to prevent zombie processes */
+    SESSION_TIMEOUTS_ENABLED: boolean;
+
     /** The config for worker threads, if this is a worker thread, undefined if master thread */
     WORKER_DATA?: IWorkerGameSessionData;
 }
@@ -133,6 +136,9 @@ const parserArgs: Array<[string[], ArgumentOptions]> = [
 
     [["--no-load-gamelogs"], {action: "storeFalse", dest: "LOAD_EXISTING_GAMELOGS",
         help: "gamelogs are not loaded to get the status or view in the web interface", defaultValue: true}],
+
+    [["--no-session-timeouts"], {action: "storeFalse", dest: "SESSION_TIMEOUTS_ENABLED",
+        help: "disables sessions timing out, most useful for debugging", defaultValue: true}],
 
     [["--no-api"], {action: "storeFalse", dest: "API_ENABLED",
         help: "does not run the hooks for the REST API service", defaultValue: true}],

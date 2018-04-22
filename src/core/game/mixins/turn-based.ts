@@ -53,6 +53,10 @@ export function mixTurnBased<
 
         public values = this.initialValues(this.schema);
 
+        public getMaxPlayerTime(): number {
+            return super.getMaxPlayerTime() + (this.values.maxTurns * this.values.timeAddedPerTurn);
+        }
+
         protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
             const invalidated = super.invalidate(someSettings);
             if (invalidated instanceof Error) {
