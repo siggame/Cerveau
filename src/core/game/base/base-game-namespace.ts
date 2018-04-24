@@ -16,8 +16,6 @@ export interface IBaseGameObjectSchema {
 
 /** Namespace schema for functions that game objects can invoke */
 export interface IBaseGameObjectFunctionSchema {
-    // invalidate: (instance: BaseGameObject, args: IAnyObject) => string | IArguments;
-    // run: (instance: BaseGameObject, ...args: any[]) => Promise<any>;
     args: Array<ISanitizableType & { argName: string, defaultValue?: any }>;
     returns: ISanitizableType;
     invalidValue?: any;
