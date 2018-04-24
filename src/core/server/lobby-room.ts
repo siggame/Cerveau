@@ -7,7 +7,8 @@ import { BaseClient } from "../clients/";
 import { Updater } from "../updater";
 
 /**
- * A container for the Lobby to contain clients and information about what they want to play
+ * A container for the Lobby to contain clients and information about what they
+ * want to play.
  */
 export class Room {
     public readonly events = events({
@@ -51,7 +52,7 @@ export class Room {
     }
 
     /**
-     * Adds a client to this session
+     * Adds a client to this session.
      *
      * @param client - the client to add to this session
      */
@@ -60,7 +61,7 @@ export class Room {
     }
 
     /**
-     * Removes a client from this session
+     * Removes a client from this session.
      *
      * @param client - the client to remove from this session
      */
@@ -86,18 +87,21 @@ export class Room {
     }
 
     /**
-     * If this session has enough playing clients in it to start running. Lobby starts sessions.
+     * If this session has enough playing clients in it to start running.
+     * The Lobby uses this to know when it should start.
      *
      * @returns true if ready to start running, false otherwise
      */
     public canStart(): boolean {
+        const { requiredNumberOfPlayers } = this.gameNamespace.GameManager;
         return !this.isOver()
             && !this.isRunning()
-            && this.getClientsPlaying().length === this.gameNamespace.GameManager.requiredNumberOfPlayers;
+            && this.getClientsPlaying().length === requiredNumberOfPlayers;
     }
 
     /**
-     * Starts this session by having it spin up a new worker thread for the game instance
+     * Starts this session by having it spin up a new worker thread for the
+     * game instance.
      */
     public start(): void {
         if (this.updater) { // && this.updater.foundUpdates()) {
@@ -116,7 +120,8 @@ export class Room {
     }
 
     /**
-     * Adds game settings to this game instance, parsing them from strings to correct types
+     * Adds game settings to this game instance, parsing them from strings to
+     * correct types.
      *
      * @param settings - the key/value pair settings to add
      * @returns An error if the settings were invalid, otherwise nothing
@@ -125,15 +130,28 @@ export class Room {
         return this.gameSettingsManager.addSettings(settings);
     }
 
+    /**
+     * Invoked when a sub class knows its game session.
+     *
+     * @returns Once the over event is emitted.
+     */
     protected async handleOver(): Promise<void> {
         this.events.over.emit();
     }
 
+    /**
+     * Cleans everything up once the same session is over
+     *
+     * @param gamelog The gamelog resulting from the game played in the session
+     * @returns A promise that resolves once the gamelog is written to disk.
+     */
     protected async cleanUp(gamelog: IGamelog): Promise<void> {
         this.over = true;
         this.winners = gamelog.winners;
         this.losers = gamelog.losers;
-        // undefined to signify the gamelog does not exist, as it has not be written to the file system yet
+
+        // Undefined to signify the gamelog does not exist,
+        // as it has not be written to the file system yet
         this.gamelogFilename = undefined;
 
         // now write the gamelog, once written update our

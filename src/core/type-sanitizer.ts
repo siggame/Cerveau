@@ -33,17 +33,22 @@ export interface ISanitizableTypeGameObject {
 
 /**
  * Takes a variable and tries to cast it to a boolean
- * @param b any variable to try to cast to a boolean, for example "TRue" will be true
- * @returns a boolean that represents what was sent
+ * @param b Any variable to try to cast to a boolean, for example "TruE" will
+ * be `true`.
+ * @returns A boolean that represents what was sent.
  */
 export function defaultBoolean(b: any): boolean {
     switch (typeof(b)) {
         case "string":
             const lowered = b.toLowerCase();
-            if (lowered === "true") { // they sent some form of "true" as a string, so make it the boolean true
+            if (lowered === "true") {
+                // They sent some form of "true" as a string,
+                // so make it the boolean true
                 return true;
             }
-            else if (lowered === "false") { // they sent some form of "false" as a string, so make it the boolean false
+            else if (lowered === "false") {
+                // They sent some form of "false" as a string,
+                // so make it the boolean false
                 return false;
             }
             return Boolean(b);
@@ -55,18 +60,21 @@ export function defaultBoolean(b: any): boolean {
 }
 
 /**
- * Takes a variable and tries to cast it to a number
- * @param n any number like variable to try to transform
- * @returns always returns a number, 0 is the default
+ * Takes a variable and tries to cast it to a number.
+ *
+ * @param n Any number like variable to try to transform.
+ * @returns Always returns a number, 0 is the default.
  */
 export function defaultNumber(n: any): number {
     return Number(n) || 0.0;
 }
 
 /**
- * Takes a variable and tries to cast it to a integer, checking 32 bit integer bounds
- * @param i any number like variable to try to transform
- * @returns always returns an integer, 0 is the default
+ * Takes a variable and tries to cast it to a integer, checking 32 bit integer
+ * bounds.
+ *
+ * @param i Any number like variable to try to transform.
+ * @returns Always returns an integer, 0 is the default.
  */
 export function defaultInteger(i: any): number {
     let num = parseInt(i, 10) || 0;
@@ -84,9 +92,11 @@ export function defaultInteger(i: any): number {
 }
 
 /**
- * Takes a variable and tries to cast it to a string
- * @param s any string like variable to try to transform, undefined and null will be empty string
- * @returns always returns a string
+ * Takes a variable and tries to cast it to a string.
+ *
+ * @param s Any string like variable to try to transform, undefined and null
+ * will be empty string.
+ * @returns Always returns a string.
  */
 export function defaultString(s: any): string {
     return s === undefined || s === null
@@ -96,8 +106,11 @@ export function defaultString(s: any): string {
 
 /**
  * Takes a variable and tries to cast it to an array
- * @param a any variable, if it is an array passes it back, otherwise returns a new empty array
- * @returns always returns an array, if the passed in variable was not an array, constructs and returns a new array
+ *
+ * @param a Any variable, if it is an array passes it back, otherwise returns
+ * a new empty array.
+ * @returns Always returns an array, if the passed in variable was not an
+ * array, constructs and returns a new array.
  */
 export function defaultArray<T = any>(a: T[]): T[] {
     return Array.isArray(a)
@@ -107,8 +120,10 @@ export function defaultArray<T = any>(a: T[]): T[] {
 
 /**
  * Takes a variable and tries to cast it to an object
- * @param o any variable, if it is an object passes it back, otherwise returns a new empty object
- * @returns always returns an object, if the passed in variable was not an object, constructs and returns a new object
+ * @param o Any variable, if it is an object passes it back, otherwise returns
+ * a new empty object.
+ * @returns Always returns an object, if the passed in variable was not an
+ * object, constructs and returns a new object.
  */
 export function defaultObject<T = any>(o: any): ITypedObject<T> {
     return isObject(o)
@@ -117,12 +132,19 @@ export function defaultObject<T = any>(o: any): ITypedObject<T> {
 }
 
 /**
- * Takes a variable and ensures it is a game object, if it is not, returns undefined
- * @param o any variable, if it is a game object passes it back, otherwise returns a undefined
- * @param gameObjectClass an optional game object class to enforce on the game object
- * @returns the passed in game object, if it is one, otherwise undefined
+ * Takes a variable and ensures it is a game object, if it is not, returns
+ * undefined.
+ *
+ * @param o Any variable, if it is a game object passes it back, otherwise
+ * returns a undefined.
+ * @param gameObjectClass An optional game object class to enforce on the game
+ * object.
+ * @returns The passed in game object, if it is one, otherwise undefined.
  */
-export function defaultGameObject(o: any, gameObjectClass?: typeof BaseGameObject): BaseGameObject | undefined {
+export function defaultGameObject(
+    o: any,
+    gameObjectClass?: typeof BaseGameObject,
+): BaseGameObject | undefined {
     const obj = o instanceof BaseGameObject
         ? o
         : undefined;
@@ -137,6 +159,13 @@ export function defaultGameObject(o: any, gameObjectClass?: typeof BaseGameObjec
     }
 }
 
+/**
+ * Sanitizes a value to a specified type. If it does not match at all, then the
+ * default value for that type is returned.
+ * @param type The type to coerce to.
+ * @param obj The value to coerce from.
+ * @returns A value now sanitized and guaranteed to be of that type.
+ */
 export function sanitizeType(type: ISanitizableType, obj: any): any {
     switch (type.typeName) {
         case "void":

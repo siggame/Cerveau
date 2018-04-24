@@ -11,7 +11,8 @@ cluster.setupMaster({
 });
 
 /**
- * A LobbyRoom that in intended to be ran in serial (on one thread with the master lobby)
+ * A LobbyRoom that in intended to be ran in serial
+ * (on one thread with the master lobby)
  */
 export class ThreadedRoom extends Room {
     private worker?: cluster.Worker;
@@ -32,15 +33,16 @@ export class ThreadedRoom extends Room {
 
     /**
      * This happens when there are enough clients to start the game Instance.
-     * We start the on a separate "worker" thread, for true multi-threading via cluster
+     * We start the on a separate "worker" thread, for true multi-threading via
+     * cluster
      */
     protected threadInstance(): void {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         this.worker = cluster.fork({
-            ...Config, // so that the worker thread will see these in its process.env
+            ...Config, // the worker thread will see these in its process.env
             WORKER_GAME_SESSION_DATA: JSON.stringify({
-                mainDebugPort: (process as any)._debugPort, // non-standard, used for chrome debug tools
+                mainDebugPort: (process as any)._debugPort, // used by debugger
                 sessionID: this.id,
                 gameName: this.gameNamespace.GameManager.gameName,
                 gameSettings: this.gameSettingsManager.values,
@@ -53,10 +55,12 @@ export class ThreadedRoom extends Room {
                 // listening to it, as we no longer care.
                 client.stopListeningToSocket();
 
+                const clientClass = Object.getPrototypeOf(client);
+
                 this.worker!.send({
                     type: "client",
                     clientInfo: {
-                        className: Object.getPrototypeOf(client).constructor.name,
+                        className: clientClass.constructor.name,
                         index: client.playerIndex,
                         name: client.name,
                         type: client.programmingLanguage,
@@ -67,7 +71,8 @@ export class ThreadedRoom extends Room {
                 );
             }
 
-            // Tell the worker thread we are done sending client + sockets to them
+            // Tell the worker thread we are done sending client + sockets to
+            // them
             this.worker!.send({ type: "done"} as MessageFromMainThread);
 
             // And remove the clients from us, they are no longer ours to care
@@ -78,7 +83,8 @@ export class ThreadedRoom extends Room {
             this.clients.length = 0;
         });
 
-        this.worker.on("message", async (data) => { // this message should only happen once, when the game is over
+        // this message should only happen once, when the game is over
+        this.worker.once("message", async (data) => {
             if (data.gamelog) {
                 this.cleanUp(data.gamelog);
             }

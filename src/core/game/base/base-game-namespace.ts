@@ -7,12 +7,14 @@ import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer } from "./base-player";
 
+/** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
     parentClassName?: string;
     attributes: { [key: string]: ISanitizableType & { defaultValue?: any } };
     functions: { [key: string]: IBaseGameObjectFunctionSchema };
 }
 
+/** Namespace schema for functions that game objects can invoke */
 export interface IBaseGameObjectFunctionSchema {
     // invalidate: (instance: BaseGameObject, args: IAnyObject) => string | IArguments;
     // run: (instance: BaseGameObject, ...args: any[]) => Promise<any>;
@@ -41,6 +43,12 @@ export interface IBaseGameNamespace {
     gameSettingsManager: BaseGameSettingsManager;
 }
 
+/**
+ * Should be invoked by all games to format their namespace correctly.
+ *
+ * @param namespace - The base game namespace to use.
+ * @returns A fresh game namespace ready to be used to play games with.
+ */
 export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace {
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
         let depth = obj;

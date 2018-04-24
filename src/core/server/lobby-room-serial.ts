@@ -4,7 +4,8 @@ import { Room } from "./lobby-room";
 import { Session } from "./session";
 
 /**
- * A LobbyRoom that in intended to be ran in serial (on one thread with the master lobby)
+ * A Room that in intended to be ran in serial
+ * (on one thread with the master lobby)
  */
 export class SerialRoom extends Room {
     private session?: Session;

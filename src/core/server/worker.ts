@@ -93,7 +93,9 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
             id: workerData.sessionID,
             clients,
             gameNamespace,
-            gameSettingsManager: new gameNamespace.GameSettingsManager(workerData.gameSettings),
+            gameSettingsManager: new gameNamespace.GameSettingsManager(
+                workerData.gameSettings,
+            ),
         });
 
         process.on("unhandledRejection", (reason, p) => {

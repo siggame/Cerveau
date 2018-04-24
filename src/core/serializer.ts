@@ -41,26 +41,35 @@ export function isSerializable(obj: any, key: string): boolean {
 }
 
 /**
- * Checks if the given value is an object that is an array in delta array notation
- * @param a the object to check
- * @returns true if it a delta array, false otherwise
+ * Checks if the given value is an object that is an array in delta array
+ * notation
+ *
+ * @param a The object to check.
+ * @returns True if it a delta array, false otherwise.
  */
 export function isDeltaArray(a: any): boolean {
-    return (isObject(a) && Object.hasOwnProperty.call(a, SHARED_CONSTANTS.DELTA_LIST_LENGTH));
+    return (
+        isObject(a) &&
+        Object.hasOwnProperty.call(a, SHARED_CONSTANTS.DELTA_LIST_LENGTH)
+    );
 }
 
 /**
  * Serializes something about a game so it is safe to send over a socket.
  * This is required to avoid cycles and send lists correctly.
- * @param state  The variable you want to serialize.
- * Anything in the game should be Serializable, numbers, strings, BaseGameObjects, dicts, lists, nulls, etc.
- * @returns the state, serialized. It will never be the same object if it is an object ({} or [])
+ *
+ * @param state The variable you want to serialize.
+ * Anything in the game should be Serializable, numbers, strings,
+ * BaseGameObjects, dicts, lists, nulls, etc.
+ * @returns The state, serialized. It will never be the same object if it is an
+ * object ({} or []).
  */
 export function serialize(state: any): any {
     if (!isObject(state)) {
         return state; // not an object, no need to further serialize
     }
-    else if (state instanceof BaseGameObject) { // no need to serialize this whole thing
+    else if (state instanceof BaseGameObject) {
+        // no need to serialize this whole thing
         return { id: state.id };
     }
 
@@ -70,8 +79,9 @@ export function serialize(state: any): any {
 
     const serialized: IAnyObject = {};
     if (state instanceof Array) {
-        // record the length, we never send arrays in serialized states because
-        // you can't tell when they change in size without sending all the elements
+        // Record the length, we never send arrays in serialized states because
+        // you can't tell when they change in size without sending all the
+        // elements.
         serialized[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = state.length;
     }
 
@@ -92,14 +102,21 @@ export function serialize(state: any): any {
 }
 
 /**
- * un-serializes data from a game client
+ * Un-serializes data from a game client.
  *
- * @param data the data to un-serialize
- * @param game the game to lookup game objects in for game object references in data
- * @param dataTypeConverter the function to convert the un-serialized value once found
- * @returns the data now un-serialized, will create new objects instead of reusing objects
+ * @param data The data to un-serialize.
+ * @param game The game to lookup game objects in for game object references in
+ * data.
+ * @param dataTypeConverter The function to convert the un-serialized value
+ * once found.
+ * @returns The data now un-serialized, will create new objects instead of
+ * reusing objects.
  */
-export function unSerialize(data: any, game: BaseGame, dataTypeConverter?: (val: any) => any): any {
+export function unSerialize(
+    data: any,
+    game: BaseGame,
+    dataTypeConverter?: (val: any) => any,
+): any {
     if (isObject(data) && game) {
         const result: IAnyObject = Array.isArray(data)
             ? []
@@ -108,7 +125,8 @@ export function unSerialize(data: any, game: BaseGame, dataTypeConverter?: (val:
         for (const key of Object.keys(data)) {
             const value = data[key];
             if (isObject(value)) {
-                if (isGameObjectReference(value)) { // it's a tracked game object
+                if (isGameObjectReference(value)) {
+                    // it's a tracked game object
                     result[key] = game.gameObjects[value.id];
                 }
                 else {

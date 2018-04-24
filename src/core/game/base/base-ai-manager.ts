@@ -1,6 +1,7 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
-import { IFinishedDeltaData, IGameObjectReference, IOrderedDeltaData, IRanDeltaData } from "~/core/game/";
+import { IFinishedDeltaData, IGameObjectReference,
+    IOrderedDeltaData, IRanDeltaData } from "~/core/game/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";

@@ -30,7 +30,7 @@ import { isObjectEmpty } from "~/utils";
  */
 export class Session {
     public readonly events = events({
-        /** Emitted once everything is setup and the game should start playing */
+        /** Emitted once everything is setup and the game should start */
         start: new Signal(),
         gameOver: new Signal(),
         ended: new Event<Error | IGamelog>(),
@@ -66,7 +66,8 @@ export class Session {
         this.name = `${this.gameName} - ${this.id}`;
         this.clients = args.clients;
 
-        if (!isMaster) { // then we are threaded, add our PID for ease of debugging
+        if (!isMaster) {
+            // then we are threaded, add our PID for ease of debugging
             this.name += ` @ ${process.pid}`;
         }
 
@@ -80,7 +81,11 @@ export class Session {
 
         const gameSanitizer = new BaseGameSanitizer(args.gameNamespace);
         for (const client of playingClients) {
-            client.aiManager = new BaseAIManager(client, gameSanitizer, args.gameNamespace);
+            client.aiManager = new BaseAIManager(
+                client,
+                gameSanitizer,
+                args.gameNamespace,
+            );
 
             client.aiManager.events.ordered.on((ordered) => {
                 this.events.aiOrdered.emit(ordered);
@@ -116,7 +121,11 @@ export class Session {
         );
         this.game = this.gameManager.game;
 
-        this.gameLogger = new GameLogger(this.game, this, playingClients, this.deltaManager);
+        this.gameLogger = new GameLogger(
+            this.game,
+            this, playingClients,
+            this.deltaManager,
+        );
         this.gameLogger.events.logged.on(this.sendDeltas);
 
         logger.info(`${this.gameName} - ${this.id} is starting.`);
@@ -132,7 +141,9 @@ export class Session {
     }
 
     /**
-     * When a fatal (unhandled) error occurs we need to exit and kill all clients. this does that
+     * When a fatal (unhandled) error occurs we need to exit and kill all
+     * clients, and then end this session.
+     *
      * @param err - the unhandled error
      * @returns once all the cleanup is done
      */
@@ -153,7 +164,7 @@ ${this.fatal!.message}`);
 
     /**
      * Called when the game ends, so that this thread "ends"
-     * @param gamelog the gamelog we made to send back to the master thread
+     * @param gamelog The gamelog we made to send back to the master thread.
      */
     private async end(gamelog?: IGamelog): Promise<void> {
         if (this.timeout) {
@@ -206,7 +217,8 @@ ${this.fatal!.message}`);
      */
     private startTimeout(gameSettingsManager: BaseGameSettingsManager): void {
         const maxTimePerPlayer = gameSettingsManager.getMaxPlayerTime();
-        const maxTime = maxTimePerPlayer * this.gameNamespace.GameManager.requiredNumberOfPlayers;
+        const { requiredNumberOfPlayers } = this.gameNamespace.GameManager;
+        const maxTime = maxTimePerPlayer * requiredNumberOfPlayers;
 
         // We now know the maximum number amount of time that all clients
         // can use accumulatively. However we need to account for server-side
@@ -247,14 +259,15 @@ ${this.fatal!.message}`);
         }
 
         if (this.gameManager.isGameOver()) {
-            // we no longer need to send deltas because the game is over and the
-            // last delta was just sent above
+            // We no longer need to send deltas because the game is over and
+            // the last delta was just sent above.
             this.gameLogger.events.logged.off(this.sendDeltas);
         }
     }
 
     /**
-     * Called when the game has ended (is over) and the clients need to know, and the gamelog needs to be generated
+     * Called when the game has ended (is over) and the clients need to know,
+     * and the gamelog needs to be generated.
      */
     private handleGameOver(): void {
         this.events.gameOver.emit();

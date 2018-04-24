@@ -59,7 +59,8 @@ export class BaseGameManager {
         const settings = settingsManager.values;
 
         if (!settings.randomSeed) {
-            // tslint:disable-next-line:no-math-random - because this is the only place we use old random
+            // This is the only place we use old random
+            // tslint:disable-next-line:no-math-random
             settings.randomSeed = Math.random().toString(36).substring(2);
         }
         this.random = new RandomNumberGenerator("wdf5pxhsqh"); // was settings.randomSeed
@@ -76,13 +77,16 @@ export class BaseGameManager {
             client.aiManager!.invalidateRun = invalidateRun;
         }
 
-        const gameCreated = new Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>();
+        const gameCreated = new Event<{
+            game: BaseGame,
+            gameObjectsDeltaMergeable: DeltaMergeable,
+        }>();
 
+        // This will happen synchronously, but TS can't know that.
         gameCreated.once(({ game }) => {
-            (this.game as any) = game; // will happen synchronously, but TS doesn't know
+            (this.game as any) = game;
         });
 
-        // TODO this needs to be ready BEFORE the game...
         this.create = new this.namespace.GameObjectFactory(
             this.namespace,
             this.generateNextGameObjectID,
@@ -101,7 +105,10 @@ export class BaseGameManager {
         });
 
         for (const client of clients) {
-            client.events.disconnected.once(() => this.playerDisconnected(client.player!));
+            client.events.disconnected.once(() => {
+                this.playerDisconnected(client.player!);
+            });
+
             this.playerToClient.set(client.player!, client);
         }
 
@@ -109,13 +116,18 @@ export class BaseGameManager {
     }
 
     /**
-     * declares some player(s) as having lost, and assumes when a player looses
+     * Declares some player(s) as having lost, and assumes when a player looses
      * the rest could still be competing to win.
-     * @param reason the reason they lost
-     * @param loser the player that lost the game
-     * @param losers additional player(s) that lost the game
+     *
+     * @param reason - The reason they lost.
+     * @param loser - The player that lost the game.
+     * @param losers - Additional player(s) that lost the game.
      */
-    public declareLoser(reason: string, loser: IBasePlayer, ...losers: IBasePlayer[]): void {
+    public declareLoser(
+        reason: string,
+        loser: IBasePlayer,
+        ...losers: IBasePlayer[],
+    ): void {
         losers.push(loser);
         for (const player of losers) {
             this.setPlayerLost(player, reason);
@@ -123,13 +135,18 @@ export class BaseGameManager {
     }
 
     /**
-     * declares some player(s) as having won, and assumes when a player wins the
-     * rest have lost if they have not won already
-     * @param reason the reason they won
-     * @param winner the winner of the game
-     * @param winners additional the player(s) that won the game
+     * Declares some player(s) as having won, and assumes when a player wins
+     * the rest have lost if they have not won already.
+     *
+     * @param reason - The reason they won.
+     * @param winner - The winner of the game.
+     * @param winners - Additional the player(s) that won the game.
      */
-    public declareWinner(reason: string, winner: IBasePlayer, ...winners: IBasePlayer[]): void {
+    public declareWinner(
+        reason: string,
+        winner: IBasePlayer,
+        ...winners: IBasePlayer[],
+    ): void {
         winners.push(winner);
         for (const player of winners) {
             player.lost = false;
@@ -142,9 +159,9 @@ export class BaseGameManager {
     }
 
     /**
-     * End the game via coin flip (1 random winner, the rest lose)
+     * End the game via coin flip (1 random winner, the rest lose).
      *
-     * @param [reason="Draw"] - optional reason why win via coin flip is happening
+     * @param reason - An optional reason why win via coin flip is happening.
      */
     public makePlayerWinViaCoinFlip(reason: string = "Draw"): void {
         // Win via coin flip - if we got here no player won via game rules.
@@ -165,8 +182,9 @@ export class BaseGameManager {
     /**
      * You **MUST** call this to let everything know the game is over and
      * all the clients should be notified
-     * @param reason the reason the game is over to set for any players that
-     * have not already won or lost the game
+     *
+     * @param reason - The reason the game is over to set for any players that
+     * have not already won or lost the game.
      */
     public endGame(reason: string = "Draw"): void {
         const playingPlayers = this.game.players.filter((p) => !p.won && !p.lost);
@@ -179,8 +197,9 @@ export class BaseGameManager {
     }
 
     /**
-     * Checks if the game is over
-     * @returns true if the game is over, false otherwise
+     * Checks if the game is over.
+     *
+     * @returns True if the game is over, false otherwise.
      */
     public isGameOver(): boolean {
         return this.isOver;
@@ -195,22 +214,24 @@ export class BaseGameManager {
     }
 
     /**
-     * Generates a new id string for a new game object
-     * @returns a string for the new id. **must be unique**s
+     * Generates a new id string for a new game object.
+     *
+     * @returns A string for the new id. **Must be unique**
      */
     protected generateNextGameObjectID = () => {
-        // returns this._nextGameObjectID then increments by 1 (that's how post++ works FYI)
+        // returns this.nextGameObjectID then increments by 1
         return String(this.nextGameObjectID++);
     }
 
     /**
      * Invoked any time an AI wants to run some game object function.
      * If a string is returned that is the reason why it is invalid.
-     * @param player the player invoking the function
-     * @param gameObject the game object being invoked on
-     * @param functionName the string name of the function
-     * @param args the key/value pair args to the function
-     * @returns a string if the run is invalid, nothing if valid
+     *
+     * @param player - The player invoking the function.
+     * @param gameObject - The game object being invoked on.
+     * @param functionName - The string name of the function.
+     * @param args - The key/value pair args to the function.
+     * @returns A string if the run is invalid, nothing if valid.
      */
     protected invalidateRun(
         player: IBasePlayer,
@@ -224,8 +245,9 @@ export class BaseGameManager {
 
     /**
      * Called when a client disconnected to remove the client from the game and
-     * check if they have a player and if removing them alters the game
-     * @param player - the player whose client disconnected
+     * checks if they have a player and if removing them alters the game.
+     *
+     * @param player - The player whose client disconnected.
      */
     private playerDisconnected(player: IBasePlayer): void {
         if (player && !this.isOver) {
@@ -282,11 +304,13 @@ export class BaseGameManager {
      * should write your own checkForWinner() function on the sub class.
      */
     private checkForGameOver(): void {
-        if (this.game.players.find((p) => p.won)) { // someone has won, so let's end this
+        if (this.game.players.find((p) => p.won)) {
+            // someone has won, so let's end this
             this.isOver = true;
 
             for (const player of this.game.players) {
-                if (!player.won && !player.lost) { // then they are going to loose
+                if (!player.won && !player.lost) {
+                    // then they are going to loose because the game is over
                     this.setPlayerLost(player, "Other player won");
                 }
             }
