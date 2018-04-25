@@ -9,6 +9,7 @@ import { createGameObject } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer, IBasePlayerData } from "./base-player";
 
+/** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
     clients: BaseClient[];
     rootDeltaMergeable: DeltaMergeable;
@@ -20,15 +21,42 @@ export interface IBaseGameRequiredData {
     sessionID: string;
 }
 
+/** The base game that all Game classes inherit from. */
 export class BaseGame extends BaseGameDeltaMergeables {
+    /**
+     * The manager of this class that handles dealing with the server systems
+     * and the game.
+     */
     public readonly manager: BaseGameManager;
+
+    /**
+     * The actual setting values we will use to initialize things.
+     */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
+    /** The name (id) of this game. */
     public readonly name!: string;
+
+    /** The id of the game session this game is playing in. */
     public readonly session!: string;
+
+    /**
+     * A special key/value object indexed by GameObject id's to the actual
+     * game object
+     */
     public readonly gameObjects!: {[id: string]: BaseGameObject | undefined};
+
+    /**
+     * The players playing this game.
+     */
     public readonly players!: IBasePlayer[];
 
+    /**
+     * Initializes a game. Should **only** be done by this game's manager.
+     *
+     * @param settingsManager - The settings manager for this instance.
+     * @param requiredData - The required initialization data.
+     */
     constructor(protected settingsManager: BaseGameSettingsManager, requiredData: IBaseGameRequiredData) {
         super({
             key: "game",
@@ -37,7 +65,8 @@ export class BaseGame extends BaseGameDeltaMergeables {
             initialValues: settingsManager.values,
         });
 
-        // super has now created our delta mergeables, let's reach in and grab the game objects all hack-y like
+        // Our super has now created our delta mergeables,
+        // let's reach in and grab the game objects all hack-y like.
         const gameObjectsDeltaMergeable = ((this as any).deltaMergeable as DeltaMergeable).child("gameObjects")!;
 
         this.manager = requiredData.manager;
@@ -46,7 +75,6 @@ export class BaseGame extends BaseGameDeltaMergeables {
         this.session = requiredData.sessionID;
 
         const clients = requiredData.clients;
-        // const sanitizer = new BaseGameSanitizer(this.namespace);
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
             client.aiManager!.game = this; // kind of hack-y, we are hooking this up here

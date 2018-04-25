@@ -4,11 +4,12 @@ import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 
-// tslint:disable-next-line:no-empty-interface
+/** The base game object data (empty). */
 export interface IBaseGameObjectData {
     // pass
 }
 
+/** Values required by all game objects to be initialized correctly. */
 export interface IBaseGameObjectRequiredData {
     id: string;
     gameObjectName: string;
@@ -18,26 +19,36 @@ export interface IBaseGameObjectRequiredData {
 }
 
 /**
- * the base object for any object in the game that will need to be tracked via an ID, e.g. players, units, etc.
+ * The base object for any object in the game that will need to be tracked via
+ * an ID, e.g. players, units, etc.
  */
 export class BaseGameObject extends BaseGameDeltaMergeables {
     public readonly id!: string;
     public readonly gameObjectName!: string;
     public readonly logs!: string[];
 
-    /** The game this game object is in, inheriting classes should specify the sub game type */
+    /**
+     * The game this game object is in.
+     * Inheriting classes should specify the sub game type
+     */
     protected readonly game: BaseGame;
 
-    /** The manager that manages actions around the game this game object is in */
+    /**
+     * The manager that manages actions around the game this game object is in.
+     */
     protected readonly manager: BaseGameManager;
 
     /**
-     * Creates a base game object with some initialization data
-     * @param data the initialization data used to hook this game object up into
-     * @param requiredData the data required to hook up this game object
-     * the game, and set default values for the sub class
+     * Creates a base game object with some initialization data.
+     *
+     * @param data - The initialization data use by the super class.
+     * @param requiredData - The data required to hook up this game object
+     * the game, and set default values for the sub class.
      */
-    constructor(data: IBaseGameObjectData, requiredData: IBaseGameObjectRequiredData) { // & IBaseGameObjectHiddenData
+    constructor(
+        data: IBaseGameObjectData,
+        requiredData: IBaseGameObjectRequiredData,
+    ) {
         super({
             key: requiredData.id,
             parent: requiredData.gameObjectsDeltaMergeable,
@@ -49,15 +60,15 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
             },
         });
 
-        // The BaseGameObjectFactory will ALWAYS inject this game, but we don't want to act
-        // like it is actually required, so it is omitted from the interface
         this.game = requiredData.game;
         this.manager = this.game.manager;
         this.game.gameObjects[this.id] = this;
     }
 
     /**
-     * String coercion override, handles players by default as every game has them
+     * String coercion override, handles players by default as every game has
+     * them.
+     *
      * @returns formatted string for this name
      */
     public toString(): string {
@@ -70,21 +81,26 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
     }
 
     /**
-     * logs a string to this BaseGameObject's log array, for debugging purposes. This is called from a 'run' event.
+     * Logs a string to this BaseGameObject's log array, for debugging purposes.
+     * This is called from a 'run' event.
      *
-     * @param player - the player requesting to log the string to this game object
-     * @param message - string to log
+     * @param player - The player requesting to log the string to this game
+     * object.
+     * @param message - The string to log.
+     * @returns The arguments, as all input is valid.
      */
-    protected invalidateLog(player: any, message: string): string | undefined {
+    protected invalidateLog(player: any, message: string): string | IArguments {
         // NOTE: may be a good idea to make sure the messages are not too long,
         // E.g. they are not trying to log 100+ MB strings
-        return; // nothing to invalidate, all input is valid
+        return arguments; // nothing to invalidate, all input is valid
     }
 
     /**
-     * logs a string to this BaseGameObject's log array, for debugging purposes. This is called from a 'run' event.
+     * Logs a string to this BaseGameObject's log array, for debugging purposes.
+     * This is called from a 'run' event.
      *
-     * @param player - the player requesting to log the string to this game object
+     * @param player - The player requesting to log the string to this game
+     * object.
      * @param message - string to log
      */
     protected async log(player: any, message: string): Promise<void> {

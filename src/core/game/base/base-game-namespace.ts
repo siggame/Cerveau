@@ -21,10 +21,7 @@ export interface IBaseGameObjectFunctionSchema {
     invalidValue?: any;
 }
 
-export interface IBaseGameSchema {
-    [gameObjectName: string]: IBaseGameObjectSchema;
-}
-
+/** The namespace all game index files should export */
 export interface IBaseGameNamespace {
     AI: typeof BaseAI;
     Game: typeof BaseGame;
