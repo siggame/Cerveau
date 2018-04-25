@@ -3,13 +3,17 @@ import { ISanitizableType } from "~/core/type-sanitizer";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
 
+/**
+ * Creates a DeltaMergeable for an Array with a Proxy wrapper.
+ * @param args - The creation args
+ * @returns A new DeltaMergeable wrapping an Array.
+ */
 export function createArray<T = any>(args: {
     key: string;
     childType: ISanitizableType;
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;
-    // let lengthUpdating = false;
     const array: T[] = [];
     const values = new Array<DeltaMergeable<T>>();
     const container = new DeltaMergeable<T[]>({
@@ -18,7 +22,7 @@ export function createArray<T = any>(args: {
         initialValue: array,
         transform: (newArray: T[] | undefined, currentValue) => {
             newArray = newArray || [];
-            // we won't allow people to re-set this array,
+            // We won't allow people to re-set this array,
             // instead we will mutate the current array to match `newArray`
             for (let i = 0; i < newArray.length; i++) {
                 currentValue![i] = newArray[i];
@@ -37,13 +41,15 @@ export function createArray<T = any>(args: {
     function checkIfUpdated(index?: number, value?: T): void {
         let newLength = array.length;
 
-        if (index !== undefined && (index >= oldLength || index >= array.length)) {
+        if (index !== undefined && (
+            index >= oldLength || index >= array.length
+        )) {
             newLength = index + 1;
         }
 
         if (newLength !== oldLength) {
             if (newLength > oldLength) {
-                // the array grew in size, so we need some new delta mergeables
+                // The array grew in size, so we need some new delta mergeables
 
                 for (let i = oldLength; i < newLength; i++) {
                     const currentValue = i === index ? value : undefined;
@@ -85,10 +91,11 @@ export function createArray<T = any>(args: {
                     return true;
                 }
 
-                return false; // all other strings are not able to be set on arrays
+                // All other strings are not able to be set on arrays
+                return false;
             }
 
-            // if we got here, we know that the property being set is an index
+            // If we got here, we know that the property being set is an index
             checkIfUpdated(index, value);
             values[index].set(value);
             Reflect.set(target, property, values[index].get());

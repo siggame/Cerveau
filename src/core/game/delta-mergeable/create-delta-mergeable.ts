@@ -4,6 +4,11 @@ import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
 import { createObject } from "./delta-mergeable-object";
 
+/**
+ * Creates a delta mergeable given a type.
+ * @param args - The data about the delta mergeable to create
+ * @returns A newly created DeltaMergeable instance of the given type.
+ */
 export function createDeltaMergeable(args: {
     key: string;
     type: ISanitizableType;

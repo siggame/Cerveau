@@ -3,6 +3,11 @@ import { IAnyObject, ITypedObject } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
 
+/**
+ * Creates a DeltaMergeable for an Object with a Proxy wrapper.
+ * @param args - The creation args
+ * @returns A new DeltaMergeable wrapping an Object.
+ */
 export function createObject(args: {
     key: string,
     initialValue?: any,
