@@ -27,20 +27,6 @@ export function isGameObjectReference(obj: IAnyObject): boolean {
 }
 
 /**
- * Checks if the given key in an object is serializable
- * @param obj the object to check
- * @param key the key to check for within obj
- * @returns true if it is serializable, false otherwise
- */
-export function isSerializable(obj: any, key: string): boolean {
-    /*
-    return isObject(obj) && (obj.hasOwnProperty(key) || (obj._serializableKeys && obj._serializableKeys[key]))
-    && !String(key).startsWith("_") && (obj._serializableKeys === undefined || obj._serializableKeys[key]);
-    */
-    return false; // TODO ^
-}
-
-/**
  * Checks if the given value is an object that is an array in delta array
  * notation
  *
@@ -85,17 +71,8 @@ export function serialize(state: any): any {
         serialized[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = state.length;
     }
 
-    for (const key of Object.keys(serialized)) {
-        if (isSerializable(state, key)) {
-            const value = state[key];
-            if (isObject(value)) {
-                serialized[key] = serialize(value);
-            }
-            else {
-                serialized[key] = value;
-            }
-        }
-        // else it is not Serializable, so skip it and look at the next key
+    for (const [key, value] of Object.entries(state)) {
+        serialized[key] = serialize(value);
     }
 
     return serialized;
