@@ -2,39 +2,45 @@ import { logger } from "~/core/log";
 import { isObject, ITypedObject } from "~/utils";
 import { BaseGameObject } from "./game/base/base-game-object";
 
-// Max/Min true int32 values for most programming languages
+// Max/Min true int32 values for most programming languages.
 const INT_MAX = 2147483647;
 const INT_MIN = -2147483648;
 
+/** The various types we can sanitize. */
 export type ISanitizableType = ISanitizableTypePrimitive
                              | ISanitizableTypeList
                              | ISanitizableTypeDictionary
                              | ISanitizableTypeGameObject;
 
+/** Primitive types we can sanitize. */
 export interface ISanitizableTypePrimitive {
     typeName: "string" | "float" | "int" | "boolean" | "void";
 }
 
+/** A list (array) that can be sanitized. */
 export interface ISanitizableTypeList {
     typeName: "list";
     valueType: ISanitizableType;
 }
 
+/** A dictionary (object/map) that can be sanitized. */
 export interface ISanitizableTypeDictionary {
     typeName: "dictionary";
     valueType: ISanitizableType;
     keyType: ISanitizableType;
 }
 
+/** A game object in a game that can be sanitized. */
 export interface ISanitizableTypeGameObject {
     typeName: "gameObject";
     gameObjectClass: typeof BaseGameObject;
 }
 
 /**
- * Takes a variable and tries to cast it to a boolean
- * @param b Any variable to try to cast to a boolean, for example "TruE" will
- * be `true`.
+ * Takes a variable and tries to cast it to a boolean.
+ *
+ * @param b - Any variable to try to cast to a boolean,
+ * for example "TruE" will be `true`.
  * @returns A boolean that represents what was sent.
  */
 export function defaultBoolean(b: any): boolean {

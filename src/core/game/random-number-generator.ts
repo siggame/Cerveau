@@ -3,6 +3,7 @@ import { shuffle } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {
+    /** The random library interface we are wrapping around. */
     private readonly random: random.prng;
 
     constructor(seed?: string) {
@@ -35,17 +36,39 @@ export class RandomNumberGenerator {
         return this.random.double() * (max - min) + min;
     }
 
-    public shuffle<T>(array: T[]): T[] {
-        return shuffle(array, () => this.float());
+    /**
+     * Shuffles an array IN PLACE using the PRNG.
+     *
+     * @param array - The array to shuffle in place.
+     * @returns The same array, now shuffled.
+     */
+    public shuffle<T>(array: T[]): void {
+        shuffle(array, () => this.float());
     }
 
-    public element<T>(array: T[]): T {
+    /**
+     * Selects a random element from an array using the PRNG.
+     *
+     * @param array - The array to select from.
+     * @returns An element from the array, or undefined if the array was empty.
+     */
+    public element<T>(array: T[]): T | undefined {
         return array[Math.floor(this.float() * array.length)];
     }
 
+    /**
+     * Selects a random element from a map of weights.
+     *
+     * @param map - The map. Where keys are the elements you want to choose
+     * from, and their values are their weights.
+     *
+     * Weights do not need to be uniform, or sum up to 1.00. Any values will
+     * work and will all be relative to the rest.
+     * @returns An element (key) from the map.
+     */
     public fromWeights<T>(map: Map<T, number>): T {
         let sum = 0;
-        for (const [_, num] of map) {
+        for (const num of map.values()) {
             sum += num;
         }
 
@@ -58,14 +81,7 @@ export class RandomNumberGenerator {
             }
         }
 
-        throw new Error("Could not chose item for fromWeights");
-    }
-
-    public dataSetFrom<T>(count: number, map: Map<T, {
-        min?: number;
-        max?: number;
-        weight?: number;
-    }>): Map<T, number> {
-        return new Map();
+        throw new Error(`Could not chose item for fromWeights.
+Ensure your map has entries`);
     }
 }

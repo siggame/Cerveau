@@ -26,10 +26,11 @@ export class ThreadedRoom extends Room {
         return Boolean(this.worker);
     }
 
+    /** Starts the game session by spinning up a true thread for the session. */
     public start(): void {
         super.start();
 
-        this.threadInstance();
+        this.threadSession();
     }
 
     /**
@@ -37,7 +38,7 @@ export class ThreadedRoom extends Room {
      * We start the on a separate "worker" thread, for true multi-threading via
      * cluster
      */
-    protected threadInstance(): void {
+    protected threadSession(): void {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         this.worker = cluster.fork({
@@ -96,6 +97,12 @@ export class ThreadedRoom extends Room {
         });
     }
 
+    /**
+     * Cleans up the room by terminating our worker thread.
+     *
+     * @param gamelog - The gamelog sent from the session.
+     * @returns A promise that resolves once we've cleaned up.
+     */
     protected async cleanUp(gamelog: IGamelog): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
         await super.cleanUp(gamelog);

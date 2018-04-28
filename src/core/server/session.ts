@@ -2,7 +2,6 @@ import * as delay from "delay";
 // import { writeFile } from "fs";
 // import * as moment from "moment";
 
-import { isMaster } from "cluster";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/args";
 import { BaseClient } from "~/core/clients";
@@ -29,31 +28,64 @@ import { isObjectEmpty } from "~/utils";
  * clients, on a separate thread than the lobby.
  */
 export class Session {
+    /** The events this Session emits. */
     public readonly events = events({
         /** Emitted once everything is setup and the game should start */
         start: new Signal(),
+
+        /**
+         * Emitted once the game is over, however not before the session is
+         * over and the gamelog is ready.
+         */
         gameOver: new Signal(),
+
+        /** Emitted once this session is over and we can be deleted. */
         ended: new Event<Error | IGamelog>(),
+
+        // -- Events proxies through from AIs in our game -- \\
         aiOrdered: new Event<IOrderedDeltaData>(),
         aiRan: new Event<IRanDeltaData>(),
         aiFinished: new Event<IFinishedDeltaData>(),
     });
 
-    public readonly name: string;
+    /** The session ID. */
     public readonly id: string;
+
+    /** The name of the game we are playing. */
     public readonly gameName: string;
 
+    /** If a fatal error occurred, it is stored here. */
     private fatal?: Error;
 
-    private readonly clients: BaseClient[] = [];
+    /** All the clients in this game. */
+    private readonly clients: BaseClient[];
+
+    /** The manager that logs events (deltas) from the game. */
     private readonly gameLogger: GameLogger;
+
+    /** Used to get game over URL data from. */
     private readonly gameLogManager = new GameLogManager();
+
+    /** The manager for the game. */
     private readonly gameManager: BaseGameManager;
+
+    /** The namespace of the game we are running. */
     private readonly gameNamespace: IBaseGameNamespace;
-    private readonly game?: BaseGame;
+
+    /** The game we are running. The GameManager actually creates it. */
+    private readonly game: BaseGame;
+
+    /** The manager of deltas for the game, which the game logger will log. */
     private readonly deltaManager = new DeltaManager();
+
+    /** A timeout to self terminate in case a game gets "stuck". */
     private timeout?: NodeJS.Timer;
 
+    /**
+     * Initializes a new session with data to create and run the game.
+     *
+     * @param args - The initialization args required to hookup a game.
+     */
     constructor(args: {
         id: string;
         gameNamespace: IBaseGameNamespace;
@@ -63,20 +95,14 @@ export class Session {
         this.id = args.id;
         this.gameNamespace = args.gameNamespace;
         this.gameName = args.gameNamespace.GameManager.gameName;
-        this.name = `${this.gameName} - ${this.id}`;
         this.clients = args.clients;
-
-        if (!isMaster) {
-            // then we are threaded, add our PID for ease of debugging
-            this.name += ` @ ${process.pid}`;
-        }
 
         // Now we have all our clients, so let's make the structures to play
         // the game with.
 
         // NOTE: the game only knows about clients playing, this session will
-        // care about spectators sending them deltas a such,
-        // so the game never needs to know of their existence
+        // care about spectators sending them deltas a such.
+        // Therefore, the game never needs to know of their existence.
         const playingClients = this.clients.filter((c) => !c.isSpectating);
 
         const gameSanitizer = new BaseGameSanitizer(args.gameNamespace);
@@ -184,6 +210,12 @@ ${this.fatal!.message}`);
         this.events.ended.emit(this.fatal || gamelog!);
     }
 
+    /**
+     * Stops the profiler and generates a profile if running.
+     *
+     * @returns A promise that resolves once the profile is written to disk,
+     * or immediately if no profiler is running.
+     */
     private stopProfiler(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!Config.RUN_PROFILER) {

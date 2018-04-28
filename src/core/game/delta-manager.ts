@@ -11,7 +11,7 @@ export class DeltaManager {
     /** The current delta state we are building. */
     private delta: any = {};
 
-    /** Creates a delta manager for some game. */
+    /** Manages delta states on behalf of a game */
     constructor() {
         this.rootDeltaMergeable = new DeltaMergeable({
             key: "__root__",
@@ -26,7 +26,7 @@ export class DeltaManager {
      * @returns delta formatted object representing the true delta
      * state of the game, with nothing hidden
      */
-    public pop(): any {
+    public dump(): any {
         const popped = this.delta;
         this.delta = {};
         return popped;

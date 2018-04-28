@@ -1,6 +1,7 @@
 import { IOrderData, IRunData } from "~/core/clients";
 import { IAnyObject } from "~/utils";
 
+/** The shape of a gamelog, both being built and if read from memory. */
 export interface IGamelog {
     /**
      * The name of the game.
@@ -50,15 +51,17 @@ export interface IDelta {
     game: any;
 }
 
-// tslint:disable-next-line:no-empty-interface - because there are no base keys
+/** The base delta data interface */
 export interface IDeltaData {
 }
 
+/** Data about why a player disconnected. */
 export interface IDisconnectDeltaData extends IDeltaData {
     player: IGameObjectReference;
     timeout: boolean;
 }
 
+/** Data about what game logic got ran. */
 export interface IRanDeltaData extends IDeltaData {
     player: IGameObjectReference;
     run: IRunData;
@@ -66,11 +69,13 @@ export interface IRanDeltaData extends IDeltaData {
     returned: any;
 }
 
+/** Data about a player being ordered to do something. */
 export interface IOrderedDeltaData extends IDeltaData {
     player: IGameObjectReference;
     order: IOrderData;
 }
 
+/** Data bout a player finishing an order. */
 export interface IFinishedDeltaData extends IDeltaData {
     player: IGameObjectReference;
     order: IOrderData;

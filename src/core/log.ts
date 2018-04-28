@@ -30,4 +30,5 @@ winston.configure({
 });
 
 // TODO: when Winston's types are updated use createLogger instead
+/** The winston logger instance to use. */
 export const logger = winston;

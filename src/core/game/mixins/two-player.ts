@@ -4,16 +4,17 @@
 import { BaseGameObject, IBasePlayer } from "~/core/game";
 import * as Base from "./base";
 
+/** A player in a two player game, that has a guaranteed opponent. */
 export interface ITwoPlayerPlayer extends IBasePlayer {
     opponent: ITwoPlayerPlayer;
 }
 
 /**
- * A base game that will only ever have two players in it, so they explicitly know
- * their singular opponent
+ * A base game that will only ever have two players in it, so they explicitly
+ * know their singular opponent.
  *
- * @param base The BaseGame (or sub BaseGame) to mix in two player logic
- * @returns a new BaseGame class with TwoPlayer logic mixed in
+ * @param base - The BaseGame (or sub BaseGame) to mix in two player logic.
+ * @returns A new BaseGame class with TwoPlayer logic mixed in.
  */
 // tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
 export function mixTwoPlayer<
@@ -29,9 +30,16 @@ export function mixTwoPlayer<
     GameObject: TBaseGameObject,
     GameSettings: TBaseGameSettings,
 }) {
+    /** A game with only two players in it. (a very common game type) */
     class TwoPlayerGame extends base.Game {
+        /** The players in the game. */
         public readonly players!: ITwoPlayerPlayer[];
 
+        /**
+         * Creates a new Two player game and hooks up the opponents.
+         *
+         * @param args - The arguments unknown to this constructor.
+         */
         constructor(...args: any[]) {
             super(...args);
 
@@ -40,26 +48,11 @@ export function mixTwoPlayer<
         }
     }
 
+    /** The manager for two player games. */
     class TwoPlayerGameManager extends base.GameManager {
+        /** Two player games require... 2 players. */
         public static get requiredNumberOfPlayers(): number {
             return 2;
-        }
-
-        public invalidateRun(
-            player: ITwoPlayerPlayer,
-            gameObject: BaseGameObject,
-            functionName: string,
-            args: Map<string, any>,
-        ): string | undefined {
-            let invalid = super.invalidateRun(player, gameObject, functionName, args);
-
-            if (!invalid) {
-                if (player.won || player.lost) {
-                    invalid = `You have already ${player.won ? "won" : "lost"} the game and cannot run anything.`;
-                }
-            }
-
-            return invalid;
         }
     }
 

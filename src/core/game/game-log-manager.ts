@@ -27,6 +27,7 @@ export interface IGamelogInfo {
     visualizerUrl?: string;
 }
 
+/** Callback type to format the filename for a gamelog */
 type FilenameFormatter = (gameName?: string, gameSession?: string, moment?: string) => string;
 
 /**

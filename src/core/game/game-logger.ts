@@ -7,36 +7,28 @@ import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";
 import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
 
-/*
-function findBad(obj: any, path: string = ""): void {
-    if (typeof(obj) === "object" && obj !== null) {
-        for (const [key, value] of Object.entries(obj)) {
-            const current = `${path}.${key}`;
-
-            if (value instanceof BaseGameObject) {
-                console.log("Found bad game obj", current, String(value));
-            }
-            else if (value instanceof Map) {
-                console.log("Found a map at", current);
-            }
-            else {
-                // go deeper
-                findBad(value, current);
-            }
-        }
-    }
-}
-*/
-
 /** Observes a game and creates a gamelog from its events */
 export class GameLogger {
+    /** The events the game logger emits when it logs something. */
     public readonly events = events({
+        /** Emitted every time a new delta is logged to the gamelog. */
         logged: new Event<IDelta>(),
     });
 
+    /** The gamelog we are buolding up. */
     public readonly gamelog: IGamelog;
+
+    /** If our gamelog is finalized and should never be changed after. */
     private finalized = false;
 
+    /**
+     * Creates a new game logger for a specific game.
+     *
+     * @param game - The game we are logging.
+     * @param session - The session the game is in.
+     * @param clients - The clients in the game session.
+     * @param deltaManager - The delta manager that builds deltas for us.
+     */
     constructor(
         game: BaseGame,
         session: Session,
@@ -125,17 +117,23 @@ export class GameLogger {
     private add(type: "order", data: IOrderedDeltaData): void;
     private add(type: "ran", data: IRanDeltaData): void;
     private add(type: "finished", data: IFinishedDeltaData): void;
+
+    /**
+     * Adds a delta for some reason, and emits that we logged it.
+     *
+     * @param type - The type of delta (reason it occurred).
+     * @param data - The data about why it changed, such as what data made the
+     * delta occur.
+     */
     private add(type: string, data?: IDeltaData): void {
         if (this.finalized) {
-            return;
+            return; // Gamelog is finalized, we can't add things.
         }
-
-        // findBad(data, "data");
 
         const delta: IDelta = {
             type,
             data,
-            game: this.deltaManager.pop(),
+            game: this.deltaManager.dump(),
         };
         this.gamelog.deltas.push(delta);
         this.events.logged.emit(delta);

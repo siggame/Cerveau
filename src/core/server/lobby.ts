@@ -21,8 +21,6 @@ import * as net from "net";
 import * as querystring from "querystring";
 import * as readline from "readline";
 
-type createServerFunction = (callback: (socket: net.Socket) => void) => net.Server;
-
 /*
     Clients connect like this:
     Lobby -> Room -> new thread -> Session
@@ -34,12 +32,11 @@ type createServerFunction = (callback: (socket: net.Socket) => void) => net.Serv
  * Basically creates and manages game sessions.
  */
 export class Lobby {
-    public static getInstance(): Lobby {
+    /** Starts up the lobby singleton, if it has not started already */
+    public static start(): void {
         if (!Lobby.instance) {
             Lobby.instance = new Lobby();
         }
-
-        return Lobby.instance;
     }
 
     /** The singleton instance. */
@@ -59,19 +56,28 @@ export class Lobby {
 
     /** All the clients connected, but not yet in a Room. */
     private readonly clients: Set<BaseClient> = new Set();
+
+    /** All the Rooms we currently have with clients in them. */
     private readonly rooms = new Map<string, Map<string, Room>>();
+
+    /** All the Rooms that are actually running a game at the moment. */
     private readonly roomsPlaying = new Map<string, Map<string, Room>>();
+
+    /** A mapping of a client to the room they are in.  */
     private readonly clientsRoom = new Map<BaseClient, Room>();
 
+    /** A mapping of game aliases to their name (id). */
     private readonly gameAliasToName = new Map<string, string>();
 
+    /** The Updater instance that checks for updates. */
     private readonly updater?: Updater;
 
+    /** The Node.js listener servers that accept new clients. */
     private readonly listenerServers: net.Server[] = [];
 
     /**
      * Initializes the Lobby that listens for new clients.
-     * There should only be 1 per program running at a time.
+     * There should only be 1 Lobby per program running at a time.
      */
     private constructor() {
         this.initializeGames().then(() => {
@@ -225,7 +231,7 @@ export class Lobby {
      */
     private initializeListener(
         port: number,
-        createServer: createServerFunction,
+        createServer: (callback: (socket: net.Socket) => void) => net.Server,
         clientClass: typeof BaseClient,
     ): void {
         const listener = createServer((socket) => {

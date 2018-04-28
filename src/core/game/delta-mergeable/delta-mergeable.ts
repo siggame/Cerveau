@@ -55,7 +55,7 @@ export class DeltaMergeable<T = any> {
         this.value = data.initialValue;
 
         this.transform = data.transform;
-        this.set(data.initialValue, false, true);
+        this.set(data.initialValue, true);
     }
 
     /**
@@ -79,11 +79,10 @@ export class DeltaMergeable<T = any> {
      * emit an event.
      *
      * @param value - The new value to try to set.
-     * @param deleted - If they value is that it was deleted.
      * @param forceSet - Force the set to occur, even if the current value is
      * the same.
      */
-    public set(value: any, deleted?: boolean, forceSet?: true): void {
+    public set(value: any, forceSet?: true): void {
         if (this.transform) {
             value = this.transform(value, this.get());
         }
@@ -95,6 +94,7 @@ export class DeltaMergeable<T = any> {
         }
     }
 
+    /** Deletes this leaf and notifies upstream that it was deleted. */
     public delete(): void {
         this.value = undefined;
         this.events.deleted.emit(this);
@@ -103,6 +103,13 @@ export class DeltaMergeable<T = any> {
 
     // Children operations \\
 
+    /**
+     * Adds a child node.
+     *
+     * **NOTE**: You cannot adopt nodes that already have a parent.
+     *
+     * @param child - The child node to adopt
+     */
     public adopt(child: DeltaMergeable<any>): void {
         if (child.parent === this) {
             return; // nothing to do

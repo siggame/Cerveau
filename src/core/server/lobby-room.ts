@@ -11,6 +11,7 @@ import { Updater } from "../updater";
  * want to play.
  */
 export class Room {
+    /** The events emitted from this room. */
     public readonly events = events({
         over: new Signal(),
     });
@@ -38,6 +39,15 @@ export class Room {
     /** If the game this room is playing has been ran and it is over */
     private over: boolean = false;
 
+    /**
+     * Creates a room for a lobby to hold clients before they play the game.
+     *
+     * @param id - The ID of our session we will run in time.
+     * @param gameNamespace - The namespace of the game to play.
+     * @param gameLogger - The game logger instance to log gamelogs generated
+     * with.
+     * @param updater - The updated to check for updates with.
+     */
     constructor(
         public readonly id: string,
         public readonly gameNamespace: IBaseGameNamespace,
@@ -47,6 +57,11 @@ export class Room {
         this.gameSettingsManager = new gameNamespace.GameSettingsManager();
     }
 
+    /**
+     * Gets the clients playing (omits spectators)
+     *
+     * @returns A new array of only clients playing the game.
+     */
     public getClientsPlaying(): BaseClient[] {
         return this.clients.filter((c) => !c.isSpectating);
     }

@@ -21,16 +21,6 @@ export function removeElements<T>(array: T[], ...elements: T[]): number {
 }
 
 /**
- * pushes elements into the array only if they are not already present
- * @param array the array to push elements into
- * @param elements to try to push.
- * @returns new length of this array
- */
-export function pushIfAbsent<T>(array: T[], ...elements: T[]): number {
-    return array.push(...elements.filter((e) => !array.includes(e)));
-}
-
-/**
  * gets an element in the array wrapping around (both ways), so -1 would be the
  * last element, and length would warp to 0.
  *
@@ -91,10 +81,6 @@ export function previousWrapAround<T>(array: T[], element: T): T | undefined {
     return getWrapAround(array, element, -1);
 }
 
-export function lastElementOf<T>(array: T[]): T {
-    return array[array.length - 1];
-}
-
 /**
  * Checks if an array is empty, and notifies TypeScript that it is if so
  * @param array the array to check if is empty
@@ -116,9 +102,7 @@ export function shuffle<T>(array: T[], rng?: () => number): T[] { // from http:/
     for (
         let j, x, i = array.length; i;
         j = Math.floor(rng() * i), x = array[--i], array[i] = array[j], array[j] = x
-    ) {
-        //
-    }
+    ) { /** pass */ }
     return array;
 }
 

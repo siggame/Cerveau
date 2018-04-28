@@ -5,6 +5,7 @@ import "dotenv"; // loads the config from an optional `.env` file
 import { IWorkerGameSessionData } from "~/core/server/worker";
 import { IAnyObject, unstringify } from "~/utils";
 
+/** The shape of config variables */
 export interface IArgs {
     /** port offset for the default port values */
     PORT_OFFSET: number;
@@ -220,4 +221,5 @@ if (!isNaN(args.PORT_OFFSET)) {
     args.WS_PORT += args.PORT_OFFSET;
 }
 
+/** The current config as set from CLI and the .env file. */
 export const Config = Object.freeze(args);

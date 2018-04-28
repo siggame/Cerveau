@@ -11,6 +11,7 @@ export class SerialRoom extends Room {
     /** The Session this Room is running */
     private session?: Session;
 
+    /** Starts the session in this room (as we are not threaded) */
     public start(): void {
         super.start();
 

@@ -7,6 +7,7 @@ import { IAnyObject, isEmptyExceptFor, isObject, mapToObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
+/** The names of types that are accepted from creer types. */
 export type SerializableTypeName =
     "string" |
     "float" |
@@ -18,9 +19,10 @@ export type SerializableTypeName =
     "void";
 
 /**
- * Checks if a given object is a game object reference (has only an id key set)
- * @param obj the object to check
- * @returns true if the object is a game object reference
+ * Checks if a given object is a game object reference (has only an id key set).
+ *
+ * @param obj - The object to check.
+ * @returns True if the object is a game object reference
  */
 export function isGameObjectReference(obj: IAnyObject): boolean {
     return isEmptyExceptFor(obj, "id");

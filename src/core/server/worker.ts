@@ -14,20 +14,23 @@ import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
 import { IAnyObject } from "~/utils";
 
-export interface IClientInfo {
-    className: string;
-    index?: number;
-    name: string;
-    type: string;
-    spectating: boolean;
-    metaDeltas: boolean;
-}
-
+/**
+ * An interface for the main thread to adhere to, so we can communicate
+ * both safely, and robustly.
+ */
 export type MessageFromMainThread = { type: "done" } | {
     type: "client";
-    clientInfo: IClientInfo;
+    clientInfo: {
+        className: string;
+        index?: number;
+        name: string;
+        type: string;
+        spectating: boolean;
+        metaDeltas: boolean;
+    };
 };
 
+/** This interface we expect to be set via the process.env for us. */
 export interface IWorkerGameSessionData {
     mainDebugPort: number;
     sessionID: string;

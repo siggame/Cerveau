@@ -2,20 +2,20 @@ import { IGameObjectReference } from "~/core/game/";
 
 // these are events the clients sends to the server (this)
 
+/** Data clients send with a "finished" event */
 export interface IFinishedData {
     orderIndex: number;
     returned: any;
 }
 
+/** Data clients second with a "run" event */
 export interface IRunData {
     caller: IGameObjectReference;
     functionName: string;
     args: {[key: string]: any};
 }
 
-/**
- * Sent from a client to the Lobby about what that client wants to play
- */
+/** Sent from a client to the Lobby about what that client wants to play */
 export interface IPlayData {
     /**
      * The name (id) of the game to play. Assume this is an alias before using.

@@ -11,11 +11,12 @@
         "completed-docs": [true, {
             "classes": true,
             "functions": {"visibilities": ["exported"]},
+            "variables": {"visibilities": ["exported"]},
             "methods": true,
             "properties": true,
             "interfaces": true,
             "enums": true,
-            "types": true,
+            "types": true
         }],
         "new-parens": true,
         "no-bitwise": true,

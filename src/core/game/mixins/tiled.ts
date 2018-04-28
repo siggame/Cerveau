@@ -1,21 +1,34 @@
-// tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface = because the some mixins have nothing to add
+// tslint:disable:max-classes-per-file - because the mixin define multiple classes while maintaining scope to each
+// tslint:disable:no-empty-interface - because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
 import { IAnyObject } from "~/utils";
 import * as Base from "./base";
 
+/** The valid direction strings tile based games use. */
 export const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];
 
+/** A player in a tile based game. */
 export interface ITiledPlayer extends IBasePlayer {}
 
+/** A base tile for super tiles to extend */
 export abstract class BaseTile extends BaseGameObject {
+    /** The X coordinate of the tile. */
     public readonly x!: number;
+
+    /** The Y coordinate of the tile. */
     public readonly y!: number;
 
+    /** The neighboring tile to the North, if present. */
     public readonly tileNorth?: BaseTile;
+
+    /** The neighboring tile to the East, if present. */
     public readonly tileEast?: BaseTile;
+
+    /** The neighboring tile to the South, if present. */
     public readonly tileSouth?: BaseTile;
+
+    /** The neighboring tile to the West, if present. */
     public readonly tileWest?: BaseTile;
 
     /**
@@ -87,10 +100,11 @@ export abstract class BaseTile extends BaseGameObject {
 }
 
 /**
- * A game that has a grid based map of tiles. This handles creating that initial
- * map and hooking it up. That's it
- * @param base The BaseGame (or sub BaseGame) to mix in tiled logic
- * @returns a new BaseGame class with Tiled logic mixed in
+ * A game that has a grid based map of tiles. This handles creating that
+ * initial map and hooking it up. That's it.
+ *
+ * @param base - The BaseGame (or sub BaseGame) to mix in tiled logic.
+ * @returns A new BaseGame class with Tiled logic mixed in.
  */
 // tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
 export function mixTiled<
@@ -106,7 +120,9 @@ export function mixTiled<
     GameObject: TBaseGameObject,
     GameSettings: TBaseGameSettings,
 }) {
+    /** The settings for a Tiled game */
     class TiledGameSettings extends base.GameSettings {
+        /** The schema for a Tiled game, adding in configurable map sizes. */
         public schema = this.makeSchema({
             ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
             mapWidth: {
@@ -121,35 +137,24 @@ export function mixTiled<
             },
         });
 
+        /** The current settings values. */
         public values = this.initialValues(this.schema);
-
-        protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
-            const invalidated = super.invalidate(someSettings);
-            if (invalidated instanceof Error) {
-                return invalidated;
-            }
-
-            const settings = { ...this.values, ...someSettings, ...invalidated };
-
-            if (settings.mapWidth < 1) {
-                return new Error(`Map height invalid: ${settings.mapWidth}. Must be > 1`);
-            }
-
-            if (settings.mapHeight < 1) {
-                return new Error(`Map width invalid: ${settings.mapHeight}. Must be > 1`);
-            }
-
-            return settings;
-        }
     }
 
+    /** A game that has a map made of tiles in it. */
     class TiledGame extends base.Game {
         // client <--> server properties
+        /** The tiles in the game, in rowMajor order. */
         public readonly tiles!: BaseTile[];
+
+        /** The width of the map along the X-Axis. */
         public readonly mapWidth!: number;
+
+        /** The height of the map along the Y-Axis. */
         public readonly mapHeight!: number;
 
         // server-side only
+        /** The valid directions tiles can be in from one another. */
         public readonly tileDirections = TILE_DIRECTIONS;
 
         constructor(...args: any[]) {
@@ -157,12 +162,12 @@ export function mixTiled<
 
             this.tiles.length = this.mapWidth * this.mapHeight;
 
-            // create each tile
+            // Create each tile.
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
                     this.tiles[x + y * this.mapWidth] = (this.manager.create as any).Tile({x, y});
-                                                        // any because we don't mix a new BaseGameObject Factory,
-                                                        // however all managers will have a Tile so no worries (I hope)
+                    // any because we don't mix a new BaseGameObject Factory,
+                    // however all managers will have a Tile so no worries (I hope)
                 }
             }
 

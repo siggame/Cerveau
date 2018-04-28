@@ -20,11 +20,21 @@ export function clamp(value: number, min: number, max: number): number {
     return Math.min(max, Math.max(min, value));
 }
 
+/** A simple 2D point. */
 export interface IPoint {
+    /** The X-Coordinate. */
     x: number;
+
+    /** The Y-Coordinate. */
     y: number;
 }
 
+/**
+ * Make points from a loose collection of point like objects.
+ *
+ * @param args - the point like things to create from.
+ * @returns An array of points from what we could determine.
+ */
 export function makePoints(...args: any[]): IPoint[] {
     const points: IPoint[] = [];
     for (let i = 0; i < args.length; i++) {

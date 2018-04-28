@@ -1,7 +1,11 @@
+/** An object with all values being a certain type */
+
 export interface ITypedObject<T = any> { [key: string]: T | undefined; }
-// tslint:disable-next-line:no-empty-interface - because it is just key/value
+
+/** An object used as a map to any values */
 export interface IAnyObject extends ITypedObject<any> {}
 
+/** shorthand for null or undefined */
 export type nil = null | undefined;
 
 /**
@@ -114,14 +118,33 @@ export function isEmptyExceptFor(obj: IAnyObject, ...keys: Array<string | number
     return true;
 }
 
+/**
+ * Checks if a given thing is null or undefined.
+ *
+ * @param thing - The thing to check against.
+ * @returns True if it is, false otherwise.
+ */
 export function isNil<T>(thing: T | undefined | null): thing is nil {
     return thing === undefined || thing === null;
 }
 
+/**
+ * Checks if an object has a given property.
+ *
+ * @param obj - The object to check in.
+ * @param property - The name of the property (key) to check for.
+ * @returns True if the property is present in the object, false otherwise.
+ */
 export function objectHasProperty(obj: any, property: PropertyKey): obj is {[property: string]: any} {
     return Boolean(obj) && Object.prototype.hasOwnProperty.call(obj, property);
 }
 
+/**
+ * Converts an object into a proper Map.
+ *
+ * @param obj - The object to convert
+ * @returns A new map with the keys from obj and their values.
+ */
 export function objectToMap<T>(obj: {[key: string]: T}): Map<string, T> {
     const map = new Map<string, T>();
     for (const [key, value] of Object.entries(obj)) {
@@ -131,7 +154,13 @@ export function objectToMap<T>(obj: {[key: string]: T}): Map<string, T> {
     return map;
 }
 
-export function mapToObject<T>(map: Map<string, T>): {[key: string]: T} {
+/**
+ * Converts a Map to an object.
+ *
+ * @param map - The map to convert from.
+ * @returns A new object with the same key/value pairs from the map.
+ */
+export function mapToObject<T>(map: Map<string, T>): {[key: string]: T | undefined} {
     const obj: {[key: string]: T} = {};
     for (const [key, value] of map) {
         obj[key] = value;

@@ -21,7 +21,7 @@ import "./core/setup-thread";
 
 import { Lobby } from "./core/server";
 
-Lobby.getInstance(); // this will create the singleton Lobby instance
+Lobby.start(); // this will create the singleton Lobby instance
 
 // if (Config.API_ENABLED || Config.WEB_ENABLED) {
     // TODO: create the web server

@@ -5,6 +5,7 @@ import { BaseGameObject, IBasePlayer } from "~/core/game";
 import { IAnyObject, nextWrapAround } from "~/utils";
 import * as Base from "./base";
 
+/** A player in a turn based game */
 export interface ITurnBasedPlayer extends IBasePlayer {
 }
 
@@ -30,13 +31,21 @@ export function mixTurnBased<
     GameObject: TBaseGameObject,
     GameSettings: TBaseGameSettings,
 }) {
+    /** An AI in the game that has turns to execute. */
     class TurnBasedAI extends base.AI {
+        /**
+         * Instructs the AI to run their turn.
+         *
+         * @returns A promise that resolves to if they want to end their turn.
+         */
         public async runTurn(): Promise<boolean> {
             return await this.executeOrder<boolean>("runTurn");
         }
     }
 
+    /** Game settings to control turn timing. */
     class TurnBaseGameSettings extends base.GameSettings {
+        /** The schema for turn based settings. */
         public schema = this.makeSchema({
             ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
             timeAddedPerTurn: {
@@ -51,49 +60,50 @@ export function mixTurnBased<
             },
         });
 
+        /** The values for turn based settings. */
         public values = this.initialValues(this.schema);
 
+        /**
+         * Adds in the maximum number of turns and time added per turn into
+         * the calculations.
+         *
+         * @returns A number of how long in MS it wold take max.
+         */
         public getMaxPlayerTime(): number {
             return super.getMaxPlayerTime() + (this.values.maxTurns * this.values.timeAddedPerTurn);
         }
-
-        protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
-            const invalidated = super.invalidate(someSettings);
-            if (invalidated instanceof Error) {
-                return invalidated;
-            }
-
-            const settings = { ...this.values, ...someSettings, ...invalidated };
-
-            if (settings.maxTurns <= 0) {
-                return new Error(`Max turns invalid: ${settings.maxTurns}. Must be > 0`);
-            }
-
-            if (settings.timeAddedPerTurn < 0) {
-                return new Error(`time added per turn invalid: ${settings.timeAddedPerTurn}. Must be >= 0`);
-            }
-
-            return settings;
-        }
     }
 
+    /** A turn based game. */
     class TurnBasedGame extends base.Game {
-        /** The amount of time added to a player's timeRemaining at the end of each of their turns */
+        /**
+         * The amount of time added to a player's timeRemaining at the end of
+         * each of their turns
+         */
         public readonly timeAddedPerTurn!: number; // 1 sec in ns
 
+        /** The current player (player whose turn it is). */
         public currentPlayer!: IBasePlayer;
 
+        /** The current turn number, starting at 0. */
         public currentTurn!: number;
 
+        /**
+         * The maximum number of turns. When currentTurn hits this the game
+         * ends, and secondary game over conditions are evaluated.
+         */
         public readonly maxTurns!: number;
     }
 
+    /** The manager for turn based games. */
     class TurnBasedGameManager extends base.GameManager {
+        /** The game we are managing. */
         public readonly game!: TurnBasedGame;
 
         /**
-         * begins the turn based game to the first player
-         * @param args all the args to pipe to our super
+         * Begins the turn based game to the first player,
+         *
+         * @param args - All the args to pipe to our super.
          */
         constructor(...args: any[]) {
             super(...args);
@@ -101,11 +111,23 @@ export function mixTurnBased<
             this.game.currentPlayer = this.game.players[0];
         }
 
+        /** Starts the game */
         protected start(): void {
             // different from nextTurn, this is called because their turn has not yet started
             this.beforeTurn();
         }
 
+        /**
+         * Base logic to invalidate any run command, ensuring players only
+         * run logic on their turns.
+         *
+         * @param player - The player running code.
+         * @param gameObject-  The game object running.
+         * @param functionName - The name of the function being run.
+         * @param args - The key.value map (in positional arg order) args.
+         * @returns A string explaining why it is invalid, or undefined if
+         * valid.
+         */
         protected invalidateRun(
             player: IBasePlayer,
             gameObject: BaseGameObject,
