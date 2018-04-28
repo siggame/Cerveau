@@ -15,6 +15,7 @@ cluster.setupMaster({
  * (on one thread with the master lobby)
  */
 export class ThreadedRoom extends Room {
+    /** The Worker thread running this session. */
     private worker?: cluster.Worker;
 
     /**

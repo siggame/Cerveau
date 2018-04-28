@@ -84,7 +84,7 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
 
         client.sendMetaDeltas = info.metaDeltas;
         client.isSpectating = info.spectating;
-        client.setInfo(info.name, info.type, info.index);
+        client.setInfo(info);
     }
     else if (message.type === "done") {
         // we've been sent all the sockets for the clients,

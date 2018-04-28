@@ -86,6 +86,13 @@ export class BaseGameSanitizer {
         return sanitizedArgs;
     }
 
+    /**
+     * Validates the return value of a ran function
+     * @param gameObject - The game object instance that ran code.
+     * @param functionName - The function name in the game object that ran.
+     * @param returned - The value that was returned from that function.
+     * @returns A sanitized return value of the expected schema type.
+     */
     public validateRanReturned(gameObject: BaseGameObject,
                                functionName: string,
                                returned: any,
@@ -98,6 +105,12 @@ export class BaseGameSanitizer {
         return sanitizeType(schema.returns, returned);
     }
 
+    /**
+     * Validates a game object has a specific function
+     * @param gameObject - The game object instance.
+     * @param functionName The function name inside the game object.
+     * @returns The schema if valid, otherwise an error.
+     */
     private validateGameObject(gameObject: BaseGameObject,
                                functionName: string,
     ): Error | IBaseGameObjectFunctionSchema {

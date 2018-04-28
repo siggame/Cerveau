@@ -23,8 +23,11 @@ export interface IBaseGameObjectRequiredData {
  * an ID, e.g. players, units, etc.
  */
 export class BaseGameObject extends BaseGameDeltaMergeables {
+    /** The ID of the game object. */
     public readonly id!: string;
+    /** The top class name of the game object. */
     public readonly gameObjectName!: string;
+    /** The logs logged to this game object. */
     public readonly logs!: string[];
 
     /**

@@ -2,7 +2,8 @@
 import { Config } from "~/core/args";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
-import { ArrayUtils, capitalizeFirstLetter, getDirs, IAnyObject, ITypedObject } from "~/utils";
+import { capitalizeFirstLetter, getDirs,
+    IAnyObject, isNil, ITypedObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
 import { GameLogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -28,7 +29,8 @@ type createServerFunction = (callback: (socket: net.Socket) => void) => net.Serv
 */
 
 /**
- * The server that clients initially connect to before being moved to their game lobby.
+ * The server that clients initially connect to before being moved to their
+ * game lobby.
  * Basically creates and manages game sessions.
  */
 export class Lobby {
@@ -40,16 +42,23 @@ export class Lobby {
         return Lobby.instance;
     }
 
+    /** The singleton instance. */
     private static instance?: Lobby;
 
-    public readonly name = `Lobby @ ${process.pid}`;
+    /** All the namespaces for games we can play, indexed by gameName. */
     public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
+
+    /** The logger instance that manages game logs. */
     public readonly gameLogger = new GameLogManager();
 
+    /** Next number to use for wildcard game sessions. */
     private nextRoomNumber = 1;
+
+    /** If we are shutting down, to prevent new games from connecting. */
     private isShuttingDown = false;
 
-    private readonly clients: BaseClient[] = [];
+    /** All the clients connected, but not yet in a Room. */
+    private readonly clients: Set<BaseClient> = new Set();
     private readonly rooms = new Map<string, Map<string, Room>>();
     private readonly roomsPlaying = new Map<string, Map<string, Room>>();
     private readonly clientsRoom = new Map<BaseClient, Room>();
@@ -60,6 +69,10 @@ export class Lobby {
 
     private readonly listenerServers: net.Server[] = [];
 
+    /**
+     * Initializes the Lobby that listens for new clients.
+     * There should only be 1 per program running at a time.
+     */
     private constructor() {
         this.initializeGames().then(() => {
             this.initializeListener(Config.TCP_PORT, net.createServer, TCPClient);
@@ -122,7 +135,7 @@ export class Lobby {
      * @param id - the session id of the gameName
      * @returns the session, if found
      */
-    public getRoom(gameAlias: string, id: string): Room | undefined {
+    public getRoom(gameAlias: string, id: string): Room | Error | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
         if (gameName) {
             const rooms = this.rooms.get(gameName);
@@ -131,7 +144,7 @@ export class Lobby {
             }
         }
         else {
-            throw new Error(`Game name '${gameAlias}' is not a valid game alias.`);
+            return new Error(`Game name '${gameAlias}' is not a valid game alias.`);
         }
     }
 
@@ -166,7 +179,7 @@ export class Lobby {
      *               (e.g. timed out)
      */
     private clientDisconnected(client: BaseClient, reason?: string): void {
-        ArrayUtils.removeElements(this.clients, client);
+        this.clients.delete(client);
 
         const room = this.clientsRoom.get(client);
         if (room) {
@@ -194,7 +207,7 @@ export class Lobby {
      */
     private addSocket(socket: net.Socket, clientClass: typeof BaseClient): void {
         const client = new clientClass(socket);
-        this.clients.push(client);
+        this.clients.add(client);
 
         client.sent.alias.on((data) => this.clientSentAlias(client, data));
         client.sent.play.on((data) => this.clientSentPlay(client, data));
@@ -203,11 +216,12 @@ export class Lobby {
     }
 
     /**
-     * Creates and initializes a server that uses a listener pattern identical to net.Server
+     * Creates and initializes a server that uses a listener pattern identical
+     * to net.Server.
      *
-     * @param port The port to listen on for this server
-     * @param createServer The required module's createServer method
-     * @param clientClass The class constructor for clients of this listener
+     * @param port - The port to listen on for this server.
+     * @param createServer - The required module's createServer method.
+     * @param clientClass - The class constructor for clients of this listener.
      */
     private initializeListener(
         port: number,
@@ -218,14 +232,17 @@ export class Lobby {
             this.addSocket(socket, clientClass);
         });
 
+        const clientName = clientClass.name;
         listener.listen(port, "0.0.0.0", () => {
-            logger.info(`»» Listening on port ${port} for ${clientClass.name}s ««`);
+            logger.info(`»» Listening on port ${port} for ${clientName}s ««`);
         });
 
         listener.on("error", (err) => {
             logger.error((err as any).code !== "EADDRINUSE"
             ? String(err)
-            : `Lobby cannot listen on port ${port} for game connections. Address in use.
+            : `Lobby cannot listen on port ${port} for game connections.
+Address is already in use.
+
 There's probably another Cerveau server running on this same computer.`);
 
             process.exit(1);
@@ -249,7 +266,8 @@ There's probably another Cerveau server running on this same computer.`);
                 gameNamespace = data.Namespace as IBaseGameNamespace;
             }
             catch (err) {
-                logger.error(`⚠ Could not load game ${capitalizeFirstLetter(dir)} ⚠`);
+                const errorGameName = capitalizeFirstLetter(dir);
+                logger.error(`⚠ Could not load game ${errorGameName} ⚠`);
                 continue; // For now while we have unconverted games
                 // return process.exit(1);
             }
@@ -268,69 +286,84 @@ There's probably another Cerveau server running on this same computer.`);
             this.roomsPlaying.set(gameName, new Map());
         }
 
-        Object.freeze(this.gameNamespaces); // no more games can be added,
-        // and it's public so we don't want people fucking with this object
+        Object.freeze(this.gameNamespaces); // No more games can be added;
+        // and it's public so we don't want people fucking with this object.
     }
 
     /**
-     * Retrieves, or creates a new, session. For clients when saying what they want to play
+     * Retrieves, or creates a new, session. For clients when saying what they
+     * want to play.
      *
-     * @param gameName - key identifying the name of the game you want. Should exist in games/
-     * @param [id] - basically a room id. Specifying an id can be used
+     * @param gameName - The key identifying the name of the game you want.
+     * Should exist in games/
+     * @param id - Basically a room id. Specifying an id can be used
      * to join other players on purpose. "*" will join you to any open session
      * or a new one, and "new" will always give you a brand new room even if
      * there are open ones.
-     * @returns the game of gameName and id. If one does not exists a new instance will be created
+     * @returns The Room of gameName and id. If one does not exists a new
+     * instance will be created
      */
     private getOrCreateRoom(gameName: string, id: string): Room |string {
         const rooms = this.rooms.get(gameName);
 
         if (!rooms) {
-            return `Game name ${gameName} is not a valid to get or create a Room for.`;
+            return `Game name ${gameName} is not known to us.`;
         }
 
         let room: Room | undefined;
 
         if (id !== "new") {
-            if (id === "*" || id === undefined) { // then they want to join any open game
-                // try to find an open session
+            if (id === "*" || id === undefined) {
+                // Then they want to join any open game,
+                // so try to find an open session.
                 for (const [, theRoom] of rooms) {
-                    if (theRoom.isOpen() && theRoom.gameNamespace.GameManager.gameName === gameName) {
+                    const theGame = theRoom.gameNamespace.GameManager.gameName;
+                    if (theRoom.isOpen() && theGame === gameName) {
                         room = theRoom;
                         break;
                     }
                 }
 
                 if (!room) {
-                    // then there was no open room to join,
-                    // so they get a new room
+                    // Then there was no open room to join,
+                    // so they get a new room.
                     id = "new";
                 }
             }
             else {
-                // they requested to join a specific room
-                room = this.getRoom(gameName, id);
+                // They requested to join a specific room.
+                // An Error cannot be returned as gameName is checked above
+                room = this.getRoom(gameName, id) as Room | undefined;
             }
         }
 
         if (room) {
             if (room.isRunning()) {
-                // we can't put them in this game, so they get a new room
+                // We can't put them in this game, so they get a new room.
                 return `Room ${id} for game ${gameName} is full! Sorry.`;
             }
             else if (room.isOver()) {
-                // we need to clear out this Room as it's over and available to re-use
+                // We need to clear out this Room as it's over and available
+                // to re-use.
                 this.rooms.delete(id);
                 room = undefined;
             }
         }
 
-        if (!room) { // then we couldn't find a room from the requested gameName + id, so they get a new one
+        if (!room) {
+            // Then we couldn't find a room from the requested gameName + id,
+            // so they get a new one.
             if (!id || id === "new") {
                 id = String(this.nextRoomNumber++);
             }
 
-            room = new RoomClass(id, this.getGameNamespace(gameName)!, this.gameLogger, this.updater);
+            room = new RoomClass(
+                id,
+                this.getGameNamespace(gameName)!,
+                this.gameLogger,
+                this.updater,
+            );
+
             rooms.set(id, room);
         }
 
@@ -338,24 +371,31 @@ There's probably another Cerveau server running on this same computer.`);
     }
 
     /**
-     * When a client sends the 'play' event, which tells the server what it wants to play and as who.
+     * When a client sends the 'play' event, which tells the server what it
+     * wants to play and as who.
      *
-     * @param client - the client that send the 'play' event
-     * @param data - the information about what this client wants to
-     * play.
+     * @param client - The client that send the 'play' event
+     * @param data - The information about what this client wants to play.
      */
-    private async clientSentPlay(client: BaseClient, data: IPlayData): Promise<void> {
+    private async clientSentPlay(
+        client: BaseClient,
+        data: IPlayData,
+    ): Promise<void> {
         const playData = this.validatePlayData(data);
 
         if (typeof(playData) === "string") {
-            // it did not validate, so playData is the invalid message
+            // It did not validate, so playData is the invalid message
             client.disconnect(playData);
             return;
         }
 
         let authenticationError: string | undefined;
         try {
-            authenticationError = await this.authenticate(playData.gameName, playData.playerName, playData.password);
+            authenticationError = await this.authenticate(
+                playData.gameName,
+                playData.playerName,
+                playData.password,
+            );
         }
         catch (error) {
             authenticationError = error.message;
@@ -373,16 +413,23 @@ There's probably another Cerveau server running on this same computer.`);
             return;
         }
 
-        // we need to check to make sure they did not request an already requested player index
-        if (playData.playerIndex !== undefined) {
+        // We need to check to make sure they did not request an already
+        // requested player index.
+        if (!isNil(playData.playerIndex)) {
             if (room.clients.find((c) => c.playerIndex === playData.playerIndex)) {
-                // then there is already a client in this room that requested this player index
-                // so the existing client gets the index, this current client gets squat
-                playData.playerIndex = undefined;
+                // Then there is already a client in this room that requested
+                // this player index so the existing client gets the index,
+                // and this client gets rejected
+                client.disconnect(`Player index ${playData.playerIndex} is already taken`);
+                return;
             }
         }
 
-        client.setInfo(playData.playerName, playData.clientType, playData.playerIndex);
+        client.setInfo({
+            name: playData.playerName,
+            type: playData.clientType,
+            index: playData.playerIndex,
+        });
 
         room.addClient(client);
         this.clientsRoom.set(client, room);
@@ -416,27 +463,42 @@ There's probably another Cerveau server running on this same computer.`);
         }
     }
 
-    private async authenticate(gameName: string, playerName: string, password: string | undefined,
+    /**
+     * Authenticates player information. If a string is resolved that is an
+     * error message string. Otherwise they authenticated and can play!
+     *
+     * @param gameName - The name of the game they want to play.
+     * @param playerName - The name of the player wanting to play.
+     * @param password - The password they are trying to use. Not encrypted or
+     * anything fancy like that. Plaintext.
+     * @returns A promise that resolves to either error text is they
+     */
+    private async authenticate(
+        gameName: string,
+        playerName: string,
+        password: string | undefined,
     ): Promise<string | undefined> {
         if (!Config.AUTH_PASSWORD) {
             return undefined; // we do not need to authenticate them
         }
 
         if (Config.AUTH_PASSWORD !== password) {
-            return `Could not authenticate. '${password} is not a valid password to play on this server'`;
+            return `Could not authenticate.
+'${password} is not a valid password to play on this server'`;
         }
 
         return undefined; // password was valid!
     }
 
     /**
-     * Validates that the data sent in a 'play' event from a client is valid
+     * Validates that the data sent in a 'play' event from a client is valid.
      *
-     * @param data - the play event data to validate
-     * @returns human readable text why the data is not valid
-     * @throws {Error} if there is a validation error, human readable message as to why is thrown
+     * @param data - The play event data to validate.
+     * @returns - Human readable text why the data is not valid.
      */
-    private validatePlayData(data?: IPlayData): string | (IPlayData & { validGameSettings: IAnyObject}) {
+    private validatePlayData(
+        data?: IPlayData,
+    ): string | (IPlayData & {validGameSettings: IAnyObject}) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -452,7 +514,9 @@ There's probably another Cerveau server running on this same computer.`);
             return "Game server is shutting down and not accepting new clients.";
         }
 
-        const gameAlias = String(data.gameName); // clients can send aliases of what they want to play
+        // Clients can send aliases of what they want to play as the game name;
+        // so we need to verify it is a valid game name
+        const gameAlias = String(data.gameName);
         const gameNamespace = this.getGameNamespace(gameAlias);
         if (!gameNamespace) {
             return `Game alias '${data.gameName}' is not a known game.`;
@@ -462,7 +526,9 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         const n = gameNamespace.GameManager.requiredNumberOfPlayers;
-        if (typeof(data.playerIndex) === "number" && (data.playerIndex < 0 || data.playerIndex >= n)) {
+        if (typeof(data.playerIndex) === "number" && (
+            data.playerIndex < 0 || data.playerIndex >= n)
+        ) {
             return `playerIndex ${data.playerIndex} is out of range (max ${n} players).`;
         }
 
@@ -477,8 +543,8 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
                 settings = (querystring.parse(data.gameSettings));
             }
             catch (err) {
-                return "Game settings incorrectly formatted. "
-                + "Must be one string in the url parameters format." + footer;
+                return `Game settings incorrectly formatted.
+Must be one string in the url parameters format.${footer}`;
             }
 
             // this function might mutate the game settings to validate them
@@ -495,12 +561,18 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
     }
 
     /**
-     * When a client sends the 'alias' event, which tells use they want to know what this game alias really is
+     * When a client sends the 'alias' event, which tells use they want to
+     * know what this game alias really is.
      *
-     * @param client - the client that send the 'play'
-     * @param alias - the alias they want named
+     * @param client - The client that send the 'play'.
+     * @param alias - The alias they want named.
+     * @returns A promise that is resolved once we've sent the client their
+     * 'named' gameName.
      */
-    private async clientSentAlias(client: BaseClient, alias: string): Promise<void> {
+    private async clientSentAlias(
+        client: BaseClient,
+        alias: string,
+    ): Promise<void> {
         const gameName = this.getGameNameForAlias(alias);
 
         if (!gameName) {
@@ -513,6 +585,7 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
 
     /**
      * Stops tracking clients
+     *
      * @param clients the clients to stop tracking events for
      */
     private unTrackClients(...clients: BaseClient[]): void {
@@ -521,6 +594,8 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
             client.events.timedOut.offAll();
         }
 
-        ArrayUtils.removeElements(this.clients, ...clients);
+        for (const client of clients) {
+            this.clients.delete(client);
+        }
     }
 }

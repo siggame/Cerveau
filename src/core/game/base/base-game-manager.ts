@@ -12,14 +12,17 @@ import { IBasePlayer } from "./base-player";
  * the base game plugin new games should inherit from.
  */
 export class BaseGameManager {
+    /** The name this manages. */
     public static get gameName(): string {
         return "BaseGame";
     }
 
+    /** The number of players required for this game to play. */
     public static get requiredNumberOfPlayers(): number {
         return 0;
     }
 
+    /** A list of aliases (case insensitive) that map to this game name. */
     public static get aliases(): string[] {
         return [];
     }
@@ -41,12 +44,27 @@ export class BaseGameManager {
      */
     public readonly random: RandomNumberGenerator;
 
+    /** If the game this managers is over. */
     private isOver = false;
+
+    /** The next game object id to use for new game objects. */
     private nextGameObjectID = 0;
 
-    /** Mapping of a player to their client */
+    /** Mapping of a player to their client. */
     private playerToClient = new Map<IBasePlayer, BaseClient>();
 
+    /**
+     * Creates a new game manager, and in turn it's game. Should be done by
+     * the Session.
+     *
+     * @param namespace - The namespace this manager is a part of.
+     * @param settingsManager - The current settings to use.
+     * @param clients - The clients in this game, including spectators.
+     * @param rootDeltaMergeable - The root delta mergeable to subscribe to.
+     * @param sessionID - The id of the session we are in.
+     * @param gameStarted - A signal to emit once the game is created.
+     * @param gameOverCallback - A callback to invoke once the game is over.
+     */
     constructor(
         private readonly namespace: IBaseGameNamespace,
         settingsManager: BaseGameSettingsManager,

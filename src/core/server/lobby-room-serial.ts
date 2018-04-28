@@ -8,6 +8,7 @@ import { Session } from "./session";
  * (on one thread with the master lobby)
  */
 export class SerialRoom extends Room {
+    /** The Session this Room is running */
     private session?: Session;
 
     public start(): void {

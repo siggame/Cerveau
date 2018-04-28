@@ -5,9 +5,13 @@ import { DeltaMergeable } from "./delta-mergeable/";
 
 /** Manages delta states on behalf of a game */
 export class DeltaManager {
+    /** The root delta mergeable we use for the game to branch off. */
     public readonly rootDeltaMergeable: DeltaMergeable<any>;
+
+    /** The current delta state we are building. */
     private delta: any = {};
 
+    /** Creates a delta manager for some game. */
     constructor() {
         this.rootDeltaMergeable = new DeltaMergeable({
             key: "__root__",

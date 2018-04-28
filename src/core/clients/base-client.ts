@@ -9,17 +9,20 @@ import * as ServerEvents from "./events-server";
 
 const DEFAULT_STR = "Unknown";
 
-/*
+/**
  * The basic implementation of a connection to the server via some I/O.
- * Should be inherited and implemented with that IO. This is just a base class.
+ * Should be inherited and implemented with that IO.
+ * This is just a base class. It would be abstract but then Lobby couldn't
+ * make it generically.
  */
 export class BaseClient {
-    /** All events this client can do */
+    /** All events this client can do. */
     public readonly events = events({
         disconnected: new Signal(),
         timedOut: new Signal(),
     });
 
+    /** The events clients emit (send). */
     public readonly sent = events({
         finished: new Event<ClientEvents.IFinishedData>(),
         run: new Event<ClientEvents.IRunData>(),
@@ -27,77 +30,81 @@ export class BaseClient {
         alias: new Event<string>(),
     });
 
-    /** The name of this client */
+    /** The name of this client. */
     public get name(): string {
         return this.ourName;
     }
 
+    /** The Player in the game this client controls. Undefined if spectating. */
     public get player(): IBasePlayer | undefined {
         return this.ourPlayer;
     }
 
+    /** A "fun" field for the name of the programming language this client. */
     public get programmingLanguage(): string {
         return this.ourProgrammingLanguageType;
     }
 
-    /** The index of this client's player in the game.players array */
+    /** The index of this client's player in the game.players array. */
     public get playerIndex(): number | undefined {
         return this.ourPlayerIndex;
     }
 
+    /** The manager of the AI this client controls. */
     public aiManager?: BaseAIManager;
 
-    /** If this client wants to be sent meta deltas instead of normal deltas */
+    /** If this client wants to be sent meta deltas instead of normal deltas. */
     public sendMetaDeltas: boolean = false;
 
-    /** If this client is a spectator */
+    /** If this client is a spectator. */
     public isSpectating: boolean = false;
 
-    /** The socket this communicates through */
+    /** The socket this communicates through. */
     protected socket: net.Socket;
 
-    /** The timer we use to see if this client timed out */
+    /** The timer we use to see if this client timed out. */
     private readonly timer: {
-        /** the timeout last used */
+        /** The timeout last used. */
         timeout?: NodeJS.Timer;
-        /** the start time we started ticking */
+        /** The start time we started ticking. */
         startTime?: [number, number];
     } = {};
 
-    /** If we are listening to our socket */
+    /** If we are listening to our socket. */
     private listening: boolean = false;
 
-    /** The listener callbacks for socket events */
+    /** The listener callbacks for socket events. */
     private readonly listeners: {[key: string]: (data: any) => void} = {};
 
     /** True once we have disconnected from the socket */
     private hasDisconnectedFromSocket: boolean = false;
 
-    /** Set to try if this client times out */
+    /** Set to try if this client times out. */
     private timedOut: boolean = false;
 
-    /** Our player in the game */
+    /** Our player in the game. */
     private ourPlayer?: IBasePlayer;
 
-    /** The name of the player, use player to get */
+    /** The name of the player, use player to get. */
     private ourName: string = DEFAULT_STR;
 
     /** The type of client this is, e.g. C++, C#, Python, etc... */
     private ourProgrammingLanguageType: string = DEFAULT_STR;
 
-    /** The private index of this client's player in the game.players array */
+    /** The private index of this client's player in the game.players array. */
     private ourPlayerIndex?: number;
 
     /**
      * Creates a client connected to a server
-     * @param socket the socket this client communicates through
-     * @param server the server this client is connected to
+     *
+     * @param socket - The socket this client communicates through.
+     * @param server - The server this client is connected to.
      */
     constructor(socket: net.Socket) {
         this.socket = socket;
 
-        // we need to wrap all the listener functions in closures to not lose
-        // reference to 'this', which is this instance of a Client
+        // We need to wrap all the listener functions in closures to not lose
+        // reference to 'this', which is this instance of a Client.
         this.listeners[this.onDataEventName] = (data) => {
             this.onSocketData(data);
         };
@@ -112,24 +119,30 @@ export class BaseClient {
     }
 
     /**
-     * Returns if the player has disconnected
-     * @returns True if this client has disconnected from the server, false otherwise
+     * Returns if the player has disconnected.
+     *
+     * @returns True if this client has disconnected from the server,
+     * false otherwise.
      */
     public hasDisconnected(): boolean {
         return this.hasDisconnectedFromSocket;
     }
 
     /**
-     * returns the raw net.Socket used by this client, probably for thread passing. Use with care
-     * @returns the socket
+     * Returns the raw net.Socket used by this client, probably for thread
+     * passing. Use with care.
+     *
+     * @returns The socket.
      */
     public getNetSocket(): net.Socket {
         return this.socket;
     }
 
     /**
-     * Checks if this client's timer is ticking (we are awaiting them to finish an order)
-     * @returns true if ticking, false otherwise
+     * Checks if this client's timer is ticking (we are awaiting them to finish
+     * an order).
+     *
+     * @returns True if ticking, false otherwise.
      */
     public isTicking(): boolean {
         return (this.timer.timeout !== undefined);
@@ -138,14 +151,16 @@ export class BaseClient {
     /**
      * Starts the timeout timer counting down from how much time this client's player has left.
      * Should be called when the client is being timed for orders.
-     * @returns true if ticking, false if timeouts are not enabled
+     *
+     * @returns True if ticking, false if timeouts are not enabled.
      */
     public startTicking(): boolean {
         if (!this.player) {
             return false;
         }
 
-        if (!Config.TIMEOUT_TIME) { // server is not going to timeout clients
+        if (!Config.TIMEOUT_TIME) {
+            // The server is never going to timeout clients
             return false;
         }
 
@@ -158,20 +173,23 @@ export class BaseClient {
         this.timer.timeout = setTimeout(() => {
             this.triggerTimedOut();
         }, Math.ceil(this.player.timeRemaining / 1e6)); // ns to ms
+
         return true;
     }
 
     /**
-     * If this client has timed out
-     * @returns True if they have timed out, false otherwise
+     * If this client has timed out.
+     *
+     * @returns True if they have timed out, false otherwise.
      */
     public hasTimedOut(): boolean {
         return this.timedOut;
     }
 
     /**
-     * Pauses the timeout timer. This should be done any time we don't expect the client to be computing something,
-     * like when they are not working on an order, or we are running game logic.
+     * Pauses the timeout timer. This should be done any time we don't expect
+     * the client to be computing something, like when they are not working on
+     * an order, or we are running game logic.
      */
     public pauseTicking(): void {
         if (this.player && this.isTicking()) {
@@ -188,8 +206,10 @@ export class BaseClient {
     }
 
     /**
-     * detaches the server from it's socket (removes EventListeners)
-     * @returns representing if the detachment was successful
+     * Detaches the server from its socket (removes EventListeners).
+     * This must be used when passing between threads.
+     *
+     * @returns A boolean representing if the detachment(s) were successful.
      */
     public stopListeningToSocket(): boolean {
         if (this.listening) {
@@ -205,10 +225,13 @@ export class BaseClient {
     }
 
     /**
-     * Disconnects from the socket
-     * @param fatalMessage If you want to send the client a 'fatal' event with a message, do so here.
-     * This is common when the client sends or does something erroneous.
-     * @returns when we have sent the disconnect message, or immediately if none
+     * Disconnects from the socket.
+     *
+     * @param fatalMessage - If you want to send the client a 'fatal' event
+     * with a message, do so here. This is common when the client sends or
+     * does something erroneous.
+     * @returns A promise that resolves when we have sent the disconnect
+     * message, or immediately if none.
      */
     public async disconnect(fatalMessage?: string): Promise<void> {
         if (fatalMessage) {
@@ -218,15 +241,25 @@ export class BaseClient {
         this.disconnected();
     }
 
-    public setInfo(playerName: string, programmingLanguageType: string, playerIndex: number | undefined): void {
-        this.ourName = playerName;
-        this.ourProgrammingLanguageType = programmingLanguageType;
-        this.ourPlayerIndex = playerIndex;
+    /**
+     * Sets the optional information about.
+     *
+     * @param info - The name, language, and index of the client
+     */
+    public setInfo(info: {
+        name?: string,
+        type?: string,
+        index?: number,
+    }): void {
+        this.ourName = info.name || DEFAULT_STR;
+        this.ourProgrammingLanguageType = info.type || DEFAULT_STR;
+        this.ourPlayerIndex = info.index;
     }
 
     /**
-     * Sets the data related to the game this client is connected to play
-     * @param player the player this ai controls
+     * Sets the data related to the game this client is connected to play.
+     *
+     * @param player - The player this ai controls.
      */
     public setPlayer(player: IBasePlayer): void {
         this.ourPlayer = player;
@@ -243,10 +276,12 @@ export class BaseClient {
     public send(event: "delta", data: IDelta): Promise<void>;
 
     /**
-     * Sends the message of type event to this client as a json string EOT_CHAR terminated.
-     * @param event the event name
-     * @param data the object to send about the event being sent
-     * @returns after the data is sent
+     * Sends the message of type event to this client as a json string EOT_CHAR
+     * terminated.
+     *
+     * @param event - The event name.
+     * @param data - The object to send about the event being sent.
+     * @returns After the data is sent.
      */
     public send(event: string, data: any): Promise<void> {
         return this.sendRaw(JSON.stringify({event, data}));
@@ -255,7 +290,8 @@ export class BaseClient {
     /**
      * Sends a the raw string to the remote client this class represents.
      * Intended to be overridden to actually send through client...
-     * @param str the raw string to send. Should be EOT_CHAR terminated.
+     *
+     * @param str - The raw string to send. Should be EOT_CHAR terminated.
      */
     protected async sendRaw(str: string): Promise<void> {
         if (Config.PRINT_TCP) {
@@ -265,19 +301,26 @@ export class BaseClient {
         return;
     }
 
+    /** The string key of the EventEmitter name to register for data events. */
     protected get onDataEventName(): string {
         return "data";
     }
+
+    /** The string key of the EventEmitter name to register for close events. */
     protected get onCloseEventName(): string {
         return "close";
     }
+
+    /** The string key of the EventEmitter name to register for error events. */
     protected get onErrorEventName(): string {
         return "error";
     }
 
     /**
-     * called when the client sends some data. the specific super class should inherit and do stuff to this
-     * @param data what the client send via the socket event listener
+     * Called when the client sends some data. the specific super class should
+     * inherit and do stuff to this.
+     *
+     * @param data - What the client send via the socket event listener.
      */
     protected onSocketData(data: any): void {
         if (Config.PRINT_TCP) {
@@ -287,6 +330,11 @@ export class BaseClient {
         // super classes should override and do stuff with data...
     }
 
+    /**
+     * Handler for when we know this client sent us some data.
+     *
+     * @param jsonData - The data, as an already parsed json object.
+     */
     protected handleSent(jsonData: any): void {
         if (!isObject(jsonData)) {
             this.disconnect(`Sent malformed json event`);
@@ -304,23 +352,25 @@ export class BaseClient {
     }
 
     /**
-     * called when the client closes (disconnects)
+     * Called when the client closes (disconnects).
      */
     protected onSocketClose(): void {
         this.disconnected();
     }
 
     /**
-     * called when the client disconnects unexpectedly
+     * Called when the client disconnects unexpectedly.
      */
     protected onSocketError(): void {
         this.disconnected();
     }
 
     /**
-     * Tries to parse json data from the client, and disconnects them fatally if it is malformed.
-     * @param json the json formatted string to parse
-     * @returns the parsed json structure, or undefined if malformed json
+     * Tries to parse json data from the client, and disconnects them fatally
+     * if it is malformed.
+     *
+     * @param json - The json formatted string to parse.
+     * @returns The parsed json structure, or undefined if malformed json.
      */
     protected parseData(json: string): any {
         try {
@@ -332,7 +382,7 @@ export class BaseClient {
     }
 
     /**
-     * Called when disconnected from the remote client this Client represents
+     * Called when disconnected from the remote client this Client represents.
      */
     protected disconnected(): void {
         this.hasDisconnectedFromSocket = true;
@@ -342,7 +392,8 @@ export class BaseClient {
     }
 
     /**
-     * Sets up the listener functions to listen to the socket this client should have data streaming from.
+     * Sets up the listener functions to listen to the socket this client
+     * should have data streaming from.
      */
     private listenToSocket(): void {
         for (const key of Object.keys(this.listeners)) {

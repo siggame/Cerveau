@@ -1,8 +1,10 @@
 import { defaultBoolean } from "~/core";
 import { IAnyObject, objectHasProperty } from "~/utils";
 
+/** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
 
+/** An individual setting in a schema. */
 export interface ISettingsSchema<T> {
     readonly default: T;
     readonly description: string;
@@ -10,10 +12,15 @@ export interface ISettingsSchema<T> {
     readonly max?: T extends number ? number : never;
 }
 
+/** The base settings schemas all implement. */
 export interface ISettingsSchemas {
     [key: string]: ISettingsSchema<PossibleSettingValue>;
 }
 
+/**
+ * The base game settings manager that validates game settings and holds their
+ * values.
+ */
 export class BaseGameSettingsManager {
     /**
      * The schema used to build and validate settings' values.

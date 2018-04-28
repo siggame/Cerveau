@@ -1,54 +1,88 @@
 import { Event, events } from "ts-typed-events";
 import { IAnyObject } from "~/utils";
 
-export interface IDeltaMergeableOptions<T> {
-    key: string;
-    parent?: DeltaMergeable<any>;
-    initialValue?: T;
-    transform?: (value: any, currentValue?: T) => T | undefined;
-    deltaReference?: boolean;
-}
-
+/**
+ * Wraps a property in the game to observe for changes (deltas).
+ * Each DeltaMergeable can have child values, such as an array with child index
+ * DeltaMergeables. This builds up a tree representing the game, used to build
+ * delta states.
+ */
 export class DeltaMergeable<T = any> {
+    /** The key parent this is */
     public readonly key: string;
-    public readonly isDeltaReference: boolean = false;
 
     /**
-     * Wraps this delta mergeable in some object like an array or js object
+     * Wraps this delta mergeable in some object like an array or js object.
      */
     public wrapper?: object;
 
+    /** The events this delta mergeable emits when it mutates */
     public readonly events = events({
         changed: new Event<DeltaMergeable<any>>(),
         deleted: new Event<DeltaMergeable<any>>(),
     });
 
+    /** The parent delta mergeable, if undefined then it is the root. */
     private parent: DeltaMergeable<any> | undefined;
+
+    /** The child nodes. If empty this is a leaf node. */
     private children = new Map<string, DeltaMergeable<any>>();
+
+    /** An optional transform function to use on all sets. */
     private transform?: (value: any, currentValue?: T) => T | undefined;
+
+    /** The current value of the node. */
     private value: T | undefined;
 
-    constructor(options: IDeltaMergeableOptions<T>) {
-        this.key = options.key;
+    /**
+     * Creates a new delta mergeable. it's creation will trigger a change in
+     * parent(s).
+     * @param data - Initialization data about the parent and value of this DM.
+     */
+    constructor(data: {
+        key: string;
+        parent?: DeltaMergeable<any>;
+        initialValue?: T;
+        transform?: (value: any, currentValue?: T) => T | undefined;
+    }) {
+        this.key = data.key;
 
-        if (options.parent) {
-            options.parent.adopt(this);
+        if (data.parent) {
+            data.parent.adopt(this);
         }
 
-        this.value = options.initialValue; // so the setter has a current value to work with if transforms happen
-        this.isDeltaReference = Boolean(options.deltaReference);
-        this.transform = options.transform;
-        this.set(options.initialValue, false, true);
+        // So the setter has a current value to work with if transforms happen
+        this.value = data.initialValue;
+
+        this.transform = data.transform;
+        this.set(data.initialValue, false, true);
     }
 
+    /**
+     * Gets our parent, if we have one.
+     * @returns Our parent, if we have one.
+     */
     public getParent(): DeltaMergeable<T> | undefined {
         return this.parent;
     }
 
+    /**
+     * Gets our current value.
+     * @returns Our current value.
+     */
     public get(): T | undefined {
         return this.value;
     }
 
+    /**
+     * Sets the current value. It may mutate or not, if it does it will
+     * emit an event.
+     *
+     * @param value - The new value to try to set.
+     * @param deleted - If they value is that it was deleted.
+     * @param forceSet - Force the set to occur, even if the current value is
+     * the same.
+     */
     public set(value: any, deleted?: boolean, forceSet?: true): void {
         if (this.transform) {
             value = this.transform(value, this.get());
@@ -98,20 +132,12 @@ export class DeltaMergeable<T = any> {
         });
     }
 
+    /**
+     * Gets our child with the given key, if we have it.
+     * @param key - They key of the child to check for.
+     * @returns The child, if it exists, otherwise undefined.
+     */
     public child(key: string): DeltaMergeable<T> | undefined {
         return this.children.get(key);
-    }
-
-    public toTree(): any {
-        const obj: IAnyObject = {};
-        for (const [key, child] of this.children) {
-            obj[key] = child.toTree();
-        }
-
-        if (Object.keys(obj).length === 0) {
-            return this.get();
-        }
-
-        return obj;
     }
 }

@@ -2,11 +2,12 @@ import * as ws from "lark-websocket";
 import * as net from "net";
 import { BaseClient } from "./base-client" ;
 
-/** A client to the game server via a WS connection */
+/** A client to the game server via a WS connection. */
 export class WSClient extends BaseClient {
     /**
-     * Creates a client connected to a server
-     * @param socket the socket this client communicates through
+     * Creates a client connected to a server.
+     *
+     * @param socket The socket this client communicates through.
      */
     constructor(socket: net.Socket) {
         super(socket instanceof net.Socket
@@ -18,9 +19,9 @@ export class WSClient extends BaseClient {
     }
 
     /**
-     * Gets the net module member of this socket for passing between threads
+     * Gets the net module member of this socket for passing between threads.
      *
-     * @returns The net socket used for WS communications
+     * @returns The net socket used for WS communications.
      */
     public getNetSocket(): net.Socket {
         // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
@@ -28,8 +29,9 @@ export class WSClient extends BaseClient {
     }
 
     /**
-     * Stops listening to the current socket, for passing to another thread
-     * @returns boolean indicating if it stopped listening
+     * Stops listening to the current socket, for passing to another thread.
+     *
+     * @returns A boolean indicating if it stopped listening.
      */
     public stopListeningToSocket(): boolean {
         const returned = super.stopListeningToSocket();
@@ -37,13 +39,15 @@ export class WSClient extends BaseClient {
         return returned;
     }
 
+    /** The on data event name in our socket to listen for. */
     protected get onDataEventName(): string {
         return "message";
     }
 
     /**
-     * Invoked when the tcp socket gets data
-     * @param data what the client send via the socket event listener
+     * Invoked when the tcp socket gets data.
+     *
+     * @param data What the client send via the socket event listener.
      */
     protected onSocketData(data: any): void {
         super.onSocketData(data);
@@ -58,9 +62,9 @@ export class WSClient extends BaseClient {
 
     /**
      * Sends a the raw string to the remote client this class represents.
-     * Intended to be overridden to actually send through client...
-     * @param str the raw string to send. Should be EOT_CHAR terminated.
-     * @returns after it it sends the data
+     *
+     * @param str - The raw string to send. Should be EOT_CHAR terminated.
+     * @returns A promise that resolves after it sends the data.
      */
     protected sendRaw(str: string): Promise<void> {
         return new Promise((resolve, reject) => {
