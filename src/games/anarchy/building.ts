@@ -7,6 +7,9 @@ import { Player } from "./player";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Building have different args.
+ */
 export interface IBuildingConstructorArgs
 extends IGameObjectConstructorArgs, IBuildingProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -96,8 +99,8 @@ export class Building extends GameObject {
     /**
      * Called when a Building is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IBuildingConstructorArgs,
@@ -113,12 +116,12 @@ export class Building extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
 
     /**
      * Gets the neighbor in a direction of the building.
      * @param direction The direction to get at
-     * @returns THe building in that direction, if there is one.
+     * @returns The building in that direction, if there is one.
      */
     public getNeighbor(direction: string): Building | undefined {
         switch (direction.toLowerCase()) {
@@ -132,6 +135,10 @@ export class Building extends GameObject {
                 return this.buildingWest;
         }
     }
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
      * Tries to find a reason why the bribe (action) is invalid
@@ -157,5 +164,5 @@ export class Building extends GameObject {
         }
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

@@ -100,8 +100,8 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
     /**
      * Called when a Player is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: {},
@@ -114,7 +114,15 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
      * Adds rowdiness to the player, which may cause a siesta
@@ -144,5 +152,5 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
         }
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

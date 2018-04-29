@@ -11,6 +11,12 @@ import { Warehouse } from "./warehouse";
 import { WeatherStation } from "./weather-station";
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Manages the game logic around the Anarchy Game.
+ * This is where you could do logic for checking if the game is over, update
+ * the game between turns, and anything that ties all the "stuff" in the game
+ * together.
+ */
 export class AnarchyGameManager extends BaseClasses.GameManager {
     /** The name of this game (used as an ID internally) */
     public static get gameName(): string {
@@ -42,6 +48,13 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: public-methods -->>
 
+    /**
+     * Creates a building of the specified type.
+     *
+     * @param type - The type of building to create. Must be the class name.
+     * @param data - The initialization data for that building.
+     * @returns A new building of that type.
+     */
     public createBuilding(
         type: "FireDepartment" | "PoliceDepartment" | "Warehouse" | "WeatherStation" | string,
         data: IBuildingConstructorArgs,

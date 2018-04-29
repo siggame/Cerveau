@@ -132,11 +132,19 @@ export class SaloonGame extends BaseClasses.Game {
      */
     public readonly turnsDrunk!: number;
 
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
     /**
      * Called when a Game is created.
      *
-     * @param settingsManager The settings manager that holds initial settings.
-     * @param required Data required to initialize this (ignore it)
+     * @param settingsManager - The manager that holds initial settings.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         protected settingsManager: SaloonGameSettingsManager,
@@ -264,20 +272,28 @@ export class SaloonGame extends BaseClasses.Game {
         // <<-- /Creer-Merge: constructor -->>
     }
 
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
-     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map
+     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map.
      *
-     * @param x the x position of the desired tile
-     * @param y the y position of the desired tile
-     * @returns the Tile at (x, y) if valid, null otherwise
+     * @param x - The x position of the desired tile.
+     * @param y - The y position of the desired tile.
+     * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
         return super.getTile(x, y) as Tile | undefined;
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

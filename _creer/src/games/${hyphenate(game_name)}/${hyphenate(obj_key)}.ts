@@ -6,6 +6,9 @@ imports['~/core/game'] = [ 'IBaseGameRequiredData' if obj_key == 'Game' else 'IB
 
 i_base_player = 'IBase{}Player'.format(game_name)
 
+if 'TiledGame' in game['serverParentClasses'] and obj_key == 'Tile':
+    imports['~/core/game/mixins/tiled'] = [ 'BaseTile' ]
+
 if obj_key == 'Game':
     imports['./game-settings'] = [ game_name + 'GameSettingsManager' ]
     imports['./game-manager'] = [ game_name + 'GameManager' ]
@@ -58,6 +61,7 @@ ${merge('// ', 'imports', """// any additional imports you want can be placed he
 """, optional=True, help=False)}
 % if obj_key != 'Game' and obj_key != 'Player':
 
+${shared['cerveau']['block_comment']('', {'description': 'Add properties here to make the create.{} have different args.'.format(obj_key)})}
 export interface I${obj_key}ConstructorArgs
 extends ${', '.join([ 'I{}ConstructorArgs'.format(p) for p in obj['parentClasses'] ] + [''])}I${obj_key}Properties {
 ${merge('    // ', 'constructor-args', """    // You can add more constructor args in here
@@ -66,7 +70,9 @@ ${merge('    // ', 'constructor-args', """    // You can add more constructor ar
 % endif
 
 ${shared['cerveau']['block_comment']('', obj)}
-export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends ${extends} {
+export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends ${extends}${
+    ' implements BaseTile' if 'TiledGame' in game['serverParentClasses'] and obj_key == 'Tile' else ''
+} {
 % if obj_key == 'Game':
     /** The manager of this game, that controls everything around it */
     public readonly manager!: ${game_name}GameManager;
@@ -116,11 +122,11 @@ ${merge('    // ', 'attributes', """
      * Called when a ${obj_key} is created.
      *
 % if obj_key == 'Game':
-     * @param settingsManager The settings manager that holds initial settings.
+     * @param settingsManager - The manager that holds initial settings.
 % else:
-     * @param data Initial value(s) to set member variables to.
+     * @param data - Initial value(s) to set member variables to.
 % endif
-     * @param required Data required to initialize this (ignore it)
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
 % if obj_key == 'Game':
@@ -136,6 +142,13 @@ ${merge('    // ', 'attributes', """
 ${merge('        // ', 'constructor', """        // setup any thing you need here
 """, optional=True, help=False)}
     }
+
+${merge('    // ', 'public-functions', """
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+""", optional=True, help=False)}
 % for function_name in obj['function_names']:
 <%
     if obj_key == 'GameObject' and function_name == 'log':
@@ -198,7 +211,79 @@ ${merge('        // ', function_name, """
     }
 % endfor
 
-${merge('    // ', 'functions', """
+% if 'TiledGame' in game['serverParentClasses']:
+%   if obj_key == 'Game':
+    /**
+     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map.
+     *
+     * @param x - The x position of the desired tile.
+     * @param y - The y position of the desired tile.
+     * @returns The Tile at (x, y) if valid, undefined otherwise.
+     */
+    public getTile(x: number, y: number): Tile | undefined {
+        return super.getTile(x, y) as Tile | undefined;
+    }
+
+%   elif obj_key == 'Tile':
+    /**
+     * Gets the adjacent direction between this Tile and an adjacent Tile
+     * (if one exists).
+     *
+     * @param adjacentTile - A tile that should be adjacent to this Tile.
+     * @returns "North", "East", "South", or "West" if the tile is adjacent to
+     * this Tile in that direction. Otherwise undefined.
+     */
+    public getAdjacentDirection(
+        adjacentTile: Tile | undefined,
+    ): "North" | "South" | "East" | "West" | undefined {
+        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+    }
+
+    /**
+     * Gets a list of all the neighbors of this Tile.
+     *
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     */
+    public getNeighbors(): Tile[] {
+        return BaseTile.prototype.getNeighbors.call(this);
+    }
+
+    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
+    public getNeighbor(direction: string): Tile | undefined;
+
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction - The direction you want, must be
+     * "North", "East", "South", or "West".
+     * @returns The Tile in that direction, or undefined if there is none.
+     */
+    public getNeighbor(direction: string): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction);
+    }
+
+    /**
+     * Checks if a Tile has another Tile as its neighbor.
+     *
+     * @param tile - The Tile to check.
+     * @returns True if neighbor, false otherwise.
+     */
+    public hasNeighbor(tile: Tile | undefined): boolean {
+        return BaseTile.prototype.hasNeighbor.call(this, tile);
+    }
+
+    /**
+     * toString override.
+     *
+     * @returns A string representation of the Tile.
+     */
+    public toString(): string {
+        return BaseTile.prototype.toString.call(this);
+    }
+
+%   endif
+% endif
+${merge('    // ', 'protected-private-functions', """
     // Any additional protected or pirate methods can go here.
 
 """, optional=True, help=False)}

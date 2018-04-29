@@ -7,6 +7,9 @@ import { Player } from "./player";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Forecast have different args.
+ */
 export interface IForecastConstructorArgs
 extends IGameObjectConstructorArgs, IForecastProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -50,8 +53,8 @@ export class Forecast extends GameObject {
     /**
      * Called when a Forecast is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IForecastConstructorArgs,
@@ -66,9 +69,17 @@ export class Forecast extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

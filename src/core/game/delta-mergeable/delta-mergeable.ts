@@ -1,5 +1,4 @@
 import { Event, events } from "ts-typed-events";
-import { IAnyObject } from "~/utils";
 
 /**
  * Wraps a property in the game to observe for changes (deltas).

@@ -9,6 +9,9 @@ import { Tile } from "./tile";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Cowboy have different args.
+ */
 export interface ICowboyConstructorArgs
 extends IGameObjectConstructorArgs, ICowboyProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -92,8 +95,8 @@ export class Cowboy extends GameObject {
     /**
      * Called when a Cowboy is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: ICowboyConstructorArgs,
@@ -117,10 +120,10 @@ export class Cowboy extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // TODO: public methods creer merge
+    // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * String coercion override
+     * String coercion override.
      *
      * @returns string stating what this cowboy is
      */
@@ -168,14 +171,16 @@ export class Cowboy extends GameObject {
         }
     }
 
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
      * Invalidation function for act. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
-     * @param player The player that called this.
-     * @param tile The Tile you want this Cowboy to act on.
-     * @param drunkDirection The direction the bottle will cause drunk cowboys
+     * @param player - The player that called this.
+     * @param tile - The Tile you want this Cowboy to act on.
+     * @param drunkDirection - The direction the bottle will cause drunk cowboys
      * to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
@@ -227,9 +232,9 @@ export class Cowboy extends GameObject {
     /**
      * Does their job's action on a Tile.
      *
-     * @param player The player that called this.
-     * @param tile The Tile you want this Cowboy to act on.
-     * @param drunkDirection The direction the bottle will cause drunk cowboys
+     * @param player - The player that called this.
+     * @param tile - The Tile you want this Cowboy to act on.
+     * @param drunkDirection - The direction the bottle will cause drunk cowboys
      * to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns True if the act worked, false otherwise.
      */
@@ -257,8 +262,8 @@ export class Cowboy extends GameObject {
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
-     * @param player The player that called this.
-     * @param tile The Tile you want to move this Cowboy to.
+     * @param player - The player that called this.
+     * @param tile - The Tile you want to move this Cowboy to.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -296,8 +301,8 @@ export class Cowboy extends GameObject {
     /**
      * Moves this Cowboy from its current Tile to an adjacent Tile.
      *
-     * @param player The player that called this.
-     * @param tile The Tile you want to move this Cowboy to.
+     * @param player - The player that called this.
+     * @param tile - The Tile you want to move this Cowboy to.
      * @returns True if the move worked, false otherwise.
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
@@ -327,8 +332,8 @@ export class Cowboy extends GameObject {
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
-     * @param player The player that called this.
-     * @param piano The Furnishing that is a piano you want to play.
+     * @param player - The player that called this.
+     * @param piano - The Furnishing that is a piano you want to play.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -370,8 +375,8 @@ export class Cowboy extends GameObject {
     /**
      * Sits down and plays a piano.
      *
-     * @param player The player that called this.
-     * @param piano The Furnishing that is a piano you want to play.
+     * @param player - The player that called this.
+     * @param piano - The Furnishing that is a piano you want to play.
      * @returns True if the play worked, false otherwise.
      */
     protected async play(player: Player, piano: Furnishing): Promise<boolean> {
@@ -387,13 +392,16 @@ export class Cowboy extends GameObject {
         // <<-- /Creer-Merge: play -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Checks if this Cowboy can do things based on the player and tile (can move, can act, acn play, etc)
-     * @param player - the player commanding this Cowboy
-     * @param tile - the tile trying to do something to
-     * @returns the reason this is invalid (still in need of formatting), undefined if valid
+     * Checks if this Cowboy can do things based on the player and tile
+     * (can move, can act, acn play, etc).
+     *
+     * @param player - The player commanding this Cowboy.
+     * @param tile - The tile trying to do something to.
+     * @returns The reason this is invalid (still in need of formatting),
+     * undefined if valid.
      */
     private invalidate(player: Player, tile: Tile | undefined): string | undefined {
         if (this.owner !== player) {
@@ -414,12 +422,13 @@ export class Cowboy extends GameObject {
     }
 
     /**
-     * Tries to invalidate the args for the Sharpshooter's act
+     * Tries to invalidate the args for the Sharpshooter's act.
      *
-     * @see Cowboy#act
-     * @param player The player making the cowboy act
-     * @param tile The tile the cowboy wants to act on
-     * @returns The invalid reason if invalid (format not invoked against it), undefined if valid
+     * @see Cowboy.act
+     * @param player - The player making the cowboy act.
+     * @param tile - The tile the cowboy wants to act on.
+     * @returns The invalid reason if invalid (format not invoked against it),
+     * undefined if valid.
      */
     private invalidateSharpshooter(player: Player, tile: Tile): string | undefined {
         if (this.focus < 1) {
@@ -432,12 +441,12 @@ export class Cowboy extends GameObject {
     }
 
     /**
-     * Makes a Sharpshooter cowboy act
+     * Makes a Sharpshooter cowboy act.
      *
-     * @see Cowboy#act
-     * @param player The player making the cowboy act
-     * @param tile The tile the cowboy wants to act on
-     * @returns true because it worked
+     * @see Cowboy.act
+     * @param player - The player making the cowboy act.
+     * @param tile - The tile the cowboy wants to act on.
+     * @returns True because it worked.
      */
     private actSharpshooter(player: Player, tile: Tile): true {
         let shot = tile;
@@ -461,7 +470,7 @@ export class Cowboy extends GameObject {
                 shot.bottle.break();
             }
 
-            shot = shot.getNeighbor(this.tile!.getAdjacentDirection(tile)!)!;
+            shot = shot.getNeighbor(this.tile!.getAdjacentDirection(tile)!);
         }
 
         this.focus = 0;
@@ -471,14 +480,15 @@ export class Cowboy extends GameObject {
     }
 
     /**
-     * Tries to invalidate the args for the Bartender's act
+     * Tries to invalidate the args for the Bartender's act.
      *
-     * @see Cowboy#act
-     * @param player The player making the cowboy act
-     * @param tile The tile the cowboy wants to act on
-     * @param drunkDirection The direction the player wants drunks hit by the bottle to go
-     * @param args Dictionary of actual args to update
-     * @returns The invalid reason if invalid (format not invoked against it), undefined if valid
+     * @see Cowboy.act
+     * @param player - The player making the cowboy act.
+     * @param tile - The tile the cowboy wants to act on.
+     * @param drunkDirection - The direction the player wants drunks hit by the
+     * bottle to go.
+     * @returns The invalid reason if invalid (format not invoked against it),
+     * undefined if valid.
      */
     private invalidateBartender(
         player: Player,
@@ -515,13 +525,14 @@ export class Cowboy extends GameObject {
     }
 
     /**
-     * makes a Bartender cowboy act
+     * Makes a Bartender cowboy act.
      *
-     * @see Cowboy#act
-     * @param player The player making the cowboy act
-     * @param tile The tile the cowboy wants to act on
-     * @param drunkDirection The direction the player wants drunks hit by the bottle to go
-     * @returns true because it worked
+     * @see Cowboy.act
+     * @param player - The player making the cowboy act.
+     * @param tile - The tile the cowboy wants to act on.
+     * @param drunkDirection - The direction the player wants drunks hit by the
+     * bottle to go.
+     * @returns True because it worked.
      */
     private actBartender(player: Player, tile: Tile, drunkDirection: string): true {
         // check to make sure the tile the bottle spawns on would not cause it to instantly break
@@ -548,5 +559,5 @@ export class Cowboy extends GameObject {
         return true;
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

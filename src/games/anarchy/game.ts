@@ -123,8 +123,10 @@ export class AnarchyGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: attributes -->>
 
+    /** A handy 2D grid of all the buildings. */
     public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
 
+    /** The valid cardinal directions buildings can be in. */
     public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];
 
     // <<-- /Creer-Merge: attributes -->>
@@ -132,8 +134,8 @@ export class AnarchyGame extends BaseClasses.Game {
     /**
      * Called when a Game is created.
      *
-     * @param settingsManager The settings manager that holds initial settings.
-     * @param required Data required to initialize this (ignore it)
+     * @param settingsManager - The manager that holds initial settings.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         protected settingsManager: AnarchyGameSettingsManager,
@@ -163,7 +165,9 @@ export class AnarchyGame extends BaseClasses.Game {
         }
 
         // now connect the points, after shuffling them
-        let points = this.manager.random.shuffle(Array.from(pointsSet));
+        const points = Array.from(pointsSet);
+        this.manager.random.shuffle(points);
+
         const startingLength = points.length;
         for (let i = 0; i < startingLength; i++) {
             let from: IPoint = keyToPoint(points[i]);
@@ -191,7 +195,7 @@ export class AnarchyGame extends BaseClasses.Game {
                 }
                 // otherwise choose a random direction and add it to the
                 // points
-                const change = this.manager.random.element(changes);
+                const change = this.manager.random.element(changes)!;
                 const connectedPoint = {
                     x: from.x + change.x,
                     y: from.y + change.y,
@@ -201,7 +205,7 @@ export class AnarchyGame extends BaseClasses.Game {
                 points.push(pointToKey(connectedPoint));
             }
         }
-        points = this.manager.random.shuffle(points);
+        this.manager.random.shuffle(points);
 
         const buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"];
         const buildingsByWeight = new Map<string, number>();
@@ -234,7 +238,7 @@ export class AnarchyGame extends BaseClasses.Game {
                 x,
                 y,
                 isHeadquarters,
-                owner: this.manager.random.element(this.players),
+                owner: this.manager.random.element(this.players)!,
             }));
         }
 
@@ -274,6 +278,8 @@ export class AnarchyGame extends BaseClasses.Game {
                     }
                 }
 
+                direction = direction || "north";
+
                 this.forecasts.push(this.manager.create.Forecast({
                     direction,
                     intensity,
@@ -288,13 +294,26 @@ export class AnarchyGame extends BaseClasses.Game {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
 
+    /**
+     * Gets a building at a specified (x, y).
+     *
+     * @param x - The x coordinate.
+     * @param y - The y coordinate.
+     * @returns The building at (x, y), or undefined if there is none.
+     */
     public getBuildingAt(x: number, y: number): Building | undefined {
         if (x >= 0 && y >= 0 && x < this.mapWidth && y < this.mapHeight) {
             return this.buildingsGrid[x][y];
         }
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

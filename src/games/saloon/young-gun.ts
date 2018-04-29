@@ -9,6 +9,9 @@ import { Tile } from "./tile";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.YoungGun have different args.
+ */
 export interface IYoungGunConstructorArgs
 extends IGameObjectConstructorArgs, IYoungGunProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -54,8 +57,8 @@ export class YoungGun extends GameObject {
     /**
      * Called when a YoungGun is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IYoungGunConstructorArgs,
@@ -72,7 +75,7 @@ export class YoungGun extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // TODO: public creer
+    // <<-- Creer-Merge: public-functions -->>
 
     /**
      * Updates Young Gun related logic: moving them clockwise
@@ -110,13 +113,15 @@ export class YoungGun extends GameObject {
         moveTo.youngGun = this;
     }
 
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
      * Invalidation function for callIn. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
-     * @param player The player that called this.
-     * @param job The job you want the Cowboy being brought to have.
+     * @param player - The player that called this.
+     * @param job - The job you want the Cowboy being brought to have.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -157,8 +162,8 @@ export class YoungGun extends GameObject {
      * Tells the YoungGun to call in a new Cowboy of the given job to the open
      * Tile nearest to them.
      *
-     * @param player The player that called this.
-     * @param job The job you want the Cowboy being brought to have.
+     * @param player - The player that called this.
+     * @param job - The job you want the Cowboy being brought to have.
      * @returns The new Cowboy that was called in if valid. They will not be
      * added to any `cowboys` lists until the turn ends. Null otherwise.
      */
@@ -195,9 +200,9 @@ export class YoungGun extends GameObject {
         // <<-- /Creer-Merge: callIn -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

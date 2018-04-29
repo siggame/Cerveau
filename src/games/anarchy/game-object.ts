@@ -7,6 +7,9 @@ import { AnarchyGameManager } from "./game-manager";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.GameObject have different args.
+ */
 export interface IGameObjectConstructorArgs
 extends IGameObjectProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -55,8 +58,8 @@ export class GameObject extends BaseClasses.GameObject {
     /**
      * Called when a GameObject is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IGameObjectConstructorArgs,
@@ -69,9 +72,17 @@ export class GameObject extends BaseClasses.GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

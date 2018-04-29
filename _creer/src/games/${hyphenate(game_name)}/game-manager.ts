@@ -10,6 +10,12 @@ ${shared['cerveau']['imports'](imports)}
 ${merge('// ', 'imports', """// any additional imports you want can be placed here safely between creer runs
 """, optional=True, help=False)}
 
+/**
+ * Manages the game logic around the ${game_name} Game.
+ * This is where you could do logic for checking if the game is over, update
+ * the game between turns, and anything that ties all the "stuff" in the game
+ * together.
+ */
 export class ${game['name']}GameManager extends BaseClasses.GameManager {
     /** The name of this game (used as an ID internally) */
     public static get gameName(): string {

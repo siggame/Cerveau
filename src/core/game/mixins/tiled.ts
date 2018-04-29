@@ -2,7 +2,6 @@
 // tslint:disable:no-empty-interface - because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
-import { IAnyObject } from "~/utils";
 import * as Base from "./base";
 
 /** The valid direction strings tile based games use. */

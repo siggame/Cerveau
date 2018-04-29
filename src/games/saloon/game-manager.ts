@@ -9,6 +9,12 @@ import { Cowboy } from "./cowboy";
 import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Manages the game logic around the Saloon Game.
+ * This is where you could do logic for checking if the game is over, update
+ * the game between turns, and anything that ties all the "stuff" in the game
+ * together.
+ */
 export class SaloonGameManager extends BaseClasses.GameManager {
     /** The name of this game (used as an ID internally) */
     public static get gameName(): string {
@@ -180,6 +186,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         this.spawnedCowboys.length = 0;
     }
 
+    /**
+     * Updates all the cowboys with in-between turns logic.
+     */
     private updateCowboys(): void {
         for (const cowboy of this.game.currentPlayer.cowboys) {
             if (cowboy.isDead) {

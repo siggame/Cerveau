@@ -2,7 +2,7 @@
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
-import { IAnyObject, nextWrapAround } from "~/utils";
+import { nextWrapAround } from "~/utils";
 import * as Base from "./base";
 
 /** A player in a turn based game */

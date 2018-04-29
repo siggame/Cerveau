@@ -8,6 +8,9 @@ import { removeElements } from "~/utils";
 import { Cowboy } from "./cowboy";
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Bottle have different args.
+ */
 export interface IBottleConstructorArgs
 extends IGameObjectConstructorArgs, IBottleProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -53,8 +56,8 @@ export class Bottle extends GameObject {
     /**
      * Called when a Bottle is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IBottleConstructorArgs,
@@ -72,7 +75,7 @@ export class Bottle extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
 
     /**
      * Advances the bottle (moves it) 1 tile in between turns
@@ -116,5 +119,11 @@ export class Bottle extends GameObject {
         removeElements(this.game.bottles, this);
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

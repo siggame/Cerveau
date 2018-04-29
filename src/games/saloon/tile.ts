@@ -1,4 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseTile } from "~/core/game/mixins/tiled";
 import { ITileProperties } from "./";
 import { Bottle } from "./bottle";
 import { Cowboy } from "./cowboy";
@@ -6,12 +7,13 @@ import { Furnishing } from "./furnishing";
 import { GameObject, IGameObjectConstructorArgs } from "./game-object";
 import { YoungGun } from "./young-gun";
 
-import { BaseTile } from "~/core/game/mixins/tiled";
-
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Tile have different args.
+ */
 export interface ITileConstructorArgs
 extends IGameObjectConstructorArgs, ITileProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -100,8 +102,8 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * Called when a Tile is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: ITileConstructorArgs,
@@ -114,22 +116,30 @@ export class Tile extends GameObject implements BaseTile {
         // <<-- /Creer-Merge: constructor -->>
     }
 
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
-     * gets the adjacent direction between this tile and an adjacent tile (if one exists)
+     * Gets the adjacent direction between this Tile and an adjacent Tile
+     * (if one exists).
      *
-     * @param adjacentTile A tile that should be adjacent to this tile
-     * @returns The string direction, or undefined if the
-     * tile is invalid, or there is no adjacent direction between this tile
-     * and that tile
-     * ("North", "East", "South", or "West") if found in that direction,
-     * undefined otherwise
+     * @param adjacentTile - A tile that should be adjacent to this Tile.
+     * @returns "North", "East", "South", or "West" if the tile is adjacent to
+     * this Tile in that direction. Otherwise undefined.
      */
-    public getAdjacentDirection(adjacentTile: Tile | undefined): string | undefined {
+    public getAdjacentDirection(
+        adjacentTile: Tile | undefined,
+    ): "North" | "South" | "East" | "West" | undefined {
         return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
     /**
-     * Gets a list of all the neighbors of this tile
+     * Gets a list of all the neighbors of this Tile.
      *
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
@@ -143,33 +153,34 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * Gets a neighbor in a particular direction
      *
-     * @param direction The direction you want, must be "North", "East", "South", or "West"
-     * @returns The Tile in that direction, null if none
+     * @param direction - The direction you want, must be
+     * "North", "East", "South", or "West".
+     * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: string): Tile | undefined {
         return BaseTile.prototype.getNeighbor.call(this, direction);
     }
 
     /**
-     * Checks if a Tile has another tile as its neighbor
+     * Checks if a Tile has another Tile as its neighbor.
      *
-     * @param tile - tile to check
-     * @returns true if neighbor, false otherwise
+     * @param tile - The Tile to check.
+     * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
     /**
-     * toString override
+     * toString override.
      *
-     * @returns a string representation of the Tile
+     * @returns A string representation of the Tile.
      */
     public toString(): string {
         return BaseTile.prototype.toString.call(this);
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
      * Checks if this tile would cause a Bottle moving to it to break
@@ -180,5 +191,5 @@ export class Tile extends GameObject implements BaseTile {
         return Boolean(!this.isBalcony && !this.furnishing && !this.cowboy);
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

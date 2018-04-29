@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
 // tslint:disable:no-empty-interface = because the some mixins have nothing to add
 
-import { BaseGameObject, IBasePlayer } from "~/core/game";
+import { IBasePlayer } from "~/core/game";
 import * as Base from "./base";
 
 /** A player in a two player game, that has a guaranteed opponent. */

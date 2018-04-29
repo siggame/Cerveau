@@ -7,6 +7,9 @@ import { Player } from "./player";
 import { clamp, manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Warehouse have different args.
+ */
 export interface IWarehouseConstructorArgs
 extends IBuildingConstructorArgs, IWarehouseProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -43,8 +46,8 @@ export class Warehouse extends Building {
     /**
      * Called when a Warehouse is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IWarehouseConstructorArgs,
@@ -65,13 +68,21 @@ export class Warehouse extends Building {
         // <<-- /Creer-Merge: constructor -->>
     }
 
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
      * Invalidation function for ignite. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
-     * @param player The player that called this.
-     * @param building The Building you want to light on fire.
+     * @param player - The player that called this.
+     * @param building - The Building you want to light on fire.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
@@ -101,10 +112,10 @@ export class Warehouse extends Building {
     /**
      * Bribes the Warehouse to light a Building on fire. This adds this
      * building's fireAdded to their fire, and then this building's exposure is
-     * increased based on the Manhatten distance between the two buildings.
+     * increased based on the Manhattan distance between the two buildings.
      *
-     * @param player The player that called this.
-     * @param building The Building you want to light on fire.
+     * @param player - The player that called this.
+     * @param building - The Building you want to light on fire.
      * @returns The exposure added to this Building's exposure. -1 is returned
      * if there was an error.
      */
@@ -126,9 +137,9 @@ export class Warehouse extends Building {
         // <<-- /Creer-Merge: ignite -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

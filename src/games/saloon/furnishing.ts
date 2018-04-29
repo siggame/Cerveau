@@ -7,6 +7,9 @@ import { Tile } from "./tile";
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
+/**
+ * Add properties here to make the create.Furnishing have different args.
+ */
 export interface IFurnishingConstructorArgs
 extends IGameObjectConstructorArgs, IFurnishingProperties {
     // <<-- Creer-Merge: constructor-args -->>
@@ -55,8 +58,8 @@ export class Furnishing extends GameObject {
     /**
      * Called when a Furnishing is created.
      *
-     * @param data Initial value(s) to set member variables to.
-     * @param required Data required to initialize this (ignore it)
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
     constructor(
         data: IFurnishingConstructorArgs,
@@ -73,7 +76,15 @@ export class Furnishing extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: functions -->>
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
      * Damages this Furnishing for some amount of damage, setting isDestroyed if it dies
@@ -96,5 +107,5 @@ export class Furnishing extends GameObject {
         }
     }
 
-    // <<-- /Creer-Merge: functions -->>
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

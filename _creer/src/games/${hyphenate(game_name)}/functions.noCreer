@@ -116,7 +116,7 @@ if not 'cerveau' in shared:
 
         if 'arguments' in doc and doc['arguments']:
             for arg in doc['arguments']:
-                lines += wrapper.wrap('@param ' + arg['name'] + ' ' + arg['description'])
+                lines += wrapper.wrap('@param ' + arg['name'] + ' - ' + arg['description'])
         if 'returns' in doc and doc['returns']:
             lines += wrapper.wrap('@returns ' + doc['returns']['description'])
 
@@ -138,7 +138,16 @@ if not 'cerveau' in shared:
 
         doc = ''
         for pair in pairs:
-            doc += 'import { '+(', '.join(sorted(pair[1])))+' } from "'+pair[0]+'";\n'
+            names = sorted(pair[1])
+            one_line = ('import { '+(', '.join(names))+' } from "'+pair[0]+'";')
+
+            if len(one_line) > 80:
+                # wrap it
+                names = '\n' + ''.join(['    {},\n'.format(n) for n in names])
+            else:
+                names = ' ' + ', '.join(names) + ' '
+
+            doc += ('import {'+ names +'} from "'+pair[0]+'";\n')
         return doc
     shared['cerveau']['imports'] = cerveau_imports
 
