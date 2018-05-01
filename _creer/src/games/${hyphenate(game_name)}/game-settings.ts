@@ -14,6 +14,7 @@ export class ${game['name']}GameSettingsManager extends BaseClasses.GameSettings
     public schema = this.makeSchema({
         ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
 
+        // ${game_name} game specific settings
 ${merge('        // ', 'schema', """
         // you can add settings here, e.g.:
         /*
@@ -26,6 +27,51 @@ ${merge('        // ', 'schema', """
 
 """, optional=True, help=False)}
 
+        // Base settings
+        playerStartingTime: {
+${merge('            // ', 'player-starting-time',
+'            default: 6e10, // 1 min in ns', optional=True, help=False)}
+            min: 0,
+            description: "The starting time (in ns) for each player.",
+        },
+        randomSeed: {
+${merge('            // ', 'random-seed',
+'            default: "", // which will generate a random string', optional=True, help=False)}
+            description: "The random seed, or empty for a random seed.",
+        },
+
+% if 'TurnBasedGame' in game['serverParentClasses']:
+        // Turn based settings
+        timeAddedPerTurn: {
+${merge('            // ', 'time-added-per-turn',
+'            default: 1e9, // 1 sec in ns,', optional=True, help=False)}
+            min: 0,
+            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+        },
+        maxTurns: {
+${merge('            // ', 'max-turns',
+'            default: 200,', optional=True, help=False)}
+            min: 1,
+            description: "The maximum number of turns before the game is force ended and a winner is determined.",
+        },
+
+% endif
+% if 'TiledGame' in game['serverParentClasses']:
+        // Tiled settings
+        mapWidth: {
+${merge('            // ', 'map-width',
+'            default: 32,', optional=True, help=False)}
+            min: 2,
+            description: "The width (in Tiles) for the game map to be initialized to.",
+        },
+        mapHeight: {
+${merge('            // ', 'map-height',
+'            default: 16,', optional=True, help=False)}
+            min: 2,
+            description: "The height (in Tiles) for the game map to be initialized to.",
+        },
+
+% endif
     });
 
     /**

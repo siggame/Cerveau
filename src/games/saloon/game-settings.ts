@@ -16,6 +16,7 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
     public schema = this.makeSchema({
         ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
 
+        // Saloon game specific settings
         // <<-- Creer-Merge: schema -->>
 
         turnsDrunk: {
@@ -55,6 +56,53 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
         },
 
         // <<-- /Creer-Merge: schema -->>
+
+        // Base settings
+        playerStartingTime: {
+            // <<-- Creer-Merge: player-starting-time -->>
+            default: 6e10, // 1 min in ns
+            // <<-- /Creer-Merge: player-starting-time -->>
+            min: 0,
+            description: "The starting time (in ns) for each player.",
+        },
+        randomSeed: {
+            // <<-- Creer-Merge: random-seed -->>
+            default: "", // which will generate a random string
+            // <<-- /Creer-Merge: random-seed -->>
+            description: "The random seed, or empty for a random seed.",
+        },
+
+        // Turn based settings
+        timeAddedPerTurn: {
+            // <<-- Creer-Merge: time-added-per-turn -->>
+            default: 1e9, // 1 sec in ns,
+            // <<-- /Creer-Merge: time-added-per-turn -->>
+            min: 0,
+            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+        },
+        maxTurns: {
+            // <<-- Creer-Merge: max-turns -->>
+            default: 200,
+            // <<-- /Creer-Merge: max-turns -->>
+            min: 1,
+            description: "The maximum number of turns before the game is force ended and a winner is determined.",
+        },
+
+        // Tiled settings
+        mapWidth: {
+            // <<-- Creer-Merge: map-width -->>
+            default: 32,
+            // <<-- /Creer-Merge: map-width -->>
+            min: 2,
+            description: "The width (in Tiles) for the game map to be initialized to.",
+        },
+        mapHeight: {
+            // <<-- Creer-Merge: map-height -->>
+            default: 16,
+            // <<-- /Creer-Merge: map-height -->>
+            min: 2,
+            description: "The height (in Tiles) for the game map to be initialized to.",
+        },
 
     });
 
