@@ -1,60 +1,44 @@
-var app = require("./app");
-var getGameInfos = require("./getGameInfos");
-var formatGamelogs = require("./formatGamelogs");
+import { Config } from "../../core/args";
+import { IGamelogInfo } from "../../core/game/index";
+import { Lobby } from "../../core/server";
+import { app } from "../app";
 
-module.exports = function(args) {
-    app.locals.site = {
-        title: args.title,
-    };
+// because this is also the index, we need to export barrels
+export * from "./archives";
 
-    if(args.web) {
-        var lobby = args.lobby;
-        formatGamelogs.init(lobby, args);
+// var getGameInfos = require("./getGameInfos");
+// var formatGamelogs = require("./formatGamelogs");
 
-        app.get("/", function(req, res) {
-            var gameInfos = getGameInfos();
+const MAX_GAMELOGS_ON_INDEX = 10;
 
-            var games = [];
-            for(var gameName in gameInfos) {
-                if(gameInfos.hasOwnProperty(gameName)) {
-                    var gameInfo = gameInfos[gameName];
-                    games.push({
-                        name: gameName,
-                        description: gameInfo.Game.description,
-                    });
-                }
-            }
+const games: Array<{
+    gameName: string;
+    description: string;
+}> = [];
 
-            games.sort(function(a, b) {
-                return a.name.toLowerCase() > b.name.toLowerCase();
-            });
+if (app && Config.WEB_ENABLED) {
+    // then we need to show them the list of all games this server can play,
+    // as well as the most recent game logs
 
-            var maxGamelogsOnIndex = 10;
-            lobby.gameLogger.getLogs(function(logs) {
-                var error = !logs;
-                logs = logs || [];
-
-                var gamelogs = [];
-                var i = logs.length;
-
-                while(i-- && gamelogs.length < maxGamelogsOnIndex) {
-                    gamelogs.push(logs[i]);
-                }
-
-                res.render("index", {
-                    games: games,
-                    gamelogs: formatGamelogs(gamelogs),
-                    moreGamelogs: (gamelogs.length === maxGamelogsOnIndex && logs.length > gamelogs.length),
-                });
-            });
+    const lobby = Lobby.getInstance();
+    for (const gameName of Object.keys(lobby.gameNamespaces)) {
+        games.push({
+            gameName,
+            description: "TODO: do",
         });
-
-        // TODO: maybe move to /routes and have that auto require files like this?
-        require("./documentation")(args);
-        require("./achieves")(args);
     }
 
-    if(args.api) {
-        require("./api")(args);
-    }
-};
+    app.get("/", async (req, res) => {
+        const logs = await Lobby.getInstance().gameLogger.getLogs();
+        const gamelogs: IGamelogInfo[] = [];
+        for (let i = logs.length; i < MAX_GAMELOGS_ON_INDEX && i >= 0; i--) {
+            gamelogs.push(logs[i]);
+        }
+
+        res.render("index", {
+            games,
+            gamelogs,
+            moreGamelogs: (gamelogs.length === MAX_GAMELOGS_ON_INDEX && logs.length > gamelogs.length),
+        });
+    });
+}

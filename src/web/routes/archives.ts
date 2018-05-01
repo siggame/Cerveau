@@ -1,49 +1,25 @@
-var app = require("./app");
-var getGameInfos = require("./getGameInfos");
-var formatGamelogs = require("./formatGamelogs");
+import * as express from "express";
+import * as expressHandlebars from "express-handlebars";
+import { Config } from "~/core/args";
+import * as helpers from "../view-helpers";
 
-module.exports = function(args) {
-    app.get("/archives/:gameName?/:pageStart?/:pageCount?", function(req, res) {
-        var gameName = req.params.gameName || "all";
+export let app: express.Express | undefined;
 
-        var pageStart = req.params.pageStart !== undefined ? parseInt(req.params.pageStart) : NaN;
-        if(isNaN(pageStart)) {
-            pageStart = 1; // starting page
-        }
+if (Config.WEB_ENABLED || Config.API_ENABLED) {
+    app = express();
 
-        var pageCount = req.params.pageCount !== undefined ? parseInt(req.params.pageCount) : NaN;
-        if(isNaN(pageCount)) {
-            pageCount = 20; // default page count
-        }
+    app.locals.site = {
+        title: Config.MAIN_TITLE,
+    };
 
-        var lobby = args.lobby;
-        lobby.gameLogger.getLogs(function(logs) {
-            var gamelogs = [];
-
-            var startIndex = logs.length - (pageStart * pageCount);
-            var endIndex = startIndex + pageCount;
-            startIndex = Math.max(startIndex, 0);
-
-            // because logs (all the gamelogs GameLogger found) is pre-sorted with the newest gamelogs at the END, startIndex starts at the end. We want to first show the NEWEST gamelogs
-            for(var i = endIndex - 1; i >= startIndex; i--) {
-                gamelogs.push(logs[i]);
-            }
-
-            var newerUri;
-            if(endIndex < logs.length) {
-                newerUri = "/archives/" + gameName + "/" + (pageStart - 1);
-            }
-
-            var olderUri;
-            if(startIndex > 0) {
-                olderUri = "/archives/" + gameName + "/" + (pageStart + 1);
-            }
-
-            res.render("archives", {
-                gamelogs: formatGamelogs(gamelogs),
-                newerUri: newerUri,
-                olderUri: olderUri,
-            });
-        });
-    });
-};
+    // setup handlebars as the views
+    app.engine("hbs", expressHandlebars({
+        extname: "hbs",
+        defaultLayout: "index.hbs",
+        partialsDir: `${Config.BASE_DIR}/web/views/partials`,
+        layoutsDir: `${Config.BASE_DIR}/web/views/layouts`,
+        helpers,
+    }));
+    app.set("view engine", "hbs");
+    app.set("views", `${Config.BASE_DIR}/web/views`);
+}
