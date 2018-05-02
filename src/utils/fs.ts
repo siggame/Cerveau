@@ -60,3 +60,18 @@ export function gunzipFile(filePath: string): Promise<Buffer> {
             });
     });
 }
+
+/**
+ * Removes everything after the period in a string.
+ *
+ * @param str - The string to remove the extensions from.
+ * @returns The same string lacking any extension(s).
+ */
+export function removeExtension(str: string): string {
+    const dotIndex = str.indexOf(".");
+    if (dotIndex > -1) {
+        str = str.slice(0, dotIndex);
+    }
+
+    return str;
+}

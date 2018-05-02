@@ -32,15 +32,24 @@ import * as readline from "readline";
  * Basically creates and manages game sessions.
  */
 export class Lobby {
-    /** Starts up the lobby singleton, if it has not started already */
-    public static start(): void {
+    /**
+     * Gets, and starts up the lobby singleton, if it has not started already.
+     *
+     * @returns The Lobby singleton
+     */
+    public static getInstance(): Lobby {
         if (!Lobby.instance) {
             Lobby.instance = new Lobby();
         }
+
+        return Lobby.instance!;
     }
 
     /** The singleton instance. */
     private static instance?: Lobby;
+
+    /** A public promise that is resolved once all the games are ready. */
+    public readonly gamesInitializedPromise: Promise<void>;
 
     /** All the namespaces for games we can play, indexed by gameName. */
     public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
@@ -80,9 +89,13 @@ export class Lobby {
      * There should only be 1 Lobby per program running at a time.
      */
     private constructor() {
-        this.initializeGames().then(() => {
-            this.initializeListener(Config.TCP_PORT, net.createServer, TCPClient);
-            this.initializeListener(Config.WS_PORT, ws.createServer, WSClient);
+        this.gamesInitializedPromise = new Promise((resolve) => {
+            this.initializeGames().then(() => {
+                this.initializeListener(Config.TCP_PORT, net.createServer, TCPClient);
+                this.initializeListener(Config.WS_PORT, ws.createServer, WSClient);
+
+                resolve();
+            });
         });
 
         const rl = readline.createInterface({

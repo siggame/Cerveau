@@ -21,28 +21,6 @@ import "./core/setup-thread";
 
 import { Lobby } from "./core/server";
 
-Lobby.start(); // this will create the singleton Lobby instance
+Lobby.getInstance(); // this will create the singleton Lobby instance
 
-// if (Config.API_ENABLED || Config.WEB_ENABLED) {
-    // TODO: create the web server
-// }
-
-/*
-var app = require("./website/app");
-if(args.api || args.web) {
-    var http = require("http").Server(app);
-    var server = http.listen(args.httpPort, function() {
-        log("--- HTTP server running on port " + args.httpPort + " ---");
-    });
-
-    server.on("error", function(err) {
-        log.error(err.code !== "EADDRINUSE"
-            ? err
-            : "Webinterface cannot listen on port " + args.httpPort + ". Address in use.");
-    });
-}
-
-require("./website/")(extend({
-    lobby: lobby,
-}, args));
-*/
+import "./web";

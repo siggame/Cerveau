@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import * as path from "path";
+import { basename, join } from "path";
 import * as sanitizeFilename from "sanitize-filename";
 import { createGzip } from "zlib";
 import { Config } from "~/core/args";
@@ -14,8 +14,8 @@ export interface IGamelogInfo {
     /** The epoch time the gamelog was written */
     epoch: number;
 
-    /** The game session this gamelog logged */
-    gameSession: string;
+    /** The game session id this gamelog logged */
+    session: string;
 
     /** The name of the game this gamelog is for */
     gameName: string;
@@ -48,7 +48,7 @@ export class GameLogManager {
      */
     constructor(
         /** The directory where this will save gamelog files to */
-        public readonly gamelogDirectory: string = path.join(Config.LOGS_DIR, "gamelogs/"),
+        public readonly gamelogDirectory: string = join(Config.LOGS_DIR, "gamelogs/"),
     ) {
         if (Config.ARENA_MODE) {
             // TODO: upgrade arena so it can get the "real" filename with
@@ -93,23 +93,25 @@ export class GameLogManager {
      * @returns a promise for the list of gamelogs information
      */
     public async getLogs(): Promise<IGamelogInfo[]> {
+        // TODO: cache this
         const files = await fs.readdir(this.gamelogDirectory);
 
         const gamelogs: IGamelogInfo[] = [];
         for (const filename of files) {
             if (!this.filenamesWriting.has(filename) && filename.endsWith(this.gamelogExtension)) {
                 // then it is a gamelog
-                const split = filename.split("-");
+                const baseFilename = basename(filename, this.gamelogExtension);
+                const split = baseFilename.split("-");
 
                 if (split.length === 3) { // then we can figure out what the game is based on file name
-                    const [epochString, gameName, session] = split;
+                    const [gameName, session, epochString] = split;
 
                     gamelogs.push({
                         epoch: Number(utils.stringToMoment(epochString)),
                         filename,
                         gameName,
-                        gameSession: session.substring(0, session.length - this.gamelogExtension.length),
-                        uri: this.getURL(filename),
+                        session,
+                        uri: this.getURL(baseFilename, false),
                         visualizerUrl: this.getVisualizerURL(filename),
                     });
                 }
@@ -151,14 +153,25 @@ export class GameLogManager {
     }
 
     /**
-     * Returns a url string to the gamelog
-     * @param filename filename of the url
-     * @returns the url to the gamelog
+     * Returns a url string to the gamelog.
+     *
+     * @param filename - The filename of the url.
+     * @param includeHostname - True if the hostname should be part of the URL,
+     * false otherwise for just he uri.
+     * @returns The url to the gamelog.
      */
-    public getURL(filename: string): string {
-        // Note: __HOSTNAME__ is expected to be overwritten by clients,
-        // as we can't know for certain what hostname they used to connect to us via.
-        return `http://__HOSTNAME__:${Config.HTTP_PORT}/gamelog/${filename}`;
+    public getURL(filename: string, includeHostname: boolean = true): string {
+        let hostname = "";
+        if (includeHostname) {
+            // Note: __HOSTNAME__ is expected to be overwritten by clients,
+            // as we can't know for certain what hostname they used to connect
+            // to us via.
+            hostname = `http://__HOSTNAME__:${Config.HTTP_PORT}`;
+        }
+
+        filename = basename(filename, this.gamelogExtension);
+
+        return `${hostname}/gamelog/${filename}`;
     }
 
     /**
@@ -206,6 +219,25 @@ export class GameLogManager {
         return sanitizeFilename(this.filenameFormat(gameName, gameSession, moment));
     }
 
+    /**
+     * Attempts to get the read stream for the gamelog's filename.
+     *
+     * @param filename - The filename of the gamelog to get
+     * @returns A promise that resolves to the gamelog's read stream if found,
+     * otherwise resolves to undefined.
+     */
+    public async getGamelogFileStream(
+        filename: string,
+    ): Promise<undefined | fs.ReadStream> {
+        const path = await this.checkGamelog(filename);
+
+        if (!path) {
+            return;
+        }
+
+        return fs.createReadStream(path);
+    }
+
     /** The format we will use to make filenames for gamelogs */
     private readonly filenameFormat: FilenameFormatter = (n, s, m) => `${n}-${s}-${m}`;
 
@@ -215,15 +247,26 @@ export class GameLogManager {
      * @returns a promise of the path to the game log if it exists, undefined otherwise
      */
     private async checkGamelog(filename: string): Promise<string | undefined> {
-        const gamelogPath = path.join(this.gamelogDirectory, filename + this.gamelogExtension);
+        const filenameWithExtension = filename.endsWith(this.gamelogExtension)
+            ? filename
+            : (filename + this.gamelogExtension);
+
+        const gamelogPath = join(this.gamelogDirectory, filenameWithExtension);
 
         if (this.filenamesWriting.has(filename)) {
             return undefined; // it is on disk, but not being written yet, so it's not ready
         }
 
-        const stats = await fs.stat(gamelogPath);
-        return stats.isFile()
-            ? gamelogPath
-            : undefined;
+        try {
+            const stats = await fs.stat(gamelogPath);
+            return stats.isFile()
+                ? gamelogPath
+                : undefined;
+        }
+        catch (err) {
+            // The file doesn't exist, or may have permission issues;
+            // either way that doesn't count so this path has nothing for us.
+            return;
+        }
     }
 }

@@ -26,8 +26,5 @@
         "node_modules/@types/**/*.d.ts",
         "src/**/*.ts",
         "src/**/*.d.ts"
-    ],
-    "exclude": [
-        "src/web/*"
     ]
 }

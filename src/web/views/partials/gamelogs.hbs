@@ -8,11 +8,11 @@
 	</tr>
 {{#each gamelogs}}
 	<tr>
-		<td class="gamelog-name">{{this.game}}</td>
+		<td class="gamelog-name">{{this.gameName}}</td>
 		<td class="gamelog-session">{{this.session}}</td>
 		<td class="gamelog-name">{{formatDate this.epoch "MMMM Do YYYY, h:mm:ss a"}}</td>
-		<td class="gamelog-raw-link"><a href="{{this.gamelogURL}}">Download</a></td>
-		<td class="gamelog-vis-link"><a href="{{this.visualizerURL}}">View</a></td>
+		<td class="gamelog-raw-link"><a href="{{this.uri}}">Download</a></td>
+		<td class="gamelog-vis-link"><a href="{{this.visualizerUrl}}">View</a></td>
 	</tr>
 {{/each}}
 </table>

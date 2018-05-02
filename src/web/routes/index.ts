@@ -4,7 +4,8 @@ import { Lobby } from "../../core/server";
 import { app } from "../app";
 
 // because this is also the index, we need to export barrels
-export * from "./archives";
+// export * from "./archives";
+export * from "./gamelog";
 
 // var getGameInfos = require("./getGameInfos");
 // var formatGamelogs = require("./formatGamelogs");
@@ -12,7 +13,7 @@ export * from "./archives";
 const MAX_GAMELOGS_ON_INDEX = 10;
 
 const games: Array<{
-    gameName: string;
+    name: string;
     description: string;
 }> = [];
 
@@ -21,21 +22,22 @@ if (app && Config.WEB_ENABLED) {
     // as well as the most recent game logs
 
     const lobby = Lobby.getInstance();
-    for (const gameName of Object.keys(lobby.gameNamespaces)) {
-        games.push({
-            gameName,
-            description: "TODO: do",
-        });
-    }
+    lobby.gamesInitializedPromise.then(() => {
+        for (const gameName of Object.keys(lobby.gameNamespaces)) {
+            games.push({
+                name: gameName,
+                description: "TODO: do",
+            });
+        }
+    });
 
     app.get("/", async (req, res) => {
         const logs = await Lobby.getInstance().gameLogger.getLogs();
-        const gamelogs: IGamelogInfo[] = [];
-        for (let i = logs.length; i < MAX_GAMELOGS_ON_INDEX && i >= 0; i--) {
-            gamelogs.push(logs[i]);
-        }
 
-        res.render("index", {
+        // select the last 10 gamelogs from all the logs to render on the index
+        const gamelogs: IGamelogInfo[] = logs.slice(-MAX_GAMELOGS_ON_INDEX);
+
+        res.render("index.hbs", {
             games,
             gamelogs,
             moreGamelogs: (gamelogs.length === MAX_GAMELOGS_ON_INDEX && logs.length > gamelogs.length),
