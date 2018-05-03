@@ -6,6 +6,7 @@ import { app } from "../app";
 // because this is also the index, we need to export barrels
 // export * from "./archives";
 export * from "./gamelog";
+export * from "./status";
 
 // var getGameInfos = require("./getGameInfos");
 // var formatGamelogs = require("./formatGamelogs");
