@@ -1,6 +1,6 @@
 import { events, Signal } from "ts-typed-events";
-import { BaseGameSettingsManager, GameLogManager, IBaseGameNamespace, IGamelog,
-    IGamelogWinnerLoser } from "~/core/game";
+import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace, IGamelog,
+         IGamelogWinnerLoser } from "~/core/game";
 import { logger } from "~/core/log";
 import { IAnyObject, removeElements } from "~/utils";
 import { BaseClient } from "../clients/";
@@ -51,14 +51,14 @@ export class Room {
     constructor(
         public readonly id: string,
         public readonly gameNamespace: IBaseGameNamespace,
-        protected readonly gamelogManager: GameLogManager,
+        protected readonly gamelogManager: GamelogManager,
         private readonly updater?: Updater,
     ) {
         this.gameSettingsManager = new gameNamespace.GameSettingsManager();
     }
 
     /**
-     * Gets the clients playing (omits spectators)
+     * Gets the clients that are playing the game (omits spectators).
      *
      * @returns A new array of only clients playing the game.
      */
@@ -169,7 +169,7 @@ export class Room {
         // as it has not be written to the file system yet
         this.gamelogFilename = undefined;
 
-        // now write the gamelog, once written update our
+        // Now write the gamelog, once written update our
         // `gamelogFilename` to the actual slug to signify it can be
         // read now
         this.gamelogFilename = await this.gamelogManager.log(gamelog);

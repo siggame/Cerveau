@@ -12,12 +12,12 @@ import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
 import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
-import { filenameFor, getURL, getVisualizerURL,
-       } from "~/core/game/game-log-utils";
-import { GameLogScribe } from "~/core/game/game-logger";
 import { IDelta, IFinishedDeltaData, IGamelog,
          IOrderedDeltaData, IRanDeltaData,
-       } from "~/core/game/gamelog-interfaces";
+       } from "~/core/game/gamelog/gamelog-interfaces";
+import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
+import { filenameFor, getURL, getVisualizerURL,
+       } from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/log";
 import { isObjectEmpty } from "~/utils";
 
@@ -61,8 +61,10 @@ export class Session {
     /** All the clients in this game. */
     private readonly clients: BaseClient[];
 
-    /** The manager that logs events (deltas) from the game. */
-    private readonly gamelogScribe: GameLogScribe;
+    /**
+     * The scribe that logs events (deltas) from the game, to make the gamelog.
+     */
+    private readonly gamelogScribe: GamelogScribe;
 
     /** The manager for the game. */
     private readonly gameManager: BaseGameManager;
@@ -145,7 +147,7 @@ export class Session {
         );
         this.game = this.gameManager.game;
 
-        this.gamelogScribe = new GameLogScribe(
+        this.gamelogScribe = new GamelogScribe(
             this.game,
             this, playingClients,
             this.deltaManager,
@@ -258,9 +260,9 @@ ${this.fatal!.message}`,
         let timeoutTime = maxTime * 2 * 1e-6; // convert ns to ms
 
         if (timeoutTime <= 0) {
-            // it is invalid, so they probably set a custom timeout time of 0
+            // It is invalid, so they probably set a custom timeout time of 0,
             // so we'll default to 30min as that is a reasonable amount of
-            // debug time
+            // debug time.
             timeoutTime = 1.8e6; // 30 minutes as ms
         }
 

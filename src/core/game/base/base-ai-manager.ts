@@ -1,7 +1,8 @@
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { IFinishedDeltaData, IGameObjectReference,
-    IOrderedDeltaData, IRanDeltaData } from "~/core/game/gamelog-interfaces";
+         IOrderedDeltaData, IRanDeltaData,
+       } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, IAnyObject } from "~/utils";
 import { BaseGame } from "./base-game";
@@ -54,7 +55,7 @@ export class BaseAIManager {
      * Creates an AI Manager for some client('s AI).
      *
      * @param client - The client this is managing the AI for.
-     * Must be a player.
+     * Must have a player.
      * @param gameSanitizer - The sanitizer instance for this AI's game.
      * @param namespace - The namespace of the game, to get schemas from.
      */

@@ -6,6 +6,7 @@ import { objectHasProperty } from "~/utils";
 import { Lobby } from "../../core/server/index";
 import { app } from "../app";
 
+/** Information about the room to be returned via the status API. */
 interface IRoomInfo {
     status: "empty" | "open" | "running" | "over";
     gameName: string;

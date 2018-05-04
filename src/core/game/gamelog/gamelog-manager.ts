@@ -4,7 +4,7 @@ import { createGzip } from "zlib";
 import { Config } from "~/core/args";
 import * as utils from "~/utils";
 import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
-       } from "./game-log-utils";
+       } from "./gamelog-utils";
 
 /** The default gamelogs directory */
 const DEFAULT_LOGS_DIR = join(Config.LOGS_DIR, "gamelogs/");
@@ -40,7 +40,7 @@ export interface IGamelogInfo {
  * A simple manager that attaches to a directory and manages creating and
  * reading game logs in that directory.
  */
-export class GameLogManager {
+export class GamelogManager {
     // state-full part of the class
 
     /** Cached info about all the gamelogs sitting on disk. */

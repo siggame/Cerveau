@@ -5,7 +5,7 @@ import { logger } from "~/core/log";
 import { capitalizeFirstLetter, getDirs,
     IAnyObject, isNil, ITypedObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
-import { GameLogManager, IBaseGameNamespace } from "../game";
+import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
 import { SerialRoom } from "./lobby-room-serial";
@@ -42,7 +42,7 @@ export class Lobby {
             Lobby.instance = new Lobby();
         }
 
-        return Lobby.instance!;
+        return Lobby.instance;
     }
 
     /** The singleton instance. */
@@ -55,7 +55,7 @@ export class Lobby {
     public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
 
     /** The logger instance that manages game logs. */
-    public readonly gamelogManager = new GameLogManager();
+    public readonly gamelogManager = new GamelogManager();
 
     /** Next number to use for wildcard game sessions. */
     private nextRoomNumber = 1;

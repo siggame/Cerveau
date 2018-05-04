@@ -7,6 +7,7 @@ import { isObject, momentString } from "~/utils";
 /** Callback type to format the filename for a gamelog */
 export type FilenameFormatter = (gameName?: string, gameSession?: string, moment?: string) => string;
 
+/** The extension for gamelog files */
 export const GAMELOG_EXTENSION = ".json.gz";
 
 /**

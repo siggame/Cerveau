@@ -3,12 +3,12 @@ import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
     IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+import { DeltaManager } from "~/core/game/delta-manager";
 import { Session } from "~/core/server";
-import { DeltaManager } from "./delta-manager";
 import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
 
 /** Observes a game and creates a gamelog by transcribing its events */
-export class GameLogScribe {
+export class GamelogScribe {
     /** The events the game logger emits when it logs something. */
     public readonly events = events({
         /** Emitted every time a new delta is logged to the gamelog. */

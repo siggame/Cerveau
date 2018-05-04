@@ -5,6 +5,7 @@ import { Config } from "~/core/args";
 import { logger } from "~/core/log";
 import * as helpers from "./view-helpers";
 
+/** The express app to register routes through. */
 export let app: express.Express | undefined;
 
 if (Config.WEB_ENABLED || Config.API_ENABLED) {
