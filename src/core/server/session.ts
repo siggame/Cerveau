@@ -14,7 +14,7 @@ import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { filenameFor, getURL, getVisualizerURL,
        } from "~/core/game/game-log-utils";
-import { GameLogger } from "~/core/game/game-logger";
+import { GameLogScribe } from "~/core/game/game-logger";
 import { IDelta, IFinishedDeltaData, IGamelog,
          IOrderedDeltaData, IRanDeltaData,
        } from "~/core/game/gamelog-interfaces";
@@ -62,7 +62,7 @@ export class Session {
     private readonly clients: BaseClient[];
 
     /** The manager that logs events (deltas) from the game. */
-    private readonly gameLogger: GameLogger;
+    private readonly gamelogScribe: GameLogScribe;
 
     /** The manager for the game. */
     private readonly gameManager: BaseGameManager;
@@ -145,12 +145,12 @@ export class Session {
         );
         this.game = this.gameManager.game;
 
-        this.gameLogger = new GameLogger(
+        this.gamelogScribe = new GameLogScribe(
             this.game,
             this, playingClients,
             this.deltaManager,
         );
-        this.gameLogger.events.logged.on(this.sendDeltas);
+        this.gamelogScribe.events.logged.on(this.sendDeltas);
 
         logger.info(`${this.gameName} - ${this.id} is starting.`);
         this.events.start.emit();
@@ -178,9 +178,11 @@ export class Session {
             : err;
 
         await Promise.all([...this.clients].map((client) => {
-            return client.disconnect(`An unhandled fatal error occurred on the server:
+            return client.disconnect(
+`An unhandled fatal error occurred on the server:
 
-${this.fatal!.message}`);
+${this.fatal!.message}`,
+            );
         }));
 
         return await this.end();
@@ -291,7 +293,7 @@ ${this.fatal!.message}`);
         if (this.gameManager.isGameOver()) {
             // We no longer need to send deltas because the game is over and
             // the last delta was just sent above.
-            this.gameLogger.events.logged.off(this.sendDeltas);
+            this.gamelogScribe.events.logged.off(this.sendDeltas);
         }
     }
 
@@ -302,7 +304,7 @@ ${this.fatal!.message}`);
     private handleGameOver(): void {
         this.events.gameOver.emit();
 
-        const gamelog = this.gameLogger.gamelog;
+        const gamelog = this.gamelogScribe.gamelog;
 
         const gamelogFilename = filenameFor(gamelog);
         const gamelogURL = getURL(gamelogFilename);

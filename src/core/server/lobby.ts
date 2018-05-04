@@ -55,7 +55,7 @@ export class Lobby {
     public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
 
     /** The logger instance that manages game logs. */
-    public readonly gameLogger = new GameLogManager();
+    public readonly gamelogManager = new GameLogManager();
 
     /** Next number to use for wildcard game sessions. */
     private nextRoomNumber = 1;
@@ -379,7 +379,7 @@ There's probably another Cerveau server running on this same computer.`);
             room = new RoomClass(
                 id,
                 this.getGameNamespace(gameName)!,
-                this.gameLogger,
+                this.gamelogManager,
                 this.updater,
             );
 

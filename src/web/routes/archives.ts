@@ -21,13 +21,13 @@ if (app && Config.WEB_ENABLED) {
             pageCount = DEFAULT_PAGE_COUNT; // starting page
         }
 
-        const logs = await lobby.gameLogger.getLogs();
+        const logs = lobby.gamelogManager.gamelogInfos;
 
         const startIndex = Math.max(logs.length - (pageStart * pageCount), 0);
         const endIndex = startIndex + pageCount;
 
-        // Because logs (all the gamelogs GameLogger found) is pre-sorted with
-        // the newest gamelogs at the END, startIndex starts at the end.
+        // Because logs (all the gamelogs GamelogManager found) is pre-sorted
+        // with the newest gamelogs at the END, startIndex starts at the end.
         // We want to first show the NEWEST gamelogs.
         const gamelogs: IGamelogInfo[] = [];
         for (let i = endIndex - 1; i >= startIndex; i--) {

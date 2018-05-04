@@ -22,7 +22,9 @@ if (app) {
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
         const filename: string = req.params.filename || "";
-        const stream = await lobby.gameLogger.getGamelogFileStream(filename);
+        const stream = await lobby.gamelogManager.getGamelogFileStream(
+            filename,
+        );
 
         if (!stream) {
             res.status(404);

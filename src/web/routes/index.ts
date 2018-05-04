@@ -32,7 +32,7 @@ if (app && Config.WEB_ENABLED) {
     });
 
     app.get("/", async (req, res) => {
-        const logs = await lobby.gameLogger.getLogs();
+        const logs = lobby.gamelogManager.gamelogInfos;
 
         // select the last 10 gamelogs from all the logs to render on the index
         const gamelogs = logs.slice(-MAX_GAMELOGS_ON_INDEX).reverse();

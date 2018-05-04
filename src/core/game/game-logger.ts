@@ -7,8 +7,8 @@ import { Session } from "~/core/server";
 import { DeltaManager } from "./delta-manager";
 import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
 
-/** Observes a game and creates a gamelog from its events */
-export class GameLogger {
+/** Observes a game and creates a gamelog by transcribing its events */
+export class GameLogScribe {
     /** The events the game logger emits when it logs something. */
     public readonly events = events({
         /** Emitted every time a new delta is logged to the gamelog. */

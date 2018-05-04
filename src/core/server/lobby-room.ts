@@ -44,14 +44,14 @@ export class Room {
      *
      * @param id - The ID of our session we will run in time.
      * @param gameNamespace - The namespace of the game to play.
-     * @param gameLogger - The game logger instance to log gamelogs generated
-     * with.
+     * @param gamelogManager - The gamelog manager instance to log gamelogs
+     * generated in this room.
      * @param updater - The updated to check for updates with.
      */
     constructor(
         public readonly id: string,
         public readonly gameNamespace: IBaseGameNamespace,
-        protected readonly gameLogger: GameLogManager,
+        protected readonly gamelogManager: GameLogManager,
         private readonly updater?: Updater,
     ) {
         this.gameSettingsManager = new gameNamespace.GameSettingsManager();
@@ -172,6 +172,6 @@ export class Room {
         // now write the gamelog, once written update our
         // `gamelogFilename` to the actual slug to signify it can be
         // read now
-        this.gamelogFilename = await this.gameLogger.log(gamelog);
+        this.gamelogFilename = await this.gamelogManager.log(gamelog);
     }
 }
