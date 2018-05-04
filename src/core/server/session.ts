@@ -12,7 +12,8 @@ import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
 import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
-import { GameLogManager } from "~/core/game/game-log-manager";
+import { filenameFor, getURL, getVisualizerURL,
+       } from "~/core/game/game-log-utils";
 import { GameLogger } from "~/core/game/game-logger";
 import { IDelta, IFinishedDeltaData, IGamelog,
          IOrderedDeltaData, IRanDeltaData,
@@ -62,9 +63,6 @@ export class Session {
 
     /** The manager that logs events (deltas) from the game. */
     private readonly gameLogger: GameLogger;
-
-    /** Used to get game over URL data from. */
-    private readonly gameLogManager = new GameLogManager();
 
     /** The manager for the game. */
     private readonly gameManager: BaseGameManager;
@@ -306,10 +304,10 @@ ${this.fatal!.message}`);
 
         const gamelog = this.gameLogger.gamelog;
 
-        const gamelogFilename = this.gameLogManager.filenameFor(gamelog);
-        const gamelogURL = this.gameLogManager.getURL(gamelogFilename);
+        const gamelogFilename = filenameFor(gamelog);
+        const gamelogURL = getURL(gamelogFilename);
 
-        const visualizerURL = this.gameLogManager.getVisualizerURL(gamelogFilename);
+        const visualizerURL = getVisualizerURL(gamelogFilename);
         const message = visualizerURL &&
 `---
 Your gamelog is viewable at:

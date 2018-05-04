@@ -1,10 +1,9 @@
 import * as fs from "fs-extra";
 import { basename, join } from "path";
-import * as sanitizeFilename from "sanitize-filename";
 import { createGzip } from "zlib";
 import { Config } from "~/core/args";
-import { IGamelog } from "~/core/game";
 import * as utils from "~/utils";
+import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL } from "./game-log-utils";
 
 /** Represents information about an unloaded gamelog */
 export interface IGamelogInfo {
@@ -27,20 +26,18 @@ export interface IGamelogInfo {
     visualizerUrl?: string;
 }
 
-/** Callback type to format the filename for a gamelog */
-type FilenameFormatter = (gameName?: string, gameSession?: string, moment?: string) => string;
-
 /**
  * A simple manager that attaches to a directory and manages creating and
  * reading game logs in that directory.
  */
 export class GameLogManager {
+    // state-full part of the class
 
-    /** The extension used for gamelogs */
-    private readonly gamelogExtension: string = ".json.gz";
-
-    /** The set of filenames we are currently writing to the disk */
+    /** The set of filenames we are currently writing to the disk. */
     private filenamesWriting = new Set<string>();
+
+    /** Cached info about all the gamelogs sitting on disk. */
+    private gamelogInfos: IGamelogInfo[] = [];
 
     /**
      * Initializes the GameLogger (needed on every thread)
@@ -50,23 +47,42 @@ export class GameLogManager {
         /** The directory where this will save gamelog files to */
         public readonly gamelogDirectory: string = join(Config.LOGS_DIR, "gamelogs/"),
     ) {
-        if (Config.ARENA_MODE) {
-            // TODO: upgrade arena so it can get the "real" filename with
-            //       the moment string in it via REST API
-            this.filenameFormat = (n, s, m) => `${n}-${s}`;
+        if (!Config.ARENA_MODE) {
+            this.initializeGamelogInfos();
         }
     }
 
     /**
-     * Creates a gamelog for the game in the directory set during init
-     * @param gamelog the gamelog which should be serialize-able to json representation of the gamelog
-     * @returns a promise that resolves to the filename written
+     * Creates a gamelog for the game in the directory set during init.
+     *
+     * @param gamelog - The gamelog which should be serialize-able to json
+     * representation of the gamelog.
+     * @returns A promise that resolves to the filename written.
      */
     public log(gamelog: any): Promise<string> {
         const serialized = JSON.stringify(gamelog);
-        const filename = this.filenameFor(gamelog.gameName, gamelog.gameSession, gamelog.epoch);
+        const filename = filenameFor(
+            gamelog.gameName,
+            gamelog.gameSession,
+            gamelog.epoch,
+        );
 
-        const writeSteam = fs.createWriteStream(this.gamelogDirectory + filename + this.gamelogExtension, "utf8");
+        if (!Config.ARENA_MODE) {
+            // cache gamelog info
+            this.gamelogInfos.push({
+                epoch: gamelog.epoch,
+                filename,
+                gameName: gamelog.gameName,
+                session: gamelog.gameSession,
+                uri: getURL(filename),
+                visualizerUrl: getVisualizerURL(filename),
+            });
+        }
+
+        const writeSteam = fs.createWriteStream(
+            this.gamelogDirectory + filename + GAMELOG_EXTENSION,
+            "utf8",
+        );
         const gzip = createGzip();
 
         return new Promise((resolve, reject) => {
@@ -88,46 +104,12 @@ export class GameLogManager {
     }
 
     /**
-     * Gets ALL the gamelogs in LOGS_DIR/gamelogs.
-     * The gamelogs are not complete, but rather a "shallow" gamelog.
-     * @returns a promise for the list of gamelogs information
-     */
-    public async getLogs(): Promise<IGamelogInfo[]> {
-        // TODO: cache this
-        const files = await fs.readdir(this.gamelogDirectory);
-
-        const gamelogs: IGamelogInfo[] = [];
-        for (const filename of files) {
-            if (!this.filenamesWriting.has(filename) && filename.endsWith(this.gamelogExtension)) {
-                // then it is a gamelog
-                const baseFilename = basename(filename, this.gamelogExtension);
-                const split = baseFilename.split("-");
-
-                if (split.length === 3) { // then we can figure out what the game is based on file name
-                    const [gameName, session, epochString] = split;
-                    const epoch = Number(utils.stringToMoment(epochString));
-
-                    gamelogs.push({
-                        epoch,
-                        filename,
-                        gameName,
-                        session,
-                        uri: this.getURL(baseFilename, false),
-                        visualizerUrl: this.getVisualizerURL(filename),
-                    });
-                }
-            }
-        }
-
-        gamelogs.sort((a, b) => a.epoch - b.epoch);
-
-        return gamelogs;
-    }
-
-    /**
-     * Gets the first gamelog matching the filename, without the extension
-     * @param filename the base filename (without gamelog extension) you want in LOGS_DIR/gamelogs/
-     * @returns a promise to a gamelog matching passed in parameters, or undefined if no gamelog. second arg is error.
+     * Gets the first gamelog matching the filename, without the extension.
+     *
+     * @param filename - The base filename (without gamelog extension) you want
+     * in LOGS_DIR/gamelogs/
+     * @returns - A promise to a gamelog matching passed in parameters, or
+     * undefined if no gamelog. second arg is error.
      */
     public async getGamelog(filename: string): Promise<any> {
         const gamelogPath = await this.checkGamelog(filename);
@@ -150,76 +132,15 @@ export class GameLogManager {
             return false;
         }
 
+        const infosIndex = this.gamelogInfos.findIndex((e) => e.filename === filename);
+        if (infosIndex !== -1) {
+            // Remove that gamelog from our infos.
+            this.gamelogInfos.splice(infosIndex, 1);
+        }
+
         // else it does exist, so delete it
         await fs.unlink(gamelogPath);
         return true;
-    }
-
-    /**
-     * Returns a url string to the gamelog.
-     *
-     * @param filename - The filename of the url.
-     * @param includeHostname - True if the hostname should be part of the URL,
-     * false otherwise for just he uri.
-     * @returns The url to the gamelog.
-     */
-    public getURL(filename: string, includeHostname: boolean = true): string {
-        let hostname = "";
-        if (includeHostname) {
-            // Note: __HOSTNAME__ is expected to be overwritten by clients,
-            // as we can't know for certain what hostname they used to connect
-            // to us via.
-            hostname = `http://__HOSTNAME__:${Config.HTTP_PORT}`;
-        }
-
-        filename = basename(filename, this.gamelogExtension);
-
-        return `${hostname}/gamelog/${filename}`;
-    }
-
-    /**
-     * Returns a url to the visualizer for said gamelog
-     * @param gamelogOrFilename the gamelog to format a visualizer url for
-     * @param visualizerURL url to visualizer, if calling statically
-     * @returns undefined if no visualizer set, url to the gamelog in visualizer otherwise
-     */
-    public getVisualizerURL(gamelogOrFilename: any, visualizerURL?: string): string | undefined {
-        const vis = Config.VISUALIZER_URL;
-        if (vis) {
-            const filename = typeof(gamelogOrFilename) === "string"
-                ? gamelogOrFilename
-                : this.filenameFor(gamelogOrFilename.gameName, gamelogOrFilename.gameSession, gamelogOrFilename.epoch);
-            const url = this.getURL(filename);
-            return `${vis}?log=${encodeURIComponent(url)}`;
-        }
-    }
-
-    /**
-     * Returns the expected filename for a gamelog
-     * @param gameName - name of the game
-     * @param gameSession - name of the session
-     * @param epoch - when the gamelog was logged
-     * @returns the filename for the given game settings
-     */
-    public filenameFor(gameName: string, gameSession: string, epoch?: number): string;
-    public filenameFor(
-        /** the with a gameName and gameSession to get for */
-        gamelog: IGamelog,
-    ): string;
-
-    public filenameFor(gameName: string | IGamelog, gameSession?: string, epoch?: number): string {
-        if (utils.isObject(gameName)) {
-            gameSession = gameName.gameSession;
-            epoch = gameName.epoch;
-            gameName = gameName.gameName;
-        }
-
-        let moment = "unknown";
-        if (epoch) {
-            moment = utils.momentString(epoch);
-        }
-
-        return sanitizeFilename(this.filenameFormat(gameName, gameSession, moment));
     }
 
     /**
@@ -241,8 +162,39 @@ export class GameLogManager {
         return fs.createReadStream(path);
     }
 
-    /** The format we will use to make filenames for gamelogs */
-    private readonly filenameFormat: FilenameFormatter = (n, s, m) => `${n}-${s}-${m}`;
+    /**
+     * Gets ALL the gamelogs in LOGS_DIR/gamelogs.
+     * The gamelogs are not complete, but rather a "shallow" gamelog.
+     * @returns a promise for the list of gamelogs information
+     */
+    private async initializeGamelogInfos(): Promise<void> {
+        const files = await fs.readdir(this.gamelogDirectory);
+
+        for (const filename of files) {
+            if (!this.filenamesWriting.has(filename) && filename.endsWith(GAMELOG_EXTENSION)) {
+                // then it is a gamelog
+                const baseFilename = basename(filename, GAMELOG_EXTENSION);
+                const split = baseFilename.split("-");
+
+                if (split.length === 3) {
+                    // then we can figure out what the game is based on filename
+                    const [gameName, session, epochString] = split;
+                    const epoch = Number(utils.stringToMoment(epochString));
+
+                    this.gamelogInfos.push({
+                        epoch,
+                        filename,
+                        gameName,
+                        session,
+                        uri: getURL(baseFilename, false),
+                        visualizerUrl: getVisualizerURL(filename),
+                    });
+                }
+            }
+        }
+
+        this.gamelogInfos.sort((a, b) => a.epoch - b.epoch);
+    }
 
     /**
      * checks to see if the filename maps to a gamelog on disk
@@ -250,9 +202,9 @@ export class GameLogManager {
      * @returns a promise of the path to the game log if it exists, undefined otherwise
      */
     private async checkGamelog(filename: string): Promise<string | undefined> {
-        const filenameWithExtension = filename.endsWith(this.gamelogExtension)
+        const filenameWithExtension = filename.endsWith(GAMELOG_EXTENSION)
             ? filename
-            : (filename + this.gamelogExtension);
+            : (filename + GAMELOG_EXTENSION);
 
         const gamelogPath = join(this.gamelogDirectory, filenameWithExtension);
 
