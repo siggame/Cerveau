@@ -253,7 +253,7 @@ export class Lobby {
 
         const clientName = clientClass.name;
         listener.listen(port, "0.0.0.0", () => {
-            logger.info(`»» Listening on port ${port} for ${clientName}s ««`);
+            logger.info(`🖧 Listening on port ${port} for ${clientName}s 🖧`);
         });
 
         listener.on("error", (err) => {
@@ -291,7 +291,7 @@ There's probably another Cerveau server running on this same computer.`);
                 // return process.exit(1);
             }
             const gameName = gameNamespace.GameManager.gameName;
-            logger.info(`► ${gameName} game loaded ◄`);
+            logger.info(`»» ${gameName} game loaded ««`);
 
             // hook up all the ways to get the game class via an index
             this.gameAliasToName.set(gameName.toLowerCase(), gameName);
