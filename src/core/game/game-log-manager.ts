@@ -105,9 +105,10 @@ export class GameLogManager {
 
                 if (split.length === 3) { // then we can figure out what the game is based on file name
                     const [gameName, session, epochString] = split;
+                    const epoch = Number(utils.stringToMoment(epochString));
 
                     gamelogs.push({
-                        epoch: Number(utils.stringToMoment(epochString)),
+                        epoch,
                         filename,
                         gameName,
                         session,
@@ -117,6 +118,8 @@ export class GameLogManager {
                 }
             }
         }
+
+        gamelogs.sort((a, b) => a.epoch - b.epoch);
 
         return gamelogs;
     }

@@ -1,10 +1,9 @@
 import { Config } from "../../core/args";
-import { IGamelogInfo } from "../../core/game/index";
 import { Lobby } from "../../core/server";
 import { app } from "../app";
 
 // because this is also the index, we need to export barrels
-// export * from "./archives";
+export * from "./archives";
 export * from "./gamelog";
 export * from "./status";
 
@@ -33,10 +32,10 @@ if (app && Config.WEB_ENABLED) {
     });
 
     app.get("/", async (req, res) => {
-        const logs = await Lobby.getInstance().gameLogger.getLogs();
+        const logs = await lobby.gameLogger.getLogs();
 
         // select the last 10 gamelogs from all the logs to render on the index
-        const gamelogs: IGamelogInfo[] = logs.slice(-MAX_GAMELOGS_ON_INDEX);
+        const gamelogs = logs.slice(-MAX_GAMELOGS_ON_INDEX).reverse();
 
         res.render("index.hbs", {
             games,
