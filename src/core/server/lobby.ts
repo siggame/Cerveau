@@ -103,47 +103,17 @@ export class Lobby {
             output: process.stdout,
         });
 
-        // ReadLine: listens for CTRL+C to kill off child threads gracefully (letting their games complete)
+        // ReadLine: listens for CTRL+C to kill off child threads gracefully
+        // (letting their games complete)
         rl.setPrompt("");
-        rl.on("SIGINT", async () => {
-            if (!this.isShuttingDown) {
-                this.isShuttingDown = true;
-                logger.info("Ω Shutting down gracefully Ω");
-
-                const n = Array.from(this.roomsPlaying).reduce((sum, [name, rooms]) => sum + rooms.size, 0);
-                logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
-                if (n === 0) {
-                    logger.info("     ↳ No one here, see you later!");
-                }
-
-                try {
-                    // tell all clients we are shutting down, and asynchronously
-                    // wait for the socket to confirm the data was sent before
-                    // proceeding
-                    await Promise.all([...this.clients].map((client) => {
-                        client.disconnect("Sorry, the server is shutting down.");
-                    }));
-                }
-                catch (rejection) {
-                    // we don't care
-                }
-
-                if (n > 0) {
-                    logger.info("     Waiting for them to exit before shutting down.");
-                    logger.info("     ^C again to force shutdown, which force disconnects clients.");
-                }
-                else {
-                    process.exit(0);
-                }
-            }
-            else {
-                logger.info("╘ Force shutting down.");
-                process.exit(0);
-            }
-        });
+        rl.on("SIGINT", () => this.shutDown());
 
         if (Config.UPDATER_ENABLED) {
             this.updater = new Updater();
+
+            this.updater.events.updateFound.on(() => {
+                this.shutDown();
+            });
         }
     }
 
@@ -251,9 +221,11 @@ export class Lobby {
             this.addSocket(socket, clientClass);
         });
 
-        const clientName = clientClass.name;
+        // place a ' ' (space) before the 'Client' part of the class name
+        const clientName = clientClass.name.replace(/(Client)/g, " $1");
+
         listener.listen(port, "0.0.0.0", () => {
-            logger.info(`🖧 Listening on port ${port} for ${clientName}s 🖧`);
+            logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
         });
 
         listener.on("error", (err) => {
@@ -286,12 +258,12 @@ There's probably another Cerveau server running on this same computer.`);
             }
             catch (err) {
                 const errorGameName = capitalizeFirstLetter(dir);
-                logger.error(`⚠ Could not load game ${errorGameName} ⚠`);
+                logger.error(`⚠️ Could not load game ${errorGameName} ⚠️`);
                 continue; // For now while we have unconverted games
                 // return process.exit(1);
             }
             const gameName = gameNamespace.GameManager.gameName;
-            logger.info(`»» ${gameName} game loaded ««`);
+            logger.info(`🕹️ ${gameName} game loaded 🕹️`);
 
             // hook up all the ways to get the game class via an index
             this.gameAliasToName.set(gameName.toLowerCase(), gameName);
@@ -615,6 +587,51 @@ Must be one string in the url parameters format.${footer}`;
 
         for (const client of clients) {
             this.clients.delete(client);
+        }
+    }
+
+    /**
+     * Attempts to gracefully shut down this Lobby and all its Rooms.
+     * If this is called a second time while waiting for games to exit,
+     * then this will force shut down.
+     *
+     * @returns A promise that _might_ resolve. Otherwise process.exit is
+     * called so it never resolves. Really just ignore this.
+     */
+    private async shutDown(): Promise<void> {
+        if (!this.isShuttingDown) {
+            this.isShuttingDown = true;
+            logger.info("Ω Shutting down gracefully Ω");
+
+            const n = Array.from(this.roomsPlaying).reduce((sum, [name, rooms]) => sum + rooms.size, 0);
+            logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
+            if (n === 0) {
+                logger.info("     ↳ No one here, see you later!");
+            }
+
+            try {
+                // tell all clients we are shutting down, and asynchronously
+                // wait for the socket to confirm the data was sent before
+                // proceeding
+                await Promise.all([...this.clients].map((client) => {
+                    client.disconnect("Sorry, the server is shutting down.");
+                }));
+            }
+            catch (rejection) {
+                // we don't care
+            }
+
+            if (n > 0) {
+                logger.info("     Waiting for them to exit before shutting down.");
+                logger.info("     ^C again to force shutdown, which force disconnects clients.");
+            }
+            else {
+                process.exit(0);
+            }
+        }
+        else {
+            logger.info("╘ Force shutting down.");
+            process.exit(0);
         }
     }
 }
