@@ -1,3 +1,4 @@
+import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as expressHandlebars from "express-handlebars";
 import { join } from "path";
@@ -25,6 +26,9 @@ if (Config.WEB_ENABLED || Config.API_ENABLED) {
     }));
     app.set("view engine", "hbs");
     app.set("views", join(__dirname, "views"));
+
+    // expect POSTs to be JSON formatted
+    app.use(bodyParser.json());
 
     app.use("/styles", express.static(join(__dirname, "styles")));
 
