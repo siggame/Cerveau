@@ -13,6 +13,7 @@
                 "--single-threaded",
                 "--no-timeout",
                 "--no-session-timeouts",
+                "--no-updater"
             ],
             "protocol": "inspector",
             "cwd": "${workspaceFolder}",
