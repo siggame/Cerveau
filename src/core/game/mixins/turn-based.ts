@@ -17,7 +17,8 @@ export interface ITurnBasedPlayer extends IBasePlayer {
  * @param base the base classes to mixin turn based logic into
  * @returns a new BaseGame class with TwoPlayerGame logic mixed in
  */
-// tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
+// Because it will be a weird mixin type inferred from the return statement.
+// tslint:disable-next-line:typedef
 export function mixTurnBased<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -47,7 +48,8 @@ export function mixTurnBased<
     class TurnBaseGameSettings extends base.GameSettings {
         /** The schema for turn based settings. */
         public schema = this.makeSchema({
-            ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+            // HACK: super should work. but schema is undefined on it
+            ...(super.schema || (this as any).schema),
             timeAddedPerTurn: {
                 default: 1e9, // 1 sec in ns,
                 min: 0,
@@ -70,7 +72,9 @@ export function mixTurnBased<
          * @returns A number of how long in MS it wold take max.
          */
         public getMaxPlayerTime(): number {
-            return super.getMaxPlayerTime() + (this.values.maxTurns * this.values.timeAddedPerTurn);
+            const { maxTurns, timeAddedPerTurn } = this.values;
+
+            return super.getMaxPlayerTime() + (maxTurns * timeAddedPerTurn);
         }
     }
 
@@ -113,7 +117,8 @@ export function mixTurnBased<
 
         /** Starts the game */
         protected start(): void {
-            // different from nextTurn, this is called because their turn has not yet started
+            // Different from nextTurn;
+            // this is called because their turn has not yet started.
             this.beforeTurn();
         }
 
@@ -122,7 +127,7 @@ export function mixTurnBased<
          * run logic on their turns.
          *
          * @param player - The player running code.
-         * @param gameObject-  The game object running.
+         * @param gameObject - The game object running.
          * @param functionName - The name of the function being run.
          * @param args - The key.value map (in positional arg order) args.
          * @returns A string explaining why it is invalid, or undefined if
@@ -134,7 +139,13 @@ export function mixTurnBased<
             functionName: string,
             args: Map<string, any>,
         ): string | undefined {
-            const invalid = super.invalidateRun(player, gameObject, functionName, args);
+            const invalid = super.invalidateRun(
+                player,
+                gameObject,
+                functionName,
+                args,
+            );
+
             if (invalid) {
                 return invalid;
             }
@@ -148,7 +159,8 @@ export function mixTurnBased<
          * Called before a players turn, including the first turn.
          */
         protected async beforeTurn(): Promise<void> {
-            const done = await (this.game.currentPlayer.ai as TurnBasedAI).runTurn();
+            const turnBasedAI = (this.game.currentPlayer.ai as TurnBasedAI);
+            const done = await turnBasedAI.runTurn();
 
             if (done) {
                 this.nextTurn();
@@ -159,7 +171,8 @@ export function mixTurnBased<
         }
 
         /**
-         * Transitions to the next turn, increasing turn and setting the currentPlayer to the next one.
+         * Transitions to the next turn, increasing turn and setting the
+         * currentPlayer to the next one.
          */
         protected nextTurn(): void {
             if (this.game.currentTurn + 1 >= this.game.maxTurns) {
@@ -168,7 +181,11 @@ export function mixTurnBased<
             }
 
             this.game.currentTurn++;
-            this.game.currentPlayer = nextWrapAround(this.game.players, this.game.currentPlayer)!;
+            this.game.currentPlayer = nextWrapAround(
+                this.game.players,
+                this.game.currentPlayer,
+            )!;
+
             this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
 
             this.beforeTurn();
@@ -185,10 +202,14 @@ export function mixTurnBased<
 
         /**
          * Intended to be inherited with secondary win condition checking.
-         * @param reason The reason why a secondary victory condition is being checked
+         *
+         * @param reason The reason why a secondary victory condition is being
+         * checked.
          */
         protected secondaryGameOver(reason: string): void {
-            this.makePlayerWinViaCoinFlip(`${reason}, Identical AIs played the game`);
+            this.makePlayerWinViaCoinFlip(
+                `${reason}, Identical AIs played the game`,
+            );
         }
     }
 

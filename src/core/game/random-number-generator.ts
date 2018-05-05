@@ -6,16 +6,22 @@ export class RandomNumberGenerator {
     /** The random library interface we are wrapping around. */
     private readonly random: random.prng;
 
+    /**
+     * Creates a random number generator that can be seeded with useful
+     * methods for games to leverage.
+     * @param seed - The optional rng seed to use.
+     */
     constructor(seed?: string) {
         this.random = random(seed);
     }
 
     /**
-     * returns a random integer within the range of upper to lower (inclusive). lower defaults to 0.
+     * Returns a random integer within the range of upper to lower (inclusive).
      *
-     * @param upper - the upper range, this number is NOT valid as a random return value
-     * @param [lower] - the lower range, defaults to 0
-     * @returns a random integer within the range lower to upper
+     * @param upper - The upper range, this number is NOT valid as a random
+     * return value.
+     * @param lower - The lower range, defaults to 0.
+     * @returns A random integer within the range lower to upper.
      */
     public int(upper: number = 1, lower: number = 0): number {
         const max = Math.round(Math.max(upper, lower));
@@ -24,11 +30,13 @@ export class RandomNumberGenerator {
     }
 
     /**
-     * returns a random floating point number within the range of upper to lower (inclusive). lower defaults to 0.
+     * Returns a random floating point number within the range of upper to
+     * lower (inclusive).
      *
-     * @param upper - the upper range, this number is NOT valid as a random return value
-     * @param lower - the lower range, defaults to 0
-     * @returns a random integer within the range lower to upper
+     * @param upper - The upper range, this number is NOT valid as a random
+     * return value.
+     * @param lower - The lower range, defaults to 0.
+     * @returns A random integer within the range lower to upper.
      */
     public float(upper: number = 1, lower: number = 0): number {
         const max = Math.max(upper, lower);
@@ -65,6 +73,14 @@ export class RandomNumberGenerator {
      * Weights do not need to be uniform, or sum up to 1.00. Any values will
      * work and will all be relative to the rest.
      * @returns An element (key) from the map.
+     * @example
+     * const map = new Map<string, number>();
+     * map.add("half", 0.5);
+     * map.add("quarter", 0.25);
+     * map.add("rarely", 0.01);
+     * map.add("never", 0.00);
+     *
+     * const chosen: string = fromWeights(map);
      */
     public fromWeights<T>(map: Map<T, number>): T {
         let sum = 0;
@@ -82,6 +98,6 @@ export class RandomNumberGenerator {
         }
 
         throw new Error(`Could not chose item for fromWeights.
-Ensure your map has entries`);
+Ensure your Map has entries`);
     }
 }

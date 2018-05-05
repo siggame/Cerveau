@@ -16,7 +16,8 @@ export type SerializableTypeName =
     "dictionary" |
     "list" |
     "gameObject" |
-    "void";
+    "void"
+;
 
 /**
  * Checks if a given object is a game object reference (has only an id key set).

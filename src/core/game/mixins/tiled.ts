@@ -31,16 +31,19 @@ export abstract class BaseTile extends BaseGameObject {
     public readonly tileWest?: BaseTile;
 
     /**
-     * gets the adjacent direction between this tile and an adjacent tile (if one exists)
+     * Gets the adjacent direction between this tile and an adjacent tile
+     * (if one exists).
      *
-     * @param adjacentTile A tile that should be adjacent to this tile
-     * @returns The string direction, or undefined if the
+     * @param adjacentTile - A tile that should be adjacent to this tile
+     * @returns - The string direction, or undefined if the
      * tile is invalid, or there is no adjacent direction between this tile
      * and that tile
      * ("North", "East", "South", or "West") if found in that direction,
-     * undefined otherwise
+     * undefined otherwise.
      */
-    public getAdjacentDirection(adjacentTile: BaseTile | undefined): string | undefined {
+    public getAdjacentDirection(
+        adjacentTile: BaseTile | undefined,
+    ): string | undefined {
         if (adjacentTile) {
             for (const direction of TILE_DIRECTIONS) {
                 if (this.getNeighbor(direction) === adjacentTile) {
@@ -51,9 +54,10 @@ export abstract class BaseTile extends BaseGameObject {
     }
 
     /**
-     * Gets a list of all the neighbors of this tile
+     * Gets a list of all the neighbors of this tile.
      *
-     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     * @returns - An array of all adjacent tiles.
+     * Should be between 2 to 4 tiles.
      */
     public getNeighbors(): BaseTile[] {
         const neighbors = new Array<BaseTile>();
@@ -69,12 +73,15 @@ export abstract class BaseTile extends BaseGameObject {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
-     * @param direction The direction you want, must be "North", "East", "South", or "West"
-     * @returns The Tile in that direction, null if none
+     * @param direction - The direction you want,
+     * must be "North", "East", "South", or "West".
+     * @returns The Tile in that direction, null if none.
      */
-    public getNeighbor(direction: "North" | "South" | "East" | "West"): BaseTile {
+    public getNeighbor(
+        direction: "North" | "South" | "East" | "West",
+    ): BaseTile {
         return (this as any)[`tile${direction}`];
     }
 
@@ -105,7 +112,8 @@ export abstract class BaseTile extends BaseGameObject {
  * @param base - The BaseGame (or sub BaseGame) to mix in tiled logic.
  * @returns A new BaseGame class with Tiled logic mixed in.
  */
-// tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
+// Because it will be a weird mixin type inferred from the return statement
+// tslint:disable-next-line:typedef
 export function mixTiled<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -123,7 +131,8 @@ export function mixTiled<
     class TiledGameSettings extends base.GameSettings {
         /** The schema for a Tiled game, adding in configurable map sizes. */
         public schema = this.makeSchema({
-            ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+            // HACK: super should work. but schema is undefined on it
+            ...(super.schema || (this as any).schema),
             mapWidth: {
                 default: 32,
                 min: 2,
@@ -166,7 +175,7 @@ export function mixTiled<
                 for (let y = 0; y < this.mapHeight; y++) {
                     this.tiles[x + y * this.mapWidth] = (this.manager.create as any).Tile({x, y});
                     // any because we don't mix a new BaseGameObject Factory,
-                    // however all managers will have a Tile so no worries (I hope)
+                    // however all managers will have a Tile so no worries.
                 }
             }
 
@@ -184,11 +193,12 @@ export function mixTiled<
         }
 
         /**
-         * Gets the tile at (x, y), or undefined if the co-ordinates are off-map
+         * Gets the tile at (x, y), or undefined if the co-ordinates are
+         * off-map.
          *
-         * @param x the x position of the desired tile
-         * @param y the y position of the desired tile
-         * @returns the Tile at (x, y) if valid, null otherwise
+         * @param x - The x position of the desired tile.
+         * @param y - The y position of the desired tile.
+         * @returns The Tile at (x, y) if valid, null otherwise.
          */
         public getTile(x: number, y: number): BaseTile | undefined {
             return this.tiles[x + y * this.mapWidth];
@@ -199,7 +209,8 @@ export function mixTiled<
          *
          * @param direction - the direction string to invert
          * @returns the direction inverted,
-         * e.g. "East" -> "West", undefined if the direction was not a valid direction string
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string.
          */
         public invertTileDirection(
             direction: "North" | "South" | "East" | "West",

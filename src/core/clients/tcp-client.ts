@@ -47,7 +47,9 @@ export class TCPClient extends BaseClient {
         for (const line of split) {
             const parsed = this.parseData(line);
             if (!parsed) {
-                return; // because we got some invalid data, so we're going to fatally disconnect anyways
+                // Because we got some invalid data,
+                // so we're going to fatally disconnect anyways
+                return;
             }
 
             this.handleSent(parsed);

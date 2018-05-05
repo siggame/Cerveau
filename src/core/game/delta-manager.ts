@@ -1,6 +1,6 @@
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGameObject } from "~/core/game";
-import { objectHasProperty } from "~/utils";
+import { isObject, objectHasProperty } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
 
 /** Manages delta states on behalf of a game */
@@ -17,29 +17,38 @@ export class DeltaManager {
             key: "__root__",
         });
 
-        this.rootDeltaMergeable.events.changed.on((changed) => this.handleDelta(changed));
-        this.rootDeltaMergeable.events.deleted.on((deleted) => this.handleDelta(deleted, true));
+        this.rootDeltaMergeable.events.changed.on((changed) => {
+            this.handleDelta(changed);
+        });
+
+        this.rootDeltaMergeable.events.deleted.on((deleted) => {
+            this.handleDelta(deleted, true);
+        });
     }
 
     /**
-     * Gets the true delta state of the game, with nothing hidden, then resets the state
-     * @returns delta formatted object representing the true delta
-     * state of the game, with nothing hidden
+     * Gets the true delta state of the game, with nothing hidden, then resets
+     * the state that was dumped.
+     *
+     * @returns - The delta formatted object representing the true delta
+     * state of the game, with nothing hidden.
      */
     public dump(): any {
-        const popped = this.delta;
+        const state = this.delta;
         this.delta = {};
-        return popped;
+        return state;
     }
 
     /**
-     * Handles a change in game state by updating our delta
-     * @param changed the delta mergeable that mutated
-     * @param wasDeleted a boolean indicating if the mutation was a deletion
+     * Handles a change in game state by updating our delta.
+     *
+     * @param changed - The delta mergeable that mutated.
+     * @param wasDeleted - A boolean indicating if the mutation was a deletion.
      */
-    protected handleDelta(changed: DeltaMergeable<any>, wasDeleted: boolean = false): void {
-        // pass
-
+    protected handleDelta(
+        changed: DeltaMergeable<any>,
+        wasDeleted: boolean = false,
+    ): void {
         let pathDeltaMergeable = changed;
         const path = new Array<DeltaMergeable<any>>();
         while (pathDeltaMergeable.getParent() !== this.rootDeltaMergeable) {
@@ -48,7 +57,8 @@ export class DeltaManager {
         }
 
         let current = this.delta;
-        // now go up the path to the deltaMergeable that changed to build up our delta
+        // Now go up the path to the deltaMergeable that changed to build up
+        // our delta.
         for (let i = 0; i < path.length; i++) {
             const dm = path[i];
             const value = dm.get();
@@ -58,7 +68,8 @@ export class DeltaManager {
             }
 
             if (Array.isArray(value)) {
-                current[dm.key][SHARED_CONSTANTS.DELTA_LIST_LENGTH] = value.length;
+                const len = value.length;
+                current[dm.key][SHARED_CONSTANTS.DELTA_LIST_LENGTH] = len;
             }
 
             if (i !== (path.length - 1)) {
@@ -90,9 +101,12 @@ export class DeltaManager {
                 }
             }
             else if (Array.isArray(changedValue)) {
-                changedValue = { [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: changedValue.length };
+                changedValue = {
+                    [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: changedValue.length,
+                };
             }
-            else if (typeof(changedValue) === "object" && changedValue !== null) {
+            else if (isObject(changedValue)) {
+                // it can be a nested object that takes key/values.
                 changedValue = {};
             }
             // else changed value is a primitive and is safe to copy

@@ -149,8 +149,9 @@ export class BaseClient {
     }
 
     /**
-     * Starts the timeout timer counting down from how much time this client's player has left.
-     * Should be called when the client is being timed for orders.
+     * Starts the timeout timer counting down from how much time this client's
+     * player has left.
+     * This should be called when the client is being timed for orders.
      *
      * @returns True if ticking, false if timeouts are not enabled.
      */
@@ -201,7 +202,9 @@ export class BaseClient {
             this.timer.timeout = undefined;
             this.timer.startTime = undefined;
 
-            this.player.timeRemaining -= (timeDiff[0] * 1e9 + timeDiff[1]); // hr time to only ns
+            // high resolution time to only ns
+            const timeTaken = (timeDiff[0] * 1e9 + timeDiff[1]);
+            this.player.timeRemaining -= timeTaken;
         }
     }
 

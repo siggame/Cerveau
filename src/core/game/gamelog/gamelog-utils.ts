@@ -4,9 +4,6 @@ import { Config } from "~/core/args";
 import { IGamelog } from "~/core/game";
 import { isObject, momentString } from "~/utils";
 
-/** Callback type to format the filename for a gamelog */
-export type FilenameFormatter = (gameName?: string, gameSession?: string, moment?: string) => string;
-
 /** The extension for gamelog files */
 export const GAMELOG_EXTENSION = ".json.gz";
 
@@ -16,7 +13,7 @@ export const GAMELOG_EXTENSION = ".json.gz";
  * @param gameName - The name of the game.
  * @param gameSession - The game session id.
  * @param moment - The moment string.
- * @returns A string that wuld be the filename.
+ * @returns A string that would be the filename.
  */
 export function filenameFormat(
     gameName?: string,
@@ -40,7 +37,10 @@ export function filenameFormat(
  * false otherwise for just he uri.
  * @returns The url to the gamelog.
  */
-export function getURL(filename: string, includeHostname: boolean = true): string {
+export function getURL(
+    filename: string,
+    includeHostname: boolean = true,
+): string {
     let hostname = "";
     if (includeHostname) {
         // Note: __HOSTNAME__ is expected to be overwritten by clients,
@@ -58,7 +58,7 @@ export function getURL(filename: string, includeHostname: boolean = true): strin
  * Returns a url to the visualizer for said gamelog
  * @param gamelogOrFilename the gamelog to format a visualizer url for
  * @param visualizerURL url to visualizer, if calling statically
- * @returns undefined if no visualizer set, url to the gamelog in visualizer otherwise
+ * @returns - Undefined if no visualizer set, url to the gamelog in visualizer otherwise
  */
 export function getVisualizerURL(
     gamelogOrFilename: any,

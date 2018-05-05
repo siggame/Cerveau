@@ -219,7 +219,7 @@ export class GamelogManager {
     /**
      * Checks to see if the filename maps to a gamelog on disk.
      *
-     * @param filename the base filename (without gamelog extension) you want
+     * @param filename - The base filename (without gamelog extension) you want
      * in LOGS_DIR/gamelogs/.
      * @returns A promise of the path to the game log if it exists, undefined
      * otherwise.

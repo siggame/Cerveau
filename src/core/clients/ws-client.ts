@@ -54,7 +54,9 @@ export class WSClient extends BaseClient {
 
         const parsed = this.parseData(data);
         if (!parsed) {
-            return; // because we got some invalid data, so we're going to fatally disconnect anyways
+            // Because we got some invalid data,
+            // so we're going to fatally disconnect anyways
+            return;
         }
 
         this.handleSent(parsed);

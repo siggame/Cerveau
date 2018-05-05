@@ -16,7 +16,8 @@ export interface ITwoPlayerPlayer extends IBasePlayer {
  * @param base - The BaseGame (or sub BaseGame) to mix in two player logic.
  * @returns A new BaseGame class with TwoPlayer logic mixed in.
  */
-// tslint:disable-next-line:typedef - because it will be a weird mixin type inferred from the return statement
+// Because it will be a weird mixin type inferred from the return statement.
+// tslint:disable-next-line:typedef
 export function mixTwoPlayer<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
