@@ -30,6 +30,7 @@ export interface IBaseGameNamespace {
     GameSettingsManager: typeof BaseGameSettingsManager;
     Player: Constructor<IBasePlayer>;
 
+    gameName: string;
     gameObjectsSchema: {
         AI: IBaseGameObjectSchema;
         Game: IBaseGameObjectSchema;

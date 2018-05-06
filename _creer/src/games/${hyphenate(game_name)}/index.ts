@@ -157,6 +157,7 @@ export const Namespace = makeNamespace({
     // these are generated metadata that allow delta-merging values from clients
     // they are never intended to be directly interfaced with outside of
     // Cerveau core developers
+    gameName: "${game_name}",
     gameSettingsManager: new ${game_name}GameSettingsManager(),
     gameObjectsSchema: {
 % for obj_name in (['AI', 'Game'] + sort_dict_keys(game_objs)):

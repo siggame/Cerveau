@@ -3,8 +3,6 @@ import { Config } from "../../core/args";
 import { Lobby } from "../../core/server";
 import { app } from "../app";
 
-const DEFAULT_PAGE_COUNT = 20;
-
 if (app && Config.ARENA_MODE) {
     // Only expose this route for the arena.
 
@@ -19,14 +17,13 @@ if (app && Config.ARENA_MODE) {
 
         const errors = [] as string[];
         const gameAlias = String(req.body.gameName);
-        const gameName = lobby.getGameNameForAlias(gameAlias);
-        const gameNamespace = lobby.getGameNamespace(gameName);
+        const gameNamespace = lobby.getGameNamespace(gameAlias);
         let numPlayers = -1;
-        if (!gameName) {
+        if (!gameNamespace) {
             errors.push(`gameName ${gameAlias} is not a known game alias`);
         }
         else {
-            numPlayers = gameNamespace!.GameManager.requiredNumberOfPlayers;
+            numPlayers = gameNamespace.GameManager.requiredNumberOfPlayers;
         }
 
         const session = String(req.body.session);
@@ -48,15 +45,21 @@ if (app && Config.ARENA_MODE) {
             errors.push(`gameSettings.playerNames must be an array of length ${numPlayers}`);
         }
 
-        if (errors.length > 0) {
-            res.status(400);
-            res.json({ error: errors.join("\n") });
-            return;
+        if (errors.length === 0) {
+            const error = lobby.setup(req.body as any);
+            if (error) {
+                errors.push(error);
+            }
+            else {
+                // else it has now been setup successfully!
+                res.status(200); // it was ok
+                res.json({}); // empty object
+
+                return; // to not respond with 400 below
+            }
         }
 
-        // if we got here we know the structure of the body is sound.
-        lobby.setup(req.body);
-        res.status(200); // it was ok
-        res.json({}); // empty object
+        res.status(400);
+        res.json({ error: errors.join("\n") });
     });
 }

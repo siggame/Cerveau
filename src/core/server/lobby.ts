@@ -161,6 +161,54 @@ export class Lobby {
     }
 
     /**
+     * Tries to set up a Room for private arena play with clients.
+     *
+     * @param data - Data about the Room to setup with.
+     * @returns An error string if it could not be validated, otherwise
+     * undefined if no error and the Room was successfully created.
+     */
+    public setup(data: {
+        gameAlias: string;
+        session: string;
+        gameSettings: IAnyObject;
+    }): string | undefined {
+        const namespace = this.getGameNamespace(data.gameAlias);
+        if (!namespace) {
+            return `gameName ${data.gameAlias} is valid for any games`;
+        }
+
+        const settings = namespace.gameSettingsManager.invalidateSettings(
+            data.gameSettings,
+        );
+
+        if (settings instanceof Error) {
+            return `gameSettings invalid: ${settings.message}`;
+        }
+
+        // Now get the room
+        // (it will never be an Error because we know the gameName is valid)
+        const existingRoom = this.getRoom(
+            namespace.gameName,
+            data.session,
+        ) as Room | undefined;
+
+        if (existingRoom) {
+            return `session ${data.session} is already taken.`;
+        }
+
+        // We now know the Room can be created safely.
+        const room = this.getOrCreateRoom(
+            data.gameAlias,
+            data.session,
+        ) as Room;
+
+        room.addGameSettings(settings);
+        this.rooms.get(namespace.gameName)!.set(data.session, room);
+
+        // if we got here the setup data looks valid, so let's setup the Room.
+    }
+
+    /**
      * Invoked when a client disconnects from the lobby
      *
      * @param client - the client that disconnected
@@ -221,7 +269,7 @@ export class Lobby {
             this.addSocket(socket, clientClass);
         });
 
-        // place a ' ' (space) before the 'Client' part of the class name
+        // Place a ' ' (space) before the 'Client' part of the class name.
         const clientName = clientClass.name.replace(/(Client)/g, " $1");
 
         listener.listen(port, "0.0.0.0", () => {
@@ -538,14 +586,12 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
 Must be one string in the url parameters format.${footer}`;
             }
 
-            // this function might mutate the game settings to validate them
-            gameNamespace.gameSettingsManager.reset();
-            const invalid = gameNamespace.gameSettingsManager.addSettings(settings);
-            if (invalid) {
-                return invalid.message + footer;
+            const validated = gameNamespace.gameSettingsManager.invalidateSettings(settings);
+            if (validated instanceof Error) {
+                return validated.message + footer;
             }
 
-            validatedData.validGameSettings = gameNamespace.gameSettingsManager.values;
+            validatedData.validGameSettings = validated;
         }
 
         return validatedData;

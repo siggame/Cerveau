@@ -57,13 +57,30 @@ export class BaseGameSettingsManager {
     }
 
     /**
-     * Attempts to add settings to this instance, or returns an Error
+     * Attempts to validates settings for this instance, or returns an Error.
+     *
      * @param invalidatedSettings key values pairs to attempt to validate, and
      * then if valid to be added to our settings
-     * @returns An error if the settings were invalid, otherwise nothing and
-     * the settings are added to this instances values
+     * @returns An error if the settings were invalid, otherwise the validated
+     * game settings as an object.
      */
     public addSettings(invalidatedSettings: IAnyObject): void | Error {
+        const validated = this.invalidateSettings(invalidatedSettings);
+
+        if (validated instanceof Error) {
+            Object.assign(this.values, validated);
+        }
+    }
+
+    /**
+     * Attempts to validates settings for this instance, or returns an Error.
+     *
+     * @param invalidatedSettings key values pairs to attempt to validate, and
+     * then if valid to be added to our settings
+     * @returns An error if the settings were invalid, otherwise the validated
+     * game settings as an object.
+     */
+    public invalidateSettings(invalidatedSettings: IAnyObject): IAnyObject | Error {
         const sanitized: IAnyObject = {};
 
         for (let [key, value] of Object.entries(invalidatedSettings)) {
@@ -98,15 +115,8 @@ export class BaseGameSettingsManager {
             }
         }
 
-        // now we've sanitized all the inputs, so see if they all are valid
-        const invalidated = this.invalidate(sanitized);
-
-        if (invalidated instanceof Error) {
-            return invalidated;
-        }
-
-        // else if appears to be valid!
-        this.values = invalidated as any;
+        // now we've sanitized all the inputs, so see if they all are valid types.
+        return this.invalidate(sanitized);
     }
 
     /**
