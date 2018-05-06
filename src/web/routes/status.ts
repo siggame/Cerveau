@@ -175,7 +175,7 @@ if (app) {
      * @apiSuccess (Client) {string} [reason] If the player won or lost this
      * will be the human readable reason why they did so.
      *
-     * @apiExample {json} Empty
+     * @apiSuccessExample {json} Empty
      *  {
      *      status: "empty",
      *      gameName: "Chess",
@@ -183,7 +183,7 @@ if (app) {
      *      requiredNumberOfPlayers: 2
      *  }
      *
-     * @apiExample {json} Open
+     * @apiSuccessExample {json} Open
      *  {
      *      status: "open",
      *      gameName: "Chess",
@@ -198,7 +198,7 @@ if (app) {
      *      ]
      *   }
      *
-     * @apiExample {json} Running
+     * @apiSuccessExample {json} Running
      *  {
      *      status: "running",
      *      gameName: "Chess",
@@ -218,12 +218,41 @@ if (app) {
      *      ]
      *  }
      *
-     * @apiExample {json} Over
+     * @apiSuccessExample {json} Over
      *  {
      *      status: "over",
      *      gameName: "Chess",
      *      gameSession: "1",
      *      gamelogFilename: "2016.03.01.11.54.30.868-Chess-1",
+     *      requiredNumberOfPlayers: 2,
+     *      clients: [
+     *          {
+     *              name: "Chess Lua Player",
+     *              index: 0,
+     *              spectating: false,
+     *              won: true,
+     *              lost: false,
+     *              reason: "Checkmate!"
+     *          },
+     *          {
+     *              name: "Chess Python Player",
+     *              index: 1,
+     *              spectating: false,
+     *              won: false,
+     *              lost: true,
+     *              reason: "Checkmated."
+     *          }
+     *      ]
+     *  }
+     *
+     * @apiSuccessExample {json} Almost Over
+     *  In this example the game is over, but the gamelog is still being
+     *  handled internally and is not available via the `gamelog/` API yet.
+     *  {
+     *      status: "over",
+     *      gameName: "Chess",
+     *      gameSession: "1",
+     *      gamelogFilename: null,
      *      requiredNumberOfPlayers: 2,
      *      clients: [
      *          {
