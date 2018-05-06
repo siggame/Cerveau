@@ -1,5 +1,14 @@
-# website/
+# web/
 
-This should contain all the code and files needed for the Cerveau website (web interface) to work. In a tradditional NodeJS project this all might be considered the 'app', but given Cerveau servces web browsers and game clients we have cleared up the differences between this website/ directory and the gameplay/ directory.
+This should contain all the code and files needed for the Cerveau web interface
+to work.
 
-Do not duplicate code. If anything code needs to be shared between the web and game services consider moving it to `../utilities/`.
+The web interface and API are a simple Express app serving web pages using
+handlebars for the templating engine, and exposing a RESTful API via Express.
+
+In a traditional Node.js project, this all might be considered the 'app';
+however the gameplay server is more of the traditional part of this "app".
+
+Do not duplicate code. If anything code needs to be shared between the web and
+game services consider moving it to `../utils/`, or to the root of this
+directory.

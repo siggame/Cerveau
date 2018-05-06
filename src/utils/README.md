@@ -1,5 +1,7 @@
-# utilities/
+# utils/
 
-This is the best place to put code shared between the web and game services. The best example is our custom `Class`, which allow OOP regardless of system.
+This is the best place to put code shared between the various parts of this
+project.
 
-If you Utilitiy function is important enough, like `Class` put it in a seperate file, otherwise adding it to index should suffice.
+If you want to add a single function, it may be better to add it here, rather
+than add a new dependency.
