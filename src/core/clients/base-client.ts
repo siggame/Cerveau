@@ -257,6 +257,16 @@ export class BaseClient {
         this.ourName = info.name || DEFAULT_STR;
         this.ourProgrammingLanguageType = info.type || DEFAULT_STR;
         this.ourPlayerIndex = info.index;
+
+        if (this.ourName.length > 80) {
+            // We don't want players to be able to use stupidly long names.
+            // so here's a limit of 80 characters.
+
+            this.ourName = `${this.ourProgrammingLanguageType} Player`;
+            // If people start cheesing this too and sending a "fake"
+            // programming language, then we might want to hard code a list of
+            // known languages and make sure it is valid here too.
+        }
     }
 
     /**
@@ -287,7 +297,7 @@ export class BaseClient {
      * @returns After the data is sent.
      */
     public send(event: string, data: any): Promise<void> {
-        return this.sendRaw(JSON.stringify({event, data}));
+        return this.sendRaw(JSON.stringify({ event, data }));
     }
 
     /**
