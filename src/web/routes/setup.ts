@@ -1,6 +1,6 @@
+import { Config } from "~/core/config";
+import { Lobby } from "~/core/server";
 import { isObject } from "~/utils";
-import { Config } from "../../core/args";
-import { Lobby } from "../../core/server";
 import { app } from "../app";
 
 if (app && Config.ARENA_MODE) {

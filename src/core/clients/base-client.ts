@@ -1,6 +1,6 @@
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
-import { Config } from "~/core/args";
+import { Config } from "~/core/config";
 import { BaseAIManager, IBasePlayer, IDelta } from "~/core/game/";
 import { logger } from "~/core/log";
 import { isObject } from "~/utils";

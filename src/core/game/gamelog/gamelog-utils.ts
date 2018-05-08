@@ -1,6 +1,6 @@
 import { basename } from "path";
 import * as sanitizeFilename from "sanitize-filename";
-import { Config } from "~/core/args";
+import { Config } from "~/core/config";
 import { IGamelog } from "~/core/game";
 import { isObject, momentString } from "~/utils";
 

@@ -1,5 +1,5 @@
 // internal imports
-import { Config } from "~/core/args";
+import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
 import { capitalizeFirstLetter, getDirs,

@@ -14,5 +14,5 @@ register({
 
 // if we got here the node modules should be good to go
 // import "module-alias/register";
-import { Config } from "./args";
+import { Config } from "./config";
 process.title = `${Config.MAIN_TITLE} Game Server`;

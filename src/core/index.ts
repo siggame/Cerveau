@@ -1,4 +1,4 @@
-export * from "./args";
+export * from "./config";
 export * from "./constants";
 export * from "./log";
 export * from "./serializer";

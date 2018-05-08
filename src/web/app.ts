@@ -2,7 +2,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as expressHandlebars from "express-handlebars";
 import { join } from "path";
-import { Config } from "~/core/args";
+import { Config } from "~/core/config";
 import { logger } from "~/core/log";
 import * as helpers from "./view-helpers";
 

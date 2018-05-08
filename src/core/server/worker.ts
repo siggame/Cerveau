@@ -7,8 +7,8 @@ import "../setup-thread";
 // this also loads the command line arguments from process.env
 import * as cluster from "cluster";
 import { Socket } from "net";
-import { Config } from "~/core/args";
 import * as Clients from "~/core/clients";
+import { Config } from "~/core/config";
 import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";

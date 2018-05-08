@@ -1,5 +1,5 @@
+import { Config } from "~/core/config";
 import { IGamelogInfo } from "~/core/game";
-import { Config } from "../../core/args";
 import { Lobby } from "../../core/server";
 import { app } from "../app";
 

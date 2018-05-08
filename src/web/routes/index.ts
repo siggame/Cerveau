@@ -1,5 +1,5 @@
-import { Config } from "../../core/args";
-import { Lobby } from "../../core/server";
+import { Config } from "~/core/config";
+import { Lobby } from "~/core/server";
 import { app } from "../app";
 
 // because this is also the index, we need to export barrels

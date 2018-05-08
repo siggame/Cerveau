@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";
-import { Config } from "~/core/args";
+import { Config } from "~/core/config";
 import * as utils from "~/utils";
 import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
        } from "./gamelog-utils";

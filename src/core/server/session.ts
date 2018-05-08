@@ -3,8 +3,8 @@ import { writeFile } from "fs-extra";
 import { join } from "path";
 import { Event, events, Signal } from "ts-typed-events";
 import { Profiler } from "v8-profiler"; // should be safe as it's from @types
-import { Config } from "~/core/args";
 import { BaseClient } from "~/core/clients";
+import { Config } from "~/core/config";
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
 import { BaseGame } from "~/core/game/base/base-game";
 import { BaseGameManager } from "~/core/game/base/base-game-manager";
