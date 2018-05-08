@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 
 /** The default format string we use for moment time stamps */
 export const DEFAULT_MOMENT_FORMAT = "YYYY.MM.DD.HH.mm.ss.SSS";

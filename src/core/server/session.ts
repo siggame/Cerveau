@@ -1,8 +1,8 @@
-import * as delay from "delay";
-// import { writeFile } from "fs";
-// import * as moment from "moment";
-
+import delay from "delay";
+import { writeFile } from "fs-extra";
+import { join } from "path";
 import { Event, events, Signal } from "ts-typed-events";
+import { Profiler } from "v8-profiler"; // should be safe as it's from @types
 import { Config } from "~/core/args";
 import { BaseClient } from "~/core/clients";
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
@@ -19,10 +19,21 @@ import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
 import { filenameFor, getURL, getVisualizerURL,
        } from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/log";
-import { isObjectEmpty } from "~/utils";
+import { isObjectEmpty, momentString } from "~/utils";
 
-// import { startProfiling, stopProfiling } from "v8-profiler";
-// TODO: v8-profiler may be missing as it is optional...
+let profiler: Profiler | undefined;
+import("v8-profiler")
+    .then((imported) => {
+        profiler = imported;
+    })
+    .catch((err) => {
+        if (Config.RUN_PROFILER) {
+            logger.error("Error importing profiler with RUN_PROFILER enabled");
+            logger.error(err);
+
+            process.exit(1);
+        }
+    });
 
 /**
  * Session: the server that handles of communications between a game and its
@@ -126,8 +137,8 @@ export class Session {
             });
         }
 
-        if (Config.RUN_PROFILER) {
-            // startProfiling();
+        if (Config.RUN_PROFILER && profiler) {
+            profiler.startProfiling();
         }
 
         if (Config.SESSION_TIMEOUTS_ENABLED) {
@@ -220,16 +231,19 @@ ${this.fatal!.message}`,
      */
     private stopProfiler(): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (!Config.RUN_PROFILER) {
+            if (!Config.RUN_PROFILER || !profiler) {
                 return resolve();
             }
 
-            /*
-            const profile = stopProfiling();
+            const profile = profiler.stopProfiling();
             profile.export((error, result) => {
-                const dateTime = moment().format("YYYY.MM.DD.HH.mm.ss.SSS");
+                const dateTime = momentString();
                 writeFile(
-                    `logs/profiles/profile-${this.gameName}-${this.id}-${dateTime}.cpuprofile`,
+                    join(
+                        Config.LOGS_DIR,
+                        "profiles/",
+                        `${this.gameName}-${this.id}-${dateTime}.cpuprofile`,
+                    ),
                     result,
                     (err) => {
                         profile.delete();
@@ -237,7 +251,6 @@ ${this.fatal!.message}`,
                     },
                 );
             });
-            */
             return resolve();
         });
     }
