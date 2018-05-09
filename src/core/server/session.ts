@@ -1,4 +1,4 @@
-import delay from "delay";
+import * as delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
 import { Event, events, Signal } from "ts-typed-events";

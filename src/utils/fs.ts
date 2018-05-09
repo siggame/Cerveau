@@ -4,18 +4,24 @@ import { promisify } from "util";
 import * as zlib from "zlib";
 
 /**
- * simple function to get director names in a directory.
- * @param sourcePath - path to check in
- * @param onlyDirs set to true for only directories, false for only files
- * @returns array of strings representing all directory names in a directory (not recursive).
+ * Simple function to get director names in a directory.
+ *
+ * @param sourcePath - Path to check in.
+ * @param onlyDirs Set to true for only directories, false for only files.
+ * @returns An Array of strings representing all directory names in a directory
+ * (not recursive).
  */
-async function getDirsOrFiles(sourcePath: string, onlyDirs: boolean = false): Promise<string[]> {
+async function getDirsOrFiles(
+    sourcePath: string,
+    onlyDirs: boolean = false,
+): Promise<string[]> {
     const files = await promisify(fs.readdir)(sourcePath);
     const results: string[] = [];
 
     for (const file of files) {
         const stats = await promisify(fs.stat)(path.join(sourcePath, file));
-        if ((onlyDirs && stats.isDirectory()) || (!onlyDirs && stats.isFile())) {
+        if ((onlyDirs && stats.isDirectory()) ||
+            (!onlyDirs && stats.isFile())) {
             results.push(file);
         }
     }
@@ -24,27 +30,32 @@ async function getDirsOrFiles(sourcePath: string, onlyDirs: boolean = false): Pr
 }
 
 /**
- * simple function to get directory names in a directory.
- * @param sourcePath the path to check in
- * @returns array of strings representing all directory names in a directory (not recursive).
+ * Simple function to get directory names in a directory.
+ *
+ * @param sourcePath - The path to check in.
+ * @returns An array of strings representing all directory names in a directory
+ * (not recursive).
  */
 export async function getDirs(sourcePath: string): Promise<string[]> {
     return await getDirsOrFiles(sourcePath, true);
 }
 
 /**
- * simple function to get file names in a directory.
- * @param sourcePath the path to check in
- * @returns array of strings representing all directory names in a directory (not recursive).
+ * Simple function to get file names in a directory.
+ *
+ * @param sourcePath - The path to check in.
+ * @returns An array of strings representing all directory names in a directory
+ * (not recursive).
  */
 export async function getFiles(sourcePath: string): Promise<string[]> {
     return await getDirsOrFiles(sourcePath, false);
 }
 
 /**
- * gunzip a file and return the buffer asynchronously
- * @param filePath the path to the file to gunzip
- * @returns a buffer of the file, now gunzipped
+ * Gunzip a file and return the buffer asynchronously.
+ *
+ * @param filePath - the path to the file to gunzip.
+ * @returns A buffer of the file, now gunzipped.
  */
 export function gunzipFile(filePath: string): Promise<Buffer> {
     const buffers: Buffer[] = [];
@@ -53,7 +64,7 @@ export function gunzipFile(filePath: string): Promise<Buffer> {
             .on("error", reject)
             .pipe(zlib.createGunzip()) // Un-Gzip
             .on("data", (buffer) => {
-                buffers.push(buffer as Buffer); // gzip will be buffer, not string
+                buffers.push(buffer as Buffer); // will be a buffer, not string
             })
             .on("end", () => {
                 resolve(Buffer.concat(buffers));

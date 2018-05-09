@@ -2,7 +2,7 @@ import { get, globalAgent } from "https";
 import { URL } from "url";
 
 /**
- * A simple async http request handler/
+ * A simple async http request handler.
  *
  * @param url - The URL to request data from via GET.
  * @returns A promise that resolves to the data found at that URL, or rejects
