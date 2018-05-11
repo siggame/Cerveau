@@ -20,7 +20,7 @@ export function httpRequest(url: string): Promise<string> {
                 "User-Agent": "Node.js",
             },
         }, (response) => {
-            // A chunk of data has been recieved.
+            // A chunk of data has been received.
             response.on("data", (chunk) => {
                 data += chunk;
             });
