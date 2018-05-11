@@ -17,9 +17,12 @@ ${merge('// ', 'imports', """// any additional imports you want can be placed he
  * together.
  */
 export class ${game['name']}GameManager extends BaseClasses.GameManager {
-    /** The name of this game (used as an ID internally) */
-    public static get gameName(): string {
-        return "${game['name']}";
+    /** Other strings (case insensitive) that can be used as an ID */
+    public static get aliases(): string[] {
+        return [
+${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
+""".format(game['name']), optional=True, help=False)}
+        ];
     }
 
     /** The number of players that must connect to play this game */
@@ -27,14 +30,6 @@ export class ${game['name']}GameManager extends BaseClasses.GameManager {
 ${merge('        // ', 'required-number-of-players', """        // override this if you want to set a different number of players
         return super.requiredNumberOfPlayers;
 """, optional=True, help=False)}
-    }
-
-    /** Other strings (case insensitive) that can be used as an ID */
-    public static get aliases(): string[] {
-        return [
-${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
-""".format(game['name']), optional=True, help=False)}
-        ];
     }
 
     /** The game this GameManager is managing */

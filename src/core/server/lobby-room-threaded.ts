@@ -46,7 +46,7 @@ export class ThreadedRoom extends Room {
             WORKER_GAME_SESSION_DATA: JSON.stringify({
                 mainDebugPort: (process as any)._debugPort, // used by debugger
                 sessionID: this.id,
-                gameName: this.gameNamespace.GameManager.gameName,
+                gameName: this.gameNamespace.gameName,
                 gameSettings: this.gameSettingsManager.values,
             } as IWorkerGameSessionData),
         });

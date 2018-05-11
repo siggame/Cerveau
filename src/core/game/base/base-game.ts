@@ -71,7 +71,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
         this.manager = requiredData.manager;
 
-        this.name = requiredData.namespace.GameManager.gameName;
+        this.name = requiredData.namespace.gameName;
         this.session = requiredData.sessionID;
 
         const clients = requiredData.clients;

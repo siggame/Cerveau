@@ -225,7 +225,7 @@ export class Lobby {
 
             if (room.clients.length === 0) {
                 // then that room is empty, no need to keep it around
-                this.rooms.get(room.gameNamespace.GameManager.gameName)!.delete(room.id);
+                this.rooms.get(room.gameNamespace.gameName)!.delete(room.id);
 
                 if (Number(room.id) + 1 === this.nextRoomNumber) {
                     // then the next game number was never used, so reuse it
@@ -310,7 +310,7 @@ There's probably another Cerveau server running on this same computer.`);
                 continue; // For now while we have unconverted games
                 // return process.exit(1);
             }
-            const gameName = gameNamespace.GameManager.gameName;
+            const gameName = gameNamespace.gameName;
             logger.info(`🕹️ ${gameName} game loaded 🕹️`);
 
             // hook up all the ways to get the game class via an index
@@ -356,7 +356,7 @@ There's probably another Cerveau server running on this same computer.`);
                 // Then they want to join any open game,
                 // so try to find an open session.
                 for (const [, theRoom] of rooms) {
-                    const theGame = theRoom.gameNamespace.GameManager.gameName;
+                    const theGame = theRoom.gameNamespace.gameName;
                     if (theRoom.isOpen() && theGame === gameName) {
                         room = theRoom;
                         break;
@@ -561,7 +561,7 @@ There's probably another Cerveau server running on this same computer.`);
             return `Game alias '${data.gameName}' is not a known game.`;
         }
         else {
-            validatedData.gameName = gameNamespace.GameManager.gameName;
+            validatedData.gameName = gameNamespace.gameName;
         }
 
         const n = gameNamespace.GameManager.requiredNumberOfPlayers;

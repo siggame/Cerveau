@@ -12,19 +12,14 @@ import { IBasePlayer } from "./base-player";
  * the base game plugin new games should inherit from.
  */
 export class BaseGameManager {
-    /** The name this manages. */
-    public static get gameName(): string {
-        return "BaseGame";
+    /** A list of aliases (case insensitive) that map to this game name. */
+    public static get aliases(): string[] {
+        return [];
     }
 
     /** The number of players required for this game to play. */
     public static get requiredNumberOfPlayers(): number {
         return 0;
-    }
-
-    /** A list of aliases (case insensitive) that map to this game name. */
-    public static get aliases(): string[] {
-        return [];
     }
 
     /**

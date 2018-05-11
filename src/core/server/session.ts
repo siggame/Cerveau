@@ -105,7 +105,7 @@ export class Session {
     }) {
         this.id = args.id;
         this.gameNamespace = args.gameNamespace;
-        this.gameName = args.gameNamespace.GameManager.gameName;
+        this.gameName = args.gameNamespace.gameName;
         this.clients = args.clients;
 
         // Now we have all our clients, so let's make the structures to play
