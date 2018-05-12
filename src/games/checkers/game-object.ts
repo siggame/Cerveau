@@ -1,58 +1,88 @@
-// GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseClasses, IGameObjectProperties } from "./";
+import { CheckersGame } from "./game";
+import { CheckersGameManager } from "./game-manager";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const BaseGameObject = require(`${__basedir}/gameplay/shared/baseGameObject`);
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-// any additional requires you want can be required here safely between cree runs
-//<<-- /Creer-Merge: requires -->>
+/**
+ * Add properties here to make the create.GameObject have different args.
+ */
+export interface IGameObjectConstructorArgs
+extends IGameObjectProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// @class GameObject: An object in the game. The most basic class that all game classes should inherit from automatically.
-let GameObject = Class(BaseGameObject, {
+/**
+ * An object in the game. The most basic class that all game classes should
+ * inherit from automatically.
+ */
+export class GameObject extends BaseClasses.GameObject {
+    /** The game this game object is in */
+    public readonly game!: CheckersGame;
+
+    /** The manager of the game that controls this */
+    public readonly manager!: CheckersGameManager;
+
     /**
-     * Initializes GameObjects.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * String representing the top level Class that this game object is an
+     * instance of. Used for reflection to create new instances on clients, but
+     * exposed for convenience should AIs want this data.
      */
-    init: function(data) {
-        BaseGameObject.init.apply(this, arguments);
+    public readonly gameObjectName!: string;
 
-        /**
-         * String representing the top level Class that this game object is an instance of. Used for reflection to create new instances on clients, but exposed for convenience should AIs want this data.
-         *
-         * @type {string}
-         */
-        this.gameObjectName = this.gameObjectName || "";
+    /**
+     * A unique id for each instance of a GameObject or a sub class. Used for
+     * client and server communication. Should never change value after being
+     * set.
+     */
+    public readonly id!: string;
 
-        /**
-         * A unique id for each instance of a GameObject or a sub class. Used for client and server communication. Should never change value after being set.
-         *
-         * @type {string}
-         */
-        this.id = this.id || "";
+    /**
+     * Any strings logged will be stored here. Intended for debugging.
+     */
+    public logs!: string[];
 
-        /**
-         * Any strings logged will be stored here. Intended for debugging.
-         *
-         * @type {Array.<string>}
-         */
-        this.logs = this.logs || [];
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
-        // NOTE: no players are connected at this point.
-        //<<-- /Creer-Merge: init -->>
-    },
+    // <<-- /Creer-Merge: attributes -->>
 
-    gameObjectName: "GameObject",
+    /**
+     * Called when a GameObject is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: IGameObjectConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-    // You can add additional functions here. These functions will not be directly callable by client AIs
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: public-functions -->>
 
-});
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-module.exports = GameObject;
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

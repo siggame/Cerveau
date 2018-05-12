@@ -1,5 +1,8 @@
-<%include file="functions.noCreer" />import { BaseClasses } from "./";
-
+<%include file="functions.noCreer" /><%
+imports = shared['cerveau']['generate_imports']('AI', ai, {
+    './': [ 'BaseClasses' ]
+})
+%>${shared['cerveau']['imports'](imports)}
 ${merge('// ', 'imports',
 '// any additional imports you want can be placed here safely between creer runs',
 optional=True, help=False)}
@@ -20,8 +23,8 @@ optional=True, help=False)}
         continue #//this is implimented in based mixins for this project
     function_parms = ai['functions'][function_name]
     ret = function_parms['returns']
-%>${shared['cerveau']['formatted_function_top'](function_name, ai)}
-        return await this.executeOrder("functionName"${"" if not function_parms['arguments'] else '' + (
+%>${shared['cerveau']['formatted_function_top'](function_name, ai, scope='public')}
+        ${'return ' if ret else ''}await this.executeOrder("functionName"${"" if not function_parms['arguments'] else '' + (
 ",\n            ".join([''] + [arg['name'] for arg in function_parms['arguments']]) + ",\n        "
 )});
     }

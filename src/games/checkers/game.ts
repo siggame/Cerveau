@@ -1,190 +1,131 @@
-// Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.
+import { IBaseGameRequiredData } from "~/core/game";
+import { BaseClasses } from "./";
+import { Checker } from "./checker";
+import { CheckersGameManager } from "./game-manager";
+import { GameObject } from "./game-object";
+import { CheckersGameSettingsManager } from "./game-settings";
+import { Player } from "./player";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
-const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-// any additional requires you want can be required here safely between cree runs
-//<<-- /Creer-Merge: requires -->>
+/**
+ * The simple version of American Checkers. An 8x8 board with 12 checkers on
+ * each side that must move diagonally to the opposing side until kinged.
+ */
+export class CheckersGame extends BaseClasses.Game {
+    /** The manager of this game, that controls everything around it */
+    public readonly manager!: CheckersGameManager;
 
-// @class Game: The simple version of American Checkers. An 8x8 board with 12 checkers on each side that must move diagonally to the opposing side until kinged.
-let Game = Class(TwoPlayerGame, TurnBasedGame, {
+    /** The settings used to initialize the game, as set by players */
+    public readonly settings = Object.freeze(this.settingsManager.values);
+
     /**
-     * Initializes Games.
+     * The height of the board for the Y component of a checker.
+     */
+    public readonly boardHeight!: number;
+
+    /**
+     * The width of the board for X component of a checker.
+     */
+    public readonly boardWidth!: number;
+
+    /**
+     * The checker that last moved and must be moved because only one checker
+     * can move during each players turn.
+     */
+    public checkerMoved?: Checker;
+
+    /**
+     * If the last checker that moved jumped, meaning it can move again.
+     */
+    public checkerMovedJumped!: boolean;
+
+    /**
+     * All the checkers currently in the game.
+     */
+    public checkers!: Checker[];
+
+    /**
+     * The player whose turn it is currently. That player can send commands.
+     * Other players cannot.
+     */
+    public currentPlayer!: Player;
+
+    /**
+     * The current turn number, starting at 0 for the first player's turn.
+     */
+    public currentTurn!: number;
+
+    /**
+     * A mapping of every game object's ID to the actual game object. Primarily
+     * used by the server and client to easily refer to the game objects via
+     * ID.
+     */
+    public gameObjects!: {[id: string]: GameObject};
+
+    /**
+     * The maximum number of turns before the game will automatically end.
+     */
+    public readonly maxTurns!: number;
+
+    /**
+     * List of all the players in the game.
+     */
+    public players!: Player[];
+
+    /**
+     * A unique identifier for the game instance that is being played.
+     */
+    public readonly session!: string;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Game is created.
      *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param settingsManager - The manager that holds initial settings.
+     * @param required - Data required to initialize this (ignore it).
      */
-    init: function(data) {
-        TurnBasedGame.init.apply(this, arguments);
-        TwoPlayerGame.init.apply(this, arguments);
+    constructor(
+        protected settingsManager: CheckersGameSettingsManager,
+        required: IBaseGameRequiredData,
+    ) {
+        super(settingsManager, required);
 
-        /**
-         * The height of the board for the Y component of a checker.
-         *
-         * @type {number}
-         */
-        this.boardHeight = this.boardHeight || 0;
+        // <<-- Creer-Merge: constructor -->>
 
-        /**
-         * The width of the board for X component of a checker.
-         *
-         * @type {number}
-         */
-        this.boardWidth = this.boardWidth || 0;
+        // they are on top, and move down the board until kinged
+        this.players[0].yDirection = 1;
 
-        /**
-         * The checker that last moved and must be moved because only one checker can move during each players turn.
-         *
-         * @type {Checker}
-         */
-        this.checkerMoved = this.checkerMoved || null;
+        // they are on bottom, and move up the board until king
+        this.players[1].yDirection = -1;
 
-        /**
-         * If the last checker that moved jumped, meaning it can move again.
-         *
-         * @type {boolean}
-         */
-        this.checkerMovedJumped = this.checkerMovedJumped || false;
+        // Initialize the Checkers
+        for (let y = 0; y < this.boardHeight; y++) {
+            for (let x = 0; x < this.boardWidth; x++) {
+                if ((x + y) % 2 === 1) {
+                    let owner: Player | undefined;
 
-        /**
-         * All the checkers currently in the game.
-         *
-         * @type {Array.<Checker>}
-         */
-        this.checkers = this.checkers || [];
-
-        /**
-         * The player whose turn it is currently. That player can send commands. Other players cannot.
-         *
-         * @type {Player}
-         */
-        this.currentPlayer = this.currentPlayer || null;
-
-        /**
-         * The current turn number, starting at 0 for the first player's turn.
-         *
-         * @type {number}
-         */
-        this.currentTurn = this.currentTurn || 0;
-
-        /**
-         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
-         *
-         * @type {Object.<string, GameObject>}
-         */
-        this.gameObjects = this.gameObjects || {};
-
-        /**
-         * The maximum number of turns before the game will automatically end.
-         *
-         * @type {number}
-         */
-        this.maxTurns = this.maxTurns || 0;
-
-        /**
-         * List of all the players in the game.
-         *
-         * @type {Array.<Player>}
-         */
-        this.players = this.players || [];
-
-        /**
-         * A unique identifier for the game instance that is being played.
-         *
-         * @type {string}
-         */
-        this.session = this.session || "";
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.boardWidth = 8;
-        this.boardHeight = 8;
-        this.maxTurns = 300;
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    name: "Checkers",
-
-    aliases: [
-        //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-##-Checkers",
-        //<<-- /Creer-Merge: aliases -->>
-    ],
-
-
-
-    /**
-     * This is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet..
-     */
-    begin: function() {
-        TurnBasedGame.begin.apply(this, arguments);
-        TwoPlayerGame.begin.apply(this, arguments);
-
-        //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this._initCheckerPieces();
-        //<<-- /Creer-Merge: begin -->>
-    },
-
-    /**
-     * This is called when the game has started, after all the begin()s. This is a good spot to send orders.
-     */
-    _started: function() {
-        TurnBasedGame._started.apply(this, arguments);
-        TwoPlayerGame._started.apply(this, arguments);
-
-        //<<-- Creer-Merge: _started -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic for _started can be put here
-        //<<-- /Creer-Merge: _started -->>
-    },
-
-
-    /**
-     * This is called whenever your checker gets captured (during an opponent's turn).
-     *
-     * @param {Player} player - the player that called this.
-     * @param {Checker} checker - The checker that was captured.
-     */
-    aiFinishedGotCaptured: function(player, checker) {
-        // <<-- Creer-Merge: gotCaptured -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Developer: Put your game logic for the Game's gotCaptured function here
-        return;
-
-        // <<-- /Creer-Merge: gotCaptured -->>
-    },
-
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-    _initPlayers: function() {
-        TurnBasedGame._initPlayers.apply(this, arguments);
-
-        // we can assume there are only 2 players (it's set above), no need to loop through them
-        this.players[0].yDirection = 1; // they are on top, and move down the board until kinged
-        this.players[1].yDirection = -1; // they are on bottom, and move up the board until kinged
-    },
-
-    // / initializes the checker game objects for this game
-    _initCheckerPieces: function() {
-        for(var y = 0; y < this.boardHeight; y++) {
-            for(var x = 0; x < this.boardWidth; x++) {
-                if(this.isValidTile(x, y)) {
-                    var owner = undefined;
-
-                    if(y < 3) { // then it is player 0's checker
+                    if (y < 3) { // then it is player 0's checker
                         owner = this.players[0];
                     }
-                    else if(y > 4) { // then it is player 1's checker
+                    else if (y > 4) { // then it is player 1's checker
                         owner = this.players[1];
                     } // else is the middle, which has no intial checker pieces
 
-                    if(owner) {
-                        var checker = this.create("Checker", {
-                            owner: owner,
-                            x: x,
-                            y: y,
+                    if (owner) {
+                        const checker = this.manager.create.Checker({
+                            owner,
+                            x,
+                            y,
                             kinged: false,
                         });
 
@@ -195,63 +136,28 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, {
 
             }
         }
-    },
 
-    isValidTile: function(x, y) {
-        return (x + y)%2 === 1;
-    },
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    getCheckerAt: function(x, y) {
-        for(var i = 0; i < this.checkers.length; i++) {
-            var checker = this.checkers[i];
+    // <<-- Creer-Merge: public-functions -->>
 
-            if(checker.x === x && checker.y === y) {
-                return checker;
-            }
-        }
-    },
+    /**
+     * Gets a Checker (if it exists) at a given (x, y).
+     *
+     * @param x - The x co-ordinate of the checker.
+     * @param y - The y co-ordinate of the checker.
+     * @returns A Checker if found, undefined otherwise.
+     */
+    public getCheckerAt(x: number, y: number): Checker | undefined {
+        return this.checkers.find((c) => c.x === x && c.y === y);
+    }
 
+    // <<-- /Creer-Merge: public-functions -->>
 
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    // /////////////////////////////
-    // Turn Based Game mechanics //
-    // /////////////////////////////
+    // Any additional protected or pirate methods can go here.
 
-    nextTurn: function() {
-        this.checkerMoved = null;
-        this.checkerMovedJumped = false;
-
-        return TurnBasedGame.nextTurn.apply(this, arguments);
-    },
-
-    _maxTurnsReached: function() {
-        TurnBasedGame._maxTurnsReached.apply(this, arguments);
-
-        var checkerValuesForPlayerID = {};
-        for(var i = 0; i < this.checkers.length; i++) {
-            var checker = this.checkers[i];
-            checkerValuesForPlayerID[checker.owner.id] = checkerValuesForPlayerID[checker.owner.id] || 1;
-            checkerValuesForPlayerID[checker.owner.id] += (checker.kinged ? 100 : 1);
-        }
-
-        // TODO: handle draw
-        var winner;
-        for(i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            winner = winner || player;
-
-            if(checkerValuesForPlayerID[player.id] > checkerValuesForPlayerID[winner.id]) {
-                winner = player;
-            }
-        }
-
-        if(winner) {
-            return this.declareWinner(winner, "Turn limit reached; has the most remaining checkers or kinged checkers");
-        }
-    },
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Game;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

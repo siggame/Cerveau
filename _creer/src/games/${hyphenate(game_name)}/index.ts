@@ -3,7 +3,8 @@
 // It basically sets up all the classes we need for TypeScript to know the
 // base classes with minimal code for developers to be forced to fill out
 <%include file="functions.noCreer" />
-// tslint:disable:max-classes-per-file - because we need to build a bunch of base class wrappers here
+// tslint:disable:max-classes-per-file
+// ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
 import {
@@ -33,8 +34,13 @@ imports = {
 
 %>
 ${shared['cerveau']['imports'](imports)}
-/** The interface the Player ${game_name} must impliment from mixed in game logic. */
-export interface IBase${game_name}Player extends IBasePlayer${', '.join([''] + [m for m in mixed_players])} {}
+/**
+ * The interface the Player for the ${game_name} game
+ * must implement from mixed in game logic.
+ */
+export interface IBase${game_name}Player extends
+    IBasePlayer${',\n    '.join([''] + [m for m in mixed_players])} {
+}
 <% base_index = 1 %>
 const base0 = {
     AI: BaseAI,
@@ -74,7 +80,8 @@ export const BaseClasses = {
     GameSettings: Base${game_name}GameSettings,
 };
 
-// now all the base classes are created, so we can start importing/exporting the classes that need them
+// Now all the base classes are created;
+// so we can start importing/exporting the classes that need them.
 
 % for game_obj_name in sort_dict_keys(game_objs):
 <%
@@ -120,7 +127,10 @@ import { ${game_name}GameSettingsManager } from "./game-settings";
 import { AI } from "./ai";
 % endif
 
-/** The factory that **must** be used to create any game objects in the ${game_name} game. */
+/**
+ * The factory that **must** be used to create any game objects in
+ * the ${game_name} game.
+ */
 export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
 % for game_obj_name in sort_dict_keys(game_objs):
 <%
@@ -145,7 +155,10 @@ export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
 % endfor
 }
 
-/** The shared namespace for ${game_name} that is used to initialize each game instance. */
+/**
+ * The shared namespace for ${game_name} that is used to
+ * initialize each game instance.
+ */
 export const Namespace = makeNamespace({
     AI,
     Game: ${game_name}Game,
@@ -154,9 +167,10 @@ export const Namespace = makeNamespace({
     GameSettingsManager: ${game_name}GameSettingsManager,
     Player,
 
-    // these are generated metadata that allow delta-merging values from clients
-    // they are never intended to be directly interfaced with outside of
-    // Cerveau core developers
+    // These are generated metadata that allow delta-merging values from
+    // clients.
+    // They are never intended to be directly interfaced with outside of the
+    // Cerveau core developers.
     gameName: "${game_name}",
     gameSettingsManager: new ${game_name}GameSettingsManager(),
     gameObjectsSchema: {

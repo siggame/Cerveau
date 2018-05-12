@@ -1,107 +1,107 @@
-// Player: A player in this game. Every AI controls one player.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IBaseCheckersPlayer } from "./";
+import { AI } from "./ai";
+import { Checker } from "./checker";
+import { GameObject } from "./game-object";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-// any additional requires you want can be required here safely between cree runs
-//<<-- /Creer-Merge: requires -->>
+/**
+ * A player in this game. Every AI controls one player.
+ */
+export class Player extends GameObject implements IBaseCheckersPlayer {
+    /** The AI controlling this Player */
+    public readonly ai!: AI;
 
-// @class Player: A player in this game. Every AI controls one player.
-let Player = Class(GameObject, {
     /**
-     * Initializes Players.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * All the checkers currently in the game owned by this player.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public checkers!: Checker[];
 
-        /**
-         * All the checkers currently in the game owned by this player.
-         *
-         * @type {Array.<Checker>}
-         */
-        this.checkers = this.checkers || [];
+    /**
+     * What type of client this is, e.g. 'Python', 'JavaScript', or some other
+     * language. For potential data mining purposes.
+     */
+    public readonly clientType!: string;
 
-        /**
-         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
-         *
-         * @type {string}
-         */
-        this.clientType = this.clientType || "";
+    /**
+     * If the player lost the game or not.
+     */
+    public lost!: boolean;
 
-        /**
-         * If the player lost the game or not.
-         *
-         * @type {boolean}
-         */
-        this.lost = this.lost || false;
+    /**
+     * The name of the player.
+     */
+    public readonly name!: string;
 
-        /**
-         * The name of the player.
-         *
-         * @type {string}
-         */
-        this.name = this.name || "";
+    /**
+     * This player's opponent in the game.
+     */
+    public readonly opponent!: Player;
 
-        /**
-         * This player's opponent in the game.
-         *
-         * @type {Player}
-         */
-        this.opponent = this.opponent || null;
+    /**
+     * The reason why the player lost the game.
+     */
+    public reasonLost!: string;
 
-        /**
-         * The reason why the player lost the game.
-         *
-         * @type {string}
-         */
-        this.reasonLost = this.reasonLost || "";
+    /**
+     * The reason why the player won the game.
+     */
+    public reasonWon!: string;
 
-        /**
-         * The reason why the player won the game.
-         *
-         * @type {string}
-         */
-        this.reasonWon = this.reasonWon || "";
+    /**
+     * The amount of time (in ns) remaining for this AI to send commands.
+     */
+    public timeRemaining!: number;
 
-        /**
-         * The amount of time (in ns) remaining for this AI to send commands.
-         *
-         * @type {number}
-         */
-        this.timeRemaining = this.timeRemaining || 0;
+    /**
+     * If the player won the game or not.
+     */
+    public won!: boolean;
 
-        /**
-         * If the player won the game or not.
-         *
-         * @type {boolean}
-         */
-        this.won = this.won || false;
+    /**
+     * The direction your checkers must go along the y-axis until kinged.
+     */
+    public yDirection!: number;
 
-        /**
-         * The direction your checkers must go along the y-axis until kinged.
-         *
-         * @type {number}
-         */
-        this.yDirection = this.yDirection || 0;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // put any initialization logic here. the base variables should be set from 'data' in Generated${obj_key}'s init function
-        // NOTE: no players are connected at this point.
-        //<<-- /Creer-Merge: init -->>
-    },
+    // <<-- /Creer-Merge: attributes -->>
 
-    gameObjectName: "Player",
+    /**
+     * Called when a Player is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: {},
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-    // You can add additional functions here. These functions will not be directly callable by client AIs
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: public-functions -->>
 
-});
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-module.exports = Player;
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

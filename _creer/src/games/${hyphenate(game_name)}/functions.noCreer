@@ -2,6 +2,9 @@
 from textwrap import TextWrapper
 import operator
 
+MAX_LINE_LENGTH = 79 # one less than 80 to allow for scroll bars in 80 char
+                     # width editors
+
 if not 'cerveau' in shared:
     shared['cerveau'] = {}
     shared['cerveau']['TextWrapper'] = TextWrapper
@@ -103,7 +106,7 @@ if not 'cerveau' in shared:
         wrapper = TextWrapper(
             initial_indent=prefix+' * ',
             subsequent_indent=prefix+' * ',
-            width=80,
+            width=79,
         )
         if isinstance(doc, str):
             doc = {'description': doc}
@@ -141,7 +144,7 @@ if not 'cerveau' in shared:
             names = sorted(pair[1])
             one_line = ('import { '+(', '.join(names))+' } from "'+pair[0]+'";')
 
-            if len(one_line) > 80:
+            if len(one_line) > 79:
                 # wrap it
                 names = '\n' + ''.join(['    {},\n'.format(n) for n in names])
             else:
@@ -191,7 +194,7 @@ if not 'cerveau' in shared:
         return imports
     shared['cerveau']['generate_imports'] = cerveau_generate_imports
 
-    def cerveau_formatted_function_top(function_name, obj, promise=True):
+    def cerveau_formatted_function_top(function_name, obj, scope='protected', promise=True):
         function_parms = dict(obj['functions'][function_name])
         docstring = cerveau_block_comment('    ', function_parms)
 
@@ -199,7 +202,7 @@ if not 'cerveau' in shared:
         if function_parms['returns']:
             returns = shared['cerveau']['type'](function_parms['returns']['type'])
 
-        formatted_name = '    protected '+('async ' if promise else '')+function_name+'('
+        formatted_name = '    {} '.format(scope)+('async ' if promise else '')+function_name+'('
         unformatted_args = (
             [(a['name']+': '+shared['cerveau']['type'](a['type'])+(
                 (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
@@ -211,7 +214,7 @@ if not 'cerveau' in shared:
 
         formatted_function_signature = None
         as_one_line = formatted_name + formatted_args + formatted_return
-        if len(as_one_line) < 80:
+        if len(as_one_line) < 79:
             formatted_function_signature = as_one_line
         else:
             # it does not all fit on one line, so split up by arg
