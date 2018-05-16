@@ -5,6 +5,18 @@
 		<li>
 			<h3 class="game-name">{{this.name}}</h3>
 			<div class="game-description">{{this.description}}</div>
+			<h4 class="game-settings">Settings</h4>
+			<ul>
+			{{#each this.settings}}
+				<li>
+					<span class="game-setting-name">{{this.name}}</span> = 
+					<span class="game-setting-default">{{this.default}}</span>
+					<span class="game-setting-min">{{this.min}}</span>
+					<span class="game-setting-max">{{this.max}}</span>: 
+					<span class="game-setting-description">{{this.description}}</span>
+				</li>
+			{{/each}}
+			</ul>
 		</li>
 	{{/each}}
 	</ul>

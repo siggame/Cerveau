@@ -1,4 +1,5 @@
 import { Config } from "~/core/config";
+import { ISettingsSchema } from "~/core/game";
 import { Lobby } from "~/core/server";
 import { app } from "../app";
 
@@ -12,9 +13,15 @@ export * from "./status";
 
 const MAX_GAMELOGS_ON_INDEX = 10;
 
+/** Setting for the view to expect. */
+type Setting = ISettingsSchema<any> & {
+    name: string;
+};
+
 const games: Array<{
     name: string;
     description: string;
+    settings: Setting[];
 }> = [];
 
 if (app && Config.WEB_ENABLED) {
@@ -23,10 +30,21 @@ if (app && Config.WEB_ENABLED) {
 
     const lobby = Lobby.getInstance();
     lobby.gamesInitializedPromise.then(() => {
-        for (const gameName of Object.keys(lobby.gameNamespaces)) {
+        for (const gameName of Object.keys(lobby.gameNamespaces).sort()) {
+            const namespace = lobby.gameNamespaces[gameName]!;
+            const schema = namespace.gameSettingsManager.schema;
+
+            const settings = [] as Setting[];
+            for (const name of Object.keys(schema)) {
+                const setting: ISettingsSchema<any> = (schema as any)[name];
+
+                settings.push({ name, ...setting });
+            }
+
             games.push({
                 name: gameName,
                 description: "TODO: do",
+                settings,
             });
         }
     });

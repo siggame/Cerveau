@@ -34,5 +34,7 @@ if (Config.WEB_ENABLED || Config.API_ENABLED) {
 
     app.listen(Config.HTTP_PORT, () => {
         logger.info(`🌐 Web server live on port ${Config.HTTP_PORT} 🌐`);
+
+        import("./routes"); // now register the routes
     });
 }
