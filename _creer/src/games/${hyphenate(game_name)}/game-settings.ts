@@ -34,11 +34,6 @@ ${merge('            // ', 'player-starting-time',
             min: 0,
             description: "The starting time (in ns) for each player.",
         },
-        randomSeed: {
-${merge('            // ', 'random-seed',
-'            default: "", // which will generate a random string', optional=True, help=False)}
-            description: "The random seed, or empty for a random seed.",
-        },
 
 % if 'TurnBasedGame' in game['serverParentClasses']:
         // Turn based settings

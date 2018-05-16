@@ -3,7 +3,8 @@
 // It basically sets up all the classes we need for TypeScript to know the
 // base classes with minimal code for developers to be forced to fill out
 
-// tslint:disable:max-classes-per-file - because we need to build a bunch of base class wrappers here
+// tslint:disable:max-classes-per-file
+// ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
 import {
@@ -19,8 +20,15 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
-/** The interface the Player Anarchy must impliment from mixed in game logic. */
-export interface IBaseAnarchyPlayer extends IBasePlayer, ITwoPlayerPlayer, ITurnBasedPlayer {}
+/**
+ * The interface the Player for the Anarchy game
+ * must implement from mixed in game logic.
+ */
+export interface IBaseAnarchyPlayer extends
+    IBasePlayer,
+    ITwoPlayerPlayer,
+    ITurnBasedPlayer {
+}
 
 const base0 = {
     AI: BaseAI,
@@ -59,7 +67,8 @@ export const BaseClasses = {
     GameSettings: BaseAnarchyGameSettings,
 };
 
-// now all the base classes are created, so we can start importing/exporting the classes that need them
+// Now all the base classes are created;
+// so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an Building. */
 export interface IBuildingProperties {
@@ -94,8 +103,8 @@ export interface IBuildingProperties {
     buildingWest?: Building;
 
     /**
-     * How much fire is currently burning the building, and thus how much damage
-     * it will take at the end of its owner's turn. 0 means no fire.
+     * How much fire is currently burning the building, and thus how much
+     * damage it will take at the end of its owner's turn. 0 means no fire.
      */
     fire?: number;
 
@@ -142,8 +151,8 @@ export interface IFireDepartmentProperties {
 /** All the possible properties for an Forecast. */
 export interface IForecastProperties {
     /**
-     * The Player that can use WeatherStations to control this Forecast when its
-     * the nextForecast.
+     * The Player that can use WeatherStations to control this Forecast when
+     * its the nextForecast.
      */
     controllingPlayer?: Player;
 
@@ -308,7 +317,10 @@ import { AnarchyGame } from "./game";
 import { AnarchyGameManager } from "./game-manager";
 import { AnarchyGameSettingsManager } from "./game-settings";
 
-/** The factory that **must** be used to create any game objects in the Anarchy game. */
+/**
+ * The factory that **must** be used to create any game objects in
+ * the Anarchy game.
+ */
 export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Building in the Game and tracks it for all players.
@@ -345,10 +357,11 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     }
 
     /**
-     * Creates a new PoliceDepartment in the Game and tracks it for all players.
+     * Creates a new PoliceDepartment in the Game and tracks it for all
+     * players.
      *
-     * @param data - Data about the PoliceDepartment to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param data - Data about the PoliceDepartment to set. Any keys matching
+     * a property in the game object's class will be automatically set for you.
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */
@@ -381,7 +394,10 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
 
 }
 
-/** The shared namespace for Anarchy that is used to initialize each game instance. */
+/**
+ * The shared namespace for Anarchy that is used to
+ * initialize each game instance.
+ */
 export const Namespace = makeNamespace({
     AI,
     Game: AnarchyGame,
@@ -390,9 +406,10 @@ export const Namespace = makeNamespace({
     GameSettingsManager: AnarchyGameSettingsManager,
     Player,
 
-    // these are generated metadata that allow delta-merging values from clients
-    // they are never intended to be directly interfaced with outside of
-    // Cerveau core developers
+    // These are generated metadata that allow delta-merging values from
+    // clients.
+    // They are never intended to be directly interfaced with outside of the
+    // Cerveau core developers.
     gameName: "Anarchy",
     gameSettingsManager: new AnarchyGameSettingsManager(),
     gameObjectsSchema: {
@@ -419,15 +436,18 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Building,
+                        nullable: false,
                     },
                 },
                 currentForecast: {
                     typeName: "gameObject",
                     gameObjectClass: Forecast,
+                    nullable: false,
                 },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 currentTurn: {
                     typeName: "int",
@@ -437,6 +457,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Forecast,
+                        nullable: false,
                     },
                 },
                 gameObjects: {
@@ -447,6 +468,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: GameObject,
+                        nullable: false,
                     },
                 },
                 mapHeight: {
@@ -467,12 +489,14 @@ export const Namespace = makeNamespace({
                 nextForecast: {
                     typeName: "gameObject",
                     gameObjectClass: Forecast,
+                    nullable: true,
                 },
                 players: {
                     typeName: "list",
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Player,
+                        nullable: false,
                     },
                 },
                 session: {
@@ -491,18 +515,22 @@ export const Namespace = makeNamespace({
                 buildingEast: {
                     typeName: "gameObject",
                     gameObjectClass: Building,
+                    nullable: true,
                 },
                 buildingNorth: {
                     typeName: "gameObject",
                     gameObjectClass: Building,
+                    nullable: true,
                 },
                 buildingSouth: {
                     typeName: "gameObject",
                     gameObjectClass: Building,
+                    nullable: true,
                 },
                 buildingWest: {
                     typeName: "gameObject",
                     gameObjectClass: Building,
+                    nullable: true,
                 },
                 fire: {
                     typeName: "int",
@@ -516,6 +544,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 x: {
                     typeName: "int",
@@ -541,6 +570,7 @@ export const Namespace = makeNamespace({
                             argName: "building",
                             typeName: "gameObject",
                             gameObjectClass: Building,
+                            nullable: false,
                         },
                     ],
                     invalidValue: false,
@@ -556,6 +586,7 @@ export const Namespace = makeNamespace({
                 controllingPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 direction: {
                     typeName: "string",
@@ -607,6 +638,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Building,
+                        nullable: false,
                     },
                 },
                 clientType: {
@@ -617,11 +649,13 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: FireDepartment,
+                        nullable: false,
                     },
                 },
                 headquarters: {
                     typeName: "gameObject",
                     gameObjectClass: Warehouse,
+                    nullable: false,
                 },
                 lost: {
                     typeName: "boolean",
@@ -632,12 +666,14 @@ export const Namespace = makeNamespace({
                 opponent: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 policeDepartments: {
                     typeName: "list",
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: PoliceDepartment,
+                        nullable: false,
                     },
                 },
                 reasonLost: {
@@ -654,6 +690,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Warehouse,
+                        nullable: false,
                     },
                 },
                 weatherStations: {
@@ -661,6 +698,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: WeatherStation,
+                        nullable: false,
                     },
                 },
                 won: {
@@ -681,6 +719,7 @@ export const Namespace = makeNamespace({
                             argName: "warehouse",
                             typeName: "gameObject",
                             gameObjectClass: Warehouse,
+                            nullable: false,
                         },
                     ],
                     invalidValue: -1,
@@ -707,6 +746,7 @@ export const Namespace = makeNamespace({
                             argName: "building",
                             typeName: "gameObject",
                             gameObjectClass: Building,
+                            nullable: false,
                         },
                     ],
                     invalidValue: -1,

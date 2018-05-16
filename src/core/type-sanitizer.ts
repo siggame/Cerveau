@@ -15,6 +15,7 @@ export type ISanitizableType = ISanitizableTypePrimitive
 /** Primitive types we can sanitize. */
 export interface ISanitizableTypePrimitive {
     typeName: "string" | "float" | "int" | "boolean" | "void";
+    literals?: any[];
 }
 
 /** A list (array) that can be sanitized. */
@@ -34,6 +35,7 @@ export interface ISanitizableTypeDictionary {
 export interface ISanitizableTypeGameObject {
     typeName: "gameObject";
     gameObjectClass: typeof BaseGameObject;
+    nullable: boolean;
 }
 
 /**

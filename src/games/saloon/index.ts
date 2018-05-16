@@ -3,7 +3,8 @@
 // It basically sets up all the classes we need for TypeScript to know the
 // base classes with minimal code for developers to be forced to fill out
 
-// tslint:disable:max-classes-per-file - because we need to build a bunch of base class wrappers here
+// tslint:disable:max-classes-per-file
+// ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
 import {
@@ -21,8 +22,16 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
-/** The interface the Player Saloon must impliment from mixed in game logic. */
-export interface IBaseSaloonPlayer extends IBasePlayer, ITwoPlayerPlayer, ITurnBasedPlayer, ITiledPlayer {}
+/**
+ * The interface the Player for the Saloon game
+ * must implement from mixed in game logic.
+ */
+export interface IBaseSaloonPlayer extends
+    IBasePlayer,
+    ITwoPlayerPlayer,
+    ITurnBasedPlayer,
+    ITiledPlayer {
+}
 
 const base0 = {
     AI: BaseAI,
@@ -62,7 +71,8 @@ export const BaseClasses = {
     GameSettings: BaseSaloonGameSettings,
 };
 
-// now all the base classes are created, so we can start importing/exporting the classes that need them
+// Now all the base classes are created;
+// so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an Bottle. */
 export interface IBottleProperties {
@@ -79,8 +89,8 @@ export interface IBottleProperties {
     drunkDirection?: string;
 
     /**
-     * True if this Bottle has impacted and has been destroyed (removed from the
-     * Game). False if still in the game flying through the saloon.
+     * True if this Bottle has impacted and has been destroyed (removed from
+     * the Game). False if still in the game flying through the saloon.
      */
     isDestroyed?: boolean;
 
@@ -99,8 +109,9 @@ export interface ICowboyProperties {
     canMove?: boolean;
 
     /**
-     * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
-     * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+     * The direction this Cowboy is moving while drunk. Will be 'North',
+     * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
+     * drunk.
      */
     drunkDirection?: string;
 
@@ -129,7 +140,7 @@ export interface ICowboyProperties {
      * The job that this Cowboy does, and dictates how they fight and interact
      * within the Saloon.
      */
-    job?: string;
+    job?: "Bartender" | "Brawler" | "Sharpshooter";
 
     /**
      * The Player that owns and can control this Cowboy.
@@ -284,8 +295,8 @@ export interface ITileProperties {
     furnishing?: Furnishing;
 
     /**
-     * If this Tile is pathable, but has a hazard that damages Cowboys that path
-     * through it.
+     * If this Tile is pathable, but has a hazard that damages Cowboys that
+     * path through it.
      */
     hasHazard?: boolean;
 
@@ -296,8 +307,8 @@ export interface ITileProperties {
     isBalcony?: boolean;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the
-     * map.
+     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
+     * the map.
      */
     tileEast?: Tile;
 
@@ -314,8 +325,8 @@ export interface ITileProperties {
     tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the
-     * map.
+     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
+     * the map.
      */
     tileWest?: Tile;
 
@@ -385,7 +396,10 @@ import { SaloonGame } from "./game";
 import { SaloonGameManager } from "./game-manager";
 import { SaloonGameSettingsManager } from "./game-settings";
 
-/** The factory that **must** be used to create any game objects in the Saloon game. */
+/**
+ * The factory that **must** be used to create any game objects in
+ * the Saloon game.
+ */
 export class SaloonGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Bottle in the Game and tracks it for all players.
@@ -414,7 +428,8 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param data - Data about the Furnishing to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Furnishing hooked up in the game and ready for you to use.
+     * @returns A new Furnishing hooked up in the game and ready for you to
+     * use.
      */
     public Furnishing(data: IFurnishingConstructorArgs): Furnishing {
         return this.createGameObject("Furnishing", Furnishing, data);
@@ -423,8 +438,8 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param data - Data about the Tile to set. Any keys matching a property in
-     * the game object's class will be automatically set for you.
+     * @param data - Data about the Tile to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public Tile(data: ITileConstructorArgs): Tile {
@@ -444,7 +459,10 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
 
 }
 
-/** The shared namespace for Saloon that is used to initialize each game instance. */
+/**
+ * The shared namespace for Saloon that is used to
+ * initialize each game instance.
+ */
 export const Namespace = makeNamespace({
     AI,
     Game: SaloonGame,
@@ -453,9 +471,10 @@ export const Namespace = makeNamespace({
     GameSettingsManager: SaloonGameSettingsManager,
     Player,
 
-    // these are generated metadata that allow delta-merging values from clients
-    // they are never intended to be directly interfaced with outside of
-    // Cerveau core developers
+    // These are generated metadata that allow delta-merging values from
+    // clients.
+    // They are never intended to be directly interfaced with outside of the
+    // Cerveau core developers.
     gameName: "Saloon",
     gameSettingsManager: new SaloonGameSettingsManager(),
     gameObjectsSchema: {
@@ -482,6 +501,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Bottle,
+                        nullable: false,
                     },
                 },
                 brawlerDamage: {
@@ -492,11 +512,13 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Cowboy,
+                        nullable: false,
                     },
                 },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 currentTurn: {
                     typeName: "int",
@@ -506,6 +528,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Furnishing,
+                        nullable: false,
                     },
                 },
                 gameObjects: {
@@ -516,6 +539,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: GameObject,
+                        nullable: false,
                     },
                 },
                 jobs: {
@@ -541,6 +565,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Player,
+                        nullable: false,
                     },
                 },
                 rowdinessToSiesta: {
@@ -560,6 +585,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Tile,
+                        nullable: false,
                     },
                 },
                 turnsDrunk: {
@@ -584,6 +610,7 @@ export const Namespace = makeNamespace({
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
             },
             functions: {
@@ -612,14 +639,18 @@ export const Namespace = makeNamespace({
                 },
                 job: {
                     typeName: "string",
+                    defaultValue: "Bartender",
+                    literals: ["Bartender", "Brawler", "Sharpshooter"],
                 },
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
                 tolerance: {
                     typeName: "int",
@@ -635,10 +666,12 @@ export const Namespace = makeNamespace({
                             argName: "tile",
                             typeName: "gameObject",
                             gameObjectClass: Tile,
+                            nullable: false,
                         },
                         {
                             argName: "drunkDirection",
                             typeName: "string",
+                            literals: ["", "North", "East", "South", "West"],
                             defaultValue: "",
                         },
                     ],
@@ -653,6 +686,7 @@ export const Namespace = makeNamespace({
                             argName: "tile",
                             typeName: "gameObject",
                             gameObjectClass: Tile,
+                            nullable: false,
                         },
                     ],
                     invalidValue: false,
@@ -666,6 +700,7 @@ export const Namespace = makeNamespace({
                             argName: "piano",
                             typeName: "gameObject",
                             gameObjectClass: Furnishing,
+                            nullable: false,
                         },
                     ],
                     invalidValue: false,
@@ -693,6 +728,7 @@ export const Namespace = makeNamespace({
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
             },
             functions: {
@@ -738,6 +774,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Cowboy,
+                        nullable: false,
                     },
                 },
                 kills: {
@@ -752,6 +789,7 @@ export const Namespace = makeNamespace({
                 opponent: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 reasonLost: {
                     typeName: "string",
@@ -777,6 +815,7 @@ export const Namespace = makeNamespace({
                 youngGun: {
                     typeName: "gameObject",
                     gameObjectClass: YoungGun,
+                    nullable: false,
                 },
             },
             functions: {
@@ -788,14 +827,17 @@ export const Namespace = makeNamespace({
                 bottle: {
                     typeName: "gameObject",
                     gameObjectClass: Bottle,
+                    nullable: true,
                 },
                 cowboy: {
                     typeName: "gameObject",
                     gameObjectClass: Cowboy,
+                    nullable: true,
                 },
                 furnishing: {
                     typeName: "gameObject",
                     gameObjectClass: Furnishing,
+                    nullable: true,
                 },
                 hasHazard: {
                     typeName: "boolean",
@@ -806,18 +848,22 @@ export const Namespace = makeNamespace({
                 tileEast: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
                 tileNorth: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
                 tileSouth: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
                 tileWest: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: true,
                 },
                 x: {
                     typeName: "int",
@@ -828,6 +874,7 @@ export const Namespace = makeNamespace({
                 youngGun: {
                     typeName: "gameObject",
                     gameObjectClass: YoungGun,
+                    nullable: true,
                 },
             },
             functions: {
@@ -839,6 +886,7 @@ export const Namespace = makeNamespace({
                 callInTile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: false,
                 },
                 canCallIn: {
                     typeName: "boolean",
@@ -846,10 +894,12 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
+                    nullable: false,
                 },
             },
             functions: {
@@ -858,12 +908,15 @@ export const Namespace = makeNamespace({
                         {
                             argName: "job",
                             typeName: "string",
+                            defaultValue: "Bartender",
+                            literals: ["Bartender", "Brawler", "Sharpshooter"],
                         },
                     ],
                     invalidValue: undefined,
                     returns: {
                         typeName: "gameObject",
                         gameObjectClass: Cowboy,
+                        nullable: false,
                     },
                 },
             },

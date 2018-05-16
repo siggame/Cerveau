@@ -127,32 +127,19 @@ export class YoungGun extends GameObject {
      */
     protected invalidateCallIn(
         player: Player,
-        job: string,
+        job: "Bartender" | "Brawler" | "Sharpshooter",
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-callIn -->>
-
-        if (player !== this.game.currentPlayer) {
-            return `${player} it is not your turn.`;
-        }
 
         if (!this.canCallIn) {
             return `${this} cannot call in any more Cowboys this turn.`;
         }
 
-        const actualJob = this.game.jobs.find((j) => j.toLowerCase() === job.toLowerCase());
-
-        if (!actualJob) {
-            return `${job} is not a valid job to send in.`;
-        }
-
         // make sure they are not trying to go above the limit
-        const count = this.owner.cowboys.filter((c) => c.job === actualJob && !c.isDead).length;
+        const count = this.owner.cowboys.filter((c) => c.job === job && !c.isDead).length;
         if (count >= this.game.maxCowboysPerJob) {
-            return `You cannot call in any more '${actualJob}' Cowboys (max of ${this.game.maxCowboysPerJob})`;
+            return `You cannot call in any more '${job}' Cowboys (max of ${this.game.maxCowboysPerJob})`;
         }
-
-        // make the job arg the correct job, as it looks valid!
-        job = actualJob;
 
         // <<-- /Creer-Merge: invalidate-callIn -->>
         return arguments;
@@ -167,7 +154,10 @@ export class YoungGun extends GameObject {
      * @returns The new Cowboy that was called in if valid. They will not be
      * added to any `cowboys` lists until the turn ends. Null otherwise.
      */
-    protected async callIn(player: Player, job: string): Promise<Cowboy> {
+    protected async callIn(
+        player: Player,
+        job: "Bartender" | "Brawler" | "Sharpshooter",
+    ): Promise<Cowboy> {
         // <<-- Creer-Merge: callIn -->>
 
         // clear the open tile before moving the young gun to it

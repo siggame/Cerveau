@@ -210,18 +210,19 @@ export class BaseAIManager {
         const schema = this.namespace.gameObjectsSchema[caller.gameObjectName].functions[functionName];
         let returned = schema.invalidValue;
 
-        const gameInvalidMessage = this.invalidateRun(
-            this.client.player,
-            caller,
-            functionName,
-            sanitizedArgs,
-        );
+        let invalid = sanitizedArgs instanceof Map
+            ? this.invalidateRun( // then it appears valid; try to invalidate
+                this.client.player,
+                caller,
+                functionName,
+                sanitizedArgs,
+            )
+            : sanitizedArgs.invalid; // failed to even sanitize
 
-        let invalid: string | undefined;
         // If the game said the run is invalid for all runs
-        if (gameInvalidMessage) {
+        if (invalid) {
             // Tell the client it is invalid
-            this.client.send("invalid", { message: gameInvalidMessage });
+            this.client.send("invalid", { message: invalid });
         }
         else {
             // else, the game is ok with trying to have
@@ -230,7 +231,7 @@ export class BaseAIManager {
             const validated: string | IArguments = invalidateFunction.call(
                 caller,
                 this.client.player,
-                ...sanitizedArgs.values(),
+                ...(sanitizedArgs as Map<string, any>).values(),
             );
 
             invalid = typeof validated === "string"

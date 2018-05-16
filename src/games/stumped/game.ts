@@ -1,523 +1,223 @@
-// Game: Gather branches and build up your lodge as beavers fight to survive.
+import { IBaseGameRequiredData } from "~/core/game";
+import { BaseClasses } from "./";
+import { Beaver } from "./beaver";
+import { StumpedGameManager } from "./game-manager";
+import { GameObject } from "./game-object";
+import { StumpedGameSettingsManager } from "./game-settings";
+import { Job } from "./job";
+import { Player } from "./player";
+import { Spawner } from "./spawner";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const TwoPlayerGame = require(`${__basedir}/gameplay/shared/twoPlayerGame`);
-const TurnBasedGame = require(`${__basedir}/gameplay/shared/turnBasedGame`);
-const TiledGame = require(`${__basedir}/gameplay/shared/tiledGame`);
+// <<-- Creer-Merge: imports -->>
+import { jobStats } from "./job-stats";
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Gather branches and build up your lodge as beavers fight to survive.
+ */
+export class StumpedGame extends BaseClasses.Game {
+    /** The manager of this game, that controls everything around it */
+    public readonly manager!: StumpedGameManager;
 
-const mathjs = require("mathjs");
-const JobStats = require("./jobStats.json");
+    /** The settings used to initialize the game, as set by players */
+    public readonly settings = Object.freeze(this.settingsManager.values);
 
-//<<-- /Creer-Merge: requires -->>
-
-// @class Game: Gather branches and build up your lodge as beavers fight to survive.
-let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
     /**
-     * Initializes Games.
+     * Every Beaver in the game.
+     */
+    public beavers!: Beaver[];
+
+    /**
+     * The player whose turn it is currently. That player can send commands.
+     * Other players cannot.
+     */
+    public currentPlayer!: Player;
+
+    /**
+     * The current turn number, starting at 0 for the first player's turn.
+     */
+    public currentTurn!: number;
+
+    /**
+     * When a Player has less Beavers than this number, then recruiting other
+     * Beavers is free.
+     */
+    public readonly freeBeaversCount!: number;
+
+    /**
+     * A mapping of every game object's ID to the actual game object. Primarily
+     * used by the server and client to easily refer to the game objects via
+     * ID.
+     */
+    public gameObjects!: {[id: string]: GameObject};
+
+    /**
+     * All the Jobs that Beavers can have in the game.
+     */
+    public jobs!: Job[];
+
+    /**
+     * Constant number used to calculate what it costs to spawn a new lodge.
+     */
+    public readonly lodgeCostConstant!: number;
+
+    /**
+     * How many lodges must be owned by a Player at once to win the game.
+     */
+    public readonly lodgesToWin!: number;
+
+    /**
+     * The number of Tiles in the map along the y (vertical) axis.
+     */
+    public readonly mapHeight!: number;
+
+    /**
+     * The number of Tiles in the map along the x (horizontal) axis.
+     */
+    public readonly mapWidth!: number;
+
+    /**
+     * The maximum number of turns before the game will automatically end.
+     */
+    public readonly maxTurns!: number;
+
+    /**
+     * List of all the players in the game.
+     */
+    public players!: Player[];
+
+    /**
+     * A unique identifier for the game instance that is being played.
+     */
+    public readonly session!: string;
+
+    /**
+     * Every Spawner in the game.
+     */
+    public spawner!: Spawner[];
+
+    /**
+     * Constant number used to calculate how many branches/food Beavers harvest
+     * from Spawners.
+     */
+    public readonly spawnerHarvestConstant!: number;
+
+    /**
+     * All the types of Spawners in the game.
+     */
+    public spawnerTypes!: string[];
+
+    /**
+     * All the tiles in the map, stored in Row-major order. Use `x + y *
+     * mapWidth` to access the correct index.
+     */
+    public tiles!: Tile[];
+
+    // <<-- Creer-Merge: attributes -->>
+
+    /**
+     * The newly spawned beavers this turn that are not tracked in any arrays
+     * (yet).
+     */
+    public readonly newBeavers: Beaver[] = [];
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Game is created.
      *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * @param settingsManager - The manager that holds initial settings.
+     * @param required - Data required to initialize this (ignore it).
      */
-    init: function(data) {
-        TiledGame.init.apply(this, arguments);
-        TurnBasedGame.init.apply(this, arguments);
-        TwoPlayerGame.init.apply(this, arguments);
+    constructor(
+        protected settingsManager: StumpedGameSettingsManager,
+        required: IBaseGameRequiredData,
+    ) {
+        super(settingsManager, required);
 
-        /**
-         * Every Beaver in the game.
-         *
-         * @type {Array.<Beaver>}
-         */
-        this.beavers = this.beavers || [];
-
-        /**
-         * The player whose turn it is currently. That player can send commands. Other players cannot.
-         *
-         * @type {Player}
-         */
-        this.currentPlayer = this.currentPlayer || null;
-
-        /**
-         * The current turn number, starting at 0 for the first player's turn.
-         *
-         * @type {number}
-         */
-        this.currentTurn = this.currentTurn || 0;
-
-        /**
-         * When a Player has less Beavers than this number, then recruiting other Beavers is free.
-         *
-         * @type {number}
-         */
-        this.freeBeaversCount = this.freeBeaversCount || 0;
-
-        /**
-         * A mapping of every game object's ID to the actual game object. Primarily used by the server and client to easily refer to the game objects via ID.
-         *
-         * @type {Object.<string, GameObject>}
-         */
-        this.gameObjects = this.gameObjects || {};
-
-        /**
-         * All the Jobs that Beavers can have in the game.
-         *
-         * @type {Array.<Job>}
-         */
-        this.jobs = this.jobs || [];
-
-        /**
-         * Constant number used to calculate what it costs to spawn a new lodge.
-         *
-         * @type {number}
-         */
-        this.lodgeCostConstant = this.lodgeCostConstant || 0;
-
-        /**
-         * How many lodges must be owned by a Player at once to win the game.
-         *
-         * @type {number}
-         */
-        this.lodgesToWin = this.lodgesToWin || 0;
-
-        /**
-         * The number of Tiles in the map along the y (vertical) axis.
-         *
-         * @type {number}
-         */
-        this.mapHeight = this.mapHeight || 0;
-
-        /**
-         * The number of Tiles in the map along the x (horizontal) axis.
-         *
-         * @type {number}
-         */
-        this.mapWidth = this.mapWidth || 0;
-
-        /**
-         * The maximum number of turns before the game will automatically end.
-         *
-         * @type {number}
-         */
-        this.maxTurns = this.maxTurns || 0;
-
-        /**
-         * List of all the players in the game.
-         *
-         * @type {Array.<Player>}
-         */
-        this.players = this.players || [];
-
-        /**
-         * A unique identifier for the game instance that is being played.
-         *
-         * @type {string}
-         */
-        this.session = this.session || "";
-
-        /**
-         * Every Spawner in the game.
-         *
-         * @type {Array.<Spawner>}
-         */
-        this.spawner = this.spawner || [];
-
-        /**
-         * Constant number used to calculate how many branches/food Beavers harvest from Spawners.
-         *
-         * @type {number}
-         */
-        this.spawnerHarvestConstant = this.spawnerHarvestConstant || 0;
-
-        /**
-         * All the types of Spawners in the game.
-         *
-         * @type {Array.<string>}
-         */
-        this.spawnerTypes = this.spawnerTypes || [];
-
-        /**
-         * All the tiles in the map, stored in Row-major order. Use `x + y * mapWidth` to access the correct index.
-         *
-         * @type {Array.<Tile>}
-         */
-        this.tiles = this.tiles || [];
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // initialize all the constants in this game
-        this.mapWidth = data.mapWidth || 32;
-        this.mapHeight = data.mapHeight || 20;
-
-        this.maxTurns = data.maxTurns || 500;
-
-        this.spawnerHarvestConstant = data.spawnerHarvestConstant || 2;
-        this.lodgeCostConstant = data.lodgeCostConstant || mathjs.phi;
-
-        this.freeBeaversCount = data.freeBeaversCount || 10;
-        this.lodgesToWin = data.lodgesToWin || 10;
-
-        this.maxSpawnerHealth = data.maxSpawnerHealth || 5;
-
-        this.spawnerTypes.push("food", "branches");
-
-        this.newBeavers = [];
-
-        this._minSpawners = {
-            food: 1,
-            branches: 4,
-        };
-
-        this._maxSpawners = {
-            food: 3,
-            branches: 12,
-        };
-
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    name: "Stumped",
-
-    aliases: [
-        //<<-- Creer-Merge: aliases -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        "MegaMinerAI-19-Stumped",
-        "MegaMiner-AI-19-Stumped",
-        //<<-- /Creer-Merge: aliases -->>
-    ],
-
-
-
-    /**
-     * This is called when the game begins, once players are connected and ready to play, and game objects have been initialized. Anything in init() may not have the appropriate game objects created yet..
-     */
-    begin: function() {
-        TiledGame.begin.apply(this, arguments);
-        TurnBasedGame.begin.apply(this, arguments);
-        TwoPlayerGame.begin.apply(this, arguments);
-
-        //<<-- Creer-Merge: begin -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // read in all the jobs in the `jobStats.json` file and initialize a Job instance for it.
-        for(const title of Object.keys(JobStats.jobs).sort()) {
+        // <<-- Creer-Merge: constructor -->>
+        for (const title of Object.keys(jobStats).sort()) {
             this.jobs.push(
-                this.create("Job", {title})
+                this.manager.create.Job({
+                    ...jobStats[title],
+                    title,
+                }),
             );
         }
 
-        // creates the 2D map based off the mapWidth/mapHeight set in the init function
-        TiledGame._initMap.call(this);
-
-        for(const player of this.players) {
+        for (const player of this.players) {
             player.calculateBranchesToBuildLodge();
         }
 
         this.generateMap();
 
-        //<<-- /Creer-Merge: begin -->>
-    },
+        // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
 
     /**
-     * This is called when the game has started, after all the begin()s. This is a good spot to send orders.
-     */
-    _started: function() {
-        TiledGame._started.apply(this, arguments);
-        TurnBasedGame._started.apply(this, arguments);
-        TwoPlayerGame._started.apply(this, arguments);
-
-        //<<-- Creer-Merge: _started -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        // any logic for _started can be put here
-        //<<-- /Creer-Merge: _started -->>
-    },
-
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-    /**
-     * Invoked before the current player starts their turn
+     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map.
      *
-     * @override
-     * @returns {*} passes through the default return value
+     * @param x - The x position of the desired tile.
+     * @param y - The y position of the desired tile.
+     * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
-    beforeTurn: function() {
-        // before they start their turn, cleanup the arrays
-        this.cleanupArrays();
+    public getTile(x: number, y: number): Tile | undefined {
+        return super.getTile(x, y) as Tile | undefined;
+    }
 
-        // finish recruiting any new beavers
-        for(const beaver of this.currentPlayer.beavers) {
-            beaver.recruited = true;
-        }
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-        // else continue to the next player (normal next turn logic)
-        return TurnBasedGame.beforeTurn.apply(this, arguments);
-    },
+    /** Generates the map, by modifying tiles attributes. */
+    private generateMap(): void {
+        // Lake center
+        const lake = Math.floor(this.mapWidth / 2);
 
-    /**
-     * Invoked when the current player ends their turn. Perform in between game logic here
-     *
-     * @override
-     * @returns {*} passes through the default return value
-     */
-    nextTurn: function() {
-        // before we go to the next turn, reset variables and do end of turn logic
-        this.cleanupArrays();
-        this.updateBeavers();
-        this.updateResources();
+        // Generate random metaballs where the lake will be
+        const balls: Array<{ x: number; y: number; r: number }> = [];
+        const minRadius = 0.5;
+        const maxRadius = 5.0;
+        const maxOffset = 2.0;
+        const additionalBalls = 5;
+        const gooeyNess = 1.0;
+        const threshold = 3.5;
+        const radiusRange = maxRadius - minRadius;
 
-        if(this.checkForWinner()) {
-            // we found a winner, no need to proceed to the next turn
-            return;
-        }
+        // Initial ball (lake center)
+        balls.push({
+            x: lake,
+            y: this.mapHeight / 2,
+            r: this.manager.random.float() * radiusRange + minRadius,
+        });
 
-        // else continue to the next player (normal next turn logic)
-        return TurnBasedGame.nextTurn.apply(this, arguments);
-    },
-
-    checkForWinner: function(secondaryWin) {
-        // Check if a player has created 10 lodges (they are built instantly)
-        // Check if this.maxTurns turns have passed, and if so, in this order:
-        // - Player has been made extinct (all beavers & lodges destroyed)
-        // - Player with most lodges wins
-        // - Player with most branches wins
-        // - Player with most food wins
-        // - Random player wins
-
-        let players = this.players.slice();
-        const extinctPlayers = players.filter((p) => p.beavers.length === 0 && p.lodges.length === 0);
-
-        if(extinctPlayers.length > 0) {
-            // someone lost via extermination
-            if(extinctPlayers.length === this.players.length) {
-                // they both somehow killed everything, so the board is empty. Win via coin flip
-                secondaryWin = "Both Players exterminated on the same turn";
-            }
-            else {
-                // all exterminated players lost
-                const loser = extinctPlayers[0];
-                this.declareWinner(loser.opponent, "Drove opponent to extinction");
-                this.declareLoser(loser, "Extinct - All Beavers and lodges destroyed");
-                return true;
-            }
-        }
-
-        players.sort((a, b) => b.lodges.length - a.lodges.length);
-
-        if(this.currentTurn % 2 === 1) {
-            // round end, check for primary win condition
-
-            if(players[0].lodges.length >= this.lodgesToWin) {
-                if(players[0].lodges.length === players[1].lodges.length) {
-                    // then both players completed the same number of lodges by the end of this round, do secondary win conditions
-                    secondaryWin = "Lodges complete on the same round";
-                }
-                else {
-                    // someone won
-                    this.declareWinner(players[0], `Reached ${players[0].lodges.length}/${this.lodgesToWin} lodges!`);
-                    this.declareLoser(players[1], "Less lodges than winner who reached completed all lodges");
-                    return true;
-                }
-            }
-        }
-
-        if(secondaryWin) {
-            // check if someone won by having more lodges
-            if(players[0].lodges.length !== players[1].lodges.length) {
-                this.declareWinner(players[0], `${secondaryWin} - Has the most lodges (${players[0].lodges.length})`);
-                this.declareLoser(players[1], `${secondaryWin} - Less lodges than opponent`);
-                return true;
-            }
-
-            // check if someone won by having more branches or food
-            for(const resource of ["branches", "food"]) {
-                /**
-                 * counts the number of resources a player has
-                 *
-                 * @param {Player} p - player to count for
-                 * @returns {int} the count f resource
-                 */
-                let count = (p) => (p.lodges.map((m) => m[resource]).reduce((acc, val) => acc + val, 0));
-                const player0Count = count(players[0]);
-                const player1Count = count(players[1]);
-
-                if(player0Count !== player1Count) {
-                    const winner = players[player0Count > player1Count ? 0 : 1];
-                    const winnerCount = Math.max(player0Count, player1Count);
-                    const looserCount = Math.min(player0Count, player1Count);
-                    this.declareWinner(winner, `${secondaryWin} - Has more ${resource} than opponent (${winnerCount})`);
-                    this.declareLoser(winner.opponent, `${secondaryWin} - Less ${resource} than winner (${looserCount})`);
-                    return true;
-                }
-            }
-
-            // if we got here they both probably did nothing, so win via coin flip
-            this._endGameViaCoinFlip(secondaryWin);
-        }
-
-        return false;
-    },
-
-    /**
-     * invoked when max turns are reached
-     *
-     * @override
-     */
-    _maxTurnsReached: function() {
-        this.checkForWinner("Max turns reached");
-    },
-
-    updateBeavers: function() {
-        for(const beaver of this.beavers) {
-            // if they are distracted
-            if(beaver.turnsDistracted > 0) {
-                beaver.turnsDistracted--; // decrement the turns count
-            }
-
-            // reset their actions/moves for next turn
-            beaver.actions = beaver.job.actions;
-            beaver.moves = beaver.job.moves;
-        }
-    },
-
-    updateResources: function() {
-        let tilesChecked = new Set();
-        let newResources = {};
-        for(const tile of this.tiles) {
-            if(!tile.lodgeOwner && tile.type === "water" && tile.flowDirection) {
-                const nextTile = tile.getNeighbor(tile.flowDirection);
-
-                // Move resources downstream
-                if(newResources[nextTile]) {
-                    let curResources = newResources[nextTile];
-                    newResources[nextTile] = [curResources[0] + tile.branches, curResources[1] + tile.food];
-                }
-                else {
-                    newResources[nextTile] = [tile.branches, tile.food];
-                }
-
-                if(!newResources[tile]) {
-                    newResources[tile] = [0, 0];
-                }
-            }
-            else {
-                // Keep resources here
-                if(newResources[tile]) {
-                    let curResources = newResources[tile];
-                    newResources[tile] = [curResources[0] + tile.branches, curResources[1] + tile.food];
-                }
-                else {
-                    newResources[tile] = [tile.branches, tile.food];
-                }
-            }
-            tile.branches = 0;
-            tile.food = 0;
-
-            // Spawn new resources
-            if(tile.spawner) {
-                if(tile.spawner.hasBeenHarvested) {
-                    tile.spawner.harvestCooldown--;
-
-                    if(tile.spawner.harvestCooldown === 0) {
-                        tile.spawner.hasBeenHarvested = false;
-                    }
-                }
-                else if(tile.spawner.health < this.maxSpawnerHealth) {
-                    tile.spawner.health++;
-                }
-            }
-        }
-
-        // Move resources
-        for(const tile of this.tiles) {
-            tile.branches = newResources[tile][0];
-            tile.food = newResources[tile][1];
-        }
-    },
-
-    cleanupArrays: function() {
-        // add all the new beavers to this.beavers
-        for(const newBeaver of this.newBeavers) {
-            this.beavers.push(newBeaver);
-            newBeaver.owner.beavers.push(newBeaver);
-        }
-
-        // and empty out the `this.newBeavers` array as they are no longer new and have been added above
-        this.newBeavers.length = 0;
-
-        let allBeavers = this.beavers.slice(); // clone of array so we can remove them from the actual array and not fuck up loop iteration
-        // remove all beavers from the game that died
-        for(const beaver of allBeavers) {
-            if(beaver.health <= 0) {
-                // poor beaver died, remove it from arrays
-                beaver.owner.beavers.removeElement(beaver);
-                this.beavers.removeElement(beaver);
-            }
-            else {
-                beaver.tile.beaver = beaver;
-            }
-        }
-    },
-
-    generateMap: function() {
-        /* Fill map with land */
-        for(let x = 0; x < this.mapWidth; x++) {
-            for(let y = 0; y < this.mapHeight; y++) {
-                let tile = this.getTile(x, y);
-                tile.type = "land";
-            }
-        }
-
-        // Used for symmetry
-        let horizontal = true || Math.random() < 0.5;
-        let lake = 0;
-
-        /* Generate lake */
-        if(horizontal) {
-            // Lake center
-            lake = Math.floor(this.mapWidth / 2);
-
-            // Generate random metaballs where the lake will be
-            let balls = [];
-            const minRadius = 0.5;
-            const maxRadius = 5.0;
-            const maxOffset = 2.0;
-            const additionalBalls = 5;
-            const gooeyness = 1.0;
-            const threshold = 3.5;
-            const radiusRange = maxRadius - minRadius;
-
-            // Initial ball (lake center)
+        // Extra balls
+        for (let i = 0; i < additionalBalls; i++) {
             balls.push({
-                x: lake,
-                y: this.mapHeight / 2,
-                r: Math.random() * radiusRange + minRadius,
+                x: lake + this.manager.random.float() * maxOffset * 2 - maxOffset,
+                y: this.mapHeight / 2 - this.manager.random.float() * maxOffset,
+                r: this.manager.random.float() * radiusRange + minRadius,
             });
+        }
 
-            // Extra balls
-            for(let i = 0; i < additionalBalls; i++) {
-                balls.push({
-                    x: lake + Math.random() * maxOffset * 2 - maxOffset,
-                    y: this.mapHeight / 2 - Math.random() * maxOffset,
-                    r: Math.random() * radiusRange + minRadius,
-                });
+        // Generate lake from metaballs
+        for (const tile of this.tiles) {
+            let energy = 0;
+            for (const ball of balls) {
+                const r = ball.r;
+                const dist = Math.sqrt(Math.pow(ball.x - tile.x, 2) + Math.pow(ball.y - tile.y, 2));
+                const d = Math.max(0.0001, Math.pow(dist, gooeyNess));
+                energy += r / d;
             }
 
-            // Generate lake from metaballs
-            for(let x = 0; x < this.mapWidth; x++) {
-                for(let y = 0; y < this.mapHeight / 2; y++) {
-                    let tile = this.getTile(x, y);
-                    let energy = 0;
-                    for(const ball of balls) {
-                        let r = ball.r;
-                        let dist = Math.sqrt(Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2));
-                        let d = Math.max(0.0001, Math.pow(dist, gooeyness));
-                        energy += r / d;
-                    }
-
-                    if(energy > threshold) {
-                        tile.type = "water";
-                    }
-                }
+            if (energy > threshold) {
+                (tile as any).type = "water";
             }
         }
 
@@ -529,229 +229,187 @@ let Game = Class(TwoPlayerGame, TurnBasedGame, TiledGame, {
         const thetaDeltaRange = maxThetaDelta - minThetaDelta;
 
         let theta = minTheta - minThetaDelta;
-        if(horizontal) {
-            while(true) {
-                theta += Math.random() * thetaDeltaRange + minThetaDelta;
-                if(theta >= maxTheta) {
-                    break;
+        while (true) {
+            theta += this.manager.random.float() * thetaDeltaRange + minThetaDelta;
+            if (theta >= maxTheta) {
+                break;
+            }
+            // console.log(`Generating river at ${theta * 180 / Math.PI} degrees`);
+
+            // Define the line segments
+            const points: Array<{ x: number; y: number }> = [];
+
+            // Starting point - The center of lake, at (0, 0)
+            points.push({
+                x: 0,
+                y: 0,
+            });
+
+            // Final point - Outside the edge of the map
+            points.push({
+                x: this.mapWidth + this.mapHeight,
+                y: 0,
+            });
+
+            // Generate fractals
+            // createFractal(points, 0, 1);
+
+            // Transform points
+            const offset = Math.PI;
+            for (const p of points) {
+                const r = Math.sqrt(p.x * p.x + p.y * p.y);
+                const t = Math.atan2(p.y, p.x) + theta + offset;
+                p.x = lake + r * Math.cos(t);
+                p.y = this.mapHeight / 2 + r * Math.sin(t);
+            }
+
+            // console.log("Points:");
+            // console.log(points);
+
+            // Draw line segments
+            let collided = false;
+            for (let i = 1; !collided && i < points.length; i++) {
+                const a = points[i - 1];
+                const b = points[i];
+
+                // Useful values
+                const dx = b.x - a.x;
+                const dy = b.y - a.y;
+                let steps = 0;
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    steps = Math.abs(dx);
                 }
-                // console.log(`Generating river at ${theta * 180 / Math.PI} degrees`);
-
-                // Define the line segments
-                let points = [];
-
-                // Starting point - The center of lake, at (0, 0)
-                points.push({
-                    x: 0,
-                    y: 0,
-                });
-
-                // Final point - Outside the edge of the map
-                points.push({
-                    x: this.mapWidth + this.mapHeight,
-                    y: 0,
-                });
-
-                // Generate fractals
-                // createFractal(points, 0, 1);
-
-                // Transform points
-                let offset = Math.PI;
-                for(let p of points) {
-                    let r = Math.sqrt(p.x * p.x + p.y * p.y);
-                    let t = Math.atan2(p.y, p.x) + theta + offset;
-                    p.x = lake + r * Math.cos(t);
-                    p.y = this.mapHeight / 2 + r * Math.sin(t);
+                else {
+                    steps = Math.abs(dy);
                 }
+                const xInc = dx / steps;
+                const yInc = dy / steps;
 
-                // console.log("Points:");
-                // console.log(points);
+                let ax = a.x;
+                let ay = a.y;
+                let lastX = -1;
+                let lastY = -1;
+                for (let step = 0; !collided && step < steps; step++) {
+                    ax += xInc;
+                    ay += yInc;
+                    const realX = Math.floor(ax);
+                    const realY = Math.floor(ay);
+                    const nextX = Math.floor(ax + xInc);
+                    const nextY = Math.floor(ay + yInc);
 
-                // Draw line segments
-                let collided = false;
-                for(let i = 1; !collided && i < points.length; i++) {
-                    let a = points[i - 1];
-                    let b = points[i];
+                    // Verify the current tile exists
+                    if (realX >= 0 && realY >= 0 && realX < this.mapWidth && realY < this.mapHeight / 2) {
+                        // Set tile to water
+                        const tile = this.getTile(realX, realY)!;
 
-                    // Useful values
-                    let dx = b.x - a.x;
-                    let dy = b.y - a.y;
-                    let steps = 0;
-                    if(Math.abs(dx) > Math.abs(dy)) {
-                        steps = Math.abs(dx);
-                    }
-                    else {
-                        steps = Math.abs(dy);
-                    }
-                    let xInc = dx / steps;
-                    let yInc = dy / steps;
-
-                    let x = a.x;
-                    let y = a.y;
-                    let lastX = -1;
-                    let lastY = -1;
-                    let nextDir = null;
-                    for(let step = 0; !collided && step < steps; step++) {
-                        x += xInc;
-                        y += yInc;
-                        let realX = Math.floor(x);
-                        let realY = Math.floor(y);
-                        let nextX = Math.floor(x + xInc);
-                        let nextY = Math.floor(y + yInc);
-
-                        // Verify the current tile exists
-                        if(realX >= 0 && realY >= 0 && realX < this.mapWidth && realY < this.mapHeight / 2) {
-                            // Set tile to water
-                            let tile = this.getTile(realX, realY);
-
-                            // Don't go diagonal
-                            if(realX !== nextX && realY !== nextY) {
-                                y -= yInc;
-                            }
-
-                            // Flow direction
-                            if(tile.type !== "water") {
-                                if(nextDir === null) {
-                                    if(realY > lastY) {
-                                        tile.flowDirection = "North";
-                                    }
-                                    else if(realY < lastY) {
-                                        tile.flowDirection = "South";
-                                    }
-                                    else if(realX < lastX) {
-                                        tile.flowDirection = "East";
-                                    }
-                                    else if(realX > lastX) {
-                                        tile.flowDirection = "West";
-                                    }
-                                }
-                                else {
-                                    tile.flowDirection = nextDir;
-                                    nextDir = null;
-                                }
-
-                                tile.type = "water";
-                            }
-                            else if(tile.flowDirection !== "") {
-                                collided = true;
-                            }
+                        // Don't go diagonal
+                        if (realX !== nextX && realY !== nextY) {
+                            ay -= yInc;
                         }
 
-                        // Update last coords
-                        lastX = realX;
-                        lastY = realY;
+                        // Flow direction
+                        if (tile.type !== "water") {
+                            if (realY > lastY) {
+                                (tile as any).flowDirection = "North";
+                            }
+                            else if (realY < lastY) {
+                                (tile as any).flowDirection = "South";
+                            }
+                            else if (realX < lastX) {
+                                (tile as any).flowDirection = "East";
+                            }
+                            else if (realX > lastX) {
+                                (tile as any).flowDirection = "West";
+                            }
+
+                            (tile as any).type = "water";
+                        }
+                        else if (tile.flowDirection !== "") {
+                            collided = true;
+                        }
                     }
+
+                    // Update last coords
+                    lastX = realX;
+                    lastY = realY;
                 }
             }
         }
 
         // create spawners
-        for(const type of this.spawnerTypes) {
-            const count = Math.randomInt(this._maxSpawners[type], this._minSpawners[type]);
+        for (const type of this.spawnerTypes as ["branches", "food"]) {
+            const max = type === "branches"
+                ? this.settings.maxBranchSpawners
+                : this.settings.maxFoodSpawners;
+            const min = type === "branches"
+                ? this.settings.minBranchSpawners
+                : this.settings.minFoodSpawners;
+
+            const count = this.manager.random.int(max, min);
             const tileType = type === "food" ? "water" : "land";
 
-            for(let i = 0; i < count; i++) {
-                let tile;
-                while(!tile || tile.type !== tileType) {
+            for (let i = 0; i < count; i++) {
+                let tile: Tile | undefined;
+                while (!tile || tile.type !== tileType) {
                     // generate a new tile to see if it is valid
-                    tile = this.getTile(Math.randomInt(this.mapWidth - 1), Math.randomInt(this.mapHeight/2 - 1));
+                    tile = this.getTile(
+                        this.manager.random.int(this.mapWidth - 1),
+                        this.manager.random.int(this.mapHeight / 2 - 1),
+                    );
                 }
 
-                this.create("Spawner", {tile, type});
+                this.manager.create.Spawner({ tile, type });
             }
         }
 
         /* Mirror map */
-        if(horizontal) {
-            for(let x = 0; x < this.mapWidth; x++) {
-                for(let y = 0; y < this.mapHeight/2; y++) {
-                    let orig = this.getTile(x, y);
-                    let target = this.getTile(x, this.mapHeight - y - 1);
+        for (const orig of this.tiles) {
+            const target = this.getTile(orig.x, this.mapHeight - orig.y - 1)!;
 
-                    // Copy data
-                    target.type = orig.type;
-                    // clone Spawner
-                    if(orig.spawner) {
-                        target.spawner = this.create("Spawner", {
-                            tile: target,
-                            type: orig.spawner.type,
-                        });
-                    }
+            // Copy data
+            (target as any).type = orig.type;
+            (target as any).flowDirection = this.invertTileDirection(orig.flowDirection);
 
-                    switch(orig.flowDirection) {
-                        case "North":
-                            target.flowDirection = "South";
-                            break;
-                        case "South":
-                            target.flowDirection = "North";
-                            break;
-                        case "East":
-                            target.flowDirection = "East";
-                            break;
-                        case "West":
-                            target.flowDirection = "West";
-                            break;
-                    }
-                }
+            // clone Spawner
+            if (orig.spawner) {
+                target.spawner = this.manager.create.Spawner({
+                    tile: target,
+                    type: orig.spawner.type,
+                });
             }
         }
 
         /* Place starting beavers */
-        if(horizontal) {
-            let x = Math.floor(Math.random() * this.mapWidth);
-            let y = Math.floor(Math.random() * this.mapHeight / 2);
+        let x = 0;
+        let y = 0;
+        do {
+            x = this.manager.random.int(this.mapWidth);
+            y = this.manager.random.int(this.mapHeight / 2);
+        } while (this.getTile(x, y)!.spawner);
 
-            while(this.getTile(x, y).spawner) {
-                x = Math.floor(Math.random() * this.mapWidth);
-                y = Math.floor(Math.random() * this.mapHeight / 2);
-            }
+        const p1 = this.getTile(x, y)!;
+        const p2 = this.getTile(x, this.mapHeight - y - 1)!;
 
-            let p1 = this.getTile(x, y);
-            let p2 = this.getTile(x, this.mapHeight - y - 1);
+        // Player 1
+        this.manager.create.Beaver({
+            owner: this.players[0],
+            tile: p1,
+            job: this.jobs[0],
+            recruited: true,
+            branches: 1,
+        });
 
-            // Player 1
-            this.create("Beaver", {
-                owner: this.players[0],
-                tile: p1,
-                job: this.jobs[0],
-                recruited: true,
-                branches: 1,
-            });
+        // Player 2
+        this.manager.create.Beaver({
+            owner: this.players[0].opponent,
+            tile: p2,
+            job: this.jobs[0],
+            recruited: true,
+            branches: 1,
+        });
 
-            // Player 2
-            this.create("Beaver", {
-                owner: this.players[0].opponent,
-                tile: p2,
-                job: this.jobs[0],
-                recruited: true,
-                branches: 1,
-            });
+        this.manager.cleanupArrays();
+    }
 
-            this.cleanupArrays();
-        }
-    },
-
-    /* createFractal: function(points, index, depth) {
-        let a = points[index];
-        let b = points[index + 1];
-        let center = {
-        x: (a.x + b.x) / 2,
-        y: (a.y + b.y) / 2,
-        };
-
-        // Modify center's y value
-        let curVariance = 3 / depth;
-        center.y += Math.random() * 2 * curVariance - curVariance;
-
-        // Insert center point into the array
-        points.splice(index, 0, center);
-
-        // Offset for recursion
-        return 1;
-    }*/
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Game;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

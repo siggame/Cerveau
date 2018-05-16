@@ -55,8 +55,8 @@ export class Building extends GameObject {
     public readonly buildingWest?: Building;
 
     /**
-     * How much fire is currently burning the building, and thus how much damage
-     * it will take at the end of its owner's turn. 0 means no fire.
+     * How much fire is currently burning the building, and thus how much
+     * damage it will take at the end of its owner's turn. 0 means no fire.
      */
     public fire!: number;
 

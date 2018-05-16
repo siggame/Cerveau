@@ -9,7 +9,7 @@ import { BaseGameObject } from "./base-game-object";
  */
 export class BaseGameSanitizer {
     /**
-     * Creates a new sanitizer for a game
+     * Creates a new sanitizer for a game.
      *
      * @param namespace - The game namespace we are sanitizing for.
      */
@@ -24,8 +24,9 @@ export class BaseGameSanitizer {
      * @returns An error if they could not be sanitized. Otherwise a new array
      * with freshly sanitized arguments.
      */
-    public sanitizeOrderArgs(aiFunctionName: string,
-                             args: any[],
+    public sanitizeOrderArgs(
+        aiFunctionName: string,
+        args: any[],
     ): Error | any[] {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -43,8 +44,9 @@ export class BaseGameSanitizer {
      * @param returned - The value they returned.
      * @returns The returned value, now sanitized.
      */
-    public validateFinishedReturned(aiFunctionName: string,
-                                    returned: any,
+    public validateFinishedReturned(
+        aiFunctionName: string,
+        returned: any,
     ): any {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -64,10 +66,11 @@ export class BaseGameSanitizer {
      * key/value arguments, with the iteration order respecting their argument
      * order for the function.
      */
-    public validateRunArgs(gameObject: BaseGameObject,
-                           functionName: string,
-                           args: IAnyObject,
-    ): Error | Map<string, any> {
+    public validateRunArgs(
+        gameObject: BaseGameObject,
+        functionName: string,
+        args: IAnyObject,
+    ): Error | Map<string, any> | { invalid: string } {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
@@ -79,7 +82,49 @@ export class BaseGameSanitizer {
                 ? args[arg.argName]
                 : arg.defaultValue;
 
-            const sanitized = sanitizeType(arg, value);
+            let sanitized = sanitizeType(arg, value);
+            const invalidPrefix = gameObject.gameObjectName
+                + `.${functionName}()'s '${arg.argName}' arg was `
+                + `sent '${value}'`;
+
+            if (arg.typeName === "gameObject" && !arg.nullable && !sanitized) {
+                return {
+                    invalid: `${invalidPrefix}, which cannot be null.`,
+                };
+            }
+
+            if ((
+                arg.typeName === "string" ||
+                arg.typeName === "float" ||
+                arg.typeName === "int" ||
+                arg.typeName === "boolean"
+            ) && arg.literals) {
+                let found = arg.literals.includes(sanitized);
+
+                if (!found && arg.typeName === "string") {
+                    // Try to see if the string is found via a case-insensitive
+                    // search.
+                    const lowered: string = sanitized.toLowerCase();
+                    for (const literal of arg.literals!) {
+                        const loweredLiteral = (literal as string).toLowerCase();
+
+                        if (lowered === loweredLiteral) {
+                            sanitized = literal; // we found the literal value
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    // the value they sent was not one of the literals
+                    return {
+                        invalid: `${invalidPrefix}, which is not an expected `
+                            + `value from [${arg.literals!.join(", ")}]`,
+                    };
+                }
+            }
+
             sanitizedArgs.set(arg.argName, sanitized);
         }
 
@@ -87,15 +132,17 @@ export class BaseGameSanitizer {
     }
 
     /**
-     * Validates the return value of a ran function
+     * Validates the return value of a ran function.
+     *
      * @param gameObject - The game object instance that ran code.
      * @param functionName - The function name in the game object that ran.
      * @param returned - The value that was returned from that function.
      * @returns A sanitized return value of the expected schema type.
      */
-    public validateRanReturned(gameObject: BaseGameObject,
-                               functionName: string,
-                               returned: any,
+    public validateRanReturned(
+        gameObject: BaseGameObject,
+        functionName: string,
+        returned: any,
     ): any {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
@@ -106,13 +153,15 @@ export class BaseGameSanitizer {
     }
 
     /**
-     * Validates a game object has a specific function
+     * Validates a game object has a specific function.
+     *
      * @param gameObject - The game object instance.
      * @param functionName The function name inside the game object.
      * @returns The schema if valid, otherwise an error.
      */
-    private validateGameObject(gameObject: BaseGameObject,
-                               functionName: string,
+    private validateGameObject(
+        gameObject: BaseGameObject,
+        functionName: string,
     ): Error | IBaseGameObjectFunctionSchema {
         if (
             !gameObject ||

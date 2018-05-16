@@ -2,10 +2,14 @@
 // tslint:disable:no-empty-interface - because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
+import { IPoint } from "~/utils";
 import * as Base from "./base";
 
+/** The possible directions a tile can be in */
+export type TileDirection = "North" | "East" | "South" | "West";
+
 /** The valid direction strings tile based games use. */
-export const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];
+const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];
 
 /** A player in a tile based game. */
 export interface ITiledPlayer extends IBasePlayer {}
@@ -205,6 +209,29 @@ export function mixTiled<
         }
 
         /**
+         * Given the index in the tiles array, gets the (x, y) of that tile.
+         *
+         * @param index - The index to get.
+         * @returns A point with the { x, y } value at that index's point.
+         */
+        public getIndex(index: number): IPoint {
+            const y = index / this.mapWidth;
+            const x = index - (y * this.mapWidth);
+
+            return { x, y };
+        }
+
+        /**
+         * Inverts a direction string, e.g. "North" -> "South"
+         *
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string. Undefined if the direction was invalid.
+         */
+        public invertTileDirection(direction: string): string | undefined;
+
+        /**
          * Inverts a direction string, e.g. "North" -> "South"
          *
          * @param direction - the direction string to invert
@@ -214,12 +241,23 @@ export function mixTiled<
          */
         public invertTileDirection(
             direction: "North" | "South" | "East" | "West",
-        ): "North" | "South" | "East" | "West" {
+        ): "North" | "South" | "East" | "West";
+
+        /**
+         * Inverts a direction string, e.g. "North" -> "South"
+         *
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string. Undefined if the direction was invalid.
+         */
+        public invertTileDirection(direction: string): string | undefined {
             switch (direction) {
                 case "North": return "South";
                 case "East": return "West";
                 case "South": return "North";
                 case "West": return "East";
+                default: return undefined;
             }
         }
     }

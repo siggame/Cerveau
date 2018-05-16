@@ -190,6 +190,8 @@ export class BaseGameManager {
                 this.declareLoser(`${reason} - Lost via coin flip.`, players[i]);
             }
         }
+
+        this.endGame();
     }
 
     /**
@@ -200,13 +202,15 @@ export class BaseGameManager {
      * have not already won or lost the game.
      */
     public endGame(reason: string = "Draw"): void {
-        const playingPlayers = this.game.players.filter((p) => !p.won && !p.lost);
-        if (playingPlayers.length > 0) {
-            this.declareLoser(reason, playingPlayers.pop()!, ...playingPlayers);
-        }
+        if (!this.isOver) {
+            const playingPlayers = this.game.players.filter((p) => !p.won && !p.lost);
+            if (playingPlayers.length > 0) {
+                this.declareLoser(reason, playingPlayers.pop()!, ...playingPlayers);
+            }
 
-        this.isOver = true;
-        this.gameOverCallback();
+            this.isOver = true;
+            this.gameOverCallback();
+        }
     }
 
     /**
@@ -318,9 +322,6 @@ export class BaseGameManager {
      */
     private checkForGameOver(): void {
         if (this.game.players.find((p) => p.won)) {
-            // someone has won, so let's end this
-            this.isOver = true;
-
             for (const player of this.game.players) {
                 if (!player.won && !player.lost) {
                     // then they are going to loose because the game is over

@@ -10,7 +10,9 @@ import { IBasePlayer } from "./base-player";
 /** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
     parentClassName?: string;
-    attributes: { [key: string]: ISanitizableType & { defaultValue?: any } };
+    attributes: { [key: string]: ISanitizableType & {
+        defaultValue?: any,
+    }};
     functions: { [key: string]: IBaseGameObjectFunctionSchema };
 }
 

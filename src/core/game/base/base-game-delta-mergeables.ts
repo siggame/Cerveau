@@ -1,6 +1,6 @@
 import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
 import { ISanitizableType } from "~/core/type-sanitizer";
-import { IAnyObject, ITypedObject } from "~/utils";
+import { IAnyObject, ITypedObject, objectHasProperty } from "~/utils";
 
 /**
  * The base class all delta mergeable instances in (and of) the game inherit
@@ -28,12 +28,13 @@ export class BaseGameDeltaMergeables {
             type: {
                 typeName: "gameObject",
                 gameObjectClass: Object.getPrototypeOf(this).constructor,
+                nullable: false,
             },
         });
 
         // setup initial values
         for (const key of Object.keys(args.attributesSchema)) {
-            const initialValue = Object.prototype.hasOwnProperty.call(args.initialValues, key)
+            const initialValue = objectHasProperty(args.initialValues, key)
                 ? args.initialValues[key]
                 : undefined; // Else they send us some key/value pair that is
                              // not a child delta mergeable we care about.

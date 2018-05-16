@@ -76,10 +76,6 @@ export class PoliceDepartment extends Building {
             return invalid;
         }
 
-        if (!warehouse) {
-            return `${warehouse} not a valid Warehouse to for ${this} to raid.`;
-        }
-
         // <<-- /Creer-Merge: invalidate-raid -->>
         return arguments;
     }

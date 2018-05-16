@@ -216,6 +216,7 @@ export const Namespace = makeNamespace({
                             argName: "checker",
                             typeName: "gameObject",
                             gameObjectClass: Checker,
+                            nullable: false,
                         },
                     ],
                     returns: {
@@ -242,6 +243,7 @@ export const Namespace = makeNamespace({
                 checkerMoved: {
                     typeName: "gameObject",
                     gameObjectClass: Checker,
+                    nullable: true,
                 },
                 checkerMovedJumped: {
                     typeName: "boolean",
@@ -251,11 +253,13 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Checker,
+                        nullable: false,
                     },
                 },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 currentTurn: {
                     typeName: "int",
@@ -268,6 +272,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: GameObject,
+                        nullable: false,
                     },
                 },
                 maxTurns: {
@@ -278,6 +283,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Player,
+                        nullable: false,
                     },
                 },
                 session: {
@@ -296,6 +302,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 x: {
                     typeName: "int",
@@ -328,6 +335,7 @@ export const Namespace = makeNamespace({
                     returns: {
                         typeName: "gameObject",
                         gameObjectClass: Checker,
+                        nullable: false,
                     },
                 },
             },
@@ -369,6 +377,7 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Checker,
+                        nullable: false,
                     },
                 },
                 clientType: {
@@ -383,6 +392,7 @@ export const Namespace = makeNamespace({
                 opponent: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: false,
                 },
                 reasonLost: {
                     typeName: "string",

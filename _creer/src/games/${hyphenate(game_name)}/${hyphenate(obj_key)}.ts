@@ -169,6 +169,7 @@ ${merge('    // ', 'public-functions', """
             'is_game_object': True,
             'valueType': None,
             'keyType': None,
+            'nullable': False,
         }
     }] + function_parms['arguments']
 

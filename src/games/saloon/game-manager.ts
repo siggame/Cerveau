@@ -16,9 +16,13 @@ import { Tile } from "./tile";
  * together.
  */
 export class SaloonGameManager extends BaseClasses.GameManager {
-    /** The name of this game (used as an ID internally) */
-    public static get gameName(): string {
-        return "Saloon";
+    /** Other strings (case insensitive) that can be used as an ID */
+    public static get aliases(): string[] {
+        return [
+            // <<-- Creer-Merge: aliases -->>
+            "MegaMinerAI-18-Saloon",
+            // <<-- /Creer-Merge: aliases -->>
+        ];
     }
 
     /** The number of players that must connect to play this game */
@@ -27,15 +31,6 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         // override this if you want to set a different number of players
         return super.requiredNumberOfPlayers;
         // <<-- /Creer-Merge: required-number-of-players -->>
-    }
-
-    /** Other strings (case insensitive) that can be used as an ID */
-    public static get aliases(): string[] {
-        return [
-            // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-18-Saloon",
-            // <<-- /Creer-Merge: aliases -->>
-        ];
     }
 
     /** The game this GameManager is managing */
@@ -155,6 +150,8 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
             this.declareWinner(`${reason} - Has highest score (${winner.score}).`, winner);
             this.declareLoser("Lower score than winner", winner.opponent);
+            this.endGame();
+            return;
         }
 
         if (players[0].kills !== players[1].kills) { // someone won with a higher kills
@@ -164,6 +161,8 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
             this.declareWinner(`${reason} - Has the most kills (${winner.kills}).`, winner);
             this.declareLoser("Less kills than winner", winner.opponent);
+            this.endGame();
+            return;
         }
 
         // <<-- /Creer-Merge: secondary-game-over -->>

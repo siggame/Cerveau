@@ -61,9 +61,9 @@ export class FireDepartment extends Building {
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
-     * Invalidation function for extinguish. Try to find a reason why the passed
-     * in parameters are invalid, and return a human readable string telling
-     * them why it is invalid.
+     * Invalidation function for extinguish. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
      *
      * @param player - The player that called this.
      * @param building - The Building you want to extinguish.
@@ -81,8 +81,8 @@ export class FireDepartment extends Building {
             return invalid;
         }
 
-        if (!building || !(building instanceof Building) || building.isHeadquarters) {
-            return `${building} not a valid building to for ${this} to extinguish.`;
+        if (building.isHeadquarters) {
+            return `${building} is a Headquarters and cannot be extinguished by ${this}.`;
         }
 
         // <<-- /Creer-Merge: invalidate-extinguish -->>

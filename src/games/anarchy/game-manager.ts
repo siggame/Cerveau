@@ -18,9 +18,13 @@ import { WeatherStation } from "./weather-station";
  * together.
  */
 export class AnarchyGameManager extends BaseClasses.GameManager {
-    /** The name of this game (used as an ID internally) */
-    public static get gameName(): string {
-        return "Anarchy";
+    /** Other strings (case insensitive) that can be used as an ID */
+    public static get aliases(): string[] {
+        return [
+            // <<-- Creer-Merge: aliases -->>
+            "MegaMinerAI-16-Anarchy",
+            // <<-- /Creer-Merge: aliases -->>
+        ];
     }
 
     /** The number of players that must connect to play this game */
@@ -29,15 +33,6 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         // override this if you want to set a different number of players
         return super.requiredNumberOfPlayers;
         // <<-- /Creer-Merge: required-number-of-players -->>
-    }
-
-    /** Other strings (case insensitive) that can be used as an ID */
-    public static get aliases(): string[] {
-        return [
-            // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-16-Anarchy",
-            // <<-- /Creer-Merge: aliases -->>
-        ];
     }
 
     /** The game this GameManager is managing */

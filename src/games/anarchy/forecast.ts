@@ -25,8 +25,8 @@ extends IGameObjectConstructorArgs, IForecastProperties {
  */
 export class Forecast extends GameObject {
     /**
-     * The Player that can use WeatherStations to control this Forecast when its
-     * the nextForecast.
+     * The Player that can use WeatherStations to control this Forecast when
+     * its the nextForecast.
      */
     public readonly controllingPlayer: Player;
 

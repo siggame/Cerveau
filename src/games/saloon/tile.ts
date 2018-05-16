@@ -41,8 +41,8 @@ export class Tile extends GameObject implements BaseTile {
     public furnishing?: Furnishing;
 
     /**
-     * If this Tile is pathable, but has a hazard that damages Cowboys that path
-     * through it.
+     * If this Tile is pathable, but has a hazard that damages Cowboys that
+     * path through it.
      */
     public hasHazard!: boolean;
 
@@ -53,8 +53,8 @@ export class Tile extends GameObject implements BaseTile {
     public isBalcony!: boolean;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the
-     * map.
+     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
+     * the map.
      */
     public readonly tileEast?: Tile;
 
@@ -71,8 +71,8 @@ export class Tile extends GameObject implements BaseTile {
     public readonly tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the
-     * map.
+     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
+     * the map.
      */
     public readonly tileWest?: Tile;
 

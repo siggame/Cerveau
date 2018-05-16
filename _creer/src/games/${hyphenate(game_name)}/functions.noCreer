@@ -28,6 +28,12 @@ if not 'cerveau' in shared:
     def cerveau_type(type_obj, nullable=None):
         base_type = type_obj['name']
 
+        if 'literals' in type_obj and type_obj['literals']:
+            literals = list(type_obj['literals'])
+            if base_type == 'string':
+                literals = [ '"{}"'.format(lit) for lit in literals ]
+            return ' | '.join(literals)
+
         if base_type == "dictionary":
             return "{[id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + "}"
         elif base_type == "list":
@@ -43,11 +49,11 @@ if not 'cerveau' in shared:
                 if nullable and type_obj['nullable']:
                     ret += " | undefined"
             return ret
-        else: # string, boolean, or GameObject(s)
+        else: # string, boolean
             return base_type
     shared['cerveau']['type'] = cerveau_type
 
-    def cerveau_schema_type(type_obj, depth=1):
+    def cerveau_schema_type(type_obj, depth=1, optional=False):
         base_type = type_obj['name']
         string = ''
         typeName = ('    ' * depth) + 'typeName: "{}",'
@@ -55,11 +61,25 @@ if not 'cerveau' in shared:
         if type_obj['is_game_object']:
             typeName = typeName.format('gameObject') + '\n' + (
                 ('    ' * depth) + 'gameObjectClass: ' + base_type + ','
-            )
+            ) + '\n' + ('    ' * depth) + 'nullable: ' + ('true' if type_obj['nullable'] else 'false') + ','
         else:
             typeName = typeName.format(base_type)
 
         string = string + typeName
+
+        literals = type_obj['literals']
+        if type_obj['literals']:
+            literals = list(literals)
+            if not optional:
+                string = string + '\n' + ('    ' * depth) + 'defaultValue: {},'.format(
+                    '"{}"'.format(literals[0]) if base_type == "string" else literals[0]
+                )
+
+            if base_type == 'string':
+                literals = [ '"{}"'.format(lit) for lit in literals ]
+            string = string + '\n' + ('    ' * depth) + 'literals: [{}],'.format(
+                ', '.join(literals)
+            )
 
         if 'keyType' in type_obj and type_obj['keyType']:
                 string = string + """
@@ -200,11 +220,11 @@ if not 'cerveau' in shared:
 
         returns = 'void'
         if function_parms['returns']:
-            returns = shared['cerveau']['type'](function_parms['returns']['type'])
+            returns = shared['cerveau']['type'](function_parms['returns']['type'], nullable=True)
 
         formatted_name = '    {} '.format(scope)+('async ' if promise else '')+function_name+'('
         unformatted_args = (
-            [(a['name']+': '+shared['cerveau']['type'](a['type'])+(
+            [(a['name']+': '+shared['cerveau']['type'](a['type'], nullable=True)+(
                 (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
             )) for a in function_parms['arguments']]
         )

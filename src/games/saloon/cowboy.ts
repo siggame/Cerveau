@@ -6,7 +6,7 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { TileDirection } from "~/core/game/mixins/tiled";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -30,8 +30,9 @@ export class Cowboy extends GameObject {
     public canMove!: boolean;
 
     /**
-     * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
-     * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+     * The direction this Cowboy is moving while drunk. Will be 'North',
+     * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
+     * drunk.
      */
     public drunkDirection!: string;
 
@@ -60,7 +61,7 @@ export class Cowboy extends GameObject {
      * The job that this Cowboy does, and dictates how they fight and interact
      * within the Saloon.
      */
-    public readonly job!: string;
+    public readonly job!: "Bartender" | "Brawler" | "Sharpshooter";
 
     /**
      * The Player that owns and can control this Cowboy.
@@ -180,15 +181,15 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want this Cowboy to act on.
-     * @param drunkDirection - The direction the bottle will cause drunk cowboys
-     * to be in, can be 'North', 'East', 'South', or 'West'.
+     * @param drunkDirection - The direction the bottle will cause drunk
+     * cowboys to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
     protected invalidateAct(
         player: Player,
         tile: Tile,
-        drunkDirection: string = "",
+        drunkDirection: "" | "North" | "East" | "South" | "West" = "",
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-act -->>
 
@@ -204,15 +205,7 @@ export class Cowboy extends GameObject {
         // job specific acts
         switch (this.job) {
             case "Bartender":
-                const bar = this.invalidateBartender(player, tile, drunkDirection);
-                if (typeof(bar) === "object") {
-                    drunkDirection = bar.validDrunkDirection;
-                    invalid = undefined;
-                }
-                else {
-                    invalid = bar;
-                }
-
+                invalid = this.invalidateBartender(player, tile, drunkDirection);
                 break;
             case "Brawler":
                 return `${this} is a Brawler and cannot act`;
@@ -234,14 +227,14 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want this Cowboy to act on.
-     * @param drunkDirection - The direction the bottle will cause drunk cowboys
-     * to be in, can be 'North', 'East', 'South', or 'West'.
+     * @param drunkDirection - The direction the bottle will cause drunk
+     * cowboys to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns True if the act worked, false otherwise.
      */
     protected async act(
         player: Player,
         tile: Tile,
-        drunkDirection: string = "",
+        drunkDirection: "" | "North" | "East" | "South" | "West" = "",
     ): Promise<boolean> {
         // <<-- Creer-Merge: act -->>
 
@@ -267,7 +260,10 @@ export class Cowboy extends GameObject {
      * @returns a string that is the invalid reason, if the arguments are
      * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    protected invalidateMove(player: Player, tile: Tile): string | IArguments {
+    protected invalidateMove(
+        player: Player,
+        tile: Tile,
+    ): string | IArguments {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, tile);
@@ -379,7 +375,10 @@ export class Cowboy extends GameObject {
      * @param piano - The Furnishing that is a piano you want to play.
      * @returns True if the play worked, false otherwise.
      */
-    protected async play(player: Player, piano: Furnishing): Promise<boolean> {
+    protected async play(
+        player: Player,
+        piano: Furnishing,
+    ): Promise<boolean> {
         // <<-- Creer-Merge: play -->>
 
         piano.isPlaying = true;
@@ -493,35 +492,16 @@ export class Cowboy extends GameObject {
     private invalidateBartender(
         player: Player,
         tile: Tile,
-        drunkDirection: string,
-    ): string | { validDrunkDirection: string } {
+        drunkDirection: "" | TileDirection,
+    ): string | undefined {
         if (!drunkDirection) {
             return `drunkDirection cannot be empty for a Bartender to act.`;
-        }
-
-        let validDrunkDirection = "";
-        const simple = drunkDirection[0].toLowerCase();
-        for (const direction of this.game.tileDirections) {
-            // so we can check just the first two letters if they are the same,
-            // so we can be lax on input
-            const dir = direction[0].toLowerCase();
-
-            if (simple === dir) {
-                validDrunkDirection = direction;
-                break;
-            }
-        }
-
-        if (!validDrunkDirection) {
-            return `${drunkDirection} is not a valid direction to send drunk Cowboys hit by ${this}'s Bottles.`;
         }
 
         // make sure the tile is an adjacent tile
         if (!this.tile!.hasNeighbor(tile)) {
             return `${tile} is not adjacent to the Tile that ${this} is on (${this.tile}).`;
         }
-
-        return { validDrunkDirection };
     }
 
     /**

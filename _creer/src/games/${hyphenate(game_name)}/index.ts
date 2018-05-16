@@ -209,7 +209,7 @@ ${shared['cerveau']['schema_type'](obj['attributes'][attr_name]['type'], 5)}
 %           for arg in function_parms['arguments']:
                         {
                             argName: "${arg['name']}",
-${shared['cerveau']['schema_type'](arg['type'], 7)}
+${shared['cerveau']['schema_type'](arg['type'], 7, arg['optional'])}
 %               if arg['optional']:
                             defaultValue: ${shared['cerveau']['value'](arg['type'], arg['default'])},
 %               endif

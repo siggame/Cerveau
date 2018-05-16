@@ -97,10 +97,6 @@ export class Warehouse extends Building {
             return invalid;
         }
 
-        if (!building) {
-            return `${building} not a valid building to for ${this} to ignite.`;
-        }
-
         if (building.isHeadquarters) {
             return `${building} Headquarters cannot be targeted by Warehouses directly.`;
         }

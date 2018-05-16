@@ -1,72 +1,88 @@
-// Spawner: A resource spawner that generates branches or food.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { ISpawnerProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Spawner have different args.
+ */
+export interface ISpawnerConstructorArgs
+extends IGameObjectConstructorArgs, ISpawnerProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    tile: Tile;
+    type: "branches" | "food";
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Spawner: A resource spawner that generates branches or food.
-let Spawner = Class(GameObject, {
+/**
+ * A resource spawner that generates branches or food.
+ */
+export class Spawner extends GameObject {
     /**
-     * Initializes Spawners.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * True if this Spawner has been harvested this turn, and it will not heal
+     * at the end of the turn, false otherwise.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public hasBeenHarvested!: boolean;
 
-        /**
-         * True if this Spawner has been harvested this turn, and it will not heal at the end of the turn, false otherwise.
-         *
-         * @type {boolean}
-         */
-        this.hasBeenHarvested = this.hasBeenHarvested || false;
+    /**
+     * How much health this Spawner has, which is used to calculate how much of
+     * its resource can be harvested.
+     */
+    public health!: number;
 
-        /**
-         * How much health this Spawner has, which is used to calculate how much of its resource can be harvested.
-         *
-         * @type {number}
-         */
-        this.health = this.health || 0;
+    /**
+     * The Tile this Spawner is on.
+     */
+    public readonly tile: Tile;
 
-        /**
-         * The Tile this Spawner is on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
+    /**
+     * What type of resource this is ('food' or 'branches').
+     */
+    public readonly type!: "food" | "branches";
 
-        /**
-         * What type of resource this is ('food' or 'branches').
-         *
-         * @type {string}
-         */
-        this.type = this.type || "";
+    // <<-- Creer-Merge: attributes -->>
 
+    /** The cooldown on being harvested */
+    public harvestCooldown = 0;
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
 
+    /**
+     * Called when a Spawner is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: ISpawnerConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
         this.health = 1;
+        this.tile = data.tile;
         this.tile.spawner = this;
-        this.game.spawner.push(this); // should be `spawners`, if we ever re-run creer
+        this.game.spawner.push(this);
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Spawner",
+    // <<-- Creer-Merge: public-functions -->>
 
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: public-functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // Any additional protected or pirate methods can go here.
 
-});
-
-module.exports = Spawner;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

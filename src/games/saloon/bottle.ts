@@ -35,8 +35,8 @@ export class Bottle extends GameObject {
     public readonly drunkDirection!: string;
 
     /**
-     * True if this Bottle has impacted and has been destroyed (removed from the
-     * Game). False if still in the game flying through the saloon.
+     * True if this Bottle has impacted and has been destroyed (removed from
+     * the Game). False if still in the game flying through the saloon.
      */
     public isDestroyed!: boolean;
 
