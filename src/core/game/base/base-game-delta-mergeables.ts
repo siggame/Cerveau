@@ -33,11 +33,14 @@ export class BaseGameDeltaMergeables {
         });
 
         // setup initial values
-        for (const key of Object.keys(args.attributesSchema)) {
-            const initialValue = objectHasProperty(args.initialValues, key)
-                ? args.initialValues[key]
-                : undefined; // Else they send us some key/value pair that is
-                             // not a child delta mergeable we care about.
+        for (const [ key, schema ] of Object.entries(args.attributesSchema)) {
+            let initialValue = objectHasProperty(schema, "defaultValue")
+                ? (schema as any).defaultValue
+                : undefined;
+
+            if (objectHasProperty(args.initialValues, key)) {
+                initialValue = args.initialValues[key];
+            }
 
             (this.deltaMergeable.wrapper as any)[key] = initialValue;
         }

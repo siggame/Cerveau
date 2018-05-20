@@ -38,7 +38,7 @@ export class Tile extends GameObject implements BaseTile {
      * The cardinal direction water is flowing on this Tile ('North', 'East',
      * 'South', 'West').
      */
-    public readonly flowDirection!: "North" | "East" | "South" | "West" | "";
+    public readonly flowDirection!: "" | "North" | "East" | "South" | "West";
 
     /**
      * The number of food dropped on this Tile.
