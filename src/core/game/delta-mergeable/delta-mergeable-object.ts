@@ -9,18 +9,20 @@ import { DeltaMergeable } from "./delta-mergeable";
  * @returns A new DeltaMergeable wrapping an Object.
  */
 export function createObject(args: {
-    key: string,
-    initialValue?: any,
-    parent?: DeltaMergeable,
-    childTypes?: ITypedObject<ISanitizableType>,
-    childType?: ISanitizableType,
-    transform?: (val?: any, currentVal?: any) => any,
+    key: string;
+    initialValue?: any;
+    parent?: DeltaMergeable;
+    childTypes?: ITypedObject<ISanitizableType>;
+    childType?: ISanitizableType;
+    transform?: (val?: any, currentVal?: any) => any;
+    validate: (val: any) => string | undefined;
 }): DeltaMergeable<IAnyObject> {
     const deltaMergeables: ITypedObject<DeltaMergeable> = {};
     const container = new DeltaMergeable<object>({
         key: args.key,
         parent: args.parent,
         initialValue: args.initialValue || {},
+        validate: args.validate,
         transform: args.transform || ((newObj?: any, currentValue?: IAnyObject): IAnyObject => {
             if (!newObj) {
                 newObj = {};

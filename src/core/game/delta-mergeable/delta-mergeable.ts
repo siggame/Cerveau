@@ -25,10 +25,16 @@ export class DeltaMergeable<T = any> {
     private parent: DeltaMergeable<any> | undefined;
 
     /** The child nodes. If empty this is a leaf node. */
-    private children = new Map<string, DeltaMergeable<any>>();
+    private readonly children = new Map<string, DeltaMergeable<any>>();
 
     /** An optional transform function to use on all sets. */
-    private transform?: (value: any, currentValue?: T) => T | undefined;
+    private readonly transform?: (value: any, currentValue?: T) => T | undefined;
+
+    /**
+     * An optional validate function to throw errors when a string is returned
+     * from the validation function.
+     */
+    private readonly validate?: (value: any) => string | undefined;
 
     /** The current value of the node. */
     private value: T | undefined;
@@ -43,6 +49,7 @@ export class DeltaMergeable<T = any> {
         parent?: DeltaMergeable<any>;
         initialValue?: T;
         transform?: (value: any, currentValue?: T) => T | undefined;
+        validate?: (value: any) => string | undefined;
     }) {
         this.key = data.key;
 
@@ -54,6 +61,7 @@ export class DeltaMergeable<T = any> {
         this.value = data.initialValue;
 
         this.transform = data.transform;
+        this.validate = data.validate;
         this.set(data.initialValue, true);
     }
 
@@ -82,6 +90,13 @@ export class DeltaMergeable<T = any> {
      * the same.
      */
     public set(value: any, forceSet?: true): void {
+        if (this.validate) {
+            const invalid = this.validate(value);
+            if (invalid) {
+                throw new Error(invalid);
+            }
+        }
+
         if (this.transform) {
             value = this.transform(value, this.get());
         }

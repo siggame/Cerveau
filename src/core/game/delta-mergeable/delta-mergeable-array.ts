@@ -12,6 +12,7 @@ export function createArray<T = any>(args: {
     key: string;
     childType: ISanitizableType;
     parent?: DeltaMergeable;
+    validate: (val: any) => string | undefined;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;
     const array: T[] = [];
@@ -20,6 +21,7 @@ export function createArray<T = any>(args: {
         key: args.key,
         parent: args.parent,
         initialValue: array,
+        validate: args.validate,
         transform: (newArray: T[] | undefined, currentValue) => {
             newArray = newArray || [];
             // We won't allow people to re-set this array,
