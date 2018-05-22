@@ -239,9 +239,37 @@ export function mixTiled<
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
-        public invertTileDirection(
-            direction: "North" | "South" | "East" | "West",
-        ): "North" | "South" | "East" | "West";
+        public invertTileDirection(direction: "North"): "South";
+
+        /**
+         * Inverts a direction string, e.g. "North" -> "South"
+         *
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string.
+         */
+        public invertTileDirection(direction: "South"): "North";
+
+        /**
+         * Inverts a direction string, e.g. "North" -> "South"
+         *
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string.
+         */
+        public invertTileDirection(direction: "East"): "West";
+
+        /**
+         * Inverts a direction string, e.g. "North" -> "South"
+         *
+         * @param direction - the direction string to invert
+         * @returns the direction inverted,
+         * e.g. "East" -> "West", undefined if the direction was not a valid
+         * direction string.
+         */
+        public invertTileDirection(direction: "West"): "East";
 
         /**
          * Inverts a direction string, e.g. "North" -> "South"
