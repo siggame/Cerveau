@@ -28,7 +28,7 @@ export class DeltaMergeable<T = any> {
     private parent: DeltaMergeable<any> | undefined;
 
     /** The child nodes. If empty this is a leaf node. */
-    private children = new Map<string, DeltaMergeable<any>>();
+    private readonly children = new Map<string, DeltaMergeable<any>>();
 
     /** An optional transform function to use on all sets. */
     private transform?: DeltaTransform<T>;
