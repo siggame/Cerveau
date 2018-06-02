@@ -136,6 +136,8 @@ export class StumpedGame extends BaseClasses.Game {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.spawnerTypes.push("branches", "food");
+
         for (const title of Object.keys(jobStats).sort()) {
             this.jobs.push(
                 this.manager.create.Job({
@@ -368,7 +370,9 @@ export class StumpedGame extends BaseClasses.Game {
 
             // Copy data
             (target as any).type = orig.type;
-            (target as any).flowDirection = this.invertTileDirection(orig.flowDirection);
+            (target as any).flowDirection = orig.flowDirection === "North" || orig.flowDirection === "South"
+                ? this.invertTileDirection(orig.flowDirection)
+                : orig.flowDirection;
 
             // clone Spawner
             if (orig.spawner) {

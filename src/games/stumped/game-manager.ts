@@ -125,7 +125,10 @@ export class StumpedGameManager extends BaseClasses.GameManager {
     protected secondaryGameOver(reason: string): void {
         // <<-- Creer-Merge: secondary-game-over -->>
 
-        const players = this.game.players.slice();
+        const players = this.game.players.slice().sort(
+            (p1, p2) => p2.lodges.length - p1.lodges.length,
+        );
+
         // check if someone won by having more lodges
         if (players[0].lodges.length !== players[1].lodges.length) {
             const winner = players[0];
