@@ -1,4 +1,4 @@
-import { IAnyObject } from "~/utils";
+<%include file="functions.noCreer" />import { IAnyObject } from "~/utils";
 import { BaseClasses } from "./";
 
 ${merge('// ', 'imports', '// any additional imports you want can be placed here safely between creer runs', optional=True, help=False)}
@@ -15,13 +15,29 @@ export class ${game['name']}GameSettingsManager extends BaseClasses.GameSettings
         ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
 
         // ${game_name} game specific settings
+% for attr_name in game['attribute_names']:
+<%
+
+attr_parms = game['attributes'][attr_name]
+setting = attr_parms['setting']
+
+if not setting:
+    continue
+
+setting_name = setting if type(setting) is str else attr_name
+%>        ${setting_name}: {
+            description: "${attr_parms['description']}",
+${merge('            // ', setting_name,
+'            default: {},'.format(shared['cerveau']['default'](attr_parms['type'])), optional=True, help=False)}
+        },
+% endfor
 ${merge('        // ', 'schema', """
-        // you can add settings here, e.g.:
+        // you can add more settings here, e.g.:
         /*
         someVariableLikeUnitHealth: {
+            description: "Describe what this setting does for the players.",
             default: 1337,
             min: 1,
-            description: "Describe what this setting does for the players.",
         },
         */
 

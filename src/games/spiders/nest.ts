@@ -1,74 +1,91 @@
-// Nest: A location (node) connected to other Nests via Webs (edges) in the game that Spiders can converge on, regardless of owner.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { INestProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
+import { Spider } from "./spider";
+import { Web } from "./web";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Nest have different args.
+ */
+export interface INestConstructorArgs
+extends IGameObjectConstructorArgs, INestProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Nest: A location (node) connected to other Nests via Webs (edges) in the game that Spiders can converge on, regardless of owner.
-let Nest = Class(GameObject, {
+/**
+ * A location (node) connected to other Nests via Webs (edges) in the game that
+ * Spiders can converge on, regardless of owner.
+ */
+export class Nest extends GameObject {
     /**
-     * Initializes Nests.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The Player that 'controls' this Nest as they have the most Spiders on
+     * this nest.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public controllingPlayer?: Player;
 
-        /**
-         * All the Spiders currently located on this Nest.
-         *
-         * @type {Array.<Spider>}
-         */
-        this.spiders = this.spiders || [];
+    /**
+     * All the Spiders currently located on this Nest.
+     */
+    public spiders!: Spider[];
 
-        /**
-         * Webs that connect to this Nest.
-         *
-         * @type {Array.<Web>}
-         */
-        this.webs = this.webs || [];
+    /**
+     * Webs that connect to this Nest.
+     */
+    public webs!: Web[];
 
-        /**
-         * The X coordinate of the Nest. Used for distance calculations.
-         *
-         * @type {number}
-         */
-        this.x = this.x || 0;
+    /**
+     * The X coordinate of the Nest. Used for distance calculations.
+     */
+    public readonly x!: number;
 
-        /**
-         * The Y coordinate of the Nest. Used for distance calculations.
-         *
-         * @type {number}
-         */
-        this.y = this.y || 0;
+    /**
+     * The Y coordinate of the Nest. Used for distance calculations.
+     */
+    public readonly y!: number;
 
+    // <<-- Creer-Merge: attributes -->>
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        this.game.nests.push(this);
+    // <<-- /Creer-Merge: attributes -->>
 
-        //<<-- /Creer-Merge: init -->>
-    },
+    /**
+     * Called when a Nest is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: INestConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-    gameObjectName: "Nest",
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
+    // <<-- Creer-Merge: public-functions -->>
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // <<-- /Creer-Merge: public-functions -->>
 
-    distanceTo: function(otherNest) {
-        return Math.euclideanDistance(this, otherNest);
-    },
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // Any additional protected or pirate methods can go here.
 
-});
-
-module.exports = Nest;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

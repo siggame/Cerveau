@@ -1,137 +1,153 @@
-// Cutter: A Spiderling that can cut existing Webs.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { ICutterProperties } from "./";
+import { Player } from "./player";
+import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
+import { Web } from "./web";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const Spiderling = require("./spiderling");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Cutter have different args.
+ */
+export interface ICutterConstructorArgs
+extends ISpiderlingConstructorArgs, ICutterProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Cutter: A Spiderling that can cut existing Webs.
-let Cutter = Class(Spiderling, {
+/**
+ * A Spiderling that can cut existing Webs.
+ */
+export class Cutter extends Spiderling {
     /**
-     * Initializes Cutters.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The Web that this Cutter is trying to cut. Null if not cutting.
      */
-    init: function(data) {
-        Spiderling.init.apply(this, arguments);
+    public cuttingWeb?: Web;
 
-        /**
-         * The Web that this Cutter is trying to cut. Null if not cutting.
-         *
-         * @type {Web}
-         */
-        this.cuttingWeb = this.cuttingWeb || null;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        this.cuttingSpeed = 10;
-
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "Cutter",
-
+    // <<-- /Creer-Merge: attributes -->>
 
     /**
-     * Invalidation function for cut
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Called when a Cutter is created.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Web} web - The web you want to Cut. Must be connected to the Nest this Cutter is currently on.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
-    invalidateCut: function(player, web, args) {
-        // <<-- Creer-Merge: invalidateCut -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    constructor(
+        data: ICutterConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-        const invalid = Spiderling._invalidate.call(this, player);
-        if(invalid) {
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // <<-- Creer-Merge: public-functions -->>
+
+    /** Kills the Cutter */
+    public kill(): void {
+        super.kill();
+
+        this.cuttingWeb = undefined;
+    }
+
+    /**
+     * Finishes the actions of the Cutter
+     *
+     * @param forceFinish - true if forcing the finish prematurely
+     * @returns True if the base logic can handle finishing
+     */
+    public finish(forceFinish?: boolean): boolean {
+        if (this.finish(forceFinish)) {
+            return true; // because they finished moving or something the base Spiderling class can handle
+        }
+
+        if (!forceFinish && this.cuttingWeb && !this.cuttingWeb.hasSnapped()) {
+            this.cuttingWeb.snap();
+        }
+
+        this.cuttingWeb = undefined;
+        return false;
+    }
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for cut. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param web - The web you want to Cut. Must be connected to the Nest this
+     * Cutter is currently on.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    protected invalidateCut(player: Player, web: Web): string | IArguments {
+        // <<-- Creer-Merge: invalidate-cut -->>
+
+        const invalid = super.invalidate(player);
+        if (invalid) {
             return invalid;
         }
 
-        if(!web) {
-            return `'${web}' is not a Web that can be cut by ${this}.`;
-        }
-
-        if(!web.isConnectedTo(this.nest)) {
+        if (!web.isConnectedTo(this.nest!)) {
             return `${this} can only cut Webs connected to the Nest it is on (${this.nest}), ${web} is not.`;
         }
 
-        // <<-- /Creer-Merge: invalidateCut -->>
-    },
+        // <<-- /Creer-Merge: invalidate-cut -->>
+        return arguments;
+    }
 
     /**
      * Cuts a web, destroying it, and any Spiderlings on it.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Web} web - The web you want to Cut. Must be connected to the Nest this Cutter is currently on.
-     * @returns {boolean} True if the cut was successfully started, false otherwise.
+     * @param player - The player that called this.
+     * @param web - The web you want to Cut. Must be connected to the Nest this
+     * Cutter is currently on.
+     * @returns True if the cut was successfully started, false otherwise.
      */
-    cut: function(player, web) {
-        // <<-- Creer-Merge: cut -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async cut(player: Player, web: Web): Promise<boolean> {
+        // <<-- Creer-Merge: cut -->>
 
         this.busy = "Cutting";
         this.cuttingWeb = web;
 
         // find coworkers
-        var sideSpiders = web.getSideSpiders();
-        for(var i = 0; i < sideSpiders.length; i++) {
-            var spider = sideSpiders[i];
-            if(spider !== this && spider.cuttingWeb === web) {
-                this.coworkers.push(spider);
-                this.numberOfCoworkers = this.coworkers.length;
-                spider.coworkers.push(this);
-                spider.numberOfCoworkers = spider.coworkers.length;
+        for (const spider of web.getSideSpiders()) {
+            if (
+                spider !== this &&
+                spider instanceof Cutter &&
+                spider.cuttingWeb === web
+            ) {
+                this.coworkers.add(spider);
+                this.numberOfCoworkers = this.coworkers.size;
+                spider.coworkers.add(this);
+                spider.numberOfCoworkers = spider.coworkers.size;
             }
         }
 
         // workRemaining =  5 * strength^2 / (cutterSpeed * sqrt(distance))
-        this.workRemaining = 5 * web.strength * web.strength / (this.game.cutSpeed * Math.sqrt(web.length));
+        this.workRemaining = 5 * web.strength ** 2 / (this.game.cutSpeed * Math.sqrt(web.length));
 
         return true;
+
         // <<-- /Creer-Merge: cut -->>
-    },
+    }
 
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any additional protected or pirate methods can go here.
 
-    /**
-     * Kills the Cutter
-     *
-     * @override
-     */
-    kill: function() {
-        Spiderling.kill.apply(this, arguments);
-
-        this.cuttingWeb = null;
-    },
-
-    /**
-     * Finishes the actions of the Cutter
-     *
-     * @override
-     * @param {boolean} forceFinish - true if forcing the finish prematurely
-     */
-    finish: function(forceFinish) {
-        if(Spiderling.finish.apply(this, arguments)) {
-            return; // because they finished moving or something the base Spiderling class can handle
-        }
-
-        if(!forceFinish && this.cuttingWeb && !this.cuttingWeb.hasSnapped()) {
-            this.cuttingWeb.snap();
-        }
-
-        this.cuttingWeb = null;
-    },
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Cutter;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

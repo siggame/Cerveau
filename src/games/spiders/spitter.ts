@@ -1,158 +1,172 @@
-// Spitter: A Spiderling that creates and spits new Webs from the Nest it is on to another Nest, connecting them.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { ISpitterProperties } from "./";
+import { Nest } from "./nest";
+import { Player } from "./player";
+import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
+import { euclideanDistance } from "~/utils";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const Spiderling = require("./spiderling");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Spitter have different args.
+ */
+export interface ISpitterConstructorArgs
+extends ISpiderlingConstructorArgs, ISpitterProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Spitter: A Spiderling that creates and spits new Webs from the Nest it is on to another Nest, connecting them.
-let Spitter = Class(Spiderling, {
+/**
+ * A Spiderling that creates and spits new Webs from the Nest it is on to
+ * another Nest, connecting them.
+ */
+export class Spitter extends Spiderling {
     /**
-     * Initializes Spitters.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The Nest that this Spitter is creating a Web to spit at, thus connecting
+     * them. Null if not spitting.
      */
-    init: function(data) {
-        Spiderling.init.apply(this, arguments);
-
-        /**
-         * The Nest that this Spitter is creating a Web to spit at, thus connecting them. Null if not spitting.
-         *
-         * @type {Nest}
-         */
-        this.spittingWebToNest = this.spittingWebToNest || null;
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        this.spittingSpeed = 10;
-
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "Spitter",
-
+    public spittingWebToNest?: Nest;
 
     /**
-     * Invalidation function for spit
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Called when a Spitter is created.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Nest} nest - The Nest you want to spit a Web to, thus connecting that Nest and the one the Spitter is on.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
      */
-    invalidateSpit: function(player, nest, args) {
-        // <<-- Creer-Merge: invalidateSpit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    constructor(
+        data: ISpitterConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-        var invalid = Spiderling._invalidate.call(this, player);
-        if(invalid) {
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // <<-- Creer-Merge: public-functions -->>
+
+    /** Kills the Spitter */
+    public kill(): void {
+        super.kill();
+
+        this.spittingWebToNest = undefined;
+    }
+
+    /**
+     * Finishes the actions of the Spitter
+     *
+     * @param forceFinish - true if forcing the finish prematurely
+     * @returns True if the base finished, false otherwise
+     */
+    public finish(forceFinish?: boolean): boolean {
+        if (super.finish(forceFinish)) {
+            return true; // because they finished moving or something the base Spiderling class can handle
+        }
+
+        if (forceFinish) {
+            this.spittingWebToNest = undefined;
+            return false;
+        }
+
+        // if we got here they finished spitting
+        const newWeb = this.manager.create.Web({
+            nestA: this.nest!,
+            nestB: this.spittingWebToNest!,
+        });
+
+        // cancel spitters on the current nest to the destination
+        for (const spider of newWeb.getSideSpiders()) {
+            if (spider !== this && spider instanceof Spitter && (
+                spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest
+            )) {
+                spider.finish(true);
+            }
+        }
+
+        this.spittingWebToNest = undefined;
+        return false;
+    }
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for spit. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param nest - The Nest you want to spit a Web to, thus connecting that
+     * Nest and the one the Spitter is on.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    protected invalidateSpit(
+        player: Player,
+        nest: Nest,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-spit -->>
+
+        const invalid = super.invalidate(player);
+        if (invalid) {
             return invalid;
         }
 
-        if(!nest) {
-            return `'${nest}' is not a Nest for ${this} to spit at.`;
-        }
-
-        if(nest === this.nest) {
+        if (nest === this.nest) {
             return `${this} cannot spit at the same Nest it is on (${nest}).`;
         }
 
-        for(const web of nest.webs) {
-            if(web.isConnectedTo(this.nest, nest)) {
+        for (const web of nest.webs) {
+            if (web.isConnectedTo(this.nest!, nest)) {
                 return `${this} cannot spit a new Web from ${this.nest} to ${nest} because ${web} already exists.`;
             }
         }
 
-        // <<-- /Creer-Merge: invalidateSpit -->>
-    },
+        // <<-- /Creer-Merge: invalidate-spit -->>
+        return arguments;
+    }
 
     /**
-     * Creates and spits a new Web from the Nest the Spitter is on to another Nest, connecting them.
+     * Creates and spits a new Web from the Nest the Spitter is on to another
+     * Nest, connecting them.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Nest} nest - The Nest you want to spit a Web to, thus connecting that Nest and the one the Spitter is on.
-     * @returns {boolean} True if the spit was successful, false otherwise.
+     * @param player - The player that called this.
+     * @param nest - The Nest you want to spit a Web to, thus connecting that
+     * Nest and the one the Spitter is on.
+     * @returns True if the spit was successful, false otherwise.
      */
-    spit: function(player, nest) {
-        // <<-- Creer-Merge: spit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async spit(player: Player, nest: Nest): Promise<boolean> {
+        // <<-- Creer-Merge: spit -->>
 
         this.busy = "Spitting";
         this.spittingWebToNest = nest;
 
         // find coworkers
-        var sideSpiders = this.nest.spiders.concat(nest.spiders);
-        for(const spider of sideSpiders) {
-            if(spider !== this && (spider.spittingWebToNest === nest || spider.spittingWebToNest === this.nest)) {
-                this.coworkers.push(spider);
-                this.numberOfCoworkers = this.coworkers.length;
-                spider.coworkers.push(this);
-                spider.numberOfCoworkers = spider.coworkers.length;
+        const sideSpiders = this.nest!.spiders.concat(nest.spiders);
+        for (const spider of sideSpiders) {
+            if (spider !== this && spider instanceof Spitter && (
+                spider.spittingWebToNest === nest || spider.spittingWebToNest === this.nest
+            )) {
+                this.coworkers.add(spider);
+                this.numberOfCoworkers = this.coworkers.size;
+                spider.coworkers.add(this);
+                spider.numberOfCoworkers = spider.coworkers.size;
             }
         }
 
-        this.workRemaining = this.nest.distanceTo(nest) / this.game.spitSpeed;
+        this.workRemaining = euclideanDistance(this.nest!, nest) / this.game.spitSpeed;
 
         return true;
 
         // <<-- /Creer-Merge: spit -->>
-    },
+    }
 
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any additional protected or pirate methods can go here.
 
-    /**
-     * Kills the Spitter
-     *
-     * @override
-     */
-    kill: function() {
-        Spiderling.kill.apply(this, arguments);
-
-        this.spittingWebToNest = null;
-    },
-
-    /**
-     * Finishes the actions of the Spitter
-     *
-     * @override
-     * @param {boolean} forceFinish - true if forcing the finish prematurely
-     */
-    finish: function(forceFinish) {
-        if(Spiderling.finish.apply(this, arguments)) {
-            return; // because they finished moving or something the base Spiderling class can handle
-        }
-
-        if(forceFinish) {
-            this.spittingWebToNest = null;
-            return;
-        }
-
-        // if we got here they finished spitting
-        var newWeb = this.game.create("Web", {
-            nestA: this.nest,
-            nestB: this.spittingWebToNest,
-        });
-
-        // cancel spitters on the current nest to the destination
-        var sideSpiders = newWeb.getSideSpiders();
-        for(var i = 0; i < sideSpiders.length; i++) {
-            var spider = sideSpiders[i];
-            if(spider !== this && (spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest)) {
-                spider.finish(true);
-            }
-        }
-
-        this.spittingWebToNest = null;
-    },
-
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Spitter;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}
