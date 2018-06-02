@@ -1,5 +1,5 @@
-import { defaultArray, sanitizeType } from "~/core/type-sanitizer";
-import { IAnyObject, objectHasProperty } from "~/utils";
+import { sanitizeArray, sanitizeType } from "~/core/sanitize/";
+import { IAnyObject, objectHasProperty, quoteIfString } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
@@ -33,8 +33,14 @@ export class BaseGameSanitizer {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
         }
 
-        const argsArray = defaultArray(args);
-        return schema.args.map((t, i) => sanitizeType(t, argsArray[i]));
+        const argsArray = sanitizeArray(args, false);
+        return schema.args.map((t, i) => {
+            const sanitized = sanitizeType(t, argsArray[i]);
+            if (sanitized instanceof Error) {
+                throw sanitized; // server side error, we should never have this happen
+            }
+            return sanitized;
+        });
     }
 
     /**
@@ -82,47 +88,14 @@ export class BaseGameSanitizer {
                 ? args[arg.argName]
                 : arg.defaultValue;
 
-            let sanitized = sanitizeType(arg, value);
-            const invalidPrefix = gameObject.gameObjectName
-                + `.${functionName}()'s '${arg.argName}' arg was `
-                + `sent '${value}'`;
+            const sanitized = sanitizeType(arg, value);
 
-            if (arg.typeName === "gameObject" && !arg.nullable && !sanitized) {
+            if (sanitized instanceof Error) {
                 return {
-                    invalid: `${invalidPrefix}, which cannot be null.`,
+                    invalid: `${gameObject.gameObjectName}.${functionName}()'s '${arg.argName}' arg was sent ${
+                        quoteIfString(value)
+                    } - ${sanitized.message}`,
                 };
-            }
-
-            if ((
-                arg.typeName === "string" ||
-                arg.typeName === "float" ||
-                arg.typeName === "int" ||
-                arg.typeName === "boolean"
-            ) && arg.literals) {
-                let found = arg.literals.includes(sanitized);
-
-                if (!found && arg.typeName === "string") {
-                    // Try to see if the string is found via a case-insensitive
-                    // search.
-                    const lowered: string = sanitized.toLowerCase();
-                    for (const literal of arg.literals!) {
-                        const loweredLiteral = (literal as string).toLowerCase();
-
-                        if (lowered === loweredLiteral) {
-                            sanitized = literal; // we found the literal value
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!found) {
-                    // the value they sent was not one of the literals
-                    return {
-                        invalid: `${invalidPrefix}, which is not an expected `
-                            + `value from [${arg.literals!.join(", ")}]`,
-                    };
-                }
             }
 
             sanitizedArgs.set(arg.argName, sanitized);
@@ -149,7 +122,12 @@ export class BaseGameSanitizer {
             return schema;
         }
 
-        return sanitizeType(schema.returns, returned);
+        const sanitized = sanitizeType(schema.returns, returned);
+        if (sanitized instanceof Error) {
+            throw sanitized; // server side error, we should never have this happen
+        }
+
+        return sanitized;
     }
 
     /**

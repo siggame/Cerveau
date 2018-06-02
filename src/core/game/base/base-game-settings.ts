@@ -1,4 +1,4 @@
-import { defaultBoolean } from "~/core";
+import { sanitizeBoolean } from "~/core";
 import { IAnyObject, objectHasProperty } from "~/utils";
 
 /** The only allowed value types settings can be of. */
@@ -105,7 +105,7 @@ export class BaseGameSettingsManager {
                 case "boolean":
                     value = value === "" // special case from url parm, means key was present with no value
                         ? true
-                        : defaultBoolean(value);
+                        : sanitizeBoolean(value, false);
                     break;
                 case "object": // string array is this case
                     value = Array.isArray(value)

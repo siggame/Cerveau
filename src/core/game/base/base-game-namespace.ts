@@ -1,4 +1,4 @@
-import { ISanitizableType } from "~/core/type-sanitizer";
+import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { Constructor } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";

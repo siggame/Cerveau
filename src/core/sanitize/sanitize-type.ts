@@ -1,204 +1,113 @@
-import { logger } from "~/core/log";
-import { isObject, ITypedObject } from "~/utils";
-import { BaseGameObject } from "./game/base/base-game-object";
-
-// Max/Min true int32 values for most programming languages.
-const INT_MAX = 2147483647;
-const INT_MIN = -2147483648;
-
-/** The various types we can sanitize. */
-export type ISanitizableType = ISanitizableTypePrimitive
-                             | ISanitizableTypeList
-                             | ISanitizableTypeDictionary
-                             | ISanitizableTypeGameObject;
-
-/** Primitive types we can sanitize. */
-export interface ISanitizableTypePrimitive {
-    typeName: "string" | "float" | "int" | "boolean" | "void";
-    literals?: any[];
-}
-
-/** A list (array) that can be sanitized. */
-export interface ISanitizableTypeList {
-    typeName: "list";
-    valueType: ISanitizableType;
-}
-
-/** A dictionary (object/map) that can be sanitized. */
-export interface ISanitizableTypeDictionary {
-    typeName: "dictionary";
-    valueType: ISanitizableType;
-    keyType: ISanitizableType;
-}
-
-/** A game object in a game that can be sanitized. */
-export interface ISanitizableTypeGameObject {
-    typeName: "gameObject";
-    gameObjectClass: typeof BaseGameObject;
-    nullable: boolean;
-}
-
-/**
- * Takes a variable and tries to cast it to a boolean.
- *
- * @param b - Any variable to try to cast to a boolean,
- * for example "TruE" will be `true`.
- * @returns A boolean that represents what was sent.
- */
-export function defaultBoolean(b: any): boolean {
-    switch (typeof(b)) {
-        case "string":
-            const lowered = b.toLowerCase();
-            if (lowered === "true") {
-                // They sent some form of "true" as a string,
-                // so make it the boolean true
-                return true;
-            }
-            else if (lowered === "false") {
-                // They sent some form of "false" as a string,
-                // so make it the boolean false
-                return false;
-            }
-            return Boolean(b);
-        case "number":
-            return b !== 0;
-        default:
-            return !!b;
-    }
-}
-
-/**
- * Takes a variable and tries to cast it to a number.
- *
- * @param n Any number like variable to try to transform.
- * @returns Always returns a number, 0 is the default.
- */
-export function defaultNumber(n: any): number {
-    return Number(n) || 0.0;
-}
-
-/**
- * Takes a variable and tries to cast it to a integer, checking 32 bit integer
- * bounds.
- *
- * @param i Any number like variable to try to transform.
- * @returns Always returns an integer, 0 is the default.
- */
-export function defaultInteger(i: any): number {
-    let num = parseInt(i, 10) || 0;
-
-    if (num > INT_MAX) {
-        logger.warn(`Integer ${num} exceeds INT_MAX`);
-        num = INT_MAX;
-    }
-    else if (num < INT_MIN) {
-        logger.warn(`Integer ${num} exceeds INT_MIN`);
-        num = INT_MIN;
-    }
-
-    return num;
-}
-
-/**
- * Takes a variable and tries to cast it to a string.
- *
- * @param s Any string like variable to try to transform, undefined and null
- * will be empty string.
- * @returns Always returns a string.
- */
-export function defaultString(s: any): string {
-    return s === undefined || s === null
-        ? ""
-        : String(s);
-}
-
-/**
- * Takes a variable and tries to cast it to an array
- *
- * @param a Any variable, if it is an array passes it back, otherwise returns
- * a new empty array.
- * @returns Always returns an array, if the passed in variable was not an
- * array, constructs and returns a new array.
- */
-export function defaultArray<T = any>(a: T[]): T[] {
-    return Array.isArray(a)
-        ? a
-        : [];
-}
-
-/**
- * Takes a variable and tries to cast it to an object
- * @param o Any variable, if it is an object passes it back, otherwise returns
- * a new empty object.
- * @returns Always returns an object, if the passed in variable was not an
- * object, constructs and returns a new object.
- */
-export function defaultObject<T = any>(o: any): ITypedObject<T> {
-    return isObject(o)
-        ? o
-        : {};
-}
-
-/**
- * Takes a variable and ensures it is a game object, if it is not, returns
- * undefined.
- *
- * @param o Any variable, if it is a game object passes it back, otherwise
- * returns a undefined.
- * @param gameObjectClass An optional game object class to enforce on the game
- * object.
- * @returns The passed in game object, if it is one, otherwise undefined.
- */
-export function defaultGameObject(
-    o: any,
-    gameObjectClass?: typeof BaseGameObject,
-): BaseGameObject | undefined {
-    const obj = o instanceof BaseGameObject
-        ? o
-        : undefined;
-
-    if (gameObjectClass) {
-        return (obj && obj instanceof gameObjectClass)
-            ? obj
-            : undefined;
-    }
-    else {
-        return obj;
-    }
-}
+import { isNil } from "~/utils";
+import { ISanitizableType } from "./sanitizable-interfaces";
+import { sanitizeArray } from "./sanitize-array";
+import { sanitizeBoolean } from "./sanitize-boolean";
+import { sanitizeGameObject } from "./sanitize-game-object";
+import { sanitizeInteger } from "./sanitize-integer";
+import { sanitizeNumber } from "./sanitize-number";
+import { sanitizeObject } from "./sanitize-object";
+import { sanitizeString } from "./sanitize-string";
 
 /**
  * Sanitizes a value to a specified type. If it does not match at all, then the
  * default value for that type is returned.
+ *
  * @param type The type to coerce to.
  * @param obj The value to coerce from.
+ * @param allowError - If errors should be allowed to be returned if they
+ * cannot be reasonable sanitized.
  * @returns A value now sanitized and guaranteed to be of that type.
  */
-export function sanitizeType(type: ISanitizableType, obj: any): any {
+export function sanitizeType(
+    type: ISanitizableType,
+    obj: any,
+    allowError: boolean = true,
+): any {
+    let value: any;
+
+    if (type.nullable && isNil(obj)) {
+        return undefined;
+    }
+
     switch (type.typeName) {
         case "void":
             return undefined;
         case "boolean":
-            return defaultBoolean(obj);
+            value = sanitizeBoolean(obj, allowError);
+            break;
         case "float":
-            return defaultNumber(obj);
+            value = sanitizeNumber(obj, allowError);
+            break;
         case "int":
-            return defaultInteger(obj);
+            value = sanitizeInteger(obj, allowError);
+            break;
         case "string":
-            return defaultString(obj);
+            value = sanitizeString(obj, allowError);
+            break;
         case "dictionary":
-            const asObj = defaultObject(obj);
+            const asObj = sanitizeObject(obj, allowError);
+            if (asObj instanceof Error) {
+                return asObj;
+            }
+
             for (const key of Object.keys(asObj)) {
-                asObj[key] = sanitizeType(type.valueType, asObj[key]);
+                asObj[key] = sanitizeType(type.valueType, asObj[key], allowError);
             }
-            return asObj;
+            value = asObj;
+            break;
         case "list":
-            const asArray = defaultArray(obj);
-            for (let i = 0; i < asArray.length; i++) {
-                asArray[i] = sanitizeType(type.valueType, asArray[i]);
+            const asArray = sanitizeArray(obj, allowError);
+            if (asArray instanceof Error) {
+                return asArray;
             }
-            return asArray;
+
+            for (let i = 0; i < asArray.length; i++) {
+                asArray[i] = sanitizeType(type.valueType, asArray[i], allowError);
+            }
+            value = asArray;
+            break;
         case "gameObject": // assume game object
-            return defaultGameObject(obj, type.gameObjectClass);
+            value = sanitizeGameObject(obj, type.gameObjectClass, allowError);
+            break;
     }
+
+    if ((
+        type.typeName === "string" ||
+        type.typeName === "float" ||
+        type.typeName === "int" ||
+        type.typeName === "boolean"
+    ) && type.literals) {
+        let found = type.literals.includes(value);
+
+        if (!found && type.typeName === "string") {
+            // Try to see if the string is found via a case-insensitive
+            // search.
+            const lowered: string = value.toLowerCase();
+            for (const literal of type.literals!) {
+                const loweredLiteral = (literal as string).toLowerCase();
+
+                if (lowered === loweredLiteral) {
+                    value = literal; // we found the literal value
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            if (allowError) {
+                // the value they sent was not one of the literals
+                return new Error(`${value} is not an expected value from literals [${type.literals!.join(", ")}]`);
+            }
+            else {
+                return type.literals![0];
+            }
+        }
+    }
+
+    if (allowError && !type.nullable && value === undefined) {
+        return new Error("Value cannot be undefined.");
+    }
+
+    return value;
 }

@@ -4,7 +4,7 @@ import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
        } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, IAnyObject } from "~/utils";
+import { capitalizeFirstLetter, IAnyObject, quoteIfString } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -18,9 +18,16 @@ interface IOrder {
     index: number;
     name: string;
     args: any[]; // should be the serialized args
+    errors: number;
     resolve: (returned: any) => void;
     reject: (err: any) => void;
 }
+
+/**
+ * The maximum number of times an AI can error trying to execute a single order
+ * before we assume they will always error and force disconnect them.
+ */
+const MAX_ORDER_ERRORS = 10;
 
 /**
  * Manages the AI that actually plays games, basically a wrapper for public
@@ -103,30 +110,17 @@ export class BaseAIManager {
                 index,
                 name,
                 args,
+                errors: 0, // keep track of how many errors the client makes
+                           // trying to execute this order.
                 // When the client sends back that they resolved this order,
                 // we will resolve via this stored resolve callback
                 resolve,
                 reject,
             };
 
-            // This is basically to notify upstream for the gamelog manager
-            // and session to record/send these
-            this.events.ordered.emit({
-                player: { id: this.client.player!.id },
-                order: {
-                    name,
-                    index,
-                    args,
-                },
-            });
-
-            this.client.send("order", {
-                name,
-                index,
-                args,
-            });
-
             this.orders.set(index, order);
+
+            this.sendOrder(order);
 
             // Now they have an order, start their timer while they execute it.
             this.client.startTicking();
@@ -272,6 +266,28 @@ export class BaseAIManager {
     }
 
     /**
+     * Sends an order to our client and notifies upstream that we did so.
+     *
+     * @param order The order to send
+     */
+    private sendOrder(order: IOrder): void {
+        const simpleOrder = {
+            name: order.name,
+            index: order.index,
+            args: order.args,
+        };
+
+        // This is basically to notify upstream for the gamelog manager
+        // and session to record/send these
+        this.events.ordered.emit({
+            player: { id: this.client.player!.id },
+            order: simpleOrder,
+        });
+
+        this.client.send("order", simpleOrder);
+    }
+
+    /**
      * Invoked by a client when they claim to have finished an order.
      *
      * This should resolve the promised generated in `executeOrder`.
@@ -282,11 +298,11 @@ export class BaseAIManager {
     private finishedOrder(orderIndex: number, unsanitizedReturned: any): void {
         const order = this.orders.get(orderIndex);
         if (!order) {
-            this.client.disconnect(`Cannot find order # ${orderIndex} you claim to have finished.`);
+            this.client.disconnect(
+                `Cannot find order # ${orderIndex} you claim to have finished.`,
+            );
             return; // we have no order to resolve or reject
         }
-
-        this.orders.delete(orderIndex);
 
         if (this.orders.size === 0) {
             // No orders remaining, stop their timer as we are not waiting on
@@ -299,23 +315,45 @@ export class BaseAIManager {
             unSerialize(unsanitizedReturned, this.game),
         );
 
-        let invalid: Error | undefined;
-        if (validated instanceof Error) {
-            invalid = validated;
-            this.client.disconnect(`Return value of ${unsanitizedReturned} could not be validated.`);
-        }
+        const invalid = validated instanceof Error
+            ? validated.message
+            : undefined;
 
         // This is basically to notify upstream for the gamelog manager and
         // session to record/send these
         this.events.finished.emit({
             player: { id: this.client.player!.id },
-            invalid: invalid && invalid.message,
+            invalid,
             order,
             returned: unsanitizedReturned,
         });
 
         if (invalid) {
-            order.reject(invalid);
+            this.client.send("invalid", {
+                message: `Return value (${quoteIfString(
+                    unsanitizedReturned,
+                )}) from finished order invalid! ${invalid}`,
+            });
+
+            order.errors++;
+
+            if (order.errors >= MAX_ORDER_ERRORS) {
+                this.client.disconnect(
+                    `Exceeded max number of errors (${MAX_ORDER_ERRORS}) `
+                  + `executing order '${order.name}' #${order.index}.`,
+                );
+            }
+            else {
+                // re-send them the same order, as they fucked up last time.
+                this.sendOrder(order);
+                return; // do not resolve/reject the promise, let them try again
+            }
+        }
+
+        this.orders.delete(orderIndex);
+
+        if (invalid) {
+            order.reject(validated); // will be an Error
         }
         else {
             order.resolve(validated);

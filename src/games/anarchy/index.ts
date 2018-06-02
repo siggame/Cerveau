@@ -502,6 +502,9 @@ export const Namespace = makeNamespace({
                 session: {
                     typeName: "string",
                 },
+                timeAddedPerTurn: {
+                    typeName: "float",
+                },
             },
             functions: {
             },

@@ -1,7 +1,7 @@
-import { ISanitizableType } from "~/core/type-sanitizer";
+import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { IAnyObject, ITypedObject } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
-import { DeltaMergeable } from "./delta-mergeable";
+import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
 
 /**
  * Creates a DeltaMergeable for an Object with a Proxy wrapper.
@@ -14,7 +14,7 @@ export function createObject(args: {
     parent?: DeltaMergeable,
     childTypes?: ITypedObject<ISanitizableType>,
     childType?: ISanitizableType,
-    transform?: (val?: any, currentVal?: any) => any,
+    transform?: DeltaTransform<object>,
 }): DeltaMergeable<IAnyObject> {
     const deltaMergeables: ITypedObject<DeltaMergeable> = {};
     const container = new DeltaMergeable<object>({
@@ -45,7 +45,8 @@ export function createObject(args: {
 
     const proxyObject = new Proxy({}, {
         set(target: IAnyObject, property: string, value: any): boolean {
-            if (!Object.prototype.hasOwnProperty.call(deltaMergeables, property)) {
+            const newKey = !Object.prototype.hasOwnProperty.call(deltaMergeables, property);
+            if (newKey) {
                 // then we need to create this new child we've never seen before
 
                 let type: ISanitizableType | undefined;
@@ -69,7 +70,7 @@ export function createObject(args: {
             }
 
             if (!deltaMergeables[property]!.getParent() || deltaMergeables[property]!.get() !== value) {
-                deltaMergeables[property]!.set(value);
+                deltaMergeables[property]!.set(value, newKey);
             }
 
             return Reflect.set(target, property, deltaMergeables[property]!.get());

@@ -1,5 +1,5 @@
 import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
-import { ISanitizableType } from "~/core/type-sanitizer";
+import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { IAnyObject, ITypedObject, objectHasProperty } from "~/utils";
 
 /**
@@ -42,7 +42,13 @@ export class BaseGameDeltaMergeables {
                 initialValue = args.initialValues[key];
             }
 
-            (this.deltaMergeable.wrapper as any)[key] = initialValue;
+            const dm = this.deltaMergeable.child(key);
+            if (dm) {
+                dm.set(initialValue, true);
+            }
+            else {
+                (this.deltaMergeable.wrapper as any)[key] = initialValue;
+            }
         }
 
         for (const [property, schema] of Object.entries(args.attributesSchema)) {

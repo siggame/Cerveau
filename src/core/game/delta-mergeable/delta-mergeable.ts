@@ -1,5 +1,8 @@
 import { Event, events } from "ts-typed-events";
 
+/** An optional transform function for delta mergeables */
+export type DeltaTransform<T> = (value: any, currentValue: T | undefined, forceSet: boolean) => T | undefined;
+
 /**
  * Wraps a property in the game to observe for changes (deltas).
  * Each DeltaMergeable can have child values, such as an array with child index
@@ -28,7 +31,7 @@ export class DeltaMergeable<T = any> {
     private children = new Map<string, DeltaMergeable<any>>();
 
     /** An optional transform function to use on all sets. */
-    private transform?: (value: any, currentValue?: T) => T | undefined;
+    private transform?: DeltaTransform<T>;
 
     /** The current value of the node. */
     private value: T | undefined;
@@ -42,7 +45,7 @@ export class DeltaMergeable<T = any> {
         key: string;
         parent?: DeltaMergeable<any>;
         initialValue?: T;
-        transform?: (value: any, currentValue?: T) => T | undefined;
+        transform?: DeltaTransform<T>;
     }) {
         this.key = data.key;
 
@@ -81,9 +84,9 @@ export class DeltaMergeable<T = any> {
      * @param forceSet - Force the set to occur, even if the current value is
      * the same.
      */
-    public set(value: any, forceSet?: true): void {
+    public set(value: any, forceSet: boolean = false): void {
         if (this.transform) {
-            value = this.transform(value, this.get());
+            value = this.transform(value, this.get(), forceSet);
         }
 
         if (value !== this.value || forceSet) {

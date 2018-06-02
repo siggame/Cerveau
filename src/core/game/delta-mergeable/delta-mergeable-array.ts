@@ -1,5 +1,5 @@
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { ISanitizableType } from "~/core/type-sanitizer";
+import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
 

@@ -1,8 +1,38 @@
-import { ISanitizableType, sanitizeType } from "~/core/type-sanitizer";
+import { ISanitizableType, sanitizeType } from "~/core/sanitize/";
 import { ITypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
 import { createObject } from "./delta-mergeable-object";
+
+/**
+ * Creates a sanitization transform function for delta mergeables.
+ *
+ * @param type They type to sanitize.
+ * @returns a function that will accept a value and try to sanitize it.
+ */
+function sanitize(type: ISanitizableType): (val: any, current: any, forceSet: boolean) => any {
+    return function transformSanitize(val: any, current: any, forceSet: boolean): any {
+        const sanitized = sanitizeType(type, val, !forceSet); // if we are force settings, don't allow errors
+        if (sanitized instanceof Error) {
+            /*
+             * If an error is thrown here you broke the type system.
+             *
+             * Whenever you set a variable in a game Cerveau type checks it,
+             * and if it can't figure out how to convert it (e.g. "0" -> 0),
+             * then it blows up here. We must do this as statically typed
+             * programming languages like C++ MUST have the right types or we
+             * will blow them up accidentally.
+             *
+             * To debug this read the stack trace and find where in the game
+             * code you set a variable to the wrong type. The best candidate is
+             * looking for code where you use the dangerous `any` type.
+             */
+            throw sanitized;
+        }
+
+        return sanitized;
+    };
+}
 
 /**
  * Creates a delta mergeable given a type.
@@ -38,7 +68,7 @@ export function createDeltaMergeable(args: {
                 initialValue: args.initialValue,
                 parent: args.parent,
                 childTypes: args.childTypes,
-                transform: (val) => sanitizeType(args.type, val),
+                transform: sanitize(args.type),
             });
             break;
         default:
@@ -46,7 +76,7 @@ export function createDeltaMergeable(args: {
                 key: args.key,
                 initialValue: args.initialValue,
                 parent: args.parent,
-                transform: (val) => sanitizeType(args.type, val),
+                transform: sanitize(args.type),
             });
     }
 
