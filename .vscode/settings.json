@@ -8,6 +8,7 @@
         "Sanitizable",
         "Serializable",
         "Serializeable",
+        "Spiderling",
         "argparse",
         "cpuprofile",
         "gamelog",

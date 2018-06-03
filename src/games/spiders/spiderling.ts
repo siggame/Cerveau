@@ -27,7 +27,7 @@ export class Spiderling extends Spider {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    public busy!: "" | "Moving" | "Attacking";
+    public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Null if it is not moving.
@@ -53,6 +53,10 @@ export class Spiderling extends Spider {
 
     // <<-- Creer-Merge: attributes -->>
 
+    /**
+     * The other Spiderlings working on the same task this Spiderling is busy
+     * with.
+     */
     public readonly coworkers = new Set<Spiderling>();
 
     // <<-- /Creer-Merge: attributes -->>

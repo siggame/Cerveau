@@ -20,43 +20,49 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
         cutSpeed: {
             description: "The speed at which Cutters work to do cut Webs.",
             // <<-- Creer-Merge: cutSpeed -->>
-            default: 0,
+            default: 2,
             // <<-- /Creer-Merge: cutSpeed -->>
         },
         eggsScalar: {
             description: "Constant used to calculate how many eggs BroodMothers get on their owner's turns.",
             // <<-- Creer-Merge: eggsScalar -->>
-            default: 0,
+            default: 0.10,
             // <<-- /Creer-Merge: eggsScalar -->>
         },
         initialWebStrength: {
             description: "The starting strength for Webs.",
             // <<-- Creer-Merge: initialWebStrength -->>
-            default: 0,
+            default: 5,
             // <<-- /Creer-Merge: initialWebStrength -->>
+        },
+        maxWebStrength: {
+            description: "The maximum strength a web can be strengthened to.",
+            // <<-- Creer-Merge: maxWebStrength -->>
+            default: 15,
+            // <<-- /Creer-Merge: maxWebStrength -->>
         },
         movementSpeed: {
             description: "The speed at which Spiderlings move on Webs.",
             // <<-- Creer-Merge: movementSpeed -->>
-            default: 0,
+            default: 10,
             // <<-- /Creer-Merge: movementSpeed -->>
         },
         spitSpeed: {
             description: "The speed at which Spitters work to spit new Webs.",
             // <<-- Creer-Merge: spitSpeed -->>
-            default: 0,
+            default: 24,
             // <<-- /Creer-Merge: spitSpeed -->>
         },
         weavePower: {
             description: "How much web strength is added or removed from Webs when they are weaved.",
             // <<-- Creer-Merge: weavePower -->>
-            default: 0,
+            default: 1,
             // <<-- /Creer-Merge: weavePower -->>
         },
         weaveSpeed: {
             description: "The speed at which Weavers work to do strengthens and weakens on Webs.",
             // <<-- Creer-Merge: weaveSpeed -->>
-            default: 0,
+            default: 16,
             // <<-- /Creer-Merge: weaveSpeed -->>
         },
         // <<-- Creer-Merge: schema -->>
@@ -91,7 +97,7 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
         },
         maxTurns: {
             // <<-- Creer-Merge: max-turns -->>
-            default: 200,
+            default: 300,
             // <<-- /Creer-Merge: max-turns -->>
             min: 1,
             description: "The maximum number of turns before the game is force ended and a winner is determined.",

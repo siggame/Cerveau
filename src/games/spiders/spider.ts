@@ -67,6 +67,14 @@ export class Spider extends GameObject {
         // <<-- /Creer-Merge: constructor -->>
     }
 
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /** Kill the spider and remove it from arrays */

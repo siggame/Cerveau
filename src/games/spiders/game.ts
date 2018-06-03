@@ -63,6 +63,11 @@ export class SpidersGame extends BaseClasses.Game {
     public readonly maxTurns!: number;
 
     /**
+     * The maximum strength a web can be strengthened to.
+     */
+    public readonly maxWebStrength!: number;
+
+    /**
      * The speed at which Spiderlings move on Webs.
      */
     public readonly movementSpeed!: number;
@@ -86,6 +91,12 @@ export class SpidersGame extends BaseClasses.Game {
      * The speed at which Spitters work to spit new Webs.
      */
     public readonly spitSpeed!: number;
+
+    /**
+     * The amount of time (in nano-seconds) added after each player performs a
+     * turn.
+     */
+    public readonly timeAddedPerTurn!: number;
 
     /**
      * How much web strength is added or removed from Webs when they are

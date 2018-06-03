@@ -3,10 +3,9 @@ import { ISpitterProperties } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
-import { euclideanDistance } from "~/utils";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { euclideanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -29,6 +28,14 @@ export class Spitter extends Spiderling {
      * them. Null if not spitting.
      */
     public spittingWebToNest?: Nest;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
 
     /**
      * Called when a Spitter is created.
