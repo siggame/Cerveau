@@ -8,7 +8,7 @@ import { Player } from "./player";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { euclideanDistance, IPoint } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -135,7 +135,113 @@ export class SpidersGame extends BaseClasses.Game {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+
+        const mapWidth = 400;
+        const mapHeight = 200;
+        const deadzone = 25;
+        const maxNests = 48; // per side, as are the mirrored
+        const minNests = 8;
+        const maxWebs = 20;
+        const minWebs = 0;
+        const minCrossWebs = 0;
+        const maxCrossWebs = 4;
+
+        // generare Nests on the left
+        let numNests = this.manager.random.int(maxNests, minNests);
+
+        // Try to place nests this many times before giving up because the map
+        // is probably too congested
+        let retries = 1000;
+        for (let i = 0; i < numNests; i++) {
+            while (--retries > 0) {
+                let point: IPoint | undefined = {
+                    x: this.manager.random.int(mapWidth / 2 - deadzone / 2),
+                    y: this.manager.random.int(mapHeight),
+                };
+
+                for (const nest of this.nests) {
+                    if (euclideanDistance(nest, point) <= deadzone) {
+                        point = undefined;
+                        break;
+                    }
+                }
+
+                if (point) {
+                    this.manager.create.Nest(point);
+                    break; // out of while(retries), as the point was valid
+                }
+            }
+        }
+
+        // re-set just incase we had to abort above due to congestion
+        numNests = this.nests.length;
+
+        // generate Webs on the left
+        const numWebs = this.manager.random.int(maxWebs, minWebs);
+        for (let i = 0; i < numWebs; i++) {
+            const nestA = this.manager.random.element(this.nests);
+            let nestB = nestA;
+            while (nestB === nestA) {
+                nestB = this.manager.random.element(this.nests);
+            }
+
+            this.manager.create.Web({ nestA, nestB });
+        }
+
+        // create the BroodMother
+        (this.players[0] as any).broodMother = this.manager.create.BroodMother({
+            owner: this.players[0],
+            nest: this.manager.random.element(this.nests),
+        });
+
+        // now mirror it
+
+        // mirror the Nests
+        const mirrorNests = new Map<Nest, Nest>();
+        for (let i = 0; i < numNests; i++) {
+            const mirroring = this.nests[i];
+            const mirrored = this.manager.create.Nest({
+                x: mapWidth - mirroring.x,
+                y: mirroring.y,
+            });
+
+            // these are not exposed to competitors
+            mirrorNests.set(mirroring, mirrored);
+            mirrorNests.set(mirrored, mirroring);
+        }
+
+        // mirror the Webs
+        for (const web of this.webs) {
+            this.manager.create.Web({
+                nestA: mirrorNests.get(web.nestA!)!,
+                nestB: mirrorNests.get(web.nestA!)!,
+            });
+        }
+
+        // webs that cross the middle of the game
+        const numCrossWebs = this.manager.random.int(minCrossWebs, maxCrossWebs);
+        for (let i = 0; i < numCrossWebs; i++) {
+            // the first half the the array has the nests on player 0's side
+            const nestA = this.nests[this.manager.random.int(numNests - 1)];
+             // and the other half has player 1's
+            const nestB = this.nests[this.manager.random.int(numNests, numNests * 2 - 1)];
+            this.manager.create.Web({ nestA, nestB });
+
+            if (mirrorNests.get(nestA) !== nestB) {
+                // this is the mirror of the web created above, so long as the nests don't mirror each other already
+                this.manager.create.Web({
+                    nestA: mirrorNests.get(nestA)!,
+                    nestB: mirrorNests.get(nestB)!,
+                });
+            }
+        }
+
+        // mirror the BroodMother
+        (this.players[1] as any).broodMother = this.manager.create.BroodMother({
+            owner: this.players[1],
+            nest: mirrorNests.get(this.players[0].broodMother.nest!)!,
+        });
+
         // <<-- /Creer-Merge: constructor -->>
     }
 

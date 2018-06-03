@@ -129,19 +129,30 @@ export class BaseGameManager {
     }
 
     /**
-     * Declares some player(s) as having lost, and assumes when a player looses
+     * Declares some player as having lost, and assumes when a player looses
      * the rest could still be competing to win.
      *
      * @param reason - The reason they lost.
      * @param loser - The player that lost the game.
-     * @param losers - Additional player(s) that lost the game.
      */
     public declareLoser(
         reason: string,
         loser: IBasePlayer,
+    ): void {
+        this.declareLosers(reason, loser);
+    }
+
+    /**
+     * Declares some player(s) as having lost, and assumes when a player looses
+     * the rest could still be competing to win.
+     *
+     * @param reason - The reason they lost.
+     * @param losers - The player(s) that lost the game.
+     */
+    public declareLosers(
+        reason: string,
         ...losers: IBasePlayer[],
     ): void {
-        losers.push(loser);
         for (const player of losers) {
             this.setPlayerLost(player, reason);
         }
@@ -152,15 +163,26 @@ export class BaseGameManager {
      * the rest have lost if they have not won already.
      *
      * @param reason - The reason they won.
-     * @param winner - The winner of the game.
-     * @param winners - Additional the player(s) that won the game.
+     * @param winner - The player that won the game.
      */
     public declareWinner(
         reason: string,
         winner: IBasePlayer,
+    ): void {
+        this.declareWinners(reason, winner);
+    }
+
+    /**
+     * Declares some player(s) as having won, and assumes when a player wins
+     * the rest have lost if they have not won already.
+     *
+     * @param reason - The reason they won.
+     * @param winners - The player(s) that won the game.
+     */
+    public declareWinners(
+        reason: string,
         ...winners: IBasePlayer[],
     ): void {
-        winners.push(winner);
         for (const player of winners) {
             player.lost = false;
             player.reasonLost = "";
