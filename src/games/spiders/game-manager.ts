@@ -64,8 +64,8 @@ export class SpidersGameManager extends BaseClasses.GameManager {
      * This is a good place to check if they won the game during their turn,
      * and do end-of-turn effects.
      */
-    protected async nextTurn(): Promise<void> {
-        // <<-- Creer-Merge: next-turn -->>
+    protected async afterTurn(): Promise<void> {
+        // <<-- Creer-Merge: after-turn -->>
 
         const movers = [] as Spiderling[];
         for (const spider of this.game.currentPlayer.spiders) {
@@ -99,9 +99,9 @@ export class SpidersGameManager extends BaseClasses.GameManager {
 
         this.checkPrimaryWin();
 
-        // <<-- /Creer-Merge: next-turn -->>
+        // <<-- /Creer-Merge: after-turn -->>
 
-        super.nextTurn(); // this actually makes their turn end
+        super.afterTurn(); // this actually makes their turn end
     }
 
     /**
@@ -110,8 +110,8 @@ export class SpidersGameManager extends BaseClasses.GameManager {
      * game win conditions to crown a winner.
      * @param reason The reason why a secondary victory condition is happening
      */
-    protected secondaryGameOver(reason: string): void {
-        // <<-- Creer-Merge: secondary-game-over -->>
+    protected secondaryWinConditions(reason: string): void {
+        // <<-- Creer-Merge: secondary-win-conditions -->>
         const players = this.game.players.slice();
         players.sort((a, b) => b.broodMother.health - a.broodMother.health);
 
@@ -177,7 +177,7 @@ export class SpidersGameManager extends BaseClasses.GameManager {
         }
 
         this._endGameViaCoinFlip();
-        // <<-- /Creer-Merge: secondary-game-over -->>
+        // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }
@@ -195,7 +195,7 @@ export class SpidersGameManager extends BaseClasses.GameManager {
 
         if (losers.length > 0) { // someone lost
             if (losers.length === this.game.players.length) {
-                this.secondaryGameOver("All BroodMothers died on same turn");
+                this.secondaryWinConditions("All BroodMothers died on same turn");
             }
             else {
                 this.declareLosers("BroodMother died", ...losers);

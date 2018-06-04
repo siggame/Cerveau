@@ -99,8 +99,8 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      * This is a good place to check if they won the game during their turn,
      * and do end-of-turn effects.
      */
-    protected async nextTurn(): Promise<void> {
-        // <<-- Creer-Merge: next-turn -->>
+    protected async afterTurn(): Promise<void> {
+        // <<-- Creer-Merge: after-turn -->>
 
         this.cleanupArrays();
         this.updateBeavers();
@@ -111,9 +111,9 @@ export class StumpedGameManager extends BaseClasses.GameManager {
             return;
         }
 
-        // <<-- /Creer-Merge: next-turn -->>
+        // <<-- /Creer-Merge: after-turn -->>
 
-        super.nextTurn(); // this actually makes their turn end
+        super.afterTurn(); // this actually makes their turn end
     }
 
     /**
@@ -122,8 +122,8 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      * game win conditions to crown a winner.
      * @param reason The reason why a secondary victory condition is happening
      */
-    protected secondaryGameOver(reason: string): void {
-        // <<-- Creer-Merge: secondary-game-over -->>
+    protected secondaryWinConditions(reason: string): void {
+        // <<-- Creer-Merge: secondary-win-conditions -->>
 
         const players = this.game.players.slice().sort(
             (p1, p2) => p2.lodges.length - p1.lodges.length,
@@ -171,7 +171,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
             }
         }
 
-        // <<-- /Creer-Merge: secondary-game-over -->>
+        // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }
@@ -200,7 +200,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
             // Someone lost via extermination, so the game is over.
             if (extinctPlayers.length === this.game.players.length) {
                 // they both somehow killed everything, so the board is empty. Win via coin flip
-                this.secondaryGameOver(
+                this.secondaryWinConditions(
                     "Both Players exterminated on the same turn",
                 );
             }
@@ -224,7 +224,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 if (players[0].lodges.length === players[1].lodges.length) {
                     // Then both players completed the same number of lodges by
                     // the end of this round, do secondary win conditions.
-                    this.secondaryGameOver(
+                    this.secondaryWinConditions(
                         "Lodges complete on the same round",
                     );
                 }

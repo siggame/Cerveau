@@ -115,13 +115,6 @@ export function mixTurnBased<
             this.game.currentPlayer = this.game.players[0];
         }
 
-        /** Starts the game */
-        protected start(): void {
-            // Different from nextTurn;
-            // this is called because their turn has not yet started.
-            this.beforeTurn();
-        }
-
         /**
          * Base logic to invalidate any run command, ensuring players only
          * run logic on their turns.
@@ -155,40 +148,24 @@ export function mixTurnBased<
             }
         }
 
+        /** Starts the game */
+        protected start(): void {
+            this.runTurn();
+        }
+
         /**
          * Called before a players turn, including the first turn.
          */
         protected async beforeTurn(): Promise<void> {
-            const turnBasedAI = (this.game.currentPlayer.ai as TurnBasedAI);
-            const done = await turnBasedAI.runTurn();
-
-            if (done) {
-                this.nextTurn();
-            }
-            else {
-                this.beforeTurn();
-            }
+            // intended to be over-ridden
         }
 
         /**
          * Transitions to the next turn, increasing turn and setting the
          * currentPlayer to the next one.
          */
-        protected nextTurn(): void {
-            if (this.game.currentTurn + 1 >= this.game.maxTurns) {
-                this.maxTurnsReached();
-                return;
-            }
-
-            this.game.currentTurn++;
-            this.game.currentPlayer = nextWrapAround(
-                this.game.players,
-                this.game.currentPlayer,
-            )!;
-
-            this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
-
-            this.beforeTurn();
+        protected async afterTurn(): Promise<void> {
+            // intended to be over-ridden
         }
 
         /**
@@ -196,8 +173,19 @@ export function mixTurnBased<
          * checked to find the winner/looser.
          */
         protected maxTurnsReached(): void {
-            this.secondaryGameOver(`Max turns reached (${this.game.maxTurns})`);
-            this.endGame();
+            this.secondaryWinConditions(`Max turns reached (${this.game.maxTurns})`);
+        }
+
+        /**
+         * Checks if the game is over in between turns.
+         * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
+         * is called.
+         *
+         * @returns True if the game is indeed over, otherwise if the game
+         * should continue return false.
+         */
+        protected primaryWinConditionsCheck(): boolean {
+            return false;
         }
 
         /**
@@ -206,10 +194,47 @@ export function mixTurnBased<
          * @param reason The reason why a secondary victory condition is being
          * checked.
          */
-        protected secondaryGameOver(reason: string): void {
+        protected secondaryWinConditions(reason: string): void {
             this.makePlayerWinViaCoinFlip(
                 `${reason}, Identical AIs played the game`,
             );
+
+            this.endGame();
+        }
+
+        /** Runs a turn, invoking all protected methods around it */
+        private async runTurn(): Promise<void> {
+            await this.beforeTurn();
+
+            const turnBasedAI = (this.game.currentPlayer.ai as TurnBasedAI);
+            const done = await turnBasedAI.runTurn();
+
+            if (done) {
+                await this.afterTurn();
+
+                // now check if the game is over before advancing the turn
+                if (this.game.currentTurn + 1 >= this.game.maxTurns) {
+                    this.maxTurnsReached();
+                    return;
+                }
+                else if (this.primaryWinConditionsCheck()) {
+                    this.endGame();
+                    return;
+                }
+
+                // If we got here all after turn logic is done, so let's
+                // advance the turn.
+                this.game.currentTurn++;
+                this.game.currentPlayer = nextWrapAround(
+                    this.game.players,
+                    this.game.currentPlayer,
+                )!;
+
+                this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
+
+            }
+
+            this.runTurn();
         }
     }
 

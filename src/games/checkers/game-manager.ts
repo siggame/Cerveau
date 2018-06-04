@@ -61,8 +61,8 @@ export class CheckersGameManager extends BaseClasses.GameManager {
      * This is a good place to check if they won the game during their turn,
      * and do end-of-turn effects.
      */
-    protected async nextTurn(): Promise<void> {
-        // <<-- Creer-Merge: next-turn -->>
+    protected async afterTurn(): Promise<void> {
+        // <<-- Creer-Merge: after-turn -->>
         // We need to check if the owner won because they just jumped all
         // the other checkers
         let winner: Player | undefined;
@@ -79,9 +79,9 @@ export class CheckersGameManager extends BaseClasses.GameManager {
             this.endGame();
             return;
         }
-        // <<-- /Creer-Merge: next-turn -->>
+        // <<-- /Creer-Merge: after-turn -->>
 
-        super.nextTurn(); // this actually makes their turn end
+        super.afterTurn(); // this actually makes their turn end
     }
 
     /**
@@ -90,10 +90,10 @@ export class CheckersGameManager extends BaseClasses.GameManager {
      * game win conditions to crown a winner.
      * @param reason The reason why a secondary victory condition is happening
      */
-    protected secondaryGameOver(reason: string): void {
-        // <<-- Creer-Merge: secondary-game-over -->>
+    protected secondaryWinConditions(reason: string): void {
+        // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here checking for the secondary win conditions
-        // <<-- /Creer-Merge: secondary-game-over -->>
+        // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }

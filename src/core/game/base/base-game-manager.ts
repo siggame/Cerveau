@@ -203,14 +203,18 @@ export class BaseGameManager {
         // They probably played identically to each other.
         const players = this.game.players.filter((p) => !p.won && !p.lost);
 
-        const winnerIndex = this.random.int(players.length);
-        for (let i = 0; i < players.length; i++) {
-            if (i === winnerIndex) {
-                this.declareWinner(`${reason} - Won via coin flip.`, players[i]);
+        if (players.length > 0) {
+            if (players.length === this.game.players.length) {
+                // no winners yet, so a random one wins
+                const winnerIndex = this.random.int(players.length);
+                // this has the side effect of removing it from players
+                const winner = players.splice(winnerIndex, 1)[0];
+
+                this.declareWinner(`${reason} - Won via coin flip.`, winner);
             }
-            else {
-                this.declareLoser(`${reason} - Lost via coin flip.`, players[i]);
-            }
+
+            // the rest of the players lose
+            this.declareLosers(`${reason} - Lost via coin flip.`, ...players);
         }
 
         this.endGame();
@@ -227,7 +231,7 @@ export class BaseGameManager {
         if (!this.isOver) {
             const playingPlayers = this.game.players.filter((p) => !p.won && !p.lost);
             if (playingPlayers.length > 0) {
-                this.declareLoser(reason, playingPlayers.pop()!, ...playingPlayers);
+                this.declareLosers(reason, ...playingPlayers);
             }
 
             this.isOver = true;

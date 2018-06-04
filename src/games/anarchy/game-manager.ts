@@ -108,8 +108,8 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
      * This is a good place to check if they won the game during their turn,
      * and do end-of-turn effects.
      */
-    protected async nextTurn(): Promise<void> {
-        // <<-- Creer-Merge: next-turn -->>
+    protected async afterTurn(): Promise<void> {
+        // <<-- Creer-Merge: after-turn -->>
         const playersBurnedDownBuildings = new Map<Player, number>();
         const fireSpreads: Array<{
             building: Building;
@@ -160,7 +160,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
                     // someone else already lost this turn...
                     // so they both lost their headquarters this turn,
                     // so check secondary win conditions (and the game is over)
-                    this.secondaryGameOver("Both headquarters reached zero health on the same turn");
+                    this.secondaryWinConditions("Both headquarters reached zero health on the same turn");
                     gameOver = true;
                     loser = undefined;
                     break;
@@ -195,9 +195,9 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             }
         }
 
-        // <<-- /Creer-Merge: next-turn -->>
+        // <<-- /Creer-Merge: after-turn -->>
 
-        super.nextTurn(); // this actually makes their turn end
+        super.afterTurn(); // this actually makes their turn end
     }
 
     /**
@@ -206,8 +206,8 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
      * game win conditions to crown a winner.
      * @param reason The reason why a secondary victory condition is happening
      */
-    protected secondaryGameOver(reason: string): void {
-        // <<-- Creer-Merge: secondary-game-over -->>
+    protected secondaryWinConditions(reason: string): void {
+        // <<-- Creer-Merge: secondary-win-conditions -->>
 
         // 1. Check if one player's HQ has more heath than the other
         const headquarters = this.game.players
@@ -251,7 +251,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         // else all their buildings are identical,
         // so they are probably the same AIs, so just random chance
 
-        // <<-- /Creer-Merge: secondary-game-over -->>
+        // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
     }
