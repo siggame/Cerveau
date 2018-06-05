@@ -13,7 +13,7 @@ import { Player } from "./player";
 export interface IForecastConstructorArgs
 extends IGameObjectConstructorArgs, IForecastProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    direction: string;
+    direction: "North" | "East" | "South" | "West";
     intensity: number;
     controllingPlayer: Player;
     // <<-- /Creer-Merge: constructor-args -->>
@@ -34,7 +34,7 @@ export class Forecast extends GameObject {
      * The direction the wind will blow fires in. Can be 'north', 'east',
      * 'south', or 'west'.
      */
-    public direction!: string;
+    public direction!: "North" | "East" | "South" | "West";
 
     /**
      * How much of a Building's fire that can be blown in the direction of this

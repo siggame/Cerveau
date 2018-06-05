@@ -157,6 +157,11 @@ export interface IPlayerProperties {
     name?: string;
 
     /**
+     * The number of nests this player controls.
+     */
+    numberOfNestsControlled?: number;
+
+    /**
      * This player's opponent in the game.
      */
     opponent?: Player;
@@ -691,6 +696,9 @@ export const Namespace = makeNamespace({
                 },
                 name: {
                     typeName: "string",
+                },
+                numberOfNestsControlled: {
+                    typeName: "int",
                 },
                 opponent: {
                     typeName: "gameObject",

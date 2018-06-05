@@ -21,16 +21,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         return [
             // <<-- Creer-Merge: aliases -->>
             "MegaMinerAI-18-Saloon",
+            "MegaMiner-AI-18-Saloon",
             // <<-- /Creer-Merge: aliases -->>
         ];
-    }
-
-    /** The number of players that must connect to play this game */
-    public static get requiredNumberOfPlayers(): number {
-        // <<-- Creer-Merge: required-number-of-players -->>
-        // override this if you want to set a different number of players
-        return super.requiredNumberOfPlayers;
-        // <<-- /Creer-Merge: required-number-of-players -->>
     }
 
     /** The game this GameManager is managing */
@@ -52,7 +45,69 @@ export class SaloonGameManager extends BaseClasses.GameManager {
      *
      * @returns True if there was a winner and the game is over, false otherwise
      */
-    public checkForWinner(): boolean {
+    public checkForWinner(): void {
+        if (this.primaryWinConditionsCheck()) {
+            this.endGame();
+        }
+    }
+
+    // <<-- /Creer-Merge: public-methods -->>
+
+    /**
+     * This is called BEFORE each player's runTun function is called
+     * (including the first turn).
+     * This is a good place to get their player ready for their turn.
+     */
+    protected async beforeTurn(): Promise<void> {
+        await super.beforeTurn();
+
+        // <<-- Creer-Merge: before-turn -->>
+        // add logic here for before the current player's turn starts
+        // <<-- /Creer-Merge: before-turn -->>
+    }
+
+    /**
+     * This is called AFTER each player's turn ends. Before the turn counter
+     * increases.
+     * This is a good place to end-of-turn effects, and clean up arrays.
+     */
+    protected async afterTurn(): Promise<void> {
+        await super.afterTurn();
+
+        // <<-- Creer-Merge: after-turn -->>
+        this.updateSpawnedCowboys();
+
+        this.game.currentPlayer.siesta = Math.max(0, this.game.currentPlayer.siesta - 1);
+        this.updateCowboys();
+        this.advanceBottles();
+        this.resetPianoPlaying();
+        this.applyHazardDamage();
+
+        filterInPlace(this.game.cowboys, (c) => !c.isDead);
+        filterInPlace(this.game.furnishings, (f) => !f.isDestroyed);
+        filterInPlace(this.game.bottles, (b) => !b.isDestroyed);
+
+        this.game.currentPlayer.youngGun.update();
+
+        if (this.checkForWinner()) {
+            return;
+        }
+        // <<-- /Creer-Merge: after-turn -->>
+    }
+
+    /**
+     * Checks if the game is over in between turns.
+     * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
+     * is called.
+     *
+     * @returns True if the game is indeed over, otherwise if the game
+     * should continue return false.
+     */
+    protected primaryWinConditionsCheck(): boolean {
+        super.primaryWinConditionsCheck();
+
+        // <<-- Creer-Merge: primary-win-conditions -->>
+
         const alivePianos = this.game.furnishings.filter((f) => !f.isDestroyed && f.isPiano);
 
         if (alivePianos.length === 0) { // game over
@@ -81,56 +136,12 @@ export class SaloonGameManager extends BaseClasses.GameManager {
                 winning.opponent,
             );
 
-            this.endGame();
             return true;
         }
 
-        return false;
-    }
+        // <<-- /Creer-Merge: primary-win-conditions -->>
 
-    // <<-- /Creer-Merge: public-methods -->>
-
-    /**
-     * This is called BEFORE each player's runTun function is called
-     * (including the first turn).
-     * This is a good place to get their player ready for their turn.
-     */
-    protected async beforeTurn(): Promise<void> {
-        super.beforeTurn();
-
-        // <<-- Creer-Merge: before-turn -->>
-        // add logic here for before the current player's turn starts
-        // <<-- /Creer-Merge: before-turn -->>
-    }
-
-    /**
-     * This is called AFTER each player's turn ends. Before the turn counter
-     * increases.
-     * This is a good place to check if they won the game during their turn,
-     * and do end-of-turn effects.
-     */
-    protected async afterTurn(): Promise<void> {
-        // <<-- Creer-Merge: after-turn -->>
-        this.updateSpawnedCowboys();
-
-        this.game.currentPlayer.siesta = Math.max(0, this.game.currentPlayer.siesta - 1);
-        this.updateCowboys();
-        this.advanceBottles();
-        this.resetPianoPlaying();
-        this.applyHazardDamage();
-
-        filterInPlace(this.game.cowboys, (c) => !c.isDead);
-        filterInPlace(this.game.furnishings, (f) => !f.isDestroyed);
-        filterInPlace(this.game.bottles, (b) => !b.isDestroyed);
-
-        this.game.currentPlayer.youngGun.update();
-
-        if (this.checkForWinner()) {
-            return;
-        }
-        // <<-- /Creer-Merge: after-turn -->>
-
-        super.afterTurn(); // this actually makes their turn end
+        return false; // If we get here no one won on this turn.
     }
 
     /**
@@ -167,7 +178,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
-        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
+        // This will end the game.
+        // If no winner it determined above, then a random one will be chosen.
+        super.secondaryWinConditions(reason);
     }
 
     // <<-- Creer-Merge: protected-private-methods -->>

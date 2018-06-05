@@ -114,6 +114,12 @@ export class StumpedGame extends BaseClasses.Game {
      */
     public tiles!: Tile[];
 
+    /**
+     * The amount of time (in nano-seconds) added after each player performs a
+     * turn.
+     */
+    public readonly timeAddedPerTurn!: number;
+
     // <<-- Creer-Merge: attributes -->>
 
     /**

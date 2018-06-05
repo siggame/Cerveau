@@ -25,6 +25,7 @@ ${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
         ];
     }
 
+% if 'TwoPlayerGame' not in game['serverParentClasses']:
     /** The number of players that must connect to play this game */
     public static get requiredNumberOfPlayers(): number {
 ${merge('        // ', 'required-number-of-players', """        // override this if you want to set a different number of players
@@ -32,6 +33,7 @@ ${merge('        // ', 'required-number-of-players', """        // override this
 """, optional=True, help=False)}
     }
 
+% endif
     /** The game this GameManager is managing */
     public readonly game!: ${game['name']}Game;
 
@@ -68,7 +70,6 @@ ${merge('        // ', 'after-turn', """        // add logic here after the curr
 """, optional=True, help=False)}
     }
 
-
     /**
      * Checks if the game is over in between turns.
      * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
@@ -78,8 +79,11 @@ ${merge('        // ', 'after-turn', """        // add logic here after the curr
      * should continue return false.
      */
     protected primaryWinConditionsCheck(): boolean {
+        super.primaryWinConditionsCheck();
+
 ${merge('        // ', 'primary-win-conditions', """        // Add logic here checking for the primary win condition(s)
 """, optional=True, help=False)}
+
         return false; // If we get here no one won on this turn.
     }
 
@@ -89,14 +93,13 @@ ${merge('        // ', 'primary-win-conditions', """        // Add logic here ch
      * game win conditions to crown a winner.
      * @param reason The reason why a secondary victory condition is happening
      */
-    protected secondaryGameOver(reason: string): void {
+    protected secondaryWinConditions(reason: string): void {
 ${merge('        // ', 'secondary-win-conditions', """        // Add logic here for the secondary win conditions
 """, optional=True, help=False)}
 
         // This will end the game.
-        // If no winner it determined above,
-        // then a random winner will be chosen.
-        super.secondaryGameOver(reason);
+        // If no winner it determined above, then a random one will be chosen.
+        super.secondaryWinConditions(reason);
     }
 
 %endif

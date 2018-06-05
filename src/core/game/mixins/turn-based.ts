@@ -150,7 +150,7 @@ export function mixTurnBased<
 
         /** Starts the game */
         protected start(): void {
-            this.runTurn();
+            this.runCurrentTurn();
         }
 
         /**
@@ -174,6 +174,8 @@ export function mixTurnBased<
          */
         protected maxTurnsReached(): void {
             this.secondaryWinConditions(`Max turns reached (${this.game.maxTurns})`);
+
+            this.endGame();
         }
 
         /**
@@ -198,12 +200,10 @@ export function mixTurnBased<
             this.makePlayerWinViaCoinFlip(
                 `${reason}, Identical AIs played the game`,
             );
-
-            this.endGame();
         }
 
         /** Runs a turn, invoking all protected methods around it */
-        private async runTurn(): Promise<void> {
+        private async runCurrentTurn(): Promise<void> {
             await this.beforeTurn();
 
             const turnBasedAI = (this.game.currentPlayer.ai as TurnBasedAI);
@@ -234,7 +234,7 @@ export function mixTurnBased<
 
             }
 
-            this.runTurn();
+            this.runCurrentTurn();
         }
     }
 

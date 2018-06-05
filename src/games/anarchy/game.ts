@@ -122,13 +122,19 @@ export class AnarchyGame extends BaseClasses.Game {
      */
     public readonly session!: string;
 
+    /**
+     * The amount of time (in nano-seconds) added after each player performs a
+     * turn.
+     */
+    public readonly timeAddedPerTurn!: number;
+
     // <<-- Creer-Merge: attributes -->>
 
     /** A handy 2D grid of all the buildings. */
     public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
 
     /** The valid cardinal directions buildings can be in. */
-    public readonly directions: ["north", "east", "south", "west"] = ["north", "east", "south", "west"];
+    public readonly directions: ["North", "East", "South", "West"] = ["North", "East", "South", "West"];
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -266,20 +272,20 @@ export class AnarchyGame extends BaseClasses.Game {
         // create the forecasts, each "set" of turns (e.g. 0 and 1, 100 and 101,
         // 264 and 265, etc) are the same initial states for each player.
         for (let i = 0; i < this.maxTurns; i += 2) {
-            let direction = this.manager.random.element(this.directions);
+            let direction = this.manager.random.element(this.directions)!;
             const intensity = this.manager.random.int(this.maxForecastIntensity);
 
             for (let j = 0; j < 2; j++) {
                 if (j === 1) { // for the second player's forecasts mirror the directions East/West
-                    if (direction === "east") {
-                        direction = "west";
+                    if (direction === "East") {
+                        direction = "West";
                     }
-                    else if (direction === "west") {
-                        direction = "east";
+                    else if (direction === "West") {
+                        direction = "East";
                     }
                 }
 
-                direction = direction || "north";
+                direction = direction || "North";
 
                 this.forecasts.push(this.manager.create.Forecast({
                     direction,

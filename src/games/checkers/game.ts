@@ -80,6 +80,12 @@ export class CheckersGame extends BaseClasses.Game {
      */
     public readonly session!: string;
 
+    /**
+     * The amount of time (in nano-seconds) added after each player performs a
+     * turn.
+     */
+    public readonly timeAddedPerTurn!: number;
+
     // <<-- Creer-Merge: attributes -->>
 
     // Any additional member attributes can go here

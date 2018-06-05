@@ -65,12 +65,6 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
             min: 0,
             description: "The starting time (in ns) for each player.",
         },
-        randomSeed: {
-            // <<-- Creer-Merge: random-seed -->>
-            default: "", // which will generate a random string
-            // <<-- /Creer-Merge: random-seed -->>
-            description: "The random seed, or empty for a random seed.",
-        },
 
         // Turn based settings
         timeAddedPerTurn: {

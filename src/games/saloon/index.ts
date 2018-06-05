@@ -588,6 +588,9 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
+                timeAddedPerTurn: {
+                    typeName: "int",
+                },
                 turnsDrunk: {
                     typeName: "int",
                 },

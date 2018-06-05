@@ -129,6 +129,12 @@ export class SaloonGame extends BaseClasses.Game {
     public tiles!: Tile[];
 
     /**
+     * The amount of time (in nano-seconds) added after each player performs a
+     * turn.
+     */
+    public readonly timeAddedPerTurn!: number;
+
+    /**
      * How many turns a Cowboy will be drunk for if a bottle breaks on it.
      */
     public readonly turnsDrunk!: number;

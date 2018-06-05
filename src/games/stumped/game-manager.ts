@@ -25,14 +25,6 @@ export class StumpedGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The number of players that must connect to play this game */
-    public static get requiredNumberOfPlayers(): number {
-        // <<-- Creer-Merge: required-number-of-players -->>
-        // override this if you want to set a different number of players
-        return super.requiredNumberOfPlayers;
-        // <<-- /Creer-Merge: required-number-of-players -->>
-    }
-
     /** The game this GameManager is managing */
     public readonly game!: StumpedGame;
 
@@ -79,7 +71,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      * This is a good place to get their player ready for their turn.
      */
     protected async beforeTurn(): Promise<void> {
-        super.beforeTurn();
+        await super.beforeTurn();
 
         // <<-- Creer-Merge: before-turn -->>
 
@@ -96,24 +88,94 @@ export class StumpedGameManager extends BaseClasses.GameManager {
     /**
      * This is called AFTER each player's turn ends. Before the turn counter
      * increases.
-     * This is a good place to check if they won the game during their turn,
-     * and do end-of-turn effects.
+     * This is a good place to end-of-turn effects, and clean up arrays.
      */
     protected async afterTurn(): Promise<void> {
+        await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
 
         this.cleanupArrays();
         this.updateBeavers();
         this.updateResources();
 
-        if (this.checkForWinner()) {
-            // we found a winner, no need to proceed to the next turn
-            return;
+        // <<-- /Creer-Merge: after-turn -->>
+    }
+
+    /**
+     * Checks if the game is over in between turns.
+     * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
+     * is called.
+     *
+     * @returns True if the game is indeed over, otherwise if the game
+     * should continue return false.
+     */
+    protected primaryWinConditionsCheck(): boolean {
+        super.primaryWinConditionsCheck();
+
+        // <<-- Creer-Merge: primary-win-conditions -->>
+
+        // Check if a player has created 10 lodges (they are built instantly)
+        // Check if this.maxTurns turns have passed, and if so, in this order:
+        // - Player has been made extinct (all beavers & lodges destroyed)
+        // - Player with most lodges wins
+        // - Player with most branches wins
+        // - Player with most food wins
+        // - Random player wins
+
+        const players = this.game.players.slice();
+        const extinctPlayers = players.filter(
+            (p) => (p.beavers.length === 0 && p.lodges.length === 0),
+        );
+
+        if (extinctPlayers.length > 0) {
+            // Someone lost via extermination, so the game is over.
+            if (extinctPlayers.length === this.game.players.length) {
+                // they both somehow killed everything, so the board is empty. Win via coin flip
+                this.secondaryWinConditions(
+                    "Both Players exterminated on the same turn",
+                );
+            }
+            else {
+                // all exterminated players lost
+                const loser = extinctPlayers[0];
+                this.declareWinner("Drove opponent to extinction", loser.opponent);
+                this.declareLoser("Extinct - All Beavers and lodges destroyed", loser);
+                this.endGame();
+            }
+
+            return true;
         }
 
-        // <<-- /Creer-Merge: after-turn -->>
+        players.sort((a, b) => b.lodges.length - a.lodges.length);
 
-        super.afterTurn(); // this actually makes their turn end
+        if (this.game.currentTurn % 2 === 1) {
+            // round end, check for primary win condition
+
+            if (players[0].lodges.length >= this.game.lodgesToWin) {
+                if (players[0].lodges.length === players[1].lodges.length) {
+                    // Then both players completed the same number of lodges by
+                    // the end of this round, do secondary win conditions.
+                    this.secondaryWinConditions(
+                        "Lodges complete on the same round",
+                    );
+                }
+                else {
+                    // someone won
+                    const winner = players[0];
+                    const loser = players[1];
+                    this.declareWinner(`Reached ${winner.lodges.length}/${this.game.lodgesToWin} lodges!`, winner);
+                    this.declareLoser("Less lodges than winner who reached completed all lodges", loser);
+                    this.endGame();
+                }
+
+                return true;
+            }
+        }
+
+        // <<-- /Creer-Merge: primary-win-conditions -->>
+
+        return false; // If we get here no one won on this turn.
     }
 
     /**
@@ -173,76 +235,12 @@ export class StumpedGameManager extends BaseClasses.GameManager {
 
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
-        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
+        // This will end the game.
+        // If no winner it determined above, then a random one will be chosen.
+        super.secondaryWinConditions(reason);
     }
 
     // <<-- Creer-Merge: protected-private-methods -->>
-
-    /**
-     * Checks for a winner.
-     * TODO: move this function to creer template
-     */
-    private checkForWinner(): boolean {
-        // Check if a player has created 10 lodges (they are built instantly)
-        // Check if this.maxTurns turns have passed, and if so, in this order:
-        // - Player has been made extinct (all beavers & lodges destroyed)
-        // - Player with most lodges wins
-        // - Player with most branches wins
-        // - Player with most food wins
-        // - Random player wins
-
-        const players = this.game.players.slice();
-        const extinctPlayers = players.filter(
-            (p) => (p.beavers.length === 0 && p.lodges.length === 0),
-        );
-
-        if (extinctPlayers.length > 0) {
-            // Someone lost via extermination, so the game is over.
-            if (extinctPlayers.length === this.game.players.length) {
-                // they both somehow killed everything, so the board is empty. Win via coin flip
-                this.secondaryWinConditions(
-                    "Both Players exterminated on the same turn",
-                );
-            }
-            else {
-                // all exterminated players lost
-                const loser = extinctPlayers[0];
-                this.declareWinner("Drove opponent to extinction", loser.opponent);
-                this.declareLoser("Extinct - All Beavers and lodges destroyed", loser);
-                this.endGame();
-            }
-
-            return true;
-        }
-
-        players.sort((a, b) => b.lodges.length - a.lodges.length);
-
-        if (this.game.currentTurn % 2 === 1) {
-            // round end, check for primary win condition
-
-            if (players[0].lodges.length >= this.game.lodgesToWin) {
-                if (players[0].lodges.length === players[1].lodges.length) {
-                    // Then both players completed the same number of lodges by
-                    // the end of this round, do secondary win conditions.
-                    this.secondaryWinConditions(
-                        "Lodges complete on the same round",
-                    );
-                }
-                else {
-                    // someone won
-                    const winner = players[0];
-                    const loser = players[1];
-                    this.declareWinner(`Reached ${winner.lodges.length}/${this.game.lodgesToWin} lodges!`, winner);
-                    this.declareLoser("Less lodges than winner who reached completed all lodges", loser);
-                    this.endGame();
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Updates the beavers variables. Must be called after their array is

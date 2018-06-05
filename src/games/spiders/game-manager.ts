@@ -18,16 +18,9 @@ export class SpidersGameManager extends BaseClasses.GameManager {
         return [
             // <<-- Creer-Merge: aliases -->>
             "MegaMinerAI-17-Spiders",
+            "MegaMiner-AI-17-Spiders",
             // <<-- /Creer-Merge: aliases -->>
         ];
-    }
-
-    /** The number of players that must connect to play this game */
-    public static get requiredNumberOfPlayers(): number {
-        // <<-- Creer-Merge: required-number-of-players -->>
-        // override this if you want to set a different number of players
-        return super.requiredNumberOfPlayers;
-        // <<-- /Creer-Merge: required-number-of-players -->>
     }
 
     /** The game this GameManager is managing */
@@ -48,23 +41,26 @@ export class SpidersGameManager extends BaseClasses.GameManager {
      * This is a good place to get their player ready for their turn.
      */
     protected async beforeTurn(): Promise<void> {
-        super.beforeTurn();
+        await super.beforeTurn();
 
         // <<-- Creer-Merge: before-turn -->>
+
         const player = this.game.currentPlayer;
         player.broodMother.eggs = Math.ceil(
             (player.maxSpiderlings - player.spiders.length - 1) * this.game.eggsScalar,
         ); // -1 for the BroodMother in player.spiders that is not a Spiderling
+
         // <<-- /Creer-Merge: before-turn -->>
     }
 
     /**
      * This is called AFTER each player's turn ends. Before the turn counter
      * increases.
-     * This is a good place to check if they won the game during their turn,
-     * and do end-of-turn effects.
+     * This is a good place to end-of-turn effects, and clean up arrays.
      */
     protected async afterTurn(): Promise<void> {
+        await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
 
         const movers = [] as Spiderling[];
@@ -97,11 +93,44 @@ export class SpidersGameManager extends BaseClasses.GameManager {
             }
         }
 
-        this.checkPrimaryWin();
-
         // <<-- /Creer-Merge: after-turn -->>
+    }
 
-        super.afterTurn(); // this actually makes their turn end
+    /**
+     * Checks if the game is over in between turns.
+     * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
+     * is called.
+     *
+     * @returns True if the game is indeed over, otherwise if the game
+     * should continue return false.
+     */
+    protected primaryWinConditionsCheck(): boolean {
+        super.primaryWinConditionsCheck();
+
+        // <<-- Creer-Merge: primary-win-conditions -->>
+
+        const losers = this.game.players.filter((p) => p.broodMother.isDead);
+
+        if (losers.length > 0) { // someone lost
+            if (losers.length === this.game.players.length) {
+                this.secondaryWinConditions("All BroodMothers died on same turn");
+            }
+            else {
+                this.declareLosers("BroodMother died", ...losers);
+
+                const notLosers = this.game.players.filter((p) => !p.broodMother.isDead);
+                if (notLosers.length === 1) {
+                    // they win!
+                    this.declareWinner("Eliminated enemy BroodMother!", notLosers[0]);
+                }
+            }
+
+            return true;
+        }
+
+        // <<-- /Creer-Merge: primary-win-conditions -->>
+
+        return false; // If we get here no one won on this turn.
     }
 
     /**
@@ -128,31 +157,14 @@ export class SpidersGameManager extends BaseClasses.GameManager {
                 ...players,
             );
 
-            return true;
+            return;
         }
 
-        // check if one player "controls" more Nests than the other player
-        // A Nest is controlled if one player owns more Spiderlings than the other player on it
-        var areasOwned = [0, 0];
-        for(var i = 0; i < this.nests.length; i++) {
-            var counts = [0, 0];
-            for(var j = 0; j < this.nests[i].spiders.length; j++) {
-                counts[this.nests[i].spiders[j].owner.id]++;
-            }
-
-            if(counts[0] > counts[1]) {
-                areasOwned[0]++;
-            }
-            else if(counts[0] < counts[1]) {
-                areasOwned[1]++;
-            }
-        }
-
-        players.sort((a, b) => b.nestsControlled - a.nestsControlled);
-        if (players[0].nestsControlled !== players[1].nestsControlled) {
+        players.sort((a, b) => b.numberOfNestsControlled - a.numberOfNestsControlled);
+        if (players[0].numberOfNestsControlled !== players[1].numberOfNestsControlled) {
             const winner = players.shift()!;
             this.declareWinner(
-                `${reason} - Has the most controlled Nests (${winner.nestsControlled}).`,
+                `${reason} - Has the most controlled Nests (${winner.numberOfNestsControlled}).`,
                 winner,
             );
 
@@ -161,57 +173,28 @@ export class SpidersGameManager extends BaseClasses.GameManager {
                 ...players,
             );
 
-            return true;
-        }
-
-        // else check if one player has more spiders than the other
-        players.sort(function(a, b) {
-            return b.spiders.length - a.spiders.length;
-        });
-
-        if(players[0].spiders.length !== players[1].spiders.length) {
-            winner = players.shift();
-            this.declareWinner(winner, "{} - Player has the most Spiders ({}).".format(secondaryReason, winner.spiders.length));
-            this.declareLosers(players, "{} - Player has less Spiders alive than winner.".format(secondaryReason));
             return;
         }
 
-        this._endGameViaCoinFlip();
-        // <<-- /Creer-Merge: secondary-win-conditions -->>
-
-        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
-    }
-
-    // <<-- Creer-Merge: protected-private-methods -->>
-
-    /**
-     * Checks if the game is over because the primary win condition was reached
-     * (BroodMother died), and declares winners/losers as such
-     *
-     * @returns True if the game is over, false otherwise.
-     */
-    private checkPrimaryWin(): boolean {
-        const losers = this.game.players.filter((p) => p.broodMother.isDead);
-
-        if (losers.length > 0) { // someone lost
-            if (losers.length === this.game.players.length) {
-                this.secondaryWinConditions("All BroodMothers died on same turn");
-            }
-            else {
-                this.declareLosers("BroodMother died", ...losers);
-
-                const notLosers = this.game.players.filter((p) => !p.broodMother.isDead);
-                if (notLosers.length === 1) {
-                    // they win!
-                    this.declareWinner("Eliminated enemy BroodMother!", notLosers[0]);
-                }
-            }
-
-            return true;
+        // else check if one player has more spiders than the other
+        players.sort((a, b) => b.spiders.length - a.spiders.length);
+        if (players[0].spiders.length !== players[1].spiders.length) {
+            const winner = players.shift()!;
+            this.declareWinner(
+                `${reason} - Player has the most Spiders (${winner.spiders.length}).`,
+                winner,
+            );
+            this.declareLosers(
+                `${reason} - Player has less Spiders alive than winner.`,
+                ...players,
+            );
+            return;
         }
 
-        return false;
-    }
+        // <<-- /Creer-Merge: secondary-win-conditions -->>
 
-    // <<-- /Creer-Merge: protected-private-methods -->>
+        // This will end the game.
+        // If no winner it determined above, then a random one will be chosen.
+        super.secondaryWinConditions(reason);
+    }
 }

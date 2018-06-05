@@ -289,7 +289,7 @@ export interface ITileProperties {
      * The cardinal direction water is flowing on this Tile ('North', 'East',
      * 'South', 'West').
      */
-    flowDirection?: "" | "North" | "East" | "South" | "West";
+    flowDirection?: "North" | "East" | "South" | "West" | "";
 
     /**
      * The number of food dropped on this Tile.
@@ -542,6 +542,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Tile,
                         nullable: false,
                     },
+                },
+                timeAddedPerTurn: {
+                    typeName: "int",
                 },
             },
             functions: {
@@ -860,8 +863,8 @@ export const Namespace = makeNamespace({
                 },
                 flowDirection: {
                     typeName: "string",
-                    defaultValue: "",
-                    literals: ["", "North", "East", "South", "West"],
+                    defaultValue: "North",
+                    literals: ["North", "East", "South", "West", ""],
                 },
                 food: {
                     typeName: "int",

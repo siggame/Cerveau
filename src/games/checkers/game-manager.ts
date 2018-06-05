@@ -22,14 +22,6 @@ export class CheckersGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The number of players that must connect to play this game */
-    public static get requiredNumberOfPlayers(): number {
-        // <<-- Creer-Merge: required-number-of-players -->>
-        // override this if you want to set a different number of players
-        return super.requiredNumberOfPlayers;
-        // <<-- /Creer-Merge: required-number-of-players -->>
-    }
-
     /** The game this GameManager is managing */
     public readonly game!: CheckersGame;
 
@@ -48,7 +40,7 @@ export class CheckersGameManager extends BaseClasses.GameManager {
      * This is a good place to get their player ready for their turn.
      */
     protected async beforeTurn(): Promise<void> {
-        super.beforeTurn();
+        await super.beforeTurn();
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
@@ -58,11 +50,28 @@ export class CheckersGameManager extends BaseClasses.GameManager {
     /**
      * This is called AFTER each player's turn ends. Before the turn counter
      * increases.
-     * This is a good place to check if they won the game during their turn,
-     * and do end-of-turn effects.
+     * This is a good place to end-of-turn effects, and clean up arrays.
      */
     protected async afterTurn(): Promise<void> {
+        await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
+        // add logic here after the current player's turn starts
+        // <<-- /Creer-Merge: after-turn -->>
+    }
+
+    /**
+     * Checks if the game is over in between turns.
+     * This is invoked AFTER afterTurn() is called, but BEFORE beforeTurn()
+     * is called.
+     *
+     * @returns True if the game is indeed over, otherwise if the game
+     * should continue return false.
+     */
+    protected primaryWinConditionsCheck(): boolean {
+        super.primaryWinConditionsCheck();
+
+        // <<-- Creer-Merge: primary-win-conditions -->>
         // We need to check if the owner won because they just jumped all
         // the other checkers
         let winner: Player | undefined;
@@ -76,12 +85,11 @@ export class CheckersGameManager extends BaseClasses.GameManager {
         if (winner) {
             this.declareLoser("No checkers remaining", winner.opponent);
             this.declareWinner("All enemy checkers jumped!", winner);
-            this.endGame();
-            return;
+            return true;
         }
-        // <<-- /Creer-Merge: after-turn -->>
+        // <<-- /Creer-Merge: primary-win-conditions -->>
 
-        super.afterTurn(); // this actually makes their turn end
+        return false; // If we get here no one won on this turn.
     }
 
     /**
@@ -95,7 +103,9 @@ export class CheckersGameManager extends BaseClasses.GameManager {
         // Add logic here checking for the secondary win conditions
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
-        this.makePlayerWinViaCoinFlip("Identical AIs played the game.");
+        // This will end the game.
+        // If no winner it determined above, then a random one will be chosen.
+        super.secondaryWinConditions(reason);
     }
 
     // <<-- Creer-Merge: protected-private-methods -->>

@@ -160,7 +160,7 @@ export interface IForecastProperties {
      * The direction the wind will blow fires in. Can be 'north', 'east',
      * 'south', or 'west'.
      */
-    direction?: string;
+    direction?: "North" | "East" | "South" | "West";
 
     /**
      * How much of a Building's fire that can be blown in the direction of this
@@ -503,7 +503,7 @@ export const Namespace = makeNamespace({
                     typeName: "string",
                 },
                 timeAddedPerTurn: {
-                    typeName: "float",
+                    typeName: "int",
                 },
             },
             functions: {
@@ -593,6 +593,8 @@ export const Namespace = makeNamespace({
                 },
                 direction: {
                     typeName: "string",
+                    defaultValue: "North",
+                    literals: ["North", "East", "South", "West"],
                 },
                 intensity: {
                     typeName: "int",

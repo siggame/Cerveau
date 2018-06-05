@@ -43,6 +43,11 @@ export class Player extends GameObject implements IBaseSpidersPlayer {
     public readonly name!: string;
 
     /**
+     * The number of nests this player controls.
+     */
+    public numberOfNestsControlled!: number;
+
+    /**
      * This player's opponent in the game.
      */
     public readonly opponent!: Player;
