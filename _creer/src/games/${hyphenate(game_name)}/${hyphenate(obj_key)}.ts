@@ -59,6 +59,15 @@ if obj_key == 'Player':
 %>${shared['cerveau']['imports'](imports)}
 ${merge('// ', 'imports', """// any additional imports you want can be placed here safely between creer runs
 """, optional=True, help=False)}
+% for attr_name in obj['attribute_names']:
+<%
+attr_parms = obj['attributes'][attr_name]
+if not attr_parms['type']['literals']:
+    continue
+%>
+${shared['cerveau']['block_comment']('', attr_parms)}
+export type ${obj_key}${upcase_first(attr_name)} = ${shared['cerveau']['type'](attr_parms['type'])};
+% endfor
 % if obj_key != 'Game' and obj_key != 'Player':
 
 ${shared['cerveau']['block_comment']('', {'description': 'Add properties here to make the create.{} have different args.'.format(obj_key)})}

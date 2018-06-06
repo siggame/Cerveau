@@ -26,7 +26,12 @@ if not setting:
 
 setting_name = setting if type(setting) is str else attr_name
 %>        ${setting_name}: {
-            description: "${attr_parms['description']}",
+            description: ${
+                shared['cerveau']['wrap_string'](
+                attr_parms['description'],
+                52,
+                "                       + "
+)},
 ${merge('            // ', setting_name,
 '            default: {},'.format(shared['cerveau']['default'](attr_parms['type'])), optional=True, help=False)}
         },

@@ -1,5 +1,5 @@
 <%
-from textwrap import TextWrapper
+from textwrap import TextWrapper, wrap
 import operator
 
 MAX_LINE_LENGTH = 79 # one less than 80 to allow for scroll bars in 80 char
@@ -249,4 +249,12 @@ if not 'cerveau' in shared:
 
         return docstring + "\n" + formatted_function_signature
     shared['cerveau']['formatted_function_top'] = cerveau_formatted_function_top
+
+    def cerveau_wrap_string(string, length, pre_lines):
+        wrapped = wrap(string, length)
+        quote_wrapped = [ '{}"{}"'.format(
+            pre_lines if i > 0 else '',
+            (w + " ") if i < (len(wrapped) - 1) else w) for i, w in enumerate(wrapped) ]
+        return '\n'.join(quote_wrapped)
+    shared['cerveau']['wrap_string'] = cerveau_wrap_string
 %>
