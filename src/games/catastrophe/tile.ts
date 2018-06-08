@@ -1,132 +1,184 @@
-// Tile: A Tile in the game that makes up the 2D map grid.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseTile } from "~/core/game/mixins/tiled";
+import { ITileProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Structure } from "./structure";
+import { Unit } from "./unit";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const TiledTile = require(`${__basedir}/gameplay/shared/tiledTile`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Tile have different args.
+ */
+export interface ITileConstructorArgs
+extends IGameObjectConstructorArgs, ITileProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Tile: A Tile in the game that makes up the 2D map grid.
-let Tile = Class(GameObject, TiledTile, {
+/**
+ * A Tile in the game that makes up the 2D map grid.
+ */
+export class Tile extends GameObject implements BaseTile {
     /**
-     * Initializes Tiles.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The number of food dropped on this Tile.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public food!: number;
 
-        /**
-         * The number of food dropped on this Tile.
-         *
-         * @type {number}
-         */
-        this.food = this.food || 0;
+    /**
+     * The amount of food that can be harvested from this Tile per turn.
+     */
+    public harvestRate!: number;
 
-        /**
-         * The amount of food that can be harvested from this Tile per turn.
-         *
-         * @type {number}
-         */
-        this.harvestRate = this.harvestRate || 0;
+    /**
+     * The number of materials dropped on this Tile.
+     */
+    public materials!: number;
 
-        /**
-         * The number of materials dropped on this Tile.
-         *
-         * @type {number}
-         */
-        this.materials = this.materials || 0;
+    /**
+     * The Structure on this Tile if present, otherwise null.
+     */
+    public structure?: Structure;
 
-        /**
-         * The Structure on this Tile if present, otherwise null.
-         *
-         * @type {Structure}
-         */
-        this.structure = this.structure || null;
+    /**
+     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
+     * the map.
+     */
+    public readonly tileEast?: Tile;
 
-        /**
-         * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of the map.
-         *
-         * @type {Tile}
-         */
-        this.tileEast = this.tileEast || null;
+    /**
+     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
+     * the map.
+     */
+    public readonly tileNorth?: Tile;
 
-        /**
-         * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of the map.
-         *
-         * @type {Tile}
-         */
-        this.tileNorth = this.tileNorth || null;
+    /**
+     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
+     * the map.
+     */
+    public readonly tileSouth?: Tile;
 
-        /**
-         * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of the map.
-         *
-         * @type {Tile}
-         */
-        this.tileSouth = this.tileSouth || null;
+    /**
+     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
+     * the map.
+     */
+    public readonly tileWest?: Tile;
 
-        /**
-         * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of the map.
-         *
-         * @type {Tile}
-         */
-        this.tileWest = this.tileWest || null;
+    /**
+     * The amount of turns before this resource can be harvested.
+     */
+    public turnsToHarvest!: number;
 
-        /**
-         * The amount of turns before this resource can be harvested.
-         *
-         * @type {number}
-         */
-        this.turnsToHarvest = this.turnsToHarvest || 0;
+    /**
+     * The Unit on this Tile if present, otherwise null.
+     */
+    public unit?: Unit;
 
-        /**
-         * The Unit on this Tile if present, otherwise null.
-         *
-         * @type {Unit}
-         */
-        this.unit = this.unit || null;
+    /**
+     * The x (horizontal) position of this Tile.
+     */
+    public readonly x!: number;
 
-        /**
-         * The x (horizontal) position of this Tile.
-         *
-         * @type {number}
-         */
-        this.x = this.x || 0;
+    /**
+     * The y (vertical) position of this Tile.
+     */
+    public readonly y!: number;
 
-        /**
-         * The y (vertical) position of this Tile.
-         *
-         * @type {number}
-         */
-        this.y = this.y || 0;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
 
-        this.food = 0;
-        this.harvestRate = 0;
-        this.materials = 0;
-        this.structure = null;
-        this.turnsToHarvest = 0;
-        this.unit = null;
+    /**
+     * Called when a Tile is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: ITileConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Tile",
+    // <<-- Creer-Merge: public-functions -->>
 
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: public-functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    /**
+     * Gets the adjacent direction between this Tile and an adjacent Tile
+     * (if one exists).
+     *
+     * @param adjacentTile - A tile that should be adjacent to this Tile.
+     * @returns "North", "East", "South", or "West" if the tile is adjacent to
+     * this Tile in that direction. Otherwise undefined.
+     */
+    public getAdjacentDirection(
+        adjacentTile: Tile | undefined,
+    ): "North" | "South" | "East" | "West" | undefined {
+        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
+    /**
+     * Gets a list of all the neighbors of this Tile.
+     *
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     */
+    public getNeighbors(): Tile[] {
+        return BaseTile.prototype.getNeighbors.call(this);
+    }
 
-});
+    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
+    public getNeighbor(direction: string): Tile | undefined;
 
-module.exports = Tile;
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction - The direction you want, must be
+     * "North", "East", "South", or "West".
+     * @returns The Tile in that direction, or undefined if there is none.
+     */
+    public getNeighbor(direction: string): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction);
+    }
+
+    /**
+     * Checks if a Tile has another Tile as its neighbor.
+     *
+     * @param tile - The Tile to check.
+     * @returns True if neighbor, false otherwise.
+     */
+    public hasNeighbor(tile: Tile | undefined): boolean {
+        return BaseTile.prototype.hasNeighbor.call(this, tile);
+    }
+
+    /**
+     * toString override.
+     *
+     * @returns A string representation of the Tile.
+     */
+    public toString(): string {
+        return BaseTile.prototype.toString.call(this);
+    }
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

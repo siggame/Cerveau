@@ -1,83 +1,103 @@
-// Structure: A structure on a Tile.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IStructureProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
+ * 'neutral').
+ */
+export type StructureType = "neutral" | "shelter" | "monument" | "wall" | "road";
 
-// any additional requires you want can be required here safely between Creer re-runs
+/**
+ * Add properties here to make the create.Structure have different args.
+ */
+export interface IStructureConstructorArgs
+extends IGameObjectConstructorArgs, IStructureProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    tile: Tile;
+    type: StructureType;
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-//<<-- /Creer-Merge: requires -->>
-
-// @class Structure: A structure on a Tile.
-let Structure = Class(GameObject, {
+/**
+ * A structure on a Tile.
+ */
+export class Structure extends GameObject {
     /**
-     * Initializes Structures.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The range of this Structure's effect. For example, a radius of 1 means
+     * this Structure affects a 3x3 square centered on this Structure.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public readonly effectRadius!: number;
 
-        /**
-         * The range of this Structure's effect. For example, a radius of 1 means this Structure affects a 3x3 square centered on this Structure.
-         *
-         * @type {number}
-         */
-        this.effectRadius = this.effectRadius || 0;
+    /**
+     * The number of materials in this Structure. Once this number reaches 0,
+     * this Structure is destroyed.
+     */
+    public materials!: number;
 
-        /**
-         * The number of materials in this Structure. Once this number reaches 0, this Structure is destroyed.
-         *
-         * @type {number}
-         */
-        this.materials = this.materials || 0;
+    /**
+     * The owner of this Structure if any, otherwise null.
+     */
+    public owner?: Player;
 
-        /**
-         * The owner of this Structure if any, otherwise null.
-         *
-         * @type {Player}
-         */
-        this.owner = this.owner || null;
+    /**
+     * The Tile this Structure is on.
+     */
+    public tile?: Tile;
 
-        /**
-         * The Tile this Structure is on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
+    /**
+     * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
+     * 'neutral').
+     */
+    public readonly type!: "neutral" | "shelter" | "monument" | "wall" | "road";
 
-        /**
-         * The type of Structure this is ('shelter', 'monument', 'wall', 'road', 'neutral').
-         *
-         * @type {string}
-         */
-        this.type = this.type || "";
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.owner = data.owner || null;
-        this.tile = data.tile || null;
-        this.type = data.type || "neutral";
-        this.type = this.type.toLowerCase();
+    // <<-- /Creer-Merge: attributes -->>
 
-        this.materials = this.game.structureCost(this.type) || 0;
-        this.effectRadius = this.game.structureRange(this.type) || 0;
+    /**
+     * Called when a Structure is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: IStructureConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
+        this.tile = data.tile;
+
+        this.materials = this.game.getStructureCost(this.type);
+        this.effectRadius = this.game.getStructureRange(this.type);
 
         this.game.newStructures.push(this);
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Structure",
+    // <<-- Creer-Merge: public-functions -->>
 
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: public-functions -->>
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // Any additional protected or pirate methods can go here.
 
-});
-
-module.exports = Structure;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

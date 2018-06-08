@@ -1,159 +1,150 @@
-// Player: A player in this game. Every AI controls one player.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IBaseCatastrophePlayer } from "./";
+import { AI } from "./ai";
+import { GameObject } from "./game-object";
+import { Structure } from "./structure";
+import { Unit } from "./unit";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+import { Tile } from "./tile";
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * A player in this game. Every AI controls one player.
+ */
+export class Player extends GameObject implements IBaseCatastrophePlayer {
+    /** The AI controlling this Player */
+    public readonly ai!: AI;
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Player: A player in this game. Every AI controls one player.
-let Player = Class(GameObject, {
     /**
-     * Initializes Players.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The overlord cat Unit owned by this Player.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public readonly cat!: Unit;
 
-        /**
-         * The overlord cat Unit owned by this Player.
-         *
-         * @type {Unit}
-         */
-        this.cat = this.cat || null;
+    /**
+     * What type of client this is, e.g. 'Python', 'JavaScript', or some other
+     * language. For potential data mining purposes.
+     */
+    public readonly clientType!: string;
 
-        /**
-         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
-         *
-         * @type {string}
-         */
-        this.clientType = this.clientType || "";
+    /**
+     * The amount of food owned by this player.
+     */
+    public food!: number;
 
-        /**
-         * The amount of food owned by this player.
-         *
-         * @type {number}
-         */
-        this.food = this.food || 0;
+    /**
+     * If the player lost the game or not.
+     */
+    public lost!: boolean;
 
-        /**
-         * If the player lost the game or not.
-         *
-         * @type {boolean}
-         */
-        this.lost = this.lost || false;
+    /**
+     * The name of the player.
+     */
+    public readonly name!: string;
 
-        /**
-         * The name of the player.
-         *
-         * @type {string}
-         */
-        this.name = this.name || "";
+    /**
+     * This player's opponent in the game.
+     */
+    public readonly opponent!: Player;
 
-        /**
-         * This player's opponent in the game.
-         *
-         * @type {Player}
-         */
-        this.opponent = this.opponent || null;
+    /**
+     * The reason why the player lost the game.
+     */
+    public reasonLost!: string;
 
-        /**
-         * The reason why the player lost the game.
-         *
-         * @type {string}
-         */
-        this.reasonLost = this.reasonLost || "";
+    /**
+     * The reason why the player won the game.
+     */
+    public reasonWon!: string;
 
-        /**
-         * The reason why the player won the game.
-         *
-         * @type {string}
-         */
-        this.reasonWon = this.reasonWon || "";
+    /**
+     * Every Structure owned by this Player.
+     */
+    public structures!: Structure[];
 
-        /**
-         * Every Structure owned by this Player.
-         *
-         * @type {Array.<Structure>}
-         */
-        this.structures = this.structures || [];
+    /**
+     * The amount of time (in ns) remaining for this AI to send commands.
+     */
+    public timeRemaining!: number;
 
-        /**
-         * The amount of time (in ns) remaining for this AI to send commands.
-         *
-         * @type {number}
-         */
-        this.timeRemaining = this.timeRemaining || 0;
+    /**
+     * Every Unit owned by this Player.
+     */
+    public units!: Unit[];
 
-        /**
-         * Every Unit owned by this Player.
-         *
-         * @type {Array.<Unit>}
-         */
-        this.units = this.units || [];
+    /**
+     * The total upkeep of every Unit owned by this Player. If there isn't
+     * enough food for every Unit, all Units become starved and do not consume
+     * food.
+     */
+    public upkeep!: number;
 
-        /**
-         * The total upkeep of every Unit owned by this Player. If there isn't enough food for every Unit, all Units become starved and do not consume food.
-         *
-         * @type {number}
-         */
-        this.upkeep = this.upkeep || 0;
+    /**
+     * If the player won the game or not.
+     */
+    public won!: boolean;
 
-        /**
-         * If the player won the game or not.
-         *
-         * @type {boolean}
-         */
-        this.won = this.won || false;
+    // <<-- Creer-Merge: attributes -->>
 
+    /** The units owned by this player that were defeated this turn. */
+    public readonly defeatedUnits: Unit[] = [];
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.cat = data.cat || null;
-        this.food = data.food || null;
+    /** The units owned by this player that were created this turn. */
+    public readonly newUnits: Unit[] = [];
 
-        // Keep track of all units defeated in combat
-        this.defeatedUnits = [];
-        this.newUnits = [];
-        //<<-- /Creer-Merge: init -->>
-    },
+    // <<-- /Creer-Merge: attributes -->>
 
-    gameObjectName: "Player",
+    /**
+     * Called when a Player is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: {},
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: public-functions -->>
+
     /**
      * Gets every structure owned by this player, including new structures
      *
-     * @returns {Structure[]} - All of this player's structures
+     * @returns All of this player's structures
      */
-    allStructures: function() {
-        return this.structures.concat(this.game.newStructures.filter(s => s.owner === this));
-    },
+    public getAllStructures(): Structure[] {
+        return this.structures.concat(this.game.newStructures.filter((s) => s.owner === this));
+    }
 
     /**
      * Recalculates all squads for this player's units.
      * Unowned units just have squads with only themselves in it.
      */
-    calculateSquads: function() {
-        for(let unit of this.units) {
+    public calculateSquads(): void {
+        for (const unit of this.units) {
             // Reset squad
             unit.squad = [];
 
             // Flood fill to calculate squads
-            let open = [unit.tile];
-            let closed = new Set();
-            while(open.length > 0) {
+            const open = [unit.tile];
+            const closed = new Set<Tile>();
+            while (open.length > 0) {
                 // Grab a tile from the open list
-                const tile = open.shift();
+                const tile = open.shift()!;
                 const cur = tile && tile.unit;
 
                 // If the tile grabbed is null/undefined, there's no valid unit there, or we already checked this tile
-                if(!cur || cur.owner !== this || (unit.squad.length > 0 && cur.job.title !== "soldier") || closed.has(tile.id)) {
+                if (!cur ||
+                    cur.owner !== this ||
+                    (unit.squad.length > 0 && cur.job.title !== "soldier") ||
+                    closed.has(tile)
+                ) {
                     // Skip this tile (and don't spread out from it)
                     continue;
                 }
@@ -162,18 +153,19 @@ let Player = Class(GameObject, {
                 unit.squad.push(cur);
 
                 // Make sure we never check this tile again
-                closed.add(tile.id);
+                closed.add(tile);
 
                 // Add the surrounding tiles to the open list to check
-                open.push(tile.tileNorth);
-                open.push(tile.tileEast);
-                open.push(tile.tileSouth);
-                open.push(tile.tileWest);
+                open.push(...tile.getNeighbors());
             }
         }
-    },
-    //<<-- /Creer-Merge: added-functions -->>
+    }
 
-});
+    // <<-- /Creer-Merge: public-functions -->>
 
-module.exports = Player;
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

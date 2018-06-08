@@ -1,90 +1,97 @@
-// Job: Information about a Unit's job.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IJobProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-const JobStats = require("./jobStats.json");
-//<<-- /Creer-Merge: requires -->>
+/**
+ * The Job title.
+ */
+export type JobTitle = "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
 
-// @class Job: Information about a Unit's job.
-let Job = Class(GameObject, {
+/**
+ * Add properties here to make the create.Job have different args.
+ */
+export interface IJobConstructorArgs
+extends IGameObjectConstructorArgs, IJobProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
+
+/**
+ * Information about a Unit's job.
+ */
+export class Job extends GameObject {
     /**
-     * Initializes Jobs.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * The amount of energy this Job normally uses to perform its actions.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public readonly actionCost!: number;
 
-        /**
-         * The amount of energy this Job normally uses to perform its actions.
-         *
-         * @type {number}
-         */
-        this.actionCost = this.actionCost || 0;
+    /**
+     * How many combined resources a Unit with this Job can hold at once.
+     */
+    public readonly carryLimit!: number;
 
-        /**
-         * How many combined resources a Unit with this Job can hold at once.
-         *
-         * @type {number}
-         */
-        this.carryLimit = this.carryLimit || 0;
+    /**
+     * The number of moves this Job can make per turn.
+     */
+    public readonly moves!: number;
 
-        /**
-         * The number of moves this Job can make per turn.
-         *
-         * @type {number}
-         */
-        this.moves = this.moves || 0;
+    /**
+     * The amount of energy normally regenerated when resting at a shelter.
+     */
+    public readonly regenRate!: number;
 
-        /**
-         * The amount of energy normally regenerated when resting at a shelter.
-         *
-         * @type {number}
-         */
-        this.regenRate = this.regenRate || 0;
+    /**
+     * The Job title.
+     */
+    public readonly title!: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
 
-        /**
-         * The Job title.
-         *
-         * @type {string}
-         */
-        this.title = this.title || "";
+    /**
+     * The amount of food per turn this Unit consumes. If there isn't enough
+     * food for every Unit, all Units become starved and do not consume food.
+     */
+    public readonly upkeep!: number;
 
-        /**
-         * The amount of food per turn this Unit consumes. If there isn't enough food for every Unit, all Units become starved and do not consume food.
-         *
-         * @type {number}
-         */
-        this.upkeep = this.upkeep || 0;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-        this.title = data.title || "fresh human";
+    // <<-- /Creer-Merge: attributes -->>
 
-        // Get stats from jobStats.json
-        for(let key of Object.keys(JobStats.default)) {
-            if(key in JobStats.jobs[this.title]) {
-                this[key] = JobStats.jobs[this.title][key];
-            }
-            else {
-                this[key] = JobStats.default[key];
-            }
-        }
-        //<<-- /Creer-Merge: init -->>
-    },
+    /**
+     * Called when a Job is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: IJobConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-    gameObjectName: "Job",
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
+    // <<-- Creer-Merge: public-functions -->>
 
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
 
-    // You can add additional functions here. These functions will not be directly callable by client AIs
+    // <<-- /Creer-Merge: public-functions -->>
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-});
+    // Any additional protected or pirate methods can go here.
 
-module.exports = Job;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}
