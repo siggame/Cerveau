@@ -12,8 +12,8 @@ import { Move } from "chess.js";
  * @param move - The move to check against
  * @returns True is so, false otherwise
  */
-function checkSTFRMove(move: Move): boolean {
-    return Boolean(move.captured || move.promotion || (move as any).piece.type === "Pawn");
+function checkMoveForSTFR(move: Move): boolean {
+    return Boolean(move.captured || move.promotion || move.piece === "p");
 }
 // <<-- /Creer-Merge: imports -->>
 
@@ -28,7 +28,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-Chess",
+            "MegaMinerAI-Chess",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -49,6 +49,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
     /** Starts the game play */
     protected start(): void {
+        super.start();
         this.runSideToMove();
     }
 
@@ -58,16 +59,19 @@ export class ChessGameManager extends BaseClasses.GameManager {
      * @returns A promise that resolves once this specific turn is ended.
      */
     private async runSideToMove(): Promise<void> {
-        const player = this.game.players[this.game.chess.turn() === "w" ? 0 : 1];
-        const ai = player.ai;
+        const playerIndex = this.game.chess.turn() === "w" ? 0 : 1;
+        const player = this.game.players[playerIndex];
 
-        const move = await ai.makeMove();
+        const move = await player.ai.makeMove();
 
         const valid = this.game.chess.move(move, { sloppy: true });
 
         if (!valid) {
-            this.declareLoser(`Made an invalid move (${move})`, player);
-            this.declareWinner("Opponent made an invalid move.", player.opponent);
+            this.declareLoser(`Made an invalid move ("${move}").`, player);
+            this.declareWinner(
+                "Opponent made an invalid move.",
+                player.opponent,
+            );
             this.endGame();
             return;
         }
@@ -75,15 +79,16 @@ export class ChessGameManager extends BaseClasses.GameManager {
         this.game.fen = this.game.chess.fen();
         this.game.history.push(valid.san);
 
-        const gameOverReasons = this.checkForGameOver();
-        if (gameOverReasons) {
-            if (gameOverReasons.length === 2) {
-                this.declareWinner(gameOverReasons[0], player);
-                this.declareLoser(gameOverReasons[1], player.opponent);
+        const [ loserReason, winnerReason ] = this.checkForGameOverReasons();
+        if (loserReason) {
+            if (winnerReason) {
+                // first won, second lost
+                this.declareWinner(winnerReason, player);
+                this.declareLoser(loserReason, player.opponent);
             }
             else {
                 // they all lost because the game is a draw
-                this.declareLosers(gameOverReasons[0], ...this.game.players);
+                this.declareLosers(loserReason, ...this.game.players);
             }
 
             this.endGame();
@@ -94,10 +99,17 @@ export class ChessGameManager extends BaseClasses.GameManager {
         this.runSideToMove();
     }
 
-    private checkForGameOver(): undefined | [string] | [string, string] {
+    /**
+     * Checks the game for a reason to end the game.
+     *
+     * @returns An empty array if the game is not over. Otherwise an array with
+     * one or two strings in it. One means a draw for that reason, two means
+     * the first won for that reason, and the second lost for that reason.
+     */
+    private checkForGameOverReasons(): Array<string | undefined> {
         const chess = this.game.chess;
         if (chess.in_checkmate()) {
-            return ["Checkmate!", "Checkmated"];
+            return ["Checkmated", "Checkmate!"];
         }
 
         if (chess.insufficient_material()) {
@@ -110,7 +122,8 @@ export class ChessGameManager extends BaseClasses.GameManager {
         if (chess.in_draw()) {
             return [
                 "Draw - 50-move rule: 50 moves completed with no pawn "
-              + "moved or piece captured."];
+              + "moved or piece captured.",
+            ];
         }
 
         if (chess.in_stalemate()) {
@@ -120,15 +133,19 @@ export class ChessGameManager extends BaseClasses.GameManager {
             ];
         }
 
-        if (chess.in_threefold_repetition()) {
+        if (this.game.settings.enableTFR && chess.in_threefold_repetition()) {
             return [
                 "Stalemate - Board position has occurred three or more times.",
             ];
         }
 
-        if (this.isInSimplifiedThreefoldRepetition()) {
+        if (this.game.settings.enableSTFR
+         && this.isInSimplifiedThreefoldRepetition()
+        ) {
             return [ "Draw - Simplified threefold repetition occurred." ];
         }
+
+        return [];
     }
 
     /**
@@ -155,7 +172,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
             // if for the last eight moves a capture, promotion, or pawn
             // movement has happened, then simplified threefold repetition has
             // NOT occurred
-            if (checkSTFRMove(move) || checkSTFRMove(nextMove)) {
+            if (checkMoveForSTFR(move) || checkMoveForSTFR(nextMove)) {
                 return false; // has not occurred
             }
 
@@ -169,7 +186,8 @@ export class ChessGameManager extends BaseClasses.GameManager {
             }
         }
 
-        return true; // if we got here the last 8 moves are repeats, so it is in STFR
+        return true; // if we got here the last 8 moves are repeats,
+                     // so it is in STFR
     }
 
     // <<-- /Creer-Merge: protected-private-methods -->>

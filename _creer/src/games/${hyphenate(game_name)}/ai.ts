@@ -24,7 +24,7 @@ optional=True, help=False)}
     function_parms = ai['functions'][function_name]
     ret = function_parms['returns']
 %>${shared['cerveau']['formatted_function_top'](function_name, ai, scope='public')}
-        ${'return ' if ret else ''}await this.executeOrder("functionName"${"" if not function_parms['arguments'] else '' + (
+        ${'return ' if ret else ''}await this.executeOrder("${function_name}"${"" if not function_parms['arguments'] else '' + (
 ",\n            ".join([''] + [arg['name'] for arg in function_parms['arguments']]) + ",\n        "
 )});
     }

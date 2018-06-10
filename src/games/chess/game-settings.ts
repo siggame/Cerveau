@@ -34,12 +34,24 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
             default: "",
         },
 
+        enableSTFR: {
+            description: "Enable non standard chess rule Simplified Three-Fold "
+                       + "Repetition rule.",
+            default: true,
+        },
+
+        enableTFR: {
+            description: "Enable the standard chess rule Three-Fold Repetition"
+                       + "rule.",
+            default: false,
+        },
+
         // <<-- /Creer-Merge: schema -->>
 
         // Base settings
         playerStartingTime: {
             // <<-- Creer-Merge: player-starting-time -->>
-            default: 6e10, // 1 min in ns
+            default: 15 * 6e10, // 15 min in ns
             // <<-- /Creer-Merge: player-starting-time -->>
             min: 0,
             description: "The starting time (in ns) for each player.",
@@ -80,7 +92,7 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
             const validated = chess.validate_fen(settings.fen);
 
             if (!validated.valid) {
-                return new Error(validated.error);
+                return new Error(`FEN invalid: ${validated.error}`);
             }
         }
 
