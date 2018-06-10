@@ -12,7 +12,7 @@ if not 'cerveau' in shared:
     def cerveau_default(type_obj):
         base_type = type_obj['name']
         if base_type == "string":
-            return "''"
+            return '""'
         elif base_type == "dictionary":
             return '{}'
         elif base_type == "list":

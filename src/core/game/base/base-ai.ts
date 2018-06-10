@@ -26,7 +26,7 @@ export class BaseAI {
      * @returns A promise that resolves to the value the AI returned from that
      * order, once they finish that order.
      */
-    protected executeOrder<T>(name: string, ...args: any[]): Promise<T> {
+    protected executeOrder(name: string, ...args: any[]): Promise<any> {
         return this.manager.executeOrder(name, ...args);
     }
 }
