@@ -113,6 +113,8 @@ export class BaseGameSettingsManager {
                         : [];
                     break;
             }
+
+            sanitized[key] = value;
         }
 
         // now we've sanitized all the inputs, so see if they all are valid types.
