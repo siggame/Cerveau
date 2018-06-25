@@ -80,7 +80,7 @@ export class RandomNumberGenerator {
      * map.add("rarely", 0.01);
      * map.add("never", 0.00);
      *
-     * const chosen: string = fromWeights(map);
+     * const chosen: string = rng.fromWeights(map);
      */
     public fromWeights<T>(map: Map<T, number>): T {
         let sum = 0;

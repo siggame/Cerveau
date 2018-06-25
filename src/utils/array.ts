@@ -128,6 +128,7 @@ export function shuffle<T>(array: T[], rng?: () => number): T[] {
     rng = rng || Math.random;
     for (
         let j, x, i = array.length; i;
+        // tslint:disable-next-line ban-comma-operator
         j = Math.floor(rng() * i), x = array[--i], array[i] = array[j], array[j] = x
     ) { /* pass */ }
     return array;

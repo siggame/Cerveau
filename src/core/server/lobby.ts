@@ -544,7 +544,7 @@ There's probably another Cerveau server running on this same computer.`);
 
         const { gameSettings, ...noGameSettings } = data;
         const validatedData = {
-            validGameSettings: {} as IAnyObject, // will be overwritten below
+            validGameSettings: {}, // will be overwritten below
             gameSettings,
             ...noGameSettings,
         };

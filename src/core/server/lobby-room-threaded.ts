@@ -41,14 +41,16 @@ export class ThreadedRoom extends Room {
     protected threadSession(): void {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
+        const workerSessionData: IWorkerGameSessionData = {
+            mainDebugPort: (process as any)._debugPort, // used by debugger
+            sessionID: this.id,
+            gameName: this.gameNamespace.gameName,
+            gameSettings: this.gameSettingsManager.values,
+        };
+
         this.worker = cluster.fork({
             ...Config, // the worker thread will see these in its process.env
-            WORKER_GAME_SESSION_DATA: JSON.stringify({
-                mainDebugPort: (process as any)._debugPort, // used by debugger
-                sessionID: this.id,
-                gameName: this.gameNamespace.gameName,
-                gameSettings: this.gameSettingsManager.values,
-            } as IWorkerGameSessionData),
+            WORKER_GAME_SESSION_DATA: JSON.stringify(workerSessionData),
         });
 
         this.worker.on("online", () => {
@@ -59,7 +61,7 @@ export class ThreadedRoom extends Room {
 
                 const clientClass = Object.getPrototypeOf(client);
 
-                this.worker!.send({
+                const messageFromMainThread: MessageFromMainThread = {
                     type: "client",
                     clientInfo: {
                         className: clientClass.constructor.name,
@@ -69,13 +71,14 @@ export class ThreadedRoom extends Room {
                         spectating: client.isSpectating,
                         metaDeltas: client.sendMetaDeltas,
                     },
-                } as MessageFromMainThread, client.getNetSocket(),
-                );
+                };
+
+                this.worker!.send(messageFromMainThread, client.getNetSocket());
             }
 
             // Tell the worker thread we are done sending client + sockets to
             // them
-            this.worker!.send({ type: "done"} as MessageFromMainThread);
+            this.worker!.send({ type: "done"});
 
             // And remove the clients from us, they are no longer ours to care
             // about; instead the worker thread will handle them from here-on.

@@ -167,7 +167,7 @@ export class SpidersGame extends BaseClasses.Game {
                 }
 
                 if (point) {
-                    this.manager.create.Nest(point);
+                    this.nests.push(this.manager.create.Nest(point));
                     break; // out of while(retries), as the point was valid
                 }
             }
@@ -180,9 +180,13 @@ export class SpidersGame extends BaseClasses.Game {
         const numWebs = this.manager.random.int(maxWebs, minWebs);
         for (let i = 0; i < numWebs; i++) {
             const nestA = this.manager.random.element(this.nests);
+            if (!nestA) {
+                throw new Error("No nests to create Webs.");
+            }
+
             let nestB = nestA;
             while (nestB === nestA) {
-                nestB = this.manager.random.element(this.nests);
+                nestB = this.manager.random.element(this.nests)!;
             }
 
             this.manager.create.Web({ nestA, nestB });
@@ -191,7 +195,7 @@ export class SpidersGame extends BaseClasses.Game {
         // create the BroodMother
         (this.players[0] as any).broodMother = this.manager.create.BroodMother({
             owner: this.players[0],
-            nest: this.manager.random.element(this.nests),
+            nest: this.manager.random.element(this.nests)!,
         });
 
         // now mirror it

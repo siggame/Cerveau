@@ -37,7 +37,7 @@ async function getDirsOrFiles(
  * (not recursive).
  */
 export async function getDirs(sourcePath: string): Promise<string[]> {
-    return await getDirsOrFiles(sourcePath, true);
+    return getDirsOrFiles(sourcePath, true);
 }
 
 /**
@@ -48,7 +48,7 @@ export async function getDirs(sourcePath: string): Promise<string[]> {
  * (not recursive).
  */
 export async function getFiles(sourcePath: string): Promise<string[]> {
-    return await getDirsOrFiles(sourcePath, false);
+    return getDirsOrFiles(sourcePath, false);
 }
 
 /**

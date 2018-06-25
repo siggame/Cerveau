@@ -130,7 +130,7 @@ export class GamelogManager {
             return undefined;
         }
 
-        return await utils.gunzipFile(gamelogPath);
+        return utils.gunzipFile(gamelogPath);
     }
 
     /**

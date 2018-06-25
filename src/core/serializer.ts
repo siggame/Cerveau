@@ -105,13 +105,9 @@ export function unSerialize(
         for (const key of Object.keys(data)) {
             const value = data[key];
             if (isObject(value)) {
-                if (isGameObjectReference(value)) {
-                    // it's a tracked game object
-                    result[key] = game.gameObjects[value.id];
-                }
-                else {
-                    result[key] = unSerialize(value, game);
-                }
+                result[key] = isGameObjectReference(value)
+                    ? game.gameObjects[value.id] // it's a tracked game object
+                    : unSerialize(value, game);
             }
             else {
                 result[key] = value;

@@ -198,7 +198,7 @@ ${this.fatal!.message}`,
             );
         }));
 
-        return await this.end();
+        await this.end();
     }
 
     /**

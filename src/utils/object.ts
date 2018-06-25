@@ -116,7 +116,7 @@ export function isObjectEmpty(obj: IAnyObject): boolean {
  */
 export function isEmptyExceptFor(
     obj: IAnyObject,
-    ...keys: Array<string | number>,
+    ...keys: Array<string | number>
 ): boolean {
     const keysSet = new Set(keys);
     const properties = Object.getOwnPropertyNames(obj);

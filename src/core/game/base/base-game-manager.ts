@@ -151,7 +151,7 @@ export class BaseGameManager {
      */
     public declareLosers(
         reason: string,
-        ...losers: IBasePlayer[],
+        ...losers: IBasePlayer[]
     ): void {
         for (const player of losers) {
             this.setPlayerLost(player, reason);
@@ -181,7 +181,7 @@ export class BaseGameManager {
      */
     public declareWinners(
         reason: string,
-        ...winners: IBasePlayer[],
+        ...winners: IBasePlayer[]
     ): void {
         for (const player of winners) {
             player.lost = false;

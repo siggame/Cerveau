@@ -1,6 +1,7 @@
 {
     "defaultSeverity": "error",
     "extends": [
+        "tslint:latest",
         "tslint:recommended",
         "tslint-eslint-rules",
         "tslint-no-math-random"
@@ -22,6 +23,7 @@
         "no-bitwise": true,
         "no-constant-condition": [true, { "checkLoops": false }],
         "no-duplicate-case": true,
+        "no-duplicate-imports": false, // for verbosity in games
         "no-ex-assign": true,
         "no-unnecessary-type-assertion": true,
         "ter-no-sparse-arrays": [true],
@@ -37,6 +39,7 @@
         "no-redundant-jsdoc": true,
         "import-spacing": true,
         // "no-parameter-reassignment": true,
+        "no-submodule-imports": false, // silly rule
         "no-unused-expression": [true, "allow-new"],
         "object-literal-sort-keys": false,
         "one-line": [true, "check-open-brace", "check-whitespace"],
@@ -47,6 +50,11 @@
             "SwitchCase": 1
         }],
         "ter-no-irregular-whitespace": [true],
+        "trailing-comma": [ true, {
+            "multiline": "always",
+            "singleline": "never",
+            "esSpecCompliant": true
+        }],
         "typedef": [ true,
             "call-signature",
             "parameter",

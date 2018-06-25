@@ -91,26 +91,19 @@ export class DeltaManager {
         if (wasDeleted) {
             changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
         }
-        else {
-            if (changedValue instanceof BaseGameObject) {
-                if (path.length === 2 && path[0].key === "gameObjects") {
-                    changedValue = {};
-                }
-                else {
-                    changedValue = { id: changedValue.id };
-                }
+        else if (isObject(changedValue)) {
+            const originalValue = changedValue;
+            changedValue = {};
+            if (originalValue instanceof BaseGameObject
+             && !(path.length === 2 && path[0].key === "gameObjects")
+            ) { // Then it should be a game object reference.
+                changedValue.id = originalValue.id;
             }
-            else if (Array.isArray(changedValue)) {
-                changedValue = {
-                    [SHARED_CONSTANTS.DELTA_LIST_LENGTH]: changedValue.length,
-                };
+            else if (Array.isArray(originalValue)) {
+                changedValue[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = changedValue.length;
             }
-            else if (isObject(changedValue)) {
-                // it can be a nested object that takes key/values.
-                changedValue = {};
-            }
-            // else changed value is a primitive and is safe to copy
         }
+        // else changed value is a primitive and is safe to copy
 
         current[changed.key] = changedValue;
     }

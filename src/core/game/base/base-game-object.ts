@@ -104,7 +104,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      *
      * @param player - The player requesting to log the string to this game
      * object.
-     * @param message - string to log
+     * @param message - The string to log.
      */
     protected async log(player: any, message: string): Promise<void> {
         this.logs.push(message);

@@ -283,13 +283,8 @@ export class StumpedGame extends BaseClasses.Game {
                 // Useful values
                 const dx = b.x - a.x;
                 const dy = b.y - a.y;
-                let steps = 0;
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    steps = Math.abs(dx);
-                }
-                else {
-                    steps = Math.abs(dy);
-                }
+                const steps = Math.max(Math.abs(dx), Math.abs(dy));
+
                 const xInc = dx / steps;
                 const yInc = dy / steps;
 

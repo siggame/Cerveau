@@ -671,12 +671,9 @@ export class Unit extends GameObject {
 
         if (amount < 1) {
             // Drop it all
-            if (resource === "food") {
-                amount = this.food;
-            }
-            else {
-                amount = this.materials;
-            }
+            amount = resource === "food"
+            ? this.food
+            : this.materials;
         }
 
         // Drop the resource
@@ -878,12 +875,9 @@ export class Unit extends GameObject {
             return `${this} can only pickup resources on or adjacent to its tile.`;
         }
 
-        if (amount < 1) {
-            amount = tile[resource];
-        }
-        else {
-            amount = Math.min(tile[resource], amount);
-        }
+        amount = amount < 1
+            ? tile[resource]
+            : Math.min(tile[resource], amount);
 
         // Make sure it picks up more than 0 resources
         if (Math.floor(this.energy) <= 0) {

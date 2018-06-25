@@ -5,7 +5,7 @@ import { ISpiderConstructorArgs, Spider } from "./spider";
 import { Spiderling } from "./spiderling";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { Nest } from "./nest";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -14,7 +14,7 @@ import { Spiderling } from "./spiderling";
 export interface IBroodMotherConstructorArgs
 extends ISpiderConstructorArgs, IBroodMotherProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    nest: Nest;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 

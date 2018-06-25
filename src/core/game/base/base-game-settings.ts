@@ -177,7 +177,7 @@ export class BaseGameSettingsManager {
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
     ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W> ? (W extends never[] ? string[] : W) : never} {
-        const values = {} as IAnyObject;
+        const values: IAnyObject = {};
         for (const [key, value] of Object.entries(this.schema)) {
             values[key] = value.default;
         }

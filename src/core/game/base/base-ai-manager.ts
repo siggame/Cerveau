@@ -205,13 +205,15 @@ export class BaseAIManager {
         let returned = schema.invalidValue;
 
         let invalid = sanitizedArgs instanceof Map
-            ? this.invalidateRun( // then it appears valid; try to invalidate
+            // if it appears valid, try to invalidate
+            ? this.invalidateRun(
                 this.client.player,
                 caller,
                 functionName,
                 sanitizedArgs,
             )
-            : sanitizedArgs.invalid; // failed to even sanitize
+            // else, failed to even sanitize
+            : sanitizedArgs.invalid;
 
         // If the game said the run is invalid for all runs
         if (invalid) {

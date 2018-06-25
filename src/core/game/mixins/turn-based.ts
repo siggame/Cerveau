@@ -40,7 +40,7 @@ export function mixTurnBased<
          * @returns A promise that resolves to if they want to end their turn.
          */
         public async runTurn(): Promise<boolean> {
-            return await this.executeOrder("runTurn");
+            return this.executeOrder("runTurn");
         }
     }
 
