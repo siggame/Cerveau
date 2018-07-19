@@ -1,142 +1,137 @@
-// Player: A player in this game. Every AI controls one player.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IBasePiratesPlayer } from "./";
+import { AI } from "./ai";
+import { GameObject } from "./game-object";
+import { Port } from "./port";
+import { Unit } from "./unit";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * A player in this game. Every AI controls one player.
+ */
+export class Player extends GameObject implements IBasePiratesPlayer {
+    /** The AI controlling this Player */
+    public readonly ai!: AI;
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Player: A player in this game. Every AI controls one player.
-let Player = Class(GameObject, {
     /**
-     * Initializes Players.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * What type of client this is, e.g. 'Python', 'JavaScript', or some other
+     * language. For potential data mining purposes.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
+    public readonly clientType!: string;
 
-        /**
-         * What type of client this is, e.g. 'Python', 'JavaScript', or some other language. For potential data mining purposes.
-         *
-         * @type {string}
-         */
-        this.clientType = this.clientType || "";
+    /**
+     * The amount of gold this Player has in reserve.
+     */
+    public gold!: number;
 
-        /**
-         * The amount of gold this Player has in reserve.
-         *
-         * @type {number}
-         */
-        this.gold = this.gold || 0;
+    /**
+     * The amount of infamy this Player has.
+     */
+    public infamy!: number;
 
-        /**
-         * The amount of infamy this Player has.
-         *
-         * @type {number}
-         */
-        this.infamy = this.infamy || 0;
+    /**
+     * If the player lost the game or not.
+     */
+    public lost!: boolean;
 
-        /**
-         * If the player lost the game or not.
-         *
-         * @type {boolean}
-         */
-        this.lost = this.lost || false;
+    /**
+     * The name of the player.
+     */
+    public readonly name!: string;
 
-        /**
-         * The name of the player.
-         *
-         * @type {string}
-         */
-        this.name = this.name || "";
+    /**
+     * This player's opponent in the game.
+     */
+    public readonly opponent!: Player;
 
-        /**
-         * This player's opponent in the game.
-         *
-         * @type {Player}
-         */
-        this.opponent = this.opponent || null;
+    /**
+     * The Port owned by this Player.
+     */
+    public readonly port!: Port;
 
-        /**
-         * The Port owned by this Player.
-         *
-         * @type {Port}
-         */
-        this.port = this.port || null;
+    /**
+     * The reason why the player lost the game.
+     */
+    public reasonLost!: string;
 
-        /**
-         * The reason why the player lost the game.
-         *
-         * @type {string}
-         */
-        this.reasonLost = this.reasonLost || "";
+    /**
+     * The reason why the player won the game.
+     */
+    public reasonWon!: string;
 
-        /**
-         * The reason why the player won the game.
-         *
-         * @type {string}
-         */
-        this.reasonWon = this.reasonWon || "";
+    /**
+     * The amount of time (in ns) remaining for this AI to send commands.
+     */
+    public timeRemaining!: number;
 
-        /**
-         * The amount of time (in ns) remaining for this AI to send commands.
-         *
-         * @type {number}
-         */
-        this.timeRemaining = this.timeRemaining || 0;
+    /**
+     * Every Unit owned by this Player.
+     */
+    public units!: Unit[];
 
-        /**
-         * Every Unit owned by this Player.
-         *
-         * @type {Array.<Unit>}
-         */
-        this.units = this.units || [];
+    /**
+     * If the player won the game or not.
+     */
+    public won!: boolean;
 
-        /**
-         * If the player won the game or not.
-         *
-         * @type {boolean}
-         */
-        this.won = this.won || false;
+    // <<-- Creer-Merge: attributes -->>
 
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
 
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- /Creer-Merge: attributes -->>
 
-        // put any initialization logic here. the base variables should be set from 'data' above
+    /**
+     * Called when a Player is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: {},
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
 
-        //<<-- /Creer-Merge: init -->>
-    },
+        // <<-- Creer-Merge: constructor -->>
+        // setup any thing you need here
+        // <<-- /Creer-Merge: constructor -->>
+    }
 
-    gameObjectName: "Player",
+    // <<-- Creer-Merge: public-functions -->>
 
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-    netWorth: function() {
+    /**
+     * Calculates the net worth of this player.
+     *
+     * @returns The net worth of this player.
+     */
+    public netWorth(): number {
         let worth = this.gold;
-        for(let unit of this.units) {
+        for (const unit of this.units) {
             // Ignore dead units
-            if(!unit.tile) {
+            if (!unit.tile) {
                 continue;
             }
 
             // Calculate net worth of unit
-            if(unit.shipHealth > 0) {
+            if (unit.shipHealth > 0) {
                 worth += this.game.shipCost;
             }
 
             worth += unit.crew * this.game.crewCost + unit.gold;
         }
         return worth;
-    },
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
+    // <<-- /Creer-Merge: public-functions -->>
 
-});
+    // <<-- Creer-Merge: protected-private-functions -->>
 
-module.exports = Player;
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

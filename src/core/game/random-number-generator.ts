@@ -65,6 +65,25 @@ export class RandomNumberGenerator {
     }
 
     /**
+     * Selects a random element from an array using the PRNG, and pops it
+     * (removes it from the array and returns it)
+     *
+     * @param array - The array to select from.
+     * @returns An element from the array, or undefined if the array was empty.
+     * The array is mutated if it contained elements, as the return value is
+     * removed.
+     */
+    public pop<T>(array: T[]): T | undefined {
+        const index = Math.floor(this.float() * array.length);
+        const popped = array[index];
+
+        // remove that element, mutating the array
+        array.splice(index, 1);
+
+        return popped;
+    }
+
+    /**
      * Selects a random element from a map of weights.
      *
      * @param map - The map. Where keys are the elements you want to choose

@@ -1,239 +1,236 @@
-// Unit: A unit group in the game. This may consist of a ship and any number of crew.
+import { IBaseGameObjectRequiredData } from "~/core/game";
+import { IUnitProperties } from "./";
+import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { Player } from "./player";
+import { Port } from "./port";
+import { Tile } from "./tile";
 
-const Class = require("classe");
-const log = require(`${__basedir}/gameplay/log`);
-const GameObject = require("./gameObject");
+// <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
+// <<-- /Creer-Merge: imports -->>
 
-//<<-- Creer-Merge: requires -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+/**
+ * Add properties here to make the create.Unit have different args.
+ */
+export interface IUnitConstructorArgs
+extends IGameObjectConstructorArgs, IUnitProperties {
+    // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+    // <<-- /Creer-Merge: constructor-args -->>
+}
 
-// any additional requires you want can be required here safely between Creer re-runs
-
-//<<-- /Creer-Merge: requires -->>
-
-// @class Unit: A unit group in the game. This may consist of a ship and any number of crew.
-let Unit = Class(GameObject, {
+/**
+ * A unit group in the game. This may consist of a ship and any number of crew.
+ */
+export class Unit extends GameObject {
     /**
-     * Initializes Units.
-     *
-     * @param {Object} data - a simple mapping passed in to the constructor with whatever you sent with it. GameSettings are in here by key/value as well.
+     * Whether this Unit has performed its action this turn.
      */
-    init: function(data) {
-        GameObject.init.apply(this, arguments);
-
-        /**
-         * Whether this Unit has performed its action this turn.
-         *
-         * @type {boolean}
-         */
-        this.acted = this.acted || false;
-
-        /**
-         * How many crew are on this Tile. This number will always be <= crewHealth.
-         *
-         * @type {number}
-         */
-        this.crew = this.crew || 0;
-
-        /**
-         * How much total health the crew on this Tile have.
-         *
-         * @type {number}
-         */
-        this.crewHealth = this.crewHealth || 0;
-
-        /**
-         * How much gold this Unit is carrying.
-         *
-         * @type {number}
-         */
-        this.gold = this.gold || 0;
-
-        /**
-         * How many more times this Unit may move this turn.
-         *
-         * @type {number}
-         */
-        this.moves = this.moves || 0;
-
-        /**
-         * The Player that owns and can control this Unit, or null if the Unit is neutral.
-         *
-         * @type {Player}
-         */
-        this.owner = this.owner || null;
-
-        /**
-         * (Merchants only) The path this Unit will follow. The first element is the Tile this Unit will move to next.
-         *
-         * @type {Array.<Tile>}
-         */
-        this.path = this.path || [];
-
-        /**
-         * If a ship is on this Tile, how much health it has remaining. 0 for no ship.
-         *
-         * @type {number}
-         */
-        this.shipHealth = this.shipHealth || 0;
-
-        /**
-         * (Merchants only) The number of turns this merchant ship won't be able to move. They will still attack. Merchant ships are stunned when they're attacked.
-         *
-         * @type {number}
-         */
-        this.stunTurns = this.stunTurns || 0;
-
-        /**
-         * (Merchants only) The Port this Unit is moving to.
-         *
-         * @type {Port}
-         */
-        this.targetPort = this.targetPort || null;
-
-        /**
-         * The Tile this Unit is on.
-         *
-         * @type {Tile}
-         */
-        this.tile = this.tile || null;
-
-
-        //<<-- Creer-Merge: init -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        this.acted = data.acted || true;
-        this.crew = data.crew || 0;
-        this.crewHealth = data.crewHealth || this.crew * this.game.crewHealth;
-        this.gold = data.gold || 0;
-        this.moves = data.moves || 0;
-        this.owner = data.owner || null;
-        this.path = data.path || [];
-        this.shipHealth = data.shipHealth || 0;
-        this.targetPort = data.targetPort || null;
-        this.tile = data.tile || null;
-        this.stunTurns = data.stunTurns || 0;
-
-        //<<-- /Creer-Merge: init -->>
-    },
-
-    gameObjectName: "Unit",
-
+    public acted!: boolean;
 
     /**
-     * Invalidation function for attack
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
-     *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew' or 'ship'. Crew deal damage to crew and ships deal damage to ships. Consumes any remaining moves.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * How many crew are on this Tile. This number will always be <=
+     * crewHealth.
      */
-    invalidateAttack: function(player, tile, target, args) {
-        // <<-- Creer-Merge: invalidateAttack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    public crew!: number;
 
-        const reason = this._invalidate(player, true);
-        if(reason) {
+    /**
+     * How much total health the crew on this Tile have.
+     */
+    public crewHealth!: number;
+
+    /**
+     * How much gold this Unit is carrying.
+     */
+    public gold!: number;
+
+    /**
+     * How many more times this Unit may move this turn.
+     */
+    public moves!: number;
+
+    /**
+     * The Player that owns and can control this Unit, or null if the Unit is
+     * neutral.
+     */
+    public owner?: Player;
+
+    /**
+     * (Merchants only) The path this Unit will follow. The first element is
+     * the Tile this Unit will move to next.
+     */
+    public path!: Tile[];
+
+    /**
+     * If a ship is on this Tile, how much health it has remaining. 0 for no
+     * ship.
+     */
+    public shipHealth!: number;
+
+    /**
+     * (Merchants only) The number of turns this merchant ship won't be able to
+     * move. They will still attack. Merchant ships are stunned when they're
+     * attacked.
+     */
+    public stunTurns!: number;
+
+    /**
+     * (Merchants only) The Port this Unit is moving to.
+     */
+    public targetPort?: Port;
+
+    /**
+     * The Tile this Unit is on.
+     */
+    public tile?: Tile;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    // Any additional member attributes can go here
+    // NOTE: They will not be sent to the AIs, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Unit is created.
+     *
+     * @param data - Initial value(s) to set member variables to.
+     * @param required - Data required to initialize this (ignore it).
+     */
+    constructor(
+        data: IUnitConstructorArgs,
+        required: IBaseGameObjectRequiredData,
+    ) {
+        super(data, required);
+
+        // <<-- Creer-Merge: constructor -->>
+
+        this.acted = true;
+        this.crewHealth = this.crewHealth || (this.crew * this.game.crewHealth);
+
+        // <<-- /Creer-Merge: constructor -->>
+    }
+
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for attack. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param tile - The Tile to attack.
+     * @param target - Whether to attack 'crew' or 'ship'. Crew deal damage to
+     * crew and ships deal damage to ships. Consumes any remaining moves.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     */
+    protected invalidateAttack(
+        player: Player,
+        tile: Tile,
+        target: "crew" | "ship",
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-attack -->>
+
+        const reason = this.invalidate(player, true);
+        if (reason) {
             return reason;
         }
 
-        if(!tile) {
-            return `${this} needs to know which tile to attack!`;
+        if (!tile.unit) {
+            return `There be nothin' for ${this} to attack on ${tile}!`;
         }
 
-        let t = target.charAt(0).toUpperCase();
-        if(t === "C") {
-            if(!tile.unit) {
-                return `There be nothin' for ${this} to attack on ${tile}!`;
-            }
-            if(tile.unit.player === player) {
-                return `${this} doesn't have time for a mutany! Don't be attackin' yer own men!`;
-            }
-            if(tile.unit.crew <= 0) {
+        if (tile.unit.owner === player) {
+            return `${this} doesn't have time for a mutany! Don't be attackin' yer own!`;
+        }
+
+        if (target === "crew") {
+            if (tile.unit.crew <= 0) {
                 return `${tile} has got no crew for you to attack!`;
             }
-
-            let dx = this.tile.x - tile.x;
-            let dy = this.tile.y - tile.y;
-            let distSq = dx * dx + dy * dy;
-            if(distSq > this.game.crewRange * this.game.crewRange) {
-                return `${this} isn't in range for that attack. Yer swords don't reach off yonder!`;
-            }
         }
-        else if(t === "S") {
-            if(!tile.unit) {
-                return `There be nothin' for ${this} to attack on ${tile}!`;
-            }
-            if(tile.unit.shipHealth <= 0) {
+        else { // target === "ship"
+            if (tile.unit.shipHealth <= 0) {
                 return `There be no ship for ${this} to attack.`;
             }
-            if(this.shipHealth <= 0) {
+            if (this.shipHealth <= 0) {
                 return `${this} has no ship to perform the attack.`;
             }
-            if(tile.unit.player === player) {
-                return `${this} doesn't have time for a mutany! Don't be attackin' yer own ship!`;
-            }
-
-            let dx = this.tile.x - tile.x;
-            let dy = this.tile.y - tile.y;
-            let distSq = dx * dx + dy * dy;
-            if(distSq > this.game.shipRange * this.game.shipRange) {
-                return `${this} isn't in range for that attack. Ye don't wanna fire blindly into the wind!`;
-            }
-        }
-        else {
-            return `${this} needs to attack somethin' valid ('ship' or 'crew'), not '${target}'.`;
         }
 
-        // Developer: try to invalidate the game logic for Unit's attack function here
-        return undefined; // meaning valid
+        const dx = this.tile!.x - tile.x;
+        const dy = this.tile!.y - tile.y;
+        const distSq = dx * dx + dy * dy;
+        const range = target === "crew"
+            ? "crewRange"
+            : "shipRange";
+        if (distSq > (this.game[range] ** 2)) {
+            return `${this} isn't in range for that attack. Ye don't wanna fire blindly into the wind!`;
+        }
 
-        // <<-- /Creer-Merge: invalidateAttack -->>
-    },
+        // <<-- /Creer-Merge: invalidate-attack -->>
+        return arguments;
+    }
 
     /**
      * Attacks either the 'crew' or 'ship' on a Tile in range.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to attack.
-     * @param {string} target - Whether to attack 'crew' or 'ship'. Crew deal damage to crew and ships deal damage to ships. Consumes any remaining moves.
-     * @returns {boolean} True if successfully attacked, false otherwise.
+     * @param player - The player that called this.
+     * @param tile - The Tile to attack.
+     * @param target - Whether to attack 'crew' or 'ship'. Crew deal damage to
+     * crew and ships deal damage to ships. Consumes any remaining moves.
+     * @returns True if successfully attacked, false otherwise.
      */
-    attack: function(player, tile, target) {
-        // <<-- Creer-Merge: attack -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async attack(
+        player: Player,
+        tile: Tile,
+        target: "crew" | "ship",
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: attack -->>
 
-        target = target.charAt(0).toUpperCase();
+        if (!tile.unit) {
+            throw new Error("tile has no unit, should be impossible");
+        }
 
         let deadCrew = 0;
         let deadShips = 0;
         let gold = 0;
-        let merchant = tile.unit.targetPort !== null;
-        let neutral = !merchant && !tile.unit.owner;
-        if(target === "C") {
+        const merchant = Boolean(tile.unit.targetPort);
+        const neutral = !merchant && !tile.unit.owner;
+        if (target === "crew") {
             // Crew attacking crew
             tile.unit.crewHealth -= this.game.crewDamage * this.crew;
             tile.unit.crewHealth = Math.max(0, tile.unit.crewHealth);
 
             // For counting the dead accurately
-            if(tile.unit.crew > tile.unit.crewHealth) {
+            if (tile.unit.crew > tile.unit.crewHealth) {
                 deadCrew = tile.unit.crew - tile.unit.crewHealth;
                 tile.unit.crew = tile.unit.crewHealth;
             }
 
             // Check if the crew was completely destroyed
-            if(tile.unit.crewHealth <= 0) {
-                if(tile.unit.shipHealth <= 0) {
+            if (tile.unit.crewHealth <= 0) {
+                if (tile.unit.shipHealth <= 0) {
                     gold += tile.unit.gold;
 
                     // Mark it as dead
-                    tile.unit.tile = null;
-                    tile.unit = null;
+                    tile.unit.tile = undefined;
+                    tile.unit = undefined;
                 }
                 else {
-                    tile.unit.owner = null;
+                    tile.unit.owner = undefined;
                     tile.unit.shipHealth = 1;
 
                     // Make sure it's not a merchant ship anymore either
-                    tile.unit.targetPort = null;
+                    tile.unit.targetPort = undefined;
                     tile.unit.path = [];
                 }
             }
@@ -244,14 +241,14 @@ let Unit = Class(GameObject, {
             tile.unit.shipHealth = Math.max(0, tile.unit.shipHealth);
 
             // Check if ship was destroyed
-            if(tile.unit.shipHealth <= 0) {
+            if (tile.unit.shipHealth <= 0) {
                 deadShips += 1;
                 gold += tile.unit.gold;
                 deadCrew += tile.unit.crew;
 
                 // Mark it as dead
-                tile.unit.tile = null;
-                tile.unit = null;
+                tile.unit.tile = undefined;
+                tile.unit = undefined;
             }
         }
 
@@ -262,26 +259,26 @@ let Unit = Class(GameObject, {
 
         // Calculate the infamy factor
         let factor = 1;
-        if(!merchant) {
+        if (!merchant) {
             // Calculate each player's net worth
-            let allyWorth = player.netWorth() + player.gold - gold;
-            let opponentWorth = player.opponent.netWorth() + player.opponent.gold + gold;
-            opponentWorth += deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
+            const allyWorth = player.netWorth() + player.gold - gold;
+            const opponentWorth = (
+                player.opponent.netWorth() + player.opponent.gold + gold
+            ) + deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
 
-            if(allyWorth > opponentWorth) {
+            if (allyWorth > opponentWorth) {
                 factor = 0.5;
             }
-            else if(allyWorth < opponentWorth) {
+            else if (allyWorth < opponentWorth) {
                 factor = 2;
             }
         }
 
         // Calculate infamy
-        let infamy = deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
-        infamy *= factor;
+        let infamy = (deadCrew * this.game.crewCost + deadShips * this.game.shipCost) * factor;
 
-        if(!neutral) {
-            if(!merchant) {
+        if (!neutral) {
+            if (!merchant) {
                 infamy = Math.min(infamy, player.opponent.infamy);
                 player.opponent.infamy -= infamy;
             }
@@ -289,287 +286,320 @@ let Unit = Class(GameObject, {
             player.infamy += infamy;
         }
 
-        if(merchant && tile.unit) {
+        if (merchant && tile.unit) {
             tile.unit.stunTurns = 2;
         }
 
         return true;
 
         // <<-- /Creer-Merge: attack -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for bury
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for bury. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param amount - How much gold this Unit should bury. Amounts <= 0 will
+     * bury as much as possible.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateBury: function(player, amount, args) {
-        // <<-- Creer-Merge: invalidateBury -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateBury(
+        player: Player,
+        amount: number,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-bury -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
-        if(this.tile.type !== "land") {
+        if (this.tile!.type !== "land") {
             return `${this} can't bury gold on the sea.`;
         }
 
-        if(this.tile.port) {
+        if (this.tile!.port) {
             return `${this} can't bury gold in ports.`;
         }
 
-        if(this.tile.gold >= this.game.maxTileGold) {
-            return `${this} can't bury loot on a tile with the max amount of booty (${this.game.maxTileGold}).`;
+        if (this.tile!.gold >= this.game.settings.maxTileGold) {
+            return `${this} can't bury loot on a tile with the max amount of booty (${
+                this.game.settings.maxTileGold
+            }).`;
         }
 
-        let dx = this.tile.x - player.port.tile.x;
-        let dy = this.tile.y - player.port.tile.y;
-        let distSq = dx * dx + dy * dy;
-        if(distSq < this.game.minInterestDistance * this.game.minInterestDistance) {
+        const dx = this.tile!.x - player.port.tile.x;
+        const dy = this.tile!.y - player.port.tile.y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < this.game.minInterestDistance * this.game.minInterestDistance) {
             return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
         }
 
-        return undefined; // meaning valid
+        amount = amount <= 0
+            ? this.gold
+            : Math.min(this.gold, amount);
 
-        // <<-- /Creer-Merge: invalidateBury -->>
-    },
+        amount = Math.min(this.game.settings.maxTileGold - this.tile!.gold, amount);
+
+        if (amount <= 0) {
+            return `${this} does not have any gold to bury!`;
+        }
+
+        // <<-- /Creer-Merge: invalidate-bury -->>
+        return arguments;
+    }
 
     /**
-     * Buries gold on this Unit's Tile. Gold must be a certain distance away for it to get interest (Game.minInterestDistance).
+     * Buries gold on this Unit's Tile. Gold must be a certain distance away
+     * for it to get interest (Game.minInterestDistance).
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should bury. Amounts <= 0 will bury as much as possible.
-     * @returns {boolean} True if successfully buried, false otherwise.
+     * @param player - The player that called this.
+     * @param amount - How much gold this Unit should bury. Amounts <= 0 will
+     * bury as much as possible.
+     * @returns True if successfully buried, false otherwise.
      */
-    bury: function(player, amount) {
-        // <<-- Creer-Merge: bury -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async bury(player: Player, amount: number): Promise<boolean> {
+        // <<-- Creer-Merge: bury -->>
 
-        if(amount <= 0) {
-            amount = this.gold;
-        }
-        else {
-            amount = Math.min(this.gold, amount);
-        }
-
-        amount = Math.min(this.game.maxTileGold - this.tile.gold, amount);
-
-        this.tile.gold += amount;
+        this.tile!.gold += amount;
         this.gold -= amount;
 
         return true;
 
         // <<-- /Creer-Merge: bury -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for deposit
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for deposit. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - The amount of gold to deposit. Amounts <= 0 will deposit all the gold on this Unit.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param amount - The amount of gold to deposit. Amounts <= 0 will deposit
+     * all the gold on this Unit.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateDeposit: function(player, amount, args) {
-        // <<-- Creer-Merge: invalidateDeposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateDeposit(
+        player: Player,
+        amount: number = 0,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-deposit -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
-        let neighbors = [this.tile, this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
-        let found = neighbors.find(t => t && t.port && t.port.owner !== player.opponent);
+        const tiles = [ this.tile!, ...this.tile!.getNeighbors() ];
+        const found = tiles.find(
+            (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
+        );
 
-        if(!found) {
+        if (!found) {
             return `Arr, ${this} has to deposit yer booty in yer home port or a merchant port, matey!`;
         }
 
-        if(this.gold <= 0) {
+        if (this.gold <= 0) {
             return `Shiver me timbers! ${this} doesn't have any booty to deposit!`;
         }
 
-        return undefined; // meaning valid
-
-        // <<-- /Creer-Merge: invalidateDeposit -->>
-    },
-
-    /**
-     * Puts gold into an adjacent Port. If that Port is the Player's port, the gold is added to that Player. If that Port is owned by merchants, it adds to that Port's investment.
-     *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - The amount of gold to deposit. Amounts <= 0 will deposit all the gold on this Unit.
-     * @returns {boolean} True if successfully deposited, false otherwise.
-     */
-    deposit: function(player, amount) {
-        // <<-- Creer-Merge: deposit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
-
-        // Adjust amount
         amount = Math.min(Math.max(amount, 0), this.gold);
-        if(amount <= 0) {
+        if (amount <= 0) {
             amount = this.gold;
         }
 
+        // <<-- /Creer-Merge: invalidate-deposit -->>
+        return arguments;
+    }
+
+    /**
+     * Puts gold into an adjacent Port. If that Port is the Player's port, the
+     * gold is added to that Player. If that Port is owned by merchants, it
+     * adds to that Port's investment.
+     *
+     * @param player - The player that called this.
+     * @param amount - The amount of gold to deposit. Amounts <= 0 will deposit
+     * all the gold on this Unit.
+     * @returns True if successfully deposited, false otherwise.
+     */
+    protected async deposit(
+        player: Player,
+        amount: number = 0,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: deposit -->>
+
         this.gold -= amount;
 
-        // Check for this player's port
-        let neighbors = [this.tile, this.tile.tileNorth, this.tile.tileEast, this.tile.tileSouth, this.tile.tileWest];
-        let tile = neighbors.find(t => t && t.port && t.port.owner === player, this);
+        const tiles = [ this.tile!, ...this.tile!.getNeighbors() ];
+        let tile = tiles.find(
+            (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
+        )!; // will be found as we validated it above
 
-        if(tile) {
+        if (tile) {
             player.gold += amount;
         }
         else {
             // Get the merchant's port
-            tile = neighbors.find(t => t && t.port && !t.port.owner, this);
-            tile.port.investment += amount;
+            tile = tiles.find((t) => Boolean(t && t.port && !t.port.owner))!;
+            tile.port!.investment += amount;
         }
 
         return true;
 
         // <<-- /Creer-Merge: deposit -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for dig
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for dig. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should take. Amounts <= 0 will dig up as much as possible.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param amount - How much gold this Unit should take. Amounts <= 0 will
+     * dig up as much as possible.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateDig: function(player, amount, args) {
-        // <<-- Creer-Merge: invalidateDig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateDig(
+        player: Player,
+        amount: number = 0,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-dig -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
         // Checking to see if the tile is anything other than a land type.
-        if(this.tile.type !== "land") {
+        if (this.tile!.type !== "land") {
             return `${this} can't dig in the sea!`;
         }
 
         // Checking to see if the tile has gold to be dug up.
-        if(this.tile.gold === 0) {
+        if (this.tile!.gold === 0) {
             return `There be no booty for ${this} to plunder.`;
         }
 
-        return undefined; // meaning valid
+        amount = amount <= 0 || amount > this.tile!.gold
+            ? this.tile!.gold
+            : amount;
 
-        // <<-- /Creer-Merge: invalidateDig -->>
-    },
+        // <<-- /Creer-Merge: invalidate-dig -->>
+        return arguments;
+    }
 
     /**
      * Digs up gold on this Unit's Tile.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - How much gold this Unit should take. Amounts <= 0 will dig up as much as possible.
-     * @returns {boolean} True if successfully dug up, false otherwise.
+     * @param player - The player that called this.
+     * @param amount - How much gold this Unit should take. Amounts <= 0 will
+     * dig up as much as possible.
+     * @returns True if successfully dug up, false otherwise.
      */
-    dig: function(player, amount) {
-        // <<-- Creer-Merge: dig -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async dig(
+        player: Player,
+        amount: number = 0,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: dig -->>
 
-        // If the amount requested is <= 0 or greater than what is current give all.
-        if(amount <= 0 || amount > this.tile.gold) {
-            // Adds the amount of gold from the current tile to the Unit.
-            this.gold += this.tile.gold;
-            // Sets the gold on tile to 0.
-            this.tile.gold = 0;
-            return true;
-        }
-        // Else if amount is less than what is there take that amount.
-        else {
-            // Adds amount requested to Unit.
-            this.gold += amount;
-            // Subtracts amount from Tile's gold
-            this.tile.gold -= amount;
-            return true;
-        }
+        // Adds amount requested to Unit.
+        this.gold += amount;
+        // Subtracts amount from Tile's gold
+        this.tile!.gold -= amount;
+
+        return true;
 
         // <<-- /Creer-Merge: dig -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for move
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for move. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile this Unit should move to.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param tile - The Tile this Unit should move to.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateMove: function(player, tile, args) {
-        // <<-- Creer-Merge: invalidateMove -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateMove(
+        player: Player,
+        tile: Tile,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-move -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
         const ship = this.shipHealth > 0;
-        if(this.moves <= 0) {
+        if (this.moves <= 0) {
             return `${this}'s crew are too tired to travel any further.`;
         }
-        if(this.acted) {
+
+        if (this.acted) {
             return `${this} can't move after acting. The men are too tired!`;
         }
-        if(!tile) {
-            return `${this} must have a destination to move to.`;
-        }
-        if(this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+
+        if (!this.tile!.hasNeighbor(tile)) {
             return `${tile} be too far for ${this} to move to.`;
         }
-        if(tile.unit && tile.unit.owner !== player && tile.unit.owner !== null) {
+
+        if (tile.unit && tile.unit.owner && tile.unit.owner !== player) {
             return `${this} refuses to share the same ground with a living foe.`;
         }
-        if(!ship && tile.type === "water" && !tile.port && !(tile.unit && tile.unit.shipHealth > 0)) {
+
+        if (!ship && tile.type === "water" && !tile.port && !(tile.unit && tile.unit.shipHealth > 0)) {
             return `${this} has no ship and can't walk on water!`;
         }
-        if(ship && tile.type === "land") {
+
+        if (ship && tile.type === "land") {
             return `Land ho! ${this} belongs in the sea! Use 'Unit.split' if ye want to move just yer crew ashore.`;
         }
-        if(ship && tile.unit && tile.unit.shipHealth > 0) {
+
+        if (ship && tile.unit && tile.unit.shipHealth > 0) {
             return `There be a ship there. If ye move ${this} to ${tile}, ye'll scuttle yer ship!`;
         }
-        if(!ship && tile.unit && tile.unit.ship && this.acted) {
+
+        if (!ship && tile.unit && tile.unit.shipHealth > 0 && this.acted) {
             return `${this} already acted, and it be too tired to board that ship.`;
         }
-        if(tile.port && tile.port.owner !== player) {
+
+        if (tile.port && tile.port.owner !== player) {
             return `${this} can't enter an enemy port!`;
         }
-        if(ship && tile.port && tile.shipHealth > 0) {
+
+        if (ship && tile.port && tile.unit && tile.unit.shipHealth > 0) {
             return `${this} can't move into yer port, ye'll scuttle yer ship!`;
         }
-        return undefined; // meaning valid
 
-        // <<-- /Creer-Merge: invalidateMove -->>
-    },
+        // <<-- /Creer-Merge: invalidate-move -->>
+        return arguments;
+    }
 
     /**
-     * Moves this Unit from its current Tile to an adjacent Tile. If this Unit merges with another one, the other Unit will be destroyed and its tile will be set to null. Make sure to check that your Unit's tile is not null before doing things with it.
+     * Moves this Unit from its current Tile to an adjacent Tile. If this Unit
+     * merges with another one, the other Unit will be destroyed and its tile
+     * will be set to null. Make sure to check that your Unit's tile is not
+     * null before doing things with it.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile this Unit should move to.
-     * @returns {boolean} True if it moved, false otherwise.
+     * @param player - The player that called this.
+     * @param tile - The Tile this Unit should move to.
+     * @returns True if it moved, false otherwise.
      */
-    move: function(player, tile) {
-        // <<-- Creer-Merge: move -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async move(player: Player, tile: Tile): Promise<boolean> {
+        // <<-- Creer-Merge: move -->>
 
-        if(tile.unit) {
-            let other = tile.unit;
-            other.tile = null;
+        if (tile.unit) {
+            // combine with that unit
+            const other = tile.unit;
+            other.tile = undefined;
             tile.unit = this;
             this.tile = tile;
 
@@ -582,7 +612,7 @@ let Unit = Class(GameObject, {
         }
         else {
             // Move this unit to that tile
-            this.tile.unit = null;
+            this.tile!.unit = undefined;
             this.tile = tile;
             tile.unit = this;
             this.moves -= 1;
@@ -591,49 +621,48 @@ let Unit = Class(GameObject, {
         return true;
 
         // <<-- /Creer-Merge: move -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for rest
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for rest. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateRest: function(player, args) {
-        // <<-- Creer-Merge: invalidateRest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateRest(player: Player): string | IArguments {
+        // <<-- Creer-Merge: invalidate-rest -->>
 
-        const reason = this._invalidate(player, true);
-        if(reason) {
+        const reason = this.invalidate(player, true);
+        if (reason) {
             return reason;
         }
 
         // Check if it's in range
         const radius = this.game.restRange;
-        if(Math.pow(this.tile.x - player.port.tile.x, 2) + Math.pow(this.tile.y - player.port.tile.y, 2) > radius * radius) {
+        if (((this.tile!.x - player.port.tile.x) ** 2 + (this.tile!.y - player.port.tile.y) ** 2) > radius ** 2) {
             return `${this} has no nearby port to rest at. No home tavern means no free rum!`;
         }
 
-        return undefined; // meaning valid
-
-        // <<-- /Creer-Merge: invalidateRest -->>
-    },
+        // <<-- /Creer-Merge: invalidate-rest -->>
+        return arguments;
+    }
 
     /**
      * Regenerates this Unit's health. Must be used in range of a port.
      *
-     * @param {Player} player - the player that called this.
-     * @returns {boolean} True if successfully rested, false otherwise.
+     * @param player - The player that called this.
+     * @returns True if successfully rested, false otherwise.
      */
-    rest: function(player) {
-        // <<-- Creer-Merge: rest -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async rest(player: Player): Promise<boolean> {
+        // <<-- Creer-Merge: rest -->>
 
         // Heal the units
         this.crewHealth += Math.ceil(this.game.crewHealth * this.game.healFactor) * this.crew;
         this.crewHealth = Math.min(this.crewHealth, this.crew * this.game.crewHealth);
-        if(this.shipHealth > 0) {
+        if (this.shipHealth > 0) {
             this.shipHealth += Math.ceil(this.game.shipHealth * this.game.healFactor);
             this.shipHealth = Math.min(this.shipHealth, this.game.shipHealth);
         }
@@ -645,134 +674,149 @@ let Unit = Class(GameObject, {
         return true;
 
         // <<-- /Creer-Merge: rest -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for split
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for split. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to move the crew to.
-     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
-     * @param {number} gold - The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param tile - The Tile to move the crew to.
+     * @param amount - The number of crew to move onto that Tile. Amount <= 0
+     * will move all the crew to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold <
+     * 0 will move all the gold to that Tile.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateSplit: function(player, tile, amount, gold, args) {
-        // <<-- Creer-Merge: invalidateSplit -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateSplit(
+        player: Player,
+        tile: Tile,
+        amount: number = 1,
+        gold: number = 0,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-split -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
-        if(!tile) {
+        if (!tile) {
             return `${this} can't split onto null!`;
         }
 
         // Check to see if the crew has a move to move
-        if(this.moves <= 0) {
+        if (this.moves <= 0) {
             return `${this} can't split cause they be out of moves.`;
         }
 
         // Check to see if they have already acted.
-        if(this.acted) {
+        if (this.acted) {
             return `${this} crew are too tired to split!`;
         }
 
         // Check to see if it is not one of the tiles around in the current direction
-        if(this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+        if (!this.tile!.hasNeighbor(tile)) {
             return `${tile} be too far for ${this} to split to.`;
         }
 
         // Check to make sure target tile is a valid tile
-        if(tile.type === "water" && !tile.unit && !tile.port) {
+        if (tile.type === "water" && !tile.unit && !tile.port) {
             return `${this} can't split onto water!`;
         }
 
-        if(tile.unit && (tile.unit.owner === player.opponent || tile.unit.targetPort)) {
+        if (tile.unit && (tile.unit.owner === player.opponent || tile.unit.targetPort)) {
             return `${this} can't split onto enemy pirates!`;
         }
 
-        if(tile.port && tile.port.owner !== player) {
+        if (tile.port && tile.port.owner !== player) {
             return `${this} can't split onto enemy ports!`;
         }
 
-        return undefined; // meaning valid
+        // Adjust the amount of crew to split
+        amount = amount <= 0
+            ? this.crew
+            : Math.min(amount, this.crew);
 
-        // <<-- /Creer-Merge: invalidateSplit -->>
-    },
+        // Adjust the amount of gold to split
+        gold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
+            ? this.gold
+            : Math.min(gold, this.gold);
+
+        // <<-- /Creer-Merge: invalidate-split -->>
+        return arguments;
+    }
 
     /**
-     * Moves a number of crew from this Unit to the given Tile. This will consume a move from those crew.
+     * Moves a number of crew from this Unit to the given Tile. This will
+     * consume a move from those crew.
      *
-     * @param {Player} player - the player that called this.
-     * @param {Tile} tile - The Tile to move the crew to.
-     * @param {number} amount - The number of crew to move onto that Tile. Amount <= 0 will move all the crew to that Tile.
-     * @param {number} gold - The amount of gold the crew should take with them. Gold < 0 will move all the gold to that Tile.
-     * @returns {boolean} True if successfully split, false otherwise.
+     * @param player - The player that called this.
+     * @param tile - The Tile to move the crew to.
+     * @param amount - The number of crew to move onto that Tile. Amount <= 0
+     * will move all the crew to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold <
+     * 0 will move all the gold to that Tile.
+     * @returns True if successfully split, false otherwise.
      */
-    split: function(player, tile, amount, gold) {
-        // <<-- Creer-Merge: split -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async split(
+        player: Player,
+        tile: Tile,
+        amount: number = 1,
+        gold: number = 0,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: split -->>
+
+        const originalCrew = this.crew;
 
         // Create a new unit
-        let newUnit = {
+        const newUnit = {
+            tile,
+            gold,
             owner: player,
-            tile: tile,
+            crew: amount,
             moves: this.moves - 1,
+
+            // Check if boarding a ship
+            acted: tile.unit && tile.unit.shipHealth > 0,
+
+            // Crew health
+            crewHealth: amount === this.crew
+                ? this.crewHealth
+                : Math.ceil((this.crewHealth / originalCrew) * amount),
         };
 
-        // Check if boarding a ship
-        if(tile.unit && tile.unit.shipHealth > 0) {
-            newUnit.acted = true;
-        }
-
-        // Adjust the amount of crew to split
-        let originalCrew = this.crew;
-        if(amount <= 0) {
-            amount = this.crew;
-        }
-        else {
-            amount = Math.min(amount, this.crew);
-        }
-
         // Move the crew
-        newUnit.crew = amount;
         this.crew -= amount;
 
         // Adjust the amount of gold to split
-        if((amount === this.crew && this.shipHealth <= 0) || gold < 0) {
-            newUnit.gold = this.gold;
-        }
-        else {
-            newUnit.gold = Math.min(gold, this.gold);
-        }
+        newUnit.gold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
+            ? this.gold
+            : Math.min(gold, this.gold);
         this.gold -= newUnit.gold;
 
         // Crew health
-        if(amount === this.crew) {
-            newUnit.crewHealth = this.crewHealth;
-        }
-        else {
-            newUnit.crewHealth = Math.ceil((this.crewHealth / originalCrew)*amount);
-        }
+        newUnit.crewHealth = amount === this.crew
+            ? this.crewHealth
+            : Math.ceil((this.crewHealth / originalCrew) * amount);
         this.crewHealth -= newUnit.crewHealth || 0;
 
         // Ownership
-        if(this.crew <= 0) {
+        if (this.crew <= 0) {
             // Disassociating from old Tile if all the crew moved
-            this.owner = null;
-            if(this.shipHealth <= 0) {
+            this.owner = undefined;
+            if (this.shipHealth <= 0) {
                 // If no units are left over, remove the unit
-                this.tile.unit = null;
-                this.tile = null;
+                this.tile!.unit = undefined;
+                this.tile = undefined;
             }
         }
 
         // Check if merging with another unit
-        if(tile.unit) {
-            let other = tile.unit;
+        if (tile.unit) {
+            const other = tile.unit;
             other.owner = player;
             other.gold += newUnit.gold || 0;
             other.crew += newUnit.crew || 0;
@@ -781,107 +825,105 @@ let Unit = Class(GameObject, {
             other.moves = Math.min(newUnit.moves || 0, other.moves);
         }
         else {
-            newUnit = this.game.create("Unit", newUnit);
-            newUnit.tile.unit = newUnit;
-            this.game.newUnits.push(newUnit);
+            const unit = this.game.manager.create.Unit(newUnit);
+            unit.tile!.unit = unit;
+            this.game.manager.newUnits.push(unit);
         }
 
-        tile.unit.owner = player;
+        tile.unit!.owner = player;
         return true;
 
         // <<-- /Creer-Merge: split -->>
-    },
-
+    }
 
     /**
-     * Invalidation function for withdraw
-     * Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid
+     * Invalidation function for withdraw. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - The amount of gold to withdraw. Amounts <= 0 will withdraw everything.
-     * @param {Object} args - a key value table of keys to the arg (passed into this function)
-     * @returns {string|undefined} a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @param player - The player that called this.
+     * @param amount - The amount of gold to withdraw. Amounts <= 0 will
+     * withdraw everything.
+     * @returns a string that is the invalid reason, if the arguments are
+     * invalid. Otherwise undefined (nothing) if the inputs are valid.
      */
-    invalidateWithdraw: function(player, amount, args) {
-        // <<-- Creer-Merge: invalidateWithdraw -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected invalidateWithdraw(
+        player: Player,
+        amount: number = 0,
+    ): string | IArguments {
+        // <<-- Creer-Merge: invalidate-withdraw -->>
 
-        const reason = this._invalidate(player, false);
-        if(reason) {
+        const reason = this.invalidate(player);
+        if (reason) {
             return reason;
         }
 
         const tile = player.port.tile;
-        if(this.tile !== tile && this.tile.tileEast !== tile && this.tile.tileNorth !== tile && this.tile.tileWest !== tile && this.tile.tileSouth !== tile) {
+        if (this.tile !== tile && !this.tile!.hasNeighbor(tile)) {
             return `${this} has to withdraw yer booty from yer home port, matey!`;
         }
 
-        return undefined; // meaning valid
+        if (amount <= 0) {
+            // Take all the gold
+            amount = player.gold;
+        }
 
-        // <<-- /Creer-Merge: invalidateWithdraw -->>
-    },
+        // cap the amount taken by how much gold they have
+        // (so they can't withdraw more gold than their player has)
+        amount = Math.min(amount, player.gold);
+
+        // <<-- /Creer-Merge: invalidate-withdraw -->>
+        return arguments;
+    }
 
     /**
      * Takes gold from the Player. You can only withdraw from your own Port.
      *
-     * @param {Player} player - the player that called this.
-     * @param {number} amount - The amount of gold to withdraw. Amounts <= 0 will withdraw everything.
-     * @returns {boolean} True if successfully withdrawn, false otherwise.
+     * @param player - The player that called this.
+     * @param amount - The amount of gold to withdraw. Amounts <= 0 will
+     * withdraw everything.
+     * @returns True if successfully withdrawn, false otherwise.
      */
-    withdraw: function(player, amount) {
-        // <<-- Creer-Merge: withdraw -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    protected async withdraw(
+        player: Player,
+        amount: number = 0,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: withdraw -->>
 
-        if(amount <= 0) {
-            // Take all the gold
-            this.gold += player.gold;
-            player.gold = 0;
-        }
-        else if(player.gold >= amount) {
-            // Take some of the gold
-            this.gold += amount;
-            player.gold -= amount;
-        }
-        else if(player.gold <= amount) {
-            // amount > player.gold, so just take it all
-            this.gold += player.gold;
-            player.gold = 0;
-        }
+        this.gold += amount;
+        player.gold -= amount;
 
-        // Developer: Put your game logic for the Unit's withdraw function here
         return true;
 
         // <<-- /Creer-Merge: withdraw -->>
-    },
+    }
 
-
-    //<<-- Creer-Merge: added-functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+    // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
      * Tries to invalidate args for an action function
      *
-     * @param {Player} player - the player commanding this Unit
-     * @param {boolean} [checkAction] - true to check if this Unit has an action
-     * @returns {string|undefined} the reason this is invalid, undefined if looks valid so far
+     * @param player - the player commanding this Unit
+     * @param checkAction - true to check if this Unit has an action
+     * @returns the reason this is invalid, undefined if looks valid so far
      */
-    _invalidate: function(player, checkAction) {
-        if(!player || player !== this.game.currentPlayer) {
+    private invalidate(player: Player, checkAction?: true): string | undefined {
+        if (!player || player !== this.game.currentPlayer) {
             return `Avast, it isn't yer turn, ${player}.`;
         }
 
-        if(this.owner !== player) {
+        if (this.owner !== player) {
             return `${this} isn't among yer crew.`;
         }
 
-        if(checkAction && this.acted) {
+        if (checkAction && this.acted) {
             return `${this} can't perform another action this turn.`;
         }
 
-        if(!this.tile || this.crew === 0) {
+        if (!this.tile || this.crew === 0) {
             return `Ye can't control ${this}.`;
         }
-    },
+    }
 
-    //<<-- /Creer-Merge: added-functions -->>
-
-});
-
-module.exports = Unit;
+    // <<-- /Creer-Merge: protected-private-functions -->>
+}

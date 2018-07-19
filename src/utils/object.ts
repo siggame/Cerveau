@@ -7,6 +7,9 @@ export interface IAnyObject extends ITypedObject<any> {}
 /** Shorthand for null or undefined. */
 export type nil = null | undefined;
 
+/** Forces an object's properties to be mutable */
+export type MutableRequired<T> = { -readonly [P in keyof T]: T[P] };
+
 /**
  * Traverses down a tree like object via list of keys.
  *
