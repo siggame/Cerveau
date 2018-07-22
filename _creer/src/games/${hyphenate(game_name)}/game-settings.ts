@@ -1,4 +1,4 @@
-<%include file="functions.noCreer" />import { IAnyObject } from "~/utils";
+<%include file="functions.noCreer" />import { IUnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
 ${merge('// ', 'imports', '// any additional imports you want can be placed here safely between creer runs', optional=True, help=False)}
@@ -101,7 +101,7 @@ ${merge('            // ', 'map-height',
      * @param someSettings A subset of settings that will be tested
      * @returns An error if the settings fail to validate.
      */
-    protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
         const invalidated = super.invalidate(someSettings);
         if (invalidated instanceof Error) {
             return invalidated;

@@ -10,6 +10,9 @@ export type nil = null | undefined;
 /** Types that can be easily deduced from a string. */
 export type UnStringified = string | number | boolean | null;
 
+/** Forces an object's properties to be mutable */
+export type MutableRequired<T> = { -readonly [P in keyof T]: T[P] };
+
 /**
  * Traverses down a tree like object via list of keys.
  *
