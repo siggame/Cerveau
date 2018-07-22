@@ -20,7 +20,7 @@ import { sanitizeString } from "./sanitize-string";
  */
 export function sanitizeType(
     type: ISanitizableType,
-    obj: any,
+    obj: unknown,
     allowError: boolean = true,
 ): any {
     let value: any;

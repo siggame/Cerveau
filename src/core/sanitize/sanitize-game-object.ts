@@ -13,7 +13,7 @@ import { BaseGameObject } from "~/core/game/base/base-game-object";
  * @returns The passed in game object, if it is one, otherwise undefined.
  */
 export function sanitizeGameObject(
-    obj: any,
+    obj: unknown,
     gameObjectClass: typeof BaseGameObject,
     allowError: boolean,
 ): BaseGameObject | Error;
@@ -31,7 +31,7 @@ export function sanitizeGameObject(
  * @returns The passed in game object, if it is one, otherwise undefined.
  */
 export function sanitizeGameObject(
-    obj: any,
+    obj: unknown,
     gameObjectClass: typeof BaseGameObject,
     allowError: false,
 ): BaseGameObject | undefined;
@@ -49,7 +49,7 @@ export function sanitizeGameObject(
  * @returns The passed in game object, if it is one, otherwise undefined.
  */
 export function sanitizeGameObject(
-    obj: any,
+    obj: unknown,
     gameObjectClass: typeof BaseGameObject,
     allowError: boolean = true,
 ): BaseGameObject | undefined | Error {

@@ -2,10 +2,13 @@
 export interface ITypedObject<T = any> { [key: string]: T | undefined; }
 
 /** An object used as a map to any values. */
-export interface IAnyObject extends ITypedObject<any> {}
+export interface IUnknownObject extends ITypedObject<unknown> {}
 
 /** Shorthand for null or undefined. */
 export type nil = null | undefined;
+
+/** Types that can be easily deduced from a string. */
+export type UnStringified = string | number | boolean | null;
 
 /**
  * Traverses down a tree like object via list of keys.
@@ -17,7 +20,7 @@ export type nil = null | undefined;
  * traversing.
  */
 export function traverse(obj: any, keys: string[]): any {
-    if (typeof(obj) !== "object" || obj === null) {
+    if (typeof obj !== "object" || obj === null) {
         throw new Error(`obj ${obj} is not an object to traverse.`);
     }
 
@@ -42,10 +45,8 @@ export function traverse(obj: any, keys: string[]): any {
  *          or value as a boolean if it appears to be 'true' or 'false',
  *          or just value back as a string.
  */
-export function unstringify(
-    value: string | number | boolean | null,
-): string | number | boolean | null {
-    if (typeof(value) === "string") {
+export function unstringify(value: UnStringified): UnStringified {
+    if (typeof value === "string") {
         switch (value.toUpperCase()) { // check for booleans
             case "TRUE":
                 return true;
@@ -76,7 +77,7 @@ export function unstringify(
  */
 export function unstringifyObject(
     obj: {[key: string]: string},
-): {[key: string]: string | number | boolean | null} {
+): {[key: string]: UnStringified} {
     const unStringified: {[key: string]: any} = {};
     for (const key of Object.keys(obj)) {
         unStringified[key] = unstringify(obj[key]);
@@ -91,8 +92,8 @@ export function unstringifyObject(
  * @param obj - The object to check.
  * @returns True if it is an object and not null, false otherwise.
  */
-export function isObject(obj: any): obj is IAnyObject {
-    return (typeof(obj) === "object" && obj !== null);
+export function isObject(obj: any): obj is IUnknownObject {
+    return (typeof obj === "object" && obj !== null);
 }
 
 /**
@@ -101,7 +102,7 @@ export function isObject(obj: any): obj is IAnyObject {
  * @param obj - The object to check.
  * @returns True if the object is empty, false otherwise.
  */
-export function isObjectEmpty(obj: IAnyObject): boolean {
+export function isObjectEmpty(obj: IUnknownObject): boolean {
     return (Object.getOwnPropertyNames(obj).length === 0);
 }
 
@@ -115,7 +116,7 @@ export function isObjectEmpty(obj: IAnyObject): boolean {
  * false otherwise.
  */
 export function isEmptyExceptFor(
-    obj: IAnyObject,
+    obj: IUnknownObject,
     ...keys: Array<string | number>
 ): boolean {
     const keysSet = new Set(keys);
@@ -151,9 +152,9 @@ export function isNil<T>(thing: T | undefined | null): thing is nil {
  * @returns True if the property is present in the object, false otherwise.
  */
 export function objectHasProperty(
-    obj: any,
+    obj: object,
     property: PropertyKey,
-): obj is {[property: string]: any} {
+): obj is {[property: string]: unknown} {
     return Boolean(obj) && Object.prototype.hasOwnProperty.call(obj, property);
 }
 

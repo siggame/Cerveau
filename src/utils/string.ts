@@ -25,7 +25,7 @@ export function unCapitalizeFirstLetter(str: string): string {
  * @returns The toString version of arg, wrapped in quotes if it was originally
  * a string.
  */
-export function quoteIfString(arg: any): string {
+export function quoteIfString(arg: unknown): string {
     return typeof arg === "string"
         ? `"${arg}"`
         : String(arg);

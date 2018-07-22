@@ -1,4 +1,4 @@
-import { isObject, ITypedObject } from "~/utils";
+import { isObject, IUnknownObject } from "~/utils";
 
 /**
  * Takes a variable and tries to cast it to an object. If the passed in value is
@@ -11,10 +11,10 @@ import { isObject, ITypedObject } from "~/utils";
  * @returns Always returns an object, if the passed in variable was not an
  * object, constructs and returns a new object.
  */
-export function sanitizeObject<T = any>(
-    o: any,
+export function sanitizeObject(
+    o: unknown,
     allowError: boolean,
-): ITypedObject<T> | Error;
+): IUnknownObject | Error;
 
 /**
  * Takes a variable and tries to cast it to an object.
@@ -27,10 +27,10 @@ export function sanitizeObject<T = any>(
  * @returns Always returns an object, if the passed in variable was not an
  * object, constructs and returns a new object.
  */
-export function sanitizeObject<T = any>(
-    o: any,
+export function sanitizeObject(
+    o: unknown,
     allowError: false,
-): ITypedObject<T>;
+): IUnknownObject;
 
 /**
  * Takes a variable and tries to cast it to an object. If the passed in value is
@@ -43,10 +43,10 @@ export function sanitizeObject<T = any>(
  * @returns Always returns an object, if the passed in variable was not an
  * object, constructs and returns a new object.
  */
-export function sanitizeObject<T = any>(
-    o: any,
+export function sanitizeObject(
+    o: unknown,
     allowError: boolean = true,
-): ITypedObject<T> | Error {
+): IUnknownObject | Error {
     return isObject(o)
         ? o
         : (allowError

@@ -12,7 +12,7 @@ const INT_MIN = -2147483648;
  * @returns Always returns an integer, 0 is the default.
  */
 export function sanitizeInteger(
-    i: any,
+    i: unknown,
     allowError: boolean,
 ): number | Error;
 
@@ -26,7 +26,7 @@ export function sanitizeInteger(
  * @returns Always returns an integer, 0 is the default.
  */
 export function sanitizeInteger(
-    i: any,
+    i: unknown,
     allowError: false,
 ): number;
 
@@ -40,10 +40,10 @@ export function sanitizeInteger(
  * @returns Always returns an integer, 0 is the default.
  */
 export function sanitizeInteger(
-    i: any,
+    i: unknown,
     allowError: boolean = true,
 ): number | Error {
-    const asNumber = parseInt(i, 10) || 0;
+    const asNumber = parseInt(String(i), 10) || 0;
 
     if (allowError) {
         if (isNaN(asNumber)) {

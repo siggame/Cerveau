@@ -1,13 +1,13 @@
 import * as winston from "winston";
 
-const format = (winston as any).format;
+const format = winston.format;
 
 const alignedWithColorsAndTime = format.combine(
     format.colorize(),
     format.timestamp(),
     format.prettyPrint(),
     format.align(),
-    format.printf((info: any) => {
+    format.printf((info) => {
         const { timestamp, level, message, ...args } = info;
 
         const ts = timestamp.slice(0, 19).replace("T", " ");

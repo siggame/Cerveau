@@ -5,14 +5,14 @@ import { IGameObjectReference } from "~/core/game/";
 /** Data clients send with a "finished" event */
 export interface IFinishedData {
     orderIndex: number;
-    returned: any;
+    returned: unknown;
 }
 
 /** Data clients second with a "run" event */
 export interface IRunData {
     caller: IGameObjectReference;
     functionName: string;
-    args: {[key: string]: any};
+    args: {[key: string]: unknown};
 }
 
 /** Sent from a client to the Lobby about what that client wants to play */

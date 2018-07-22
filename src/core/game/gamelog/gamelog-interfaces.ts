@@ -1,5 +1,5 @@
 import { IOrderData, IRunData } from "~/core/clients";
-import { IAnyObject } from "~/utils";
+import { IUnknownObject } from "~/utils";
 
 /** The shape of a gamelog, both being built and if read from memory. */
 export interface IGamelog {
@@ -18,7 +18,7 @@ export interface IGamelog {
     epoch: number;
 
     /** The value used to seed the random number generator server side */
-    settings: IAnyObject;
+    settings: IUnknownObject;
 
     /** The list of all players that won this game (normally just one) */
     winners: IGamelogWinnerLoser[];
@@ -27,7 +27,7 @@ export interface IGamelog {
     losers: IGamelogWinnerLoser[];
 
     /** Lookup of constants used to parse game server <-> client IO */
-    constants: IAnyObject;
+    constants: IUnknownObject;
 
     /**
      * The list of all deltas in the game. The first delta being the initial

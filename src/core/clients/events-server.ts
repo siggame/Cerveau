@@ -1,4 +1,4 @@
-import { IAnyObject } from "~/utils";
+import { IUnknownObject } from "~/utils";
 
 // These are events the server (this) sends to the client
 
@@ -40,7 +40,7 @@ export interface IInvalidData {
 export interface ILobbiedData {
     gameName: string;
     gameSession: string;
-    constants: IAnyObject;
+    constants: IUnknownObject;
 }
 
 /**

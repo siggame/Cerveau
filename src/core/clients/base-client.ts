@@ -3,7 +3,7 @@ import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
 import { BaseAIManager, IBasePlayer, IDelta } from "~/core/game/";
 import { logger } from "~/core/log";
-import { isObject } from "~/utils";
+import { isObject, objectHasProperty } from "~/utils";
 import * as ClientEvents from "./events-client";
 import * as ServerEvents from "./events-server";
 
@@ -335,7 +335,7 @@ export class BaseClient {
      *
      * @param data - What the client send via the socket event listener.
      */
-    protected onSocketData(data: any): void {
+    protected onSocketData(data: unknown): void {
         if (Config.PRINT_TCP) {
             logger.debug(`< From client ${this.name}  <-- ${data}\n---`);
         }
@@ -348,8 +348,11 @@ export class BaseClient {
      *
      * @param jsonData - The data, as an already parsed json object.
      */
-    protected handleSent(jsonData: any): void {
-        if (!isObject(jsonData)) {
+    protected handleSent(jsonData: unknown): void {
+        if (!isObject(jsonData)
+         || !objectHasProperty(jsonData, "event")
+         || typeof jsonData.event !== "string"
+        ) {
             this.disconnect(`Sent malformed json event`);
             return;
         }
@@ -385,12 +388,23 @@ export class BaseClient {
      * @param json - The json formatted string to parse.
      * @returns The parsed json structure, or undefined if malformed json.
      */
-    protected parseData(json: string): any {
-        try {
-            return JSON.parse(json);
+    protected parseData(json: unknown): any {
+        let invalid = "";
+
+        if (typeof json !== "string") {
+            invalid = `Sent ${json}, which cannot be parsed.`;
         }
-        catch (err) {
-            this.disconnect("Sent malformed JSON.");
+        else {
+            try {
+                return JSON.parse(json);
+            }
+            catch (err) {
+                invalid = "Sent malformed JSON.";
+            }
+        }
+
+        if (invalid) {
+            this.disconnect(invalid);
         }
     }
 

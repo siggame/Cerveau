@@ -1,5 +1,5 @@
 import { sanitizeArray, sanitizeType } from "~/core/sanitize/";
-import { IAnyObject, objectHasProperty, quoteIfString } from "~/utils";
+import { IUnknownObject, objectHasProperty, quoteIfString } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
@@ -26,7 +26,7 @@ export class BaseGameSanitizer {
      */
     public sanitizeOrderArgs(
         aiFunctionName: string,
-        args: any[],
+        args: Array<unknown>, // TODO: unknown[] when tslint gets sane
     ): Error | any[] {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -52,7 +52,7 @@ export class BaseGameSanitizer {
      */
     public validateFinishedReturned(
         aiFunctionName: string,
-        returned: any,
+        returned: unknown,
     ): any {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -75,7 +75,7 @@ export class BaseGameSanitizer {
     public validateRunArgs(
         gameObject: BaseGameObject,
         functionName: string,
-        args: IAnyObject,
+        args: IUnknownObject,
     ): Error | Map<string, any> | { invalid: string } {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
@@ -115,7 +115,7 @@ export class BaseGameSanitizer {
     public validateRanReturned(
         gameObject: BaseGameObject,
         functionName: string,
-        returned: any,
+        returned: unknown,
     ): any {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
@@ -149,11 +149,11 @@ export class BaseGameSanitizer {
             return new Error(`${gameObject} is not a valid game object`);
         }
 
-        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
+        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName]!;
         if (!gameObjectSchema.functions[functionName]) {
             return new Error(`${gameObject} does not have a method ${functionName}`);
         }
 
-        return gameObjectSchema.functions[functionName];
+        return gameObjectSchema.functions[functionName]!;
     }
 }

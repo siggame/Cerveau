@@ -34,7 +34,7 @@ export class TCPClient extends BaseClient {
      * Invoked when the tcp socket gets data
      * @param data what the client send via the socket event listener
      */
-    protected onSocketData(data: any): void {
+    protected onSocketData(data: unknown): void {
         super.onSocketData(data);
 
         this.buffer += data;

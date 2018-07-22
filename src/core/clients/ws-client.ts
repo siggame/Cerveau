@@ -49,7 +49,7 @@ export class WSClient extends BaseClient {
      *
      * @param data What the client send via the socket event listener.
      */
-    protected onSocketData(data: any): void {
+    protected onSocketData(data: unknown): void {
         super.onSocketData(data);
 
         const parsed = this.parseData(data);

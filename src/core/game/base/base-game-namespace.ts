@@ -1,5 +1,5 @@
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { Constructor } from "~/utils";
+import { Constructor, ITypedObject } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";
@@ -10,15 +10,16 @@ import { IBasePlayer } from "./base-player";
 /** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
     parentClassName?: string;
-    attributes: { [key: string]: ISanitizableType & {
-        defaultValue?: any,
-    }};
-    functions: { [key: string]: IBaseGameObjectFunctionSchema };
+    attributes: ITypedObject<ISanitizableType & { defaultValue?: any }>;
+    functions: ITypedObject<IBaseGameObjectFunctionSchema>;
 }
 
 /** Namespace schema for functions that game objects can invoke */
 export interface IBaseGameObjectFunctionSchema {
-    args: Array<ISanitizableType & { argName: string, defaultValue?: any }>;
+    args: Array<ISanitizableType & {
+        argName: string,
+        defaultValue?: any,
+    }>;
     returns: ISanitizableType;
     invalidValue?: any;
 }
@@ -36,7 +37,7 @@ export interface IBaseGameNamespace {
     gameObjectsSchema: {
         AI: IBaseGameObjectSchema;
         Game: IBaseGameObjectSchema;
-        [gameObjectName: string]: IBaseGameObjectSchema;
+        [gameObjectName: string]: IBaseGameObjectSchema | undefined;
     };
     gameSettingsManager: BaseGameSettingsManager;
 }
@@ -49,12 +50,12 @@ export interface IBaseGameNamespace {
  */
 export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace {
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
-        let depth = obj;
+        let depth = obj!; // must exist from above
         while (depth.parentClassName) {
             // hook up the parent classes' attributes/functions
-            const parent = namespace.gameObjectsSchema[depth.parentClassName];
-            Object.assign(obj.attributes, parent.attributes);
-            Object.assign(obj.functions, parent.functions);
+            const parent = namespace.gameObjectsSchema[depth.parentClassName]!;
+            Object.assign(obj!.attributes, parent.attributes);
+            Object.assign(obj!.functions, parent.functions);
             depth = parent;
         }
     }

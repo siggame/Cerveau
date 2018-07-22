@@ -3,7 +3,8 @@
  * and from serialize-able objects when communicating between client <--> sever
  */
 
-import { IAnyObject, isEmptyExceptFor, isObject, mapToObject } from "~/utils";
+import { isEmptyExceptFor, isObject,
+         IUnknownObject, mapToObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
@@ -25,7 +26,9 @@ export type SerializableTypeName =
  * @param obj - The object to check.
  * @returns True if the object is a game object reference
  */
-export function isGameObjectReference(obj: IAnyObject): boolean {
+export function isGameObjectReference(
+    obj: IUnknownObject,
+): obj is { id: string } {
     return isEmptyExceptFor(obj, "id");
 }
 
@@ -66,7 +69,7 @@ export function serialize(state: any): any {
         state = mapToObject(state);
     }
 
-    const serialized: IAnyObject = {};
+    const serialized: IUnknownObject = {};
     if (state instanceof Array) {
         // Record the length, we never send arrays in serialized states because
         // you can't tell when they change in size without sending all the
@@ -93,12 +96,12 @@ export function serialize(state: any): any {
  * reusing objects.
  */
 export function unSerialize(
-    data: any,
+    data: unknown,
     game: BaseGame,
     dataTypeConverter?: (val: any) => any,
 ): any {
     if (isObject(data) && game) {
-        const result: IAnyObject = Array.isArray(data)
+        const result: IUnknownObject = Array.isArray(data)
             ? []
             : {};
 

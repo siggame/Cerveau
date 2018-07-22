@@ -10,7 +10,7 @@
  * array, constructs and returns a new array.
  */
 export function sanitizeArray<T = any>(
-    a: any,
+    a: unknown,
     allowError: boolean,
 ): T[] | Error;
 
@@ -26,7 +26,7 @@ export function sanitizeArray<T = any>(
  * array, constructs and returns a new array.
  */
 export function sanitizeArray<T = any>(
-    a: any,
+    a: unknown,
     allowError: false,
 ): T[];
 
@@ -42,7 +42,7 @@ export function sanitizeArray<T = any>(
  * array, constructs and returns a new array.
  */
 export function sanitizeArray<T = any>(
-    a: any,
+    a: unknown,
     allowError: boolean = true,
 ): T[] | Error {
     return Array.isArray(a)

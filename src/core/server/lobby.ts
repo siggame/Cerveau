@@ -3,7 +3,7 @@ import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
 import { capitalizeFirstLetter, getDirs,
-    IAnyObject, isNil, ITypedObject } from "~/utils";
+         isNil, ITypedObject, IUnknownObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -170,7 +170,7 @@ export class Lobby {
     public setup(data: {
         gameAlias: string;
         session: string;
-        gameSettings: IAnyObject;
+        gameSettings: IUnknownObject;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -422,7 +422,7 @@ There's probably another Cerveau server running on this same computer.`);
     ): Promise<void> {
         const playData = this.validatePlayData(data);
 
-        if (typeof(playData) === "string") {
+        if (typeof playData === "string") {
             // It did not validate, so playData is the invalid message
             client.disconnect(playData);
             return;
@@ -447,7 +447,7 @@ There's probably another Cerveau server running on this same computer.`);
 
         const room = this.getOrCreateRoom(data.gameName, data.requestedSession);
 
-        if (typeof(room) === "string") {
+        if (typeof room === "string") {
             client.disconnect(room);
             return;
         }
@@ -537,7 +537,7 @@ There's probably another Cerveau server running on this same computer.`);
      */
     private validatePlayData(
         data?: IPlayData,
-    ): string | (IPlayData & {validGameSettings: IAnyObject}) {
+    ): string | (IPlayData & {validGameSettings: IUnknownObject}) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -565,7 +565,7 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         const n = gameNamespace.GameManager.requiredNumberOfPlayers;
-        if (typeof(data.playerIndex) === "number" && (
+        if (typeof data.playerIndex === "number" && (
             data.playerIndex < 0 || data.playerIndex >= n)
         ) {
             return `playerIndex ${data.playerIndex} is out of range (max ${n} players).`;
@@ -577,7 +577,7 @@ There's probably another Cerveau server running on this same computer.`);
 Available game settings:
 ${gameNamespace.gameSettingsManager.getHelp()}`;
 
-            let settings: IAnyObject = {};
+            let settings: IUnknownObject = {};
             try {
                 settings = (querystring.parse(data.gameSettings));
             }

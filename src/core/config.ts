@@ -3,7 +3,7 @@
 import { ArgumentOptions, ArgumentParser } from "argparse";
 import "dotenv"; // loads the config from an optional `.env` file
 import { IWorkerGameSessionData } from "~/core/server/worker";
-import { IAnyObject, unstringify } from "~/utils";
+import { IUnknownObject, unstringify } from "~/utils";
 
 /** The shape of config variables */
 export interface IArgs {
@@ -158,7 +158,7 @@ const parser = new ArgumentParser({description:
     "Run the JavaScript client with options to connect to a game server. Must provide a game name to play.",
 });
 
-const defaults: IAnyObject = {};
+const defaults: IUnknownObject = {};
 for (const [names, options] of parserArgs) {
     parser.addArgument(names, options);
     defaults[options.dest!] = options.defaultValue;

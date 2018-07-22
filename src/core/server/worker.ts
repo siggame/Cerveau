@@ -12,7 +12,7 @@ import { Config } from "~/core/config";
 import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
-import { IAnyObject } from "~/utils";
+import { IUnknownObject } from "~/utils";
 
 /**
  * An interface for the main thread to adhere to, so we can communicate
@@ -35,7 +35,7 @@ export interface IWorkerGameSessionData {
     mainDebugPort: number;
     sessionID: string;
     gameName: string;
-    gameSettings: IAnyObject;
+    gameSettings: IUnknownObject;
 }
 
 if (cluster.isMaster) {
@@ -61,7 +61,7 @@ const gameNamespace: IBaseGameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
 process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
-    if (typeof(message) !== "object" || !message || !message.type) {
+    if (typeof message !== "object" || !message || !message.type) {
         throw new Error(`Could not understand message from parent thread to worker: '${message}'`);
     }
 

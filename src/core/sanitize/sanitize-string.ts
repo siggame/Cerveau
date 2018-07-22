@@ -11,7 +11,7 @@ import { isObject } from "~/utils";
  * @returns Always returns a string.
  */
 export function sanitizeString(
-    s: any,
+    s: unknown,
     allowError: boolean,
 ): string | Error;
 
@@ -26,7 +26,7 @@ export function sanitizeString(
  * @returns Always returns a string.
  */
 export function sanitizeString(
-    s: any,
+    s: unknown,
     allowError: false,
 ): string;
 
@@ -41,7 +41,7 @@ export function sanitizeString(
  * @returns Always returns a string.
  */
 export function sanitizeString(
-    s: any,
+    s: unknown,
     allowError: boolean = true,
 ): string | Error {
     if (allowError && isObject(s)) {

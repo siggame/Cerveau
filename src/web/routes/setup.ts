@@ -70,7 +70,7 @@ if (app && Config.ARENA_MODE) {
         }
 
         const gameSettings = req.body.gameSettings;
-        if (!gameSettings) {
+        if (!gameSettings || !isObject(gameSettings)) {
             errors.push("gameSettings is required");
         }
         else if (!gameSettings.playerNames) {

@@ -1,5 +1,5 @@
 import { sanitizeBoolean } from "~/core";
-import { IAnyObject, objectHasProperty } from "~/utils";
+import { IUnknownObject, objectHasProperty, quoteIfString } from "~/utils";
 
 /** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
@@ -50,7 +50,7 @@ export class BaseGameSettingsManager {
      * Creates a game settings manager with optional initial values
      * @param values Optional initial values for the settings
      */
-    public constructor(values?: IAnyObject) {
+    public constructor(values?: IUnknownObject) {
         if (values) {
             this.addSettings(values);
         }
@@ -64,7 +64,7 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public addSettings(invalidatedSettings: IAnyObject): void | Error {
+    public addSettings(invalidatedSettings: IUnknownObject): void | Error {
         const validated = this.invalidateSettings(invalidatedSettings);
 
         if (validated instanceof Error) {
@@ -80,41 +80,44 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public invalidateSettings(invalidatedSettings: IAnyObject): IAnyObject | Error {
-        const sanitized: IAnyObject = {};
+    public invalidateSettings(invalidatedSettings: IUnknownObject): IUnknownObject | Error {
+        const sanitized: IUnknownObject = {};
 
-        for (let [key, value] of Object.entries(invalidatedSettings)) {
+        for (const [key, value] of Object.entries(invalidatedSettings)) {
             if (!objectHasProperty(this.schema, key)) {
                 return new Error(`Unknown setting '${key}'.`);
             }
 
+            const str = quoteIfString(value);
+
             const schema = (this.schema as ISettingsSchemas)[key];
+            let sanitizedValue: any = "";
             switch (typeof schema.default) {
                 case "number":
-                    value = Number(value) || 0;
-                    if (schema.min !== undefined && value < schema.min) {
-                        return new Error(`${key} setting is invalid (${value}). Must be >= ${schema.min}`);
+                    sanitizedValue = Number(value) || 0;
+                    if (schema.min !== undefined && sanitizedValue < schema.min) {
+                        return new Error(`${key} setting is invalid (${str}). Must be >= ${schema.min}`);
                     }
-                    if (schema.max !== undefined && value > schema.max) {
-                        return new Error(`${key} setting is invalid (${value}). Must be <= ${schema.max}`);
+                    if (schema.max !== undefined && sanitizedValue > schema.max) {
+                        return new Error(`${key} setting is invalid (${str}). Must be <= ${schema.max}`);
                     }
                     break;
                 case "string":
-                    value = String(value);
+                    sanitizedValue = String(value);
                     break;
                 case "boolean":
-                    value = value === "" // special case from url parm, means key was present with no value
+                    sanitizedValue = value === "" // special case from url parm, means key was present with no value
                         ? true
                         : sanitizeBoolean(value, false);
                     break;
                 case "object": // string array is this case
-                    value = Array.isArray(value)
+                    sanitizedValue = Array.isArray(value)
                         ? value.map((item) => String(item))
                         : [];
                     break;
             }
 
-            sanitized[key] = value;
+            sanitized[key] = sanitizedValue;
         }
 
         // now we've sanitized all the inputs, so see if they all are valid types.
@@ -132,7 +135,7 @@ export class BaseGameSettingsManager {
         for (const [key, schema] of Object.entries(this.schema)) {
             let type = Array.isArray(schema.default)
                 ? "string[]"
-                : typeof(schema.default);
+                : typeof schema.default;
 
             if (schema.default !== "" &&
                (!Array.isArray(schema.default) || schema.default.length > 0)
@@ -177,7 +180,7 @@ export class BaseGameSettingsManager {
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
     ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W> ? (W extends never[] ? string[] : W) : never} {
-        const values: IAnyObject = {};
+        const values: IUnknownObject = {};
         for (const [key, value] of Object.entries(this.schema)) {
             values[key] = value.default;
         }
@@ -190,7 +193,7 @@ export class BaseGameSettingsManager {
      * @param someSettings a subset of the valid settings to attempt to validate
      * @returns an Error if invalid, otherwise the validated settings
      */
-    protected invalidate(someSettings: IAnyObject): IAnyObject | Error {
+    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
         // Use our current values and the new ones to form a settings
         // object to try to validate against
         const settings = { ...this.values, ...someSettings };

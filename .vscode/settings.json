@@ -26,5 +26,6 @@
         "spiderlings",
         "unsanitized",
         "unstringify"
-    ]
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -4,7 +4,7 @@ import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
        } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, IAnyObject, quoteIfString } from "~/utils";
+import { capitalizeFirstLetter, IUnknownObject, quoteIfString } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -142,7 +142,7 @@ export class BaseAIManager {
     private async requestedRun<T>(
         callerReference: IGameObjectReference,
         functionName: string,
-        unsanitizedArgs: IAnyObject,
+        unsanitizedArgs: IUnknownObject,
     ): Promise<T | undefined> {
         this.client.pauseTicking();
 
@@ -169,7 +169,7 @@ export class BaseAIManager {
     private async tryToRun<T>(
         callerReference: IGameObjectReference,
         functionName: string,
-        unsanitizedArgs: IAnyObject,
+        unsanitizedArgs: IUnknownObject,
     ): Promise<T | undefined> {
         if (!this.client.player) {
             this.client.disconnect(
@@ -182,6 +182,7 @@ export class BaseAIManager {
         const caller = this.game.gameObjects[callerID];
 
         if (!caller) {
+            // they sent us an invalid caller
             this.client.disconnect(`Cannot determine the calling game object of ${callerReference} to run for.`);
             return undefined;
         }
@@ -199,9 +200,16 @@ export class BaseAIManager {
             return undefined;
         }
 
+        const gameObjectSchema = this.namespace.gameObjectsSchema[caller.gameObjectName];
+        if (!gameObjectSchema) {
+            // the caller is malformed in some unexpected way
+            this.client.disconnect(`Cannot find schema for game object '${caller.gameObjectName}'.`);
+            return undefined;
+        }
+
         // If we got here, we have sanitized the args and know the calling
         // game object has the appropriate function
-        const schema = this.namespace.gameObjectsSchema[caller.gameObjectName].functions[functionName];
+        const schema = gameObjectSchema.functions[functionName]!;
         let returned = schema.invalidValue;
 
         let invalid = sanitizedArgs instanceof Map
@@ -297,7 +305,7 @@ export class BaseAIManager {
      * @param unsanitizedReturned - The value they returned from executing
      * that order.
      */
-    private finishedOrder(orderIndex: number, unsanitizedReturned: any): void {
+    private finishedOrder(orderIndex: number, unsanitizedReturned: unknown): void {
         const order = this.orders.get(orderIndex);
         if (!order) {
             this.client.disconnect(

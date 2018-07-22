@@ -10,7 +10,7 @@
  * @returns A boolean that represents what was sent, or an error if no default could be found
  */
 export function sanitizeBoolean(
-    b: any,
+    b: unknown,
     allowError: boolean,
 ): boolean | Error;
 
@@ -25,7 +25,7 @@ export function sanitizeBoolean(
  * @returns A boolean that represents what was sent, or an error if no default could be found
  */
 export function sanitizeBoolean(
-    b: any,
+    b: unknown,
     allowError: false,
 ): boolean;
 
@@ -40,12 +40,14 @@ export function sanitizeBoolean(
  * @returns A boolean that represents what was sent, or an error if no default could be found
  */
 export function sanitizeBoolean(
-    b: any,
+    b: unknown,
     allowError: boolean = true,
 ): boolean | Error {
-    switch (typeof(b)) {
+    switch (typeof b) {
         case "string":
-            const lowered = b.toLowerCase();
+            // we know this cast is safe, ts does not know how to follow
+            // switch statements for type inferring ATM
+            const lowered = (b as string).toLowerCase();
             if (lowered === "true") {
                 // They sent some form of "true" as a string,
                 // so make it the boolean true

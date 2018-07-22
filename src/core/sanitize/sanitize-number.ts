@@ -8,7 +8,7 @@
  * @returns A number, or an error if the input was not number like
  */
 export function sanitizeNumber(
-    n: any,
+    n: unknown,
     allowError: boolean,
 ): number | Error;
 
@@ -22,7 +22,7 @@ export function sanitizeNumber(
  * @returns A number, or an error if the input was not number like
  */
 export function sanitizeNumber(
-    n: any,
+    n: unknown,
     allowError: false,
 ): number;
 
@@ -36,7 +36,7 @@ export function sanitizeNumber(
  * @returns A number, or an error if the input was not number like
  */
 export function sanitizeNumber(
-    n: any,
+    n: unknown,
     allowError: boolean = true,
 ): number | Error {
     const asNumber = Number(n);

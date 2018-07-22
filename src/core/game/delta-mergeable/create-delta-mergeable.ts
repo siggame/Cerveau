@@ -10,8 +10,16 @@ import { createObject } from "./delta-mergeable-object";
  * @param type They type to sanitize.
  * @returns a function that will accept a value and try to sanitize it.
  */
-function sanitize(type: ISanitizableType): (val: any, current: any, forceSet: boolean) => any {
-    return function transformSanitize(val: any, current: any, forceSet: boolean): any {
+function sanitize(type: ISanitizableType): (
+    val: unknown,
+    current: any,
+    forceSet: boolean,
+) => any {
+    return function transformSanitize(
+        val: unknown,
+        current: any,
+        forceSet: boolean,
+    ): any {
         const sanitized = sanitizeType(type, val, !forceSet); // if we are force settings, don't allow errors
         if (sanitized instanceof Error) {
             /*

@@ -41,7 +41,7 @@ export function makePoints(...args: any[]): IPoint[] {
     const points: IPoint[] = [];
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
-        if (typeof(arg) === "object") {
+        if (typeof arg === "object") {
             if (Array.isArray(arg)) {
                 points.push({x: arg[0], y: arg[1]});
             }
@@ -49,7 +49,7 @@ export function makePoints(...args: any[]): IPoint[] {
                 points.push({x: arg.x, y: arg.y});
             }
         }
-        else if (typeof(arg) === "number" && typeof(args[i + 1] === "number")) {
+        else if (typeof arg === "number" && typeof args[i + 1] === "number") {
             points.push({x: arg, y: args[++i]});
         }
         else {

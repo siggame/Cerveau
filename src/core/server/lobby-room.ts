@@ -2,7 +2,7 @@ import { events, Signal } from "ts-typed-events";
 import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace, IGamelog,
          IGamelogWinnerLoser } from "~/core/game";
 import { logger } from "~/core/log";
-import { IAnyObject, removeElements } from "~/utils";
+import { IUnknownObject, removeElements } from "~/utils";
 import { BaseClient } from "../clients/";
 import { Updater } from "../updater";
 
@@ -141,7 +141,7 @@ export class Room {
      * @param settings - the key/value pair settings to add
      * @returns An error if the settings were invalid, otherwise nothing
      */
-    public addGameSettings(settings: IAnyObject): void | Error {
+    public addGameSettings(settings: IUnknownObject): void | Error {
         return this.gameSettingsManager.addSettings(settings);
     }
 

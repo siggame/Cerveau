@@ -66,7 +66,7 @@ export function getVisualizerURL(
 ): string | undefined {
     const vis = Config.VISUALIZER_URL;
     if (vis) {
-        const filename = typeof(gamelogOrFilename) === "string"
+        const filename = typeof gamelogOrFilename === "string"
             ? gamelogOrFilename
             : filenameFor(
                 gamelogOrFilename.gameName,

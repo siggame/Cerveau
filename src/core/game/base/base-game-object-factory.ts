@@ -23,7 +23,7 @@ export function createGameObject< T extends BaseGameObject>(args: {
         game: args.game,
         gameObjectName: args.gameObjectName,
         gameObjectsDeltaMergeable: args.gameObjectsDeltaMergeable,
-        schema: args.gameNamespace.gameObjectsSchema[args.gameObjectName],
+        schema: args.gameNamespace.gameObjectsSchema[args.gameObjectName]!,
     }) as T;
 }
 
