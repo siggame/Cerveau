@@ -160,7 +160,8 @@ export class Session {
 
         this.gamelogScribe = new GamelogScribe(
             this.game,
-            this, playingClients,
+            this,
+            playingClients,
             this.deltaManager,
         );
         this.gamelogScribe.events.logged.on(this.sendDeltas);
@@ -186,15 +187,17 @@ export class Session {
      */
     public async kill(err: Error | string): Promise<void> {
         logger.error(String(err));
-        this.fatal = typeof err === "string"
+        const fatal = typeof err === "string"
             ? new Error(err)
             : err;
+
+        this.fatal = fatal;
 
         await Promise.all([...this.clients].map((client) => {
             return client.disconnect(
 `An unhandled fatal error occurred on the server:
 
-${this.fatal!.message}`,
+${fatal.message}`,
             );
         }));
 
@@ -220,7 +223,9 @@ ${this.fatal!.message}`,
 
         logger.info(`${this.gameName} - ${this.id} is over, exiting.`);
 
-        this.events.ended.emit(this.fatal || gamelog!);
+        this.events.ended.emit(
+            this.fatal || gamelog || new Error("No gamelog!"),
+        );
     }
 
     /**
@@ -251,6 +256,7 @@ ${this.fatal!.message}`,
                     },
                 );
             });
+
             return resolve();
         });
     }
@@ -298,10 +304,12 @@ ${this.fatal!.message}`,
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
-                client.send("delta", client.sendMetaDeltas
-                    ? delta
-                    : delta.game || {},
-                );
+                if (client.sendMetaDeltas) {
+                    client.send("metaDelta", delta);
+                }
+                else {
+                    client.send("delta", delta.game);
+                }
             }
         }
 

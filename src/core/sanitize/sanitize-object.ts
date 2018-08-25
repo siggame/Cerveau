@@ -1,4 +1,4 @@
-import { isObject, IUnknownObject } from "~/utils";
+import { isObject, UnknownObject } from "~/utils";
 
 /**
  * Takes a variable and tries to cast it to an object. If the passed in value is
@@ -14,7 +14,7 @@ import { isObject, IUnknownObject } from "~/utils";
 export function sanitizeObject(
     o: unknown,
     allowError: boolean,
-): IUnknownObject | Error;
+): UnknownObject | Error;
 
 /**
  * Takes a variable and tries to cast it to an object.
@@ -30,7 +30,7 @@ export function sanitizeObject(
 export function sanitizeObject(
     o: unknown,
     allowError: false,
-): IUnknownObject;
+): UnknownObject;
 
 /**
  * Takes a variable and tries to cast it to an object. If the passed in value is
@@ -46,7 +46,7 @@ export function sanitizeObject(
 export function sanitizeObject(
     o: unknown,
     allowError: boolean = true,
-): IUnknownObject | Error {
+): UnknownObject | Error {
     return isObject(o)
         ? o
         : (allowError

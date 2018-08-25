@@ -10,20 +10,26 @@ import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";
  * @returns The newly created game object.
  */
 export function createGameObject< T extends BaseGameObject>(args: {
-    id: string,
-    game: BaseGame,
-    GameObjectClass: typeof BaseGameObject,
-    gameObjectName: string,
-    gameObjectsDeltaMergeable: DeltaMergeable,
-    gameNamespace: IBaseGameNamespace,
-    data: IBaseGameObjectData,
+    id: string;
+    game: BaseGame;
+    GameObjectClass: typeof BaseGameObject;
+    gameObjectName: string;
+    gameObjectsDeltaMergeable: DeltaMergeable;
+    gameNamespace: IBaseGameNamespace;
+    data: IBaseGameObjectData;
 }): T {
+    const schema = args.gameNamespace.gameObjectsSchema[args.gameObjectName];
+
+    if (!schema) {
+        throw new Error(`Cannot find game object schema for ${args.gameObjectName} in ${args.gameNamespace.gameName}`);
+    }
+
     return new args.GameObjectClass(args.data, {
         id: args.id,
         game: args.game,
         gameObjectName: args.gameObjectName,
         gameObjectsDeltaMergeable: args.gameObjectsDeltaMergeable,
-        schema: args.gameNamespace.gameObjectsSchema[args.gameObjectName]!,
+        schema,
     }) as T;
 }
 

@@ -50,7 +50,7 @@ export class Player extends GameObject implements IBasePiratesPlayer {
     /**
      * The Port owned by this Player.
      */
-    public readonly port!: Port;
+    public port!: Port;
 
     /**
      * The reason why the player lost the game.

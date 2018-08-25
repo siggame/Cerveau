@@ -1,4 +1,4 @@
-import { IUnknownObject } from "~/utils";
+import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
 // <<-- Creer-Merge: imports -->>
@@ -14,7 +14,9 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public schema = this.makeSchema({
-        ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+// HACK: `super` should work. but schema is undefined on it at run time.
+        // tslint:disable-next-line:no-any
+        ...(super.schema || (this as any).schema),
 
         // Checkers game specific settings
         // <<-- Creer-Merge: schema -->>
@@ -73,7 +75,7 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
      * @param someSettings A subset of settings that will be tested
      * @returns An error if the settings fail to validate.
      */
-    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
+    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);
         if (invalidated instanceof Error) {
             return invalidated;

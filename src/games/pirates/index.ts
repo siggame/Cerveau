@@ -215,7 +215,7 @@ export interface ITileProperties {
     /**
      * The type of Tile this is ('water' or 'land').
      */
-    type?: "water" | "land";
+    type?: string;
 
     /**
      * The Unit on this Tile if present, otherwise null.
@@ -331,7 +331,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public Port(data: IPortConstructorArgs): Port {
+    public port(data: IPortConstructorArgs): Port {
         return this.createGameObject("Port", Port, data);
     }
 
@@ -342,7 +342,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public Tile(data: ITileConstructorArgs): Tile {
+    public tile(data: ITileConstructorArgs): Tile {
         return this.createGameObject("Tile", Tile, data);
     }
 
@@ -353,7 +353,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public Unit(data: IUnitConstructorArgs): Unit {
+    public unit(data: IUnitConstructorArgs): Unit {
         return this.createGameObject("Unit", Unit, data);
     }
 
@@ -604,7 +604,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
-                    nullable: true,
+                    nullable: false,
                 },
                 tile: {
                     typeName: "gameObject",
@@ -618,8 +618,6 @@ export const Namespace = makeNamespace({
                         {
                             argName: "type",
                             typeName: "string",
-                            defaultValue: "crew",
-                            literals: ["crew", "ship"],
                         },
                     ],
                     invalidValue: false,
@@ -641,7 +639,7 @@ export const Namespace = makeNamespace({
                 port: {
                     typeName: "gameObject",
                     gameObjectClass: Port,
-                    nullable: true,
+                    nullable: false,
                 },
                 tileEast: {
                     typeName: "gameObject",
@@ -665,13 +663,11 @@ export const Namespace = makeNamespace({
                 },
                 type: {
                     typeName: "string",
-                    defaultValue: "water",
-                    literals: ["water", "land"],
                 },
                 unit: {
                     typeName: "gameObject",
                     gameObjectClass: Unit,
-                    nullable: true,
+                    nullable: false,
                 },
                 x: {
                     typeName: "int",
@@ -704,7 +700,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
-                    nullable: true,
+                    nullable: false,
                 },
                 path: {
                     typeName: "list",
@@ -723,12 +719,12 @@ export const Namespace = makeNamespace({
                 targetPort: {
                     typeName: "gameObject",
                     gameObjectClass: Port,
-                    nullable: true,
+                    nullable: false,
                 },
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
-                    nullable: true,
+                    nullable: false,
                 },
             },
             functions: {
@@ -743,8 +739,6 @@ export const Namespace = makeNamespace({
                         {
                             argName: "target",
                             typeName: "string",
-                            defaultValue: "crew",
-                            literals: ["crew", "ship"],
                         },
                     ],
                     invalidValue: false,

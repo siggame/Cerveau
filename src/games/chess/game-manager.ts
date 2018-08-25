@@ -73,6 +73,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
                 player.opponent,
             );
             this.endGame();
+
             return;
         }
         // else their move was accepted, update our state proxies
@@ -92,6 +93,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
             }
 
             this.endGame();
+
             return;
         }
 

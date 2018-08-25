@@ -49,19 +49,19 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         let building: Building | undefined;
         switch (type) {
             case "FireDepartment":
-                building = this.create.FireDepartment(data);
+                building = this.create.fireDepartment(data);
                 building.owner.fireDepartments.push(building as FireDepartment);
                 break;
             case "PoliceDepartment":
-                building = this.create.PoliceDepartment(data);
+                building = this.create.policeDepartment(data);
                 building.owner.policeDepartments.push(building as PoliceDepartment);
                 break;
             case "Warehouse":
-                building = this.create.Warehouse(data);
+                building = this.create.warehouse(data);
                 building.owner.warehouses.push(building as Warehouse);
                 break;
             case "WeatherStation":
-                building = this.create.WeatherStation(data);
+                building = this.create.weatherStation(data);
                 building.owner.weatherStations.push(building as WeatherStation);
                 break;
             default:
@@ -118,7 +118,11 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
                 building.health = Math.max(0, building.health - building.fire); // it takes fire damage
 
                 if (building.health <= 0) {
-                    playersBurnedDownBuildings.set(building.owner, playersBurnedDownBuildings.get(building.owner)!);
+                    const num = playersBurnedDownBuildings.get(building.owner);
+                    if (num === undefined) {
+                        continue; // dead building
+                    }
+                    playersBurnedDownBuildings.set(building.owner, num);
                 }
 
                 // Try to spread the fire
@@ -149,12 +153,16 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             fireSpread.building.fire = Math.max(fireSpread.building.fire, fireSpread.fire);
         }
 
-        this.game.currentForecast = this.game.nextForecast!;
+        if (this.game.nextForecast) {
+            // if there is a next turn, update the current forecast
+            this.game.currentForecast = this.game.nextForecast;
+        }
         // Turn isn't incremented until super statement
         this.game.nextForecast = this.game.forecasts[this.game.currentTurn + 1];
 
         for (const player of this.game.players) {
-            player.bribesRemaining = this.game.baseBribesPerTurn + playersBurnedDownBuildings.get(player)!;
+            const num = playersBurnedDownBuildings.get(player) || 0;
+            player.bribesRemaining = this.game.baseBribesPerTurn + num;
         }
 
         // <<-- /Creer-Merge: after-turn -->>
@@ -221,6 +229,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             this.declareWinner(`${reason} - Your headquarters had the most health remaining.`, headquarters[0].owner);
             this.declareLoser(`${reason} - Your headquarters had less health remaining than another player.`,
                               headquarters[1].owner);
+
             return;
         }
 
@@ -234,6 +243,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             const winner = buildingsAlive[0][0].owner;
             this.declareWinner(`${reason} - You had the most buildings not burned down.`, winner);
             this.declareLoser(`${reason} - You had more buildings burned down than another player.`, winner.opponent);
+
             return;
         }
 
@@ -248,6 +258,7 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             ];
             this.declareWinner(`${reason} - You had the highest health sum among your Buildings.`, winner);
             this.declareLoser(`${reason} - You had a lower health sum than the other player.`, winner.opponent);
+
             return;
         }
 

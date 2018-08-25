@@ -58,6 +58,7 @@ export function sanitizeBoolean(
                 // so make it the boolean false
                 return false;
             }
+
             return Boolean(b);
         case "number":
             return b !== 0;

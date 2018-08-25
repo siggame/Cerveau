@@ -42,32 +42,32 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * The rate buried gold increases each turn.
      */
-    public readonly buryInterestRate!: number;
+    public buryInterestRate!: number;
 
     /**
      * How much gold it costs to construct a single crew.
      */
-    public readonly crewCost!: number;
+    public crewCost!: number;
 
     /**
      * How much damage crew deal to each other.
      */
-    public readonly crewDamage!: number;
+    public crewDamage!: number;
 
     /**
      * The maximum amount of health a crew member can have.
      */
-    public readonly crewHealth!: number;
+    public crewHealth!: number;
 
     /**
      * The number of moves Units with only crew are given each turn.
      */
-    public readonly crewMoves!: number;
+    public crewMoves!: number;
 
     /**
      * A crew's attack range. Range is circular.
      */
-    public readonly crewRange!: number;
+    public crewRange!: number;
 
     /**
      * The player whose turn it is currently. That player can send commands.
@@ -90,7 +90,7 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much health a Unit recovers when they rest.
      */
-    public readonly healFactor!: number;
+    public healFactor!: number;
 
     /**
      * The number of Tiles in the map along the y (vertical) axis.
@@ -110,19 +110,19 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much gold merchant Ports get each turn.
      */
-    public readonly merchantGoldRate!: number;
+    public merchantGoldRate!: number;
 
     /**
      * When a merchant ship spawns, the amount of additional gold it has
      * relative to the Port's investment.
      */
-    public readonly merchantInterestRate!: number;
+    public merchantInterestRate!: number;
 
     /**
      * The Euclidean distance buried gold must be from the Player's Port to
      * accumulate interest.
      */
-    public readonly minInterestDistance!: number;
+    public minInterestDistance!: number;
 
     /**
      * List of all the players in the game.
@@ -137,7 +137,7 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How far a Unit can be from a Port to rest. Range is circular.
      */
-    public readonly restRange!: number;
+    public restRange!: number;
 
     /**
      * A unique identifier for the game instance that is being played.
@@ -147,27 +147,27 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much gold it costs to construct a ship.
      */
-    public readonly shipCost!: number;
+    public shipCost!: number;
 
     /**
      * How much damage ships deal to ships and ports.
      */
-    public readonly shipDamage!: number;
+    public shipDamage!: number;
 
     /**
      * The maximum amount of health a ship can have.
      */
-    public readonly shipHealth!: number;
+    public shipHealth!: number;
 
     /**
      * The number of moves Units with ships are given each turn.
      */
-    public readonly shipMoves!: number;
+    public shipMoves!: number;
 
     /**
      * A ship's attack range. Range is circular.
      */
-    public readonly shipRange!: number;
+    public shipRange!: number;
 
     /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
@@ -235,6 +235,7 @@ export class PiratesGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 

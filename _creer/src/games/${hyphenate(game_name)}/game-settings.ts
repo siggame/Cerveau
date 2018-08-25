@@ -1,4 +1,4 @@
-<%include file="functions.noCreer" />import { IUnknownObject } from "~/utils";
+<%include file="functions.noCreer" />import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
 ${merge('// ', 'imports', '// any additional imports you want can be placed here safely between creer runs', optional=True, help=False)}
@@ -12,7 +12,9 @@ export class ${game['name']}GameSettingsManager extends BaseClasses.GameSettings
      * generate the values, as well as basic type and range checking.
      */
     public schema = this.makeSchema({
-        ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+// HACK: `super` should work. but schema is undefined on it at run time.
+        // tslint:disable-next-line:no-any
+        ...(super.schema || (this as any).schema),
 
         // ${game_name} game specific settings
 % for attr_name in game['attribute_names']:
@@ -101,7 +103,7 @@ ${merge('            // ', 'map-height',
      * @param someSettings A subset of settings that will be tested
      * @returns An error if the settings fail to validate.
      */
-    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
+    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);
         if (invalidated instanceof Error) {
             return invalidated;

@@ -1,5 +1,8 @@
+// tslint:disable:no-any no-non-null-assertion
+// ^ as DeltaMergeables are black magic anyways
+
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { ITypedObject, IUnknownObject } from "~/utils";
+import { ITypedObject, UnknownObject } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
 
@@ -9,19 +12,19 @@ import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
  * @returns A new DeltaMergeable wrapping an Object.
  */
 export function createObject(args: {
-    key: string,
-    initialValue?: any,
-    parent?: DeltaMergeable,
-    childTypes?: ITypedObject<ISanitizableType>,
-    childType?: ISanitizableType,
-    transform?: DeltaTransform<object>,
-}): DeltaMergeable<IUnknownObject> {
+    key: string;
+    initialValue?: any;
+    parent?: DeltaMergeable;
+    childTypes?: ITypedObject<ISanitizableType>;
+    childType?: ISanitizableType;
+    transform?: DeltaTransform<object>;
+}): DeltaMergeable<UnknownObject> {
     const deltaMergeables: ITypedObject<DeltaMergeable> = {};
     const container = new DeltaMergeable<object>({
         key: args.key,
         parent: args.parent,
         initialValue: args.initialValue || {},
-        transform: args.transform || ((newObj?: any, currentValue?: IUnknownObject): IUnknownObject => {
+        transform: args.transform || ((newObj?: any, currentValue?: UnknownObject): UnknownObject => {
             if (!newObj) {
                 newObj = {};
             }
@@ -39,12 +42,13 @@ export function createObject(args: {
                     }
                 }
             }
+
             return currentValue!;
         }),
     });
 
     const proxyObject = new Proxy({}, {
-        set(target: IUnknownObject, property: string, value: any): boolean {
+        set(target: UnknownObject, property: string, value: any): boolean {
             const newKey = !Object.prototype.hasOwnProperty.call(deltaMergeables, property);
             if (newKey) {
                 // then we need to create this new child we've never seen before
@@ -75,7 +79,7 @@ export function createObject(args: {
 
             return Reflect.set(target, property, deltaMergeables[property]!.get());
         },
-        deleteProperty(target: IUnknownObject, property: string): boolean {
+        deleteProperty(target: UnknownObject, property: string): boolean {
             if (!Object.prototype.hasOwnProperty.call(deltaMergeables, property)) {
                 return false;
             }
@@ -83,6 +87,7 @@ export function createObject(args: {
             deltaMergeables[property]!.delete();
 
             Reflect.deleteProperty(target, property);
+
             return true;
         },
     });

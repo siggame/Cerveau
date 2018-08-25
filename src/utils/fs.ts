@@ -59,12 +59,13 @@ export async function getFiles(sourcePath: string): Promise<string[]> {
  */
 export function gunzipFile(filePath: string): Promise<Buffer> {
     const buffers: Buffer[] = [];
+
     return new Promise<Buffer>((resolve, reject) => {
         fs.createReadStream(filePath)
             .on("error", reject)
             .pipe(zlib.createGunzip()) // Un-Gzip
-            .on("data", (buffer) => {
-                buffers.push(buffer as Buffer); // will be a buffer, not string
+            .on("data", (buffer: Buffer) => {
+                buffers.push(buffer); // will be a Buffer
             })
             .on("end", () => {
                 resolve(Buffer.concat(buffers));
@@ -81,7 +82,7 @@ export function gunzipFile(filePath: string): Promise<Buffer> {
 export function removeExtension(str: string): string {
     const dotIndex = str.indexOf(".");
     if (dotIndex > -1) {
-        str = str.slice(0, dotIndex);
+        return str.slice(0, dotIndex);
     }
 
     return str;

@@ -26,7 +26,10 @@ export class BaseAI {
      * @returns A promise that resolves to the value the AI returned from that
      * order, once they finish that order.
      */
-    protected executeOrder(name: string, ...args: any[]): Promise<any> {
+    protected executeOrder(
+        name: string,
+        ...args: Array<unknown>
+    ): Promise<any> /* tslint:disable-line:no-any - this is dynamic */ {
         return this.manager.executeOrder(name, ...args);
     }
 }

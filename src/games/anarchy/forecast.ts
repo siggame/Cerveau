@@ -8,6 +8,12 @@ import { Player } from "./player";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The direction the wind will blow fires in. Can be 'north', 'east', 'south',
+ * or 'west'.
+ */
+export type ForecastDirection = "North" | "East" | "South" | "West";
+
+/**
  * Add properties here to make the create.Forecast have different args.
  */
 export interface IForecastConstructorArgs

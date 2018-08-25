@@ -11,6 +11,17 @@ import { Spawner } from "./spawner";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The cardinal direction water is flowing on this Tile ('North', 'East',
+ * 'South', 'West').
+ */
+export type TileFlowDirection = "North" | "East" | "South" | "West" | "";
+
+/**
+ * What type of Tile this is, either 'water' or 'land'.
+ */
+export type TileType = "land" | "water";
+
+/**
  * Add properties here to make the create.Tile have different args.
  */
 export interface ITileConstructorArgs
@@ -186,6 +197,7 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
@@ -195,6 +207,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this);
     }
 
@@ -209,6 +222,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: string): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbor.call(this, direction);
     }
 
@@ -219,6 +233,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
@@ -228,6 +243,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns A string representation of the Tile.
      */
     public toString(): string {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
 

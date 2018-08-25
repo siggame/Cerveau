@@ -84,8 +84,8 @@ export class Weaver extends Spiderling {
         }
 
         const web = weakening
-            ? this.weakeningWeb!
-            : this.strengtheningWeb!;
+            ? this.weakeningWeb
+            : this.strengtheningWeb;
 
         this.weakeningWeb = undefined;
         this.strengtheningWeb = undefined;

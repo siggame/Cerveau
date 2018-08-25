@@ -1,5 +1,5 @@
 import { IOrderData, IRunData } from "~/core/clients";
-import { IUnknownObject } from "~/utils";
+import { UnknownObject } from "~/utils";
 
 /** The shape of a gamelog, both being built and if read from memory. */
 export interface IGamelog {
@@ -18,7 +18,7 @@ export interface IGamelog {
     epoch: number;
 
     /** The value used to seed the random number generator server side */
-    settings: IUnknownObject;
+    settings: UnknownObject;
 
     /** The list of all players that won this game (normally just one) */
     winners: IGamelogWinnerLoser[];
@@ -27,7 +27,7 @@ export interface IGamelog {
     losers: IGamelogWinnerLoser[];
 
     /** Lookup of constants used to parse game server <-> client IO */
-    constants: IUnknownObject;
+    constants: UnknownObject;
 
     /**
      * The list of all deltas in the game. The first delta being the initial
@@ -48,11 +48,12 @@ export interface IDelta {
     data?: IDeltaData;
 
     /** The state of the game, but ONLY changed keys */
-    game: any;
+    game: UnknownObject;
 }
 
 /** The base delta data interface */
 export interface IDeltaData {
+    [key: string]: unknown;
 }
 
 /** Data about why a player disconnected. */
@@ -66,7 +67,7 @@ export interface IRanDeltaData extends IDeltaData {
     player: IGameObjectReference;
     run: IRunData;
     invalid?: string;
-    returned: any;
+    returned: unknown;
 }
 
 /** Data about a player being ordered to do something. */
@@ -79,8 +80,8 @@ export interface IOrderedDeltaData extends IDeltaData {
 export interface IFinishedDeltaData extends IDeltaData {
     player: IGameObjectReference;
     order: IOrderData;
-    returned: any;
-    invalid?: any;
+    returned: unknown;
+    invalid?: unknown;
 }
 
 /** A shorthand object representing a player that won or lost in the game */

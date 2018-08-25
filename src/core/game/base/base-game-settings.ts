@@ -1,5 +1,5 @@
 import { sanitizeBoolean } from "~/core";
-import { IUnknownObject, objectHasProperty, quoteIfString } from "~/utils";
+import { UnknownObject, objectHasProperty, quoteIfString } from "~/utils";
 
 /** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
@@ -50,7 +50,7 @@ export class BaseGameSettingsManager {
      * Creates a game settings manager with optional initial values
      * @param values Optional initial values for the settings
      */
-    public constructor(values?: IUnknownObject) {
+    public constructor(values?: UnknownObject) {
         if (values) {
             this.addSettings(values);
         }
@@ -64,7 +64,7 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public addSettings(invalidatedSettings: IUnknownObject): void | Error {
+    public addSettings(invalidatedSettings: UnknownObject): void | Error {
         const validated = this.invalidateSettings(invalidatedSettings);
 
         if (validated instanceof Error) {
@@ -80,8 +80,8 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public invalidateSettings(invalidatedSettings: IUnknownObject): IUnknownObject | Error {
-        const sanitized: IUnknownObject = {};
+    public invalidateSettings(invalidatedSettings: UnknownObject): UnknownObject | Error {
+        const sanitized: UnknownObject = {};
 
         for (const [key, value] of Object.entries(invalidatedSettings)) {
             if (!objectHasProperty(this.schema, key)) {
@@ -91,7 +91,7 @@ export class BaseGameSettingsManager {
             const str = quoteIfString(value);
 
             const schema = (this.schema as ISettingsSchemas)[key];
-            let sanitizedValue: any = "";
+            let sanitizedValue: any = ""; // tslint:disable-line:no-any
             switch (typeof schema.default) {
                 case "number":
                     sanitizedValue = Number(value) || 0;
@@ -112,9 +112,8 @@ export class BaseGameSettingsManager {
                     break;
                 case "object": // string array is this case
                     sanitizedValue = Array.isArray(value)
-                        ? value.map((item) => String(item))
+                        ? value.map(String) // convert all values to a string
                         : [];
-                    break;
             }
 
             sanitized[key] = sanitizedValue;
@@ -179,13 +178,21 @@ export class BaseGameSettingsManager {
      */
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
-    ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W> ? (W extends never[] ? string[] : W) : never} {
-        const values: IUnknownObject = {};
+    ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W>
+        ? (W extends never[]
+            ? string[]
+            : W
+        )
+        : never
+    } {
+        const values: UnknownObject = {};
         for (const [key, value] of Object.entries(this.schema)) {
             values[key] = value.default;
         }
 
-        return values as any; // lol, try accurately casting to that monstrosity of a type
+        // lol, try accurately casting to that monstrosity of a type
+        // tslint:disable-next-line:no-any
+        return values as any;
     }
 
     /**
@@ -193,7 +200,7 @@ export class BaseGameSettingsManager {
      * @param someSettings a subset of the valid settings to attempt to validate
      * @returns an Error if invalid, otherwise the validated settings
      */
-    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
+    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         // Use our current values and the new ones to form a settings
         // object to try to validate against
         const settings = { ...this.values, ...someSettings };

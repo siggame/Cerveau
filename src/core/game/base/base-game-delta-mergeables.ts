@@ -1,6 +1,6 @@
 import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { ITypedObject, IUnknownObject, objectHasProperty } from "~/utils";
+import { ITypedObject, objectHasProperty, UnknownObject } from "~/utils";
 
 /**
  * The base class all delta mergeable instances in (and of) the game inherit
@@ -18,7 +18,7 @@ export class BaseGameDeltaMergeables {
         key: string;
         parent?: DeltaMergeable;
         attributesSchema: ITypedObject<ISanitizableType>;
-        initialValues: IUnknownObject;
+        initialValues: UnknownObject;
     }) {
         this.deltaMergeable = createDeltaMergeable({
             key: args.key,
@@ -34,8 +34,13 @@ export class BaseGameDeltaMergeables {
 
         // setup initial values
         for (const [ key, schema ] of Object.entries(args.attributesSchema)) {
-            let initialValue = objectHasProperty(schema!, "defaultValue")
-                ? (schema as any).defaultValue
+            if (!schema) {
+                throw new Error(`Schema must exist for property ${key}`);
+            }
+
+            let initialValue = objectHasProperty(schema, "defaultValue")
+                // TODO: objectHasProperty should infer this
+                ? (schema as ISanitizableType & { defaultValue: unknown }).defaultValue
                 : undefined;
 
             if (objectHasProperty(args.initialValues, key)) {
@@ -47,20 +52,24 @@ export class BaseGameDeltaMergeables {
                 dm.set(initialValue, true);
             }
             else {
-                (this.deltaMergeable.wrapper as any)[key] = initialValue;
+                (this.deltaMergeable.wrapper as UnknownObject)[key] = initialValue;
             }
         }
 
         for (const [property, schema] of Object.entries(args.attributesSchema)) {
-            const dm = this.deltaMergeable.child(property)!;
+            const dm = this.deltaMergeable.child(property);
+
+            if (!dm || !schema) {
+                throw new Error(`Delta mergeable attribute expected for ${property}!`);
+            }
 
             Object.defineProperty(this, property, {
                 enumerable: true, // Show up in for of loops
                 configurable: false, // Can't be deleted
-                get: schema!.typeName === "list" // Lists are behind Proxies
+                get: schema.typeName === "list" // Lists are behind Proxies
                     ? () => dm.wrapper
                     : () => dm.get(),
-                set: (val: any) => dm.set(val),
+                set: (val: unknown) => dm.set(val),
             });
         }
     }

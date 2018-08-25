@@ -8,6 +8,11 @@ import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * What type of resource this is ('food' or 'branches').
+ */
+export type SpawnerType = "food" | "branches";
+
+/**
  * Add properties here to make the create.Spawner have different args.
  */
 export interface ISpawnerConstructorArgs

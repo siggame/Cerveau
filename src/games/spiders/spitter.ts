@@ -76,13 +76,14 @@ export class Spitter extends Spiderling {
 
         if (forceFinish) {
             this.spittingWebToNest = undefined;
+
             return false;
         }
 
         // if we got here they finished spitting
-        const newWeb = this.manager.create.Web({
-            nestA: this.nest!,
-            nestB: this.spittingWebToNest!,
+        const newWeb = this.manager.create.web({
+            nestA: this.nest,
+            nestB: this.spittingWebToNest,
         });
 
         // cancel spitters on the current nest to the destination
@@ -95,6 +96,7 @@ export class Spitter extends Spiderling {
         }
 
         this.spittingWebToNest = undefined;
+
         return false;
     }
 
@@ -122,12 +124,16 @@ export class Spitter extends Spiderling {
             return invalid;
         }
 
+        if (!this.nest) {
+            return `${this} is not on a Nest`;
+        }
+
         if (nest === this.nest) {
             return `${this} cannot spit at the same Nest it is on (${nest}).`;
         }
 
         for (const web of nest.webs) {
-            if (web.isConnectedTo(this.nest!, nest)) {
+            if (web.isConnectedTo(this.nest, nest)) {
                 return `${this} cannot spit a new Web from ${this.nest} to ${nest} because ${web} already exists.`;
             }
         }
@@ -148,15 +154,22 @@ export class Spitter extends Spiderling {
     protected async spit(player: Player, nest: Nest): Promise<boolean> {
         // <<-- Creer-Merge: spit -->>
 
+        if (!this.nest) {
+            throw new Error(`${this} is trying to spit without being on a Nest!`);
+        }
+
         this.busy = "Spitting";
         this.spittingWebToNest = nest;
 
         // find coworkers
-        const sideSpiders = this.nest!.spiders.concat(nest.spiders);
+        const sideSpiders = this.nest.spiders.concat(nest.spiders);
         for (const spider of sideSpiders) {
-            if (spider !== this && spider instanceof Spitter && (
-                spider.spittingWebToNest === nest || spider.spittingWebToNest === this.nest
-            )) {
+            if (spider !== this
+                && spider instanceof Spitter
+                && (spider.spittingWebToNest === nest
+                    || spider.spittingWebToNest === this.nest
+                )
+            ) {
                 this.coworkers.add(spider);
                 this.numberOfCoworkers = this.coworkers.size;
                 spider.coworkers.add(this);
@@ -164,7 +177,7 @@ export class Spitter extends Spiderling {
             }
         }
 
-        this.workRemaining = euclideanDistance(this.nest!, nest) / this.game.spitSpeed;
+        this.workRemaining = euclideanDistance(this.nest, nest) / this.game.spitSpeed;
 
         return true;
 

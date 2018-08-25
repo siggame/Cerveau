@@ -13,7 +13,7 @@ import { Tile } from "./tile";
 export interface IFurnishingConstructorArgs
 extends IGameObjectConstructorArgs, IFurnishingProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    tile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -69,9 +69,11 @@ export class Furnishing extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
 
+        this.tile = data.tile;
+
         this.game.furnishings.push(this);
         this.health = this.isPiano ? 48 : 16;
-        this.tile!.furnishing = this;
+        this.tile.furnishing = this;
 
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -97,7 +99,9 @@ export class Furnishing extends GameObject {
         if (this.health === 0) { // it has been destroyed
             this.isDestroyed = true;
             this.isPlaying = false;
-            this.tile!.furnishing = undefined;
+            if (this.tile) {
+                this.tile.furnishing = undefined;
+            }
             this.tile = undefined;
 
             if (this.isPiano) {

@@ -42,7 +42,7 @@ export class ThreadedRoom extends Room {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         const workerSessionData: IWorkerGameSessionData = {
-            mainDebugPort: (process as any)._debugPort, // used by debugger
+            mainDebugPort: (process as any)._debugPort, // tslint:disable-line:no-any - used by debugger
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,
             gameSettings: this.gameSettingsManager.values,
@@ -54,6 +54,10 @@ export class ThreadedRoom extends Room {
         });
 
         this.worker.on("online", () => {
+            if (!this.worker) {
+                throw new Error("Threaded room lost worker on online.");
+            }
+
             for (const client of this.clients) {
                 // we are about to send it, so we don't want this client object
                 // listening to it, as we no longer care.
@@ -73,12 +77,12 @@ export class ThreadedRoom extends Room {
                     },
                 };
 
-                this.worker!.send(messageFromMainThread, client.getNetSocket());
+                this.worker.send(messageFromMainThread, client.getNetSocket());
             }
 
             // Tell the worker thread we are done sending client + sockets to
             // them
-            this.worker!.send({ type: "done"});
+            this.worker.send({ type: "done"});
 
             // And remove the clients from us, they are no longer ours to care
             // about; instead the worker thread will handle them from here-on.

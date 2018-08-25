@@ -1,3 +1,6 @@
+// tslint:disable:no-any no-non-null-assertion
+// ^ as DeltaMergeables are black magic anyways
+
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { createDeltaMergeable } from "./create-delta-mergeable";
@@ -28,6 +31,7 @@ export function createArray<T = any>(args: {
                 currentValue![i] = newArray[i];
             }
             currentValue!.length = newArray.length;
+
             return currentValue;
         },
     });
@@ -88,6 +92,7 @@ export function createArray<T = any>(args: {
                 if (property === "length") {
                     Reflect.set(target, property, value);
                     checkIfUpdated();
+
                     return true;
                 }
 
@@ -111,6 +116,7 @@ export function createArray<T = any>(args: {
 
             values[index].delete();
             Reflect.deleteProperty(target, property);
+
             return true;
         },
     });

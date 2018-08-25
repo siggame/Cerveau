@@ -20,7 +20,7 @@ export type ISanitizableType = (
 /** Primitive types we can sanitize. */
 export interface ISanitizableTypePrimitive {
     typeName: "string" | "float" | "int" | "boolean" | "void";
-    literals?: any[];
+    literals?: Array<string | boolean | number>;
 }
 
 /** A list (array) that can be sanitized. */

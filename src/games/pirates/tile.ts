@@ -10,11 +10,6 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of Tile this is ('water' or 'land').
- */
-export type TileType = "water" | "land";
-
-/**
  * Add properties here to make the create.Tile have different args.
  */
 export interface ITileConstructorArgs
@@ -42,7 +37,7 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * The Port on this Tile if present, otherwise null.
      */
-    public readonly port?: Port;
+    public port: Port;
 
     /**
      * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
@@ -71,12 +66,12 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * The type of Tile this is ('water' or 'land').
      */
-    public readonly type!: "water" | "land";
+    public type!: string;
 
     /**
      * The Unit on this Tile if present, otherwise null.
      */
-    public unit?: Unit;
+    public unit: Unit;
 
     /**
      * The x (horizontal) position of this Tile.
@@ -132,6 +127,7 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
@@ -141,6 +137,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this);
     }
 
@@ -155,6 +152,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: string): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbor.call(this, direction);
     }
 
@@ -165,6 +163,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
@@ -174,6 +173,7 @@ export class Tile extends GameObject implements BaseTile {
      * @returns A string representation of the Tile.
      */
     public toString(): string {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
 

@@ -1,22 +1,37 @@
+import { Express } from "express";
 import { Config } from "~/core/config";
 import { IGamelogInfo } from "~/core/game";
 import { Lobby } from "../../core/server";
-import { app } from "../app";
 
 const DEFAULT_PAGE_COUNT = 20;
 
-if (app && Config.WEB_ENABLED) {
+/**
+ * Registers the archives/ route with a given Express app.
+ *
+ * @param app - The Express app instance to register the route to.
+ */
+export function registerRouteArchives(app: Express): void {
+    if (Config.ARENA_MODE) {
+        return;
+    }
+
     const lobby = Lobby.getInstance();
 
     app.get("/archives/:gameName?/:pageStart?/:pageCount?", async (req, res) => {
-        const gameName = String(req.params.gameName) || "all";
+        const params = req.params as {
+            gameName: unknown;
+            pageStart: unknown;
+            pageCount: unknown;
+        };
 
-        let pageStart = Number(req.params.pageStart);
+        const gameName = String(params.gameName) || "all";
+
+        let pageStart = Number(params.pageStart);
         if (isNaN(pageStart)) {
             pageStart = 1; // starting page
         }
 
-        let pageCount = Number(req.params.pageCount);
+        let pageCount = Number(params.pageCount);
         if (isNaN(pageCount)) {
             pageCount = DEFAULT_PAGE_COUNT; // starting page
         }
@@ -38,11 +53,11 @@ if (app && Config.WEB_ENABLED) {
         }
 
         const newerUri = endIndex < logs.length
-            ? ("/archives/" + gameName + "/" + (pageStart - 1))
+            ? (`/archives/${gameName}/${pageStart - 1}`)
             : undefined;
 
         const olderUri = startIndex > 0
-            ? ("/archives/" + gameName + "/" + (pageStart + 1))
+            ? (`/archives/${gameName}/${pageStart + 1}`)
             : undefined;
 
         res.render("archives", {

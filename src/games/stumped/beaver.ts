@@ -142,6 +142,10 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
         if (!beaver) {
             return `${beaver} is not a valid beaver for ${this} to attack.`;
         }
@@ -150,7 +154,7 @@ export class Beaver extends GameObject {
             return `${beaver} has not finished being recruited yet, and cannot be attacked yet.`;
         }
 
-        if (!this.tile!.hasNeighbor(beaver.tile)) {
+        if (!this.tile.hasNeighbor(beaver.tile)) {
             return `${beaver} is not adjacent to ${this} beaver to be attacked.`;
         }
 
@@ -168,6 +172,10 @@ export class Beaver extends GameObject {
     protected async attack(player: Player, beaver: Beaver): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
+        if (!beaver.tile) {
+            throw new Error(`${this} is attacking without being on a Tile!`);
+        }
+
         beaver.health = Math.max(0, beaver.health - this.job.damage);
 
         // If the beaver is already distracted, keep that value, otherwise they
@@ -178,8 +186,8 @@ export class Beaver extends GameObject {
         // Check if the enemy beaver died.
         if (beaver.health <= 0) {
             // Drop it's resources on the ground.
-            beaver.tile!.branches += beaver.branches;
-            beaver.tile!.food += beaver.food;
+            beaver.tile.branches += beaver.branches;
+            beaver.tile.food += beaver.food;
 
             // And set its values to invalid numbers to signify it is dead.
             beaver.branches = -1;
@@ -189,7 +197,7 @@ export class Beaver extends GameObject {
             beaver.turnsDistracted = -1;
 
             // Remove him from the map of tiles.
-            beaver.tile!.beaver = undefined;
+            beaver.tile.beaver = undefined;
             beaver.tile = undefined;
         }
 
@@ -215,15 +223,19 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
-        if ((this.branches + this.tile!.branches) < player.branchesToBuildLodge) {
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
+        if ((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
             return `${this} does not have enough branches to build the lodge.`;
         }
 
-        if (this.tile!.lodgeOwner) {
-            return `${this.tile} already has a lodge owned by ${this.tile!.lodgeOwner}.`;
+        if (this.tile.lodgeOwner) {
+            return `${this.tile} already has a lodge owned by ${this.tile.lodgeOwner}.`;
         }
 
-        if (this.tile!.spawner) {
+        if (this.tile.spawner) {
             return `${this.tile} has a spawner which cannot be built over.`;
         }
 
@@ -240,19 +252,23 @@ export class Beaver extends GameObject {
     protected async buildLodge(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: buildLodge -->>
 
+        if (!this.tile) {
+            throw new Error(`${this} is not on a tile but is trying to build a lodge!`);
+        }
+
         // Overcharge tile's branches
-        this.tile!.branches -= player.branchesToBuildLodge;
-        if (this.tile!.branches < 0) {
+        this.tile.branches -= player.branchesToBuildLodge;
+        if (this.tile.branches < 0) {
             // Make up difference with this Beaver's branches
             // NOTE Tile has a debt, ie a negative value being added
-            this.branches += this.tile!.branches;
-            this.tile!.branches = 0;
+            this.branches += this.tile.branches;
+            this.tile.branches = 0;
         }
 
         // All the branches are now on this tile to makeup the lodge
-        this.tile!.branches = player.branchesToBuildLodge;
-        this.tile!.lodgeOwner = player;
-        this.owner.lodges.push(this.tile!);
+        this.tile.branches = player.branchesToBuildLodge;
+        this.tile.lodgeOwner = player;
+        this.owner.lodges.push(this.tile);
         this.actions--;
 
         player.calculateBranchesToBuildLodge();
@@ -289,6 +305,10 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
         // transform the amount if they passed in a number =< 0
         if (amount <= 0) {
             amount = this[resource];
@@ -306,7 +326,7 @@ export class Beaver extends GameObject {
             return `${tile} is not a valid tile to drop resources on.`;
         }
 
-        if (this.tile !== tile && !this.tile!.hasNeighbor(tile)) {
+        if (this.tile !== tile && !this.tile.hasNeighbor(tile)) {
             return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
         }
 
@@ -376,11 +396,15 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
         if (!spawner) {
             return `${spawner} is not a valid Spawner`;
         }
 
-        if (!this.tile!.hasNeighbor(spawner.tile)) {
+        if (!this.tile.hasNeighbor(spawner.tile)) {
             return `${this} on tile ${this.tile} is not adjacent to ${spawner.tile}`;
         }
 
@@ -461,6 +485,10 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
         if (this.moves <= 0) {
             return `${this} is out of moves.`;
         }
@@ -481,7 +509,7 @@ export class Beaver extends GameObject {
             return `${tile} contains ${tile.spawner}.`;
         }
 
-        const movementCost = this.tile!.getMovementCost(tile);
+        const movementCost = this.tile.getMovementCost(tile);
         if (isNaN(movementCost)) {
             return `${tile} is not adjacent to ${this.tile}`;
         }
@@ -504,14 +532,18 @@ export class Beaver extends GameObject {
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
 
+        if (!this.tile) {
+            throw new Error(`${this} is not on a tile to move from!`);
+        }
+
         // calculate movement cost before moving
-        const cost = this.tile!.getMovementCost(tile);
+        const cost = this.tile.getMovementCost(tile);
 
         // update target tile's beaver to this beaver
         tile.beaver = this;
 
         // remove me from the time I was on
-        this.tile!.beaver = undefined;
+        this.tile.beaver = undefined;
 
         // update this beaver's tile to target tile
         this.tile = tile;
@@ -551,11 +583,15 @@ export class Beaver extends GameObject {
             return invalid;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
         if (!tile) {
             return `${tile} is not a valid tile to pick up resources from.`;
         }
 
-        if (this.tile !== tile && !this.tile!.hasNeighbor(tile)) {
+        if (this.tile !== tile && !this.tile.hasNeighbor(tile)) {
             return `${tile} is not the adjacent to or equal to the tile ${this} is on (${this.tile})`;
         }
 

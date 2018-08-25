@@ -10,6 +10,12 @@ import { TileDirection } from "~/core/game/mixins/tiled";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The job that this Cowboy does, and dictates how they fight and interact
+ * within the Saloon.
+ */
+export type CowboyJob = "Bartender" | "Brawler" | "Sharpshooter";
+
+/**
  * Add properties here to make the create.Cowboy have different args.
  */
 export interface ICowboyConstructorArgs
@@ -211,7 +217,6 @@ export class Cowboy extends GameObject {
                 return `${this} is a Brawler and cannot act`;
             case "Sharpshooter":
                 invalid = this.invalidateSharpshooter(player, tile);
-                break;
         }
 
         if (invalid) {
@@ -304,7 +309,11 @@ export class Cowboy extends GameObject {
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
 
-        this.tile!.cowboy = undefined; // remove me from the tile I was on
+        if (!this.tile) {
+            throw new Error("Cowboy.move called in illegal state!");
+        }
+
+        this.tile.cowboy = undefined; // remove me from the tile I was on
         tile.cowboy = this;
         this.tile = tile; // and move me to the new tile
         this.canMove = false; // and mark me as having moved this turn
@@ -430,11 +439,15 @@ export class Cowboy extends GameObject {
      * undefined if valid.
      */
     private invalidateSharpshooter(player: Player, tile: Tile): string | undefined {
+        if (!this.tile) {
+            return `${this} must be on a tile`;
+        }
+
         if (this.focus < 1) {
             return `${this} needs focus to act. Currently has ${this.focus} focus.`;
         }
 
-        if (!this.tile!.getAdjacentDirection(tile)) {
+        if (!this.tile.getAdjacentDirection(tile)) {
             return `${tile} is not adjacent to the Tile that ${this} is on (${this.tile}).`;
         }
     }
@@ -448,6 +461,7 @@ export class Cowboy extends GameObject {
      * @returns True because it worked.
      */
     private actSharpshooter(player: Player, tile: Tile): true {
+
         let shot = tile;
         let distance = this.focus;
         while (shot && distance > 0) { // shoot things
@@ -469,7 +483,15 @@ export class Cowboy extends GameObject {
                 shot.bottle.break();
             }
 
-            shot = shot.getNeighbor(this.tile!.getAdjacentDirection(tile)!);
+            if (!this.tile) {
+                throw new Error("Sharpshooter's act invoked illegally");
+            }
+
+            const adjacentDirection = this.tile.getAdjacentDirection(tile);
+            if (!adjacentDirection) {
+                throw new Error("Sharpshooter act on illegal tile direction");
+            }
+            shot = shot.getNeighbor(adjacentDirection);
         }
 
         this.focus = 0;
@@ -495,11 +517,15 @@ export class Cowboy extends GameObject {
         drunkDirection: "" | TileDirection,
     ): string | undefined {
         if (!drunkDirection) {
-            return `drunkDirection cannot be empty for a Bartender to act.`;
+            return "drunkDirection cannot be empty for a Bartender to act.";
+        }
+
+        if (!this.tile) {
+            return `${this} has no tile.`;
         }
 
         // make sure the tile is an adjacent tile
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile.hasNeighbor(tile)) {
             return `${tile} is not adjacent to the Tile that ${this} is on (${this.tile}).`;
         }
     }
@@ -527,10 +553,20 @@ export class Cowboy extends GameObject {
             }
         }
         else { // the adjacent tile is empty, so spawn one
-            this.manager.create.Bottle({
+            if (!this.tile) {
+                throw new Error("Bartender act called in illegal state!");
+            }
+
+            const direction = this.tile.getAdjacentDirection(tile);
+
+            if (!direction) {
+                throw new Error("Could not get direction between tiles!");
+            }
+
+            this.manager.create.bottle({
                 tile,
                 drunkDirection,
-                direction: this.tile!.getAdjacentDirection(tile)!,
+                direction,
             });
         }
 

@@ -90,7 +90,11 @@ export class Bottle extends GameObject {
         }
 
         this.tile.bottle = undefined; // we moved off it
-        this.tile = this.tile.getNeighbor(this.direction)!;
+        const nextTile = this.tile.getNeighbor(this.direction);
+        if (!nextTile) {
+            throw new Error("Could not find next tile to advance to!");
+        }
+        this.tile = nextTile;
 
         if (!this.tile.isPathableToBottles()) {
             this.break(); // hit something

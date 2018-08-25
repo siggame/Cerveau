@@ -1,5 +1,11 @@
 import { MathUtils } from "./";
 
+/** An array with at least 1 or more items */
+export type ArrayWithOneOrMore<T, K = number> = (
+    [T] |
+    { 0: T }
+) & T[];
+
 /**
  * Removes a matching element from the array, if present.
  *
@@ -14,7 +20,7 @@ export function removeElements<T>(array: T[], ...elements: T[]): number {
 
         if (index > -1) {
             array.splice(index, 1);
-            removed++;
+            removed += 1;
         }
     }
 
@@ -35,7 +41,7 @@ export function removeElementFrom<T>(element: T, ...arrays: T[][]): number {
 
         if (index > -1) {
             array.splice(index, 1);
-            removed++;
+            removed += 1;
         }
     }
 
@@ -116,21 +122,31 @@ export function isEmpty<T>(array: T[]): array is [never] {
 }
 
 /**
+ * Checks if an array has at least 1 item
+ *
+ * @param array - The array to check if it has at least 1 element.
+ * @returns True if not empty, otherwise false when empty.
+ */
+export function arrayHasElements<T>(array: T[]): array is ArrayWithOneOrMore<T> {
+    return array.length > 0;
+}
+
+/**
  * Shuffles this array randomly IN PLACE.
  *
  * @param array - The array to shuffle IN PLACE.
- * @param rng - An optional callback that is a random number generator,
+ * @param rng - A callback that is a random number generator,
  * must generate numbers [0, 1).
  * @returns This array.
  */
-export function shuffle<T>(array: T[], rng?: () => number): T[] {
+export function shuffle<T>(array: T[], rng: () => number): T[] {
     // from http://stackoverflow.com/a/6274381/944727
-    rng = rng || Math.random;
     for (
         let j, x, i = array.length; i;
         // tslint:disable-next-line ban-comma-operator
         j = Math.floor(rng() * i), x = array[--i], array[i] = array[j], array[j] = x
     ) { /* pass */ }
+
     return array;
 }
 
@@ -146,6 +162,7 @@ export function make2D<T>(width: number, height: number): Array<Array<T | undefi
     for (let i = 0; i < array.length; i++) {
         array[i] = new Array<T | undefined>(height);
     }
+
     return array;
 }
 

@@ -1,4 +1,4 @@
-import { IUnknownObject } from "~/utils";
+import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
 // <<-- Creer-Merge: imports -->>
@@ -14,111 +14,11 @@ export class PiratesGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public schema = this.makeSchema({
-        ...(super.schema || (this as any).schema), // HACK: super should work. but schema is undefined on it
+// HACK: `super` should work. but schema is undefined on it at run time.
+        // tslint:disable-next-line:no-any
+        ...(super.schema || (this as any).schema),
 
         // Pirates game specific settings
-        buryInterestRate: {
-            description: "The rate buried gold increases each turn.",
-            // <<-- Creer-Merge: buryInterestRate -->>
-            default: 1.025,
-            // <<-- /Creer-Merge: buryInterestRate -->>
-        },
-        crewCost: {
-            description: "How much gold it costs to construct a single crew.",
-            // <<-- Creer-Merge: crewCost -->>
-            default: 200,
-            // <<-- /Creer-Merge: crewCost -->>
-        },
-        crewDamage: {
-            description: "How much damage crew deal to each other.",
-            // <<-- Creer-Merge: crewDamage -->>
-            default: 1,
-            // <<-- /Creer-Merge: crewDamage -->>
-        },
-        crewHealth: {
-            description: "The maximum amount of health a crew member can have.",
-            // <<-- Creer-Merge: crewHealth -->>
-            default: 4,
-            // <<-- /Creer-Merge: crewHealth -->>
-        },
-        crewMoves: {
-            description: "The number of moves Units with only crew are given "
-                       + "each turn.",
-            // <<-- Creer-Merge: crewMoves -->>
-            default: 2,
-            // <<-- /Creer-Merge: crewMoves -->>
-        },
-        crewRange: {
-            description: "A crew's attack range. Range is circular.",
-            // <<-- Creer-Merge: crewRange -->>
-            default: 3,
-            // <<-- /Creer-Merge: crewRange -->>
-        },
-        healFactor: {
-            description: "How much health a Unit recovers when they rest.",
-            // <<-- Creer-Merge: healFactor -->>
-            default: 0.25,
-            // <<-- /Creer-Merge: healFactor -->>
-        },
-        merchantGoldRate: {
-            description: "How much gold merchant Ports get each turn.",
-            // <<-- Creer-Merge: merchantGoldRate -->>
-            default: 100,
-            // <<-- /Creer-Merge: merchantGoldRate -->>
-        },
-        merchantInterestRate: {
-            description: "When a merchant ship spawns, the amount of "
-                       + "additional gold it has relative to the Port's "
-                       + "investment.",
-            // <<-- Creer-Merge: merchantInterestRate -->>
-            default: 1.1,
-            // <<-- /Creer-Merge: merchantInterestRate -->>
-        },
-        minInterestDistance: {
-            description: "The Euclidean distance buried gold must be from the "
-                       + "Player's Port to accumulate interest.",
-            // <<-- Creer-Merge: minInterestDistance -->>
-            default: 10,
-            // <<-- /Creer-Merge: minInterestDistance -->>
-        },
-        restRange: {
-            description: "How far a Unit can be from a Port to rest. Range is "
-                       + "circular.",
-            // <<-- Creer-Merge: restRange -->>
-            default: 1.5,
-            // <<-- /Creer-Merge: restRange -->>
-        },
-        shipCost: {
-            description: "How much gold it costs to construct a ship.",
-            // <<-- Creer-Merge: shipCost -->>
-            default: 600,
-            // <<-- /Creer-Merge: shipCost -->>
-        },
-        shipDamage: {
-            description: "How much damage ships deal to ships and ports.",
-            // <<-- Creer-Merge: shipDamage -->>
-            default: 2,
-            // <<-- /Creer-Merge: shipDamage -->>
-        },
-        shipHealth: {
-            description: "The maximum amount of health a ship can have.",
-            // <<-- Creer-Merge: shipHealth -->>
-            default: 20,
-            // <<-- /Creer-Merge: shipHealth -->>
-        },
-        shipMoves: {
-            description: "The number of moves Units with ships are given each "
-                       + "turn.",
-            // <<-- Creer-Merge: shipMoves -->>
-            default: 3,
-            // <<-- /Creer-Merge: shipMoves -->>
-        },
-        shipRange: {
-            description: "A ship's attack range. Range is circular.",
-            // <<-- Creer-Merge: shipRange -->>
-            default: 3,
-            // <<-- /Creer-Merge: shipRange -->>
-        },
         // <<-- Creer-Merge: schema -->>
 
         startingGold: {
@@ -189,7 +89,7 @@ export class PiratesGameSettingsManager extends BaseClasses.GameSettings {
      * @param someSettings A subset of settings that will be tested
      * @returns An error if the settings fail to validate.
      */
-    protected invalidate(someSettings: IUnknownObject): IUnknownObject | Error {
+    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);
         if (invalidated instanceof Error) {
             return invalidated;

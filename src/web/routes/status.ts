@@ -1,10 +1,10 @@
 // Exposed various uri schemes for other applications to query data from Cerveau
 // Basically http responses that are not HTML, probably JSON
 
-// import { Config } from "../../core/args";
+import { Express } from "express";
+import { Config } from "~/core/config";
+import { Lobby } from "~/core/server/lobby";
 import { objectHasProperty } from "~/utils";
-import { Lobby } from "../../core/server/index";
-import { app } from "../app";
 
 /** Information about the room to be returned via the status API. */
 interface IRoomInfo {
@@ -41,15 +41,23 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
     const room = lobby.getRoom(gameAlias, id);
 
     if (room instanceof Error) {
-        return {
-            error: room.message,
-        };
+        return { error: room.message };
     }
 
     // If we got there, then we know the game name is valid now so there
     // has to be a namespace.
-    const gameName = lobby.getGameNameForAlias(gameAlias)!;
-    const gameNamespace = lobby.getGameNamespace(gameName)!;
+    const gameName = lobby.getGameNameForAlias(gameAlias);
+
+    if (!gameName) {
+        return { error: `${gameAlias} is no known game` };
+    }
+
+    const gameNamespace = lobby.getGameNamespace(gameName);
+
+    if (!gameNamespace) {
+        return { error: `${gameAlias} is no known game` };
+    }
+
     const { requiredNumberOfPlayers } = gameNamespace.GameManager;
 
     const info: IRoomInfo = {
@@ -83,12 +91,14 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
     if (!room.isRunning() && !room.isOver()) {
         // it has clients, but it still open more more before it starts running
         info.status = "open";
+
         return info;
     }
 
     if (room.isRunning()) {
         // on a separate thread running the game
         info.status = "running";
+
         return info;
     }
 
@@ -119,7 +129,16 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
     };
 }
 
-if (app) {
+/**
+ * Registers the status route with some express app
+ *
+ * @param app - The Express app instance to register the route on
+ */
+export function registerRouteStatus(app: Express): void {
+    if (!Config.API_ENABLED) {
+        return;
+    }
+
     /**
      * @apiGroup API
      */
@@ -289,16 +308,22 @@ if (app) {
      *  }
      */
     app.get("/status/:gameName/:gameSession", async (req, res) => {
-        const gameName = String(req.params.gameName);
-        const id = String(req.params.gameSession);
+        const params = req.params as {
+            gameName: unknown;
+            gameSession: unknown;
+        };
+
+        const gameName = String(params.gameName);
+        const gameSession = String(params.gameSession);
 
         let info: { error: string } | IRoomInfo;
-        if (!gameName || !id) {
+        if (!gameName || !gameSession) {
             info = { error: "gameName and gameSession are required" };
+
             return;
         }
         else {
-            info = getRoomInfo(gameName, id);
+            info = getRoomInfo(gameName, gameSession);
         }
 
         if (objectHasProperty(info, "error")) {

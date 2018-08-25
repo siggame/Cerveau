@@ -22,8 +22,8 @@ export function sanitizeType(
     type: ISanitizableType,
     obj: unknown,
     allowError: boolean = true,
-): any {
-    let value: any;
+): unknown {
+    let value: unknown;
 
     if (type.nullable && isNil(obj)) {
         return undefined;
@@ -69,6 +69,8 @@ export function sanitizeType(
         case "gameObject": // assume game object
             value = sanitizeGameObject(obj, type.gameObjectClass, allowError);
             break;
+        default:
+            throw new Error(`Sanitizing unknown type ${type}.`);
     }
 
     if ((
@@ -77,13 +79,14 @@ export function sanitizeType(
         type.typeName === "int" ||
         type.typeName === "boolean"
     ) && type.literals) {
-        let found = type.literals.includes(value);
+        const literals = type.literals;
+        let found = literals.includes(value as (boolean | number | string));
 
         if (!found && type.typeName === "string") {
             // Try to see if the string is found via a case-insensitive
             // search.
-            const lowered: string = value.toLowerCase();
-            for (const literal of type.literals!) {
+            const lowered: string = (value as string).toLowerCase();
+            for (const literal of literals) {
                 const loweredLiteral = (literal as string).toLowerCase();
 
                 if (lowered === loweredLiteral) {
@@ -97,10 +100,11 @@ export function sanitizeType(
         if (!found) {
             if (allowError) {
                 // the value they sent was not one of the literals
-                return new Error(`${value} is not an expected value from literals [${type.literals!.join(", ")}]`);
+                return new Error(`${value} is not an expected value from literals [${literals.join(", ")}]`);
             }
             else {
-                return type.literals![0];
+                // Couldn't be found at all, default to first literal value.
+                return literals[0];
             }
         }
     }

@@ -1,5 +1,5 @@
 import * as random from "seedrandom";
-import { shuffle } from "~/utils";
+import { shuffle, ArrayWithOneOrMore } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {
@@ -60,7 +60,23 @@ export class RandomNumberGenerator {
      * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.
      */
-    public element<T>(array: T[]): T | undefined {
+    public element<T>(array: ArrayWithOneOrMore<T>): T;
+
+    /**
+     * Selects a random element from an array using the PRNG.
+     *
+     * @param array - The array to select from.
+     * @returns An element from the array, or undefined if the array was empty.
+     */
+    public element<T>(array: T[]): T | undefined;
+
+    /**
+     * Selects a random element from an array using the PRNG.
+     *
+     * @param array - The array to select from.
+     * @returns An element from the array, or undefined if the array was empty.
+     */
+    public element<T>(array: ArrayWithOneOrMore<T>): T {
         return array[Math.floor(this.float() * array.length)];
     }
 

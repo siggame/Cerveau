@@ -10,18 +10,18 @@ import { IBasePlayer } from "./base-player";
 /** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
     parentClassName?: string;
-    attributes: ITypedObject<ISanitizableType & { defaultValue?: any }>;
+    attributes: ITypedObject<ISanitizableType & { defaultValue?: unknown }>;
     functions: ITypedObject<IBaseGameObjectFunctionSchema>;
 }
 
 /** Namespace schema for functions that game objects can invoke */
 export interface IBaseGameObjectFunctionSchema {
     args: Array<ISanitizableType & {
-        argName: string,
-        defaultValue?: any,
+        argName: string;
+        defaultValue?: unknown;
     }>;
     returns: ISanitizableType;
-    invalidValue?: any;
+    invalidValue?: unknown;
 }
 
 /** The namespace all game index files should export */
@@ -50,12 +50,20 @@ export interface IBaseGameNamespace {
  */
 export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace {
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
-        let depth = obj!; // must exist from above
+        if (!obj) {
+            throw new Error(`unexpected non object in namespace ${namespace.gameName}`);
+        }
+
+        let depth = obj;
         while (depth.parentClassName) {
             // hook up the parent classes' attributes/functions
-            const parent = namespace.gameObjectsSchema[depth.parentClassName]!;
-            Object.assign(obj!.attributes, parent.attributes);
-            Object.assign(obj!.functions, parent.functions);
+            const parent = namespace.gameObjectsSchema[depth.parentClassName];
+            if (!parent) {
+                throw new Error(`No parent for namespace ${namespace.gameName} recursively constructing!`);
+            }
+
+            Object.assign(obj.attributes, parent.attributes);
+            Object.assign(obj.functions, parent.functions);
             depth = parent;
         }
     }

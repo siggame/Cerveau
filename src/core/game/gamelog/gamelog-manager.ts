@@ -3,6 +3,7 @@ import { basename, join } from "path";
 import { createGzip } from "zlib";
 import { Config } from "~/core/config";
 import * as utils from "~/utils";
+import { IGamelog } from "./gamelog-interfaces";
 import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
        } from "./gamelog-utils";
 
@@ -71,7 +72,7 @@ export class GamelogManager {
      * representation of the gamelog.
      * @returns A promise that resolves to the filename written.
      */
-    public log(gamelog: any): Promise<string> {
+    public log(gamelog: IGamelog): Promise<string> {
         const serialized = JSON.stringify(gamelog);
         const filename = filenameFor(
             gamelog.gameName,
@@ -123,7 +124,7 @@ export class GamelogManager {
      * @returns - A promise to a gamelog matching passed in parameters, or
      * undefined if no gamelog. second arg is error.
      */
-    public async getGamelog(filename: string): Promise<any> {
+    public async getGamelog(filename: string): Promise<Buffer | undefined> {
         const gamelogPath = await this.checkGamelog(filename);
         if (!gamelogPath) {
             // gamelog doesn't exist, so we have nothing to return
@@ -156,6 +157,7 @@ export class GamelogManager {
 
         // else it does exist, so delete it
         await fs.unlink(gamelogPath);
+
         return true;
     }
 
@@ -238,6 +240,7 @@ export class GamelogManager {
 
         try {
             const stats = await fs.stat(gamelogPath);
+
             return stats.isFile()
                 ? gamelogPath
                 : undefined;

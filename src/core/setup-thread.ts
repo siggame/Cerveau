@@ -5,6 +5,7 @@
 import { readFileSync } from "fs";
 import { parse } from "json5";
 import { register } from "tsconfig-paths";
+
 const tsconfig = parse(readFileSync("tsconfig.json").toString());
 
 register({

@@ -78,8 +78,10 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         if (this.gameObjectName === "Player") {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
+            // tslint:disable-next-line:no-any
             return `Player "${(this as any as IBasePlayer).name}" #${this.id}`;
         }
+
         return `${this.gameObjectName} #${this.id}`;
     }
 
@@ -92,7 +94,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * @param message - The string to log.
      * @returns The arguments, as all input is valid.
      */
-    protected invalidateLog(player: any, message: string): string | IArguments {
+    protected invalidateLog(player: IBasePlayer, message: string): string | IArguments {
         // NOTE: may be a good idea to make sure the messages are not too long,
         // E.g. they are not trying to log 100+ MB strings
         return arguments; // nothing to invalidate, all input is valid
@@ -106,7 +108,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * object.
      * @param message - The string to log.
      */
-    protected async log(player: any, message: string): Promise<void> {
+    protected async log(player: IBasePlayer, message: string): Promise<void> {
         this.logs.push(message);
     }
 }

@@ -86,13 +86,17 @@ export class YoungGun extends GameObject {
         // find the adjacent tile that they were not on last turn,
         //   this way all YoungGuns continue walking clockwise
         const tiles = this.tile.getNeighbors();
-        const moveTo = tiles.find((tile) => tile.isBalcony && this.previousTile !== tile)!;
+        const moveTo = tiles.find((tile) => tile.isBalcony && this.previousTile !== tile);
+
+        if (!moveTo) {
+            throw new Error(`${this} cannot move to a new Tile!`);
+        }
 
         // do a quick BFS to find the callInTile
         const searchTiles = [ moveTo ];
         const searched = new Set();
         while (searchTiles.length > 0) {
-            const searchTile = searchTiles.shift()!; // will exist because above check
+            const searchTile = searchTiles.shift() as Tile; // will exist because above check
 
             if (!searched.has(searchTile)) {
                 searched.add(searchTile);
@@ -171,7 +175,7 @@ export class YoungGun extends GameObject {
 
         this.canCallIn = false;
 
-        const cowboy = this.manager.create.Cowboy({
+        const cowboy = this.manager.create.cowboy({
             owner: this.owner,
             job,
             tile: this.callInTile,

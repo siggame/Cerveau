@@ -1,3 +1,5 @@
+import { isObject } from "~/utils/object";
+
 /**
  * Wraps an index around a given range.
  *
@@ -37,20 +39,32 @@ export interface IPoint {
  * @param args - The point like things to create from.
  * @returns An array of points from what we could determine.
  */
-export function makePoints(...args: any[]): IPoint[] {
+export function makePoints(...args: Array<unknown>): IPoint[] {
     const points: IPoint[] = [];
-    for (let i = 0; i < args.length; i++) {
+    for (let i = 0; i < args.length; i += 1) {
         const arg = args[i];
-        if (typeof arg === "object") {
+        if (isObject(arg)) {
             if (Array.isArray(arg)) {
-                points.push({x: arg[0], y: arg[1]});
+                const x = Number(arg[0]);
+                const y = Number(arg[1]);
+                points.push({ x, y });
             }
             else {
-                points.push({x: arg.x, y: arg.y});
+                if (!arg.x || !arg.y) {
+                    throw new Error(`arg ${arg} does not have point like structure!`);
+                }
+                points.push({
+                    x: Number(arg.x),
+                    y: Number(arg.y),
+                });
             }
         }
         else if (typeof arg === "number" && typeof args[i + 1] === "number") {
-            points.push({x: arg, y: args[++i]});
+            i += 1;
+            points.push({
+                x: arg,
+                y: Number(args[i]),
+            });
         }
         else {
             throw new Error(`Unexpected point to parse: ${arg} at index ${i}`);
@@ -108,11 +122,12 @@ export function manhattanDistance(
  * [{x1, y1}, {x1, y2}], or [ [x1, y1], [x1, y2] ].
  * @returns The manhattan distance between the two points.
  */
-export function manhattanDistance(...args: any[]): number {
+export function manhattanDistance(...args: Array<unknown>): number {
     const points = makePoints(...args);
 
     const dx = Math.abs(points[0].x - points[1].x);
     const dy = Math.abs(points[0].y - points[1].y);
+
     return dx + dy;
 }
 
@@ -168,7 +183,7 @@ export function euclideanDistance(
  * [{x1, y1}, {x1, y2}], or [ [x1, y1], [x1, y2] ]
  * @returns The euclidean distance between the two points.
  */
-export function euclideanDistance(...args: any[]): number {
+export function euclideanDistance(...args: Array<unknown>): number {
     const points = makePoints(...args);
 
     return Math.sqrt(

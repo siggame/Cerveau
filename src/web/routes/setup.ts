@@ -1,10 +1,18 @@
+import { Express } from "express";
 import { Config } from "~/core/config";
 import { Lobby } from "~/core/server";
 import { isObject } from "~/utils";
-import { app } from "../app";
 
-if (app && Config.ARENA_MODE) {
+/**
+ * Registers the setup/ route on an express app.
+ *
+ * @param app - The app to register the route on.
+ */
+export function registerRouteSetup(app: Express): void {
     // Only expose this route for the arena.
+    if (!Config.ARENA_MODE) {
+        return;
+    }
 
     const lobby = Lobby.getInstance();
 
@@ -46,15 +54,22 @@ if (app && Config.ARENA_MODE) {
      * }
      */
     app.post("/setup", async (req, res) => {
-        if (!req.body || !isObject(req.body)) {
+        if (!isObject(req.body as unknown)) {
             res.status(400);
             res.json({ error: "No body sent." });
+
             return;
         }
 
+        const body = req.body as {
+            gameName: unknown;
+            session: unknown;
+            gameSettings: unknown;
+        };
+
         const errors = [] as string[];
 
-        const gameAlias = String(req.body.gameName);
+        const gameAlias = String(body.gameName);
         const gameNamespace = lobby.getGameNamespace(gameAlias);
         let numPlayers = -1;
         if (!gameNamespace) {
@@ -64,12 +79,12 @@ if (app && Config.ARENA_MODE) {
             numPlayers = gameNamespace.GameManager.requiredNumberOfPlayers;
         }
 
-        const session = String(req.body.session);
+        const session = String(body.session);
         if (!session || session === "*" || session === "new") {
             errors.push(`session '${session}' is not valid`);
         }
 
-        const gameSettings = req.body.gameSettings;
+        const gameSettings = body.gameSettings;
         if (!gameSettings || !isObject(gameSettings)) {
             errors.push("gameSettings is required");
         }
@@ -84,7 +99,12 @@ if (app && Config.ARENA_MODE) {
         }
 
         if (errors.length === 0) {
-            const error = lobby.setup(req.body as any);
+            const error = lobby.setup({
+                gameAlias,
+                gameSettings: gameSettings as {}, // if it was not an object an error would be added above
+                session,
+            });
+
             if (error) {
                 errors.push(error);
             }

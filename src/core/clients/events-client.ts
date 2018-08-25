@@ -10,7 +10,7 @@ export interface IFinishedData {
 
 /** Data clients second with a "run" event */
 export interface IRunData {
-    caller: IGameObjectReference;
+    caller: IGameObjectReference; // tslint:disable-line:no-banned-terms
     functionName: string;
     args: {[key: string]: unknown};
 }

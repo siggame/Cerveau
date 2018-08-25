@@ -1,9 +1,9 @@
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
-import { BaseAIManager, IBasePlayer, IDelta } from "~/core/game/";
+import { BaseAIManager, IBasePlayer, IDelta, IDeltaData } from "~/core/game/";
 import { logger } from "~/core/log";
-import { isObject, objectHasProperty } from "~/utils";
+import { isObject, objectHasProperty, ParsedJSON } from "~/utils";
 import * as ClientEvents from "./events-client";
 import * as ServerEvents from "./events-server";
 
@@ -74,7 +74,9 @@ export class BaseClient {
     private listening: boolean = false;
 
     /** The listener callbacks for socket events. */
-    private readonly listeners: {[key: string]: (data: any) => void} = {};
+    private readonly listeners: {
+        [key: string]: (data: unknown) => void | undefined;
+    } = {};
 
     /** True once we have disconnected from the socket */
     private hasDisconnectedFromSocket: boolean = false;
@@ -105,7 +107,7 @@ export class BaseClient {
 
         // We need to wrap all the listener functions in closures to not lose
         // reference to 'this', which is this instance of a Client.
-        this.listeners[this.onDataEventName] = (data) => {
+        this.listeners[this.onDataEventName] = (data: unknown) => {
             this.onSocketData(data);
         };
         this.listeners[this.onCloseEventName] = (data) => {
@@ -221,6 +223,7 @@ export class BaseClient {
             }
 
             this.listening = false;
+
             return true;
         }
 
@@ -250,9 +253,9 @@ export class BaseClient {
      * @param info - The name, language, and index of the client
      */
     public setInfo(info: {
-        name?: string,
-        type?: string,
-        index?: number,
+        name?: string;
+        type?: string;
+        index?: number;
     }): void {
         this.ourName = info.name || DEFAULT_STR;
         this.ourProgrammingLanguageType = info.type || DEFAULT_STR;
@@ -283,10 +286,11 @@ export class BaseClient {
     public send(event: "start", data: ServerEvents.IStartData): Promise<void>;
     public send(event: "order", data: ServerEvents.IOrderData): Promise<void>;
     public send(event: "invalid", data: ServerEvents.IInvalidData): Promise<void>;
-    public send(event: "ran", data: any): Promise<void>;
+    public send(event: "ran", data: unknown): Promise<void>;
     public send(event: "named", data: string): Promise<void>;
     public send(event: "lobbied", data: ServerEvents.ILobbiedData): Promise<void>;
-    public send(event: "delta", data: IDelta): Promise<void>;
+    public send(event: "delta", data: IDeltaData): Promise<void>;
+    public send(event: "metaDelta", data: IDelta): Promise<void>;
 
     /**
      * Sends the message of type event to this client as a json string EOT_CHAR
@@ -296,7 +300,7 @@ export class BaseClient {
      * @param data - The object to send about the event being sent.
      * @returns After the data is sent.
      */
-    public send(event: string, data: any): Promise<void> {
+    public async send(event: string, data: unknown): Promise<void> {
         return this.sendRaw(JSON.stringify({ event, data }));
     }
 
@@ -353,13 +357,15 @@ export class BaseClient {
          || !objectHasProperty(jsonData, "event")
          || typeof jsonData.event !== "string"
         ) {
-            this.disconnect(`Sent malformed json event`);
+            this.disconnect("Sent malformed json event");
+
             return;
         }
 
         const event = this.sent[jsonData.event];
         if (!event) {
             this.disconnect(`Sent unknown event '${jsonData.event}'.`);
+
             return;
         }
 
@@ -388,7 +394,7 @@ export class BaseClient {
      * @param json - The json formatted string to parse.
      * @returns The parsed json structure, or undefined if malformed json.
      */
-    protected parseData(json: unknown): any {
+    protected parseData(json: unknown): ParsedJSON | undefined {
         let invalid = "";
 
         if (typeof json !== "string") {

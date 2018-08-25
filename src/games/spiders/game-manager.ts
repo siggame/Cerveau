@@ -3,6 +3,7 @@
 import { BaseClasses, SpidersGame, SpidersGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
+import { arrayHasElements } from "~/utils";
 import { Spiderling } from "./spiderling";
 // <<-- /Creer-Merge: imports -->>
 
@@ -142,11 +143,20 @@ export class SpidersGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         const players = this.game.players.slice();
+
+        if (!arrayHasElements(players)) {
+            throw new Error("No players to win game!");
+        }
+
         players.sort((a, b) => b.broodMother.health - a.broodMother.health);
 
         // check if one player has more health in his BroodMother than the rest
         if (players[0].broodMother.health !== players[1].broodMother.health) {
-            const winner = players.shift()!;
+            const winner = players.shift();
+            if (!winner) {
+                throw new Error("No winners for Spiders game!");
+            }
+
             this.declareWinner(
                 `${reason} - BroodMother has the most remaining health (${winner.broodMother.health}).`,
                 winner,
@@ -162,7 +172,11 @@ export class SpidersGameManager extends BaseClasses.GameManager {
 
         players.sort((a, b) => b.numberOfNestsControlled - a.numberOfNestsControlled);
         if (players[0].numberOfNestsControlled !== players[1].numberOfNestsControlled) {
-            const winner = players.shift()!;
+            const winner = players.shift();
+            if (!winner) {
+                throw new Error("No winners for Spiders game!");
+            }
+
             this.declareWinner(
                 `${reason} - Has the most controlled Nests (${winner.numberOfNestsControlled}).`,
                 winner,
@@ -179,7 +193,11 @@ export class SpidersGameManager extends BaseClasses.GameManager {
         // else check if one player has more spiders than the other
         players.sort((a, b) => b.spiders.length - a.spiders.length);
         if (players[0].spiders.length !== players[1].spiders.length) {
-            const winner = players.shift()!;
+            const winner = players.shift();
+            if (!winner) {
+                throw new Error("No winners for Spiders game!");
+            }
+
             this.declareWinner(
                 `${reason} - Player has the most Spiders (${winner.spiders.length}).`,
                 winner,
@@ -188,6 +206,7 @@ export class SpidersGameManager extends BaseClasses.GameManager {
                 `${reason} - Player has less Spiders alive than winner.`,
                 ...players,
             );
+
             return;
         }
 
@@ -197,4 +216,10 @@ export class SpidersGameManager extends BaseClasses.GameManager {
         // If no winner it determined above, then a random one will be chosen.
         super.secondaryWinConditions(reason);
     }
+
+    // <<-- Creer-Merge: protected-private-methods -->>
+
+    // any additional protected/private methods you need can be added here
+
+    // <<-- /Creer-Merge: protected-private-methods -->>
 }

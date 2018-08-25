@@ -89,7 +89,7 @@ export class Web extends GameObject {
      * Snaps the web, killing all spiders on it.
      */
     public snap(): void {
-        if (this.hasSnapped()) {
+        if (this.hasSnapped() || !this.nestA || !this.nestB) {
             return; // as it's snapping more than once at the end of the turn
         }
 
@@ -116,8 +116,8 @@ export class Web extends GameObject {
 
         removeElementFrom(this,
             this.game.webs,
-            this.nestA!.webs,
-            this.nestB!.webs,
+            this.nestA.webs,
+            this.nestB.webs,
         );
 
         this.nestA = undefined;
@@ -129,8 +129,17 @@ export class Web extends GameObject {
      *
      * @returns True if the web has been snapped (is dead), false otherwise
      */
-    public hasSnapped(): boolean {
+    public hasSnapped(): this is Web & { nestA: undefined; nestB: undefined } {
         return this.strength === -1;
+    }
+
+    /**
+     * Returns if this Web has been NOT snapped, and thus has nests.
+     *
+     * @returns False if the web has been snapped (is dead), True otherwise
+     */
+    public hasNotSnapped(): this is Web & { nestA: Nest; nestB: Nest } {
+        return this.strength > -1;
     }
 
     /**
@@ -202,8 +211,8 @@ export class Web extends GameObject {
      * @returns An array of Spiders in nest A and B (the sides of this web).
      */
     public getSideSpiders(): Spider[] {
-        return this.nestA
-            ? this.nestA.spiders.concat(this.nestB!.spiders)
+        return (this.nestA && this.nestB)
+            ? this.nestA.spiders.concat(this.nestB.spiders)
             : [];
     }
 

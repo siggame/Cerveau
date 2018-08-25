@@ -8,7 +8,11 @@ import { Player } from "./player";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
-import { euclideanDistance, IPoint } from "~/utils";
+import { arrayHasElements, euclideanDistance, IPoint, MutableRequired,
+       } from "~/utils";
+
+/** A Player that can mutate before the game begins */
+type MutablePlayer = MutableRequired<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -167,7 +171,7 @@ export class SpidersGame extends BaseClasses.Game {
                 }
 
                 if (point) {
-                    this.nests.push(this.manager.create.Nest(point));
+                    this.nests.push(this.manager.create.nest(point));
                     break; // out of while(retries), as the point was valid
                 }
             }
@@ -175,6 +179,10 @@ export class SpidersGame extends BaseClasses.Game {
 
         // re-set just incase we had to abort above due to congestion
         numNests = this.nests.length;
+
+        if (!arrayHasElements(this.nests)) {
+            throw new Error("Spiders game has no nests!");
+        }
 
         // generate Webs on the left
         const numWebs = this.manager.random.int(maxWebs, minWebs);
@@ -184,18 +192,18 @@ export class SpidersGame extends BaseClasses.Game {
                 throw new Error("No nests to create Webs.");
             }
 
-            let nestB = nestA;
+            let nestB: Nest | undefined = nestA;
             while (nestB === nestA) {
-                nestB = this.manager.random.element(this.nests)!;
+                nestB = this.manager.random.element(this.nests);
             }
 
-            this.manager.create.Web({ nestA, nestB });
+            this.manager.create.web({ nestA, nestB });
         }
 
         // create the BroodMother
-        (this.players[0] as any).broodMother = this.manager.create.BroodMother({
+        (this.players[0] as MutablePlayer).broodMother = this.manager.create.broodMother({
             owner: this.players[0],
-            nest: this.manager.random.element(this.nests)!,
+            nest: this.manager.random.element(this.nests),
         });
 
         // now mirror it
@@ -204,7 +212,7 @@ export class SpidersGame extends BaseClasses.Game {
         const mirrorNests = new Map<Nest, Nest>();
         for (let i = 0; i < numNests; i++) {
             const mirroring = this.nests[i];
-            const mirrored = this.manager.create.Nest({
+            const mirrored = this.manager.create.nest({
                 x: mapWidth - mirroring.x,
                 y: mirroring.y,
             });
@@ -216,10 +224,15 @@ export class SpidersGame extends BaseClasses.Game {
 
         // mirror the Webs
         for (const web of this.webs) {
-            this.manager.create.Web({
-                nestA: mirrorNests.get(web.nestA!)!,
-                nestB: mirrorNests.get(web.nestA!)!,
-            });
+            if (!web.hasNotSnapped()) {
+                throw new Error("Invalid web on game creation!");
+            }
+
+            // get mirror the nests
+            const nestA = mirrorNests.get(web.nestA);
+            const nestB = mirrorNests.get(web.nestB);
+
+            this.manager.create.web({ nestA, nestB });
         }
 
         // webs that cross the middle of the game
@@ -229,21 +242,29 @@ export class SpidersGame extends BaseClasses.Game {
             const nestA = this.nests[this.manager.random.int(numNests - 1)];
              // and the other half has player 1's
             const nestB = this.nests[this.manager.random.int(numNests, numNests * 2 - 1)];
-            this.manager.create.Web({ nestA, nestB });
+            this.manager.create.web({ nestA, nestB });
 
+            const mirrorA = mirrorNests.get(nestA);
+            const mirrorB = mirrorNests.get(nestB);
             if (mirrorNests.get(nestA) !== nestB) {
                 // this is the mirror of the web created above, so long as the nests don't mirror each other already
-                this.manager.create.Web({
-                    nestA: mirrorNests.get(nestA)!,
-                    nestB: mirrorNests.get(nestB)!,
-                });
+                this.manager.create.web({ nestA: mirrorA, nestB: mirrorB });
             }
         }
 
         // mirror the BroodMother
-        (this.players[1] as any).broodMother = this.manager.create.BroodMother({
+        const secondPlayer: MutablePlayer = this.players[1];
+        const nest0 = this.players[0].broodMother.nest;
+        if (!nest0) {
+            throw new Error("Player 0's BroodMother has no nest!");
+        }
+        const mirrorNest = mirrorNests.get(nest0);
+        if (!mirrorNest) {
+            throw new Error("Player 1's BroodMother has no nest!");
+        }
+        secondPlayer.broodMother = this.manager.create.broodMother({
             owner: this.players[1],
-            nest: mirrorNests.get(this.players[0].broodMother.nest!)!,
+            nest: mirrorNest,
         });
 
         // <<-- /Creer-Merge: constructor -->>

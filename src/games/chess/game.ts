@@ -7,6 +7,10 @@ import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import * as chessjs from "chess.js";
+import { MutableRequired } from "~/utils";
+
+/** A player that can be mutated BEFORE the game starts */
+type MutablePlayer = MutableRequired<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -20,8 +24,8 @@ export class ChessGame extends BaseClasses.Game {
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
-     * Forsyth-Edwards Notation (fen), a notation that describes the game
-     * board state.
+     * Forsyth-Edwards Notation (fen), a notation that describes the game board
+     * state.
      */
     public fen!: string;
 
@@ -76,8 +80,8 @@ export class ChessGame extends BaseClasses.Game {
             this.chess.load_pgn(this.settings.pgn);
         }
 
-        (this.players[0].color as any) = "white";
-        (this.players[1].color as any) = "black";
+        (this.players[0] as MutablePlayer).color = "white";
+        (this.players[1] as MutablePlayer).color = "black";
 
         this.fen = this.chess.fen();
         this.history.push(...this.chess.history());
@@ -91,4 +95,10 @@ export class ChessGame extends BaseClasses.Game {
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }

@@ -25,11 +25,11 @@ export function mixTwoPlayer<
     TBaseGameObject extends Base.BaseGameObjectConstructor,
     TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
-    AI: TBaseAI,
-    Game: TBaseGame,
-    GameManager: TBaseGameManager,
-    GameObject: TBaseGameObject,
-    GameSettings: TBaseGameSettings,
+    AI: TBaseAI;
+    Game: TBaseGame;
+    GameManager: TBaseGameManager;
+    GameObject: TBaseGameObject;
+    GameSettings: TBaseGameSettings;
 }) {
     /** A game with only two players in it. (a very common game type) */
     class TwoPlayerGame extends base.Game {
@@ -41,7 +41,7 @@ export function mixTwoPlayer<
          *
          * @param args - The arguments unknown to this constructor.
          */
-        constructor(...args: any[]) {
+        constructor(...args: any[]) { // tslint:disable-line:no-any - any[] required for mixin constructor signature
             super(...args);
 
             this.players[0].opponent = this.players[1];

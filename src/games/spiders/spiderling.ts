@@ -10,6 +10,12 @@ import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * When empty string this Spiderling is not busy, and can act. Otherwise a
+ * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
+ */
+export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+
+/**
  * Add properties here to make the create.Spiderling have different args.
  */
 export interface ISpiderlingConstructorArgs
@@ -116,10 +122,13 @@ export class Spiderling extends Spider {
         this.workRemaining = 0;
 
         if (finishing === "Moving") {
-            this.nest = this.movingToNest!;
+            if (!this.movingToNest || !this.movingOnWeb) {
+                throw new Error(`${this} finished Moving but to no web!`);
+            }
+            this.nest = this.movingToNest;
             this.nest.spiders.push(this);
-            removeElements(this.movingOnWeb!.spiderlings, this);
-            this.movingOnWeb!.addLoad(-1);
+            removeElements(this.movingOnWeb.spiderlings, this);
+            this.movingOnWeb.addLoad(-1);
 
             this.movingToNest = undefined;
             this.movingOnWeb = undefined;
@@ -142,6 +151,7 @@ export class Spiderling extends Spider {
         else { // they finished doing a different action (cut, weave, spit)
             this.coworkers.clear();
             this.numberOfCoworkers = this.coworkers.size;
+
             return false;
         }
     }
@@ -281,13 +291,17 @@ export class Spiderling extends Spider {
     protected async move(player: Player, web: Web): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
 
+        if (!this.nest) {
+            throw new Error(`${this} told to move without being on a Nest.`);
+        }
+
         this.busy = "Moving";
         this.workRemaining = Math.ceil(web.length / this.game.movementSpeed);
 
         this.movingOnWeb = web;
-        this.movingToNest = web.getOtherNest(this.nest!);
+        this.movingToNest = web.getOtherNest(this.nest);
 
-        removeElements(this.nest!.spiders, this);
+        removeElements(this.nest.spiders, this);
         this.nest = undefined;
 
         web.spiderlings.push(this);

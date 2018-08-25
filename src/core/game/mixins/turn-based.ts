@@ -6,8 +6,7 @@ import { nextWrapAround } from "~/utils";
 import * as Base from "./base";
 
 /** A player in a turn based game */
-export interface ITurnBasedPlayer extends IBasePlayer {
-}
+export interface ITurnBasedPlayer extends IBasePlayer {}
 
 /**
  * A base game that is turn based, with helper functions that should be common
@@ -26,11 +25,11 @@ export function mixTurnBased<
     TBaseGameObject extends Base.BaseGameObjectConstructor,
     TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
-    AI: TBaseAI,
-    Game: TBaseGame,
-    GameManager: TBaseGameManager,
-    GameObject: TBaseGameObject,
-    GameSettings: TBaseGameSettings,
+    AI: TBaseAI;
+    Game: TBaseGame;
+    GameManager: TBaseGameManager;
+    GameObject: TBaseGameObject;
+    GameSettings: TBaseGameSettings;
 }) {
     /** An AI in the game that has turns to execute. */
     class TurnBasedAI extends base.AI {
@@ -49,6 +48,7 @@ export function mixTurnBased<
         /** The schema for turn based settings. */
         public schema = this.makeSchema({
             // HACK: super should work. but schema is undefined on it
+            // tslint:disable-next-line:no-any - HACK: super should work. but schema is undefined on it
             ...(super.schema || (this as any).schema),
             timeAddedPerTurn: {
                 default: 1e9, // 1 sec in ns,
@@ -109,7 +109,7 @@ export function mixTurnBased<
          *
          * @param args - All the args to pipe to our super.
          */
-        constructor(...args: any[]) {
+        constructor(...args: any[]) { // tslint:disable-line:no-any - signature must be any[] for mixins as per TS
             super(...args);
 
             this.game.currentPlayer = this.game.players[0];
@@ -130,7 +130,7 @@ export function mixTurnBased<
             player: IBasePlayer,
             gameObject: BaseGameObject,
             functionName: string,
-            args: Map<string, any>,
+            args: Map<string, unknown>,
         ): string | undefined {
             const invalid = super.invalidateRun(
                 player,
@@ -215,21 +215,31 @@ export function mixTurnBased<
                 // now check if the game is over before advancing the turn
                 if (this.game.currentTurn + 1 >= this.game.maxTurns) {
                     this.maxTurnsReached();
+
                     return;
                 }
                 else if (this.primaryWinConditionsCheck()) {
                     this.endGame();
+
                     return;
                 }
 
                 // If we got here all after turn logic is done, so let's
                 // advance the turn.
                 this.game.currentTurn++;
-                this.game.currentPlayer = nextWrapAround(
+
+                const nextPlayer = nextWrapAround(
                     this.game.players,
                     this.game.currentPlayer,
-                )!;
+                );
 
+                if (!nextPlayer) {
+                    throw new Error(
+                        "Cannot find the next player for their turn!",
+                    );
+                }
+
+                this.game.currentPlayer = nextPlayer;
                 this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
 
             }

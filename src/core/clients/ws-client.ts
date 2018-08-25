@@ -25,6 +25,7 @@ export class WSClient extends BaseClient {
      */
     public getNetSocket(): net.Socket {
         // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
+        // tslint:disable-next-line:no-any
         return (this.socket as any)._socket;
     }
 
@@ -36,6 +37,7 @@ export class WSClient extends BaseClient {
     public stopListeningToSocket(): boolean {
         const returned = super.stopListeningToSocket();
         this.socket.pause();
+
         return returned;
     }
 

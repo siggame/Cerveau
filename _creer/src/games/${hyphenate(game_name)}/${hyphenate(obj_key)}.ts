@@ -231,6 +231,7 @@ ${merge('        // ', function_name, """
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 
@@ -246,6 +247,7 @@ ${merge('        // ', function_name, """
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
@@ -255,6 +257,7 @@ ${merge('        // ', function_name, """
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this);
     }
 
@@ -269,6 +272,7 @@ ${merge('        // ', function_name, """
      * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: string): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbor.call(this, direction);
     }
 
@@ -279,6 +283,7 @@ ${merge('        // ', function_name, """
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
@@ -288,6 +293,7 @@ ${merge('        // ', function_name, """
      * @returns A string representation of the Tile.
      */
     public toString(): string {
+        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
 

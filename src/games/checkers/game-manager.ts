@@ -85,6 +85,7 @@ export class CheckersGameManager extends BaseClasses.GameManager {
         if (winner) {
             this.declareLoser("No checkers remaining", winner.opponent);
             this.declareWinner("All enemy checkers jumped!", winner);
+
             return true;
         }
         // <<-- /Creer-Merge: primary-win-conditions -->>

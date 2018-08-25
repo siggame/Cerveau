@@ -1,9 +1,12 @@
 // This file handles all the CLI args, parsing them, and outputting a sane obj
 
 import { ArgumentOptions, ArgumentParser } from "argparse";
-import "dotenv"; // loads the config from an optional `.env` file
+import { config } from "dotenv";
 import { IWorkerGameSessionData } from "~/core/server/worker";
-import { IUnknownObject, unstringify } from "~/utils";
+import { UnknownObject, unstringify } from "~/utils";
+
+// loads the config from an optional `.env` file
+config();
 
 /** The shape of config variables */
 export interface IArgs {
@@ -83,7 +86,7 @@ export interface IArgs {
     WORKER_DATA?: IWorkerGameSessionData;
 }
 
-const parserArgs: Array<[string[], ArgumentOptions]> = [
+const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
     [["--port-offset"], {action: "store", dest: "PORT_OFFSET", defaultValue: 0,
         type: "int", help: "port offset for the default port values"}],
 
@@ -118,7 +121,9 @@ const parserArgs: Array<[string[], ArgumentOptions]> = [
         help: "If game sessions should be ran on the master thread, for easier debugging of game logic"}],
 
     [["--visualizer-url"], {action: "store", dest: "VISUALIZER_URL",
-        help: "the base url the a remote visualizer to send clients to", defaultValue: "http://vis.siggame.io/"}],
+        help: "the base url the a remote visualizer to send clients to",
+        // tslint:disable-next-line:no-http-string - because it has to be
+        defaultValue: "http://vis.siggame.io/"}],
 
     [["--arena"], {action: "storeTrue", dest: "ARENA_MODE",
         help: "starts the server in arena mode, where certain functionality is changed", defaultValue: false}],
@@ -158,14 +163,15 @@ const parser = new ArgumentParser({description:
     "Run the JavaScript client with options to connect to a game server. Must provide a game name to play.",
 });
 
-const defaults: IUnknownObject = {};
+const defaults: UnknownObject = {};
 for (const [names, options] of parserArgs) {
     parser.addArgument(names, options);
-    defaults[options.dest!] = options.defaultValue;
+    defaults[options.dest] = options.defaultValue;
 }
 
 // first two args are `node main.js`, with the full path to each
 const parsedArgs = parser.parseArgs(process.argv.slice(2));
+// tslint:disable-next-line:no-any
 const args: IArgs = {} as any; // we will set it so that it becomes a valid
                                // IArgs in the next loop
 
@@ -176,6 +182,7 @@ for (const key of Object.keys(parsedArgs)) {
     // if the command line value is the default value, and an env value was set
     // use the env value, otherwise use the command line value which will be the
     // default/cli value
+    // tslint:disable-next-line:no-any
     (args as any)[key] = commandLineValue === defaults[key] && envValue
         ? unstringify(envValue)
         : commandLineValue;
@@ -190,9 +197,9 @@ if (process.env.WORKER_GAME_SESSION_DATA) {
 
 if (args.RUN_PROFILER) {
     try {
-        // tslint:disable-next-line no-var-requires
+        // tslint:disable-next-line:no-var-requires no-require-imports
         if (!require("v8-profiler")) {
-            throw new Error(
+            throw new Error(// tslint:disable-next-line:no-multiline-string
 `ERROR: Module 'v8-profiler' not found and is needed for profiling.
 Please use 'npm install v8-profiler'.
 NOTE: This will require node-gyp to compile its C++ addons.`,

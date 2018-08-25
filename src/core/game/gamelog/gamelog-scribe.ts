@@ -2,7 +2,7 @@ import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
-    IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+         IFinishedDeltaData, IRanDeltaData } from "~/core/game";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { Session } from "~/core/server";
 import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
@@ -69,9 +69,15 @@ export class GamelogScribe {
         });
 
         for (const client of clients) {
+            if (!client.player) {
+                continue; // We don't care when non-player clients disconnect.
+            }
+
+            const { id } = client.player;
             client.events.disconnected.on(() => {
+
                 this.add("disconnect", {
-                    player: { id: client.player!.id },
+                    player: { id },
                     timeout: client.hasTimedOut(),
                 });
             });
@@ -80,14 +86,19 @@ export class GamelogScribe {
 
     /**
      * Generates the game log from all the events that happened in this game.
-     * @param clients the list of clients that played this game
-     * @returns the gamelog that was generated
+     *
+     * @param clients - The list of clients that played this game.
+     * @returns The gamelog that was generated.
      */
     private finalizeGamelog(clients: BaseClient[]): void {
         // update the winners and losers of the gamelog
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
-            const player = client.player!;
+            const player = client.player;
+
+            if (!player) {
+                continue; // they are a spectator and don't matter to the gamelog.
+            }
 
             const winnerLoserArray = player.won
                 ? this.gamelog.winners

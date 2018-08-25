@@ -1,3 +1,6 @@
+// tslint:disable:no-any no-non-null-assertion
+// ^ as DeltaMergeables are black magic anyways
+
 import { ISanitizableType, sanitizeType } from "~/core/sanitize/";
 import { ITypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";

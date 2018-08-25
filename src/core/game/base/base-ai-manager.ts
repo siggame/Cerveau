@@ -4,7 +4,7 @@ import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
        } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, IUnknownObject, quoteIfString } from "~/utils";
+import { capitalizeFirstLetter, quoteIfString, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -17,10 +17,11 @@ interface IOrder {
     // but clients currently only know the numbered index
     index: number;
     name: string;
-    args: any[]; // should be the serialized args
+    args: Array<unknown>; // should be the serialized args
     errors: number;
-    resolve: (returned: any) => void;
-    reject: (err: any) => void;
+
+    resolve(returned: unknown): void;
+    reject(err: unknown): void;
 }
 
 /**
@@ -49,7 +50,7 @@ export class BaseAIManager {
         player: IBasePlayer,
         gameObject: BaseGameObject,
         functionName: string,
-        args: Map<string, any>,
+        args: Map<string, unknown>,
     ) => string | undefined;
 
     /** The orders that have been sent to clients */
@@ -88,7 +89,10 @@ export class BaseAIManager {
      * @returns A promise that will resolve when the AI finishes that order
      * resolving to their returned value.
      */
-    public executeOrder(name: string, ...unsanitizedArgs: any[]): Promise<any> {
+    public executeOrder(
+        name: string,
+        ...unsanitizedArgs: Array<unknown>
+    ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const sanitizedArgs = this.gameSanitizer.sanitizeOrderArgs(
                 name,
@@ -100,10 +104,11 @@ export class BaseAIManager {
                 // can't figure out what to do
                 this.client.disconnect(`We could not make you execute ${name}.`);
                 reject(sanitizedArgs);
+
                 return;
             }
 
-            const args = sanitizedArgs.map((a) => serialize(a));
+            const args = sanitizedArgs.map(serialize);
             const index = this.nextOrderIndex++;
 
             const order: IOrder = {
@@ -142,7 +147,7 @@ export class BaseAIManager {
     private async requestedRun<T>(
         callerReference: IGameObjectReference,
         functionName: string,
-        unsanitizedArgs: IUnknownObject,
+        unsanitizedArgs: UnknownObject,
     ): Promise<T | undefined> {
         this.client.pauseTicking();
 
@@ -153,6 +158,7 @@ export class BaseAIManager {
         );
 
         this.client.startTicking();
+
         return returned;
     }
 
@@ -169,26 +175,28 @@ export class BaseAIManager {
     private async tryToRun<T>(
         callerReference: IGameObjectReference,
         functionName: string,
-        unsanitizedArgs: IUnknownObject,
+        unsanitizedArgs: UnknownObject,
     ): Promise<T | undefined> {
         if (!this.client.player) {
             this.client.disconnect(
                 "You do not have a Player to send run commands for",
             );
+
             return undefined;
         }
 
         const callerID = callerReference && callerReference.id;
-        const caller = this.game.gameObjects[callerID];
+        const gameObject = this.game.gameObjects[callerID];
 
-        if (!caller) {
+        if (!gameObject) {
             // they sent us an invalid caller
             this.client.disconnect(`Cannot determine the calling game object of ${callerReference} to run for.`);
+
             return undefined;
         }
 
         const sanitizedArgs = this.gameSanitizer.validateRunArgs(
-            caller,
+            gameObject,
             functionName,
             unSerialize(unsanitizedArgs, this.game),
         );
@@ -197,26 +205,32 @@ export class BaseAIManager {
             // The structure of their run command is so malformed we can't even
             // run it, so something is wrong with their client, disconnect them
             this.client.disconnect(sanitizedArgs.message);
+
             return undefined;
         }
 
-        const gameObjectSchema = this.namespace.gameObjectsSchema[caller.gameObjectName];
+        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
         if (!gameObjectSchema) {
             // the caller is malformed in some unexpected way
-            this.client.disconnect(`Cannot find schema for game object '${caller.gameObjectName}'.`);
+            this.client.disconnect(`Cannot find schema for game object '${gameObject.gameObjectName}'.`);
+
             return undefined;
         }
 
         // If we got here, we have sanitized the args and know the calling
         // game object has the appropriate function
-        const schema = gameObjectSchema.functions[functionName]!;
+        const schema = gameObjectSchema.functions[functionName];
+        if (!schema) {
+            throw new Error(`Invalid state: no schema found for ${gameObject}'s function ${functionName}.`);
+        }
+
         let returned = schema.invalidValue;
 
         let invalid = sanitizedArgs instanceof Map
             // if it appears valid, try to invalidate
             ? this.invalidateRun(
                 this.client.player,
-                caller,
+                gameObject,
                 functionName,
                 sanitizedArgs,
             )
@@ -231,11 +245,13 @@ export class BaseAIManager {
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
-            const invalidateFunction = (caller as any)[`invalidate${capitalizeFirstLetter(functionName)}`];
+            // tslint:disable-next-line:no-any - we are getting this function via reflection, no easier way to do this.
+            const gameObjectAsAny = gameObject as any;
+            const invalidateFunction = gameObjectAsAny[`invalidate${capitalizeFirstLetter(functionName)}`];
             const validated: string | IArguments = invalidateFunction.call(
-                caller,
+                gameObject,
                 this.client.player,
-                ...(sanitizedArgs as Map<string, any>).values(),
+                ...(sanitizedArgs as Map<string, unknown>).values(),
             );
 
             invalid = typeof validated === "string"
@@ -249,8 +265,8 @@ export class BaseAIManager {
             }
             else {
                 // It's valid!
-                const unsanitizedReturned: any = await (caller as any)[functionName](...validated);
-                returned = this.gameSanitizer.validateRanReturned(caller, functionName, unsanitizedReturned);
+                const unsanitizedReturned = await gameObjectAsAny[functionName](...validated);
+                returned = this.gameSanitizer.validateRanReturned(gameObject, functionName, unsanitizedReturned);
             }
         }
 
@@ -287,10 +303,14 @@ export class BaseAIManager {
             args: order.args,
         };
 
+        if (!this.client.player) {
+            throw new Error(`Cannot send an order to client ${this.client} as it is not playing!`);
+        }
+
         // This is basically to notify upstream for the gamelog manager
         // and session to record/send these
         this.events.ordered.emit({
-            player: { id: this.client.player!.id },
+            player: { id: this.client.player.id },
             order: simpleOrder,
         });
 
@@ -307,10 +327,11 @@ export class BaseAIManager {
      */
     private finishedOrder(orderIndex: number, unsanitizedReturned: unknown): void {
         const order = this.orders.get(orderIndex);
-        if (!order) {
+        if (!order || !this.client.player) {
             this.client.disconnect(
                 `Cannot find order # ${orderIndex} you claim to have finished.`,
             );
+
             return; // we have no order to resolve or reject
         }
 
@@ -332,7 +353,7 @@ export class BaseAIManager {
         // This is basically to notify upstream for the gamelog manager and
         // session to record/send these
         this.events.finished.emit({
-            player: { id: this.client.player!.id },
+            player: { id: this.client.player.id },
             invalid,
             order,
             returned: unsanitizedReturned,
@@ -356,7 +377,9 @@ export class BaseAIManager {
             else {
                 // re-send them the same order, as they fucked up last time.
                 this.sendOrder(order);
-                return; // do not resolve/reject the promise, let them try again
+
+                // do not resolve/reject the promise, let them try again
+                return;
             }
         }
 

@@ -10,7 +10,15 @@ import { Spawner } from "./spawner";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
+
+import { MutableRequired } from "~/utils";
 import { jobStats } from "./job-stats";
+
+/**
+ * A tile that can be mutated. Should only be used during game initialization.
+ */
+type MutableTile = MutableRequired<Tile>;
+
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -146,7 +154,7 @@ export class StumpedGame extends BaseClasses.Game {
 
         for (const title of Object.keys(jobStats).sort()) {
             this.jobs.push(
-                this.manager.create.Job({
+                this.manager.create.job({
                     ...jobStats[title],
                     title,
                 }),
@@ -178,6 +186,7 @@ export class StumpedGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 
@@ -225,13 +234,13 @@ export class StumpedGame extends BaseClasses.Game {
             }
 
             if (energy > threshold) {
-                (tile as any).type = "water";
+                (tile as MutableTile).type = "water";
             }
         }
 
         /* Generate rivers */
         const minTheta = Math.PI / 4;
-        const maxTheta = 3 * Math.PI / 4;
+        const maxTheta = Math.PI * 3 / 4;
         const minThetaDelta = Math.PI / 6;
         const maxThetaDelta = Math.PI / 4;
         const thetaDeltaRange = maxThetaDelta - minThetaDelta;
@@ -303,7 +312,7 @@ export class StumpedGame extends BaseClasses.Game {
                     // Verify the current tile exists
                     if (realX >= 0 && realY >= 0 && realX < this.mapWidth && realY < this.mapHeight / 2) {
                         // Set tile to water
-                        const tile = this.getTile(realX, realY)!;
+                        const tile = this.getTile(realX, realY) as MutableTile;
 
                         // Don't go diagonal
                         if (realX !== nextX && realY !== nextY) {
@@ -313,19 +322,19 @@ export class StumpedGame extends BaseClasses.Game {
                         // Flow direction
                         if (tile.type !== "water") {
                             if (realY > lastY) {
-                                (tile as any).flowDirection = "North";
+                                tile.flowDirection = "North";
                             }
                             else if (realY < lastY) {
-                                (tile as any).flowDirection = "South";
+                                tile.flowDirection = "South";
                             }
                             else if (realX < lastX) {
-                                (tile as any).flowDirection = "East";
+                                tile.flowDirection = "East";
                             }
                             else if (realX > lastX) {
-                                (tile as any).flowDirection = "West";
+                                tile.flowDirection = "West";
                             }
 
-                            (tile as any).type = "water";
+                            tile.type = "water";
                         }
                         else if (tile.flowDirection !== "") {
                             collided = true;
@@ -361,42 +370,50 @@ export class StumpedGame extends BaseClasses.Game {
                     );
                 }
 
-                this.manager.create.Spawner({ tile, type });
+                this.manager.create.spawner({ tile, type });
             }
         }
 
         /* Mirror map */
         for (const orig of this.tiles) {
-            const target = this.getTile(orig.x, this.mapHeight - orig.y - 1)!;
+            const target = this.getTile(orig.x, this.mapHeight - orig.y - 1) as MutableTile;
 
             // Copy data
-            (target as any).type = orig.type;
-            (target as any).flowDirection = orig.flowDirection === "North" || orig.flowDirection === "South"
+            target.type = orig.type;
+            target.flowDirection = (orig.flowDirection === "North" || orig.flowDirection === "South")
                 ? this.invertTileDirection(orig.flowDirection)
                 : orig.flowDirection;
 
             // clone Spawner
             if (orig.spawner) {
-                target.spawner = this.manager.create.Spawner({
-                    tile: target,
+                target.spawner = this.manager.create.spawner({
+                    tile: target as Tile,
                     type: orig.spawner.type,
                 });
             }
         }
 
         /* Place starting beavers */
-        let x = 0;
-        let y = 0;
+        let p1: Tile | undefined;
         do {
-            x = this.manager.random.int(this.mapWidth);
-            y = this.manager.random.int(this.mapHeight / 2);
-        } while (this.getTile(x, y)!.spawner);
+            p1 = this.getTile(
+                this.manager.random.int(this.mapWidth),
+                this.manager.random.int(this.mapHeight / 2),
+            );
 
-        const p1 = this.getTile(x, y)!;
-        const p2 = this.getTile(x, this.mapHeight - y - 1)!;
+            if (!p1) {
+                throw new Error("could not get random tile from expected map dimensions!");
+            }
+        } while (p1.spawner);
+
+        const p2 = this.getTile(p1.x, this.mapHeight - p1.y - 1);
+
+        if (!p2) {
+            throw new Error("could not get mirrored starting tile for player 2!");
+        }
 
         // Player 1
-        this.manager.create.Beaver({
+        this.manager.create.beaver({
             owner: this.players[0],
             tile: p1,
             job: this.jobs[0],
@@ -405,8 +422,8 @@ export class StumpedGame extends BaseClasses.Game {
         });
 
         // Player 2
-        this.manager.create.Beaver({
-            owner: this.players[0].opponent,
+        this.manager.create.beaver({
+            owner: this.players[1],
             tile: p2,
             job: this.jobs[0],
             recruited: true,

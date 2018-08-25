@@ -9,7 +9,7 @@
  * @returns Always returns an array, if the passed in variable was not an
  * array, constructs and returns a new array.
  */
-export function sanitizeArray<T = any>(
+export function sanitizeArray<T = unknown>(
     a: unknown,
     allowError: boolean,
 ): T[] | Error;
@@ -25,7 +25,7 @@ export function sanitizeArray<T = any>(
  * @returns Always returns an array, if the passed in variable was not an
  * array, constructs and returns a new array.
  */
-export function sanitizeArray<T = any>(
+export function sanitizeArray<T = unknown>(
     a: unknown,
     allowError: false,
 ): T[];
@@ -41,7 +41,7 @@ export function sanitizeArray<T = any>(
  * @returns Always returns an array, if the passed in variable was not an
  * array, constructs and returns a new array.
  */
-export function sanitizeArray<T = any>(
+export function sanitizeArray<T = unknown>(
     a: unknown,
     allowError: boolean = true,
 ): T[] | Error {

@@ -3,7 +3,7 @@ import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/log";
 import { capitalizeFirstLetter, getDirs,
-         isNil, ITypedObject, IUnknownObject } from "~/utils";
+         isNil, ITypedObject, UnknownObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -37,7 +37,7 @@ export class Lobby {
      *
      * @returns The Lobby singleton
      */
-    public static getInstance(): Lobby {
+    public static getInstance(): Lobby { // tslint:disable-line:function-name
         if (!Lobby.instance) {
             Lobby.instance = new Lobby();
         }
@@ -129,7 +129,7 @@ export class Lobby {
         if (gameName) {
             const rooms = this.rooms.get(gameName);
             if (rooms) {
-                return this.rooms.get(gameName)!.get(id);
+                return rooms.get(id);
             }
         }
         else {
@@ -156,7 +156,7 @@ export class Lobby {
     public getGameNamespace(gameAlias: string): IBaseGameNamespace | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
         if (gameName) {
-            return this.gameNamespaces[gameName]!;
+            return this.gameNamespaces[gameName];
         }
     }
 
@@ -170,7 +170,7 @@ export class Lobby {
     public setup(data: {
         gameAlias: string;
         session: string;
-        gameSettings: IUnknownObject;
+        gameSettings: UnknownObject;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -203,7 +203,13 @@ export class Lobby {
         ) as Room;
 
         room.addGameSettings(settings);
-        this.rooms.get(namespace.gameName)!.set(data.session, room);
+        const rooms = this.rooms.get(namespace.gameName);
+
+        if (!rooms) {
+            throw new Error(`Could not find rooms for ${namespace.gameName}.`);
+        }
+
+        rooms.set(data.session, room);
 
         // if we got here the setup data looks valid, so let's setup the Room.
     }
@@ -225,7 +231,11 @@ export class Lobby {
 
             if (room.clients.length === 0) {
                 // then that room is empty, no need to keep it around
-                this.rooms.get(room.gameNamespace.gameName)!.delete(room.id);
+                const rooms = this.rooms.get(room.gameNamespace.gameName);
+                if (!rooms) {
+                    throw new Error("Could not find rooms client was in");
+                }
+                rooms.delete(room.id);
 
                 if (Number(room.id) + 1 === this.nextRoomNumber) {
                     // then the next game number was never used, so reuse it
@@ -276,8 +286,8 @@ export class Lobby {
             logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
         });
 
-        listener.on("error", (err) => {
-            logger.error((err as any).code !== "EADDRINUSE"
+        listener.on("error", (err: Error & { code: string }) => {
+            logger.error(err.code !== "EADDRINUSE"
             ? String(err)
             : `Lobby cannot listen on port ${port} for game connections.
 Address is already in use.
@@ -350,9 +360,10 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         let room: Room | undefined;
+        let roomId = id;
 
-        if (id !== "new") {
-            if (id === "*" || id === undefined) {
+        if (roomId !== "new") {
+            if (roomId === "*" || roomId === undefined) {
                 // Then they want to join any open game,
                 // so try to find an open session.
                 for (const [, theRoom] of rooms) {
@@ -366,25 +377,25 @@ There's probably another Cerveau server running on this same computer.`);
                 if (!room) {
                     // Then there was no open room to join,
                     // so they get a new room.
-                    id = "new";
+                    roomId = "new";
                 }
             }
             else {
                 // They requested to join a specific room.
                 // An Error cannot be returned as gameName is checked above
-                room = this.getRoom(gameName, id) as Room | undefined;
+                room = this.getRoom(gameName, roomId) as Room | undefined;
             }
         }
 
         if (room) {
             if (room.isRunning()) {
                 // We can't put them in this game, so they get a new room.
-                return `Room ${id} for game ${gameName} is full! Sorry.`;
+                return `Room ${roomId} for game ${gameName} is full! Sorry.`;
             }
             else if (room.isOver()) {
                 // We need to clear out this Room as it's over and available
                 // to re-use.
-                this.rooms.delete(id);
+                this.rooms.delete(roomId);
                 room = undefined;
             }
         }
@@ -393,17 +404,22 @@ There's probably another Cerveau server running on this same computer.`);
             // Then we couldn't find a room from the requested gameName + id,
             // so they get a new one.
             if (!id || id === "new") {
-                id = String(this.nextRoomNumber++);
+                roomId = String(this.nextRoomNumber++);
+            }
+
+            const namespace = this.getGameNamespace(gameName);
+            if (!namespace) {
+                throw new Error(`Could not find a namespace for ${gameName}.`);
             }
 
             room = new RoomClass(
-                id,
-                this.getGameNamespace(gameName)!,
+                roomId,
+                namespace,
                 this.gamelogManager,
                 this.updater,
             );
 
-            rooms.set(id, room);
+            rooms.set(roomId, room);
         }
 
         return room;
@@ -425,6 +441,7 @@ There's probably another Cerveau server running on this same computer.`);
         if (typeof playData === "string") {
             // It did not validate, so playData is the invalid message
             client.disconnect(playData);
+
             return;
         }
 
@@ -442,6 +459,7 @@ There's probably another Cerveau server running on this same computer.`);
 
         if (authenticationError) {
             client.disconnect(`Authentication Error: '${authenticationError}'`);
+
             return;
         }
 
@@ -449,6 +467,7 @@ There's probably another Cerveau server running on this same computer.`);
 
         if (typeof room === "string") {
             client.disconnect(room);
+
             return;
         }
 
@@ -460,6 +479,7 @@ There's probably another Cerveau server running on this same computer.`);
                 // this player index so the existing client gets the index,
                 // and this client gets rejected
                 client.disconnect(`Player index ${playData.playerIndex} is already taken`);
+
                 return;
             }
         }
@@ -486,7 +506,10 @@ There's probably another Cerveau server running on this same computer.`);
         if (room.canStart()) {
             this.unTrackClients(...room.clients);
 
-            const roomsPlayingThisGame = this.roomsPlaying.get(playData.gameName)!;
+            const roomsPlayingThisGame = this.roomsPlaying.get(playData.gameName);
+            if (!roomsPlayingThisGame) {
+                throw new Error(`Could not find rooms for ${data.gameName} to start`);
+            }
             roomsPlayingThisGame.set(room.id, room);
 
             room.events.over.on(() => {
@@ -521,6 +544,7 @@ There's probably another Cerveau server running on this same computer.`);
             return undefined; // we do not need to authenticate them
         }
 
+        // tslint:disable-next-line:possible-timing-attack - passwords are in no way crypto-safe in Cerveau
         if (Config.AUTH_PASSWORD !== password) {
             return `Could not authenticate.
 '${password} is not a valid password to play on this server'`;
@@ -537,7 +561,7 @@ There's probably another Cerveau server running on this same computer.`);
      */
     private validatePlayData(
         data?: IPlayData,
-    ): string | (IPlayData & {validGameSettings: IUnknownObject}) {
+    ): string | (IPlayData & { validGameSettings: UnknownObject }) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -577,7 +601,7 @@ There's probably another Cerveau server running on this same computer.`);
 Available game settings:
 ${gameNamespace.gameSettingsManager.getHelp()}`;
 
-            let settings: IUnknownObject = {};
+            let settings: UnknownObject = {};
             try {
                 settings = (querystring.parse(data.gameSettings));
             }
@@ -614,6 +638,7 @@ Must be one string in the url parameters format.${footer}`;
 
         if (!gameName) {
             client.disconnect(`${alias} is not a known game alias for any game.`);
+
             return;
         }
 

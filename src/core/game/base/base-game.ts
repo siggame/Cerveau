@@ -1,6 +1,7 @@
 import { Event } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
+import { BaseAIManager } from "./base-ai-manager";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";
@@ -9,16 +10,27 @@ import { createGameObject } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer, IBasePlayerData } from "./base-player";
 
+/**
+ * A base client that has a player
+ */
+export type BaseClientWithPlayer = BaseClient & {
+    aiManager: BaseAIManager;
+    player: IBasePlayer;
+};
+
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
-    clients: BaseClient[];
+    sessionID: string;
+    clients: BaseClientWithPlayer[];
     rootDeltaMergeable: DeltaMergeable;
     playerIDs: string[];
     namespace: IBaseGameNamespace;
     schema: IBaseGameObjectSchema;
     manager: BaseGameManager;
-    gameCreated: Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>;
-    sessionID: string;
+    gameCreated: Event<{
+        game: BaseGame;
+        gameObjectsDeltaMergeable: DeltaMergeable;
+    }>;
 }
 
 /** The base game that all Game classes inherit from. */
@@ -67,6 +79,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
         // Our super has now created our delta mergeables,
         // let's reach in and grab the game objects all hack-y like.
+        // tslint:disable-next-line:no-any no-non-null-assertion
         const gameObjectsDeltaMergeable = ((this as any).deltaMergeable as DeltaMergeable).child("gameObjects")!;
 
         this.manager = requiredData.manager;
@@ -77,7 +90,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
         const clients = requiredData.clients;
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
-            client.aiManager!.game = this; // kind of hack-y, we are hooking this up here
+            client.aiManager.game = this; // kind of hack-y, we are hooking this up here
 
             const playerData: IBasePlayerData = {
                 name: this.settings.playerNames[i] || client.name || `Player ${i}`,
@@ -95,7 +108,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
             });
 
             player.timeRemaining = this.settings.playerStartingTime;
-            player.ai = new requiredData.namespace.AI(client.aiManager!);
+            player.ai = new requiredData.namespace.AI(client.aiManager);
 
             client.setPlayer(player);
             this.players.push(player);

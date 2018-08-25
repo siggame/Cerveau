@@ -1,8 +1,8 @@
 /** An object with all values being a certain type. */
-export interface ITypedObject<T = any> { [key: string]: T | undefined; }
+export interface ITypedObject<T = unknown> { [key: string]: T | undefined; }
 
 /** An object used as a map to any values. */
-export interface IUnknownObject extends ITypedObject<unknown> {}
+export type UnknownObject = ITypedObject;
 
 /** Shorthand for null or undefined. */
 export type nil = null | undefined;
@@ -10,35 +10,11 @@ export type nil = null | undefined;
 /** Types that can be easily deduced from a string. */
 export type UnStringified = string | number | boolean | null;
 
-/** Forces an object's properties to be mutable */
+/** Forces an object's properties to be mutable. */
 export type MutableRequired<T> = { -readonly [P in keyof T]: T[P] };
 
-/**
- * Traverses down a tree like object via list of keys.
- *
- * @param obj - Tree like object with nested properties to traverse
- * @param keys - List of keys to traverse, in order
- * @returns Whatever value is at the end of the keys path
- * @throws Throws an error when a given key is not found in the object
- * traversing.
- */
-export function traverse(obj: any, keys: string[]): any {
-    if (typeof obj !== "object" || obj === null) {
-        throw new Error(`obj ${obj} is not an object to traverse.`);
-    }
-
-    let o = obj;
-    for (const key of keys) {
-        if (Object.hasOwnProperty.call(obj, key)) {
-            o = o[key];
-        }
-        else {
-            throw new Error(`Key ${key} not found in object to traverse`);
-        }
-    }
-
-    return o;
-}
+/** The types that JSON.parse can output. */
+export type ParsedJSON = number | string | boolean | null | object;
 
 /**
  * Tries to cast a string to a primitive value if it looks like one.
@@ -81,7 +57,7 @@ export function unstringify(value: UnStringified): UnStringified {
 export function unstringifyObject(
     obj: {[key: string]: string},
 ): {[key: string]: UnStringified} {
-    const unStringified: {[key: string]: any} = {};
+    const unStringified: {[key: string]: UnStringified} = {};
     for (const key of Object.keys(obj)) {
         unStringified[key] = unstringify(obj[key]);
     }
@@ -95,7 +71,7 @@ export function unstringifyObject(
  * @param obj - The object to check.
  * @returns True if it is an object and not null, false otherwise.
  */
-export function isObject(obj: any): obj is IUnknownObject {
+export function isObject(obj: unknown): obj is UnknownObject {
     return (typeof obj === "object" && obj !== null);
 }
 
@@ -105,7 +81,7 @@ export function isObject(obj: any): obj is IUnknownObject {
  * @param obj - The object to check.
  * @returns True if the object is empty, false otherwise.
  */
-export function isObjectEmpty(obj: IUnknownObject): boolean {
+export function isObjectEmpty(obj: UnknownObject): boolean {
     return (Object.getOwnPropertyNames(obj).length === 0);
 }
 
@@ -119,7 +95,7 @@ export function isObjectEmpty(obj: IUnknownObject): boolean {
  * false otherwise.
  */
 export function isEmptyExceptFor(
-    obj: IUnknownObject,
+    obj: UnknownObject,
     ...keys: Array<string | number>
 ): boolean {
     const keysSet = new Set(keys);
@@ -148,17 +124,43 @@ export function isNil<T>(thing: T | undefined | null): thing is nil {
 }
 
 /**
+ * Less type safe version for checking if a given object has ANY key.
+ *
+ * @param obj - The object to check in.
+ * @param property - The name of the property (key) to check for.
+ * @returns True if the property is present in the object, false otherwise.
+ */
+export function objectHasProperty<T extends object>(
+    obj: T,
+    property: string,
+): boolean;
+
+/**
+ * Strictly checks for a given key type of a known shape in an object.
+ *
+ * @param obj - The object to check in.
+ * @param property - The name of the property (key) to check for.
+ * @returns True if the property is present in the object, false otherwise.
+ */
+export function objectHasProperty<T extends object, K extends keyof T>(
+    obj: T,
+    property: K,
+): obj is (T & Required<Pick<T, K>>);
+
+/**
  * Checks if an object has a given property.
  *
  * @param obj - The object to check in.
  * @param property - The name of the property (key) to check for.
  * @returns True if the property is present in the object, false otherwise.
  */
-export function objectHasProperty(
-    obj: object,
-    property: PropertyKey,
-): obj is {[property: string]: unknown} {
-    return Boolean(obj) && Object.prototype.hasOwnProperty.call(obj, property);
+export function objectHasProperty<T extends object, K extends keyof T>(
+    obj: T,
+    property: K,
+): obj is (T & Required<Pick<T, K>>) {
+    return Boolean(obj)
+        // tslint:disable-next-line:no-unsafe-any
+        && Object.prototype.hasOwnProperty.call(obj, property);
 }
 
 /**
@@ -191,4 +193,20 @@ export function mapToObject<T>(
     }
 
     return obj;
+}
+
+/**
+ * Safely parses a json string and returns the result, or an Error, instead of
+ * throwing an Error. Also wraps the type.
+ *
+ * @param json - The json still in string format.
+ * @returns The parsed JSON, or an Error object if the JSON was malformed.
+ */
+export function safelyParseJSON(json: string): ParsedJSON | Error {
+    try {
+        return JSON.parse(json) as ParsedJSON;
+    }
+    catch (err) {
+        return err as Error;
+    }
 }

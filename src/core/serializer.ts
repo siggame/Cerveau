@@ -4,7 +4,7 @@
  */
 
 import { isEmptyExceptFor, isObject,
-         IUnknownObject, mapToObject } from "~/utils";
+         ITypedObject, mapToObject, UnknownObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
@@ -20,6 +20,35 @@ export type SerializableTypeName =
     "void"
 ;
 
+type BaseSerializable =
+    string |
+    boolean |
+    BaseGameObject |
+    null |
+    undefined
+;
+
+type Serializable =
+    BaseSerializable |
+    ITypedObject<BaseSerializable> |
+    Map<string, BaseSerializable> |
+    BaseSerializable[]
+;
+
+type BaseSerialized =
+    string |
+    number |
+    boolean |
+    null |
+    undefined
+;
+
+type Serialized =
+    BaseSerialized |
+    BaseSerialized[] |
+    ITypedObject<BaseSerialized>
+;
+
 /**
  * Checks if a given object is a game object reference (has only an id key set).
  *
@@ -27,7 +56,7 @@ export type SerializableTypeName =
  * @returns True if the object is a game object reference
  */
 export function isGameObjectReference(
-    obj: IUnknownObject,
+    obj: UnknownObject,
 ): obj is { id: string } {
     return isEmptyExceptFor(obj, "id");
 }
@@ -39,7 +68,7 @@ export function isGameObjectReference(
  * @param a The object to check.
  * @returns True if it a delta array, false otherwise.
  */
-export function isDeltaArray(a: any): boolean {
+export function isDeltaArray(a: unknown): boolean {
     return (
         isObject(a) &&
         Object.hasOwnProperty.call(a, SHARED_CONSTANTS.DELTA_LIST_LENGTH)
@@ -56,32 +85,33 @@ export function isDeltaArray(a: any): boolean {
  * @returns The state, serialized. It will never be the same object if it is an
  * object ({} or []).
  */
-export function serialize(state: any): any {
-    if (!isObject(state)) {
-        return state; // not an object, no need to further serialize
+export function serialize(state: Serializable): Serialized {
+    let serializing = state;
+    if (!isObject(serializing)) {
+        return serializing; // not an object, no need to further serialize
     }
-    else if (state instanceof BaseGameObject) {
+    else if (serializing instanceof BaseGameObject) {
         // no need to serialize this whole thing
-        return { id: state.id };
+        return { id: serializing.id };
     }
 
-    if (state instanceof Map) {
-        state = mapToObject(state);
+    if (serializing instanceof Map) {
+        serializing = mapToObject(serializing);
     }
 
-    const serialized: IUnknownObject = {};
-    if (state instanceof Array) {
+    const serialized: UnknownObject = {};
+    if (serializing instanceof Array) {
         // Record the length, we never send arrays in serialized states because
         // you can't tell when they change in size without sending all the
         // elements.
-        serialized[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = state.length;
+        serialized[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = serializing.length;
     }
 
-    for (const [key, value] of Object.entries(state)) {
+    for (const [key, value] of Object.entries(serializing)) {
         serialized[key] = serialize(value);
     }
 
-    return serialized;
+    return serialized as {}; // it is actually ITypedObject<Serialized> but that gets mad
 }
 
 /**
@@ -95,13 +125,13 @@ export function serialize(state: any): any {
  * @returns The data now un-serialized, will create new objects instead of
  * reusing objects.
  */
-export function unSerialize(
+export function unSerialize<T = Serializable>(
     data: unknown,
     game: BaseGame,
-    dataTypeConverter?: (val: any) => any,
-): any {
+    dataTypeConverter?: (val: unknown) => T,
+): T {
     if (isObject(data) && game) {
-        const result: IUnknownObject = Array.isArray(data)
+        const result: UnknownObject = Array.isArray(data)
             ? []
             : {};
 
@@ -117,11 +147,12 @@ export function unSerialize(
             }
         }
 
-        return result;
+        return result as T;
     }
 
     if (dataTypeConverter) {
         return dataTypeConverter(data);
     }
-    return data;
+
+    return data as T; // it is a primitive, which are serializeable
 }

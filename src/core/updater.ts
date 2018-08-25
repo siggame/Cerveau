@@ -1,10 +1,12 @@
 import { exec } from "child_process";
 import { events, Signal } from "ts-typed-events";
-import { httpRequest } from "~/utils";
+import { httpRequest, safelyParseJSON } from "~/utils";
 import { logger } from "./log";
 
 const UPDATE_INTERVAL = 1000; // 1 sec in ms
 const GITHUB_URL = "https://api.github.com/repos/siggame/cerveau/commits";
+
+// tslint:disable:no-multiline-string - we use them here
 
 /** Manages and automatically updates this repository */
 export class Updater {
@@ -37,8 +39,8 @@ Is this a git repo with git installed on your system?`,
 
             this.sha = stdout.toLowerCase().trim();
 
-            this.interval = setInterval(() => {
-                this.intervalCheck();
+            this.interval = setInterval(async () => {
+                await this.intervalCheck();
             }, UPDATE_INTERVAL);
 
             // do it immediately too
@@ -87,12 +89,9 @@ Is this a git repo with git installed on your system?`,
 Updater shuting down.`;
         }
 
-        let githubData: any;
-        try {
-            githubData = JSON.parse(githubResponse);
-        }
-        catch (err) {
-            return `Error parsing GitHub data: ${err}
+        const githubData = safelyParseJSON(githubResponse);
+        if (githubData instanceof Error) {
+            return `Error parsing GitHub data: ${githubData}
 Updater shuting down.`;
         }
 
@@ -110,6 +109,7 @@ Updater shuting down.`;
 
         if (this.sha !== headSHA) {
             this.updateFound = true;
+
             return `🆕 Update Found! 🆕
 Your current Cerveau commit:           ${this.sha}
 GitHub's most recent Cerveau commit:   ${headSHA}

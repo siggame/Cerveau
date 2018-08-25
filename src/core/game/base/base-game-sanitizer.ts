@@ -1,5 +1,5 @@
 import { sanitizeArray, sanitizeType } from "~/core/sanitize/";
-import { IUnknownObject, objectHasProperty, quoteIfString } from "~/utils";
+import { objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
@@ -27,18 +27,20 @@ export class BaseGameSanitizer {
     public sanitizeOrderArgs(
         aiFunctionName: string,
         args: Array<unknown>, // TODO: unknown[] when tslint gets sane
-    ): Error | any[] {
+    ): Error | Array<unknown> {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
         }
 
         const argsArray = sanitizeArray(args, false);
+
         return schema.args.map((t, i) => {
             const sanitized = sanitizeType(t, argsArray[i]);
             if (sanitized instanceof Error) {
                 throw sanitized; // server side error, we should never have this happen
             }
+
             return sanitized;
         });
     }
@@ -53,7 +55,7 @@ export class BaseGameSanitizer {
     public validateFinishedReturned(
         aiFunctionName: string,
         returned: unknown,
-    ): any {
+    ): unknown {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize returned for`);
@@ -75,14 +77,14 @@ export class BaseGameSanitizer {
     public validateRunArgs(
         gameObject: BaseGameObject,
         functionName: string,
-        args: IUnknownObject,
-    ): Error | Map<string, any> | { invalid: string } {
+        args: UnknownObject,
+    ): Error | Map<string, unknown> | { invalid: string } {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
         }
 
-        const sanitizedArgs = new Map<string, any>();
+        const sanitizedArgs = new Map<string, unknown>();
         for (const arg of schema.args) {
             const value = objectHasProperty(args, arg.argName)
                 ? args[arg.argName]
@@ -116,7 +118,7 @@ export class BaseGameSanitizer {
         gameObject: BaseGameObject,
         functionName: string,
         returned: unknown,
-    ): any {
+    ): unknown {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
@@ -149,11 +151,12 @@ export class BaseGameSanitizer {
             return new Error(`${gameObject} is not a valid game object`);
         }
 
-        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName]!;
-        if (!gameObjectSchema.functions[functionName]) {
+        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
+        const functionSchema = gameObjectSchema && gameObjectSchema.functions[functionName];
+        if (!gameObjectSchema || !functionSchema) {
             return new Error(`${gameObject} does not have a method ${functionName}`);
         }
 
-        return gameObjectSchema.functions[functionName]!;
+        return functionSchema;
     }
 }

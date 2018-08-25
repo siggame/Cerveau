@@ -199,6 +199,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
             this.declareLoser(`${reason} - Less lodges than opponent`, loser);
 
             this.endGame();
+
             return;
         }
 
@@ -229,6 +230,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 );
 
                 this.endGame();
+
                 return;
             }
         }
@@ -277,7 +279,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 });
             }
 
-            let resources = newResources.get(tile)!;
+            let resources = newResources.get(tile);
 
             if (!tile.lodgeOwner && tile.type === "water" && tile.flowDirection) {
                 const nextTile = tile.getNeighbor(tile.flowDirection);
@@ -292,9 +294,13 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                         food: 0,
                     });
                 }
-                resources = newResources.get(nextTile)!;
+                resources = newResources.get(nextTile);
             }
             // Else, keep resources here
+
+            if (!resources) {
+                throw new Error(`Could not update resources for tile ${tile}`);
+            }
 
             resources.branches += tile.branches;
             resources.food += tile.food;

@@ -22,7 +22,7 @@ export class AI extends BaseClasses.AI {
      * @param checker - The checker that was captured.
      */
     public async gotCaptured(checker: Checker): Promise<void> {
-        await this.executeOrder("functionName",
+        this.executeOrder("gotCaptured",
             checker,
         );
     }

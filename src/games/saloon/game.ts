@@ -12,6 +12,10 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 
 import * as gaussian from "gaussian";
+import { MutableRequired } from "~/utils";
+
+/** A player that can mutate before the game starts */
+type MutablePlayer = MutableRequired<Player>;
 
 // <<-- /Creer-Merge: imports -->>
 
@@ -174,14 +178,25 @@ export class SaloonGame extends BaseClasses.Game {
 
         // make top and bottom sides walls
         for (let x = 0; x < this.mapWidth; x++) {
-            this.getTile(x, 0)!.isBalcony = true;
-            this.getTile(x, this.mapHeight - 1)!.isBalcony = true;
+            const topTile = this.getTile(x, 0);
+            const bottomTile = this.getTile(x, this.mapHeight - 1);
+            if (!topTile || !bottomTile) {
+                throw new Error(`Could not make top or bottom tile at x=${x} a balcony.`);
+            }
+
+            topTile.isBalcony = true;
+            bottomTile.isBalcony = true;
         }
 
         // make left and right sides walls
         for (let y = 0; y < this.mapHeight; y++) {
-            this.getTile(0, y)!.isBalcony = true;
-            this.getTile(this.mapWidth - 1, y)!.isBalcony = true;
+            const leftTile = this.getTile(0, y);
+            const rightTile = this.getTile(this.mapWidth - 1, y);
+            if (!leftTile || !rightTile) {
+                throw new Error(`Could not make top or bottom tile at y=${y} a balcony.`);
+            }
+            leftTile.isBalcony = true;
+            rightTile.isBalcony = true;
         }
 
         // spawn some random furnishings in quadrants
@@ -233,10 +248,14 @@ export class SaloonGame extends BaseClasses.Game {
 
                 if (numHazards > 0) { // if there are hazards to spawn
                     numHazards--;
-                    this.getTile(x, y)!.hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
+                    const tile = this.getTile(x, y);
+                    if (!tile) {
+                        throw new Error(`(${x},${y} is out of range to place a hazard on!`);
+                    }
+                    tile.hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
                 }
                 else { // need to spawn a furnishing
-                    this.manager.create.Furnishing({
+                    this.manager.create.furnishing({
                         tile: this.getTile(x, y),
                         // if there are pianos to spawn, make it one, else false and thus it is not a piano
                         isPiano: numPianos > 0,
@@ -265,14 +284,20 @@ export class SaloonGame extends BaseClasses.Game {
                 dy = -1;
             }
 
-            (player.youngGun as any) = this.manager.create.YoungGun({
-                owner: player,
-                tile: this.getTile(x, y + dy)!,
-                canCallIn: true,
+            // used for moving the young guns around the map,
+            // but not a property exposed to clients
+            const previousTile = this.getTile(x, y + dy * 2);
+            const tile = this.getTile(x, y + dy);
 
-                // used for moving the young guns around the map,
-                // but not a property exposed to clients
-                previousTile: this.getTile(x, y + dy * 2)!,
+            if (!tile || !previousTile) {
+                throw new Error("Could not find tiles to place YoungGun on!");
+            }
+
+            (player as MutablePlayer).youngGun = this.manager.create.youngGun({
+                owner: player,
+                tile,
+                canCallIn: true,
+                previousTile,
             });
         }
 
@@ -295,6 +320,7 @@ export class SaloonGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 

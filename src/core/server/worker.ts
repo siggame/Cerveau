@@ -2,6 +2,7 @@
 // thread that spins up a game session into an Instance using true
 // multi-threading
 
+// tslint:disable-next-line:no-import-side-effect
 import "../setup-thread";
 
 // this also loads the command line arguments from process.env
@@ -12,7 +13,7 @@ import { Config } from "~/core/config";
 import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
-import { IUnknownObject } from "~/utils";
+import { UnknownObject } from "~/utils";
 
 /**
  * An interface for the main thread to adhere to, so we can communicate
@@ -35,7 +36,7 @@ export interface IWorkerGameSessionData {
     mainDebugPort: number;
     sessionID: string;
     gameName: string;
-    gameSettings: IUnknownObject;
+    gameSettings: UnknownObject;
 }
 
 if (cluster.isMaster) {
@@ -51,7 +52,7 @@ const workerData = Config.WORKER_DATA;
 
 process.title = `${workerData.gameName} - ${workerData.sessionID}`;
 
-// tslint:disable-next-line:no-var-requires - as we need it to be synchronous
+// tslint:disable-next-line:no-var-requires non-literal-require - as we need it to be synchronous and dynamic
 const required = require(`src/games/${workerData.gameName.toLowerCase()}/`);
 
 if (!required.Namespace) {
@@ -73,6 +74,7 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
 
         const info = message.clientInfo;
         const { className } = info;
+        // tslint:disable-next-line:no-any - because we are indexing the object for a * import
         const baseClientClass: typeof Clients.BaseClient | undefined = (Clients as any)[className];
 
         if (!baseClientClass) {
@@ -120,7 +122,11 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
                 gamelog = data;
             }
 
-            process.send!({ gamelog }, (err: any) => {
+            if (!process.send) {
+                throw new Error("Worker not on separate thread!");
+            }
+
+            process.send({ gamelog }, () => {
                 process.exit(errorCode);
             });
         });

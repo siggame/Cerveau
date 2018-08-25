@@ -125,10 +125,10 @@ export class CheckersGame extends BaseClasses.Game {
                     }
                     else if (y > 4) { // then it is player 1's checker
                         owner = this.players[1];
-                    } // else is the middle, which has no intial checker pieces
+                    } // else is the middle, which has no initial checker pieces
 
                     if (owner) {
-                        const checker = this.manager.create.Checker({
+                        const checker = this.manager.create.checker({
                             owner,
                             x,
                             y,

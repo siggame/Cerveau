@@ -1,3 +1,6 @@
+// tslint:disable:no-any no-non-null-assertion
+// ^ as DeltaMergeables are black magic anyways
+
 import { Event, events } from "ts-typed-events";
 
 /** An optional transform function for delta mergeables */

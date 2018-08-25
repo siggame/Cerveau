@@ -61,11 +61,15 @@ export class Spider extends GameObject {
         // <<-- Creer-Merge: constructor -->>
         this.owner = data.owner;
         if (!(this instanceof BroodMother)) {
-            this.nest = this.owner.broodMother.nest!;
+            this.nest = this.owner.broodMother.nest;
+        }
+
+        if (!this.nest) {
+            throw new Error(`Tried to create Spider ${this} on no nest!`);
         }
 
         this.isDead = false;
-        this.nest!.spiders.push(this);
+        this.nest.spiders.push(this);
         this.owner.spiders.push(this);
         // <<-- /Creer-Merge: constructor -->>
     }

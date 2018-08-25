@@ -2,11 +2,14 @@ import { Event, Signal } from "ts-typed-events";
 import { BaseClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
+import { MutableRequired } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { IBasePlayer } from "./base-player";
+
+type MutableGame = MutableRequired<BaseGame>;
 
 /**
  * the base game plugin new games should inherit from.
@@ -73,7 +76,7 @@ export class BaseGameManager {
 
         if (!settings.randomSeed) {
             // This is the only place we use old random
-            // tslint:disable-next-line:no-math-random
+            // tslint:disable-next-line:no-math-random insecure-random
             settings.randomSeed = Math.random().toString(36).substring(2);
         }
         this.random = new RandomNumberGenerator(settings.randomSeed);
@@ -81,23 +84,25 @@ export class BaseGameManager {
         const invalidateRun = (player: IBasePlayer,
                                gameObject: BaseGameObject,
                                functionName: string,
-                               args: Map<string, any>,
+                               args: Map<string, unknown>,
         ) => {
             return this.invalidateRun(player, gameObject, functionName, args);
         };
 
         for (const client of clients) {
-            client.aiManager!.invalidateRun = invalidateRun;
+            if (client.aiManager) {
+                client.aiManager.invalidateRun = invalidateRun;
+            }
         }
 
         const gameCreated = new Event<{
-            game: BaseGame,
-            gameObjectsDeltaMergeable: DeltaMergeable,
+            game: BaseGame;
+            gameObjectsDeltaMergeable: DeltaMergeable;
         }>();
 
         // This will happen synchronously, but TS can't know that.
         gameCreated.once(({ game }) => {
-            (this.game as any) = game;
+            (this.game as MutableGame) = game;
         });
 
         this.create = new this.namespace.GameObjectFactory(
@@ -118,11 +123,17 @@ export class BaseGameManager {
         });
 
         for (const client of clients) {
-            client.events.disconnected.once(() => {
-                this.playerDisconnected(client.player!);
-            });
+            if (client.player) {
+                client.events.disconnected.once(() => {
+                    if (!client.player) {
+                        throw new Error("Client disconnected without player!");
+                    }
 
-            this.playerToClient.set(client.player!, client);
+                    this.playerDisconnected(client.player);
+                });
+
+                this.playerToClient.set(client.player, client);
+            }
         }
 
         gameStarted.once(() => this.start());
@@ -280,7 +291,7 @@ export class BaseGameManager {
         player: IBasePlayer,
         gameObject: BaseGameObject,
         functionName: string,
-        args: Map<string, any>,
+        args: Map<string, unknown>,
     ): string | undefined {
         // all runs are valid by default
         return undefined;
@@ -301,17 +312,21 @@ export class BaseGameManager {
                 // then only one player is left in the game, he wins!
 
                 // and this is them!
-                const winner = this.game.players.find((p) => !p.lost)!;
+                const winner = this.game.players.find((p) => !p.lost);
+
+                if (!winner) {
+                    throw new Error("No winner found when one should exist!");
+                }
 
                 const allLosersDisconnected = losers
                     .filter(
-                        (p) => this.playerToClient.get(p)!.hasDisconnected(),
+                        (p) => this.unsafeGetClient(p).hasDisconnected(),
                     )
                     .length === losers.length;
 
                 const allLosersTimedOut = losers
                     .filter(
-                        (p) => this.playerToClient.get(p)!.hasTimedOut(),
+                        (p) => this.unsafeGetClient(p).hasTimedOut(),
                     )
                     .length === losers.length;
 
@@ -355,5 +370,20 @@ export class BaseGameManager {
                 }
             }
         }
+    }
+
+    /**
+     * Gets a client for a given player, or throws an Error if non exists.
+     * @param player - The player to get the client for.
+     * @returns A client, always.
+     */
+    private unsafeGetClient(player: IBasePlayer): BaseClient {
+        const client = this.playerToClient.get(player);
+
+        if (!client) {
+            throw new Error(`No client for player ${player}`);
+        }
+
+        return client;
     }
 }

@@ -408,7 +408,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public Bottle(data: IBottleConstructorArgs): Bottle {
+    public bottle(data: IBottleConstructorArgs): Bottle {
         return this.createGameObject("Bottle", Bottle, data);
     }
 
@@ -419,7 +419,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public Cowboy(data: ICowboyConstructorArgs): Cowboy {
+    public cowboy(data: ICowboyConstructorArgs): Cowboy {
         return this.createGameObject("Cowboy", Cowboy, data);
     }
 
@@ -431,7 +431,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new Furnishing hooked up in the game and ready for you to
      * use.
      */
-    public Furnishing(data: IFurnishingConstructorArgs): Furnishing {
+    public furnishing(data: IFurnishingConstructorArgs): Furnishing {
         return this.createGameObject("Furnishing", Furnishing, data);
     }
 
@@ -442,7 +442,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public Tile(data: ITileConstructorArgs): Tile {
+    public tile(data: ITileConstructorArgs): Tile {
         return this.createGameObject("Tile", Tile, data);
     }
 
@@ -453,7 +453,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public YoungGun(data: IYoungGunConstructorArgs): YoungGun {
+    public youngGun(data: IYoungGunConstructorArgs): YoungGun {
         return this.createGameObject("YoungGun", YoungGun, data);
     }
 

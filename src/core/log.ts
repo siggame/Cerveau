@@ -1,6 +1,4 @@
-import * as winston from "winston";
-
-const format = winston.format;
+import { createLogger, format, transports } from "winston";
 
 const alignedWithColorsAndTime = format.combine(
     format.colorize(),
@@ -19,16 +17,13 @@ const alignedWithColorsAndTime = format.combine(
     }),
 );
 
-winston.configure({
+/** The winston logger instance to use. */
+export const logger = createLogger({
     level: "debug",
     transports: [
     // colorize the output to the console
-        new winston.transports.Console({
+        new transports.Console({
             format: alignedWithColorsAndTime,
         }),
     ],
 });
-
-// TODO: when Winston's types are updated use createLogger instead
-/** The winston logger instance to use. */
-export const logger = winston;

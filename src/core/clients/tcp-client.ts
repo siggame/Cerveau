@@ -26,6 +26,7 @@ export class TCPClient extends BaseClient {
     constructor(socket: Socket) {
         super((() => {
             socket.setEncoding("utf8");
+
             return socket;
         })());
     }

@@ -1,7 +1,12 @@
+import { Express } from "express";
 import { Lobby } from "~/core/server";
-import { app } from "../app";
 
-if (app) {
+/**
+ * Registers the gamelog/ route on a given Express app.
+ *
+ * @param app - The express app to register the route on.
+ */
+export function registerRouteGamelog(app: Express): void {
     const lobby = Lobby.getInstance();
 
     /**
@@ -56,11 +61,15 @@ if (app) {
      * }
      */
     app.get("/gamelog/:filename", async (req, res, next) => {
+        const params = req.params as {
+            filename: unknown;
+        };
+
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-        const filename: string = req.params.filename || "";
+        const filename = String(params.filename);
         const stream = await lobby.gamelogManager.getGamelogFileStream(
             filename,
         );
@@ -68,6 +77,7 @@ if (app) {
         if (!stream) {
             res.status(404);
             res.json({ error: "Gamelog not found." });
+
             return;
         }
 

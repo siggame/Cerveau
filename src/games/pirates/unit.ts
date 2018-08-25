@@ -15,7 +15,8 @@ import { Tile } from "./tile";
 export interface IUnitConstructorArgs
 extends IGameObjectConstructorArgs, IUnitProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+    owner: Player;
+    tile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
 
@@ -53,7 +54,7 @@ export class Unit extends GameObject {
      * The Player that owns and can control this Unit, or null if the Unit is
      * neutral.
      */
-    public owner?: Player;
+    public owner: Player;
 
     /**
      * (Merchants only) The path this Unit will follow. The first element is
@@ -77,12 +78,12 @@ export class Unit extends GameObject {
     /**
      * (Merchants only) The Port this Unit is moving to.
      */
-    public targetPort?: Port;
+    public targetPort: Port;
 
     /**
      * The Tile this Unit is on.
      */
-    public tile?: Tile;
+    public tile: Tile;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -135,7 +136,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-        target: "crew" | "ship",
+        target: string,
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-attack -->>
 
@@ -166,8 +167,8 @@ export class Unit extends GameObject {
             }
         }
 
-        const dx = this.tile!.x - tile.x;
-        const dy = this.tile!.y - tile.y;
+        const dx = this.tile.x - tile.x;
+        const dy = this.tile.y - tile.y;
         const distSq = dx * dx + dy * dy;
         const range = target === "crew"
             ? "crewRange"
@@ -192,7 +193,7 @@ export class Unit extends GameObject {
     protected async attack(
         player: Player,
         tile: Tile,
-        target: "crew" | "ship",
+        target: string,
     ): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
@@ -703,6 +704,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} must be on a Tile!`;
+        }
+
         if (!tile) {
             return `${this} can't split onto null!`;
         }
@@ -718,7 +723,7 @@ export class Unit extends GameObject {
         }
 
         // Check to see if it is not one of the tiles around in the current direction
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile.hasNeighbor(tile)) {
             return `${tile} be too far for ${this} to split to.`;
         }
 
@@ -769,6 +774,10 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: split -->>
 
+        if (!this.tile) {
+            throw new Error("Unit split in invalid state!");
+        }
+
         const originalCrew = this.crew;
 
         // Create a new unit
@@ -809,7 +818,7 @@ export class Unit extends GameObject {
             this.owner = undefined;
             if (this.shipHealth <= 0) {
                 // If no units are left over, remove the unit
-                this.tile!.unit = undefined;
+                this.tile.unit = undefined;
                 this.tile = undefined;
             }
         }
@@ -826,11 +835,15 @@ export class Unit extends GameObject {
         }
         else {
             const unit = this.game.manager.create.Unit(newUnit);
-            unit.tile!.unit = unit;
+            if (!unit.tile) {
+                throw new Error("New unit is not on a Tile somehow!");
+            }
+            tile.unit = unit;
             this.game.manager.newUnits.push(unit);
         }
 
-        tile.unit!.owner = player;
+        tile.unit.owner = player;
+
         return true;
 
         // <<-- /Creer-Merge: split -->>

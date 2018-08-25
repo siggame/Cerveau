@@ -46,12 +46,13 @@ export function getURL(
         // Note: __HOSTNAME__ is expected to be overwritten by clients,
         // as we can't know for certain what hostname they used to connect
         // to us via.
+        // tslint:disable-next-line:no-http-string
         hostname = `http://__HOSTNAME__:${Config.HTTP_PORT}`;
     }
 
-    filename = basename(filename, GAMELOG_EXTENSION);
+    const baseFilename = basename(filename, GAMELOG_EXTENSION);
 
-    return `${hostname}/gamelog/${filename}`;
+    return `${hostname}/gamelog/${baseFilename}`;
 }
 
 /**
@@ -61,7 +62,7 @@ export function getURL(
  * @returns - Undefined if no visualizer set, url to the gamelog in visualizer otherwise
  */
 export function getVisualizerURL(
-    gamelogOrFilename: any,
+    gamelogOrFilename: IGamelog | string,
     visualizerURL?: string,
 ): string | undefined {
     const vis = Config.VISUALIZER_URL;
@@ -74,6 +75,7 @@ export function getVisualizerURL(
                 gamelogOrFilename.epoch,
             );
         const url = getURL(filename);
+
         return `${vis}?log=${encodeURIComponent(url)}`;
     }
 }

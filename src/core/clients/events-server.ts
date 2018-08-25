@@ -1,4 +1,4 @@
-import { IUnknownObject } from "~/utils";
+import { UnknownObject } from "~/utils";
 
 // These are events the server (this) sends to the client
 
@@ -21,7 +21,7 @@ export interface IStartData {
 export interface IOrderData {
     name: string;
     index: number;
-    args: any[];
+    args: Array<unknown>;
 }
 
 /**
@@ -29,8 +29,10 @@ export interface IOrderData {
  * For the "invalid" event
  */
 export interface IInvalidData {
+    /** Human readable message as to why it is invalid. */
     message: string;
-    data?: any;
+    /** Data about why it is invalid, if any. */
+    data?: unknown;
 }
 
 /**
@@ -40,7 +42,7 @@ export interface IInvalidData {
 export interface ILobbiedData {
     gameName: string;
     gameSession: string;
-    constants: IUnknownObject;
+    constants: UnknownObject;
 }
 
 /**

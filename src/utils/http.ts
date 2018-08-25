@@ -11,6 +11,7 @@ import { URL } from "url";
 export function httpRequest(url: string): Promise<string> {
     let data = "";
     const asURL = new URL(url);
+
     return new Promise((resolve, reject) => {
         get({
             hostname: asURL.hostname,

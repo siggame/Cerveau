@@ -159,7 +159,7 @@ export class Job extends GameObject {
             tile.food -= this.cost;
         }
 
-        const beaver = this.manager.create.Beaver({
+        const beaver = this.manager.create.beaver({
             job: this,
             owner: player,
             tile,

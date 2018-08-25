@@ -381,7 +381,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Beaver hooked up in the game and ready for you to use.
      */
-    public Beaver(data: IBeaverConstructorArgs): Beaver {
+    public beaver(data: IBeaverConstructorArgs): Beaver {
         return this.createGameObject("Beaver", Beaver, data);
     }
 
@@ -392,7 +392,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public Job(data: IJobConstructorArgs): Job {
+    public job(data: IJobConstructorArgs): Job {
         return this.createGameObject("Job", Job, data);
     }
 
@@ -403,7 +403,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
-    public Spawner(data: ISpawnerConstructorArgs): Spawner {
+    public spawner(data: ISpawnerConstructorArgs): Spawner {
         return this.createGameObject("Spawner", Spawner, data);
     }
 
@@ -414,7 +414,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public Tile(data: ITileConstructorArgs): Tile {
+    public tile(data: ITileConstructorArgs): Tile {
         return this.createGameObject("Tile", Tile, data);
     }
 

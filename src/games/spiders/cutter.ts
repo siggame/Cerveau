@@ -77,6 +77,7 @@ export class Cutter extends Spiderling {
         }
 
         this.cuttingWeb = undefined;
+
         return false;
     }
 
@@ -101,7 +102,11 @@ export class Cutter extends Spiderling {
             return invalid;
         }
 
-        if (!web.isConnectedTo(this.nest!)) {
+        if (!this.nest) {
+            return `${this} is not on a Nest.`;
+        }
+
+        if (!web.isConnectedTo(this.nest)) {
             return `${this} can only cut Webs connected to the Nest it is on (${this.nest}), ${web} is not.`;
         }
 
@@ -138,7 +143,7 @@ export class Cutter extends Spiderling {
         }
 
         // workRemaining =  5 * strength^2 / (cutterSpeed * sqrt(distance))
-        this.workRemaining = 5 * web.strength ** 2 / (this.game.cutSpeed * Math.sqrt(web.length));
+        this.workRemaining = (web.strength ** 2) * 5 / (this.game.cutSpeed * Math.sqrt(web.length));
 
         return true;
 
