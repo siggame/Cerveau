@@ -166,11 +166,11 @@ const parser = new ArgumentParser({description:
 const defaults: UnknownObject = {};
 for (const [names, options] of parserArgs) {
     parser.addArgument(names, options);
-    defaults[options.dest] = options.defaultValue;
+    defaults[options.dest] = options.defaultValue as unknown;
 }
 
 // first two args are `node main.js`, with the full path to each
-const parsedArgs = parser.parseArgs(process.argv.slice(2));
+const parsedArgs = parser.parseArgs(process.argv.slice(2)) as UnknownObject;
 // tslint:disable-next-line:no-any
 const args: IArgs = {} as any; // we will set it so that it becomes a valid
                                // IArgs in the next loop
@@ -192,6 +192,8 @@ for (const key of Object.keys(parsedArgs)) {
 args.BASE_DIR = args.BASE_DIR || __dirname;
 
 if (process.env.WORKER_GAME_SESSION_DATA) {
+    // hackish, but let's assume if the data is set it is in the correct format.
+    // tslint:disable-next-line:no-unsafe-any
     args.WORKER_DATA = JSON.parse(process.env.WORKER_GAME_SESSION_DATA);
 }
 

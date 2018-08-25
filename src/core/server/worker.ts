@@ -55,9 +55,11 @@ process.title = `${workerData.gameName} - ${workerData.sessionID}`;
 // tslint:disable-next-line:no-var-requires non-literal-require - as we need it to be synchronous and dynamic
 const required = require(`src/games/${workerData.gameName.toLowerCase()}/`);
 
+// tslint-disable-next-line:no-unsafe-any
 if (!required.Namespace) {
     throw new Error("Error required game namespace not found!");
 }
+// tslint-disable-next-line:no-unsafe-any
 const gameNamespace: IBaseGameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
@@ -74,7 +76,7 @@ process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
 
         const info = message.clientInfo;
         const { className } = info;
-        // tslint:disable-next-line:no-any - because we are indexing the object for a * import
+        // tslint:disable-next-line:no-any no-unsafe-any - because we are indexing the object for a * import
         const baseClientClass: typeof Clients.BaseClient | undefined = (Clients as any)[className];
 
         if (!baseClientClass) {

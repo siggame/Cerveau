@@ -50,7 +50,7 @@ export class Player extends GameObject implements IBasePiratesPlayer {
     /**
      * The Port owned by this Player.
      */
-    public port!: Port;
+    public readonly port!: Port;
 
     /**
      * The reason why the player lost the game.
@@ -124,6 +124,7 @@ export class Player extends GameObject implements IBasePiratesPlayer {
 
             worth += unit.crew * this.game.crewCost + unit.gold;
         }
+
         return worth;
     }
 

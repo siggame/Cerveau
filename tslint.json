@@ -38,6 +38,7 @@
         "no-suspicious-comment": false, // SUPER annoying
         "no-unnecessary-type-assertion": true,
         "no-unnecessary-local-variable": false,
+        "no-unnecessary-override": false, // triggers on all SecondaryWinConditions, we don't want that marked
         "no-unused-variable": false, // https://github.com/palantir/tslint/issues/2649
         "number-literal-format": false, // looks worse in games with many numeric values described with floats
         "prefer-array-literal": false, // has some issues, incorrect error on Array<string | number>
@@ -63,6 +64,7 @@
         // "no-parameter-reassignment": true,
         "no-submodule-imports": false, // silly rule
         "no-unused-expression": [true, "allow-new"],
+        "no-void-expression": [true, "ignore-arrow-function-shorthand"],
         "object-literal-sort-keys": false,
         "one-line": [true, "check-open-brace", "check-whitespace"],
         "space-in-parens": [true, "never"],
@@ -96,5 +98,8 @@
         }],
         "valid-typeof": true
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+        "exclude": [
+          "**/games/**"
+        ]
 }

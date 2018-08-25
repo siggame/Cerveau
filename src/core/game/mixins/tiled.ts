@@ -118,6 +118,7 @@ export abstract class BaseTile extends BaseGameObject {
     }
 }
 
+/** A tile that is mutable */
 type MutableBaseTile = MutableRequired<BaseTile>;
 
 /**
@@ -188,8 +189,8 @@ export function mixTiled<
             // Create each tile.
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
-                    // tslint:disable-next-line:no-any
-                    this.tiles[x + y * this.mapWidth] = (this.manager.create as any).Tile({x, y});
+                    // tslint:disable-next-line:no-any no-unsafe-any
+                    this.tiles[x + y * this.mapWidth] = (this.manager.create as any).tile({x, y});
                     // any because we don't mix a new BaseGameObject Factory,
                     // however all managers will have a Tile so no worries.
                 }

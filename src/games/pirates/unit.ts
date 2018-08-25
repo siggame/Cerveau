@@ -15,7 +15,6 @@ import { Tile } from "./tile";
 export interface IUnitConstructorArgs
 extends IGameObjectConstructorArgs, IUnitProperties {
     // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
     tile: Tile;
     // <<-- /Creer-Merge: constructor-args -->>
 }
@@ -54,7 +53,7 @@ export class Unit extends GameObject {
      * The Player that owns and can control this Unit, or null if the Unit is
      * neutral.
      */
-    public owner: Player;
+    public owner?: Player;
 
     /**
      * (Merchants only) The path this Unit will follow. The first element is
@@ -78,12 +77,12 @@ export class Unit extends GameObject {
     /**
      * (Merchants only) The Port this Unit is moving to.
      */
-    public targetPort: Port;
+    public targetPort?: Port;
 
     /**
      * The Tile this Unit is on.
      */
-    public tile: Tile;
+    public tile?: Tile;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -136,7 +135,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-        target: string,
+        target: "crew" | "ship",
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-attack -->>
 
@@ -193,7 +192,7 @@ export class Unit extends GameObject {
     protected async attack(
         player: Player,
         tile: Tile,
-        target: string,
+        target: "crew" | "ship",
     ): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
@@ -318,22 +317,22 @@ export class Unit extends GameObject {
             return reason;
         }
 
-        if (this.tile!.type !== "land") {
+        if (this.tile.type !== "land") {
             return `${this} can't bury gold on the sea.`;
         }
 
-        if (this.tile!.port) {
+        if (this.tile.port) {
             return `${this} can't bury gold in ports.`;
         }
 
-        if (this.tile!.gold >= this.game.settings.maxTileGold) {
+        if (this.tile.gold >= this.game.settings.maxTileGold) {
             return `${this} can't bury loot on a tile with the max amount of booty (${
                 this.game.settings.maxTileGold
             }).`;
         }
 
-        const dx = this.tile!.x - player.port.tile.x;
-        const dy = this.tile!.y - player.port.tile.y;
+        const dx = this.tile.x - player.port.tile.x;
+        const dy = this.tile.y - player.port.tile.y;
         const distSq = dx * dx + dy * dy;
         if (distSq < this.game.minInterestDistance * this.game.minInterestDistance) {
             return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
@@ -343,7 +342,7 @@ export class Unit extends GameObject {
             ? this.gold
             : Math.min(this.gold, amount);
 
-        amount = Math.min(this.game.settings.maxTileGold - this.tile!.gold, amount);
+        amount = Math.min(this.game.settings.maxTileGold - this.tile.gold, amount);
 
         if (amount <= 0) {
             return `${this} does not have any gold to bury!`;
@@ -365,7 +364,7 @@ export class Unit extends GameObject {
     protected async bury(player: Player, amount: number): Promise<boolean> {
         // <<-- Creer-Merge: bury -->>
 
-        this.tile!.gold += amount;
+        this.tile.gold += amount;
         this.gold -= amount;
 
         return true;
@@ -395,7 +394,7 @@ export class Unit extends GameObject {
             return reason;
         }
 
-        const tiles = [ this.tile!, ...this.tile!.getNeighbors() ];
+        const tiles = [ this.tile, ...this.tile.getNeighbors() ];
         const found = tiles.find(
             (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
         );
@@ -435,18 +434,21 @@ export class Unit extends GameObject {
 
         this.gold -= amount;
 
-        const tiles = [ this.tile!, ...this.tile!.getNeighbors() ];
+        const tiles = [ this.tile, ...this.tile.getNeighbors() ];
         let tile = tiles.find(
             (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
-        )!; // will be found as we validated it above
+        ); // will be found as we validated it above
 
         if (tile) {
             player.gold += amount;
         }
         else {
             // Get the merchant's port
-            tile = tiles.find((t) => Boolean(t && t.port && !t.port.owner))!;
-            tile.port!.investment += amount;
+            tile = tiles.find((t) => Boolean(t && t.port && !t.port.owner));
+            if (!tile) {
+                throw new Error("Could not find perchant port tile to deposit money on!");
+            }
+            tile.port.investment += amount;
         }
 
         return true;
@@ -477,17 +479,17 @@ export class Unit extends GameObject {
         }
 
         // Checking to see if the tile is anything other than a land type.
-        if (this.tile!.type !== "land") {
+        if (this.tile.type !== "land") {
             return `${this} can't dig in the sea!`;
         }
 
         // Checking to see if the tile has gold to be dug up.
-        if (this.tile!.gold === 0) {
+        if (this.tile.gold === 0) {
             return `There be no booty for ${this} to plunder.`;
         }
 
-        amount = amount <= 0 || amount > this.tile!.gold
-            ? this.tile!.gold
+        amount = amount <= 0 || amount > this.tile.gold
+            ? this.tile.gold
             : amount;
 
         // <<-- /Creer-Merge: invalidate-dig -->>
@@ -511,7 +513,7 @@ export class Unit extends GameObject {
         // Adds amount requested to Unit.
         this.gold += amount;
         // Subtracts amount from Tile's gold
-        this.tile!.gold -= amount;
+        this.tile.gold -= amount;
 
         return true;
 
@@ -548,7 +550,7 @@ export class Unit extends GameObject {
             return `${this} can't move after acting. The men are too tired!`;
         }
 
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile.hasNeighbor(tile)) {
             return `${tile} be too far for ${this} to move to.`;
         }
 
@@ -613,7 +615,7 @@ export class Unit extends GameObject {
         }
         else {
             // Move this unit to that tile
-            this.tile!.unit = undefined;
+            this.tile.unit = undefined;
             this.tile = tile;
             tile.unit = this;
             this.moves -= 1;
@@ -643,7 +645,7 @@ export class Unit extends GameObject {
 
         // Check if it's in range
         const radius = this.game.restRange;
-        if (((this.tile!.x - player.port.tile.x) ** 2 + (this.tile!.y - player.port.tile.y) ** 2) > radius ** 2) {
+        if (((this.tile.x - player.port.tile.x) ** 2 + (this.tile.y - player.port.tile.y) ** 2) > radius ** 2) {
             return `${this} has no nearby port to rest at. No home tavern means no free rum!`;
         }
 
@@ -834,7 +836,7 @@ export class Unit extends GameObject {
             other.moves = Math.min(newUnit.moves || 0, other.moves);
         }
         else {
-            const unit = this.game.manager.create.Unit(newUnit);
+            const unit = this.game.manager.create.unit(newUnit);
             if (!unit.tile) {
                 throw new Error("New unit is not on a Tile somehow!");
             }
@@ -872,7 +874,7 @@ export class Unit extends GameObject {
         }
 
         const tile = player.port.tile;
-        if (this.tile !== tile && !this.tile!.hasNeighbor(tile)) {
+        if (this.tile !== tile && !this.tile.hasNeighbor(tile)) {
             return `${this} has to withdraw yer booty from yer home port, matey!`;
         }
 

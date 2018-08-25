@@ -1,4 +1,4 @@
-// tslint:disable:no-any no-non-null-assertion
+// tslint:disable:no-any no-unsafe-any no-non-null-assertion
 // ^ as DeltaMergeables are black magic anyways
 
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";

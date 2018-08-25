@@ -13,6 +13,7 @@ export class WSClient extends BaseClient {
         super(socket instanceof net.Socket
             // hackish, we need to re - set socket before super is called,
             // but the super method wants to be called first
+            // tslint:disable-next-line:no-unsafe-any
             ? ws.createClient(socket) // then we need to create a websocket interface wrapped around this net.Socket
             : socket, // normal socket fail through
         );
@@ -25,7 +26,7 @@ export class WSClient extends BaseClient {
      */
     public getNetSocket(): net.Socket {
         // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
-        // tslint:disable-next-line:no-any
+        // tslint:disable-next-line:no-any no-unsafe-any
         return (this.socket as any)._socket;
     }
 

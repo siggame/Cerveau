@@ -10,7 +10,7 @@ import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 
-import { MutableRequired } from "~/utils";
+import { arrayHasElements, MutableRequired } from "~/utils";
 import * as BallGens from "./game-ball-gen";
 // Generate some meta-balls for the islands
 const ballGens = Object.values(BallGens);
@@ -42,32 +42,32 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * The rate buried gold increases each turn.
      */
-    public buryInterestRate!: number;
+    public readonly buryInterestRate!: number;
 
     /**
      * How much gold it costs to construct a single crew.
      */
-    public crewCost!: number;
+    public readonly crewCost!: number;
 
     /**
      * How much damage crew deal to each other.
      */
-    public crewDamage!: number;
+    public readonly crewDamage!: number;
 
     /**
      * The maximum amount of health a crew member can have.
      */
-    public crewHealth!: number;
+    public readonly crewHealth!: number;
 
     /**
      * The number of moves Units with only crew are given each turn.
      */
-    public crewMoves!: number;
+    public readonly crewMoves!: number;
 
     /**
      * A crew's attack range. Range is circular.
      */
-    public crewRange!: number;
+    public readonly crewRange!: number;
 
     /**
      * The player whose turn it is currently. That player can send commands.
@@ -90,7 +90,7 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much health a Unit recovers when they rest.
      */
-    public healFactor!: number;
+    public readonly healFactor!: number;
 
     /**
      * The number of Tiles in the map along the y (vertical) axis.
@@ -110,19 +110,19 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much gold merchant Ports get each turn.
      */
-    public merchantGoldRate!: number;
+    public readonly merchantGoldRate!: number;
 
     /**
      * When a merchant ship spawns, the amount of additional gold it has
      * relative to the Port's investment.
      */
-    public merchantInterestRate!: number;
+    public readonly merchantInterestRate!: number;
 
     /**
      * The Euclidean distance buried gold must be from the Player's Port to
      * accumulate interest.
      */
-    public minInterestDistance!: number;
+    public readonly minInterestDistance!: number;
 
     /**
      * List of all the players in the game.
@@ -137,7 +137,7 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How far a Unit can be from a Port to rest. Range is circular.
      */
-    public restRange!: number;
+    public readonly restRange!: number;
 
     /**
      * A unique identifier for the game instance that is being played.
@@ -147,27 +147,27 @@ export class PiratesGame extends BaseClasses.Game {
     /**
      * How much gold it costs to construct a ship.
      */
-    public shipCost!: number;
+    public readonly shipCost!: number;
 
     /**
      * How much damage ships deal to ships and ports.
      */
-    public shipDamage!: number;
+    public readonly shipDamage!: number;
 
     /**
      * The maximum amount of health a ship can have.
      */
-    public shipHealth!: number;
+    public readonly shipHealth!: number;
 
     /**
      * The number of moves Units with ships are given each turn.
      */
-    public shipMoves!: number;
+    public readonly shipMoves!: number;
 
     /**
      * A ship's attack range. Range is circular.
      */
-    public shipRange!: number;
+    public readonly shipRange!: number;
 
     /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
@@ -211,7 +211,7 @@ export class PiratesGame extends BaseClasses.Game {
         this.generateMap();
 
         // Give players their starting gold
-        const startingGold = this.settings.startingGold || 3 * this.crewCost + 3 * this.shipCost;
+        const startingGold = this.settings.startingGold || (this.crewCost + this.shipCost * 3);
         for (const player of this.players) {
             player.gold = startingGold;
         }
@@ -262,13 +262,17 @@ export class PiratesGame extends BaseClasses.Game {
             }
 
             // Pick a meta-ball generator
-            const ballGen = this.manager.random.element(ballGens)!;
+            if (!arrayHasElements(ballGens)) {
+                throw new Error("Error loading ballGens for Piracy, appears to be empty.");
+            }
+
+            const ballGen = this.manager.random.element(ballGens);
             const ballInfo = ballGen(this.mapWidth, this.mapHeight, () => this.manager.random.float());
 
             // Generate the islands from the meta-balls
             for (let x = 0; x < this.mapWidth / 2; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
-                    const tile = this.getTile(x, y)!;
+                    const tile = this.getTile(x, y) as MutableTile;
                     let energy = 0;
                     for (const ball of ballInfo.balls) {
                         const r = ball.r;
@@ -278,13 +282,13 @@ export class PiratesGame extends BaseClasses.Game {
                     }
 
                     if (energy >= ballInfo.threshold) {
-                        (tile as MutableTile).type = "land";
+                        tile.type = "land";
                         if (energy >= ballInfo.grassThreshold) {
                             tile.decoration = true;
                         }
                     }
                     else {
-                        (tile as MutableTile).type = "water";
+                        tile.type = "water";
                         if (energy <= ballInfo.seaThreshold) {
                             tile.decoration = true;
                         }
@@ -355,30 +359,34 @@ export class PiratesGame extends BaseClasses.Game {
                 continue;
             }
 
+            if (!arrayHasElements(portTiles)) {
+                throw new Error("no port tiles to select from!");
+            }
+
             // Place the starting port
-            const selected = this.manager.random.pop(portTiles)!;
-            const port = this.manager.create.Port({
+            const selected = this.manager.random.pop(portTiles);
+            const port = this.manager.create.port({
                 owner: this.players[0],
                 tile: selected,
                 gold: this.shipCost,
             });
 
             (port.tile as MutableTile).port = port;
-            (port.owner! as MutablePlayer).port = port;
+            (port.owner as MutablePlayer).port = port;
             this.ports.push(port);
 
             // Find merchant port locations
             const merchantTiles = portTiles.filter(
                 (t) => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 9,
             );
-            if (merchantTiles.length === 0) {
+            if (!arrayHasElements(merchantTiles)) {
                 failed = true;
                 continue;
             }
 
             // Place merchant port
-            const merchantTile = this.manager.random.pop(merchantTiles)!;
-            const merchantPort = this.manager.create.Port({
+            const merchantTile = this.manager.random.pop(merchantTiles);
+            const merchantPort = this.manager.create.port({
                 tile: merchantTile,
             });
 
@@ -390,8 +398,12 @@ export class PiratesGame extends BaseClasses.Game {
         // Mirror the map
         for (let x = 0; x < this.mapWidth / 2; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                const orig = this.getTile(x, y)!;
-                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1)!;
+                const orig = this.getTile(x, y);
+                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+
+                if (!orig || !target) {
+                    throw new Error("Could not mirror the map!");
+                }
 
                 // Copy tile data
                 (target as MutableTile).type = orig.type;
@@ -399,7 +411,7 @@ export class PiratesGame extends BaseClasses.Game {
 
                 // Clone ports
                 if (orig.port) {
-                    const port = this.manager.create.Port({
+                    const port = this.manager.create.port({
                         tile: target,
                         owner: orig.port.owner && orig.port.owner.opponent,
                         gold: orig.port.gold,
@@ -442,7 +454,7 @@ export class PiratesGame extends BaseClasses.Game {
             const body: Tile[] = [];
             const open: Tile[] = [ tile ];
             while (open.length > 0) {
-                const cur = open.shift()!;
+                const cur = open.shift() as Tile;
 
                 // Only add water to the body
                 if (cur.type !== "water") {

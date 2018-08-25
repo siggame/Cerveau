@@ -20,6 +20,7 @@ export type SerializableTypeName =
     "void"
 ;
 
+/** Base types that are serializable */
 type BaseSerializable =
     string |
     boolean |
@@ -28,6 +29,7 @@ type BaseSerializable =
     undefined
 ;
 
+/** All seriabliable types */
 type Serializable =
     BaseSerializable |
     ITypedObject<BaseSerializable> |
@@ -35,6 +37,7 @@ type Serializable =
     BaseSerializable[]
 ;
 
+/** Base types that are serialized to */
 type BaseSerialized =
     string |
     number |
@@ -43,6 +46,7 @@ type BaseSerialized =
     undefined
 ;
 
+/** All types that are serialized to */
 type Serialized =
     BaseSerialized |
     BaseSerialized[] |
@@ -85,10 +89,11 @@ export function isDeltaArray(a: unknown): boolean {
  * @returns The state, serialized. It will never be the same object if it is an
  * object ({} or []).
  */
-export function serialize(state: Serializable): Serialized {
+export function serialize(state: unknown): Serialized {
     let serializing = state;
     if (!isObject(serializing)) {
-        return serializing; // not an object, no need to further serialize
+        // not an object, no need to further serialize
+        return serializing as BaseSerialized;
     }
     else if (serializing instanceof BaseGameObject) {
         // no need to serialize this whole thing
@@ -107,7 +112,7 @@ export function serialize(state: Serializable): Serialized {
         serialized[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = serializing.length;
     }
 
-    for (const [key, value] of Object.entries(serializing)) {
+    for (const [key, value] of Object.entries(serializing as UnknownObject)) {
         serialized[key] = serialize(value);
     }
 

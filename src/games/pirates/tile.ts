@@ -10,6 +10,11 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The type of Tile this is ('water' or 'land').
+ */
+export type TileType = "water" | "land";
+
+/**
  * Add properties here to make the create.Tile have different args.
  */
 export interface ITileConstructorArgs
@@ -37,7 +42,7 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * The Port on this Tile if present, otherwise null.
      */
-    public port: Port;
+    public readonly port?: Port;
 
     /**
      * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
@@ -66,12 +71,12 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * The type of Tile this is ('water' or 'land').
      */
-    public type!: string;
+    public readonly type!: "water" | "land";
 
     /**
      * The Unit on this Tile if present, otherwise null.
      */
-    public unit: Unit;
+    public unit?: Unit;
 
     /**
      * The x (horizontal) position of this Tile.

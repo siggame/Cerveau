@@ -245,9 +245,15 @@ export class BaseAIManager {
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
-            // tslint:disable-next-line:no-any - we are getting this function via reflection, no easier way to do this.
-            const gameObjectAsAny = gameObject as any;
-            const invalidateFunction = gameObjectAsAny[`invalidate${capitalizeFirstLetter(functionName)}`];
+
+            //  ↙ We are getting this function via reflection, no easier way to do this.
+            // tslint:disable-next-line:no-any no-unsafe-any
+            const invalidateFunction = (gameObject as any)[`invalidate${capitalizeFirstLetter(functionName)}`] as (
+                player: IBasePlayer,
+                ...args: Array<unknown>
+            ) => string | IArguments;
+
+            // tslint:disable-next-line:no-unsafe-any
             const validated: string | IArguments = invalidateFunction.call(
                 gameObject,
                 this.client.player,
@@ -265,7 +271,8 @@ export class BaseAIManager {
             }
             else {
                 // It's valid!
-                const unsanitizedReturned = await gameObjectAsAny[functionName](...validated);
+                // tslint:disable-next-line:no-any no-unsafe-any
+                const unsanitizedReturned = await (gameObject as any)[functionName](...validated) as unknown;
                 returned = this.gameSanitizer.validateRanReturned(gameObject, functionName, unsanitizedReturned);
             }
         }
@@ -288,7 +295,7 @@ export class BaseAIManager {
 
         this.client.send("ran", returned);
 
-        return returned;
+        return returned as T;
     }
 
     /**

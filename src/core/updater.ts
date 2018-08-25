@@ -98,14 +98,14 @@ Updater shuting down.`;
         // If we got here, we got the data from GitHub, and it parsed correctly
         if (!githubData ||
             !Array.isArray(githubData) ||
-            !githubData[0] ||
-            !githubData[0].sha
+            !githubData[0] || // tslint:disable-line:no-unsafe-any - isArray should be updated to unknown[]
+            !githubData[0].sha // tslint:disable-line:no-unsafe-any  ^
         ) {
             return `GitHub data appears malformed.
 Updater shuting down.`;
         }
 
-        const headSHA = String(githubData[0].sha).toLowerCase().trim();
+        const headSHA = String(githubData[0].sha).toLowerCase().trim(); // tslint:disable-line:no-unsafe-any
 
         if (this.sha !== headSHA) {
             this.updateFound = true;

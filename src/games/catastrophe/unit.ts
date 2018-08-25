@@ -825,17 +825,22 @@ export class Unit extends GameObject {
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
 
+        if (!this.tile || !this.owner) {
+            throw new Error(`${this} is trying to move while dead!`);
+        }
+
         // Deduct the move from the unit
         this.moves -= 1;
 
         // Update the tiles
-        this.tile!.unit = undefined;
+        this.tile.unit = undefined;
         this.tile = tile;
         tile.unit = this;
 
         // Recalculate squads
-        this.owner!.calculateSquads();
+        this.owner.calculateSquads();
         // console.log(`${this} moving to ${tile}`);
+
         return true;
 
         // <<-- /Creer-Merge: move -->>
@@ -868,10 +873,14 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         if (!tile) {
             return `${this} can only pick things up off tiles that exist`;
         }
-        if (tile !== this.tile && !this.tile!.hasNeighbor(tile)) {
+        if (tile !== this.tile && !this.tile.hasNeighbor(tile)) {
             return `${this} can only pickup resources on or adjacent to its tile.`;
         }
 
@@ -968,8 +977,12 @@ export class Unit extends GameObject {
     protected async rest(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: rest -->>
 
+        if (!this.owner || !this.tile) {
+            throw new Error(`${this} trying to rest when dead!`);
+        }
+
         // Get all shelters this unit is in range of
-        const nearbyShelters = this.owner!.getAllStructures().filter((structure) => {
+        const nearbyShelters = this.owner.getAllStructures().filter((structure) => {
             // Make sure this structure isn't destroyed
             if (!structure.tile) {
                 return false;
@@ -982,17 +995,22 @@ export class Unit extends GameObject {
 
             // Make sure this shelter is in range of this unit
             const radius = structure.effectRadius;
-            return Math.abs(this.tile!.x - structure.tile.x) <= radius
-                && Math.abs(this.tile!.y - structure.tile.y) <= radius;
+
+            return this.tile
+                && Math.abs(this.tile.x - structure.tile.x) <= radius
+                && Math.abs(this.tile.y - structure.tile.y) <= radius;
         });
 
         // Get a nearby shelter with a cat in range of it, or undefined if none
         const catShelter = nearbyShelters.find((shelter) => {
             // Make sure the cat is in range of this shelter
-            const cat = this.owner!.cat;
+            const cat = this.owner && this.owner.cat;
             const radius = shelter.effectRadius;
-            return Math.abs(cat.tile!.x - shelter.tile!.x) <= radius
-                && Math.abs(cat.tile!.y - shelter.tile!.y) <= radius;
+
+            return Boolean(cat && cat.tile && shelter && shelter.tile
+                && Math.abs(cat.tile.x - shelter.tile.x) <= radius
+                && Math.abs(cat.tile.y - shelter.tile.y) <= radius,
+            );
         });
 
         // Calculate the energy multiplier
@@ -1057,13 +1075,14 @@ export class Unit extends GameObject {
     private isInRange(type: StructureType): boolean {
         return Boolean(this.game.structures.concat(
             this.game.newStructures).find((structure) => {
-                if (!structure.tile || structure.owner !== this.owner || structure.type !== type) {
+                if (!this.tile || !structure.tile || structure.owner !== this.owner || structure.type !== type) {
                     return false;
                 }
 
                 const radius = structure.effectRadius;
-                return Math.abs(this.tile!.x - structure.tile.x) <= radius
-                    && Math.abs(this.tile!.y - structure.tile.y) <= radius;
+
+                return Math.abs(this.tile.x - structure.tile.x) <= radius
+                    && Math.abs(this.tile.y - structure.tile.y) <= radius;
             }, this),
         );
     }

@@ -38,12 +38,12 @@ export class Port extends GameObject {
     /**
      * The owner of this Port, or null if owned by merchants.
      */
-    public owner: Player;
+    public owner?: Player;
 
     /**
      * The Tile this Port is on.
      */
-    public tile: Tile;
+    public readonly tile: Tile;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -90,7 +90,7 @@ export class Port extends GameObject {
      */
     protected invalidateSpawn(
         player: Player,
-        type: string,
+        type: "crew" | "ship",
     ): string | IArguments {
         // <<-- Creer-Merge: invalidate-spawn -->>
 
@@ -136,12 +136,15 @@ export class Port extends GameObject {
      * @param type - What type of Unit to create ('crew' or 'ship').
      * @returns True if Unit was created successfully, false otherwise.
      */
-    protected async spawn(player: Player, type: string): Promise<boolean> {
+    protected async spawn(
+        player: Player,
+        type: "crew" | "ship",
+    ): Promise<boolean> {
         // <<-- Creer-Merge: spawn -->>
 
         // Make sure there's a unit on this tile
         if (!this.tile.unit) {
-            this.tile.unit = this.game.manager.create.Unit({
+            this.tile.unit = this.game.manager.create.unit({
                 tile: this.tile,
             });
 

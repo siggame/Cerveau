@@ -93,7 +93,7 @@ export class ThreadedRoom extends Room {
         });
 
         // this message should only happen once, when the game is over
-        this.worker.once("message", async (data) => {
+        this.worker.once("message", async (data: {gamelog?: IGamelog}) => {
             if (data.gamelog) {
                 this.cleanUp(data.gamelog);
             }

@@ -1,5 +1,5 @@
 import { sanitizeBoolean } from "~/core";
-import { UnknownObject, objectHasProperty, quoteIfString } from "~/utils";
+import { objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
 
 /** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
@@ -91,7 +91,7 @@ export class BaseGameSettingsManager {
             const str = quoteIfString(value);
 
             const schema = (this.schema as ISettingsSchemas)[key];
-            let sanitizedValue: any = ""; // tslint:disable-line:no-any
+            let sanitizedValue: PossibleSettingValue = "";
             switch (typeof schema.default) {
                 case "number":
                     sanitizedValue = Number(value) || 0;

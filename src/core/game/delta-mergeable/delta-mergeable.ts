@@ -1,4 +1,4 @@
-// tslint:disable:no-any no-non-null-assertion
+// tslint:disable:no-any no-unsafe-any no-non-null-assertion
 // ^ as DeltaMergeables are black magic anyways
 
 import { Event, events } from "ts-typed-events";
@@ -23,15 +23,15 @@ export class DeltaMergeable<T = any> {
 
     /** The events this delta mergeable emits when it mutates */
     public readonly events = events({
-        changed: new Event<DeltaMergeable<any>>(),
-        deleted: new Event<DeltaMergeable<any>>(),
+        changed: new Event<DeltaMergeable>(),
+        deleted: new Event<DeltaMergeable>(),
     });
 
     /** The parent delta mergeable, if undefined then it is the root. */
-    private parent: DeltaMergeable<any> | undefined;
+    private parent: DeltaMergeable | undefined;
 
     /** The child nodes. If empty this is a leaf node. */
-    private readonly children = new Map<string, DeltaMergeable<any>>();
+    private readonly children = new Map<string, DeltaMergeable>();
 
     /** An optional transform function to use on all sets. */
     private transform?: DeltaTransform<T>;
@@ -46,7 +46,7 @@ export class DeltaMergeable<T = any> {
      */
     constructor(data: {
         key: string;
-        parent?: DeltaMergeable<any>;
+        parent?: DeltaMergeable;
         initialValue?: T;
         transform?: DeltaTransform<T>;
     }) {
@@ -115,7 +115,7 @@ export class DeltaMergeable<T = any> {
      *
      * @param child - The child node to adopt
      */
-    public adopt(child: DeltaMergeable<any>): void {
+    public adopt(child: DeltaMergeable): void {
         if (child.parent === this) {
             return; // nothing to do
         }
@@ -127,7 +127,7 @@ export class DeltaMergeable<T = any> {
         child.parent = this;
         this.children.set(child.key, child);
 
-        const onChanged = (changed: DeltaMergeable<any>) => {
+        const onChanged = (changed: DeltaMergeable) => {
             this.events.changed.emit(changed);
         };
         child.events.changed.on(onChanged);

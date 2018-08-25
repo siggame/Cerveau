@@ -1,3 +1,6 @@
+// tslint:disable:no-any no-unsafe-any no-non-null-assertion
+// ^ as DeltaMergeables are black magic anyways
+
 import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { ITypedObject, objectHasProperty, UnknownObject } from "~/utils";
@@ -27,7 +30,7 @@ export class BaseGameDeltaMergeables {
             childTypes: args.attributesSchema,
             type: {
                 typeName: "gameObject",
-                gameObjectClass: Object.getPrototypeOf(this).constructor,
+                gameObjectClass: Object.getPrototypeOf(this).constructor, // tslint:disable-line:no-any no-unsafe-any
                 nullable: false,
             },
         });

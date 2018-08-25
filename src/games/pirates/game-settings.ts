@@ -19,6 +19,108 @@ export class PiratesGameSettingsManager extends BaseClasses.GameSettings {
         ...(super.schema || (this as any).schema),
 
         // Pirates game specific settings
+        buryInterestRate: {
+            description: "The rate buried gold increases each turn.",
+            // <<-- Creer-Merge: buryInterestRate -->>
+            default: 0,
+            // <<-- /Creer-Merge: buryInterestRate -->>
+        },
+        crewCost: {
+            description: "How much gold it costs to construct a single crew.",
+            // <<-- Creer-Merge: crewCost -->>
+            default: 0,
+            // <<-- /Creer-Merge: crewCost -->>
+        },
+        crewDamage: {
+            description: "How much damage crew deal to each other.",
+            // <<-- Creer-Merge: crewDamage -->>
+            default: 0,
+            // <<-- /Creer-Merge: crewDamage -->>
+        },
+        crewHealth: {
+            description: "The maximum amount of health a crew member can have.",
+            // <<-- Creer-Merge: crewHealth -->>
+            default: 0,
+            // <<-- /Creer-Merge: crewHealth -->>
+        },
+        crewMoves: {
+            description: "The number of moves Units with only crew are given "
+                       + "each turn.",
+            // <<-- Creer-Merge: crewMoves -->>
+            default: 0,
+            // <<-- /Creer-Merge: crewMoves -->>
+        },
+        crewRange: {
+            description: "A crew's attack range. Range is circular.",
+            // <<-- Creer-Merge: crewRange -->>
+            default: 0,
+            // <<-- /Creer-Merge: crewRange -->>
+        },
+        healFactor: {
+            description: "How much health a Unit recovers when they rest.",
+            // <<-- Creer-Merge: healFactor -->>
+            default: 0,
+            // <<-- /Creer-Merge: healFactor -->>
+        },
+        merchantGoldRate: {
+            description: "How much gold merchant Ports get each turn.",
+            // <<-- Creer-Merge: merchantGoldRate -->>
+            default: 0,
+            // <<-- /Creer-Merge: merchantGoldRate -->>
+        },
+        merchantInterestRate: {
+            description: "When a merchant ship spawns, the amount of "
+                       + "additional gold it has relative to the Port's "
+                       + "investment.",
+            // <<-- Creer-Merge: merchantInterestRate -->>
+            default: 0,
+            // <<-- /Creer-Merge: merchantInterestRate -->>
+        },
+        minInterestDistance: {
+            description: "The Euclidean distance buried gold must be from the "
+                       + "Player's Port to accumulate interest.",
+            // <<-- Creer-Merge: minInterestDistance -->>
+            default: 0,
+            // <<-- /Creer-Merge: minInterestDistance -->>
+        },
+        restRange: {
+            description: "How far a Unit can be from a Port to rest. Range is "
+                       + "circular.",
+            // <<-- Creer-Merge: restRange -->>
+            default: 0,
+            // <<-- /Creer-Merge: restRange -->>
+        },
+        shipCost: {
+            description: "How much gold it costs to construct a ship.",
+            // <<-- Creer-Merge: shipCost -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipCost -->>
+        },
+        shipDamage: {
+            description: "How much damage ships deal to ships and ports.",
+            // <<-- Creer-Merge: shipDamage -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipDamage -->>
+        },
+        shipHealth: {
+            description: "The maximum amount of health a ship can have.",
+            // <<-- Creer-Merge: shipHealth -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipHealth -->>
+        },
+        shipMoves: {
+            description: "The number of moves Units with ships are given each "
+                       + "turn.",
+            // <<-- Creer-Merge: shipMoves -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipMoves -->>
+        },
+        shipRange: {
+            description: "A ship's attack range. Range is circular.",
+            // <<-- Creer-Merge: shipRange -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipRange -->>
+        },
         // <<-- Creer-Merge: schema -->>
 
         startingGold: {

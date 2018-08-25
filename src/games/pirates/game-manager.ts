@@ -95,12 +95,14 @@ export class PiratesGameManager extends BaseClasses.GameManager {
 
         if (killedOff.length === 2) {
             this.secondaryWinConditions("Ye killed each other");
+
             return true;
         }
         else if (killedOff.length === 1) {
             const loser = killedOff[0];
             this.declareWinner("Ye killed the other pirate!", loser.opponent);
             this.declareLoser("Crew be in Davy Jones' locker, and can't build a ship", loser);
+
             return true;
         }
 
@@ -200,10 +202,14 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     pathValid = false;
                 }
 
+                if (!unit.tile) {
+                    throw new Error(`${unit} has not Tile to update from!`);
+                }
+
                 // Find path to target port (BFS)
                 if (!pathValid) {
                     const open: IPath[] = [{
-                        tile: unit.tile!,
+                        tile: unit.tile,
                         g: 1,
                         parent: undefined,
                     }];
@@ -213,7 +219,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     unit.path = [];
                     while (open.length > 0) {
                         // Pop the first open element (lowest distance)
-                        let current: IPath | undefined = open.shift()!;
+                        let current: IPath | undefined = open.shift() as IPath; // must exist from above check
                         if (closed.has(current.tile)) {
                             continue;
                         }
@@ -234,9 +240,9 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                         // Add neighbors
                         const neighbors = [
                             { tile: current.tile.tileNorth, cost: 1 },
-                            { tile: current.tile.tileEast, cost: 1 + 1 / Math.min(10 * current.g, 1000) },
+                            { tile: current.tile.tileEast, cost: 1 / Math.min(current.g * 10, 1000) + 1 },
                             { tile: current.tile.tileSouth, cost: 1 },
-                            { tile: current.tile.tileWest, cost: 1 + 1 / Math.min(10 * current.g, 1000) },
+                            { tile: current.tile.tileWest, cost: 1 / Math.min(current.g * 10, 1000) + 1},
                         ];
 
                         let unsorted = false;
@@ -281,15 +287,16 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     }
 
                     // Check if in range
-                    const range = (unit.tile!.x - u.tile!.x) ** 2 + (unit.tile!.y - u.tile!.y) ** 2;
+                    const range = (unit.tile.x - u.tile.x) ** 2 + (unit.tile.y - u.tile.y) ** 2;
+
                     return range <= this.game.shipRange ** 2;
                 });
 
                 if (target) {
                     // Attack the target
                     target.shipHealth -= this.game.shipDamage;
-                    if (target.shipHealth <= 0 && !target.tile!.port) {
-                        target.tile!.unit = undefined;
+                    if (target.shipHealth <= 0 && !target.tile.port) {
+                        target.tile.unit = undefined;
                         target.tile = undefined;
                     }
 
@@ -301,14 +308,14 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     // Check if it's at its destination
                     if (unit.path[0].port === unit.targetPort) {
                         // Mark it as dead
-                        unit.tile!.unit = undefined;
+                        unit.tile.unit = undefined;
                         unit.tile = undefined;
                     }
                     else {
-                        const tile = unit.path.shift();
-                        unit.tile!.unit = undefined;
+                        const tile = unit.path.shift() as Tile; // must exist from above check
+                        unit.tile.unit = undefined;
                         unit.tile = tile;
-                        tile!.unit = unit;
+                        tile.unit = unit;
                     }
                 }
             }
@@ -345,13 +352,19 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                 const crew = merchantBaseCrew + invested;
 
                 // Get the opposite port of this one
-                const targetPort = this.game.getTile(
+                const target = this.game.getTile(
                     this.game.mapWidth - port.tile.x - 1,
                     this.game.mapHeight - port.tile.y - 1,
-                )!.port;
+                );
+
+                if (!target) {
+                    throw new Error("Merchange has no opposite target!");
+                }
+
+                const targetPort = target.port;
 
                 // Spawn the unit
-                const unit = this.create.Unit({
+                const unit = this.create.unit({
                     owner: undefined,
                     tile: port.tile,
                     crew,
@@ -361,7 +374,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     targetPort,
                 });
 
-                unit.tile!.unit = unit;
+                unit.tile.unit = unit;
                 this.newUnits.push(unit);
                 port.investment = 0;
             }

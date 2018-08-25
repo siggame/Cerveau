@@ -85,6 +85,28 @@ export class RandomNumberGenerator {
      * (removes it from the array and returns it)
      *
      * @param array - The array to select from.
+     * @returns An element from the array.
+     * The array is mutated if it contained elements, as the return value is
+     * removed.
+     */
+    public pop<T>(array: ArrayWithOneOrMore<T>): T;
+
+    /**
+     * Selects a random element from an array using the PRNG, and pops it
+     * (removes it from the array and returns it)
+     *
+     * @param array - The array to select from.
+     * @returns An element from the array, or undefined if the array was empty.
+     * The array is mutated if it contained elements, as the return value is
+     * removed.
+     */
+    public pop<T>(array: T[]): T | undefined;
+
+    /**
+     * Selects a random element from an array using the PRNG, and pops it
+     * (removes it from the array and returns it)
+     *
+     * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.
      * The array is mutated if it contained elements, as the return value is
      * removed.

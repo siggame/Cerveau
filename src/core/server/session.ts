@@ -29,7 +29,7 @@ import("v8-profiler")
     .catch((err) => {
         if (Config.RUN_PROFILER) {
             logger.error("Error importing profiler with RUN_PROFILER enabled");
-            logger.error(err);
+            logger.error(err as Error);
 
             process.exit(1);
         }
@@ -237,7 +237,9 @@ ${fatal.message}`,
     private stopProfiler(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!Config.RUN_PROFILER || !profiler) {
-                return resolve();
+                resolve();
+
+                return;
             }
 
             const profile = profiler.stopProfiling();
@@ -257,7 +259,7 @@ ${fatal.message}`,
                 );
             });
 
-            return resolve();
+            resolve();
         });
     }
 

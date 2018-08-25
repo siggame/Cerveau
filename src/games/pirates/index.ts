@@ -215,7 +215,7 @@ export interface ITileProperties {
     /**
      * The type of Tile this is ('water' or 'land').
      */
-    type?: string;
+    type?: "water" | "land";
 
     /**
      * The Unit on this Tile if present, otherwise null.
@@ -604,7 +604,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
-                    nullable: false,
+                    nullable: true,
                 },
                 tile: {
                     typeName: "gameObject",
@@ -618,6 +618,8 @@ export const Namespace = makeNamespace({
                         {
                             argName: "type",
                             typeName: "string",
+                            defaultValue: "crew",
+                            literals: ["crew", "ship"],
                         },
                     ],
                     invalidValue: false,
@@ -639,7 +641,7 @@ export const Namespace = makeNamespace({
                 port: {
                     typeName: "gameObject",
                     gameObjectClass: Port,
-                    nullable: false,
+                    nullable: true,
                 },
                 tileEast: {
                     typeName: "gameObject",
@@ -663,11 +665,13 @@ export const Namespace = makeNamespace({
                 },
                 type: {
                     typeName: "string",
+                    defaultValue: "water",
+                    literals: ["water", "land"],
                 },
                 unit: {
                     typeName: "gameObject",
                     gameObjectClass: Unit,
-                    nullable: false,
+                    nullable: true,
                 },
                 x: {
                     typeName: "int",
@@ -700,7 +704,7 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
-                    nullable: false,
+                    nullable: true,
                 },
                 path: {
                     typeName: "list",
@@ -719,12 +723,12 @@ export const Namespace = makeNamespace({
                 targetPort: {
                     typeName: "gameObject",
                     gameObjectClass: Port,
-                    nullable: false,
+                    nullable: true,
                 },
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
-                    nullable: false,
+                    nullable: true,
                 },
             },
             functions: {
@@ -739,6 +743,8 @@ export const Namespace = makeNamespace({
                         {
                             argName: "target",
                             typeName: "string",
+                            defaultValue: "crew",
+                            literals: ["crew", "ship"],
                         },
                     ],
                     invalidValue: false,
