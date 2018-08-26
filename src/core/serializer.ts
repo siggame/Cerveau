@@ -74,7 +74,7 @@ export function isGameObjectReference(
  */
 export function isDeltaArray(a: unknown): boolean {
     return (
-        isObject(a) &&
+        isObject(a) && // tslint:disable-line:no-unsafe-any
         Object.hasOwnProperty.call(a, SHARED_CONSTANTS.DELTA_LIST_LENGTH)
     );
 }

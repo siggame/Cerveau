@@ -20,6 +20,7 @@ import * as ws from "lark-websocket";
 import * as net from "net";
 import * as querystring from "querystring";
 import * as readline from "readline";
+import { IGamesExport } from "~/core/server/games-export";
 
 /*
     Clients connect like this:
@@ -91,8 +92,16 @@ export class Lobby {
     private constructor() {
         this.gamesInitializedPromise = new Promise((resolve) => {
             this.initializeGames().then(() => {
-                this.initializeListener(Config.TCP_PORT, net.createServer, TCPClient);
-                this.initializeListener(Config.WS_PORT, ws.createServer, WSClient);
+                this.initializeListener(
+                    Config.TCP_PORT,
+                    net.createServer,
+                    TCPClient,
+                );
+                this.initializeListener(
+                    Config.WS_PORT,
+                    (ws as { createServer: typeof net.createServer }).createServer,
+                    WSClient,
+                );
 
                 resolve();
             });
@@ -311,8 +320,8 @@ There's probably another Cerveau server running on this same computer.`);
 
             let gameNamespace: IBaseGameNamespace | undefined;
             try {
-                const data = await import(GAMES_DIR + dir);
-                gameNamespace = data.Namespace as IBaseGameNamespace;
+                const data = await import(GAMES_DIR + dir) as IGamesExport;
+                gameNamespace = data.Namespace;
             }
             catch (err) {
                 const errorGameName = capitalizeFirstLetter(dir);
@@ -454,7 +463,7 @@ There's probably another Cerveau server running on this same computer.`);
             );
         }
         catch (error) {
-            authenticationError = error.message;
+            authenticationError = (error as Error).message;
         }
 
         if (authenticationError) {

@@ -51,7 +51,10 @@ export class BaseGameObjectFactory {
     constructor(
         private readonly namespace: IBaseGameNamespace,
         private readonly generateID: () => string,
-        gameCreated: Event<{game: BaseGame, gameObjectsDeltaMergeable: DeltaMergeable}>,
+        gameCreated: Event<{
+            game: BaseGame;
+            gameObjectsDeltaMergeable: DeltaMergeable;
+        }>,
     ) {
         gameCreated.once(({game, gameObjectsDeltaMergeable}) => {
             this.game = game;

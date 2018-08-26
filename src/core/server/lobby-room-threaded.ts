@@ -42,7 +42,7 @@ export class ThreadedRoom extends Room {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         const workerSessionData: IWorkerGameSessionData = {
-            mainDebugPort: (process as any)._debugPort, // tslint:disable-line:no-any - used by debugger
+            mainDebugPort: (process as any)._debugPort, // tslint:disable-line:no-any no-unsafe-any - used by debugger
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,
             gameSettings: this.gameSettingsManager.values,
@@ -63,7 +63,9 @@ export class ThreadedRoom extends Room {
                 // listening to it, as we no longer care.
                 client.stopListeningToSocket();
 
-                const clientClass = Object.getPrototypeOf(client);
+                const clientClass = Object.getPrototypeOf(client) as {
+                    constructor: { name: string };
+                };
 
                 const messageFromMainThread: MessageFromMainThread = {
                     type: "client",

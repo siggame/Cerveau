@@ -1,9 +1,9 @@
-import * as delay from "delay";
+import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
 import { Event, events, Signal } from "ts-typed-events";
 import { Profiler } from "v8-profiler"; // should be safe as it's from @types
-import { BaseClient } from "~/core/clients";
+import { BaseClient, BasePlayingClient } from "~/core/clients";
 import { Config } from "~/core/config";
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
 import { BaseGame } from "~/core/game/base/base-game";
@@ -114,7 +114,9 @@ export class Session {
         // NOTE: the game only knows about clients playing, this session will
         // care about spectators sending them deltas a such.
         // Therefore, the game never needs to know of their existence.
-        const playingClients = this.clients.filter((c) => !c.isSpectating);
+        const playingClients = this.clients.filter(
+            (c) => !c.isSpectating,
+        ) as BasePlayingClient[];
 
         const gameSanitizer = new BaseGameSanitizer(args.gameNamespace);
         for (const client of playingClients) {

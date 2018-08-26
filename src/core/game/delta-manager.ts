@@ -93,6 +93,7 @@ export class DeltaManager {
         if (wasDeleted) {
             changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
         }
+        // tslint:disable-next-line:no-unsafe-any
         else if (isObject(changedValue)) {
             const originalValue = changedValue;
             changedValue = {};
@@ -110,6 +111,6 @@ export class DeltaManager {
         }
         // else changed value is a primitive and is safe to copy
 
-        current[changed.key] = changedValue;
+        current[changed.key] = changedValue as unknown;
     }
 }

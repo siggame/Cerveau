@@ -1,5 +1,5 @@
 import * as random from "seedrandom";
-import { shuffle, ArrayWithOneOrMore } from "~/utils";
+import { ArrayWithOneOrMore, shuffle } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {
@@ -26,6 +26,7 @@ export class RandomNumberGenerator {
     public int(upper: number = 1, lower: number = 0): number {
         const max = Math.round(Math.max(upper, lower));
         const min = Math.round(Math.min(upper, lower));
+
         return Math.abs(this.random.int32() % max) + min;
     }
 
@@ -41,6 +42,7 @@ export class RandomNumberGenerator {
     public float(upper: number = 1, lower: number = 0): number {
         const max = Math.max(upper, lower);
         const min = Math.min(upper, lower);
+
         return this.random.double() * (max - min) + min;
     }
 

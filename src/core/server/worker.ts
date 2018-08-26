@@ -14,6 +14,7 @@ import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
 import { UnknownObject } from "~/utils";
+import { IGamesExport } from "./games-export";
 
 /**
  * An interface for the main thread to adhere to, so we can communicate
@@ -53,14 +54,13 @@ const workerData = Config.WORKER_DATA;
 process.title = `${workerData.gameName} - ${workerData.sessionID}`;
 
 // tslint:disable-next-line:no-var-requires non-literal-require - as we need it to be synchronous and dynamic
-const required = require(`src/games/${workerData.gameName.toLowerCase()}/`);
+const required = require(`src/games/${workerData.gameName.toLowerCase()}/`) as IGamesExport;
 
-// tslint-disable-next-line:no-unsafe-any
 if (!required.Namespace) {
     throw new Error("Error required game namespace not found!");
 }
-// tslint-disable-next-line:no-unsafe-any
-const gameNamespace: IBaseGameNamespace = required.Namespace;
+
+const gameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
 process.on("message", (message: MessageFromMainThread, socket?: Socket) => {

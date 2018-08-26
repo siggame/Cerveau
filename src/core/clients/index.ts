@@ -5,5 +5,7 @@ export * from "./base-client";
 export * from "./tcp-client";
 export * from "./ws-client";
 
+export * from "./base-playing-client";
+
 export * from "./events-client";
 export * from "./events-server";

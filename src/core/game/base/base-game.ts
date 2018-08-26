@@ -1,7 +1,6 @@
 import { Event } from "ts-typed-events";
-import { BaseClient } from "~/core/clients";
+import { BasePlayingClient } from "~/core/clients";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
-import { BaseAIManager } from "./base-ai-manager";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";
@@ -10,18 +9,10 @@ import { createGameObject } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
 import { IBasePlayer, IBasePlayerData } from "./base-player";
 
-/**
- * A base client that has a player
- */
-export type BaseClientWithPlayer = BaseClient & {
-    aiManager: BaseAIManager;
-    player: IBasePlayer;
-};
-
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
     sessionID: string;
-    clients: BaseClientWithPlayer[];
+    playingClients: BasePlayingClient[];
     rootDeltaMergeable: DeltaMergeable;
     playerIDs: string[];
     namespace: IBaseGameNamespace;
@@ -87,7 +78,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
         this.name = requiredData.namespace.gameName;
         this.session = requiredData.sessionID;
 
-        const clients = requiredData.clients;
+        const clients = requiredData.playingClients;
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
             client.aiManager.game = this; // kind of hack-y, we are hooking this up here

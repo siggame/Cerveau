@@ -1,5 +1,5 @@
 import { Event, Signal } from "ts-typed-events";
-import { BaseClient } from "~/core/clients/";
+import { BasePlayingClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
 import { MutableRequired } from "~/utils";
@@ -9,6 +9,9 @@ import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { IBasePlayer } from "./base-player";
 
+/**
+ * A game where we can mutate readonly properties in it, as we are THE MANAGER.
+ */
 type MutableGame = MutableRequired<BaseGame>;
 
 /**
@@ -49,7 +52,7 @@ export class BaseGameManager {
     private nextGameObjectID = 0;
 
     /** Mapping of a player to their client. */
-    private playerToClient = new Map<IBasePlayer, BaseClient>();
+    private playerToClient = new Map<IBasePlayer, BasePlayingClient>();
 
     /**
      * Creates a new game manager, and in turn it's game. Should be done by
@@ -57,7 +60,7 @@ export class BaseGameManager {
      *
      * @param namespace - The namespace this manager is a part of.
      * @param settingsManager - The current settings to use.
-     * @param clients - The clients in this game, including spectators.
+     * @param playingClients - The clients in this game, including spectators.
      * @param rootDeltaMergeable - The root delta mergeable to subscribe to.
      * @param sessionID - The id of the session we are in.
      * @param gameStarted - A signal to emit once the game is created.
@@ -66,7 +69,7 @@ export class BaseGameManager {
     constructor(
         private readonly namespace: IBaseGameNamespace,
         settingsManager: BaseGameSettingsManager,
-        clients: BaseClient[],
+        playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,
         sessionID: string,
         gameStarted: Signal,
@@ -81,15 +84,16 @@ export class BaseGameManager {
         }
         this.random = new RandomNumberGenerator(settings.randomSeed);
 
-        const invalidateRun = (player: IBasePlayer,
-                               gameObject: BaseGameObject,
-                               functionName: string,
-                               args: Map<string, unknown>,
+        const invalidateRun = (
+            player: IBasePlayer,
+            gameObject: BaseGameObject,
+            functionName: string,
+            args: Map<string, unknown>,
         ) => {
             return this.invalidateRun(player, gameObject, functionName, args);
         };
 
-        for (const client of clients) {
+        for (const client of playingClients) {
             if (client.aiManager) {
                 client.aiManager.invalidateRun = invalidateRun;
             }
@@ -113,16 +117,16 @@ export class BaseGameManager {
 
         this.game = new this.namespace.Game(settingsManager, {
             namespace,
-            clients,
+            playingClients,
             rootDeltaMergeable,
             manager: this,
-            playerIDs: clients.map(() => this.generateNextGameObjectID()),
+            playerIDs: playingClients.map(() => this.generateNextGameObjectID()),
             schema: this.namespace.gameObjectsSchema.Game,
             gameCreated,
             sessionID,
         });
 
-        for (const client of clients) {
+        for (const client of playingClients) {
             if (client.player) {
                 client.events.disconnected.once(() => {
                     if (!client.player) {
@@ -377,7 +381,7 @@ export class BaseGameManager {
      * @param player - The player to get the client for.
      * @returns A client, always.
      */
-    private unsafeGetClient(player: IBasePlayer): BaseClient {
+    private unsafeGetClient(player: IBasePlayer): BasePlayingClient {
         const client = this.playerToClient.get(player);
 
         if (!client) {
