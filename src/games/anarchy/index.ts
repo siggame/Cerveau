@@ -329,7 +329,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Building hooked up in the game and ready for you to use.
      */
-    public building(data: IBuildingConstructorArgs): Building {
+    public building<T extends IBuildingConstructorArgs>(data: T): Building & T {
         return this.createGameObject("Building", Building, data);
     }
 
@@ -341,7 +341,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new FireDepartment hooked up in the game and ready for you to
      * use.
      */
-    public fireDepartment(data: IFireDepartmentConstructorArgs): FireDepartment {
+    public fireDepartment<T extends IFireDepartmentConstructorArgs>(data: T): FireDepartment & T {
         return this.createGameObject("FireDepartment", FireDepartment, data);
     }
 
@@ -352,7 +352,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Forecast hooked up in the game and ready for you to use.
      */
-    public forecast(data: IForecastConstructorArgs): Forecast {
+    public forecast<T extends IForecastConstructorArgs>(data: T): Forecast & T {
         return this.createGameObject("Forecast", Forecast, data);
     }
 
@@ -365,7 +365,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */
-    public policeDepartment(data: IPoliceDepartmentConstructorArgs): PoliceDepartment {
+    public policeDepartment<T extends IPoliceDepartmentConstructorArgs>(data: T): PoliceDepartment & T {
         return this.createGameObject("PoliceDepartment", PoliceDepartment, data);
     }
 
@@ -376,7 +376,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Warehouse hooked up in the game and ready for you to use.
      */
-    public warehouse(data: IWarehouseConstructorArgs): Warehouse {
+    public warehouse<T extends IWarehouseConstructorArgs>(data: T): Warehouse & T {
         return this.createGameObject("Warehouse", Warehouse, data);
     }
 
@@ -388,7 +388,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new WeatherStation hooked up in the game and ready for you to
      * use.
      */
-    public weatherStation(data: IWeatherStationConstructorArgs): WeatherStation {
+    public weatherStation<T extends IWeatherStationConstructorArgs>(data: T): WeatherStation & T {
         return this.createGameObject("WeatherStation", WeatherStation, data);
     }
 

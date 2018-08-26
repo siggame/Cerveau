@@ -347,7 +347,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new BroodMother hooked up in the game and ready for you to
      * use.
      */
-    public broodMother(data: IBroodMotherConstructorArgs): BroodMother {
+    public broodMother<T extends IBroodMotherConstructorArgs>(data: T): BroodMother & T {
         return this.createGameObject("BroodMother", BroodMother, data);
     }
 
@@ -358,7 +358,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cutter hooked up in the game and ready for you to use.
      */
-    public cutter(data: ICutterConstructorArgs): Cutter {
+    public cutter<T extends ICutterConstructorArgs>(data: T): Cutter & T {
         return this.createGameObject("Cutter", Cutter, data);
     }
 
@@ -369,7 +369,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
-    public nest(data: INestConstructorArgs): Nest {
+    public nest<T extends INestConstructorArgs>(data: T): Nest & T {
         return this.createGameObject("Nest", Nest, data);
     }
 
@@ -380,7 +380,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Spider hooked up in the game and ready for you to use.
      */
-    public spider(data: ISpiderConstructorArgs): Spider {
+    public spider<T extends ISpiderConstructorArgs>(data: T): Spider & T {
         return this.createGameObject("Spider", Spider, data);
     }
 
@@ -392,7 +392,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new Spiderling hooked up in the game and ready for you to
      * use.
      */
-    public spiderling(data: ISpiderlingConstructorArgs): Spiderling {
+    public spiderling<T extends ISpiderlingConstructorArgs>(data: T): Spiderling & T {
         return this.createGameObject("Spiderling", Spiderling, data);
     }
 
@@ -403,7 +403,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
-    public spitter(data: ISpitterConstructorArgs): Spitter {
+    public spitter<T extends ISpitterConstructorArgs>(data: T): Spitter & T {
         return this.createGameObject("Spitter", Spitter, data);
     }
 
@@ -414,7 +414,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Weaver hooked up in the game and ready for you to use.
      */
-    public weaver(data: IWeaverConstructorArgs): Weaver {
+    public weaver<T extends IWeaverConstructorArgs>(data: T): Weaver & T {
         return this.createGameObject("Weaver", Weaver, data);
     }
 
@@ -425,7 +425,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Web hooked up in the game and ready for you to use.
      */
-    public web(data: IWebConstructorArgs): Web {
+    public web<T extends IWebConstructorArgs>(data: T): Web & T {
         return this.createGameObject("Web", Web, data);
     }
 

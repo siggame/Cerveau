@@ -331,7 +331,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public port(data: IPortConstructorArgs): Port {
+    public port<T extends IPortConstructorArgs>(data: T): Port & T {
         return this.createGameObject("Port", Port, data);
     }
 
@@ -342,7 +342,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile(data: ITileConstructorArgs): Tile {
+    public tile<T extends ITileConstructorArgs>(data: T): Tile & T {
         return this.createGameObject("Tile", Tile, data);
     }
 
@@ -353,7 +353,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit(data: IUnitConstructorArgs): Unit {
+    public unit<T extends IUnitConstructorArgs>(data: T): Unit & T {
         return this.createGameObject("Unit", Unit, data);
     }
 

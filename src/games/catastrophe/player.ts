@@ -136,8 +136,8 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
             const closed = new Set<Tile>();
             while (open.length > 0) {
                 // Grab a tile from the open list
-                const tile = open.shift()!;
-                const cur = tile && tile.unit;
+                const tile = open.shift() as Tile; // must exist from above check
+                const cur = tile.unit;
 
                 // If the tile grabbed is null/undefined, there's no valid unit there, or we already checked this tile
                 if (!cur ||

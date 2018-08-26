@@ -109,7 +109,11 @@ export class WeatherStation extends Building {
     ): Promise<boolean> {
         // <<-- Creer-Merge: intensify -->>
 
-        this.game.nextForecast!.intensity += (negative ? -1 : 1);
+        if (!this.game.nextForecast) {
+            throw new Error("Intensify called when there is no next forecast!");
+        }
+
+        this.game.nextForecast.intensity += (negative ? -1 : 1);
 
         this.bribed = true;
         player.bribesRemaining--;
@@ -166,11 +170,20 @@ export class WeatherStation extends Building {
     ): Promise<boolean> {
         // <<-- Creer-Merge: rotate -->>
 
+        if (!this.game.nextForecast) {
+            throw new Error("Intensify called when there is no next forecast!");
+        }
+
         const wrapAround = counterclockwise
             ? previousWrapAround
             : nextWrapAround;
 
-        this.game.nextForecast!.direction = wrapAround(this.game.directions, this.game.nextForecast!.direction)!;
+        const direction = wrapAround(this.game.directions, this.game.nextForecast.direction);
+        if (!direction) {
+            throw new Error("No direction should never happen but TS is dumb at times");
+        }
+
+        this.game.nextForecast.direction = direction;
 
         this.bribed = true;
         this.owner.bribesRemaining--;

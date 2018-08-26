@@ -10,10 +10,13 @@ import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
-import { removeElements } from "~/utils";
+import { arrayHasElements, MutableRequired, removeElements } from "~/utils";
 import { JobTitle } from "./job";
 import { jobStats } from "./jobs-stats";
 import { StructureType } from "./structure";
+
+/** A player that we can mutate before the game begins */
+type MutablePlayer = MutableRequired<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -171,7 +174,7 @@ export class CatastropheGame extends BaseClasses.Game {
     // <<-- Creer-Merge: attributes -->>
 
     /** New structures created but not yet inserted into the structures array */
-    public newStructures: Structure[] = [];
+    public readonly newStructures: Structure[] = [];
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -192,7 +195,7 @@ export class CatastropheGame extends BaseClasses.Game {
         for (const title of Object.keys(jobStats).sort()) {
             const stats = jobStats[title];
             this.jobs.push(
-                this.manager.create.Job({
+                this.manager.create.job({
                     title: title as JobTitle,
                     ...stats,
                 }),
@@ -298,12 +301,15 @@ export class CatastropheGame extends BaseClasses.Game {
         // Place structures and food spawners
         for (let x = 0; x < halfWidth; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                const tile = this.getTile(x, y)!;
+                const tile = this.getTile(x, y);
+                if (!tile) {
+                    throw new Error(`No tile at (${x}, ${y})`);
+                }
 
                 // Generate structures and spawners
                 if (y === halfHeight - 1 || y === halfHeight) {
                     // Generate road
-                    tile.structure = this.manager.create.Structure({
+                    tile.structure = this.manager.create.structure({
                         tile,
                         type: "road",
                     });
@@ -342,7 +348,7 @@ export class CatastropheGame extends BaseClasses.Game {
                     }
                     else if (this.manager.random.float() < structureChance) {
                         // Generate neutral structures
-                        tile.structure = this.manager.create.Structure({
+                        tile.structure = this.manager.create.structure({
                             tile,
                             type: "neutral",
                         });
@@ -362,17 +368,21 @@ export class CatastropheGame extends BaseClasses.Game {
             return t.x < halfWidth / 2 && (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2);
         });
 
-        const selected = this.manager.random.element(possibleTiles)!;
+        if (!arrayHasElements(possibleTiles)) {
+            throw new Error("No possible tiles to generate map from.");
+        }
+
+        const selected = this.manager.random.element(possibleTiles);
 
         // Shelter
-        selected.structure = this.manager.create.Structure({
+        selected.structure = this.manager.create.structure({
             owner: this.players[0],
             tile: selected,
             type: "shelter",
         });
 
         // Cat
-        (this.players[0] as any).cat = selected.unit = this.manager.create.Unit({
+        (this.players[0] as MutablePlayer).cat = selected.unit = this.manager.create.unit({
             owner: this.players[0],
             tile: selected,
             job: this.jobs.find((j) => j.title === "cat overlord"),
@@ -400,17 +410,25 @@ export class CatastropheGame extends BaseClasses.Game {
                         return false;
                     }
 
+                    if (!cat.tile) {
+                        throw new Error("Cat is not on a tile!");
+                    }
+
                     // Check if the tile is close enough to the cat
-                    return Math.abs(cat.tile!.x - t.x) <= maxDist && Math.abs(cat.tile!.y - t.y) <= maxDist;
+                    return Math.abs(cat.tile.x - t.x) <= maxDist && Math.abs(cat.tile.y - t.y) <= maxDist;
                 });
             }
 
+            if (!arrayHasElements(possibleTiles)) {
+                throw new Error("No possible tiles to generate map from again.");
+            }
+
             // Choose a tile
-            const tile = this.manager.random.element(possibleTiles)!;
-            tile.unit = this.manager.create.Unit({
+            const tile = this.manager.random.element(possibleTiles);
+            tile.unit = this.manager.create.unit({
                 owner: this.players[0],
                 tile,
-                job: this.jobs.find((j) => j.title === "fresh human")!,
+                job: this.jobs.find((j) => j.title === "fresh human"),
             });
             removeElements(possibleTiles, tile);
         }
@@ -418,15 +436,19 @@ export class CatastropheGame extends BaseClasses.Game {
         // Mirror map
         for (let x = 0; x < halfWidth; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                const orig = this.getTile(x, y)!;
-                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1)!;
+                const orig = this.getTile(x, y);
+                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+
+                if (!orig || !target) {
+                    throw new Error("No origin or target tile to mirror the map with");
+                }
 
                 // Copy data
                 target.harvestRate = orig.harvestRate;
 
                 // Clone structure
                 if (orig.structure) {
-                    target.structure = this.manager.create.Structure({
+                    target.structure = this.manager.create.structure({
                         tile: target,
                         type: orig.structure.type,
                         owner: orig.structure.owner && orig.structure.owner.opponent,
@@ -435,14 +457,14 @@ export class CatastropheGame extends BaseClasses.Game {
 
                 // Clone unit
                 if (orig.unit) {
-                    target.unit = this.manager.create.Unit({
+                    target.unit = this.manager.create.unit({
                         tile: target,
                         owner: orig.unit.owner && orig.unit.owner.opponent,
                         job: orig.unit.job,
                     });
 
                     if (target.unit.job.title === "cat overlord") {
-                        (target.unit.owner as any).cat = target.unit;
+                        (target.unit.owner as MutablePlayer).cat = target.unit;
                     }
                 }
             }

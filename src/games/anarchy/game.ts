@@ -8,7 +8,7 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { ArrayUtils, IPoint } from "~/utils";
+import { arrayHasElements, ArrayUtils, IPoint } from "~/utils";
 
 const DIRECTIONAL_OFFSETS = {
     North: { x: 0, y: -1 },
@@ -23,6 +23,7 @@ function pointToKey(pt: IPoint): string {
 
 function keyToPoint(str: string): IPoint {
     const split = str.split(",");
+
     return {
         x: Number(split[0]),
         y: Number(split[1]),
@@ -134,7 +135,12 @@ export class AnarchyGame extends BaseClasses.Game {
     public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
 
     /** The valid cardinal directions buildings can be in. */
-    public readonly directions: ["North", "East", "South", "West"] = ["North", "East", "South", "West"];
+    public readonly directions: ["North", "East", "South", "West"] = [
+        "North",
+        "East",
+        "South",
+        "West",
+    ];
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -197,12 +203,12 @@ export class AnarchyGame extends BaseClasses.Game {
                 }
                 // this means that the point has already been reached
                 // so break from the loop
-                if (changes.length === 0) {
+                if (!arrayHasElements(changes)) {
                     break;
                 }
                 // otherwise choose a random direction and add it to the
                 // points
-                const change = this.manager.random.element(changes)!;
+                const change = this.manager.random.element(changes);
                 const connectedPoint = {
                     x: from.x + change.x,
                     y: from.y + change.y,
@@ -240,12 +246,16 @@ export class AnarchyGame extends BaseClasses.Game {
                 madeHQ = true;
             }
 
+            if (!arrayHasElements(this.players)) {
+                throw new Error("No players in Anarchy game!");
+            }
+
             const { x, y } = keyToPoint(points[i]);
             originalBuildings.push(this.manager.createBuilding(buildingType, {
                 x,
                 y,
                 isHeadquarters,
-                owner: this.manager.random.element(this.players)!,
+                owner: this.manager.random.element(this.players),
             }));
         }
 
@@ -262,6 +272,7 @@ export class AnarchyGame extends BaseClasses.Game {
         // now all the buildings on the map should be created, so hook up the north/east/south/west pointers
         for (const building of this.buildings) {
             for (const [direction, offset] of Object.entries(DIRECTIONAL_OFFSETS)) {
+                // tslint:disable-next-line:no-any no-unsafe-any - any other way would be stupid over complex
                 (building as any)[`building${direction}`] = this.getBuildingAt(
                     building.x + offset.x,
                     building.y + offset.y,
@@ -272,7 +283,7 @@ export class AnarchyGame extends BaseClasses.Game {
         // create the forecasts, each "set" of turns (e.g. 0 and 1, 100 and 101,
         // 264 and 265, etc) are the same initial states for each player.
         for (let i = 0; i < this.maxTurns; i += 2) {
-            let direction = this.manager.random.element(this.directions)!;
+            let direction = this.manager.random.element(this.directions);
             const intensity = this.manager.random.int(this.maxForecastIntensity);
 
             for (let j = 0; j < 2; j++) {
@@ -287,7 +298,7 @@ export class AnarchyGame extends BaseClasses.Game {
 
                 direction = direction || "North";
 
-                this.forecasts.push(this.manager.create.Forecast({
+                this.forecasts.push(this.manager.create.forecast({
                     direction,
                     intensity,
                     controllingPlayer: this.players[j],

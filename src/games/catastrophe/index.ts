@@ -388,7 +388,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job(data: IJobConstructorArgs): Job {
+    public job<T extends IJobConstructorArgs>(data: T): Job & T {
         return this.createGameObject("Job", Job, data);
     }
 
@@ -399,7 +399,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Structure hooked up in the game and ready for you to use.
      */
-    public structure(data: IStructureConstructorArgs): Structure {
+    public structure<T extends IStructureConstructorArgs>(data: T): Structure & T {
         return this.createGameObject("Structure", Structure, data);
     }
 
@@ -410,7 +410,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile(data: ITileConstructorArgs): Tile {
+    public tile<T extends ITileConstructorArgs>(data: T): Tile & T {
         return this.createGameObject("Tile", Tile, data);
     }
 
@@ -421,7 +421,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit(data: IUnitConstructorArgs): Unit {
+    public unit<T extends IUnitConstructorArgs>(data: T): Unit & T {
         return this.createGameObject("Unit", Unit, data);
     }
 

@@ -8,6 +8,7 @@ import {
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
+import { Player } from "./player";
 import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
@@ -88,11 +89,14 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         players.sort((a, b) => b.cat.energy - a.cat.energy);
         if (players[0].cat.energy <= 0) {
             this.secondaryWinConditions("Both players' cats defeated at the same time.");
+
             return true;
         }
         else if (players[1].cat.energy <= 0) {
-            this.declareWinner("Defeated opponent's cat!", players.shift()!);
+            const winner = players.shift() as Player;
+            this.declareWinner("Defeated opponent's cat!", winner);
             this.declareLosers("Cat died", ...players);
+
             return true;
         }
 
@@ -100,11 +104,14 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         players.sort((a, b) => b.units.length - a.units.length);
         if (players[0].units.length === 1) {
             this.secondaryWinConditions("All units died for both players.");
+
             return true;
         }
         else if (players[1].units.length === 1) {
-            this.declareWinner("Defeated all enemy humans!", players.shift()!);
+            const winner = players.shift() as Player;
+            this.declareWinner("Defeated all enemy humans!", winner);
             this.declareLosers("Humans died", ...players);
+
             return true;
         }
 
@@ -127,24 +134,31 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         // 1. Most units
         players.sort((a, b) => b.units.length - a.units.length);
         if (players[0].units.length > players[1].units.length) {
-            this.declareWinner(`${reason}: Had the most units`, players.shift()!);
+            const winner = players.shift() as Player;
+            this.declareWinner(`${reason}: Had the most units`, winner);
             this.declareLosers(`${reason}: Had the least units`, ...players);
+
             return;
         }
 
         // 2. Most food
         players.sort((a, b) => b.food - a.food);
         if (players[0].food > players[1].food) {
-            this.declareWinner(`${reason}: Had the most food`, players.shift()!);
+            const winner = players.shift() as Player;
+            this.declareWinner(`${reason}: Had the most food`, winner);
             this.declareLosers(`${reason}: Had the least food`, ...players);
+
             return;
         }
 
         // 3. Most structures
         players.sort((a, b) => b.structures.length - a.structures.length);
         if (players[0].structures.length > players[1].structures.length) {
-            this.declareWinner(`${reason}: Had the most structures`, players.shift()!);
-            this.declareLosers(`${reason}: Had the least structures`);
+            const winner = players.shift() as Player;
+            this.declareWinner(`${reason}: Had the most structures`, winner);
+            this.declareLosers(`${reason}: Had the least structures`, ...players);
+
+            return;
         }
 
         // <<-- /Creer-Merge: secondary-win-conditions -->>
@@ -237,11 +251,11 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
                 }
 
                 const target = unit.movementTarget;
-                if (target) {
+                if (target && unit.tile) {
                     // Move neutral fresh humans on the road
-                    const nextTile = this.game.getTile(unit.tile!.x + Math.sign(target.x - unit.tile!.x), unit.tile!.y);
+                    const nextTile = this.game.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
                     if (nextTile && !nextTile.unit) {
-                        unit.tile!.unit = undefined;
+                        unit.tile.unit = undefined;
                         nextTile.unit = unit;
                         unit.tile = nextTile;
                     }
@@ -269,14 +283,14 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
 
             // If one was found (as in, not a map-wide line of units), spawn a new fresh human
             if (!tile.unit) {
-                const unit = this.create.Unit({
+                const unit = this.create.unit({
                     job: this.game.jobs[0],
                     owner: undefined,
                     tile,
                     turnsToDie: this.game.mapWidth - tile.x,
                     movementTarget: this.game.getTile(this.game.mapWidth - 1, this.game.mapHeight / 2 - 1),
                 });
-                unit.tile!.unit = unit;
+                unit.tile.unit = unit;
             }
         }
         else if (this.game.currentTurn % this.game.turnsToCreateHuman === 1) {
@@ -297,14 +311,14 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
 
             // If one was found (as in, not a map-wide line of units), spawn a new fresh human
             if (!tile.unit) {
-                const unit = this.create.Unit({
+                const unit = this.create.unit({
                     job: this.game.jobs[0],
                     owner: undefined,
                     tile,
                     turnsToDie: tile.x + 1,
                     movementTarget: this.game.getTile(0, this.game.mapHeight / 2),
                 });
-                unit.tile!.unit = unit;
+                unit.tile.unit = unit;
             }
         }
 

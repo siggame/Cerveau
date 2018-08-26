@@ -159,11 +159,15 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         if (this.job.title !== "soldier") {
             return `${this} cannot attack as they are not a soldier! Their only combat ability is as a meatshield!`;
         }
 
-        if (this.tile!.hasNeighbor(tile)) {
+        if (this.tile.hasNeighbor(tile)) {
             return `${tile} is not adjacent to ${this}.`;
         }
 
@@ -229,13 +233,17 @@ export class Unit extends GameObject {
         }
         else { // assuming unit, which it should be if not a structure
             // Attack a unit/squad
-            for (const target of tile.unit!.squad) {
+            if (!tile.unit) {
+                throw new Error(`${this} attacking ${tile} with no unit on it!`);
+            }
+
+            for (const target of tile.unit.squad) {
                 let attackMod = 1; // damage modifier
                 if (target.isInRange("monument")) {
                     // if near enemy monument, take less dmg
                     attackMod = this.game.monumentCostMult;
                 }
-                target.energy -= attackSum * attackMod / tile.unit!.squad.length;
+                target.energy -= attackSum * attackMod / tile.unit.squad.length;
                 if (target.energy <= 0) {
                     toDie.add(target);
                 }
@@ -245,8 +253,11 @@ export class Unit extends GameObject {
         // IT'S KILLING TIME
         for (const dead of toDie) {
             // Drop carried resources
-            dead.tile!.food += dead.food;
-            dead.tile!.materials += dead.materials;
+            if (!dead.tile) {
+                throw new Error(`${dead} is already dead`);
+            }
+            dead.tile.food += dead.food;
+            dead.tile.materials += dead.materials;
             dead.food = 0;
             dead.materials = 0;
 
@@ -267,7 +278,7 @@ export class Unit extends GameObject {
             }
             else {
                 // Neutral fresh human, will get removed from arrays in next turn logic
-                dead.tile!.unit = undefined;
+                dead.tile.unit = undefined;
                 dead.tile = undefined;
             }
         }
@@ -303,6 +314,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         if (this.job.title === "cat overlord") {
             return `${this} is the overlord. It cannot change jobs!`;
         }
@@ -315,8 +330,12 @@ export class Unit extends GameObject {
             return `${this} must be at 100 energy to change jobs`;
         }
 
-        if (Math.abs(this.tile!.x - player.cat.tile!.x) > 1
-         || Math.abs(this.tile!.y - player.cat.tile!.y) > 1
+        if (!player.cat.tile) {
+            return `Player's Cat ${player.cat} is not on a Tile!`;
+        }
+
+        if (Math.abs(this.tile.x - player.cat.tile.x) > 1
+         || Math.abs(this.tile.y - player.cat.tile.y) > 1
         ) {
             return `${this} must be adjacent or diagonal to your cat to change jobs`;
         }
@@ -338,14 +357,23 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: changeJob -->>
 
-        this.job = this.game.jobs.find((j) => j.title === job)!;
+        const actualJob = this.game.jobs.find((j) => j.title === job);
+        if (!actualJob) {
+            throw new Error(`Trying to set ${this} to unknown job ${job}.`);
+        }
+
+        if (!this.tile || !this.owner) {
+            throw new Error(`${this} is dead and cannot change job`);
+        }
+
+        this.job = actualJob;
         this.acted = true;
         this.moves = 0; // It takes all their time
-        this.tile!.food += this.food;
-        this.tile!.materials += this.materials;
+        this.tile.food += this.food;
+        this.tile.materials += this.materials;
         this.food = 0;
         this.materials = 0;
-        this.owner!.calculateSquads();
+        this.owner.calculateSquads();
 
         return true;
 
@@ -383,12 +411,16 @@ export class Unit extends GameObject {
             return `${tile} already has a structure! ${this} cannot construct here!`;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         // Check structure type and if they have enough materials
         if (tile.unit && type !== "shelter") {
             return `${this} can't construct on ${tile} because ${tile.unit} is there!`;
         }
 
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile.hasNeighbor(tile)) {
             return `${tile} is not adjacent to ${this}.`;
         }
 
@@ -417,7 +449,7 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: construct -->>
 
-        tile.structure = this.manager.create.Structure({
+        tile.structure = this.manager.create.structure({
             owner: player,
             tile,
             type,
@@ -456,6 +488,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         if (this.job.title !== "missionary") {
             return `${this} isn't a missionary and is thus unable to convince units to join you cul- I mean kingdom.`;
         }
@@ -464,7 +500,7 @@ export class Unit extends GameObject {
             return `${this} can't convert a nonexistent tile to your cause.`;
         }
 
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile.hasNeighbor(tile)) {
             return `${this} can only convert units on adjacent tiles.`;
         }
 
@@ -491,7 +527,11 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: convert -->>
 
         // Unit will be added to the player's units array at the start of their next turn
-        const unit = tile.unit!;
+        const unit = tile.unit;
+        if (!unit) {
+            throw new Error(`No unit on ${tile} to convert!`);
+        }
+
         unit.turnsToDie = -1;
         unit.owner = player;
         unit.energy = 100;
@@ -553,7 +593,11 @@ export class Unit extends GameObject {
             return `${this} cannot carry any more materials.`;
         }
 
-        if (!this.tile!.hasNeighbor(tile)) {
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
+        if (!this.tile.hasNeighbor(tile)) {
             return `${tile} is not adjacent to ${this}.`;
         }
 
@@ -575,7 +619,11 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: deconstruct -->>
 
-        const structure = tile.structure!;
+        const structure = tile.structure;
+        if (!structure) {
+            throw new Error(`No structure on ${tile} to desconstruct!`);
+        }
+
         const amount = Math.min(
             this.job.carryLimit - this.materials - this.food,
             structure.materials,
@@ -597,6 +645,7 @@ export class Unit extends GameObject {
 
         this.energy -= this.job.actionCost * mult;
         this.acted = true;
+
         return true;
 
         // <<-- /Creer-Merge: deconstruct -->>
@@ -628,7 +677,11 @@ export class Unit extends GameObject {
             return reason;
         }
 
-        if (tile !== this.tile && !this.tile!.hasNeighbor(tile)) {
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
+        if (tile !== this.tile && !this.tile.hasNeighbor(tile)) {
             return `${this} can only drop things on or adjacent to your tile.`;
         }
 
@@ -679,8 +732,8 @@ export class Unit extends GameObject {
         // Drop the resource
         if (resource === "food") {
             amount = Math.min(amount, this.food);
-            if (tile.structure && tile.structure.type === "shelter") {
-                this.owner!.food += amount;
+            if (tile.structure && tile.structure.type === "shelter" && this.owner) {
+                this.owner.food += amount;
             }
             else {
                 tile.food += amount;
@@ -719,7 +772,11 @@ export class Unit extends GameObject {
             return reason;
         }
 
-        if (tile !== this.tile && !this.tile!.hasNeighbor(tile)) {
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
+        if (tile !== this.tile && !this.tile.hasNeighbor(tile)) {
             return "You can only harvest on or adjacent to your tile.";
         }
 
@@ -757,9 +814,9 @@ export class Unit extends GameObject {
 
         const carry = this.job.carryLimit - (this.food + this.materials);
         let pickup = 0;
-        if (tile.structure) {
-            pickup = Math.min(tile.structure.owner!.food, carry);
-            tile.structure.owner!.food -= pickup;
+        if (tile.structure && tile.structure.owner) {
+            pickup = Math.min(tile.structure.owner.food, carry);
+            tile.structure.owner.food -= pickup;
         }
         else {
             pickup = Math.min(tile.harvestRate, carry);
@@ -770,6 +827,7 @@ export class Unit extends GameObject {
         this.energy -= this.job.actionCost * mult;
         this.food += pickup;
         this.acted = true;
+
         return true;
 
         // <<-- /Creer-Merge: harvest -->>
@@ -795,6 +853,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
         if (tile.unit) {
             return `Can't move because the tile is already occupied by ${tile.unit}.`;
         }
@@ -803,7 +865,7 @@ export class Unit extends GameObject {
             return "Your unit is out of moves!";
         }
 
-        if (this.tile!.hasNeighbor(tile)) {
+        if (this.tile.hasNeighbor(tile)) {
             return "Your unit must move to a tile to the north, south, east, or west.";
         }
 
