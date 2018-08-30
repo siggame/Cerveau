@@ -282,7 +282,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                 // Make the merchant attack this turn's player if they have a unit in range
                 const target = this.game.currentPlayer.units.find((u) => {
                     // Only attack ships
-                    if (u.shipHealth <= 0) {
+                    if (u.shipHealth <= 0 || !u.tile || !unit.tile) {
                         return false;
                     }
 
@@ -292,7 +292,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     return range <= this.game.shipRange ** 2;
                 });
 
-                if (target) {
+                if (target && target.tile) {
                     // Attack the target
                     target.shipHealth -= this.game.shipDamage;
                     if (target.shipHealth <= 0 && !target.tile.port) {

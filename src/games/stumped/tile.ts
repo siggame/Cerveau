@@ -152,6 +152,10 @@ export class Tile extends GameObject implements BaseTile {
      * @returns boolean if this tile is in flow with the provided tile
      */
     public isAgainstFlowDirection(tile: Tile): boolean {
+        if (!tile.flowDirection) {
+            return false;
+        }
+
         return Boolean(
             tile &&
             this.getNeighbor(

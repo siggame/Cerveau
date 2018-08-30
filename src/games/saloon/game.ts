@@ -255,8 +255,12 @@ export class SaloonGame extends BaseClasses.Game {
                     tile.hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
                 }
                 else { // need to spawn a furnishing
+                    const tile = this.getTile(x, y);
+                    if (!tile) {
+                        throw new Error(`No tile at (${x}, ${y}) to place Furnishing on!`);
+                    }
                     this.manager.create.furnishing({
-                        tile: this.getTile(x, y),
+                        tile,
                         // if there are pianos to spawn, make it one, else false and thus it is not a piano
                         isPiano: numPianos > 0,
                     });

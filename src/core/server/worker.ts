@@ -6,11 +6,10 @@
 import "../setup-thread";
 
 // this also loads the command line arguments from process.env
-import * as cluster from "cluster";
+import { isMaster } from "cluster";
 import { Socket } from "net";
 import * as Clients from "~/core/clients";
 import { Config } from "~/core/config";
-import { IBaseGameNamespace } from "~/core/game";
 import { logger } from "~/core/log";
 import { Session } from "~/core/server/session";
 import { UnknownObject } from "~/utils";
@@ -40,7 +39,7 @@ export interface IWorkerGameSessionData {
     gameSettings: UnknownObject;
 }
 
-if (cluster.isMaster) {
+if (isMaster) {
     /* tslint:disable-next-line:no-console */
     console.error("ERROR: worker running on master thread");
     process.exit(1); // worker threads not intended to run on main thread.

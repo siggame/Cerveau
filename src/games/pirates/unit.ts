@@ -144,6 +144,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
+        }
+
         if (!tile.unit) {
             return `There be nothin' for ${this} to attack on ${tile}!`;
         }
@@ -317,6 +321,10 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
+        }
+
         if (this.tile.type !== "land") {
             return `${this} can't bury gold on the sea.`;
         }
@@ -364,6 +372,10 @@ export class Unit extends GameObject {
     protected async bury(player: Player, amount: number): Promise<boolean> {
         // <<-- Creer-Merge: bury -->>
 
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to bury gold!`);
+        }
+
         this.tile.gold += amount;
         this.gold -= amount;
 
@@ -392,6 +404,10 @@ export class Unit extends GameObject {
         const reason = this.invalidate(player);
         if (reason) {
             return reason;
+        }
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
         }
 
         const tiles = [ this.tile, ...this.tile.getNeighbors() ];
@@ -434,6 +450,10 @@ export class Unit extends GameObject {
 
         this.gold -= amount;
 
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to deposit gold!`);
+        }
+
         const tiles = [ this.tile, ...this.tile.getNeighbors() ];
         let tile = tiles.find(
             (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
@@ -447,6 +467,10 @@ export class Unit extends GameObject {
             tile = tiles.find((t) => Boolean(t && t.port && !t.port.owner));
             if (!tile) {
                 throw new Error("Could not find perchant port tile to deposit money on!");
+            }
+
+            if (!tile.port) {
+                throw new Error(`${tile} has no port to deposit money on to!`);
             }
             tile.port.investment += amount;
         }
@@ -476,6 +500,10 @@ export class Unit extends GameObject {
         const reason = this.invalidate(player);
         if (reason) {
             return reason;
+        }
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
         }
 
         // Checking to see if the tile is anything other than a land type.
@@ -509,6 +537,10 @@ export class Unit extends GameObject {
         amount: number = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dig -->>
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to dig!`);
+        }
 
         // Adds amount requested to Unit.
         this.gold += amount;
@@ -548,6 +580,10 @@ export class Unit extends GameObject {
 
         if (this.acted) {
             return `${this} can't move after acting. The men are too tired!`;
+        }
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
         }
 
         if (!this.tile.hasNeighbor(tile)) {
@@ -614,6 +650,9 @@ export class Unit extends GameObject {
             this.moves = Math.min(this.moves - 1, other.moves);
         }
         else {
+            if (!this.tile) {
+                throw new Error(`${this} has no Tile to move from!`);
+            }
             // Move this unit to that tile
             this.tile.unit = undefined;
             this.tile = tile;
@@ -641,6 +680,10 @@ export class Unit extends GameObject {
         const reason = this.invalidate(player, true);
         if (reason) {
             return reason;
+        }
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
         }
 
         // Check if it's in range
@@ -871,6 +914,10 @@ export class Unit extends GameObject {
         const reason = this.invalidate(player);
         if (reason) {
             return reason;
+        }
+
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile!`);
         }
 
         const tile = player.port.tile;
