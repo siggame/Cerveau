@@ -34,6 +34,9 @@ imports = {
 
 %>
 ${shared['cerveau']['imports'](imports)}
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the ${game_name} game
  * must implement from mixed in game logic.
@@ -127,6 +130,12 @@ import { ${game_name}GameSettingsManager } from "./game-settings";
 import { AI } from "./ai";
 % endif
 
+% for game_obj_name in sort_dict_keys(game_objs):
+<%
+    if game_obj_name in ['Player', 'GameObject']:
+        continue
+%>export type ${game_obj_name}Args = FirstArgumentFromConstructor<typeof ${game_obj_name}>
+% endfor
 /**
  * The factory that **must** be used to create any game objects in
  * the ${game_name} game.
