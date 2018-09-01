@@ -4,7 +4,11 @@
 import { Event, events } from "ts-typed-events";
 
 /** An optional transform function for delta mergeables */
-export type DeltaTransform<T> = (value: any, currentValue: T | undefined, forceSet: boolean) => T | undefined;
+export type DeltaTransform<T> = (
+    value: any,
+    currentValue: T | undefined,
+    forceSet: boolean,
+) => T | undefined;
 
 /**
  * Wraps a property in the game to observe for changes (deltas).

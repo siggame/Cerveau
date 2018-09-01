@@ -1,5 +1,7 @@
-// tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface = because the some mixins have nothing to add
+// tslint:disable:max-classes-per-file
+// ^ because the mixin define multiple classes while maintaining scope to each
+// tslint:disable:no-empty-interface
+// ^ because the some mixins have nothing to add
 
 import { IBasePlayer } from "~/core/game";
 import * as Base from "./base";
@@ -41,7 +43,9 @@ export function mixTwoPlayer<
          *
          * @param args - The arguments unknown to this constructor.
          */
-        constructor(...args: any[]) { // tslint:disable-line:no-any - any[] required for mixin constructor signature
+        constructor(...args: any[]) { // tslint:disable-line:no-any
+                                      // any[] is required for mixin
+                                      // constructor signature
             super(...args);
 
             this.players[0].opponent = this.players[1];

@@ -1,5 +1,7 @@
-// tslint:disable:max-classes-per-file = because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface = because the some mixins have nothing to add
+// tslint:disable:max-classes-per-file
+// ^ because the mixin define multiple classes while maintaining scope to each
+// tslint:disable:no-empty-interface
+// ^ because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
 import { nextWrapAround } from "~/utils";
@@ -48,17 +50,19 @@ export function mixTurnBased<
         /** The schema for turn based settings. */
         public schema = this.makeSchema({
             // HACK: super should work. but schema is undefined on it
-            // tslint:disable-next-line:no-any - HACK: super should work. but schema is undefined on it
+            // tslint:disable-next-line:no-any
             ...(super.schema || (this as any).schema),
             timeAddedPerTurn: {
                 default: 1e9, // 1 sec in ns,
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description: "The amount of time (in nano-seconds) to add "
+                           + "after each player performs a turn.",
             },
             maxTurns: {
                 default: 200,
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description: "The maximum number of turns before the game is "
+                           + "force ended and a winner is determined.",
             },
         });
 
@@ -109,7 +113,9 @@ export function mixTurnBased<
          *
          * @param args - All the args to pipe to our super.
          */
-        constructor(...args: any[]) { // tslint:disable-line:no-any - signature must be any[] for mixins as per TS
+        constructor(...args: any[]) { // tslint:disable-line:no-any
+                                      // any[] is required for mixin
+                                      // constructor signature
             super(...args);
 
             this.game.currentPlayer = this.game.players[0];

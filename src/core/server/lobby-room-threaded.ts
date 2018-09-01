@@ -42,7 +42,8 @@ export class ThreadedRoom extends Room {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         const workerSessionData: IWorkerGameSessionData = {
-            mainDebugPort: (process as any)._debugPort, // tslint:disable-line:no-any no-unsafe-any - used by debugger
+            // tslint:disable-next-line:no-any no-unsafe-any - used by debugger
+            mainDebugPort: (process as any)._debugPort,
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,
             gameSettings: this.gameSettingsManager.values,

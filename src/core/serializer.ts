@@ -66,20 +66,6 @@ export function isGameObjectReference(
 }
 
 /**
- * Checks if the given value is an object that is an array in delta array
- * notation
- *
- * @param a The object to check.
- * @returns True if it a delta array, false otherwise.
- */
-export function isDeltaArray(a: unknown): boolean {
-    return (
-        isObject(a) && // tslint:disable-line:no-unsafe-any
-        Object.hasOwnProperty.call(a, SHARED_CONSTANTS.DELTA_LIST_LENGTH)
-    );
-}
-
-/**
  * Serializes something about a game so it is safe to send over a socket.
  * This is required to avoid cycles and send lists correctly.
  *

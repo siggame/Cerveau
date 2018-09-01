@@ -1,5 +1,7 @@
-// tslint:disable:max-classes-per-file - because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface - because the some mixins have nothing to add
+// tslint:disable:max-classes-per-file
+// ^ because the mixin define multiple classes while maintaining scope to each
+// tslint:disable:no-empty-interface
+// ^ because the some mixins have nothing to add
 
 import { BaseGameObject, IBasePlayer } from "~/core/game";
 import { IPoint, MutableRequired } from "~/utils";
@@ -9,7 +11,8 @@ import * as Base from "./base";
 export type TileDirection = "North" | "East" | "South" | "West";
 
 /** The valid direction strings tile based games use. */
-const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] = [ "North", "South", "East", "West" ];
+const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] =
+                       [ "North", "South", "East", "West" ];
 
 /** A player in a tile based game. */
 export interface ITiledPlayer extends IBasePlayer {}
@@ -147,17 +150,20 @@ export function mixTiled<
     class TiledGameSettings extends base.GameSettings {
         /** The schema for a Tiled game, adding in configurable map sizes. */
         public schema = this.makeSchema({
-            // tslint:disable-next-line:no-any - HACK: super should work. but schema is undefined on it
+            // HACK: super should work. but schema is undefined on it
+            // tslint:disable-next-line:no-any
             ...(super.schema || (this as any).schema),
             mapWidth: {
                 default: 32,
                 min: 2,
-                description: "The width (in Tiles) for the game map to be initialized to.",
+                description: "The width (in Tiles) for the game map to be "
+                           + "initialized to.",
             },
             mapHeight: {
                 default: 16,
                 min: 2,
-                description: "The height (in Tiles) for the game map to be initialized to.",
+                description: "The height (in Tiles) for the game map to be "
+                           + "initialized to.",
             },
         });
 
@@ -181,7 +187,9 @@ export function mixTiled<
         /** The valid directions tiles can be in from one another. */
         public readonly tileDirections = TILE_DIRECTIONS;
 
-        constructor(...args: any[]) { // tslint:disable-line:no-any - signature must be any[] for mixins as per TS
+        constructor(...args: any[]) { // tslint:disable-line:no-any
+                                      // any[] is required for mixin
+                                      // constructor signature
             super(...args);
 
             this.tiles.length = this.mapWidth * this.mapHeight;
@@ -189,8 +197,9 @@ export function mixTiled<
             // Create each tile.
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
+                    const i = x + y * this.mapWidth;
                     // tslint:disable-next-line:no-any no-unsafe-any
-                    this.tiles[x + y * this.mapWidth] = (this.manager.create as any).tile({x, y});
+                    this.tiles[i] = (this.manager.create as any).tile({x, y});
                     // any because we don't mix a new BaseGameObject Factory,
                     // however all managers will have a Tile so no worries.
                 }
