@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ISpawnerProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
@@ -11,17 +11,6 @@ import { Tile } from "./tile";
  * What type of resource this is ('food' or 'branches').
  */
 export type SpawnerType = "food" | "branches";
-
-/**
- * Add properties here to make the create.Spawner have different args.
- */
-export interface ISpawnerConstructorArgs
-extends IGameObjectConstructorArgs, ISpawnerProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    type: "branches" | "food";
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A resource spawner that generates branches or food.
@@ -59,18 +48,23 @@ export class Spawner extends GameObject {
     /**
      * Called when a Spawner is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ISpawnerConstructorArgs,
+        args: ISpawnerProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            type: "branches" | "food";
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         this.health = 1;
-        this.tile = data.tile;
+        this.tile = args.tile;
         this.tile.spawner = this;
         this.game.spawner.push(this);
 

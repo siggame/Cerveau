@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Port } from "./port";
 import { Tile } from "./tile";
@@ -8,16 +8,6 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Unit have different args.
- */
-export interface IUnitConstructorArgs
-extends IGameObjectConstructorArgs, IUnitProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A unit group in the game. This may consist of a ship and any number of crew.
@@ -50,8 +40,8 @@ export class Unit extends GameObject {
     public moves!: number;
 
     /**
-     * The Player that owns and can control this Unit, or null if the Unit is
-     * neutral.
+     * The Player that owns and can control this Unit, or undefined if the Unit
+     * is neutral.
      */
     public owner?: Player;
 
@@ -95,14 +85,18 @@ export class Unit extends GameObject {
     /**
      * Called when a Unit is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IUnitConstructorArgs,
+        args: IUnitProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
@@ -625,8 +619,8 @@ export class Unit extends GameObject {
     /**
      * Moves this Unit from its current Tile to an adjacent Tile. If this Unit
      * merges with another one, the other Unit will be destroyed and its tile
-     * will be set to null. Make sure to check that your Unit's tile is not
-     * null before doing things with it.
+     * will be set to undefined. Make sure to check that your Unit's tile is
+     * not undefined before doing things with it.
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Unit should move to.

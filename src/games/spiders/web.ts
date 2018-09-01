@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IWebProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Spiderling } from "./spiderling";
 
@@ -10,16 +10,6 @@ import { Cutter } from "./cutter";
 import { Spider } from "./spider";
 import { Weaver } from "./weaver";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Web have different args.
- */
-export interface IWebConstructorArgs
-extends IGameObjectConstructorArgs, IWebProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A connection (edge) to a Nest (node) in the game that Spiders can converge
@@ -69,14 +59,18 @@ export class Web extends GameObject {
     /**
      * Called when a Web is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IWebConstructorArgs,
+        args: IWebProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

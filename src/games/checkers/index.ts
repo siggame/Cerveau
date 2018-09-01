@@ -20,6 +20,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Checkers game
  * must implement from mixed in game logic.
@@ -160,7 +163,7 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { Checker, ICheckerConstructorArgs } from "./checker";
+import { Checker } from "./checker";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -168,6 +171,9 @@ import { AI } from "./ai";
 import { CheckersGame } from "./game";
 import { CheckersGameManager } from "./game-manager";
 import { CheckersGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a Checker */
+export type CheckerArgs = FirstArgumentFromConstructor<typeof Checker>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -177,12 +183,12 @@ export class CheckersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Checker in the Game and tracks it for all players.
      *
-     * @param data - Data about the Checker to set. Any keys matching a
+     * @param args - Data about the Checker to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Checker hooked up in the game and ready for you to use.
      */
-    public checker<T extends ICheckerConstructorArgs>(data: T): Checker & T {
-        return this.createGameObject("Checker", Checker, data);
+    public checker<T extends CheckerArgs>(args: T): Checker & T {
+        return this.createGameObject("Checker", Checker, args);
     }
 
 }

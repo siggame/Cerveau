@@ -1,23 +1,13 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IJobProperties } from "./";
 import { Beaver } from "./beaver";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Job have different args.
- */
-export interface IJobConstructorArgs
-extends IGameObjectConstructorArgs, IJobProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * Information about a beaver's job.
@@ -84,14 +74,18 @@ export class Job extends GameObject {
     /**
      * Called when a Job is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IJobConstructorArgs,
+        args: IJobProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
@@ -149,7 +143,7 @@ export class Job extends GameObject {
      * @param player - The player that called this.
      * @param tile - The Tile that is a lodge owned by you that you wish to
      * spawn the Beaver of this Job on.
-     * @returns The recruited Beaver if successful, null otherwise.
+     * @returns The recruited Beaver if successful, undefined otherwise.
      */
     protected async recruit(player: Player, tile: Tile): Promise<Beaver> {
         // <<-- Creer-Merge: recruit -->>

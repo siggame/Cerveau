@@ -1,21 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ICheckerProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Checker have different args.
- */
-export interface ICheckerConstructorArgs
-extends IGameObjectConstructorArgs, ICheckerProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A checker on the game board.
@@ -52,17 +42,21 @@ export class Checker extends GameObject {
     /**
      * Called when a Checker is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ICheckerConstructorArgs,
+        args: ICheckerProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            owner: Player;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.owner = data.owner;
+        this.owner = args.owner;
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -192,7 +186,7 @@ export class Checker extends GameObject {
      * @param x - The x coordinate to move to.
      * @param y - The y coordinate to move to.
      * @returns Returns the same checker that moved if the move was successful.
-     * null otherwise.
+     * undefined otherwise.
      */
     protected async move(
         player: Player,

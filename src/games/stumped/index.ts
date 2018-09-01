@@ -22,6 +22,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Stumped game
  * must implement from mixed in game logic.
@@ -276,7 +279,7 @@ export interface ISpawnerProperties {
 /** All the possible properties for an Tile. */
 export interface ITileProperties {
     /**
-     * The Beaver on this Tile if present, otherwise null.
+     * The Beaver on this Tile if present, otherwise undefined.
      */
     beaver?: Beaver;
 
@@ -297,36 +300,37 @@ export interface ITileProperties {
     food?: number;
 
     /**
-     * The owner of the Beaver lodge on this Tile, if present, otherwise null.
+     * The owner of the Beaver lodge on this Tile, if present, otherwise
+     * undefined.
      */
     lodgeOwner?: Player;
 
     /**
-     * The resource Spawner on this Tile if present, otherwise null.
+     * The resource Spawner on this Tile if present, otherwise undefined.
      */
     spawner?: Spawner;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
+     * of the map.
      */
     tileEast?: Tile;
 
     /**
-     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'North' of this one (x, y-1). Undefined if out of bounds
+     * of the map.
      */
     tileNorth?: Tile;
 
     /**
-     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'South' of this one (x, y+1). Undefined if out of bounds
+     * of the map.
      */
     tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'West' of this one (x-1, y). Undefined if out of bounds
+     * of the map.
      */
     tileWest?: Tile;
 
@@ -357,17 +361,29 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { Beaver, IBeaverConstructorArgs } from "./beaver";
+import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
-import { IJobConstructorArgs, Job } from "./job";
+import { Job } from "./job";
 import { Player } from "./player";
-import { ISpawnerConstructorArgs, Spawner } from "./spawner";
-import { ITileConstructorArgs, Tile } from "./tile";
+import { Spawner } from "./spawner";
+import { Tile } from "./tile";
 
 import { AI } from "./ai";
 import { StumpedGame } from "./game";
 import { StumpedGameManager } from "./game-manager";
 import { StumpedGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a Beaver */
+export type BeaverArgs = FirstArgumentFromConstructor<typeof Beaver>;
+
+/** The arguments used to construct a Job */
+export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
+
+/** The arguments used to construct a Spawner */
+export type SpawnerArgs = FirstArgumentFromConstructor<typeof Spawner>;
+
+/** The arguments used to construct a Tile */
+export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -377,45 +393,45 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Beaver in the Game and tracks it for all players.
      *
-     * @param data - Data about the Beaver to set. Any keys matching a property
+     * @param args - Data about the Beaver to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Beaver hooked up in the game and ready for you to use.
      */
-    public beaver<T extends IBeaverConstructorArgs>(data: T): Beaver & T {
-        return this.createGameObject("Beaver", Beaver, data);
+    public beaver<T extends BeaverArgs>(args: T): Beaver & T {
+        return this.createGameObject("Beaver", Beaver, args);
     }
 
     /**
      * Creates a new Job in the Game and tracks it for all players.
      *
-     * @param data - Data about the Job to set. Any keys matching a property in
+     * @param args - Data about the Job to set. Any keys matching a property in
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends IJobConstructorArgs>(data: T): Job & T {
-        return this.createGameObject("Job", Job, data);
+    public job<T extends JobArgs>(args: T): Job & T {
+        return this.createGameObject("Job", Job, args);
     }
 
     /**
      * Creates a new Spawner in the Game and tracks it for all players.
      *
-     * @param data - Data about the Spawner to set. Any keys matching a
+     * @param args - Data about the Spawner to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
-    public spawner<T extends ISpawnerConstructorArgs>(data: T): Spawner & T {
-        return this.createGameObject("Spawner", Spawner, data);
+    public spawner<T extends SpawnerArgs>(args: T): Spawner & T {
+        return this.createGameObject("Spawner", Spawner, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param data - Data about the Tile to set. Any keys matching a property
+     * @param args - Data about the Tile to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends ITileConstructorArgs>(data: T): Tile & T {
-        return this.createGameObject("Tile", Tile, data);
+    public tile<T extends TileArgs>(args: T): Tile & T {
+        return this.createGameObject("Tile", Tile, args);
     }
 
 }

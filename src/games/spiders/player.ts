@@ -88,14 +88,15 @@ export class Player extends GameObject implements IBaseSpidersPlayer {
     /**
      * Called when a Player is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: {},
+        // never directly created by game developers
+        args: IBaseSpidersPlayer,
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

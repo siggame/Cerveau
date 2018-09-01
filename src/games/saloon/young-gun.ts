@@ -1,25 +1,13 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IYoungGunProperties } from "./";
 import { Cowboy } from "./cowboy";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.YoungGun have different args.
- */
-export interface IYoungGunConstructorArgs
-extends IGameObjectConstructorArgs, IYoungGunProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
-    tile: Tile;
-    previousTile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * An eager young person that wants to join your gang, and will call in the
@@ -57,20 +45,26 @@ export class YoungGun extends GameObject {
     /**
      * Called when a YoungGun is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IYoungGunConstructorArgs,
+        args: IYoungGunProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            owner: Player;
+            tile: Tile;
+            previousTile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.owner = data.owner;
-        this.tile = data.tile;
-        this.previousTile = data.previousTile;
-        this.callInTile = data.tile; // will be over-ridden next
+        this.owner = args.owner;
+        this.tile = args.tile;
+        this.previousTile = args.previousTile;
+        this.callInTile = args.tile; // will be over-ridden next
         this.update();
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -156,7 +150,7 @@ export class YoungGun extends GameObject {
      * @param player - The player that called this.
      * @param job - The job you want the Cowboy being brought to have.
      * @returns The new Cowboy that was called in if valid. They will not be
-     * added to any `cowboys` lists until the turn ends. Null otherwise.
+     * added to any `cowboys` lists until the turn ends. Undefined otherwise.
      */
     protected async callIn(
         player: Player,

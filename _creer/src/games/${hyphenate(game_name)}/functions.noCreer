@@ -53,6 +53,10 @@ if not 'cerveau' in shared:
             return base_type
     shared['cerveau']['type'] = cerveau_type
 
+    def cerveai_description_format(description):
+        return description.replace('Null', 'Undefined').replace('null', 'undefined')
+    shared['cerveau']['description'] = cerveai_description_format
+
     def cerveau_schema_type(type_obj, depth=1, optional=False):
         base_type = type_obj['name']
         string = ''
@@ -117,7 +121,7 @@ if not 'cerveau' in shared:
             properties.append({
                 'name': attr_name,
                 'type': cerveau_type(attr['type']),
-                'description': attr["description"]
+                'description': cerveai_description_format(attr["description"])
             })
         return properties
     shared['cerveau']['properties'] = cerveau_properties
@@ -131,17 +135,17 @@ if not 'cerveau' in shared:
         if isinstance(doc, str):
             doc = {'description': doc}
 
-        description = doc['description']
-        lines = wrapper.wrap(doc['description'])
+        description = cerveai_description_format(doc['description'])
+        lines = wrapper.wrap(description)
 
         if ('arguments' in doc and doc['arguments']) or 'returns' in doc and doc['returns']:
             lines.append(prefix+' *')
 
         if 'arguments' in doc and doc['arguments']:
             for arg in doc['arguments']:
-                lines += wrapper.wrap('@param ' + arg['name'] + ' - ' + arg['description'])
+                lines += wrapper.wrap('@param ' + arg['name'] + ' - ' + cerveai_description_format(arg['description']))
         if 'returns' in doc and doc['returns']:
-            lines += wrapper.wrap('@returns ' + doc['returns']['description'])
+            lines += wrapper.wrap('@returns ' + cerveai_description_format(doc['returns']['description']))
 
         lines.insert(0, prefix+'/**')
         lines.append(prefix+' */')

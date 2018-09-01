@@ -34,9 +34,11 @@ imports = {
 
 %>
 ${shared['cerveau']['imports'](imports)}
+% if len(game_objs) > 2:
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
+% endif
 /**
  * The interface the Player for the ${game_name} game
  * must implement from mixed in game logic.
@@ -114,9 +116,7 @@ export * from "./ai";
 <%
 for game_obj_name in sort_dict_keys(game_objs):
     imports = {}
-    imports['./' + hyphenate(game_obj_name)] = [game_obj_name] + (
-        [] if (game_obj_name in ['Player', 'GameObject']) else ['I' + game_obj_name + 'ConstructorArgs']
-    )
+    imports['./' + hyphenate(game_obj_name)] = [game_obj_name]
 
     context.write(shared['cerveau']['imports'](imports))
 %>
@@ -134,7 +134,9 @@ import { AI } from "./ai";
 <%
     if game_obj_name in ['Player', 'GameObject']:
         continue
-%>export type ${game_obj_name}Args = FirstArgumentFromConstructor<typeof ${game_obj_name}>
+%>/** The arguments used to construct a ${game_obj_name} */
+export type ${game_obj_name}Args = FirstArgumentFromConstructor<typeof ${game_obj_name}>;
+
 % endfor
 /**
  * The factory that **must** be used to create any game objects in
@@ -149,7 +151,7 @@ export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
     'description': 'Creates a new {} in the Game and tracks it for all players.'.format(game_obj_name),
     'arguments': [
         {
-            'name': 'data',
+            'name': 'args',
             'description': 'Data about the {} to set. Any keys matching a property in the game object\'s class will be automatically set for you.'.format(game_obj_name)
         }
     ],
@@ -157,8 +159,8 @@ export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
         'description': 'A new {} hooked up in the game and ready for you to use.'.format(game_obj_name)
     }
 })}
-    public ${uncapitalize(game_obj_name)}<T extends I${game_obj_name}ConstructorArgs>(data: T): ${game_obj_name} & T {
-        return this.createGameObject("${game_obj_name}", ${game_obj_name}, data);
+    public ${uncapitalize(game_obj_name)}<T extends ${game_obj_name}Args>(args: T): ${game_obj_name} & T {
+        return this.createGameObject("${game_obj_name}", ${game_obj_name}, args);
     }
 
 % endfor

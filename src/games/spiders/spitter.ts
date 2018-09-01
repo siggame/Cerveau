@@ -1,22 +1,12 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpitterProperties } from "./";
+import { ISpitterProperties, SpiderlingArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
-import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
+import { Spiderling } from "./spiderling";
 
 // <<-- Creer-Merge: imports -->>
 import { euclideanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Spitter have different args.
- */
-export interface ISpitterConstructorArgs
-extends ISpiderlingConstructorArgs, ISpitterProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A Spiderling that creates and spits new Webs from the Nest it is on to
@@ -25,7 +15,7 @@ extends ISpiderlingConstructorArgs, ISpitterProperties {
 export class Spitter extends Spiderling {
     /**
      * The Nest that this Spitter is creating a Web to spit at, thus connecting
-     * them. Null if not spitting.
+     * them. Undefined if not spitting.
      */
     public spittingWebToNest?: Nest;
 
@@ -40,14 +30,18 @@ export class Spitter extends Spiderling {
     /**
      * Called when a Spitter is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ISpitterConstructorArgs,
+        args: SpiderlingArgs & ISpitterProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

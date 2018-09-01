@@ -20,6 +20,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Spiders game
  * must implement from mixed in game logic.
@@ -88,7 +91,7 @@ export interface IBroodMotherProperties {
 /** All the possible properties for an Cutter. */
 export interface ICutterProperties {
     /**
-     * The Web that this Cutter is trying to cut. Null if not cutting.
+     * The Web that this Cutter is trying to cut. Undefined if not cutting.
      */
     cuttingWeb?: Web;
 
@@ -201,7 +204,8 @@ export interface ISpiderProperties {
     isDead?: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Null when moving on a Web.
+     * The Nest that this Spider is currently on. Undefined when moving on a
+     * Web.
      */
     nest?: Nest;
 
@@ -221,12 +225,12 @@ export interface ISpiderlingProperties {
     busy?: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
     /**
-     * The Web this Spiderling is using to move. Null if it is not moving.
+     * The Web this Spiderling is using to move. Undefined if it is not moving.
      */
     movingOnWeb?: Web;
 
     /**
-     * The Nest this Spiderling is moving to. Null if it is not moving.
+     * The Nest this Spiderling is moving to. Undefined if it is not moving.
      */
     movingToNest?: Nest;
 
@@ -248,7 +252,7 @@ export interface ISpiderlingProperties {
 export interface ISpitterProperties {
     /**
      * The Nest that this Spitter is creating a Web to spit at, thus connecting
-     * them. Null if not spitting.
+     * them. Undefined if not spitting.
      */
     spittingWebToNest?: Nest;
 
@@ -257,12 +261,13 @@ export interface ISpitterProperties {
 /** All the possible properties for an Weaver. */
 export interface IWeaverProperties {
     /**
-     * The Web that this Weaver is strengthening. Null if not strengthening.
+     * The Web that this Weaver is strengthening. Undefined if not
+     * strengthening.
      */
     strengtheningWeb?: Web;
 
     /**
-     * The Web that this Weaver is weakening. Null if not weakening.
+     * The Web that this Weaver is weakening. Undefined if not weakening.
      */
     weakeningWeb?: Web;
 
@@ -318,21 +323,45 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { BroodMother, IBroodMotherConstructorArgs } from "./brood-mother";
-import { Cutter, ICutterConstructorArgs } from "./cutter";
+import { BroodMother } from "./brood-mother";
+import { Cutter } from "./cutter";
 import { GameObject } from "./game-object";
-import { INestConstructorArgs, Nest } from "./nest";
+import { Nest } from "./nest";
 import { Player } from "./player";
-import { ISpiderConstructorArgs, Spider } from "./spider";
-import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
-import { ISpitterConstructorArgs, Spitter } from "./spitter";
-import { IWeaverConstructorArgs, Weaver } from "./weaver";
-import { IWebConstructorArgs, Web } from "./web";
+import { Spider } from "./spider";
+import { Spiderling } from "./spiderling";
+import { Spitter } from "./spitter";
+import { Weaver } from "./weaver";
+import { Web } from "./web";
 
 import { AI } from "./ai";
 import { SpidersGame } from "./game";
 import { SpidersGameManager } from "./game-manager";
 import { SpidersGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a BroodMother */
+export type BroodMotherArgs = FirstArgumentFromConstructor<typeof BroodMother>;
+
+/** The arguments used to construct a Cutter */
+export type CutterArgs = FirstArgumentFromConstructor<typeof Cutter>;
+
+/** The arguments used to construct a Nest */
+export type NestArgs = FirstArgumentFromConstructor<typeof Nest>;
+
+/** The arguments used to construct a Spider */
+export type SpiderArgs = FirstArgumentFromConstructor<typeof Spider>;
+
+/** The arguments used to construct a Spiderling */
+export type SpiderlingArgs = FirstArgumentFromConstructor<typeof Spiderling>;
+
+/** The arguments used to construct a Spitter */
+export type SpitterArgs = FirstArgumentFromConstructor<typeof Spitter>;
+
+/** The arguments used to construct a Weaver */
+export type WeaverArgs = FirstArgumentFromConstructor<typeof Weaver>;
+
+/** The arguments used to construct a Web */
+export type WebArgs = FirstArgumentFromConstructor<typeof Web>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -342,91 +371,91 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new BroodMother in the Game and tracks it for all players.
      *
-     * @param data - Data about the BroodMother to set. Any keys matching a
+     * @param args - Data about the BroodMother to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new BroodMother hooked up in the game and ready for you to
      * use.
      */
-    public broodMother<T extends IBroodMotherConstructorArgs>(data: T): BroodMother & T {
-        return this.createGameObject("BroodMother", BroodMother, data);
+    public broodMother<T extends BroodMotherArgs>(args: T): BroodMother & T {
+        return this.createGameObject("BroodMother", BroodMother, args);
     }
 
     /**
      * Creates a new Cutter in the Game and tracks it for all players.
      *
-     * @param data - Data about the Cutter to set. Any keys matching a property
+     * @param args - Data about the Cutter to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Cutter hooked up in the game and ready for you to use.
      */
-    public cutter<T extends ICutterConstructorArgs>(data: T): Cutter & T {
-        return this.createGameObject("Cutter", Cutter, data);
+    public cutter<T extends CutterArgs>(args: T): Cutter & T {
+        return this.createGameObject("Cutter", Cutter, args);
     }
 
     /**
      * Creates a new Nest in the Game and tracks it for all players.
      *
-     * @param data - Data about the Nest to set. Any keys matching a property
+     * @param args - Data about the Nest to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
-    public nest<T extends INestConstructorArgs>(data: T): Nest & T {
-        return this.createGameObject("Nest", Nest, data);
+    public nest<T extends NestArgs>(args: T): Nest & T {
+        return this.createGameObject("Nest", Nest, args);
     }
 
     /**
      * Creates a new Spider in the Game and tracks it for all players.
      *
-     * @param data - Data about the Spider to set. Any keys matching a property
+     * @param args - Data about the Spider to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Spider hooked up in the game and ready for you to use.
      */
-    public spider<T extends ISpiderConstructorArgs>(data: T): Spider & T {
-        return this.createGameObject("Spider", Spider, data);
+    public spider<T extends SpiderArgs>(args: T): Spider & T {
+        return this.createGameObject("Spider", Spider, args);
     }
 
     /**
      * Creates a new Spiderling in the Game and tracks it for all players.
      *
-     * @param data - Data about the Spiderling to set. Any keys matching a
+     * @param args - Data about the Spiderling to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Spiderling hooked up in the game and ready for you to
      * use.
      */
-    public spiderling<T extends ISpiderlingConstructorArgs>(data: T): Spiderling & T {
-        return this.createGameObject("Spiderling", Spiderling, data);
+    public spiderling<T extends SpiderlingArgs>(args: T): Spiderling & T {
+        return this.createGameObject("Spiderling", Spiderling, args);
     }
 
     /**
      * Creates a new Spitter in the Game and tracks it for all players.
      *
-     * @param data - Data about the Spitter to set. Any keys matching a
+     * @param args - Data about the Spitter to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
-    public spitter<T extends ISpitterConstructorArgs>(data: T): Spitter & T {
-        return this.createGameObject("Spitter", Spitter, data);
+    public spitter<T extends SpitterArgs>(args: T): Spitter & T {
+        return this.createGameObject("Spitter", Spitter, args);
     }
 
     /**
      * Creates a new Weaver in the Game and tracks it for all players.
      *
-     * @param data - Data about the Weaver to set. Any keys matching a property
+     * @param args - Data about the Weaver to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Weaver hooked up in the game and ready for you to use.
      */
-    public weaver<T extends IWeaverConstructorArgs>(data: T): Weaver & T {
-        return this.createGameObject("Weaver", Weaver, data);
+    public weaver<T extends WeaverArgs>(args: T): Weaver & T {
+        return this.createGameObject("Weaver", Weaver, args);
     }
 
     /**
      * Creates a new Web in the Game and tracks it for all players.
      *
-     * @param data - Data about the Web to set. Any keys matching a property in
+     * @param args - Data about the Web to set. Any keys matching a property in
      * the game object's class will be automatically set for you.
      * @returns A new Web hooked up in the game and ready for you to use.
      */
-    public web<T extends IWebConstructorArgs>(data: T): Web & T {
-        return this.createGameObject("Web", Web, data);
+    public web<T extends WebArgs>(args: T): Web & T {
+        return this.createGameObject("Web", Web, args);
     }
 
 }

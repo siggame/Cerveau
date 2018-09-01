@@ -83,14 +83,15 @@ export class Player extends GameObject implements IBaseStumpedPlayer {
     /**
      * Called when a Player is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: {},
+        // never directly created by game developers
+        args: IBaseStumpedPlayer,
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
@@ -116,7 +117,6 @@ export class Player extends GameObject implements IBaseStumpedPlayer {
 
     /** Re-calculates this player's branchesToBuildLodge number */
     public calculateBranchesToBuildLodge(): void {
-        // TODO: document this in the game rules
         this.branchesToBuildLodge = Math.ceil(
             this.game.lodgeCostConstant ** this.lodges.length,
         );

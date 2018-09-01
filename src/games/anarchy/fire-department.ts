@@ -1,21 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IFireDepartmentProperties } from "./";
-import { Building, IBuildingConstructorArgs } from "./building";
+import { BuildingArgs, IFireDepartmentProperties } from "./";
+import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import { clamp } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.FireDepartment have different args.
- */
-export interface IFireDepartmentConstructorArgs
-extends IBuildingConstructorArgs, IFireDepartmentProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * Can put out fires completely.
@@ -38,14 +28,18 @@ export class FireDepartment extends Building {
     /**
      * Called when a FireDepartment is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IFireDepartmentConstructorArgs,
+        args: BuildingArgs & IFireDepartmentProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

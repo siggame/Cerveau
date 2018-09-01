@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICutterProperties } from "./";
+import { ICutterProperties, SpiderlingArgs } from "./";
 import { Player } from "./player";
-import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
+import { Spiderling } from "./spiderling";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
@@ -9,21 +9,11 @@ import { Web } from "./web";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Add properties here to make the create.Cutter have different args.
- */
-export interface ICutterConstructorArgs
-extends ISpiderlingConstructorArgs, ICutterProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
-
-/**
  * A Spiderling that can cut existing Webs.
  */
 export class Cutter extends Spiderling {
     /**
-     * The Web that this Cutter is trying to cut. Null if not cutting.
+     * The Web that this Cutter is trying to cut. Undefined if not cutting.
      */
     public cuttingWeb?: Web;
 
@@ -38,14 +28,18 @@ export class Cutter extends Spiderling {
     /**
      * Called when a Cutter is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ICutterConstructorArgs,
+        args: SpiderlingArgs & ICutterProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

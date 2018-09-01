@@ -1,23 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBuildingProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Building have different args.
- */
-export interface IBuildingConstructorArgs
-extends IGameObjectConstructorArgs, IBuildingProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
-    x: number;
-    y: number;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A basic building. It does nothing besides burn down. Other Buildings inherit
@@ -31,25 +19,25 @@ export class Building extends GameObject {
     public bribed!: boolean;
 
     /**
-     * The Building directly to the east of this building, or null if not
+     * The Building directly to the east of this building, or undefined if not
      * present.
      */
     public readonly buildingEast?: Building;
 
     /**
-     * The Building directly to the north of this building, or null if not
+     * The Building directly to the north of this building, or undefined if not
      * present.
      */
     public readonly buildingNorth?: Building;
 
     /**
-     * The Building directly to the south of this building, or null if not
+     * The Building directly to the south of this building, or undefined if not
      * present.
      */
     public readonly buildingSouth?: Building;
 
     /**
-     * The Building directly to the west of this building, or null if not
+     * The Building directly to the west of this building, or undefined if not
      * present.
      */
     public readonly buildingWest?: Building;
@@ -99,18 +87,24 @@ export class Building extends GameObject {
     /**
      * Called when a Building is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IBuildingConstructorArgs,
+        args: IBuildingProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            owner: Player;
+            x: number;
+            y: number;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.owner = data.owner;
+        this.owner = args.owner;
         this.health = this.game.settings.buildingStartingHealth;
 
         // <<-- /Creer-Merge: constructor -->>

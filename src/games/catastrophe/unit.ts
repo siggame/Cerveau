@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -8,16 +8,6 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 import { StructureType } from "./structure";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Unit have different args.
- */
-export interface IUnitConstructorArgs
-extends IGameObjectConstructorArgs, IUnitProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A unit in the game.
@@ -60,8 +50,8 @@ export class Unit extends GameObject {
     public moves!: number;
 
     /**
-     * The Player that owns and can control this Unit, or null if the Unit is
-     * neutral.
+     * The Player that owns and can control this Unit, or undefined if the Unit
+     * is neutral.
      */
     public owner?: Player;
 
@@ -99,24 +89,28 @@ export class Unit extends GameObject {
     /**
      * Called when a Unit is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IUnitConstructorArgs,
+        args: IUnitProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.energy = data.energy || 100;
-        this.job = data.job || this.game.jobs[0];
+        this.energy = args.energy || 100;
+        this.job = args.job || this.game.jobs[0];
         this.moves = this.job.moves;
-        this.owner = data.owner;
-        this.tile = data.tile;
-        this.turnsToDie = data.turnsToDie || -1;
-        this.movementTarget = data.movementTarget;
+        this.owner = args.owner;
+        this.tile = args.tile;
+        this.turnsToDie = args.turnsToDie || -1;
+        this.movementTarget = args.movementTarget;
 
         this.game.units.push(this);
         if (this.owner) {

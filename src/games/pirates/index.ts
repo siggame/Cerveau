@@ -22,6 +22,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Pirates game
  * must implement from mixed in game logic.
@@ -159,7 +162,7 @@ export interface IPortProperties {
     investment?: number;
 
     /**
-     * The owner of this Port, or null if owned by merchants.
+     * The owner of this Port, or undefined if owned by merchants.
      */
     owner?: Player;
 
@@ -184,31 +187,31 @@ export interface ITileProperties {
     gold?: number;
 
     /**
-     * The Port on this Tile if present, otherwise null.
+     * The Port on this Tile if present, otherwise undefined.
      */
     port?: Port;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
+     * of the map.
      */
     tileEast?: Tile;
 
     /**
-     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'North' of this one (x, y-1). Undefined if out of bounds
+     * of the map.
      */
     tileNorth?: Tile;
 
     /**
-     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'South' of this one (x, y+1). Undefined if out of bounds
+     * of the map.
      */
     tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'West' of this one (x-1, y). Undefined if out of bounds
+     * of the map.
      */
     tileWest?: Tile;
 
@@ -218,7 +221,7 @@ export interface ITileProperties {
     type?: "water" | "land";
 
     /**
-     * The Unit on this Tile if present, otherwise null.
+     * The Unit on this Tile if present, otherwise undefined.
      */
     unit?: Unit;
 
@@ -263,8 +266,8 @@ export interface IUnitProperties {
     moves?: number;
 
     /**
-     * The Player that owns and can control this Unit, or null if the Unit is
-     * neutral.
+     * The Player that owns and can control this Unit, or undefined if the Unit
+     * is neutral.
      */
     owner?: Player;
 
@@ -310,14 +313,23 @@ export * from "./ai";
 
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { IPortConstructorArgs, Port } from "./port";
-import { ITileConstructorArgs, Tile } from "./tile";
-import { IUnitConstructorArgs, Unit } from "./unit";
+import { Port } from "./port";
+import { Tile } from "./tile";
+import { Unit } from "./unit";
 
 import { AI } from "./ai";
 import { PiratesGame } from "./game";
 import { PiratesGameManager } from "./game-manager";
 import { PiratesGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a Port */
+export type PortArgs = FirstArgumentFromConstructor<typeof Port>;
+
+/** The arguments used to construct a Tile */
+export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
+
+/** The arguments used to construct a Unit */
+export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -327,34 +339,34 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Port in the Game and tracks it for all players.
      *
-     * @param data - Data about the Port to set. Any keys matching a property
+     * @param args - Data about the Port to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public port<T extends IPortConstructorArgs>(data: T): Port & T {
-        return this.createGameObject("Port", Port, data);
+    public port<T extends PortArgs>(args: T): Port & T {
+        return this.createGameObject("Port", Port, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param data - Data about the Tile to set. Any keys matching a property
+     * @param args - Data about the Tile to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends ITileConstructorArgs>(data: T): Tile & T {
-        return this.createGameObject("Tile", Tile, data);
+    public tile<T extends TileArgs>(args: T): Tile & T {
+        return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param data - Data about the Unit to set. Any keys matching a property
+     * @param args - Data about the Unit to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends IUnitConstructorArgs>(data: T): Unit & T {
-        return this.createGameObject("Unit", Unit, data);
+    public unit<T extends UnitArgs>(args: T): Unit & T {
+        return this.createGameObject("Unit", Unit, args);
     }
 
 }

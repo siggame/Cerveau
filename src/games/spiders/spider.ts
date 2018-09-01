@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ISpiderProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Player } from "./player";
 
@@ -8,16 +8,6 @@ import { Player } from "./player";
 import { removeElements } from "~/utils";
 import { BroodMother } from "./brood-mother";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Spider have different args.
- */
-export interface ISpiderConstructorArgs
-extends IGameObjectConstructorArgs, ISpiderProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A Spider in the game. The most basic unit.
@@ -29,7 +19,8 @@ export class Spider extends GameObject {
     public isDead!: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Null when moving on a Web.
+     * The Nest that this Spider is currently on. Undefined when moving on a
+     * Web.
      */
     public nest?: Nest;
 
@@ -49,17 +40,21 @@ export class Spider extends GameObject {
     /**
      * Called when a Spider is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ISpiderConstructorArgs,
+        args: ISpiderProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            owner: Player;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.owner = data.owner;
+        this.owner = args.owner;
         if (!(this instanceof BroodMother)) {
             this.nest = this.owner.broodMother.nest;
         }

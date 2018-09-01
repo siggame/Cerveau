@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IWeaverProperties } from "./";
+import { IWeaverProperties, SpiderlingArgs } from "./";
 import { Player } from "./player";
-import { ISpiderlingConstructorArgs, Spiderling } from "./spiderling";
+import { Spiderling } from "./spiderling";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
@@ -9,27 +9,18 @@ import { Web } from "./web";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Add properties here to make the create.Weaver have different args.
- */
-export interface IWeaverConstructorArgs
-extends ISpiderlingConstructorArgs, IWeaverProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
-
-/**
  * A Spiderling that can alter existing Webs by weaving to add or remove silk
  * from the Webs, thus altering its strength.
  */
 export class Weaver extends Spiderling {
     /**
-     * The Web that this Weaver is strengthening. Null if not strengthening.
+     * The Web that this Weaver is strengthening. Undefined if not
+     * strengthening.
      */
     public strengtheningWeb?: Web;
 
     /**
-     * The Web that this Weaver is weakening. Null if not weakening.
+     * The Web that this Weaver is weakening. Undefined if not weakening.
      */
     public weakeningWeb?: Web;
 
@@ -44,14 +35,18 @@ export class Weaver extends Spiderling {
     /**
      * Called when a Weaver is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IWeaverConstructorArgs,
+        args: SpiderlingArgs & IWeaverProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

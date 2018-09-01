@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ICowboyProperties } from "./";
 import { Furnishing } from "./furnishing";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 
@@ -14,17 +14,6 @@ import { TileDirection } from "~/core/game/mixins/tiled";
  * within the Saloon.
  */
 export type CowboyJob = "Bartender" | "Brawler" | "Sharpshooter";
-
-/**
- * Add properties here to make the create.Cowboy have different args.
- */
-export interface ICowboyConstructorArgs
-extends IGameObjectConstructorArgs, ICowboyProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    owner: Player;
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A person on the map that can move around and interact within the saloon.
@@ -102,19 +91,24 @@ export class Cowboy extends GameObject {
     /**
      * Called when a Cowboy is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ICowboyConstructorArgs,
+        args: ICowboyProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            owner: Player;
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.owner = data.owner;
-        this.tile = data.tile;
+        this.owner = args.owner;
+        this.tile = args.tile;
 
         this.canMove = true;
         this.health = 10;

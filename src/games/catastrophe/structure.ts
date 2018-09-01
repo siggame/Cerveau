@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IStructureProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 
@@ -13,17 +13,6 @@ import { Tile } from "./tile";
  * 'neutral').
  */
 export type StructureType = "neutral" | "shelter" | "monument" | "wall" | "road";
-
-/**
- * Add properties here to make the create.Structure have different args.
- */
-export interface IStructureConstructorArgs
-extends IGameObjectConstructorArgs, IStructureProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    type: StructureType;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A structure on a Tile.
@@ -42,7 +31,7 @@ export class Structure extends GameObject {
     public materials!: number;
 
     /**
-     * The owner of this Structure if any, otherwise null.
+     * The owner of this Structure if any, otherwise undefined.
      */
     public owner?: Player;
 
@@ -68,17 +57,22 @@ export class Structure extends GameObject {
     /**
      * Called when a Structure is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IStructureConstructorArgs,
+        args: IStructureProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            type: StructureType;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.tile = data.tile;
+        this.tile = args.tile;
 
         this.materials = this.game.getStructureCost(this.type);
         this.effectRadius = this.game.getStructureRange(this.type);

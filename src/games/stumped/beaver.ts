@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBeaverProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
 import { Spawner } from "./spawner";
@@ -9,18 +9,6 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Beaver have different args.
- */
-export interface IBeaverConstructorArgs
-extends IGameObjectConstructorArgs, IBeaverProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    job: Job;
-    owner: Player;
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A beaver in the game.
@@ -88,20 +76,26 @@ export class Beaver extends GameObject {
     /**
      * Called when a Beaver is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IBeaverConstructorArgs,
+        args: IBeaverProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            job: Job;
+            owner: Player;
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.owner = data.owner;
-        this.job = data.job;
-        this.tile = data.tile;
+        this.owner = args.owner;
+        this.job = args.job;
+        this.tile = args.tile;
 
         this.health = this.job.health;
         this.actions = this.job.actions;

@@ -4,7 +4,7 @@ import { ITileProperties } from "./";
 import { Bottle } from "./bottle";
 import { Cowboy } from "./cowboy";
 import { Furnishing } from "./furnishing";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { YoungGun } from "./young-gun";
 
 // <<-- Creer-Merge: imports -->>
@@ -12,31 +12,21 @@ import { YoungGun } from "./young-gun";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Add properties here to make the create.Tile have different args.
- */
-export interface ITileConstructorArgs
-extends IGameObjectConstructorArgs, ITileProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
-
-/**
  * A Tile in the game that makes up the 2D map grid.
  */
 export class Tile extends GameObject implements BaseTile {
     /**
-     * The beer Bottle currently flying over this Tile, null otherwise.
+     * The beer Bottle currently flying over this Tile, undefined otherwise.
      */
     public bottle?: Bottle;
 
     /**
-     * The Cowboy that is on this Tile, null otherwise.
+     * The Cowboy that is on this Tile, undefined otherwise.
      */
     public cowboy?: Cowboy;
 
     /**
-     * The furnishing that is on this Tile, null otherwise.
+     * The furnishing that is on this Tile, undefined otherwise.
      */
     public furnishing?: Furnishing;
 
@@ -53,26 +43,26 @@ export class Tile extends GameObject implements BaseTile {
     public isBalcony!: boolean;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileEast?: Tile;
 
     /**
-     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'North' of this one (x, y-1). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileNorth?: Tile;
 
     /**
-     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'South' of this one (x, y+1). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'West' of this one (x-1, y). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileWest?: Tile;
 
@@ -87,7 +77,7 @@ export class Tile extends GameObject implements BaseTile {
     public readonly y!: number;
 
     /**
-     * The YoungGun on this tile, null otherwise.
+     * The YoungGun on this tile, undefined otherwise.
      */
     public youngGun?: YoungGun;
 
@@ -102,14 +92,15 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * Called when a Tile is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ITileConstructorArgs,
+        // never directly created by game developers
+        args: ITileProperties,
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

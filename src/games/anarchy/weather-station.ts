@@ -1,21 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IWeatherStationProperties } from "./";
-import { Building, IBuildingConstructorArgs } from "./building";
+import { BuildingArgs, IWeatherStationProperties } from "./";
+import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import { nextWrapAround, previousWrapAround } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.WeatherStation have different args.
- */
-export interface IWeatherStationConstructorArgs
-extends IBuildingConstructorArgs, IWeatherStationProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * Can be bribed to change the next Forecast in some way.
@@ -32,14 +22,18 @@ export class WeatherStation extends Building {
     /**
      * Called when a WeatherStation is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IWeatherStationConstructorArgs,
+        args: BuildingArgs & IWeatherStationProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

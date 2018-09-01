@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { ITileProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Port } from "./port";
 import { Unit } from "./unit";
 
@@ -13,16 +13,6 @@ import { Unit } from "./unit";
  * The type of Tile this is ('water' or 'land').
  */
 export type TileType = "water" | "land";
-
-/**
- * Add properties here to make the create.Tile have different args.
- */
-export interface ITileConstructorArgs
-extends IGameObjectConstructorArgs, ITileProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A Tile in the game that makes up the 2D map grid.
@@ -40,31 +30,31 @@ export class Tile extends GameObject implements BaseTile {
     public gold!: number;
 
     /**
-     * The Port on this Tile if present, otherwise null.
+     * The Port on this Tile if present, otherwise undefined.
      */
     public readonly port?: Port;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileEast?: Tile;
 
     /**
-     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'North' of this one (x, y-1). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileNorth?: Tile;
 
     /**
-     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'South' of this one (x, y+1). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'West' of this one (x-1, y). Undefined if out of bounds
+     * of the map.
      */
     public readonly tileWest?: Tile;
 
@@ -74,7 +64,7 @@ export class Tile extends GameObject implements BaseTile {
     public readonly type!: "water" | "land";
 
     /**
-     * The Unit on this Tile if present, otherwise null.
+     * The Unit on this Tile if present, otherwise undefined.
      */
     public unit?: Unit;
 
@@ -99,14 +89,15 @@ export class Tile extends GameObject implements BaseTile {
     /**
      * Called when a Tile is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ITileConstructorArgs,
+        // never directly created by game developers
+        args: ITileProperties,
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

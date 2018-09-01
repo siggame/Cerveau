@@ -22,6 +22,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Saloon game
  * must implement from mixed in game logic.
@@ -280,17 +283,17 @@ export interface IPlayerProperties {
 /** All the possible properties for an Tile. */
 export interface ITileProperties {
     /**
-     * The beer Bottle currently flying over this Tile, null otherwise.
+     * The beer Bottle currently flying over this Tile, undefined otherwise.
      */
     bottle?: Bottle;
 
     /**
-     * The Cowboy that is on this Tile, null otherwise.
+     * The Cowboy that is on this Tile, undefined otherwise.
      */
     cowboy?: Cowboy;
 
     /**
-     * The furnishing that is on this Tile, null otherwise.
+     * The furnishing that is on this Tile, undefined otherwise.
      */
     furnishing?: Furnishing;
 
@@ -307,26 +310,26 @@ export interface ITileProperties {
     isBalcony?: boolean;
 
     /**
-     * The Tile to the 'East' of this one (x+1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
+     * of the map.
      */
     tileEast?: Tile;
 
     /**
-     * The Tile to the 'North' of this one (x, y-1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'North' of this one (x, y-1). Undefined if out of bounds
+     * of the map.
      */
     tileNorth?: Tile;
 
     /**
-     * The Tile to the 'South' of this one (x, y+1). Null if out of bounds of
-     * the map.
+     * The Tile to the 'South' of this one (x, y+1). Undefined if out of bounds
+     * of the map.
      */
     tileSouth?: Tile;
 
     /**
-     * The Tile to the 'West' of this one (x-1, y). Null if out of bounds of
-     * the map.
+     * The Tile to the 'West' of this one (x-1, y). Undefined if out of bounds
+     * of the map.
      */
     tileWest?: Tile;
 
@@ -341,7 +344,7 @@ export interface ITileProperties {
     y?: number;
 
     /**
-     * The YoungGun on this tile, null otherwise.
+     * The YoungGun on this tile, undefined otherwise.
      */
     youngGun?: YoungGun;
 
@@ -383,18 +386,33 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { Bottle, IBottleConstructorArgs } from "./bottle";
-import { Cowboy, ICowboyConstructorArgs } from "./cowboy";
-import { Furnishing, IFurnishingConstructorArgs } from "./furnishing";
+import { Bottle } from "./bottle";
+import { Cowboy } from "./cowboy";
+import { Furnishing } from "./furnishing";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { ITileConstructorArgs, Tile } from "./tile";
-import { IYoungGunConstructorArgs, YoungGun } from "./young-gun";
+import { Tile } from "./tile";
+import { YoungGun } from "./young-gun";
 
 import { AI } from "./ai";
 import { SaloonGame } from "./game";
 import { SaloonGameManager } from "./game-manager";
 import { SaloonGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a Bottle */
+export type BottleArgs = FirstArgumentFromConstructor<typeof Bottle>;
+
+/** The arguments used to construct a Cowboy */
+export type CowboyArgs = FirstArgumentFromConstructor<typeof Cowboy>;
+
+/** The arguments used to construct a Furnishing */
+export type FurnishingArgs = FirstArgumentFromConstructor<typeof Furnishing>;
+
+/** The arguments used to construct a Tile */
+export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
+
+/** The arguments used to construct a YoungGun */
+export type YoungGunArgs = FirstArgumentFromConstructor<typeof YoungGun>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -404,57 +422,57 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Bottle in the Game and tracks it for all players.
      *
-     * @param data - Data about the Bottle to set. Any keys matching a property
+     * @param args - Data about the Bottle to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public bottle<T extends IBottleConstructorArgs>(data: T): Bottle & T {
-        return this.createGameObject("Bottle", Bottle, data);
+    public bottle<T extends BottleArgs>(args: T): Bottle & T {
+        return this.createGameObject("Bottle", Bottle, args);
     }
 
     /**
      * Creates a new Cowboy in the Game and tracks it for all players.
      *
-     * @param data - Data about the Cowboy to set. Any keys matching a property
+     * @param args - Data about the Cowboy to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public cowboy<T extends ICowboyConstructorArgs>(data: T): Cowboy & T {
-        return this.createGameObject("Cowboy", Cowboy, data);
+    public cowboy<T extends CowboyArgs>(args: T): Cowboy & T {
+        return this.createGameObject("Cowboy", Cowboy, args);
     }
 
     /**
      * Creates a new Furnishing in the Game and tracks it for all players.
      *
-     * @param data - Data about the Furnishing to set. Any keys matching a
+     * @param args - Data about the Furnishing to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Furnishing hooked up in the game and ready for you to
      * use.
      */
-    public furnishing<T extends IFurnishingConstructorArgs>(data: T): Furnishing & T {
-        return this.createGameObject("Furnishing", Furnishing, data);
+    public furnishing<T extends FurnishingArgs>(args: T): Furnishing & T {
+        return this.createGameObject("Furnishing", Furnishing, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param data - Data about the Tile to set. Any keys matching a property
+     * @param args - Data about the Tile to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends ITileConstructorArgs>(data: T): Tile & T {
-        return this.createGameObject("Tile", Tile, data);
+    public tile<T extends TileArgs>(args: T): Tile & T {
+        return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new YoungGun in the Game and tracks it for all players.
      *
-     * @param data - Data about the YoungGun to set. Any keys matching a
+     * @param args - Data about the YoungGun to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public youngGun<T extends IYoungGunConstructorArgs>(data: T): YoungGun & T {
-        return this.createGameObject("YoungGun", YoungGun, data);
+    public youngGun<T extends YoungGunArgs>(args: T): YoungGun & T {
+        return this.createGameObject("YoungGun", YoungGun, args);
     }
 
 }

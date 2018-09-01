@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IJobProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -10,16 +10,6 @@ import { GameObject, IGameObjectConstructorArgs } from "./game-object";
  * The Job title.
  */
 export type JobTitle = "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
-
-/**
- * Add properties here to make the create.Job have different args.
- */
-export interface IJobConstructorArgs
-extends IGameObjectConstructorArgs, IJobProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * Information about a Unit's job.
@@ -67,14 +57,18 @@ export class Job extends GameObject {
     /**
      * Called when a Job is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IJobConstructorArgs,
+        args: IJobProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+    // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

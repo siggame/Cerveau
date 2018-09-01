@@ -1,22 +1,12 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBroodMotherProperties } from "./";
+import { IBroodMotherProperties, SpiderArgs } from "./";
 import { Player } from "./player";
-import { ISpiderConstructorArgs, Spider } from "./spider";
+import { Spider } from "./spider";
 import { Spiderling } from "./spiderling";
 
 // <<-- Creer-Merge: imports -->>
 import { Nest } from "./nest";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.BroodMother have different args.
- */
-export interface IBroodMotherConstructorArgs
-extends ISpiderConstructorArgs, IBroodMotherProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    nest: Nest;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * The Spider Queen. She alone can spawn Spiderlings for each Player, and if
@@ -45,14 +35,18 @@ export class BroodMother extends Spider {
     /**
      * Called when a BroodMother is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IBroodMotherConstructorArgs,
+        args: SpiderArgs & IBroodMotherProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            nest: Nest;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
@@ -149,7 +143,8 @@ export class BroodMother extends Spider {
      * @param player - The player that called this.
      * @param spiderlingType - The string name of the Spiderling class you want
      * to Spawn. Must be 'Spitter', 'Weaver', or 'Cutter'.
-     * @returns The newly spwaned Spiderling if successful. Null otherwise.
+     * @returns The newly spwaned Spiderling if successful. Undefined
+     * otherwise.
      */
     protected async spawn(
         player: Player,

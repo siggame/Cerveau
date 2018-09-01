@@ -1,21 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IWarehouseProperties } from "./";
-import { Building, IBuildingConstructorArgs } from "./building";
+import { BuildingArgs, IWarehouseProperties } from "./";
+import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import { clamp, manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Warehouse have different args.
- */
-export interface IWarehouseConstructorArgs
-extends IBuildingConstructorArgs, IWarehouseProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A typical abandoned warehouse... that anarchists hang out in and can be
@@ -46,14 +36,18 @@ export class Warehouse extends Building {
     /**
      * Called when a Warehouse is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IWarehouseConstructorArgs,
+        args: BuildingArgs & IWarehouseProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 

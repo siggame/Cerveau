@@ -130,7 +130,7 @@ export class PiratesGame extends BaseClasses.Game {
     public players!: Player[];
 
     /**
-     * Every Port in the game. Merchant ports have owner set to null.
+     * Every Port in the game. Merchant ports have owner set to undefined.
      */
     public ports!: Port[];
 

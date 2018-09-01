@@ -1,8 +1,8 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpiderlingProperties } from "./";
+import { ISpiderlingProperties, SpiderArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
-import { ISpiderConstructorArgs, Spider } from "./spider";
+import { Spider } from "./spider";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
@@ -16,16 +16,6 @@ import { removeElements } from "~/utils";
 export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
 /**
- * Add properties here to make the create.Spiderling have different args.
- */
-export interface ISpiderlingConstructorArgs
-extends ISpiderConstructorArgs, ISpiderlingProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
-    // <<-- /Creer-Merge: constructor-args -->>
-}
-
-/**
  * A Spider spawned by the BroodMother.
  */
 export class Spiderling extends Spider {
@@ -36,12 +26,12 @@ export class Spiderling extends Spider {
     public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
     /**
-     * The Web this Spiderling is using to move. Null if it is not moving.
+     * The Web this Spiderling is using to move. Undefined if it is not moving.
      */
     public movingOnWeb?: Web;
 
     /**
-     * The Nest this Spiderling is moving to. Null if it is not moving.
+     * The Nest this Spiderling is moving to. Undefined if it is not moving.
      */
     public movingToNest?: Nest;
 
@@ -70,14 +60,18 @@ export class Spiderling extends Spider {
     /**
      * Called when a Spiderling is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: ISpiderlingConstructorArgs,
+        args: SpiderArgs & ISpiderlingProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here

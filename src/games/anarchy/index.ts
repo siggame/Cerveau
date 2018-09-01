@@ -20,6 +20,9 @@ import {
     mixTwoPlayer,
 } from "~/core/game/mixins";
 
+// extract game object constructor args
+import { FirstArgumentFromConstructor } from "~/utils";
+
 /**
  * The interface the Player for the Anarchy game
  * must implement from mixed in game logic.
@@ -79,25 +82,25 @@ export interface IBuildingProperties {
     bribed?: boolean;
 
     /**
-     * The Building directly to the east of this building, or null if not
+     * The Building directly to the east of this building, or undefined if not
      * present.
      */
     buildingEast?: Building;
 
     /**
-     * The Building directly to the north of this building, or null if not
+     * The Building directly to the north of this building, or undefined if not
      * present.
      */
     buildingNorth?: Building;
 
     /**
-     * The Building directly to the south of this building, or null if not
+     * The Building directly to the south of this building, or undefined if not
      * present.
      */
     buildingSouth?: Building;
 
     /**
-     * The Building directly to the west of this building, or null if not
+     * The Building directly to the west of this building, or undefined if not
      * present.
      */
     buildingWest?: Building;
@@ -294,28 +297,37 @@ export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
-import { Building, IBuildingConstructorArgs } from "./building";
-import {
-    FireDepartment,
-    IFireDepartmentConstructorArgs,
-} from "./fire-department";
-import { Forecast, IForecastConstructorArgs } from "./forecast";
+import { Building } from "./building";
+import { FireDepartment } from "./fire-department";
+import { Forecast } from "./forecast";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import {
-    IPoliceDepartmentConstructorArgs,
-    PoliceDepartment,
-} from "./police-department";
-import { IWarehouseConstructorArgs, Warehouse } from "./warehouse";
-import {
-    IWeatherStationConstructorArgs,
-    WeatherStation,
-} from "./weather-station";
+import { PoliceDepartment } from "./police-department";
+import { Warehouse } from "./warehouse";
+import { WeatherStation } from "./weather-station";
 
 import { AI } from "./ai";
 import { AnarchyGame } from "./game";
 import { AnarchyGameManager } from "./game-manager";
 import { AnarchyGameSettingsManager } from "./game-settings";
+
+/** The arguments used to construct a Building */
+export type BuildingArgs = FirstArgumentFromConstructor<typeof Building>;
+
+/** The arguments used to construct a FireDepartment */
+export type FireDepartmentArgs = FirstArgumentFromConstructor<typeof FireDepartment>;
+
+/** The arguments used to construct a Forecast */
+export type ForecastArgs = FirstArgumentFromConstructor<typeof Forecast>;
+
+/** The arguments used to construct a PoliceDepartment */
+export type PoliceDepartmentArgs = FirstArgumentFromConstructor<typeof PoliceDepartment>;
+
+/** The arguments used to construct a Warehouse */
+export type WarehouseArgs = FirstArgumentFromConstructor<typeof Warehouse>;
+
+/** The arguments used to construct a WeatherStation */
+export type WeatherStationArgs = FirstArgumentFromConstructor<typeof WeatherStation>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -325,71 +337,71 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Building in the Game and tracks it for all players.
      *
-     * @param data - Data about the Building to set. Any keys matching a
+     * @param args - Data about the Building to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Building hooked up in the game and ready for you to use.
      */
-    public building<T extends IBuildingConstructorArgs>(data: T): Building & T {
-        return this.createGameObject("Building", Building, data);
+    public building<T extends BuildingArgs>(args: T): Building & T {
+        return this.createGameObject("Building", Building, args);
     }
 
     /**
      * Creates a new FireDepartment in the Game and tracks it for all players.
      *
-     * @param data - Data about the FireDepartment to set. Any keys matching a
+     * @param args - Data about the FireDepartment to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new FireDepartment hooked up in the game and ready for you to
      * use.
      */
-    public fireDepartment<T extends IFireDepartmentConstructorArgs>(data: T): FireDepartment & T {
-        return this.createGameObject("FireDepartment", FireDepartment, data);
+    public fireDepartment<T extends FireDepartmentArgs>(args: T): FireDepartment & T {
+        return this.createGameObject("FireDepartment", FireDepartment, args);
     }
 
     /**
      * Creates a new Forecast in the Game and tracks it for all players.
      *
-     * @param data - Data about the Forecast to set. Any keys matching a
+     * @param args - Data about the Forecast to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Forecast hooked up in the game and ready for you to use.
      */
-    public forecast<T extends IForecastConstructorArgs>(data: T): Forecast & T {
-        return this.createGameObject("Forecast", Forecast, data);
+    public forecast<T extends ForecastArgs>(args: T): Forecast & T {
+        return this.createGameObject("Forecast", Forecast, args);
     }
 
     /**
      * Creates a new PoliceDepartment in the Game and tracks it for all
      * players.
      *
-     * @param data - Data about the PoliceDepartment to set. Any keys matching
+     * @param args - Data about the PoliceDepartment to set. Any keys matching
      * a property in the game object's class will be automatically set for you.
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */
-    public policeDepartment<T extends IPoliceDepartmentConstructorArgs>(data: T): PoliceDepartment & T {
-        return this.createGameObject("PoliceDepartment", PoliceDepartment, data);
+    public policeDepartment<T extends PoliceDepartmentArgs>(args: T): PoliceDepartment & T {
+        return this.createGameObject("PoliceDepartment", PoliceDepartment, args);
     }
 
     /**
      * Creates a new Warehouse in the Game and tracks it for all players.
      *
-     * @param data - Data about the Warehouse to set. Any keys matching a
+     * @param args - Data about the Warehouse to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new Warehouse hooked up in the game and ready for you to use.
      */
-    public warehouse<T extends IWarehouseConstructorArgs>(data: T): Warehouse & T {
-        return this.createGameObject("Warehouse", Warehouse, data);
+    public warehouse<T extends WarehouseArgs>(args: T): Warehouse & T {
+        return this.createGameObject("Warehouse", Warehouse, args);
     }
 
     /**
      * Creates a new WeatherStation in the Game and tracks it for all players.
      *
-     * @param data - Data about the WeatherStation to set. Any keys matching a
+     * @param args - Data about the WeatherStation to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
      * @returns A new WeatherStation hooked up in the game and ready for you to
      * use.
      */
-    public weatherStation<T extends IWeatherStationConstructorArgs>(data: T): WeatherStation & T {
-        return this.createGameObject("WeatherStation", WeatherStation, data);
+    public weatherStation<T extends WeatherStationArgs>(args: T): WeatherStation & T {
+        return this.createGameObject("WeatherStation", WeatherStation, args);
     }
 
 }

@@ -1,21 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IFurnishingProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Furnishing have different args.
- */
-export interface IFurnishingConstructorArgs
-extends IGameObjectConstructorArgs, IFurnishingProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * An furnishing in the Saloon that must be pathed around, or destroyed.
@@ -58,18 +48,22 @@ export class Furnishing extends GameObject {
     /**
      * Called when a Furnishing is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IFurnishingConstructorArgs,
+        args: IFurnishingProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.tile = data.tile;
+        this.tile = args.tile;
 
         this.game.furnishings.push(this);
         this.health = this.isPiano ? 48 : 16;

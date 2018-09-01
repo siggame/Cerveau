@@ -1,22 +1,12 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBottleProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
 import { Cowboy } from "./cowboy";
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Bottle have different args.
- */
-export interface IBottleConstructorArgs
-extends IGameObjectConstructorArgs, IBottleProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A bottle thrown by a bartender at a Tile.
@@ -56,18 +46,22 @@ export class Bottle extends GameObject {
     /**
      * Called when a Bottle is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IBottleConstructorArgs,
+        args: IBottleProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.tile = data.tile;
+        this.tile = args.tile;
 
         this.game.bottles.push(this);
         this.tile.bottle = this;

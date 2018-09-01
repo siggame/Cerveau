@@ -1,22 +1,12 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IPortProperties } from "./";
-import { GameObject, IGameObjectConstructorArgs } from "./game-object";
+import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
-
-/**
- * Add properties here to make the create.Port have different args.
- */
-export interface IPortConstructorArgs
-extends IGameObjectConstructorArgs, IPortProperties {
-    // <<-- Creer-Merge: constructor-args -->>
-    tile: Tile;
-    // <<-- /Creer-Merge: constructor-args -->>
-}
 
 /**
  * A port on a Tile.
@@ -36,7 +26,7 @@ export class Port extends GameObject {
     public investment!: number;
 
     /**
-     * The owner of this Port, or null if owned by merchants.
+     * The owner of this Port, or undefined if owned by merchants.
      */
     public owner?: Player;
 
@@ -56,17 +46,21 @@ export class Port extends GameObject {
     /**
      * Called when a Port is created.
      *
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        data: IPortConstructorArgs,
+        args: IPortProperties & {
+            // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
+            // <<-- /Creer-Merge: constructor-args -->>
+        },
         required: IBaseGameObjectRequiredData,
     ) {
-        super(data, required);
+        super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.tile = data.tile;
+        this.tile = args.tile;
         // <<-- /Creer-Merge: constructor -->>
     }
 

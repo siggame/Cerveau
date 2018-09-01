@@ -48,10 +48,10 @@ for parent_class in obj['parentClasses']:
     if not parent_class in imports[filename]:
         imports[filename].append(parent_class)
 
-    if obj_key != 'Player':
-        constructor_args = 'I{}ConstructorArgs'.format(parent_class)
-        if not constructor_args in imports[filename]:
-            imports[filename].append(constructor_args)
+    if obj_key != 'Player' and parent_class != 'GameObject':
+        constructor_args = '{}Args'.format(parent_class)
+        if not constructor_args in imports['./']:
+            imports['./'].append(constructor_args)
 
 if obj_key == 'Player':
     extends = extends + ' implements ' + i_base_player
@@ -68,15 +68,6 @@ if not attr_parms['type']['literals']:
 ${shared['cerveau']['block_comment']('', attr_parms)}
 export type ${obj_key}${upcase_first(attr_name)} = ${shared['cerveau']['type'](attr_parms['type'])};
 % endfor
-% if obj_key != 'Game' and obj_key != 'Player':
-
-${shared['cerveau']['block_comment']('', {'description': 'Add properties here to make the create.{} have different args.'.format(obj_key)})}
-export interface I${obj_key}ConstructorArgs
-extends ${', '.join([ 'I{}ConstructorArgs'.format(p) for p in obj['parentClasses'] ] + [''])}I${obj_key}Properties {
-${merge('    // ', 'constructor-args', """    // You can add more constructor args in here
-""", optional=True, help=False)}
-}
-% endif
 
 ${shared['cerveau']['block_comment']('', obj)}
 export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends ${extends}${
@@ -133,7 +124,7 @@ ${merge('    // ', 'attributes', """
 % if obj_key == 'Game':
      * @param settingsManager - The manager that holds initial settings.
 % else:
-     * @param data - Initial value(s) to set member variables to.
+     * @param args - Initial value(s) to set member variables to.
 % endif
      * @param required - Data required to initialize this (ignore it).
      */
@@ -141,12 +132,32 @@ ${merge('    // ', 'attributes', """
 % if obj_key == 'Game':
         protected settingsManager: ${game_name}GameSettingsManager,
         required: IBaseGameRequiredData,
-% else:
-        data: ${'I{}ConstructorArgs'.format(obj_key) if obj_key != 'Player' else '{}'},
+% else: # if not a base class, or it is a `Tile`, and this is not a tiled game
+%   if obj_key not in ['Player', 'GameObject', 'Tile'] or (obj_key == 'Tile' and 'TiledGame' not in game['serverParentClasses']):
+<%
+parent_unions = []
+for parent_class in obj['parentClasses']:
+    if parent_class == 'GameObject':
+        continue
+    parent_unions.append('{}Args'.format(parent_class))
+unions = parent_unions + [ 'I' + obj_key + 'Properties' ] + ['{']
+wrapper = shared['cerveau']['TextWrapper'](
+    width=79,
+    initial_indent='        args: ',
+    subsequent_indent='        ',
+)
+%>${'\n'.join(wrapper.wrap(' & '.join(unions)))}
+${merge('            // ', 'constructor-args', """            // You can add more constructor args in here
+""", optional=True, help=False)}
+        },
+%   else:
+        // never directly created by game developers
+        args: ${'I' + (('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))},
+%   endif
         required: IBaseGameObjectRequiredData,
 % endif
     ) {
-        super(${'settingsManager' if (obj_key == 'Game') else 'data'}, required);
+        super(${'settingsManager' if (obj_key == 'Game') else 'args'}, required);
 
 ${merge('        // ', 'constructor', """        // setup any thing you need here
 """, optional=True, help=False)}
