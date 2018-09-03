@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - "10.7.0"
+
+script:
+  # run linter and check to make sure TypeScript can build the source code
+  - npm test
+
+before_deploy:
+  # build the docs for the API
+  - npm run api-docs
+  # file to tell GitHub pages not to try to run jekyll stuff (can break urls)
+  - touch api-docs/.nojekyll
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  verbose: true
+  local-dir: api-docs/
+  github-token: $GH_TOKEN
+  on:
+    branch: master
