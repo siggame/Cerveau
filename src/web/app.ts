@@ -7,38 +7,43 @@ import { logger } from "~/core/log";
 import * as routes from "./routes";
 import * as helpers from "./view-helpers";
 
-if (Config.WEB_ENABLED || Config.API_ENABLED) {
-    const app = express();
+/**
+ * Sets up an Express web server and all routes for it.
+ */
+export function setupWebServer(): void {
+    if (Config.WEB_ENABLED || Config.API_ENABLED) {
+        const app = express();
 
-    // tslint:disable-next-line:no-unsafe-any
-    app.locals.site = {
-        title: Config.MAIN_TITLE,
-    };
+        // tslint:disable-next-line:no-unsafe-any
+        app.locals.site = {
+            title: Config.MAIN_TITLE,
+        };
 
-    if (Config.WEB_ENABLED) {
-        // setup handlebars as the views
-        app.engine("hbs", expressHandlebars({
-            extname: "hbs",
-            defaultLayout: "main.hbs",
-            partialsDir: join(__dirname, "views/partials"),
-            layoutsDir: join(__dirname, "views/layouts"),
-            helpers,
-        }));
+        if (Config.WEB_ENABLED) {
+            // setup handlebars as the views
+            app.engine("hbs", expressHandlebars({
+                extname: "hbs",
+                defaultLayout: "main.hbs",
+                partialsDir: join(__dirname, "views/partials"),
+                layoutsDir: join(__dirname, "views/layouts"),
+                helpers,
+            }));
 
-        app.set("view engine", "hbs");
-        app.set("views", join(__dirname, "views"));
+            app.set("view engine", "hbs");
+            app.set("views", join(__dirname, "views"));
 
-        app.use("/styles", express.static(join(__dirname, "styles")));
-    }
-
-    // expect POSTs to be JSON formatted
-    app.use(bodyParser.json());
-
-    app.listen(Config.HTTP_PORT, () => {
-        logger.info(`🌐 Web server live on port ${Config.HTTP_PORT} 🌐`);
-
-        for (const registerRoute of Object.values(routes)) {
-            registerRoute(app);
+            app.use("/styles", express.static(join(__dirname, "styles")));
         }
-    });
+
+        // expect POSTs to be JSON formatted
+        app.use(bodyParser.json());
+
+        app.listen(Config.HTTP_PORT, () => {
+            logger.info(`🌐 Web server live on port ${Config.HTTP_PORT} 🌐`);
+
+            for (const registerRoute of Object.values(routes)) {
+                registerRoute(app);
+            }
+        });
+    }
 }

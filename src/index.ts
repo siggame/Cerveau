@@ -21,12 +21,12 @@ catch (err) {
 
 // if we get here then the node_modules should be installed, let's go!
 
-// tslint:disable:no-import-side-effect - we want them below
-
+// tslint:disable-next-line:no-import-side-effect - we want them below
 import "./core/setup-thread";
 
 import { Lobby } from "./core/server";
 
 Lobby.getInstance(); // this will create the singleton Lobby instance
 
-import "./web";
+import { setupWebServer } from "./web/app";
+setupWebServer();
