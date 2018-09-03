@@ -7,6 +7,34 @@ import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
 
 /**
+ * Overrides of build-in array methods to be type safe at run time.
+ */
+class DeltaArray<T> extends Array<T> {
+    /**
+     * Inserts new elements at the start of an array.
+     *
+     * NOTE: This is overriden because the Node.js implimentation clears
+     * out the array while unshifting. However our arrays can never have
+     * undefined set (which they are temporarily here), so it produces errors.
+     *
+     * This implimentation below is less efficent, however it ensures an index
+     * is never undefined, to maintain type safety at all times.
+     * @param items  Elements to insert at the start of the Array.
+     * @returns The new length of the array.
+     */
+    public unshift(...items: T[]): number {
+        const newThis = [...items, ...this];
+        const length = newThis.length;
+
+        for (let i = 0; i < length; i++) {
+            this[i] = newThis[i];
+        }
+
+        return length;
+    }
+}
+
+/**
  * Creates a DeltaMergeable for an Array with a Proxy wrapper.
  * @param args - The creation args
  * @returns A new DeltaMergeable wrapping an Array.
@@ -17,7 +45,7 @@ export function createArray<T = any>(args: {
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;
-    const array: T[] = [];
+    const array: T[] = new DeltaArray();
     const values = new Array<DeltaMergeable<T>>();
     const container = new DeltaMergeable<T[]>({
         key: args.key,
@@ -45,9 +73,9 @@ export function createArray<T = any>(args: {
     function checkIfUpdated(index?: number, value?: T): void {
         let newLength = array.length;
 
-        if (index !== undefined && (
-            index >= oldLength || index >= array.length
-        )) {
+        if (index !== undefined
+            && (index >= oldLength || index >= array.length)
+        ) {
             newLength = index + 1;
         }
 
@@ -60,7 +88,7 @@ export function createArray<T = any>(args: {
 
                     if (values[i]) {
                         container.adopt(values[i]);
-                        values[i].set(currentValue);
+                        values[i].set(currentValue, true);
                     }
                     else {
                         values[i] = createDeltaMergeable({

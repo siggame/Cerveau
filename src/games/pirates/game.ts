@@ -211,7 +211,8 @@ export class PiratesGame extends BaseClasses.Game {
         this.generateMap();
 
         // Give players their starting gold
-        const startingGold = this.settings.startingGold || (this.crewCost + this.shipCost * 3);
+        const startingGoldFromSettings = Math.max(this.settings.startingGold, 0);
+        const startingGold = startingGoldFromSettings || (this.crewCost + this.shipCost * 3);
         for (const player of this.players) {
             player.gold = startingGold;
         }

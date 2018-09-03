@@ -229,7 +229,7 @@ export class Unit extends GameObject {
 
                     // Make sure it's not a merchant ship anymore either
                     tile.unit.targetPort = undefined;
-                    tile.unit.path = [];
+                    tile.unit.path.length = 0;
                 }
             }
         }
