@@ -310,9 +310,13 @@ There's probably another Cerveau server running on this same computer.`);
     }
 
     /**
-     * Initializes all the games in the games/ folder
+     * Initializes all the games in the games/ folder.
+     *
+     * @returns The promise resolves when all games are initialized,
+     * if an error occurs loading a game this is never resolved and the
+     * process exits with code 1.
      */
-    private async initializeGames(): Promise<void> {
+    private async initializeGames(): Promise<void | never> {
         const GAMES_DIR = "src/games/";
         const dirs = await getDirs(GAMES_DIR);
 
@@ -326,8 +330,8 @@ There's probably another Cerveau server running on this same computer.`);
             catch (err) {
                 const errorGameName = capitalizeFirstLetter(dir);
                 logger.error(`⚠️ Could not load game ${errorGameName} ⚠️`);
-                continue; // For now while we have unconverted games
-                // return process.exit(1);
+
+                return process.exit(1); // kills the entire game server
             }
             const gameName = gameNamespace.gameName;
             logger.info(`🕹️ ${gameName} game loaded 🕹️`);
