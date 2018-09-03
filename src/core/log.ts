@@ -1,4 +1,5 @@
 import { createLogger, format, transports } from "winston";
+import { Config } from "~/core/config";
 
 const alignedWithColorsAndTime = format.combine(
     format.colorize(),
@@ -21,9 +22,10 @@ const alignedWithColorsAndTime = format.combine(
 export const logger = createLogger({
     level: "debug",
     transports: [
-    // colorize the output to the console
         new transports.Console({
+            // colorize the output to the console
             format: alignedWithColorsAndTime,
+            silent: Config.SILENT,
         }),
     ],
 });
