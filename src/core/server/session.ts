@@ -18,7 +18,7 @@ import { IDelta, IFinishedDeltaData, IGamelog,
 import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
 import { filenameFor, getURL, getVisualizerURL,
        } from "~/core/game/gamelog/gamelog-utils";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import { isObjectEmpty, momentString } from "~/utils";
 
 let profiler: Profiler | undefined;

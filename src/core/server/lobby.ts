@@ -1,7 +1,7 @@
 // internal imports
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import { capitalizeFirstLetter, getDirs,
          isNil, ITypedObject, UnknownObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";

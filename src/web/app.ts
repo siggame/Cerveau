@@ -3,7 +3,7 @@ import * as express from "express";
 import * as expressHandlebars from "express-handlebars";
 import { join } from "path";
 import { Config } from "~/core/config";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import * as routes from "./routes";
 import * as helpers from "./view-helpers";
 

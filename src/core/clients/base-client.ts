@@ -2,7 +2,7 @@ import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
 import { BaseAIManager, IBasePlayer, IDelta, IDeltaData } from "~/core/game/";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import { isObject, objectHasProperty, ParsedJSON } from "~/utils";
 import * as ClientEvents from "./events-client";
 import * as ServerEvents from "./events-server";

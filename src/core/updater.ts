@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { events, Signal } from "ts-typed-events";
 import { httpRequest, safelyParseJSON } from "~/utils";
-import { logger } from "./log";
+import { logger } from "./logger";
 
 const UPDATE_INTERVAL = 1000; // 1 sec in ms
 const GITHUB_URL = "https://api.github.com/repos/siggame/cerveau/commits";

@@ -1,7 +1,7 @@
 import { events, Signal } from "ts-typed-events";
 import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace, IGamelog,
          IGamelogWinnerLoser } from "~/core/game";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import { removeElements, UnknownObject } from "~/utils";
 import { BaseClient } from "../clients/";
 import { Updater } from "../updater";

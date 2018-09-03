@@ -10,7 +10,7 @@ import { isMaster } from "cluster";
 import { Socket } from "net";
 import * as Clients from "~/core/clients";
 import { Config } from "~/core/config";
-import { logger } from "~/core/log";
+import { logger } from "~/core/logger";
 import { Session } from "~/core/server/session";
 import { UnknownObject } from "~/utils";
 import { IGamesExport } from "./games-export";
