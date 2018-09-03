@@ -61,18 +61,18 @@
   },
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
-    "ln": "shx cp ./node_modules/ ./dist/node_modules/",
+    "test": "npm run lint && npm run build:test",
+    "build": "tsc && link:symbolic",
+    "build:test": "tsc --noEmit",
+    "link:copy": "shx cp -R node_modules dist/node_modules",
+    "link:symbolic": "shx ln -s node_modules/ dist/node_modules && shx ln -s logs/ dist/logs",
     "watch": "tsc --watch",
     "clean": "shx rm -rf dist",
     "rebuild": "npm run clean && npm run build",
     "apidoc": "apidoc -i ./src/web/routes/ -o ./api-docs",
-    "test": "npm run lint && npm run build",
     "lint": "tslint --config tslint.json --project tsconfig.json",
-    "fix": "tslint --config tslint.json --project tsconfig.json --fix --force",
-    "precommit": "npm test",
-    "postmerge": "npm install",
-    "postrewrite": "npm install"
+    "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix --force",
+    "precommit": "npm test"
   },
   "_moduleAliases": {
     "src": "dist/"
