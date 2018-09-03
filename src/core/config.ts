@@ -5,6 +5,13 @@ import { config } from "dotenv";
 import { IWorkerGameSessionData } from "~/core/server/worker";
 import { UnknownObject, unstringify } from "~/utils";
 
+/**
+ * Set this to true while real life tournaments are on going and competitors
+ * are cloning this repo. Otherwise keep on false during development so you
+ * can easily move between branches and commits without it being fussy.
+ */
+const UPDATER_ENABLED_BY_DEFAULT = false;
+
 // loads the config from an optional `.env` file
 config();
 
@@ -37,7 +44,7 @@ export interface IArgs {
     /** The directory to store generated logs (e.g. gamelogs) in. */
     LOGS_DIR: string;
 
-    /** log will not print anything to the console */
+    /** The winston logger will not print anything to the console */
     SILENT: boolean;
 
     /** the base url the a remote visualizer to send clients to */
@@ -153,7 +160,7 @@ const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
         help: "does not run the web interface", defaultValue: true}],
 
     [["--no-updater"], {action: "storeFalse", dest: "UPDATER_ENABLED",
-        help: "does not run the update checker", defaultValue: true}],
+        help: "does not run the update checker", defaultValue: UPDATER_ENABLED_BY_DEFAULT}],
 
     [["--no-auto-update"], {action: "storeFalse", dest: "AUTO_UPDATE_ENABLED", defaultValue: true,
         help: "the updater will not try to autoUpdate when updates are found"}],
@@ -201,7 +208,8 @@ if (args.RUN_PROFILER) {
     try {
         // tslint:disable-next-line:no-var-requires no-require-imports
         if (!require("v8-profiler")) {
-            throw new Error(// tslint:disable-next-line:no-multiline-string
+            throw new Error(
+// tslint:disable-next-line:no-multiline-string
 `ERROR: Module 'v8-profiler' not found and is needed for profiling.
 Please use 'npm install v8-profiler'.
 NOTE: This will require node-gyp to compile its C++ addons.`,
