@@ -105,10 +105,10 @@ export class Bottle extends GameObject {
             return; // we're already broken :(
         }
 
-        cowboy = cowboy || this.tile.cowboy;
+        const hitCowboy = cowboy || this.tile.cowboy;
 
-        if (cowboy) {
-            cowboy.getDrunk(this.drunkDirection);
+        if (hitCowboy) {
+            hitCowboy.getDrunk(this.drunkDirection);
         }
 
         this.isDestroyed = true;

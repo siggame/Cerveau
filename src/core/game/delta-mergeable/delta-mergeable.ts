@@ -87,14 +87,14 @@ export class DeltaMergeable<T = any> {
      * Sets the current value. It may mutate or not, if it does it will
      * emit an event.
      *
-     * @param value - The new value to try to set.
+     * @param newValue - The new value to try to set.
      * @param forceSet - Force the set to occur, even if the current value is
      * the same.
      */
-    public set(value: any, forceSet: boolean = false): void {
-        if (this.transform) {
-            value = this.transform(value, this.get(), forceSet);
-        }
+    public set(newValue: any, forceSet: boolean = false): void {
+        const value = this.transform
+            ? this.transform(newValue, this.get(), forceSet)
+            : newValue;
 
         if (value !== this.value || forceSet) {
             this.value = value;

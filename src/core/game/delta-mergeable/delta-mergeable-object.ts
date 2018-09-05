@@ -25,20 +25,18 @@ export function createObject(args: {
         parent: args.parent,
         initialValue: args.initialValue || {},
         transform: args.transform || ((newObj?: any, currentValue?: UnknownObject): UnknownObject => {
-            if (!newObj) {
-                newObj = {};
-            }
+            const copyFrom = newObj || {};
 
-            const keys = new Set(Object.keys(newObj || {}).concat(Object.keys(currentValue || {})));
+            const keys = new Set(Object.keys(copyFrom || {}).concat(Object.keys(currentValue || {})));
             for (const key of keys) {
-                if (!Object.prototype.hasOwnProperty.call(newObj, key)) {
+                if (!Object.prototype.hasOwnProperty.call(copyFrom, key)) {
                     if (Object.prototype.hasOwnProperty.call(currentValue, key)) {
                         delete currentValue![key];
                     }
                 }
                 else {
                     if (!Object.prototype.hasOwnProperty.call(currentValue, key)) {
-                        currentValue![key] = newObj[key];
+                        currentValue![key] = copyFrom[key];
                     }
                 }
             }

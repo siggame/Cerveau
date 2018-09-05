@@ -693,6 +693,19 @@ export class Unit extends GameObject {
             }
         }
 
+        const maxAmount = resource === "food"
+            ? this.food
+            : this.materials;
+
+        return {
+            // ensure the amount is within the max amount, and if less than 1
+            // then they drop everything
+            amount: Math.min(maxAmount, amount < 1
+                ? maxAmount
+                : amount,
+            ),
+        };
+
         // <<-- /Creer-Merge: invalidate-drop -->>
         return arguments;
     }
@@ -716,16 +729,8 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
-        if (amount < 1) {
-            // Drop it all
-            amount = resource === "food"
-            ? this.food
-            : this.materials;
-        }
-
         // Drop the resource
         if (resource === "food") {
-            amount = Math.min(amount, this.food);
             if (tile.structure && tile.structure.type === "shelter" && this.owner) {
                 this.owner.food += amount;
             }
@@ -735,7 +740,6 @@ export class Unit extends GameObject {
             this.food -= amount;
         }
         else {
-            amount = Math.min(amount, this.materials);
             tile.materials += amount;
             this.materials -= amount;
         }
@@ -940,7 +944,7 @@ export class Unit extends GameObject {
             return `${this} can only pickup resources on or adjacent to its tile.`;
         }
 
-        amount = amount < 1
+        let actualAmount = amount < 1
             ? tile[resource]
             : Math.min(tile[resource], amount);
 
@@ -953,12 +957,18 @@ export class Unit extends GameObject {
             return `${this} is already carrying as many resources as it can.`;
         }
 
-        if (amount <= 0) {
+        if (actualAmount <= 0) {
             return `There are no resources on ${tile} for ${this} to pickup.`;
         }
 
         // looks valid, let's update amount to the computed value
-        amount = Math.min(amount, this.getCarryLeft(), Math.floor(this.energy));
+        actualAmount = Math.min(
+            amount,
+            this.getCarryLeft(),
+            Math.floor(this.energy),
+        );
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-pickup -->>
         return arguments;
@@ -984,7 +994,6 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
-        amount = Math.min(amount, tile[resource]);
         tile[resource] -= amount;
         this[resource] += amount;
         this.energy -= amount;

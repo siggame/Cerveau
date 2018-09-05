@@ -24,6 +24,10 @@ else:
         imports['./'].append('I{}Properties'.format(obj_key))
 
     functions = list(obj['function_names'])
+    for function_name in functions:
+        function_args_import = 'I{}{}Args'.format(obj_key, upcase_first(function_name))
+        imports['./'].append(function_args_import)
+
     if 'log' in functions: # log is server implimented
         functions.remove('log')
 
@@ -174,8 +178,9 @@ ${merge('    // ', 'public-functions', """
     if obj_key == 'GameObject' and function_name == 'log':
         continue
 
+    upcase_first_function_name = upcase_first(function_name)
     function_parms = obj['functions'][function_name]
-    invalidate_function_name = 'invalidate' + upcase_first(function_name)
+    invalidate_function_name = 'invalidate' + upcase_first_function_name
 
     temp = { 'functions': {} }
     temp['functions'][function_name] = dict(function_parms)
@@ -202,7 +207,7 @@ ${merge('    // ', 'public-functions', """
         'description': 'a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.',
         'invalidValue': None,
         'type': {
-            'name': 'string | IArguments',
+            'name': 'undefined | string | I{}{}Args'.format(obj_key, upcase_first_function_name),
             'is_game_object': False,
             'valueType': None,
             'keyType': None,

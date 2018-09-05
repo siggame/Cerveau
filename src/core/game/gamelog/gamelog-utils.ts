@@ -2,7 +2,7 @@ import { basename } from "path";
 import * as sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";
 import { IGamelog } from "~/core/game";
-import { isObject, momentString } from "~/utils";
+import { momentString } from "~/utils";
 
 /** The extension for gamelog files */
 export const GAMELOG_EXTENSION = ".json.gz";
@@ -69,11 +69,7 @@ export function getVisualizerURL(
     if (vis) {
         const filename = typeof gamelogOrFilename === "string"
             ? gamelogOrFilename
-            : filenameFor(
-                gamelogOrFilename.gameName,
-                gamelogOrFilename.gameSession,
-                gamelogOrFilename.epoch,
-            );
+            : filenameFor(gamelogOrFilename);
         const url = getURL(filename);
 
         return `${vis}?log=${encodeURIComponent(url)}`;
@@ -81,29 +77,22 @@ export function getVisualizerURL(
 }
 
 /**
- * Returns the expected filename for a gamelog
- * @param gameName - name of the game
- * @param gameSession - name of the session
- * @param epoch - when the gamelog was logged
- * @returns the filename for the given game settings
+ * Returns the expected filename for a gamelog.
+ *
+ * @param gamelogData - A partial interface of the gamelog data to get the
+ * filename from.
+ * @returns the string filename (just name, no path), expected for the data.
  */
-export function filenameFor(gameName: string, gameSession: string, epoch?: number): string;
-export function filenameFor(
-    /** the with a gameName and gameSession to get for */
-    gamelog: IGamelog,
-): string;
-
-export function filenameFor(gameName: string | IGamelog, gameSession?: string, epoch?: number): string {
-    if (isObject(gameName)) {
-        gameSession = gameName.gameSession;
-        epoch = gameName.epoch;
-        gameName = gameName.gameName;
-    }
-
-    let moment = "unknown";
-    if (epoch) {
-        moment = momentString(epoch);
-    }
-
-    return sanitizeFilename(filenameFormat(gameName, gameSession, moment));
+export function filenameFor(gamelogData: {
+    gameName: string;
+    gameSession: string;
+    epoch?: number;
+}): string {
+    return sanitizeFilename(filenameFormat(
+        gamelogData.gameName,
+        gamelogData.gameSession,
+        gamelogData.epoch === undefined
+            ? "unknown"
+            : momentString(gamelogData.epoch),
+    ));
 }

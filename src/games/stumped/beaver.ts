@@ -304,16 +304,16 @@ export class Beaver extends GameObject {
         }
 
         // transform the amount if they passed in a number =< 0
-        if (amount <= 0) {
-            amount = this[resource];
+        const actualAmount = amount <= 0
+            ? this[resource]
+            : amount;
+
+        if (actualAmount <= 0) {
+            return `${this} cannot drop ${actualAmount} of ${resource}`;
         }
 
-        if (amount <= 0) {
-            return `${this} cannot drop ${amount} of ${resource}`;
-        }
-
-        if (amount > this[resource]) {
-            return `${this} does not have ${amount} ${resource} to drop.`;
+        if (actualAmount > this[resource]) {
+            return `${this} does not have ${actualAmount} ${resource} to drop.`;
         }
 
         if (!tile) {
@@ -329,9 +329,8 @@ export class Beaver extends GameObject {
         }
 
         // Looks valid!
-        // Note:  the variables `amount` and `resource` have been
-        // modified and will be sent to the drop() function below via the magic
-        // arguments variable.
+        // let's override their `amount` argument with the actual number.
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-drop -->>
         return arguments;
@@ -601,34 +600,30 @@ export class Beaver extends GameObject {
             return `${resource} is not a valid resource to pick up.`;
         }
 
-        // now clean the actual resource
-        const res = char === "f"
-            ? "food"
-            : "branches";
-        resource = res;
-
         // Calculate max resources the beaver can carry.
         const spaceAvailable = this.job.carryLimit - this.branches - this.food;
 
         // Transform the amount if they passed in a number =< 0
-        if (amount <= 0) {
-            amount = Math.min(tile[res], spaceAvailable);
+        const actualAmount = amount <= 0
+            ? Math.min(tile[resource], spaceAvailable)
+            : amount;
+
+        if (actualAmount <= 0) {
+            return `${this} cannot pick up ${actualAmount} of ${resource}`;
         }
 
-        if (amount <= 0) {
-            return `${this} cannot pick up ${amount} of ${resource}`;
+        if (actualAmount > tile[resource]) {
+            return `${tile} does not have ${actualAmount} ${resource} to pick up.`;
         }
 
-        if (amount > tile[res]) {
-            return `${tile} does not have ${amount} ${resource} to pick up.`;
-        }
-
-        if (amount > spaceAvailable) {
+        if (actualAmount > spaceAvailable) {
             return (
-                `${this} cannot carry ${amount} of ${resource} because it `
+                `${this} cannot carry ${actualAmount} of ${resource} because it `
                 + `only can carry ${spaceAvailable} more resources`
             );
         }
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-pickup -->>
         return arguments;

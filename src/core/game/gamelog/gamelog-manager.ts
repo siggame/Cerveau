@@ -74,11 +74,7 @@ export class GamelogManager {
      */
     public log(gamelog: IGamelog): Promise<string> {
         const serialized = JSON.stringify(gamelog);
-        const filename = filenameFor(
-            gamelog.gameName,
-            gamelog.gameSession,
-            gamelog.epoch,
-        );
+        const filename = filenameFor(gamelog);
 
         if (!Config.ARENA_MODE) {
             // cache gamelog info

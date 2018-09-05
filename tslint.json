@@ -29,9 +29,6 @@
         // Only until they fix the tsconfig path error
         // "no-implicit-dependencies": [true, "dev", "optional"],
         "no-implicit-dependencies": false,
-        // desireable, but disabled while the invalidate functions
-        // allows for parameter reassignment to affect run args
-        "no-parameter-reassignment": false,
         "no-redundant-jsdoc": true,
         "no-submodule-imports": false, // silly rule
         "no-unnecessary-type-assertion": true,

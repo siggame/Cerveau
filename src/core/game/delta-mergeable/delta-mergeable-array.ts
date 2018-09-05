@@ -52,13 +52,13 @@ export function createArray<T = any>(args: {
         parent: args.parent,
         initialValue: array,
         transform: (newArray: T[] | undefined, currentValue) => {
-            newArray = newArray || [];
+            const copyFrom = newArray || [];
             // We won't allow people to re-set this array,
             // instead we will mutate the current array to match `newArray`
-            for (let i = 0; i < newArray.length; i++) {
-                currentValue![i] = newArray[i];
+            for (let i = 0; i < copyFrom.length; i++) {
+                currentValue![i] = copyFrom[i];
             }
-            currentValue!.length = newArray.length;
+            currentValue!.length = copyFrom.length;
 
             return currentValue;
         },

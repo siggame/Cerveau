@@ -4,7 +4,8 @@ import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
        } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, quoteIfString, UnknownObject } from "~/utils";
+import { capitalizeFirstLetter, mapToObject,
+         quoteIfString, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -245,24 +246,51 @@ export class BaseAIManager {
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
+            let argsMap = (sanitizedArgs as Map<string, unknown>);
 
             //  ↙ We are getting this function via reflection, no easier way to do this.
             // tslint:disable-next-line:no-any no-unsafe-any
-            const invalidateFunction = (gameObject as any)[`invalidate${capitalizeFirstLetter(functionName)}`] as (
+            const invalidateFunction = (gameObject as any)[`invalidate${capitalizeFirstLetter(functionName)}`].call as (
+                gameObject: BaseGameObject,
                 player: IBasePlayer,
                 ...args: Array<unknown>
-            ) => string | IArguments;
+            ) => string | UnknownObject | undefined;
 
             // tslint:disable-next-line:no-unsafe-any
-            const validated: string | IArguments = invalidateFunction.call(
+            const validated = invalidateFunction(
                 gameObject,
                 this.client.player,
-                ...(sanitizedArgs as Map<string, unknown>).values(),
+                ...argsMap.values(),
             );
 
             invalid = typeof validated === "string"
                 ? validated
                 : undefined;
+
+            if (typeof validated === "object") {
+                // they returns an object for new args, so re-validate them
+                const argsMapAsObject = mapToObject(argsMap);
+                const newArgsMap = this.gameSanitizer.validateRunArgs(
+                    gameObject,
+                    functionName,
+                    { ...argsMapAsObject, ...validated },
+                );
+
+                if (newArgsMap instanceof Error) {
+                    // Somehow a game dev returned an invalid object,
+                    // so this is a server error
+                    throw new Error(
+`Invalidate function for ${gameObject.gameObjectName}.${functionName} returned invalid object:
+${JSON.stringify(validated)}
+from:
+${JSON.stringify(mapToObject(argsMap))}
+`,
+);
+                }
+                else if (newArgsMap instanceof Map) {
+                    argsMap = newArgsMap;
+                }
+            }
 
             if (invalid) {
                 // Their arguments did not validate,
@@ -272,7 +300,7 @@ export class BaseAIManager {
             else {
                 // It's valid!
                 // tslint:disable-next-line:no-any no-unsafe-any
-                const unsanitizedReturned = await (gameObject as any)[functionName](...validated) as unknown;
+                const unsanitizedReturned = await (gameObject as any)[functionName](...argsMap.values()) as unknown;
                 returned = this.gameSanitizer.validateRanReturned(gameObject, functionName, unsanitizedReturned);
             }
         }

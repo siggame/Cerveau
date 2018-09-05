@@ -340,15 +340,20 @@ export class Unit extends GameObject {
             return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
         }
 
-        amount = amount <= 0
+        let actualAmount = amount <= 0
             ? this.gold
             : Math.min(this.gold, amount);
 
-        amount = Math.min(this.game.settings.maxTileGold - this.tile.gold, amount);
+        actualAmount = Math.min(
+            this.game.settings.maxTileGold - this.tile.gold,
+            actualAmount,
+        );
 
-        if (amount <= 0) {
-            return `${this} does not have any gold to bury!`;
+        if (actualAmount <= 0) {
+            return `${this} doesn't have any gold to bury! Ye poor scallywag.`;
         }
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-bury -->>
         return arguments;
@@ -417,10 +422,12 @@ export class Unit extends GameObject {
             return `Shiver me timbers! ${this} doesn't have any booty to deposit!`;
         }
 
-        amount = Math.min(Math.max(amount, 0), this.gold);
-        if (amount <= 0) {
-            amount = this.gold;
+        let actualAmount = Math.min(Math.max(amount, 0), this.gold);
+        if (actualAmount <= 0) {
+            actualAmount = this.gold;
         }
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-deposit -->>
         return arguments;
@@ -510,9 +517,11 @@ export class Unit extends GameObject {
             return `There be no booty for ${this} to plunder.`;
         }
 
-        amount = amount <= 0 || amount > this.tile.gold
+        const actualAmount = amount <= 0 || amount > this.tile.gold
             ? this.tile.gold
             : amount;
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-dig -->>
         return arguments;
@@ -780,14 +789,19 @@ export class Unit extends GameObject {
         }
 
         // Adjust the amount of crew to split
-        amount = amount <= 0
+        const actualAmount = amount <= 0
             ? this.crew
             : Math.min(amount, this.crew);
 
         // Adjust the amount of gold to split
-        gold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
+        const actualGold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
             ? this.gold
             : Math.min(gold, this.gold);
+
+        return {
+            amount: actualAmount,
+            gold: actualGold,
+        };
 
         // <<-- /Creer-Merge: invalidate-split -->>
         return arguments;
@@ -919,14 +933,18 @@ export class Unit extends GameObject {
             return `${this} has to withdraw yer booty from yer home port, matey!`;
         }
 
-        if (amount <= 0) {
+        let actualAmount = amount;
+
+        if (actualAmount <= 0) {
             // Take all the gold
-            amount = player.gold;
+            actualAmount = player.gold;
         }
 
         // cap the amount taken by how much gold they have
         // (so they can't withdraw more gold than their player has)
-        amount = Math.min(amount, player.gold);
+        actualAmount = Math.min(actualAmount, player.gold);
+
+        return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-withdraw -->>
         return arguments;

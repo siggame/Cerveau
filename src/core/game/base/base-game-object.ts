@@ -4,6 +4,9 @@ import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 
+/** 16kb should be enough for any log, and may still be too large. */
+const MAX_LOG_LENGTH = 16 * 1024;
+
 /** The base game object data (empty). */
 export interface IBaseGameObjectData {
     // pass
@@ -94,10 +97,13 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * @param message - The string to log.
      * @returns The arguments, as all input is valid.
      */
-    protected invalidateLog(player: IBasePlayer, message: string): string | IArguments {
-        // NOTE: may be a good idea to make sure the messages are not too long,
-        // E.g. they are not trying to log 100+ MB strings
-        return arguments; // nothing to invalidate, all input is valid
+    protected invalidateLog(
+        player: IBasePlayer,
+        message: string,
+    ): undefined | string | { message?: string } {
+        if (message.length > MAX_LOG_LENGTH) {
+            return `Message is too long! Max ${MAX_LOG_LENGTH} per message.`;
+        }
     }
 
     /**
