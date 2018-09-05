@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICutterProperties, SpiderlingArgs } from "./";
+import { ICutterCutArgs, ICutterProperties, SpiderlingArgs } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
 import { Web } from "./web";
@@ -85,10 +85,14 @@ export class Cutter extends Spiderling {
      * @param player - The player that called this.
      * @param web - The web you want to Cut. Must be connected to the Nest this
      * Cutter is currently on.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateCut(player: Player, web: Web): string | IArguments {
+    protected invalidateCut(
+        player: Player,
+        web: Web,
+    ): void | string | ICutterCutArgs {
         // <<-- Creer-Merge: invalidate-cut -->>
 
         const invalid = super.invalidate(player);
@@ -105,7 +109,6 @@ export class Cutter extends Spiderling {
         }
 
         // <<-- /Creer-Merge: invalidate-cut -->>
-        return arguments;
     }
 
     /**

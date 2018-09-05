@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IYoungGunProperties } from "./";
+import { IYoungGunCallInArgs, IYoungGunProperties } from "./";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -120,13 +120,14 @@ export class YoungGun extends GameObject {
      *
      * @param player - The player that called this.
      * @param job - The job you want the Cowboy being brought to have.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateCallIn(
         player: Player,
         job: "Bartender" | "Brawler" | "Sharpshooter",
-    ): string | IArguments {
+    ): void | string | IYoungGunCallInArgs {
         // <<-- Creer-Merge: invalidate-callIn -->>
 
         if (!this.canCallIn) {
@@ -140,7 +141,6 @@ export class YoungGun extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-callIn -->>
-        return arguments;
     }
 
     /**

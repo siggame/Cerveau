@@ -1,5 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitProperties } from "./";
+import { IUnitAttackArgs, IUnitBuryArgs, IUnitDepositArgs, IUnitDigArgs,
+         IUnitMoveArgs, IUnitProperties, IUnitRestArgs, IUnitSplitArgs,
+         IUnitWithdrawArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Port } from "./port";
@@ -123,14 +125,15 @@ export class Unit extends GameObject {
      * @param tile - The Tile to attack.
      * @param target - Whether to attack 'crew' or 'ship'. Crew deal damage to
      * crew and ships deal damage to ships. Consumes any remaining moves.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateAttack(
         player: Player,
         tile: Tile,
         target: "crew" | "ship",
-    ): string | IArguments {
+    ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true);
@@ -175,7 +178,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
-        return arguments;
     }
 
     /**
@@ -301,13 +303,14 @@ export class Unit extends GameObject {
      * @param player - The player that called this.
      * @param amount - How much gold this Unit should bury. Amounts <= 0 will
      * bury as much as possible.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateBury(
         player: Player,
         amount: number,
-    ): string | IArguments {
+    ): void | string | IUnitBuryArgs {
         // <<-- Creer-Merge: invalidate-bury -->>
 
         const reason = this.invalidate(player);
@@ -356,7 +359,6 @@ export class Unit extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-bury -->>
-        return arguments;
     }
 
     /**
@@ -391,13 +393,14 @@ export class Unit extends GameObject {
      * @param player - The player that called this.
      * @param amount - The amount of gold to deposit. Amounts <= 0 will deposit
      * all the gold on this Unit.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateDeposit(
         player: Player,
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitDepositArgs {
         // <<-- Creer-Merge: invalidate-deposit -->>
 
         const reason = this.invalidate(player);
@@ -430,7 +433,6 @@ export class Unit extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-deposit -->>
-        return arguments;
     }
 
     /**
@@ -489,13 +491,14 @@ export class Unit extends GameObject {
      * @param player - The player that called this.
      * @param amount - How much gold this Unit should take. Amounts <= 0 will
      * dig up as much as possible.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateDig(
         player: Player,
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitDigArgs {
         // <<-- Creer-Merge: invalidate-dig -->>
 
         const reason = this.invalidate(player);
@@ -524,7 +527,6 @@ export class Unit extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-dig -->>
-        return arguments;
     }
 
     /**
@@ -562,13 +564,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Unit should move to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const reason = this.invalidate(player);
@@ -622,7 +625,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**
@@ -674,10 +676,11 @@ export class Unit extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): string | IArguments {
+    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true);
@@ -696,7 +699,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-rest -->>
-        return arguments;
     }
 
     /**
@@ -736,15 +738,16 @@ export class Unit extends GameObject {
      * will move all the crew to that Tile.
      * @param gold - The amount of gold the crew should take with them. Gold <
      * 0 will move all the gold to that Tile.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateSplit(
         player: Player,
         tile: Tile,
         amount: number = 1,
         gold: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitSplitArgs {
         // <<-- Creer-Merge: invalidate-split -->>
 
         const reason = this.invalidate(player);
@@ -804,7 +807,6 @@ export class Unit extends GameObject {
         };
 
         // <<-- /Creer-Merge: invalidate-split -->>
-        return arguments;
     }
 
     /**
@@ -910,13 +912,14 @@ export class Unit extends GameObject {
      * @param player - The player that called this.
      * @param amount - The amount of gold to withdraw. Amounts <= 0 will
      * withdraw everything.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateWithdraw(
         player: Player,
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitWithdrawArgs {
         // <<-- Creer-Merge: invalidate-withdraw -->>
 
         const reason = this.invalidate(player);
@@ -947,7 +950,6 @@ export class Unit extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-withdraw -->>
-        return arguments;
     }
 
     /**

@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IFireDepartmentProperties } from "./";
+import { BuildingArgs, IFireDepartmentExtinguishArgs,
+         IFireDepartmentProperties } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -61,13 +62,14 @@ export class FireDepartment extends Building {
      *
      * @param player - The player that called this.
      * @param building - The Building you want to extinguish.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateExtinguish(
         player: Player,
         building: Building,
-    ): string | IArguments {
+    ): void | string | IFireDepartmentExtinguishArgs {
         // <<-- Creer-Merge: invalidate-extinguish -->>
 
         const invalid = this.invalidateBribe(player);
@@ -80,7 +82,6 @@ export class FireDepartment extends Building {
         }
 
         // <<-- /Creer-Merge: invalidate-extinguish -->>
-        return arguments;
     }
 
     /**

@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IJobProperties } from "./";
+import { IJobProperties, IJobRecruitArgs } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -108,13 +108,14 @@ export class Job extends GameObject {
      * @param player - The player that called this.
      * @param tile - The Tile that is a lodge owned by you that you wish to
      * spawn the Beaver of this Job on.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateRecruit(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IJobRecruitArgs {
         // <<-- Creer-Merge: invalidate-recruit -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -134,7 +135,6 @@ export class Job extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-recruit -->>
-        return arguments;
     }
 
     /**

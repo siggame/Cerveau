@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpitterProperties, SpiderlingArgs } from "./";
+import { ISpitterProperties, ISpitterSpitArgs, SpiderlingArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
@@ -104,13 +104,14 @@ export class Spitter extends Spiderling {
      * @param player - The player that called this.
      * @param nest - The Nest you want to spit a Web to, thus connecting that
      * Nest and the one the Spitter is on.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateSpit(
         player: Player,
         nest: Nest,
-    ): string | IArguments {
+    ): void | string | ISpitterSpitArgs {
         // <<-- Creer-Merge: invalidate-spit -->>
 
         const invalid = super.invalidate(player);
@@ -133,7 +134,6 @@ export class Spitter extends Spiderling {
         }
 
         // <<-- /Creer-Merge: invalidate-spit -->>
-        return arguments;
     }
 
     /**

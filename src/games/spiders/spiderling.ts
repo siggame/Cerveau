@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpiderlingProperties, SpiderArgs } from "./";
+import { ISpiderlingAttackArgs, ISpiderlingMoveArgs, ISpiderlingProperties,
+         SpiderArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spider } from "./spider";
@@ -159,13 +160,14 @@ export class Spiderling extends Spider {
      *
      * @param player - The player that called this.
      * @param spiderling - The Spiderling to attack.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateAttack(
         player: Player,
         spiderling: Spiderling,
-    ): string | IArguments {
+    ): void | string | ISpiderlingAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = super.invalidate(player);
@@ -190,7 +192,6 @@ export class Spiderling extends Spider {
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
-        return arguments;
     }
 
     /**
@@ -248,10 +249,14 @@ export class Spiderling extends Spider {
      *
      * @param player - The player that called this.
      * @param web - The Web you want to move across to the other Nest.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateMove(player: Player, web: Web): string | IArguments {
+    protected invalidateMove(
+        player: Player,
+        web: Web,
+    ): void | string | ISpiderlingMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = super.invalidate(player);
@@ -272,7 +277,6 @@ export class Spiderling extends Spider {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**

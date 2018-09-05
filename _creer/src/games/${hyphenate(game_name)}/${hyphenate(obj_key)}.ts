@@ -25,6 +25,9 @@ else:
 
     functions = list(obj['function_names'])
     for function_name in functions:
+        if function_name == 'log' and obj_key == 'GameObject':
+            continue
+
         function_args_import = 'I{}{}Args'.format(obj_key, upcase_first(function_name))
         imports['./'].append(function_args_import)
 
@@ -204,10 +207,10 @@ ${merge('    // ', 'public-functions', """
     invalidate_obj['description'] = 'Invalidation function for {}. Try to find a reason why the passed in parameters are invalid, and return a human readable string telling them why it is invalid.'.format(function_name)
     invalidate_obj['returns'] = {
         'default': None,
-        'description': 'a string that is the invalid reason, if the arguments are invalid. Otherwise undefined (nothing) if the inputs are valid.',
+        'description': 'If the arguments are invalid, return a string explaining to human players why it is invalid. If it is valid return nothing, or an object with new arguments to use in the actual function.',
         'invalidValue': None,
         'type': {
-            'name': 'undefined | string | I{}{}Args'.format(obj_key, upcase_first_function_name),
+            'name': 'void | string | I{}{}Args'.format(obj_key, upcase_first_function_name),
             'is_game_object': False,
             'valueType': None,
             'keyType': None,
@@ -223,7 +226,6 @@ ${merge('        // ', 'invalidate-' + function_name, """
         // changing its value in this scope is enough.
 
 """.format(function_name), optional=True, help=False)}
-        return arguments;
     }
 
 ${shared['cerveau']['formatted_function_top'](function_name, temp)}

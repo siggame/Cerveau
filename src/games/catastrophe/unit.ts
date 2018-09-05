@@ -1,5 +1,8 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitProperties } from "./";
+import { IUnitAttackArgs, IUnitChangeJobArgs, IUnitConstructArgs,
+         IUnitConvertArgs, IUnitDeconstructArgs, IUnitDropArgs,
+         IUnitHarvestArgs, IUnitMoveArgs, IUnitPickupArgs, IUnitProperties,
+         IUnitRestArgs } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -139,13 +142,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to attack.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true, false);
@@ -179,7 +183,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
-        return arguments;
     }
 
     /**
@@ -294,13 +297,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param job - The name of the Job to change to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateChangeJob(
         player: Player,
         job: "soldier" | "gatherer" | "builder" | "missionary",
-    ): string | IArguments {
+    ): void | string | IUnitChangeJobArgs {
         // <<-- Creer-Merge: invalidate-changeJob -->>
 
         const reason = this.invalidate(player, true, false);
@@ -335,7 +339,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-changeJob -->>
-        return arguments;
     }
 
     /**
@@ -383,14 +386,15 @@ export class Unit extends GameObject {
      * @param tile - The Tile to construct the Structure on. It must have
      * enough materials on it for a Structure to be constructed.
      * @param type - The type of Structure to construct on that Tile.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateConstruct(
         player: Player,
         tile: Tile,
         type: "neutral" | "shelter" | "monument" | "wall" | "road",
-    ): string | IArguments {
+    ): void | string | IUnitConstructArgs {
         // <<-- Creer-Merge: invalidate-construct -->>
 
         const reason = this.invalidate(player, true, true);
@@ -424,7 +428,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-construct -->>
-        return arguments;
     }
 
     /**
@@ -468,13 +471,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile with the Unit to convert.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateConvert(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitConvertArgs {
         // <<-- Creer-Merge: invalidate-convert -->>
 
         const reason = this.invalidate(player, true, true);
@@ -507,7 +511,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-convert -->>
-        return arguments;
     }
 
     /**
@@ -552,13 +555,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to deconstruct. It must have a Structure on it.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateDeconstruct(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitDeconstructArgs {
         // <<-- Creer-Merge: invalidate-deconstruct -->>
 
         const reason = this.invalidate(player, true, true);
@@ -596,7 +600,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-deconstruct -->>
-        return arguments;
     }
 
     /**
@@ -655,15 +658,16 @@ export class Unit extends GameObject {
      * @param resource - The type of resource to drop ('materials' or 'food').
      * @param amount - The amount of the resource to drop. Amounts <= 0 will
      * drop as much as possible.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateDrop(
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const reason = this.invalidate(player, false, false);
@@ -707,7 +711,6 @@ export class Unit extends GameObject {
         };
 
         // <<-- /Creer-Merge: invalidate-drop -->>
-        return arguments;
     }
 
     /**
@@ -756,13 +759,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want to harvest.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateHarvest(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const reason = this.invalidate(player, true, true);
@@ -797,7 +801,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-harvest -->>
-        return arguments;
     }
 
     /**
@@ -838,13 +841,14 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Unit should move to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         const reason = this.invalidate(player, false, false);
         if (reason) {
@@ -872,7 +876,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**
@@ -917,15 +920,16 @@ export class Unit extends GameObject {
      * 'food').
      * @param amount - The amount of the resource to pickup. Amounts <= 0 will
      * pickup as much as possible.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidatePickup(
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IUnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const reason = this.invalidate(player, false, false);
@@ -971,7 +975,6 @@ export class Unit extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-pickup -->>
-        return arguments;
     }
 
     /**
@@ -1009,10 +1012,11 @@ export class Unit extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): string | IArguments {
+    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true, false);
@@ -1029,7 +1033,6 @@ export class Unit extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-rest -->>
-        return arguments;
     }
 
     /**

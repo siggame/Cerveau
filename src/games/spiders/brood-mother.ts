@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBroodMotherProperties, SpiderArgs } from "./";
+import { IBroodMotherConsumeArgs, IBroodMotherProperties,
+         IBroodMotherSpawnArgs, SpiderArgs } from "./";
 import { Player } from "./player";
 import { Spider } from "./spider";
 import { Spiderling } from "./spiderling";
@@ -69,13 +70,14 @@ export class BroodMother extends Spider {
      * @param player - The player that called this.
      * @param spiderling - The Spiderling to consume. It must be on the same
      * Nest as this BroodMother.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateConsume(
         player: Player,
         spiderling: Spiderling,
-    ): string | IArguments {
+    ): void | string | IBroodMotherConsumeArgs {
         // <<-- Creer-Merge: invalidate-consume -->>
 
         // Check all the arguments for consume here and try to
@@ -84,7 +86,6 @@ export class BroodMother extends Spider {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-consume -->>
-        return arguments;
     }
 
     /**
@@ -118,13 +119,14 @@ export class BroodMother extends Spider {
      * @param player - The player that called this.
      * @param spiderlingType - The string name of the Spiderling class you want
      * to Spawn. Must be 'Spitter', 'Weaver', or 'Cutter'.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateSpawn(
         player: Player,
         spiderlingType: "Spitter" | "Weaver" | "Cutter",
-    ): string | IArguments {
+    ): void | string | IBroodMotherSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
 
         // Check all the arguments for spawn here and try to
@@ -133,7 +135,6 @@ export class BroodMother extends Spider {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-spawn -->>
-        return arguments;
     }
 
     /**

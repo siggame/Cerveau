@@ -1,10 +1,7 @@
 // This file is where you should put logic to control the game and everything
 // around it.
-import {
-    BaseClasses,
-    CatastropheGame,
-    CatastropheGameObjectFactory,
-} from "./";
+import { BaseClasses, CatastropheGame, CatastropheGameObjectFactory,
+       } from "./";
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";

@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICheckerProperties } from "./";
+import { ICheckerIsMineArgs, ICheckerMoveArgs, ICheckerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -74,10 +74,13 @@ export class Checker extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateIsMine(player: Player): string | IArguments {
+    protected invalidateIsMine(
+        player: Player,
+    ): void | string | ICheckerIsMineArgs {
         // <<-- Creer-Merge: invalidate-isMine -->>
 
         // Check all the arguments for isMine here and try to
@@ -86,7 +89,6 @@ export class Checker extends GameObject {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-isMine -->>
-        return arguments;
     }
 
     /**
@@ -113,14 +115,15 @@ export class Checker extends GameObject {
      * @param player - The player that called this.
      * @param x - The x coordinate to move to.
      * @param y - The y coordinate to move to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateMove(
         player: Player,
         x: number,
         y: number,
-    ): string | IArguments {
+    ): void | string | ICheckerMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         if (this.game.currentPlayer !== player) {
@@ -176,7 +179,6 @@ export class Checker extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**

@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IWeaverProperties, SpiderlingArgs } from "./";
+import { IWeaverProperties, IWeaverStrengthenArgs, IWeaverWeakenArgs,
+         SpiderlingArgs } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
 import { Web } from "./web";
@@ -104,13 +105,14 @@ export class Weaver extends Spiderling {
      * @param player - The player that called this.
      * @param web - The web you want to strengthen. Must be connected to the
      * Nest this Weaver is currently on.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateStrengthen(
         player: Player,
         web: Web,
-    ): string | IArguments {
+    ): void | string | IWeaverStrengthenArgs {
         // <<-- Creer-Merge: invalidate-strengthen -->>
 
         const invalid = this.invalidateWeave(player, web, false);
@@ -119,7 +121,6 @@ export class Weaver extends Spiderling {
         }
 
         // <<-- /Creer-Merge: invalidate-strengthen -->>
-        return arguments;
     }
 
     /**
@@ -147,13 +148,14 @@ export class Weaver extends Spiderling {
      * @param player - The player that called this.
      * @param web - The web you want to weaken. Must be connected to the Nest
      * this Weaver is currently on.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateWeaken(
         player: Player,
         web: Web,
-    ): string | IArguments {
+    ): void | string | IWeaverWeakenArgs {
         // <<-- Creer-Merge: invalidate-weaken -->>
 
         const invalid = this.invalidateWeave(player, web, true);
@@ -162,7 +164,6 @@ export class Weaver extends Spiderling {
         }
 
         // <<-- /Creer-Merge: invalidate-weaken -->>
-        return arguments;
     }
 
     /**

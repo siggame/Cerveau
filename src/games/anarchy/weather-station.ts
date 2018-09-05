@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IWeatherStationProperties } from "./";
+import { BuildingArgs, IWeatherStationIntensifyArgs, IWeatherStationProperties,
+         IWeatherStationRotateArgs } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -56,13 +57,14 @@ export class WeatherStation extends Building {
      * @param player - The player that called this.
      * @param negative - By default the intensity will be increased by 1,
      * setting this to true decreases the intensity by 1.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateIntensify(
         player: Player,
         negative: boolean = false,
-    ): string | IArguments {
+    ): void | string | IWeatherStationIntensifyArgs {
         // <<-- Creer-Merge: invalidate-intensify -->>
 
         const invalid = this.invalidateBribe(player);
@@ -86,7 +88,6 @@ export class WeatherStation extends Building {
         }
 
         // <<-- /Creer-Merge: invalidate-intensify -->>
-        return arguments;
     }
 
     /**
@@ -126,13 +127,14 @@ export class WeatherStation extends Building {
      * @param counterclockwise - By default the direction will be rotated
      * clockwise. If you set this to true we will rotate the forecast
      * counterclockwise instead.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateRotate(
         player: Player,
         counterclockwise: boolean = false,
-    ): string | IArguments {
+    ): void | string | IWeatherStationRotateArgs {
         // <<-- Creer-Merge: invalidate-rotate -->>
 
         const invalid = this.invalidateBribe(player);
@@ -145,7 +147,6 @@ export class WeatherStation extends Building {
         }
 
         // <<-- /Creer-Merge: invalidate-rotate -->>
-        return arguments;
     }
 
     /**

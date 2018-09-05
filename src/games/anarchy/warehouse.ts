@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IWarehouseProperties } from "./";
+import { BuildingArgs, IWarehouseIgniteArgs, IWarehouseProperties } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -77,13 +77,14 @@ export class Warehouse extends Building {
      *
      * @param player - The player that called this.
      * @param building - The Building you want to light on fire.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateIgnite(
         player: Player,
         building: Building,
-    ): string | IArguments {
+    ): void | string | IWarehouseIgniteArgs {
         // <<-- Creer-Merge: invalidate-ignite -->>
 
         const invalid = this.invalidateBribe(player);
@@ -96,7 +97,6 @@ export class Warehouse extends Building {
         }
 
         // <<-- /Creer-Merge: invalidate-ignite -->>
-        return arguments;
     }
 
     /**

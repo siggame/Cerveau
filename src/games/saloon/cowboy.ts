@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICowboyProperties } from "./";
+import { ICowboyActArgs, ICowboyMoveArgs, ICowboyPlayArgs, ICowboyProperties,
+       } from "./";
 import { Furnishing } from "./furnishing";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -183,14 +184,15 @@ export class Cowboy extends GameObject {
      * @param tile - The Tile you want this Cowboy to act on.
      * @param drunkDirection - The direction the bottle will cause drunk
      * cowboys to be in, can be 'North', 'East', 'South', or 'West'.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateAct(
         player: Player,
         tile: Tile,
         drunkDirection: "" | "North" | "East" | "South" | "West" = "",
-    ): string | IArguments {
+    ): void | string | ICowboyActArgs {
         // <<-- Creer-Merge: invalidate-act -->>
 
         let invalid = this.invalidate(player, tile);
@@ -218,7 +220,6 @@ export class Cowboy extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-act -->>
-        return arguments;
     }
 
     /**
@@ -256,13 +257,14 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want to move this Cowboy to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | ICowboyMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, tile);
@@ -290,7 +292,6 @@ export class Cowboy extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**
@@ -333,13 +334,14 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param piano - The Furnishing that is a piano you want to play.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidatePlay(
         player: Player,
         piano: Furnishing,
-    ): string | IArguments {
+    ): void | string | ICowboyPlayArgs {
         // <<-- Creer-Merge: invalidate-play -->>
 
         const invalid = this.invalidate(player, this.tile);
@@ -368,7 +370,6 @@ export class Cowboy extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-play -->>
-        return arguments;
     }
 
     /**

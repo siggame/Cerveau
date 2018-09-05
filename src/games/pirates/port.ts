@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IPortProperties } from "./";
+import { IPortProperties, IPortSpawnArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -79,13 +79,14 @@ export class Port extends GameObject {
      *
      * @param player - The player that called this.
      * @param type - What type of Unit to create ('crew' or 'ship').
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateSpawn(
         player: Player,
         type: "crew" | "ship",
-    ): string | IArguments {
+    ): void | string | IPortSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
 
         if (this.owner !== player) {
@@ -120,7 +121,6 @@ export class Port extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-spawn -->>
-        return arguments;
     }
 
     /**

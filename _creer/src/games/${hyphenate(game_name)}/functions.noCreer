@@ -168,13 +168,31 @@ if not 'cerveau' in shared:
             names = sorted(pair[1])
             one_line = ('import { '+(', '.join(names))+' } from "'+pair[0]+'";')
 
-            if len(one_line) > 79:
-                # wrap it
-                names = '\n' + ''.join(['    {},\n'.format(n) for n in names])
+            if len(one_line) <= 79:
+                doc += one_line
             else:
-                names = ' ' + ', '.join(names) + ' '
+                # too long for one line, so it needs to be wrapped
+                initial_indent = 'import { '
+                import_from_line = '}$from$"' + pair[0] + '";'
 
-            doc += ('import {'+ names +'} from "'+pair[0]+'";\n')
+                wrapper = TextWrapper(
+                    initial_indent=initial_indent,
+                    subsequent_indent=(' ' * len(initial_indent)),
+                    width=79,
+                )
+
+                wrapped = wrapper.wrap(', '.join(names + [import_from_line]))
+                last_line = wrapped[-1].strip()
+                if last_line[0] == '}':
+                    # then import_from_line wrapped to the last line, so there
+                    # needs to be a dangling comma on the end
+                    wrapped[-1] = (' ' * len('import ')) + import_from_line
+                else:
+                    # remove the last comma
+                    comma_index = wrapped[-1].rfind(',')
+                    wrapped[-1] = wrapped[-1][:comma_index] + wrapped[-1][comma_index+1:]
+                doc += ('\n'.join(wrapped)).replace('$', ' ')
+            doc += '\n'
         return doc
     shared['cerveau']['imports'] = cerveau_imports
 

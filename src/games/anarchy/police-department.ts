@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IPoliceDepartmentProperties } from "./";
+import { BuildingArgs, IPoliceDepartmentProperties, IPoliceDepartmentRaidArgs,
+       } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 import { Warehouse } from "./warehouse";
@@ -56,13 +57,14 @@ export class PoliceDepartment extends Building {
      *
      * @param player - The player that called this.
      * @param warehouse - The warehouse you want to raid.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateRaid(
         player: Player,
         warehouse: Warehouse,
-    ): string | IArguments {
+    ): void | string | IPoliceDepartmentRaidArgs {
         // <<-- Creer-Merge: invalidate-raid -->>
 
         const invalid = this.invalidateBribe(player);
@@ -71,7 +73,6 @@ export class PoliceDepartment extends Building {
         }
 
         // <<-- /Creer-Merge: invalidate-raid -->>
-        return arguments;
     }
 
     /**

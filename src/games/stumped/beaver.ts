@@ -1,5 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBeaverProperties } from "./";
+import { IBeaverAttackArgs, IBeaverBuildLodgeArgs, IBeaverDropArgs,
+         IBeaverHarvestArgs, IBeaverMoveArgs, IBeaverPickupArgs,
+         IBeaverProperties } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -122,13 +124,14 @@ export class Beaver extends GameObject {
      *
      * @param player - The player that called this.
      * @param beaver - The Beaver to attack. Must be on an adjacent Tile.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateAttack(
         player: Player,
         beaver: Beaver,
-    ): string | IArguments {
+    ): void | string | IBeaverAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = this.invalidate(player);
@@ -153,7 +156,6 @@ export class Beaver extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
-        return arguments;
     }
 
     /**
@@ -206,10 +208,13 @@ export class Beaver extends GameObject {
      * telling them why it is invalid.
      *
      * @param player - The player that called this.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
-    protected invalidateBuildLodge(player: Player): string | IArguments {
+    protected invalidateBuildLodge(
+        player: Player,
+    ): void | string | IBeaverBuildLodgeArgs {
         // <<-- Creer-Merge: invalidate-buildLodge -->>
 
         const invalid = this.invalidate(player);
@@ -234,7 +239,6 @@ export class Beaver extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-buildLodge -->>
-        return arguments;
     }
 
     /**
@@ -283,15 +287,16 @@ export class Beaver extends GameObject {
      * @param resource - The type of resource to drop ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * drop all the resource type.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateDrop(
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IBeaverDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const invalid = this.invalidate(player);
@@ -333,7 +338,6 @@ export class Beaver extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-drop -->>
-        return arguments;
     }
 
     /**
@@ -375,13 +379,14 @@ export class Beaver extends GameObject {
      * @param player - The player that called this.
      * @param spawner - The Spawner you want to harvest. Must be on an adjacent
      * Tile.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateHarvest(
         player: Player,
         spawner: Spawner,
-    ): string | IArguments {
+    ): void | string | IBeaverHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const invalid = this.invalidate(player);
@@ -407,7 +412,6 @@ export class Beaver extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-harvest -->>
-        return arguments;
     }
 
     /**
@@ -464,13 +468,14 @@ export class Beaver extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Beaver should move to.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): string | IArguments {
+    ): void | string | IBeaverMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, true);
@@ -512,7 +517,6 @@ export class Beaver extends GameObject {
         }
 
         // <<-- /Creer-Merge: invalidate-move -->>
-        return arguments;
     }
 
     /**
@@ -560,15 +564,16 @@ export class Beaver extends GameObject {
      * @param resource - The type of resource to pickup ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * pickup all of the resource type.
-     * @returns a string that is the invalid reason, if the arguments are
-     * invalid. Otherwise undefined (nothing) if the inputs are valid.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
      */
     protected invalidatePickup(
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
         amount: number = 0,
-    ): string | IArguments {
+    ): void | string | IBeaverPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const invalid = this.invalidate(player);
@@ -626,7 +631,6 @@ export class Beaver extends GameObject {
         return { amount: actualAmount };
 
         // <<-- /Creer-Merge: invalidate-pickup -->>
-        return arguments;
     }
 
     /**
