@@ -1,10 +1,10 @@
 {
-	"name": "Cerveau API",
-	"version": "1.0.0",
-	"description": "API for the Cerveau Game Server.",
-	"title": "Cerveau API",
-	"url" : "http://localhost:3080",
-	"template": {
-		"withCompare": false
-	}
+  "name": "Cerveau API",
+  "version": "1.0.0",
+  "description": "API for the Cerveau Game Server.",
+  "title": "Cerveau API",
+  "url" : "http://localhost:3080",
+  "template": {
+    "withCompare": false
+  }
 }

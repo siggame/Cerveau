@@ -1,0 +1,13 @@
+<section id="gamelogs" class="info-block">
+	<h2>Game Archives</h2>
+	{{> gamelogs}}
+
+	<section class="pagination">
+	{{#if newerUri}}
+		<a class="newer" href="{{newerUri}}">Newer</a>
+	{{/if}}
+	{{#if olderUri}}
+		<a class="older" href="{{olderUri}}">Older</a>
+	{{/if}}
+	</section>
+</section>

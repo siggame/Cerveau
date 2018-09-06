@@ -1,0 +1,420 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,700,700italic,400italic);
+@import url(http://fonts.googleapis.com/css?family=Inconsolata:400,700);
+
+:root {
+	--color-primary: #2D4671;	/* Main Primary color */
+	--color-primary-lightest: #7689A9;
+	--color-primary-light: #4D658D;
+	--color-primary-dark: #152C55;
+	--color-primary-darkest: #051838;
+
+	--color-complement: #AA8239;	/* Main Complement color */
+	--color-complement-lightest: #FFE1AA;
+	--color-complement-light: #D5AF6B;
+	--color-complement-dark: #805A16;
+	--color-complement-darkest: #553700;
+
+	--color-off-black: #121212;
+	--color-off-white: #D5DCE8;
+	--color-gray: #494949;
+}
+
+* {
+	-webkit-transition: all 333ms ease-in-out;
+	-moz-transition: all 333ms ease-in-out;
+	-o-transition: all 333ms ease-in-out;
+	-ms-transition: all 333ms ease-in-out;
+	transition: all 333ms ease-in-out;
+}
+
+::selection,
+::-moz-selection {
+  background: var(--color-complement-lightest); /* WebKit/Blink Browsers */
+}
+
+html {
+	/*background-color: var(--color-primary-dark);*/
+	background: radial-gradient(circle at center, var(--color-primary) 0, var(--color-primary-darkest) 100%);
+	font-family: 'Roboto', sans-serif;
+	overflow-y: scroll;
+}
+
+strong {
+	font-weight: bold;
+}
+
+em {
+	font-style: italic;
+}
+
+a, a:visited {
+	color: var(--color-primary);
+	text-decoration: underline;
+}
+
+a:hover, a:focus, a:active {
+	color: var(--color-complement);
+}
+
+*:focus {
+	outline: dotted 0.125em var(--color-primary-lightest);
+}
+
+h1 {
+	font-size: 2.5em;
+	font-weight: bold;
+	color: var(--color-primary-darkest);
+}
+
+h2,
+.game-class > header {
+	font-size: 2em;
+	font-weight: bold;
+	color: var(--color-primary-dark);
+}
+
+h3,
+.game-class section > header {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: var(--color-primary);
+}
+
+h4,
+.function header,
+.attribute header {
+	font-size: 1.25em;
+	font-weight: bold;
+	color: var(--color-primary-darkest);
+}
+
+p {
+	margin: 0 0 1em 0;
+}
+
+p:last-child {
+	margin: 0;
+}
+
+#main {
+	font-size: 1em;
+	border-radius: 0.5em;
+	background: radial-gradient(circle at center, #dcdcdc 0, #ffffff 100%);
+	box-shadow: 0 0 1em 0.5em rgba(0, 0, 0, 0.3);
+	color: var(--color-off-black);
+	max-width: 800px;
+	margin: 2em auto;
+	padding: 1em;
+}
+
+:disabled {
+	background-color: #cdcdcd;
+	color: var(--color-gray);
+}
+
+#site-title {
+	border-radius: 0.125em;
+	background: radial-gradient(circle at center, var(--color-off-black) 0, var(--color-primary-darkest) 100%);
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	padding: 0.25em 0;
+	font-size: 3em;
+	margin-bottom: 0.5em;
+	color: #D5DCE8;
+}
+
+#site-title a {
+	color: #D5DCE8;
+	text-decoration: none;
+}
+
+#site-title a:hover, #site-title a:focus, #site-title a:active {
+	color: var(--color-complement-lightest);
+}
+
+.info-block h2 {
+	margin-bottom: 0.25em;
+}
+
+#main .info-block {
+	margin: 1em;
+}
+
+#main .info-block:first-child {
+	margin-top: 0em;
+}
+
+#main .info-block:last-child {
+	margin-bottom: 0em;
+}
+
+table.gamelogs {
+	width: 100%;
+}
+
+.info-block li,
+table tr {
+	padding: 0.125em;
+}
+
+table tr th {
+	font-weight: bold;
+	text-align: left;
+}
+
+table tr td,
+table tr th {
+	padding: 0.125em;
+}
+
+tr:hover {
+	background-color: var(--color-complement-lightest);
+}
+
+tr:hover:nth-child(odd) {
+	background-color: var(--color-complement-light);
+}
+
+.info-block li:nth-child(odd),
+table tr:nth-child(odd) {
+	background-color: var(--color-off-white)
+}
+
+.info-block li a {
+	color: var(--color-primary-darkest);
+}
+
+.info-block li a:hover, .info-block li a:focus, .info-block li a:active {
+	color:var(--color-complement-light);
+}
+
+.pagination {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+
+/* --- Collapsible --- */
+.collapsible {
+	margin: 1em 0.5em 1em 0.5em;
+}
+
+.collapsible input[type='checkbox'] {
+	display: none;
+	font-size: 2em;
+}
+
+.collapsible .toggle-label {
+	display: block;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.collapsible .toggle-label:hover,
+.collapsible .toggle-label:focus {
+	cursor: pointer;
+	color: var(--color-complement);
+}
+
+.collapsible .toggle-label::before {
+	content: ' ';
+	display: inline-block;
+
+	border-top: 7px solid transparent;
+	border-bottom: 7px solid transparent;
+	border-left: 7px solid currentColor;
+	vertical-align: middle;
+	margin-right: .7rem;
+	transform: translateY(-2px);
+
+	transition: transform .33s ease-in-out;
+}
+
+.collapsible .toggle:checked + .toggle-label::before {
+	transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible .collapsible-content-wrapper {
+	opacity: 0;
+	max-height: 0px;
+	overflow: hidden;
+	margin-top: 0.5em;
+}
+
+.toggle:checked + .toggle-label + .collapsible-content-wrapper {
+	opacity: 1;
+	max-height: 30em;
+}
+
+/* --- Settings --- */
+
+.game-description {
+	margin-bottom: 0.5em;
+	font-style: italic;
+}
+
+h4.game-settings {
+	margin-bottom: 0.25em;
+}
+
+.game-setting-name {
+	font-family: monospace;
+	font-weight: bold;
+}
+
+.game-setting-default {
+	color: var(--color-complement-dark);
+}
+
+.game-setting-default:before {
+	content: " = ";
+	color: var(--color-off-black);
+}
+
+.game-setting-min:empty,
+.game-setting-max:empty,
+.game-setting-default:empty {
+	display: none;
+}
+
+.game-setting-min,
+.game-setting-max {
+	color: var(--color-gray);
+	font-style: italic;
+	margin-left: 0.5em;
+}
+
+.game-setting-min:before {
+	content: "(min: "
+}
+
+.game-setting-max:before {
+	content: "(max: "
+}
+
+.game-setting-min:after,
+.game-setting-max:after {
+	content: ")"
+}
+
+
+
+/* --- Docs --- */
+
+.documentation > .game-class:first-child {
+	margin-top: 1em;
+}
+
+.documentation > .game-class {
+	margin-top: 3em;
+}
+
+.documentation * {
+	background-color: transparent;
+	outline: rgba(255, 255, 255, 0) 0.25em solid;
+}
+
+.documentation .anchor-highlight {
+	background-color: var(--color-complement-lightest);
+	outline-color: var(--color-complement);
+}
+
+.game-class > section {
+	margin-top: 1em;
+}
+
+.game-class > * {
+	margin-left: 2em;
+}
+
+.game-class > header {
+	margin-left: 0;
+}
+
+.attributes ul li, .functions ul li {
+	margin: 0.5em 0 0.5em 1em;
+}
+
+.attributes ul li:before, .functions ul li:before {
+	/*content: '▪ ';*/
+}
+
+.attributes ul li:first-child, .functions ul li:first-child {
+	margin-top: 0;
+}
+
+.attributes ul li:last-child, .functions ul li:last-child {
+	margin-bottom: 0;
+}
+
+.attributes > ul > li > *, .functions > ul > li > * {
+	margin-left: 2em;
+}
+
+.attributes > ul > li > header, .functions > ul > li > header {
+	margin-left: 0;
+}
+
+.attributes .name, .functions .name {
+	font-family: 'Inconsolata', monospace;
+	font-weight: bold;
+	color: #454545;
+}
+
+.documentation .type {
+	font-family: 'Inconsolata', monospace;
+	font-weight: normal;
+	color: var(--color-prrimary);
+}
+
+.documentation .default, .documentation .inherited {
+	font-style: italic;
+}
+
+.documentation .type:before {
+	content: '<';
+	color: #454545;
+}
+
+.documentation .type:after {
+	content: '>';
+	color: #454545;
+}
+
+.parentClasses {
+	font-style: italic;
+}
+
+.function .inline-arguments,
+.parentClasses ul {
+	display: inline;
+}
+
+.function .inline-arguments li,
+.parentClasses li {
+	display: inline;
+	margin: 0;
+}
+
+.function .inline-arguments li:after,
+.parentClasses li:after {
+	content: ", ";
+}
+
+.function .inline-arguments li:before,
+.parentClasses li:before {
+	content: none;
+}
+
+.function .inline-arguments li:last-child:after,
+.parentClasses li:last-child:after {
+	content: none;
+}
+
+.function .arguments header,
+.function .returns header {
+	font-size: 1.125em;
+}
+

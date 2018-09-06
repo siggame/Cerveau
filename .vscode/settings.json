@@ -1,0 +1,31 @@
+{
+    "cSpell.words": [
+        "Cerveau",
+        "Cooldown",
+        "Creer",
+        "Mergeable",
+        "Pathable",
+        "Sanitizable",
+        "Serializable",
+        "Serializeable",
+        "Spiderling",
+        "argparse",
+        "cpuprofile",
+        "gamelog",
+        "gamelog's",
+        "gamelogs",
+        "gameplay",
+        "gunzipped",
+        "gzipped",
+        "mergeables",
+        "mixins",
+        "nagle",
+        "prng",
+        "promisify",
+        "seedrandom",
+        "spiderlings",
+        "unsanitized",
+        "unstringify"
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
+}

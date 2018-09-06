@@ -1,0 +1,282 @@
+<%
+from textwrap import TextWrapper, wrap
+import operator
+
+MAX_LINE_LENGTH = 79 # one less than 80 to allow for scroll bars in 80 char
+                     # width editors
+
+if not 'cerveau' in shared:
+    shared['cerveau'] = {}
+    shared['cerveau']['TextWrapper'] = TextWrapper
+
+    def cerveau_default(type_obj):
+        base_type = type_obj['name']
+        if base_type == "string":
+            return '""'
+        elif base_type == "dictionary":
+            return '{}'
+        elif base_type == "list":
+            return '[]'
+        elif base_type == "int" or base_type == "float":
+            return '0'
+        elif base_type == "boolean":
+            return 'false'
+        else:
+            return "undefined"
+    shared['cerveau']['default'] = cerveau_default
+
+    def cerveau_type(type_obj, nullable=None):
+        base_type = type_obj['name']
+
+        if 'literals' in type_obj and type_obj['literals']:
+            literals = list(type_obj['literals'])
+            if base_type == 'string':
+                literals = [ '"{}"'.format(lit) for lit in literals ]
+            return ' | '.join(literals)
+
+        if base_type == "dictionary":
+            return "{[id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + "}"
+        elif base_type == "list":
+            ret = cerveau_type(type_obj['valueType'], False)
+            if ' ' in ret:
+                ret = '(' + ret + ')'
+            return ret + "[]"
+        elif base_type == "int" or base_type == "float":
+            return "number"
+        elif type_obj['is_game_object']:
+            ret = base_type
+            if nullable is not None:
+                if nullable and type_obj['nullable']:
+                    ret += " | undefined"
+            return ret
+        else: # string, boolean
+            return base_type
+    shared['cerveau']['type'] = cerveau_type
+
+    def cerveai_description_format(description):
+        return description.replace('Null', 'Undefined').replace('null', 'undefined')
+    shared['cerveau']['description'] = cerveai_description_format
+
+    def cerveau_schema_type(type_obj, depth=1, optional=False):
+        base_type = type_obj['name']
+        string = ''
+        typeName = ('    ' * depth) + 'typeName: "{}",'
+
+        if type_obj['is_game_object']:
+            typeName = typeName.format('gameObject') + '\n' + (
+                ('    ' * depth) + 'gameObjectClass: ' + base_type + ','
+            ) + '\n' + ('    ' * depth) + 'nullable: ' + ('true' if type_obj['nullable'] else 'false') + ','
+        else:
+            typeName = typeName.format(base_type)
+
+        string = string + typeName
+
+        literals = type_obj['literals']
+        if type_obj['literals']:
+            literals = list(literals)
+            if not optional:
+                string = string + '\n' + ('    ' * depth) + 'defaultValue: {},'.format(
+                    '"{}"'.format(literals[0]) if base_type == "string" else literals[0]
+                )
+
+            if base_type == 'string':
+                literals = [ '"{}"'.format(lit) for lit in literals ]
+            string = string + '\n' + ('    ' * depth) + 'literals: [{}],'.format(
+                ', '.join(literals)
+            )
+
+        if 'keyType' in type_obj and type_obj['keyType']:
+                string = string + """
+{indent}keyType: {{
+{type}
+{indent}}},""".format(indent=('    ' * depth), type=cerveau_schema_type(type_obj['keyType'], depth + 1))
+
+        if 'valueType' in type_obj and type_obj['valueType']:
+                string = string + """
+{indent}valueType: {{
+{type}
+{indent}}},""".format(indent=('    ' * depth), type=cerveau_schema_type(type_obj['valueType'], depth + 1))
+
+        return string
+    shared['cerveau']['schema_type'] = cerveau_schema_type
+
+    def cerveau_value(type_obj, default):
+        base_type = type_obj['name']
+        if base_type == "string":
+            return '"' + default + '"'
+        elif base_type == "boolean":
+            return str(default).lower()
+        elif base_type == "int" or base_type == "float":
+            return str(default)
+        else:
+            return "undefined"
+    shared['cerveau']['value'] = cerveau_value
+
+    def cerveau_properties(obj):
+        attrs = dict(obj['attributes'], **obj['inheritedAttributes']) # merge the two attributes
+
+        properties = []
+        for attr_name in sort_dict_keys(attrs):
+            attr = attrs[attr_name]
+            properties.append({
+                'name': attr_name,
+                'type': cerveau_type(attr['type']),
+                'description': cerveai_description_format(attr["description"])
+            })
+        return properties
+    shared['cerveau']['properties'] = cerveau_properties
+
+    def cerveau_block_comment(prefix, doc):
+        wrapper = TextWrapper(
+            initial_indent=prefix+' * ',
+            subsequent_indent=prefix+' * ',
+            width=79,
+        )
+        if isinstance(doc, str):
+            doc = {'description': doc}
+
+        description = cerveai_description_format(doc['description'])
+        lines = wrapper.wrap(description)
+
+        if ('arguments' in doc and doc['arguments']) or 'returns' in doc and doc['returns']:
+            lines.append(prefix+' *')
+
+        if 'arguments' in doc and doc['arguments']:
+            for arg in doc['arguments']:
+                lines += wrapper.wrap('@param ' + arg['name'] + ' - ' + cerveai_description_format(arg['description']))
+        if 'returns' in doc and doc['returns']:
+            lines += wrapper.wrap('@returns ' + cerveai_description_format(doc['returns']['description']))
+
+        lines.insert(0, prefix+'/**')
+        lines.append(prefix+' */')
+        return '\n'.join(lines)
+    shared['cerveau']['block_comment'] = cerveau_block_comment
+
+    def cerveau_imports(imports):
+        pairs = sorted(imports.items(), key=operator.itemgetter(0))
+        index = -1
+        for i, item in enumerate(pairs):
+            if item[0][0] != '.':
+                index = i
+                break
+        if index > -1:
+            p = pairs[index:] + pairs[:index]
+            pairs = p
+
+        doc = ''
+        for pair in pairs:
+            names = sorted(pair[1])
+            one_line = ('import { '+(', '.join(names))+' } from "'+pair[0]+'";')
+
+            if len(one_line) <= 79:
+                doc += one_line
+            else:
+                # too long for one line, so it needs to be wrapped
+                initial_indent = 'import { '
+                import_from_line = '}$from$"' + pair[0] + '";'
+
+                wrapper = TextWrapper(
+                    initial_indent=initial_indent,
+                    subsequent_indent=(' ' * len(initial_indent)),
+                    width=79,
+                )
+
+                wrapped = wrapper.wrap(', '.join(names + [import_from_line]))
+                last_line = wrapped[-1].strip()
+                if last_line[0] == '}':
+                    # then import_from_line wrapped to the last line, so there
+                    # needs to be a dangling comma on the end
+                    wrapped[-1] = (' ' * len('import ')) + import_from_line
+                else:
+                    # remove the last comma
+                    comma_index = wrapped[-1].rfind(',')
+                    wrapped[-1] = wrapped[-1][:comma_index] + wrapped[-1][comma_index+1:]
+                doc += ('\n'.join(wrapped)).replace('$', ' ')
+            doc += '\n'
+        return doc
+    shared['cerveau']['imports'] = cerveau_imports
+
+    def cerveau_generate_imports(obj_key, obj, imports):
+        if imports == None:
+            imports = {}
+        used_types = []
+
+        def gen_used_types(type_obj):
+            deep_obj = False
+            for key in ['keyType', 'valueType']:
+                if type_obj[key]:
+                    gen_used_types(type_obj[key])
+                    deep_obj = True
+            if not deep_obj:
+                used_types.append(type_obj)
+
+        # AI does not have attributes at this time
+        if 'attributes' in obj:
+            for attr_name, attr_parms in obj['attributes'].items():
+                gen_used_types(attr_parms['type'])
+
+        # AI and all game objects share functions
+        for function_name, function_parms in obj['functions'].items():
+            for arg in function_parms['arguments']:
+                gen_used_types(arg['type'])
+            if function_parms['returns']:
+                gen_used_types(function_parms['returns']['type'])
+
+        for used_type in used_types:
+            if used_type['is_game_object']:
+                name = used_type['name']
+                key = './' + str(hyphenate(name))
+                if name != obj_key:
+                    if key in imports:
+                        if not name in imports[key]:
+                            imports[key].append(name)
+                        #else:
+                    else:
+                        imports[key] = [name]
+        return imports
+    shared['cerveau']['generate_imports'] = cerveau_generate_imports
+
+    def cerveau_formatted_function_top(function_name, obj, scope='protected', promise=True):
+        function_parms = dict(obj['functions'][function_name])
+        docstring = cerveau_block_comment('    ', function_parms)
+
+        returns = 'void'
+        if function_parms['returns']:
+            returns = shared['cerveau']['type'](function_parms['returns']['type'], nullable=True)
+
+        formatted_name = '    {} '.format(scope)+('async ' if promise else '')+function_name+'('
+        unformatted_args = (
+            [(a['name']+': '+shared['cerveau']['type'](a['type'], nullable=True)+(
+                (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
+            )) for a in function_parms['arguments']]
+        )
+
+        formatted_return = '): '+ ('Promise<{}>' if promise else '{}').format(returns) +' {'
+        formatted_args = ', '.join(unformatted_args)
+
+        formatted_function_signature = None
+        as_one_line = formatted_name + formatted_args + formatted_return
+        if len(as_one_line) < 79:
+            formatted_function_signature = as_one_line
+        else:
+            # it does not all fit on one line, so split up by arg
+            formatted_function_signature = "".join([
+                formatted_name,
+                '\n        ',
+                ',\n        '.join(unformatted_args),
+                ',\n    ',
+                formatted_return
+            ])
+
+
+        return docstring + "\n" + formatted_function_signature
+    shared['cerveau']['formatted_function_top'] = cerveau_formatted_function_top
+
+    def cerveau_wrap_string(string, length, pre_lines):
+        wrapped = wrap(string, length)
+        quote_wrapped = [ '{}"{}"'.format(
+            pre_lines if i > 0 else '',
+            (w + " ") if i < (len(wrapped) - 1) else w) for i, w in enumerate(wrapped) ]
+        return '\n'.join(quote_wrapped)
+    shared['cerveau']['wrap_string'] = cerveau_wrap_string
+%>

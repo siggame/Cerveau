@@ -1,0 +1,26 @@
+<section id="games" class="info-block">
+	<h2>Available Games on this Server</h2>
+	<section class="game-list">
+	{{#each games}}
+		{{#> collapsible title=this.name}}
+			<div class="game-description">{{this.description}}</div>
+			<h4 class="game-settings">Settings</h4>
+			<ul>
+			{{#each this.settings}}
+				<li>
+					<span class="game-setting-name">{{this.name}}</span><span class="game-setting-default">{{this.default}}</span><span class="game-setting-min">{{this.min}}</span><span class="game-setting-max">{{this.max}}</span>: <span class="game-setting-description">{{this.description}}</span>
+				</li>
+			{{/each}}
+			</ul>
+		{{/collapsible}}
+	{{/each}}
+	</section>
+</section>
+
+<section id="gamelogs" class="info-block">
+	<h2>Game Archives</h2>
+	{{> gamelogs}}
+	{{#if moreGamelogs}}
+		<a href="/archives/">More Gamelogs</a>
+	{{/if}}
+</section>
