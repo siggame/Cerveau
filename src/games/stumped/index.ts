@@ -881,7 +881,7 @@ export const Namespace = makeNamespace({
                     returns: {
                         typeName: "gameObject",
                         gameObjectClass: Beaver,
-                        nullable: false,
+                        nullable: true,
                     },
                 },
             },

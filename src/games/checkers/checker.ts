@@ -194,7 +194,7 @@ export class Checker extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): Promise<Checker> {
+    ): Promise<Checker | undefined> {
         // <<-- Creer-Merge: move -->>
 
         this.x = x;

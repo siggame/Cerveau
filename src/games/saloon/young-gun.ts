@@ -155,7 +155,7 @@ export class YoungGun extends GameObject {
     protected async callIn(
         player: Player,
         job: "Bartender" | "Brawler" | "Sharpshooter",
-    ): Promise<Cowboy> {
+    ): Promise<Cowboy | undefined> {
         // <<-- Creer-Merge: callIn -->>
 
         // clear the open tile before moving the young gun to it

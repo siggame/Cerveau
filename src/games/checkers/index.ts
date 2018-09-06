@@ -364,7 +364,7 @@ export const Namespace = makeNamespace({
                     returns: {
                         typeName: "gameObject",
                         gameObjectClass: Checker,
-                        nullable: false,
+                        nullable: true,
                     },
                 },
             },

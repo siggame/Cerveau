@@ -145,7 +145,10 @@ export class Job extends GameObject {
      * spawn the Beaver of this Job on.
      * @returns The recruited Beaver if successful, undefined otherwise.
      */
-    protected async recruit(player: Player, tile: Tile): Promise<Beaver> {
+    protected async recruit(
+        player: Player,
+        tile: Tile,
+    ): Promise<Beaver | undefined> {
         // <<-- Creer-Merge: recruit -->>
 
         // if they have more beavers
