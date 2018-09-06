@@ -248,20 +248,13 @@ export class BaseAIManager {
             // the calling game object try to invalidate the run
             let argsMap = (sanitizedArgs as Map<string, unknown>);
 
+            const invalidateName = `invalidate${capitalizeFirstLetter(functionName)}`;
             //  ↙ We are getting this function via reflection, no easier way to do this.
             // tslint:disable-next-line:no-any no-unsafe-any
-            const invalidateFunction = (gameObject as any)[`invalidate${capitalizeFirstLetter(functionName)}`].call as (
-                gameObject: BaseGameObject,
-                player: IBasePlayer,
-                ...args: Array<unknown>
-            ) => string | UnknownObject | undefined;
-
-            // tslint:disable-next-line:no-unsafe-any
-            const validated = invalidateFunction(
-                gameObject,
+            const validated = (gameObject as any)[invalidateName](
                 this.client.player,
                 ...argsMap.values(),
-            );
+            ) as void | string | UnknownObject;
 
             invalid = typeof validated === "string"
                 ? validated
@@ -300,7 +293,10 @@ ${JSON.stringify(mapToObject(argsMap))}
             else {
                 // It's valid!
                 // tslint:disable-next-line:no-any no-unsafe-any
-                const unsanitizedReturned = await (gameObject as any)[functionName](...argsMap.values()) as unknown;
+                const unsanitizedReturned = await (gameObject as any)[functionName](
+                    this.client.player,
+                    ...argsMap.values(),
+                ) as unknown;
                 returned = this.gameSanitizer.validateRanReturned(gameObject, functionName, unsanitizedReturned);
             }
         }
