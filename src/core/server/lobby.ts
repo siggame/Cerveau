@@ -329,7 +329,9 @@ There's probably another Cerveau server running on this same computer.`);
             }
             catch (err) {
                 const errorGameName = capitalizeFirstLetter(dir);
-                logger.error(`⚠️ Could not load game ${errorGameName} ⚠️`);
+                logger.error(`⚠️ Could not load game ${errorGameName} ⚠️
+---
+${err}`);
 
                 return process.exit(1); // kills the entire game server
             }
@@ -358,14 +360,14 @@ There's probably another Cerveau server running on this same computer.`);
      *
      * @param gameName - The key identifying the name of the game you want.
      * Should exist in games/
-     * @param id - Basically a room id. Specifying an id can be used
+     * @param requestedId - Basically a room id. Specifying an id can be used
      * to join other players on purpose. "*" will join you to any open session
      * or a new one, and "new" will always give you a brand new room even if
      * there are open ones.
      * @returns The Room of gameName and id. If one does not exists a new
      * instance will be created
      */
-    private getOrCreateRoom(gameName: string, id: string): Room |string {
+    private getOrCreateRoom(gameName: string, requestedId: string = "*"): Room |string {
         const rooms = this.rooms.get(gameName);
 
         if (!rooms) {
@@ -373,10 +375,10 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         let room: Room | undefined;
-        let roomId = id;
+        let id = requestedId;
 
-        if (roomId !== "new") {
-            if (roomId === "*" || roomId === undefined) {
+        if (id !== "new") {
+            if (id === "*" || id === undefined) {
                 // Then they want to join any open game,
                 // so try to find an open session.
                 for (const [, theRoom] of rooms) {
@@ -390,25 +392,25 @@ There's probably another Cerveau server running on this same computer.`);
                 if (!room) {
                     // Then there was no open room to join,
                     // so they get a new room.
-                    roomId = "new";
+                    id = "new";
                 }
             }
             else {
                 // They requested to join a specific room.
                 // An Error cannot be returned as gameName is checked above
-                room = this.getRoom(gameName, roomId) as Room | undefined;
+                room = this.getRoom(gameName, id) as Room | undefined;
             }
         }
 
         if (room) {
             if (room.isRunning()) {
                 // We can't put them in this game, so they get a new room.
-                return `Room ${roomId} for game ${gameName} is full! Sorry.`;
+                return `Room ${id} for game ${gameName} is full! Sorry.`;
             }
             else if (room.isOver()) {
                 // We need to clear out this Room as it's over and available
                 // to re-use.
-                this.rooms.delete(roomId);
+                this.rooms.delete(id);
                 room = undefined;
             }
         }
@@ -417,7 +419,7 @@ There's probably another Cerveau server running on this same computer.`);
             // Then we couldn't find a room from the requested gameName + id,
             // so they get a new one.
             if (!id || id === "new") {
-                roomId = String(this.nextRoomNumber++);
+                id = String(this.nextRoomNumber++);
             }
 
             const namespace = this.getGameNamespace(gameName);
@@ -426,13 +428,13 @@ There's probably another Cerveau server running on this same computer.`);
             }
 
             room = new RoomClass(
-                roomId,
+                id,
                 namespace,
                 this.gamelogManager,
                 this.updater,
             );
 
-            rooms.set(roomId, room);
+            rooms.set(id, room);
         }
 
         return room;
