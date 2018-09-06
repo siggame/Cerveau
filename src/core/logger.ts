@@ -1,4 +1,5 @@
-import winston from "winston";
+import { join } from "path";
+import * as winston from "winston";
 import { Config } from "~/core/config";
 import { momentString } from "~/utils";
 
@@ -41,7 +42,7 @@ const transports: TransportInstance[] = [
 if (Config.LOG_TO_FILES) {
     transports.push(
         new winston.transports.File({
-            dirname: Config.LOGS_DIR,
+            dirname: join(Config.LOGS_DIR, "console"),
             filename: `${momentString()}.log`,
         }),
     );

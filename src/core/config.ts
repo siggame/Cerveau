@@ -118,7 +118,7 @@ const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
     [["--log"], {action: "storeTrue", dest: "LOG_TO_FILES",
         help: "store all logged strings to text files in LOGS_DIR/console/"}],
 
-    [["--logs-dir"], {action: "store", dest: "LOGS_DIR", defaultValue: "logs/console/",
+    [["--logs-dir"], {action: "store", dest: "LOGS_DIR", defaultValue: "logs/",
         help: "The directory to store generated logs (e.g. gamelogs) in."}],
 
     [["--silent"], {action: "storeTrue", dest: "SILENT",
