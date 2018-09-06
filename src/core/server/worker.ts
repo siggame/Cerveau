@@ -2,8 +2,8 @@
 // thread that spins up a game session into an Instance using true
 // multi-threading
 
-// tslint:disable-next-line:no-import-side-effect
-import "../setup-thread";
+import { setupThread } from "../setup-thread";
+setupThread(); // we have to do this before doing aliased imports below
 
 // this also loads the command line arguments from process.env
 import { isMaster } from "cluster";

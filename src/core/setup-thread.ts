@@ -6,20 +6,30 @@ import { readFileSync } from "fs";
 import { parse } from "json5";
 import { register } from "tsconfig-paths";
 
-const tsconfig = parse(readFileSync("tsconfig.json").toString()) as {
-    compilerOptions: {
-        paths: {
-            [key: string]: string[];
+/**
+ * Sets up a thread and registers runtime TypeScript functions to easier
+ * debugging.
+ */
+export function setupThread(): void {
+    const tsconfig = parse(readFileSync("tsconfig.json").toString()) as {
+        compilerOptions: {
+            paths: {
+                [key: string]: string[];
+            };
         };
     };
-};
 
-register({
-    baseUrl: "./",
-    paths: tsconfig.compilerOptions.paths,
-});
+    register({
+        baseUrl: "./",
+        paths: tsconfig.compilerOptions.paths,
+    });
+}
 
-// if we got here the node modules should be good to go
-// import "module-alias/register";
-import { Config } from "./config";
-process.title = `${Config.MAIN_TITLE} Game Server`;
+/**
+ * Setups up the current thread with data from a loaded config file.
+ *
+ * @param processTitle - the title to set this thread to (for *Unix)
+ */
+export function setupThreadWithConfig(processTitle: string): void {
+    process.title = processTitle || "Cerveau Game Server";
+}
