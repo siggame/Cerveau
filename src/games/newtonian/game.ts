@@ -3,6 +3,7 @@ import { BaseClasses } from "./";
 import { NewtonianGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { NewtonianGameSettingsManager } from "./game-settings";
+import { Job } from "./job";
 import { Machine } from "./machine";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -49,6 +50,11 @@ export class NewtonianGame extends BaseClasses.Game {
      * How many interns a player can have.
      */
     public readonly internCap!: number;
+
+    /**
+     * Every job in the game.
+     */
+    public jobs!: Job[];
 
     /**
      * Every Machine in the game.

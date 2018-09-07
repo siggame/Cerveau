@@ -37,7 +37,7 @@ export class Unit extends GameObject {
     /**
      * The Job this Unit does.
      */
-    public readonly job!: Job;
+    public readonly job: Job;
 
     /**
      * How many more times this Unit may move this turn.
@@ -266,57 +266,12 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
-		
-		// makes sure the player is the owner of the unit.
-		if(!player || this.owner !== player) {
-			return `${this} is not your unit ${player}.`;
-		}
-		// Make it is that players turn.
-		if(player !== this.game.currentPlayer) {
-			return `It is not your turn ${player}!`;
-		}
-		// make sure the unit is on the planet.... wait...
-		if(!tile) {
-			return `${this}, gratz. You proved flat earthers correct.`;
-		}
-		// Make sure the unit is alive.
-		if(this.health <= 0) {
-			return `${this} is fuel.`;
-		}
-		// make sure the unit can function
-		if(this.stunTime > 0) {
-			return `${this} is stunned and cannot move.`;
-		}
-		// Make sure there isn't a wall there. Ouch.
-		if(tile.isWall) {
-			return `${this} cannot walk through solid matter. Yet....`;
-		}
-		// Make sure the unit still has moves
-		if(this.moves <= 0) {
-			return `${this} cannot move anymore this turn`;
-		}
-		// Make sure there isn't a machine there.
-		if(tile.machine) {
-			return `${this} cannot walk over machines. They are expensive`;
-		}
-		// Make sure the unit hasn't acted.
-		if(this.acted) {
-			return `${this} has already acted this turn. Or not enough coffee`;
-		}
-		// Make sure the tile isn't ocuppied.
-		if(tile.unit) {
-			return `${this} cannot walk through units. Yet.....`;
-		}
-		// make sure the tile is next to the unit
-		if(this.tile !== tile.tileEast && this.tile !== tile.tileSouth && this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-			return `${this} can only travel to an adjacent tile.`;
-		}
 
         // Check all the arguments for move here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-        return;
+
         // <<-- /Creer-Merge: invalidate-move -->>
     }
 
@@ -331,11 +286,9 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: move -->>
 
         // Add logic here for move.
-		tile.unit = undefined;
-		this.tile = tile;
-		tile.unit = this;
-		
-        return true;
+
+        // TODO: replace this with actual logic
+        return false;
 
         // <<-- /Creer-Merge: move -->>
     }

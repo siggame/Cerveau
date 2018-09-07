@@ -610,6 +610,14 @@ export const Namespace = makeNamespace({
                 internCap: {
                     typeName: "int",
                 },
+                jobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Job,
+                        nullable: false,
+                    },
+                },
                 machines: {
                     typeName: "list",
                     valueType: {
