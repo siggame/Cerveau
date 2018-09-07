@@ -57,6 +57,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
+        // code spawning below this:
+        //
+        // code the generator below this:
+        //
         // <<-- /Creer-Merge: after-turn -->>
     }
 
