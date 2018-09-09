@@ -107,21 +107,10 @@ export interface IJobProperties {
 /** All the possible properties for an Machine. */
 export interface IMachineProperties {
     /**
-     * The amount of ore that is in the machine. Cannot be higher than the
-     * refineInput value.
-     */
-    input?: number;
-
-    /**
      * What type of ore the machine takes it, also determins the type of
      * material it outputs.
      */
     oreType?: "redium" | "blueium";
-
-    /**
-     * The amount of material that is waiting to be collected in the machine.
-     */
-    output?: number;
 
     /**
      * The amount of ore that needs to be inputted into the machine.
@@ -743,16 +732,10 @@ export const Namespace = makeNamespace({
         Machine: {
             parentClassName: "GameObject",
             attributes: {
-                input: {
-                    typeName: "int",
-                },
                 oreType: {
                     typeName: "string",
                     defaultValue: "redium",
                     literals: ["redium", "blueium"],
-                },
-                output: {
-                    typeName: "int",
                 },
                 refineInput: {
                     typeName: "int",

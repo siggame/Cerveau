@@ -30,7 +30,7 @@ export class Unit extends GameObject {
     public blueiumOre!: number;
 
     /**
-     * The remaining health of a unit.
+     * If a ship is on this Tile, how much health it has remaining.
      */
     public health!: number;
 

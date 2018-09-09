@@ -18,21 +18,10 @@ export type MachineOreType = "redium" | "blueium";
  */
 export class Machine extends GameObject {
     /**
-     * The amount of ore that is in the machine. Cannot be higher than the
-     * refineInput value.
-     */
-    public input!: number;
-
-    /**
      * What type of ore the machine takes it, also determins the type of
      * material it outputs.
      */
     public readonly oreType!: "redium" | "blueium";
-
-    /**
-     * The amount of material that is waiting to be collected in the machine.
-     */
-    public output!: number;
 
     /**
      * The amount of ore that needs to be inputted into the machine.

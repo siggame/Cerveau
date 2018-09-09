@@ -23,38 +23,38 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "Determins the rate at which the highest value "
                        + "victory points degrade.",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 0,
+            default: 2,
             // <<-- /Creer-Merge: degradeRate -->>
         },
         internCap: {
             description: "How many interns a player can have.",
             // <<-- Creer-Merge: internCap -->>
-            default: 0,
+            default: 3,
             // <<-- /Creer-Merge: internCap -->>
         },
         managerCap: {
             description: "How many managers a player can have.",
             // <<-- Creer-Merge: managerCap -->>
-            default: 0,
+            default: 3,
             // <<-- /Creer-Merge: managerCap -->>
         },
         physicistCap: {
             description: "How many physicists a player can have.",
             // <<-- Creer-Merge: physicistCap -->>
-            default: 0,
+            default: 3,
             // <<-- /Creer-Merge: physicistCap -->>
         },
         refinedValue: {
             description: "How much each refined ore adds when put in the "
                        + "generator.",
             // <<-- Creer-Merge: refinedValue -->>
-            default: 0,
+            default: 5,
             // <<-- /Creer-Merge: refinedValue -->>
         },
         spawnTime: {
             description: "The number of turns between spawning unit waves.",
             // <<-- Creer-Merge: spawnTime -->>
-            default: 0,
+            default: 5,
             // <<-- /Creer-Merge: spawnTime -->>
         },
         // <<-- Creer-Merge: schema -->>
