@@ -47,7 +47,7 @@ export class Machine extends GameObject {
     /**
      * The amount of turns this machine takes to refine the ore.
      */
-    public refineTime!: number;
+    public readonly refineTime!: number;
 
     /**
      * The Tile this Machine is on.
@@ -81,6 +81,7 @@ export class Machine extends GameObject {
     constructor(
         args: IMachineProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            tile: Tile;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         },
@@ -89,6 +90,7 @@ export class Machine extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.tile = args.tile;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }

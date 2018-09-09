@@ -427,6 +427,10 @@ export interface IUnitAttackArgs {
  */
 export interface IUnitDropArgs {
     /**
+     * The tile the materials will be dropped on.
+     */
+    tile?: Tile;
+    /**
      * The amount of materials to dropped. Amounts <= 0 will drop all the
      * materials on the Unit.
      */
@@ -455,6 +459,10 @@ export interface IUnitMoveArgs {
  * used in the actual function.
  */
 export interface IUnitPickupArgs {
+    /**
+     * The tile the materials will be dropped on.
+     */
+    tile?: Tile;
     /**
      * The amount of materials to pick up. Amounts <= 0 will pick up all the
      * materials on the Unit.
@@ -988,6 +996,12 @@ export const Namespace = makeNamespace({
                 drop: {
                     args: [
                         {
+                            argName: "tile",
+                            typeName: "gameObject",
+                            gameObjectClass: Tile,
+                            nullable: false,
+                        },
+                        {
                             argName: "amount",
                             typeName: "int",
                         },
@@ -1019,6 +1033,12 @@ export const Namespace = makeNamespace({
                 },
                 pickup: {
                     args: [
+                        {
+                            argName: "tile",
+                            typeName: "gameObject",
+                            gameObjectClass: Tile,
+                            nullable: false,
+                        },
                         {
                             argName: "amount",
                             typeName: "int",

@@ -144,6 +144,9 @@ export class NewtonianGame extends BaseClasses.Game {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.jobs.push(this.manager.create.job({carryLimit: 4, damage: 4, health: 12, moves: 3, title: "intern"}));
+        this.jobs.push(this.manager.create.job({carryLimit: 1, damage: 4, health: 12, moves: 3, title: "physicists"}));
+        this.jobs.push(this.manager.create.job({carryLimit: 0, damage: 4, health: 16, moves: 3, title: "manager"}));
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -169,7 +172,25 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
+    /**
+     * Gets the tile at (x, y), or throws a error if it is undefined.
+     *
+     * @param x - The x position of the desired tile.
+     * @param y - The y position of the desired tile.
+     * @returns The Tile at (x, y). If it doesn't throw a error.
+     */
+    public getTileUnsafe(x: number, y: number): Tile {
+        // grabs the tile
+        const tile = super.getTile(x, y) as Tile | undefined;
 
+        // throws a error if it doesn't exist.
+        if (tile === undefined) {
+            throw new Error(`Tile at (${x},${y}) doesn't exist!`);
+        }
+
+        // returns the tile.
+        return tile;
+    }
     // Any additional protected or pirate methods can go here.
 
     // <<-- /Creer-Merge: protected-private-functions -->>
