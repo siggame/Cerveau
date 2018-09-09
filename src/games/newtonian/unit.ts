@@ -285,21 +285,21 @@ export class Unit extends GameObject {
         {
             return `${this} resisted your attempts at mind control, ${player}!`;
         }
-        if(material == "redium" && (this.redium -= amount) < 0)
+        if(material === "redium" && this.redium < amount)
         {
-            return `${this} doesn't have enough redium! Maybe try harder?`;
+            amount = this.redium;
         }
-        if(material == "redium ore" && (this.rediumOre -= amount) < 0)
+        if(material === "redium ore" && this.rediumOre < amount)
         {
-            return `${this} doesn't have enough redium ore! That's your fault.`;
+            amount = this.rediumOre;
         }
-        if(material == "blueium" && (this.blueium -= amount) < 0)
-        {
-            return `Not enough blueium! ${this} deserves more. Get it.`;
+        if(material === "blueium" && this.blueium < amount)
+        { 
+            amount = this.blueium;
         }
-        if(material == "blueium ore" && (this.blueiumOre) < 0)
+        if(material === "blueium ore" && this.blueiumOre < amount)
         {
-            return `${this} doesn't have enough blueium ore! Punish him!`;
+            amount = this.blueiumOre;
         }
         if(tile.isWall)
         {
@@ -357,25 +357,25 @@ export class Unit extends GameObject {
             this.blueium = this.redium = this.blueiumOre = this. rediumOre = 0;
         }
         // Drops certain amount of redium ore.
-        else if (material == "redium ore")
+        else if (material === "redium ore")
         {
             tile.rediumOre += amount;
             this.rediumOre -= amount;
         }
         // Drops certain amount of redium.
-        else if (material == "redium")
+        else if (material === "redium")
         {
             tile.redium += amount;
             this.redium -= amount; 
         }
         // Drops certain amount of blueium.
-        else if (material == "blueium")
+        else if (material === "blueium")
         {
             tile.blueium += amount;
             this.blueium -= amount;
         }
         // Drops certain amount of blueium ore.
-        else if (material == "blueium ore")
+        else if (material === "blueium ore")
         {
             tile.blueiumOre += amount;
             this.blueiumOre -= amount;
