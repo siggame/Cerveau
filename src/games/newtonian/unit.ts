@@ -281,11 +281,51 @@ export class Unit extends GameObject {
     ): void | string | IUnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
-        // Check all the arguments for drop here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
+        if(!player || this.owner != player)
+        {
+            return `${this} resisted your attempts at mind control, ${player}!`;
+        }
+        if(material == "redium" && (this.redium -= amount) < 0)
+        {
+            return `${this} doesn't have enough redium! Maybe try harder?`;
+        }
+        if(material == "redium ore" && (this.rediumOre -= amount) < 0)
+        {
+            return `${this} doesn't have enough redium ore! That's your fault.`;
+        }
+        if(material == "blueium" && (this.blueium -= amount) < 0)
+        {
+            return `Not enough blueium! ${this} deserves more. Get it.`;
+        }
+        if(material == "blueium ore" && (this.blueiumOre) < 0)
+        {
+            return `${this} doesn't have enough blueium ore! Punish him!`;
+        }
+        if(tile.isWall)
+        {
+            return `${this} can't place stuff on a wall. That just don't work, my friend.`;
+        }
+        if(!tile)
+        {
+            return `${this} is trippin'. Ain't nothin' there, dawg.`;
+        }
+        if (this.acted) {
+            return `${this} has already acted. You should pay more.`;
+        }
+        if (this.stunTime > 0) {
+            return `${this} is stunned. They are too busy doing nothing`;
+        }
+        if (this.health <= 0) {
+            return `${this} is dead. Too bad about the wife and kids...`;
+        }
+        if (player !== this.game.currentPlayer) {
+            return `Wait your turn, ${player}!`;
+        }
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth && this.tile
+            !== tile.tileWest && this.tile !== tile.tileNorth) {
+             return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
+        }
+        return;
         // <<-- /Creer-Merge: invalidate-drop -->>
     }
 
@@ -307,10 +347,40 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
-        // Add logic here for drop.
-
-        // TODO: replace this with actual logic
-        return false;
+        // If amount <= 0, the unit will drop all resources.
+        if(amount <= 0) 
+        {
+            tile.blueium += this.blueium;
+            tile.blueiumOre += this.blueiumOre;
+            tile.redium += this.redium;
+            tile.rediumOre += this.rediumOre;
+            this.blueium = this.redium = this.blueiumOre = this. rediumOre = 0;
+        }
+        // Drops certain amount of redium ore.
+        else if (material == "redium ore")
+        {
+            tile.rediumOre += amount;
+            this.rediumOre -= amount;
+        }
+        // Drops certain amount of redium.
+        else if (material == "redium")
+        {
+            tile.redium += amount;
+            this.redium -= amount; 
+        }
+        // Drops certain amount of blueium.
+        else if (material == "blueium")
+        {
+            tile.blueium += amount;
+            this.blueium -= amount;
+        }
+        // Drops certain amount of blueium ore.
+        else if (material == "blueium ore")
+        {
+            tile.blueiumOre += amount;
+            this.blueiumOre -= amount;
+        }
+        return true;
 
         // <<-- /Creer-Merge: drop -->>
     }
