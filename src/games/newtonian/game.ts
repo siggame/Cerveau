@@ -12,11 +12,13 @@ import { Unit } from "./unit";
 // <<-- Creer-Merge: imports -->>
 import { IPoint, MutableRequired } from "~/utils";
 
-// struct used to track mapgen.
+/** interface used to create rooms.s */
 interface IRoom {
+    // room locations to be stored.
     x1: number; y1: number;
     x2: number; y2: number;
-    x3: number; y3: number;// x3 is there, but not supported for now TODO: add support for x3
+    x3: number; y3: number; // x3 is there, but not supported for now TODO: add support for x3
+    // tracks doors and walls.
     WNorth: boolean; WEast: boolean; WSouth: boolean; WWest: boolean;
     DNorth: boolean; DEast: boolean; DSouth: boolean; DWest: boolean;
 }
@@ -118,6 +120,11 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly spawnTime!: number;
 
     /**
+     * How many turns a unit is stunned.
+     */
+    public readonly stunTime!: number;
+
+    /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
      * mapWidth` to access the correct index.
      */
@@ -128,6 +135,11 @@ export class NewtonianGame extends BaseClasses.Game {
      * turn.
      */
     public readonly timeAddedPerTurn!: number;
+
+    /**
+     * How many turns a unit is immune to being stunned.
+     */
+    public readonly timeImmune!: number;
 
     /**
      * Every Unit in the game.
@@ -162,7 +174,7 @@ export class NewtonianGame extends BaseClasses.Game {
         // <<-- /Creer-Merge: constructor -->>
     }
 
-    // <<-- Creer-Merge: public-functions -->
+    // <<-- Creer-Merge: public-functions -->>
 
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
@@ -325,7 +337,7 @@ export class NewtonianGame extends BaseClasses.Game {
         let shiftDir = this.manager.random.int(2, 0);
         shiftDir = 0; // TODO: delete this, this is test code
         /** Determines the ship of the middle room */
-        if(shiftDir === 1) {
+        if (shiftDir === 1) {
             shift = -shift;
         }
         /** Determines machines shift */
@@ -543,11 +555,11 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
                 getMutableTile(Math.floor(this.mapWidth / 2), mid - midSize + shift).isWall = true;
                 // determines the number of rooms on the x axis
-                const a = Math.floor(((this.mapWidth-1)/2 - MMstart)/3); // MUST be a whole number, or things break.
+                const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
                 // determines the number of rooms on the y axis
                 let b = Math.floor((mid - midSize + shift) / 3);
                 // counts the extra y tiles.
-                const extra = (mid - midSize + shift)%3;
+                const extra = (mid - midSize + shift) % 3;
                 // map used for mapgen.
                 const map: IRoom[][] = [];
                 for (let i = 0; i < a; i++) {
@@ -560,8 +572,11 @@ export class NewtonianGame extends BaseClasses.Game {
                 if (extra === 2) {
                     for (let i = 0; i < a; i++) {
                         room = this.makeRoom(
-                            MMstart + 1 + (i * 3), MMstart + 2 + (i * 3),
-                            yStart, yStart + 1, yStart + 2,
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yStart,
+                            yStart + 1,
+                            yStart + 2,
                         );
                         map[i][0] = room;
                         // getMutableTile(9+i, 2).isWall = true
@@ -570,8 +585,11 @@ export class NewtonianGame extends BaseClasses.Game {
                     yStart += 1;
                     for (let i = 0; i < a; i++) {
                         room = this.makeRoom(
-                            MMstart + 1 + (i * 3), MMstart + 2 + (i * 3), 
-                            yEnd - 2, yEnd - 1 , yEnd
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yEnd - 2,
+                            yEnd - 1 ,
+                            yEnd,
                         );
                         map[i][b - 1] = room;
                         // getMutableTile(9+i, 1+b).isWall = true
@@ -583,8 +601,11 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (shiftDir === 1) {
                         for (let i = 0; i < a; i++) {
                             room = this.makeRoom(
-                                MMstart + 1 + (i * 3), MMstart 
-                                + 2 + (i * 3), yStart, yStart + 1, yStart + 2
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yStart,
+                                yStart + 1,
+                                yStart + 2,
                             );
                             map[i][0] = room;
                             // getMutableTile(9+i, 2).isWall = true
@@ -595,8 +616,11 @@ export class NewtonianGame extends BaseClasses.Game {
                     else {
                         for (let i = 0; i < a; i++) {
                             room = this.makeRoom(
-                                MMstart + 1 + (i * 3), MMstart + 2 +
-                                (i * 3), yEnd - 2, yEnd - 1 , yEnd
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yEnd - 2,
+                                yEnd - 1,
+                                yEnd,
                             );
                             map[i][b - 1] = room;
                             // getMutableTile(9+i, 1+b).isWall = true
@@ -607,8 +631,10 @@ export class NewtonianGame extends BaseClasses.Game {
                 for (let x = 0; x < a; x++) {
                     for (let y = start; y < b; y++) {
                         room = this.makeRoom(
-                            MMstart + 1 + (x * 3), MMstart + 2 +
-                            (x * 3), yStart + (y * 3), yStart + 1 + (y * 3)
+                            MMstart + 1 + (x * 3),
+                            MMstart + 2 + (x * 3),
+                            yStart + (y * 3),
+                            yStart + 1 + (y * 3),
                         );
                         map[x][y] = room;
                         // getMutableTile(9+x, 2+y).isWall = true
@@ -616,21 +642,21 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
                 // add doors into the center room
                 shiftDir = this.manager.random.int(map.length, 0);
-                for(let x = 0; x < map.length; x++) {
+                for (let x = 0; x < map.length; x++) {
                     if (shiftDir !== x) {
                         map[x][map[0].length - 1].DSouth = true;
                     }
                 }
                 // add doors into the other side of the middle area
                 shiftDir = this.manager.random.int(map[0].length, 0);
-                for(let y = 0; y < map.length; y++) {
+                for (let y = 0; y < map.length; y++) {
                     if (shiftDir !== y) {
                         map[map.length - 1][y].DSouth = true;
                     }
                 }
                 // add doors into the side room area.
                 shiftDir = this.manager.random.int(map[0].length, 0);
-                for(let y = 0; y < map.length; y++) {
+                for (let y = 0; y < map.length; y++) {
                     if (shiftDir !== y) {
                         map[0][y].DSouth = true;
                     }
@@ -1091,7 +1117,7 @@ export class NewtonianGame extends BaseClasses.Game {
         connect = map.length * map[0].length / 2;
         connect = Math.floor(connect * 1.5);
         // resetting unconnected to make sure it is empty.
-        unconnected.length = 0;;
+        unconnected.length = 0;
         // tracking connected rooms.
         const connected: IPoint[] = [];
         // grabs a random rooms
@@ -1115,7 +1141,7 @@ export class NewtonianGame extends BaseClasses.Game {
             if (unconnected.length > 0 && false) { // TODO: remove && false to test this code
                 done = false;
                 // grabs a unconnected room.
-                let index = this.manager.random.int(unconnected.length, 0);
+                const index = this.manager.random.int(unconnected.length, 0);
                 // tracks it's value.
                 find = unconnected[index];
                 // picks a random direction.

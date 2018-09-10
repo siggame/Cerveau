@@ -57,6 +57,18 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             default: 5,
             // <<-- /Creer-Merge: spawnTime -->>
         },
+        stunTime: {
+            description: "How many turns a unit is stunned.",
+            // <<-- Creer-Merge: stunTime -->>
+            default: 2,
+            // <<-- /Creer-Merge: stunTime -->>
+        },
+        timeImmune: {
+            description: "How many turns a unit is immune to being stunned.",
+            // <<-- Creer-Merge: timeImmune -->>
+            default: 4,
+            // <<-- /Creer-Merge: timeImmune -->>
+        },
         // <<-- Creer-Merge: schema -->>
 
         // you can add more settings here, e.g.:

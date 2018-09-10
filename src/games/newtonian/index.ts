@@ -153,11 +153,6 @@ export interface IPlayerProperties {
     clientType?: string;
 
     /**
-     * Every generator tile owned by this Player.
-     */
-    generatorTiles?: Tile[];
-
-    /**
      * The amount of heat this Player has.
      */
     heat?: number;
@@ -339,7 +334,7 @@ export interface IUnitProperties {
     blueiumOre?: number;
 
     /**
-     * If a ship is on this Tile, how much health it has remaining.
+     * The remaining health of a unit.
      */
     health?: number;
 
@@ -655,6 +650,9 @@ export const Namespace = makeNamespace({
                 spawnTime: {
                     typeName: "int",
                 },
+                stunTime: {
+                    typeName: "int",
+                },
                 tiles: {
                     typeName: "list",
                     valueType: {
@@ -664,6 +662,9 @@ export const Namespace = makeNamespace({
                     },
                 },
                 timeAddedPerTurn: {
+                    typeName: "int",
+                },
+                timeImmune: {
                     typeName: "int",
                 },
                 units: {
@@ -766,14 +767,6 @@ export const Namespace = makeNamespace({
             attributes: {
                 clientType: {
                     typeName: "string",
-                },
-                generatorTiles: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Tile,
-                        nullable: false,
-                    },
                 },
                 heat: {
                     typeName: "int",

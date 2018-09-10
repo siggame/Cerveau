@@ -2,7 +2,6 @@ import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBaseNewtonianPlayer } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
-import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
@@ -21,11 +20,6 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
      * language. For potential data mining purposes.
      */
     public readonly clientType!: string;
-
-    /**
-     * Every generator tile owned by this Player.
-     */
-    public generatorTiles!: Tile[];
 
     /**
      * The amount of heat this Player has.
