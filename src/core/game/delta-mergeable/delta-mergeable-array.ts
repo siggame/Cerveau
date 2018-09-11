@@ -13,24 +13,29 @@ class DeltaArray<T> extends Array<T> {
     /**
      * Inserts new elements at the start of an array.
      *
-     * NOTE: This is overriden because the Node.js implimentation clears
+     * NOTE: This is overrides because the Node.js implementation clears
      * out the array while unshifting. However our arrays can never have
      * undefined set (which they are temporarily here), so it produces errors.
      *
-     * This implimentation below is less efficent, however it ensures an index
+     * This implementation below is less efficient, however it ensures an index
      * is never undefined, to maintain type safety at all times.
      * @param items  Elements to insert at the start of the Array.
      * @returns The new length of the array.
      */
     public unshift(...items: T[]): number {
         const newThis = [...items, ...this];
-        const length = newThis.length;
+        const newLength = newThis.length;
 
-        for (let i = 0; i < length; i++) {
-            this[i] = newThis[i];
+        for (let i = 0; i < newLength; i++) {
+            if (i < this.length) {
+                this[i] = newThis[i];
+            }
+            else {
+                this.push(newThis[i]);
+            }
         }
 
-        return length;
+        return newLength;
     }
 }
 
@@ -103,7 +108,7 @@ export function createArray<T = any>(args: {
                 }
             }
             else { // newLength < oldLength
-                for (let i = newLength; i >= oldLength; i--) {
+                for (let i = newLength; i < oldLength; i++) {
                     values[i].delete();
                 }
             }
