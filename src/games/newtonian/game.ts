@@ -327,7 +327,7 @@ export class NewtonianGame extends BaseClasses.Game {
         // Determine the rooms offset
         // 0-7, 6 mean y = 0, 7 means y = maxHeight
         // let shift = this.manager.random.int(Math.floor(this.mapHeight / 2) - midSize);
-        let shift = this.mapHeight / 2 - midSize - 5; // TODO: delete after testing
+        let shift = Math.floor(this.mapHeight / 2) - midSize - 5; // TODO: delete after testing
         // Edge case handling to make sure walls don't touch.
         if (shift === Math.floor(this.mapHeight / 2) - midSize - 1) {
             shift += 1;
@@ -649,14 +649,14 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
                 // add doors into the other side of the middle area
                 shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map.length; y++) {
+                for (let y = 0; y < map[0].length; y++) {
                     if (shiftDir !== y) {
                         map[map.length - 1][y].DSouth = true;
                     }
                 }
                 // add doors into the side room area.
                 shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map.length; y++) {
+                for (let y = 0; y < map[0].length; y++) {
                     if (shiftDir !== y) {
                         map[0][y].DSouth = true;
                     }
