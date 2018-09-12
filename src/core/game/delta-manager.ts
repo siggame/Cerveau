@@ -1,5 +1,5 @@
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGameObject } from "~/core/game";
+import { BaseGame, BaseGameObject } from "~/core/game";
 import { IDeltaData } from "~/core/game/gamelog";
 import { isObject, objectHasProperty, UnknownObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
@@ -51,11 +51,16 @@ export class DeltaManager {
         changed: DeltaMergeable,
         wasDeleted: boolean = false,
     ): void {
-        let pathDeltaMergeable = changed;
+        let changedValue = changed.get();
+        if (changedValue instanceof BaseGame) {
+            return; // we only care about the game's children, not itself
+        }
+
+        let pathDeltaMergeable: DeltaMergeable | undefined = changed;
         const path = [] as DeltaMergeable[];
-        while (pathDeltaMergeable.getParent() !== this.rootDeltaMergeable) {
+        while (pathDeltaMergeable && pathDeltaMergeable.getParent() !== this.rootDeltaMergeable) {
             path.unshift(pathDeltaMergeable);
-            pathDeltaMergeable = pathDeltaMergeable.getParent() as DeltaMergeable;
+            pathDeltaMergeable = pathDeltaMergeable.getParent();
         }
 
         let current = this.delta;
@@ -80,7 +85,6 @@ export class DeltaManager {
         }
 
         // current should now be at the end of the path
-        let changedValue = changed.get();
         if (changedValue === undefined && !wasDeleted) {
             // Do not use `undefined` in this case.
             // When JSON serializing, keys with the value `undefined` will be
@@ -91,6 +95,8 @@ export class DeltaManager {
         }
 
         if (wasDeleted) {
+            // Change the value to the special constant to tell clients
+            // to delete this key from the object.
             changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
         }
         // tslint:disable-next-line:no-unsafe-any
@@ -98,15 +104,13 @@ export class DeltaManager {
             const originalValue = changedValue;
             changedValue = {};
             if (originalValue instanceof BaseGameObject
-             && !(path.length === 2 && path[0].key === "gameObjects")
+                && !(path.length === 2 && path[0].key === "gameObjects")
             ) {
                 // Then it should be a game object reference.
                 (changedValue as UnknownObject).id = originalValue.id;
             }
             else if (Array.isArray(originalValue)) {
-                (changedValue as UnknownObject)[
-                    SHARED_CONSTANTS.DELTA_LIST_LENGTH
-                ] = (changedValue as []).length;
+                (changedValue as UnknownObject)[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = originalValue.length;
             }
         }
         // else changed value is a primitive and is safe to copy

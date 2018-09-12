@@ -4,7 +4,7 @@ import { MathUtils } from "./";
 export type ArrayWithOneOrMore<T, K = number> = (
     [T] |
     { 0: T }
-) & T[];
+) & [T, ...T[]] & T[];
 
 /**
  * Removes a matching element from the array, if present.
@@ -117,12 +117,12 @@ export function previousWrapAround<T>(array: T[], element: T): T | undefined {
  * @param array - The array to check if is empty.
  * @returns True if empty, false otherwise.
  */
-export function isEmpty<T>(array: T[]): array is [never] {
+export function isEmpty<T>(array: T[]): array is [] {
     return array.length === 0;
 }
 
 /**
- * Checks if an array has at least 1 item
+ * Checks if an array has at least 1 item.
  *
  * @param array - The array to check if it has at least 1 element.
  * @returns True if not empty, otherwise false when empty.
@@ -155,12 +155,39 @@ export function shuffle<T>(array: T[], rng: () => number): T[] {
  *
  * @param width - The width of the [first] array.
  * @param height - The height of the [second] arrays in the first.
- * @returns A 2D array, all empty.
+ * @param defaultValue - The default value to fill in each element
+ * in all arrays with.
+ * @returns A 2D array, all fill in with the default value.
  */
-export function make2D<T>(width: number, height: number): Array<Array<T | undefined>> {
-    const array = new Array<Array<T | undefined>>(width);
-    for (let i = 0; i < array.length; i++) {
-        array[i] = new Array<T | undefined>(height);
+export function make2D<T>(width: number, height: number, defaultValue: T): T[][];
+
+/**
+ * Creates a 2D array (array of arrays).
+ *
+ * @param width - The width of the [first] array.
+ * @param height - The height of the [second] arrays in the first.
+ * @returns A 2D array, all fill in with undefined.
+ */
+export function make2D<T>(width: number, height: number): Array<Array<T | undefined>>;
+
+/**
+ * Creates a 2D array (array of arrays).
+ *
+ * @param width - The width of the [first] array.
+ * @param height - The height of the [second] arrays in the first.
+ * @param defaultValue - (optional) The default value to fill in each element
+ * in all arrays with.
+ * @returns A 2D array, all fill in with the default value if given, otherwise
+ * filled in with undefined.
+ */
+export function make2D<T>(width: number, height: number, defaultValue?: T): Array<Array<T | undefined>> {
+    const array: Array<Array<T | undefined>> = [];
+    for (let x = 0; x < width; x++) {
+        const subArray: Array<T | undefined> = [];
+        subArray.length = height;
+        subArray.fill(defaultValue);
+
+        array.push(subArray);
     }
 
     return array;
