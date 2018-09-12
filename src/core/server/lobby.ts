@@ -20,6 +20,7 @@ import * as ws from "lark-websocket";
 import * as net from "net";
 import * as querystring from "querystring";
 import * as readline from "readline";
+import { sanitizeNumber } from "~/core/sanitize";
 import { IGamesExport } from "~/core/server/games-export";
 
 /*
@@ -449,7 +450,7 @@ ${err}`);
      */
     private async clientSentPlay(
         client: BaseClient,
-        data: IPlayData,
+        data: Readonly<IPlayData>,
     ): Promise<void> {
         const playData = this.validatePlayData(data);
 
@@ -575,7 +576,7 @@ ${err}`);
      * @returns - Human readable text why the data is not valid.
      */
     private validatePlayData(
-        data?: IPlayData,
+        data?: Readonly<IPlayData>,
     ): string | (IPlayData & { validGameSettings: UnknownObject }) {
         if (!data) {
             return "Sent 'play' event with no data.";
@@ -603,12 +604,27 @@ ${err}`);
             validatedData.gameName = gameNamespace.gameName;
         }
 
-        const n = gameNamespace.GameManager.requiredNumberOfPlayers;
-        if (typeof data.playerIndex === "number" && (
-            data.playerIndex < 0 || data.playerIndex >= n)
-        ) {
-            return `playerIndex ${data.playerIndex} is out of range (max ${n} players).`;
+        // Special case for backwards compatibility.
+        // -1 is treated as if they didn't care about their playerIndex
+        if (validatedData.playerIndex === -1 || isNil(validatedData.playerIndex)) {
+            validatedData.playerIndex = undefined;
         }
+        else {
+            const asNumber = sanitizeNumber(validatedData.playerIndex, true);
+            if (asNumber instanceof Error) {
+                return `playerIndex is not valid: ${asNumber.message}`;
+            }
+            validatedData.playerIndex = asNumber;
+        }
+
+        const n = gameNamespace.GameManager.requiredNumberOfPlayers;
+        if (validatedData.playerIndex !== undefined
+            && (validatedData.playerIndex < 0 || validatedData.playerIndex >= n)
+        ) {
+            return `playerIndex '${validatedData.playerIndex}' is out of range (max ${n} players).
+Please use zero-based indexing, where '0' is the first player.`;
+        }
+        // else it is valid as undefined or a number in the range for max players.
 
         if (data && data.gameSettings && Config.GAME_SETTINGS_ENABLED) {
             const footer = `
