@@ -105,8 +105,8 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: IBaseSaloonPlayer,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<IBaseSaloonPlayer>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

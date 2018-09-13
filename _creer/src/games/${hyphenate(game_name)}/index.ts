@@ -175,7 +175,9 @@ export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
         'description': 'A new {} hooked up in the game and ready for you to use.'.format(game_obj_name)
     }
 })}
-    public ${uncapitalize(game_obj_name)}<T extends ${game_obj_name}Args>(args: T): ${game_obj_name} & T {
+    public ${uncapitalize(game_obj_name)}<T extends ${game_obj_name}Args>(
+        args: Readonly<T>,
+    ): ${game_obj_name} & T {
         return this.createGameObject("${game_obj_name}", ${game_obj_name}, args);
     }
 

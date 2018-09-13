@@ -50,7 +50,7 @@ export class Room {
      */
     constructor(
         public readonly id: string,
-        public readonly gameNamespace: IBaseGameNamespace,
+        public readonly gameNamespace: Readonly<IBaseGameNamespace>,
         protected readonly gamelogManager: GamelogManager,
         private readonly updater?: Updater,
     ) {
@@ -142,7 +142,7 @@ export class Room {
      * @param settings - the key/value pair settings to add
      * @returns An error if the settings were invalid, otherwise nothing
      */
-    public addGameSettings(settings: UnknownObject): void | Error {
+    public addGameSettings(settings: Readonly<UnknownObject>): void | Error {
         return this.gameSettingsManager.addSettings(settings);
     }
 
@@ -161,7 +161,7 @@ export class Room {
      * @param gamelog The gamelog resulting from the game played in the session
      * @returns A promise that resolves once the gamelog is written to disk.
      */
-    protected async cleanUp(gamelog: IGamelog): Promise<void> {
+    protected async cleanUp(gamelog: Readonly<IGamelog>): Promise<void> {
         this.over = true;
         this.winners = gamelog.winners;
         this.losers = gamelog.losers;

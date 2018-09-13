@@ -96,13 +96,13 @@ export class Cowboy extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: ICowboyProperties & {
+        args: Readonly<ICowboyProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             owner: Player;
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

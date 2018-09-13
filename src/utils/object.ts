@@ -54,15 +54,15 @@ export function unstringify(value: UnStringified): UnStringified {
  * @param obj the object to try to unstringify its children
  * @returns the un-stringified object (a new object, obj is untouched)
  */
-export function unstringifyObject(
-    obj: {[key: string]: string},
-): {[key: string]: UnStringified} {
-    const unStringified: {[key: string]: UnStringified} = {};
+export function unstringifyObject<T extends Readonly<ITypedObject<string>>>(
+    obj: T,
+): { [K in keyof T]: UnStringified } {
+    const unStringified: UnknownObject = {};
     for (const key of Object.keys(obj)) {
-        unStringified[key] = unstringify(obj[key]);
+        unStringified[key] = unstringify(obj[key] as string);
     }
 
-    return unStringified;
+    return unStringified as { [K in keyof T]: UnStringified };
 }
 
 /**

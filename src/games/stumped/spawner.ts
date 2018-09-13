@@ -52,13 +52,13 @@ export class Spawner extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: ISpawnerProperties & {
+        args: Readonly<ISpawnerProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             tile: Tile;
             type: "branches" | "food";
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

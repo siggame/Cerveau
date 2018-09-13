@@ -94,8 +94,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: ITileProperties,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<ITileProperties>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

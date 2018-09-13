@@ -474,7 +474,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new BroodMother hooked up in the game and ready for you to
      * use.
      */
-    public broodMother<T extends BroodMotherArgs>(args: T): BroodMother & T {
+    public broodMother<T extends BroodMotherArgs>(
+        args: Readonly<T>,
+    ): BroodMother & T {
         return this.createGameObject("BroodMother", BroodMother, args);
     }
 
@@ -485,7 +487,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cutter hooked up in the game and ready for you to use.
      */
-    public cutter<T extends CutterArgs>(args: T): Cutter & T {
+    public cutter<T extends CutterArgs>(
+        args: Readonly<T>,
+    ): Cutter & T {
         return this.createGameObject("Cutter", Cutter, args);
     }
 
@@ -496,7 +500,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
-    public nest<T extends NestArgs>(args: T): Nest & T {
+    public nest<T extends NestArgs>(
+        args: Readonly<T>,
+    ): Nest & T {
         return this.createGameObject("Nest", Nest, args);
     }
 
@@ -507,7 +513,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Spider hooked up in the game and ready for you to use.
      */
-    public spider<T extends SpiderArgs>(args: T): Spider & T {
+    public spider<T extends SpiderArgs>(
+        args: Readonly<T>,
+    ): Spider & T {
         return this.createGameObject("Spider", Spider, args);
     }
 
@@ -519,7 +527,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new Spiderling hooked up in the game and ready for you to
      * use.
      */
-    public spiderling<T extends SpiderlingArgs>(args: T): Spiderling & T {
+    public spiderling<T extends SpiderlingArgs>(
+        args: Readonly<T>,
+    ): Spiderling & T {
         return this.createGameObject("Spiderling", Spiderling, args);
     }
 
@@ -530,7 +540,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
-    public spitter<T extends SpitterArgs>(args: T): Spitter & T {
+    public spitter<T extends SpitterArgs>(
+        args: Readonly<T>,
+    ): Spitter & T {
         return this.createGameObject("Spitter", Spitter, args);
     }
 
@@ -541,7 +553,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Weaver hooked up in the game and ready for you to use.
      */
-    public weaver<T extends WeaverArgs>(args: T): Weaver & T {
+    public weaver<T extends WeaverArgs>(
+        args: Readonly<T>,
+    ): Weaver & T {
         return this.createGameObject("Weaver", Weaver, args);
     }
 
@@ -552,7 +566,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Web hooked up in the game and ready for you to use.
      */
-    public web<T extends WebArgs>(args: T): Web & T {
+    public web<T extends WebArgs>(
+        args: Readonly<T>,
+    ): Web & T {
         return this.createGameObject("Web", Web, args);
     }
 

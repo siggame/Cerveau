@@ -180,7 +180,7 @@ export class Lobby {
     public setup(data: {
         gameAlias: string;
         session: string;
-        gameSettings: UnknownObject;
+        gameSettings: Readonly<UnknownObject>;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -368,7 +368,10 @@ ${err}`);
      * @returns The Room of gameName and id. If one does not exists a new
      * instance will be created
      */
-    private getOrCreateRoom(gameName: string, requestedId: string = "*"): Room |string {
+    private getOrCreateRoom(
+        gameName: string,
+        requestedId: string = "*",
+    ): Room |string {
         const rooms = this.rooms.get(gameName);
 
         if (!rooms) {
@@ -705,22 +708,25 @@ Must be one string in the url parameters format.${footer}`;
             this.isShuttingDown = true;
             logger.info("Ω Shutting down gracefully Ω");
 
-            const n = Array.from(this.roomsPlaying).reduce((sum, [name, rooms]) => sum + rooms.size, 0);
+            const n = Array
+                .from(this.roomsPlaying)
+                .reduce((sum, [name, rooms]) => sum + rooms.size, 0);
+
             logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
             if (n === 0) {
                 logger.info("     ↳ No one here, see you later!");
             }
 
             try {
-                // tell all clients we are shutting down, and asynchronously
+                // Tell all clients we are shutting down, and asynchronously
                 // wait for the socket to confirm the data was sent before
-                // proceeding
+                // proceeding.
                 await Promise.all([...this.clients].map((client) => {
                     client.disconnect("Sorry, the server is shutting down.");
                 }));
             }
             catch (rejection) {
-                // we don't care
+                // We don't care.
             }
 
             if (n > 0) {

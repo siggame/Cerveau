@@ -15,7 +15,7 @@ export class GamelogScribe {
         logged: new Event<IDelta>(),
     });
 
-    /** The gamelog we are buolding up. */
+    /** The gamelog we are building up. */
     public readonly gamelog: IGamelog;
 
     /** If our gamelog is finalized and should never be changed after. */
@@ -32,7 +32,7 @@ export class GamelogScribe {
     constructor(
         game: BaseGame,
         session: Session,
-        clients: BaseClient[],
+        clients: ReadonlyArray<BaseClient>,
         private readonly deltaManager: DeltaManager,
     ) {
         this.gamelog = {
@@ -90,7 +90,7 @@ export class GamelogScribe {
      * @param clients - The list of clients that played this game.
      * @returns The gamelog that was generated.
      */
-    private finalizeGamelog(clients: BaseClient[]): void {
+    private finalizeGamelog(clients: ReadonlyArray<BaseClient>): void {
         // update the winners and losers of the gamelog
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
@@ -136,7 +136,7 @@ export class GamelogScribe {
      * @param data - The data about why it changed, such as what data made the
      * delta occur.
      */
-    private add(type: string, data?: IDeltaData): void {
+    private add(type: string, data?: Readonly<IDeltaData>): void {
         if (this.finalized) {
             return; // Gamelog is finalized, we can't add things.
         }
@@ -146,6 +146,7 @@ export class GamelogScribe {
             data,
             game: this.deltaManager.dump(),
         };
+
         this.gamelog.deltas.push(delta);
         this.events.logged.emit(delta);
     }

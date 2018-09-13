@@ -473,7 +473,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public bottle<T extends BottleArgs>(args: T): Bottle & T {
+    public bottle<T extends BottleArgs>(
+        args: Readonly<T>,
+    ): Bottle & T {
         return this.createGameObject("Bottle", Bottle, args);
     }
 
@@ -484,7 +486,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public cowboy<T extends CowboyArgs>(args: T): Cowboy & T {
+    public cowboy<T extends CowboyArgs>(
+        args: Readonly<T>,
+    ): Cowboy & T {
         return this.createGameObject("Cowboy", Cowboy, args);
     }
 
@@ -496,7 +500,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new Furnishing hooked up in the game and ready for you to
      * use.
      */
-    public furnishing<T extends FurnishingArgs>(args: T): Furnishing & T {
+    public furnishing<T extends FurnishingArgs>(
+        args: Readonly<T>,
+    ): Furnishing & T {
         return this.createGameObject("Furnishing", Furnishing, args);
     }
 
@@ -507,7 +513,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: T): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -518,7 +526,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public youngGun<T extends YoungGunArgs>(args: T): YoungGun & T {
+    public youngGun<T extends YoungGunArgs>(
+        args: Readonly<T>,
+    ): YoungGun & T {
         return this.createGameObject("YoungGun", YoungGun, args);
     }
 

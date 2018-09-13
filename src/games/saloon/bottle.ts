@@ -50,12 +50,12 @@ export class Bottle extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IBottleProperties & {
+        args: Readonly<IBottleProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

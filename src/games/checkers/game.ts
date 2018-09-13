@@ -102,7 +102,7 @@ export class CheckersGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CheckersGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

@@ -82,14 +82,14 @@ export class Beaver extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IBeaverProperties & {
+        args: Readonly<IBeaverProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             job: Job;
             owner: Player;
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

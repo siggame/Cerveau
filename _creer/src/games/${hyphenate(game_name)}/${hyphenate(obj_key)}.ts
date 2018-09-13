@@ -138,7 +138,7 @@ ${merge('    // ', 'attributes', """
     constructor(
 % if obj_key == 'Game':
         protected settingsManager: ${game_name}GameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
 % else: # if not a base class, or it is a `Tile`, and this is not a tiled game
 %   if obj_key not in ['Player', 'GameObject', 'Tile'] or (obj_key == 'Tile' and 'TiledGame' not in game['serverParentClasses']):
 <%
@@ -150,18 +150,18 @@ for parent_class in obj['parentClasses']:
 unions = parent_unions + [ 'I' + obj_key + 'Properties' ] + ['{']
 wrapper = shared['cerveau']['TextWrapper'](
     width=79,
-    initial_indent='        args: ',
+    initial_indent='        args: Readonly<',
     subsequent_indent='        ',
 )
 %>${'\n'.join(wrapper.wrap(' & '.join(unions)))}
 ${merge('            // ', 'constructor-args', """            // You can add more constructor args in here
 """, optional=True, help=False)}
-        },
+        }>,
 %   else:
         // never directly created by game developers
-        args: ${'I' + (('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))},
+        args: Readonly<${'I' + (('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))}>,
 %   endif
-        required: IBaseGameObjectRequiredData,
+        required: Readonly<IBaseGameObjectRequiredData>,
 % endif
     ) {
         super(${'settingsManager' if (obj_key == 'Game') else 'args'}, required);

@@ -207,7 +207,9 @@ export class CheckersGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Checker hooked up in the game and ready for you to use.
      */
-    public checker<T extends CheckerArgs>(args: T): Checker & T {
+    public checker<T extends CheckerArgs>(
+        args: Readonly<T>,
+    ): Checker & T {
         return this.createGameObject("Checker", Checker, args);
     }
 

@@ -114,8 +114,8 @@ export class Player extends GameObject implements IBaseAnarchyPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: IBaseAnarchyPlayer,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<IBaseAnarchyPlayer>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

@@ -46,7 +46,7 @@ class DeltaArray<T> extends Array<T> {
  */
 export function createArray<T = any>(args: {
     key: string;
-    childType: ISanitizableType;
+    childType: Readonly<ISanitizableType>;
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;

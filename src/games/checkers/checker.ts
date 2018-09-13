@@ -46,12 +46,12 @@ export class Checker extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: ICheckerProperties & {
+        args: Readonly<ICheckerProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             owner: Player;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

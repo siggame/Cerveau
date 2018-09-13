@@ -13,7 +13,7 @@ import { createObject } from "./delta-mergeable-object";
  * @param type They type to sanitize.
  * @returns a function that will accept a value and try to sanitize it.
  */
-function sanitize(type: ISanitizableType): (
+function sanitize(type: Readonly<ISanitizableType>): (
     val: unknown,
     current: any,
     forceSet: boolean,
@@ -52,36 +52,32 @@ function sanitize(type: ISanitizableType): (
  */
 export function createDeltaMergeable(args: {
     key: string;
-    type: ISanitizableType;
-    childTypes?: ITypedObject<ISanitizableType>;
+    type: Readonly<ISanitizableType>;
+    childTypes?: Readonly<ITypedObject<ISanitizableType>>;
     parent?: DeltaMergeable;
     initialValue?: any;
 }): DeltaMergeable {
-    let container: DeltaMergeable | undefined;
     switch (args.type.typeName) {
         case "list":
-            container = createArray({
+            return createArray({
                 key: args.key,
                 parent: args.parent,
                 childType: args.type.valueType,
             });
-            break;
         case "dictionary":
-            container = createObject({
+            return createObject({
                 key: args.key,
                 parent: args.parent,
                 childType: args.type.valueType,
             });
-            break;
         case "gameObject":
-            container = createObject({
+            return createObject({
                 key: args.key,
                 initialValue: args.initialValue,
                 parent: args.parent,
                 childTypes: args.childTypes,
                 transform: sanitize(args.type),
             });
-            break;
         default:
             return new DeltaMergeable({
                 key: args.key,
@@ -90,6 +86,4 @@ export function createDeltaMergeable(args: {
                 transform: sanitize(args.type),
             });
     }
-
-    return container;
 }

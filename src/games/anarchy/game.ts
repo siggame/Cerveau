@@ -152,7 +152,7 @@ export class AnarchyGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: AnarchyGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

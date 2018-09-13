@@ -186,7 +186,7 @@ export class CatastropheGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CatastropheGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

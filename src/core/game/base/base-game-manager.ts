@@ -2,7 +2,7 @@ import { Event, Signal } from "ts-typed-events";
 import { BasePlayingClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
-import { MutableRequired } from "~/utils";
+import { MutableRequired, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -67,7 +67,7 @@ export class BaseGameManager {
      * @param gameOverCallback - A callback to invoke once the game is over.
      */
     constructor(
-        private readonly namespace: IBaseGameNamespace,
+        private readonly namespace: Readonly<IBaseGameNamespace>,
         settingsManager: BaseGameSettingsManager,
         playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,
@@ -80,7 +80,7 @@ export class BaseGameManager {
         if (!settings.randomSeed) {
             // This is the only place we use old random
             // tslint:disable-next-line:no-math-random insecure-random
-            settings.randomSeed = Math.random().toString(36).substring(2);
+            (settings as UnknownObject).randomSeed = Math.random().toString(36).substring(2);
         }
         this.random = new RandomNumberGenerator(settings.randomSeed);
 

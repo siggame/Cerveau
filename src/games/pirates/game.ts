@@ -202,7 +202,7 @@ export class PiratesGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: PiratesGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

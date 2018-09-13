@@ -62,7 +62,7 @@ export function getURL(
  * @returns - Undefined if no visualizer set, url to the gamelog in visualizer otherwise
  */
 export function getVisualizerURL(
-    gamelogOrFilename: IGamelog | string,
+    gamelogOrFilename: Readonly<IGamelog> | string,
     visualizerURL?: string,
 ): string | undefined {
     const vis = Config.VISUALIZER_URL;

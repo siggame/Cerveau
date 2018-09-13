@@ -80,7 +80,9 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public invalidateSettings(invalidatedSettings: UnknownObject): UnknownObject | Error {
+    public invalidateSettings(
+        invalidatedSettings: Readonly<UnknownObject>,
+    ): Readonly<UnknownObject> | Error {
         const sanitized: UnknownObject = {};
 
         for (const [key, value] of Object.entries(invalidatedSettings)) {
@@ -167,7 +169,7 @@ export class BaseGameSettingsManager {
      * @param schema The schema to make it from
      * @returns the schema, now frozen
      */
-    protected makeSchema<T extends ISettingsSchemas>(schema: T): T {
+    protected makeSchema<T extends ISettingsSchemas>(schema: T): Readonly<T> {
         return Object.freeze(schema);
     }
 
@@ -200,7 +202,9 @@ export class BaseGameSettingsManager {
      * @param someSettings a subset of the valid settings to attempt to validate
      * @returns an Error if invalid, otherwise the validated settings
      */
-    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
+    protected invalidate(
+        someSettings: Readonly<UnknownObject>,
+    ): Readonly<UnknownObject> | Error {
         // Use our current values and the new ones to form a settings
         // object to try to validate against
         const settings = { ...this.values, ...someSettings };

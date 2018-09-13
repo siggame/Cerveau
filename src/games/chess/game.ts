@@ -68,7 +68,7 @@ export class ChessGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: ChessGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
