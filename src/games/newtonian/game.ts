@@ -258,7 +258,7 @@ export class NewtonianGame extends BaseClasses.Game {
         // marks where the generator room in the spawn area ends.
         const genEnd = Math.floor(this.mapHeight * 0.653);
         // marks how many tiles wide the spawn and generator are.
-        const startEnd = Math.floor(this.mapWidth * 0.725);
+        const startEnd = Math.floor(this.mapWidth * 0.073);
         // used to track the maps mid-point.
         const mid = Math.floor(this.mapHeight / 2);
         // iterates over the map and adds basic structure.
@@ -269,7 +269,7 @@ export class NewtonianGame extends BaseClasses.Game {
                  || x === 0 // left edge of map
                  || x === RMstart
                  || x === MMstart
-                 || x === Math.floor(this.mapWidth / 2) - 1
+                // || x === Math.floor(this.mapWidth / 2) - 1
                  || (x < startEnd && (y === spawnEnd || y === genEnd))
                 ) {
                     getMutableTile(x, y).isWall = true;
@@ -372,11 +372,11 @@ export class NewtonianGame extends BaseClasses.Game {
             getMutableTile(x, mid + midSize + shift).isWall = true;
             getMutableTile(x, mid - midSize + shift).isWall = true;
 
-            if (x === Math.floor(this.mapWidth / 2) - 1) {
+            /*if (x === Math.floor(this.mapWidth / 2) - 1) {
                 for (let y = mid - midSize + 1 + shift; y < mid + midSize + shift; y++) {
                     getMutableTile(x, y).isWall = false;
                 }
-            }
+            }*/
         }
 
         // generates structures that fill in the rest of the center area
@@ -549,13 +549,8 @@ export class NewtonianGame extends BaseClasses.Game {
             }
             // if the room is bigger
             else {
-                // TODO: see if the center hallway cleanup is needed.
-                for (let y = 1; y < mid - midSize + shift; y++) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, y).isWall = false;
-                }
-                getMutableTile(Math.floor(this.mapWidth / 2), mid - midSize + shift).isWall = true;
                 // determines the number of rooms on the x axis
-                const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
+                /*const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
                 // determines the number of rooms on the y axis
                 let b = Math.floor((mid - midSize + shift) / 3);
                 // counts the extra y tiles.
@@ -651,17 +646,20 @@ export class NewtonianGame extends BaseClasses.Game {
                 shiftDir = this.manager.random.int(map[0].length, 0);
                 for (let y = 0; y < map[0].length; y++) {
                     if (shiftDir !== y) {
-                        map[map.length - 1][y].DSouth = true;
+                        map[map.length - 1][y].DEast = true;
                     }
                 }
                 // add doors into the side room area.
                 shiftDir = this.manager.random.int(map[0].length, 0);
                 for (let y = 0; y < map[0].length; y++) {
                     if (shiftDir !== y) {
-                        map[0][y].DSouth = true;
+                        map[0][y].DWest = true;
                     }
                 }
-                this.roomFill(map, getMutableTile);
+                this.roomFill(map, getMutableTile);*/
+                this.roomCalc(MMstart + 1, (this.mapWidth + 1) / 2, 1,
+                              mid - midSize + shift - 1, getMutableTile,
+                              false, true, true, true);
             }
         }
         // bottom area
@@ -834,18 +832,114 @@ export class NewtonianGame extends BaseClasses.Game {
             // generate a very large area.
             }
             else {
-                for (let y = mid + midSize + shift + 1; y < this.mapHeight - 1; y++) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, y).isWall = false;
+                // determines the number of rooms on the x axis
+                const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
+                // determines the number of rooms on the y axis
+                let b = Math.floor((this.mapHeight - (mid + midSize + shift)) / 3);
+                // counts the extra y tiles.
+                const extra = (mid + midSize + shift) % 3;
+                // map used for mapgen.
+                const map: IRoom[][] = [];
+                for (let i = 0; i < a; i++) {
+                    map[i] = new Array(b);
                 }
-                /*
-                getMutableTile(Math.floor(this.mapWidth/2), mid+midSize+shift).isWall = true;
-                shiftDir = this.manager.random.int(2, 0);
-                if(shiftDir === 1) {
-                    //
-                } else {
-                    //
+                let yStart = mid + midSize + shift + 1;
+                const yEnd = this.mapHeight - 1;
+                let room = this.makeRoom(0, 0, 0, 0);
+                let start = 0;
+                if (extra === 2) {
+                    for (let i = 0; i < a; i++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yStart,
+                            yStart + 1,
+                            yStart + 2,
+                        );
+                        map[i][0] = room;
+                        // getMutableTile(9+i, 2).isWall = true
+                    }
+                    start = 1;
+                    yStart += 1;
+                    for (let i = 0; i < a; i++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yEnd - 2,
+                            yEnd - 1 ,
+                            yEnd,
+                        );
+                        map[i][b - 1] = room;
+                        // getMutableTile(9+i, 1+b).isWall = true
+                    }
+                    b -= 1;
                 }
-                */
+                else if (extra === 1) {
+                    shiftDir = this.manager.random.int(2, 0);
+                    if (shiftDir === 1) {
+                        for (let i = 0; i < a; i++) {
+                            room = this.makeRoom(
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yStart,
+                                yStart + 1,
+                                yStart + 2,
+                            );
+                            map[i][0] = room;
+                            // getMutableTile(9+i, 2).isWall = true
+                        }
+                        start = 1;
+                        yStart += 1;
+                    }
+                    else {
+                        for (let i = 0; i < a; i++) {
+                            room = this.makeRoom(
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yEnd - 2,
+                                yEnd - 1,
+                                yEnd,
+                            );
+                            map[i][b - 1] = room;
+                            // getMutableTile(9+i, 1+b).isWall = true
+                        }
+                        b -= 1;
+                    }
+                }
+                for (let x = 0; x < a; x++) {
+                    for (let y = start; y < b; y++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (x * 3),
+                            MMstart + 2 + (x * 3),
+                            yStart + (y * 3),
+                            yStart + 1 + (y * 3),
+                        );
+                        map[x][y] = room;
+                        // getMutableTile(9+x, 2+y).isWall = true
+                    }
+                }
+                // add doors into the center room
+                shiftDir = this.manager.random.int(map.length, 0);
+                for (let x = 0; x < map.length; x++) {
+                    if (shiftDir !== x) {
+                        map[x][0].DNorth = true;
+                    }
+                }
+                // add doors into the other side of the middle area
+                shiftDir = this.manager.random.int(map[0].length, 0);
+                for (let y = 0; y < map[0].length; y++) {
+                    if (shiftDir !== y) {
+                        map[map.length - 1][y].DEast = true;
+                    }
+                }
+                // add doors into the side room area.
+                shiftDir = this.manager.random.int(map[0].length, 0);
+                for (let y = 0; y < map[0].length; y++) {
+                    if (shiftDir !== y) {
+                        map[0][y].DWest = true;
+                    }
+                }
+                this.roomFill(map, getMutableTile);
             }
         }
         // generate Side area
@@ -905,7 +999,7 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param y2 - highest y value of a 2 by 2 room.
      * @param y3 - If the room is 3 tall, this is actually the highest value.
      * @param x3 - If the room is 3 wide, this is actually the highest value.
-     * @returns TODO: document
+     * @returns - the room object.
      */
     private makeRoom(x1: number, x2: number, y1: number, y2: number, y3: number = -1, x3: number = -1): IRoom {
         return {
@@ -915,6 +1009,258 @@ export class NewtonianGame extends BaseClasses.Game {
             WNorth: true, WEast: true, WSouth: true, WWest: true,
             DNorth: false, DEast: false, DSouth: false, DWest: false,
         };
+    }
+
+    /**
+     * takes a area and starts the process of filling it with rooms.
+     *
+     * All of these parameters are for the INSIDE of the room, walls not included!
+     * @param x1 - lowest x value of the area.
+     * @param x2 - highest x value of the area.
+     * @param y1 - lowest y value of the area.
+     * @param y2 - highest y value of the area.
+     * @param getMutableTile - A function that gets a mutable tile given an (x, y)
+     * @param DNorth - If there should be doors to the north.
+     * @param DEast - If there should be doors to the East.
+     * @param DSouth - If there should be doors to the south.
+     * @param DWest - If there should be doors to the west.
+     * @returns - nothing, calls the next stage
+     */
+    private roomCalc(x1: number, x2: number, y1: number, y2: number,
+                     getMutableTile: (x: number, y: number) => MutableRequired<Tile>,
+                     DNorth: boolean = false, DEast: boolean = false,
+                     DSouth: boolean = false, DWest: boolean = false): void {
+            // determines the number of rooms on the x axis
+            /*
+            this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2, 1,
+                          mid - midSize + shift - 1, getMutableTile,
+                          false, true, true, true);
+            const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
+            // determines the number of rooms on the y axis
+            let b = Math.floor((mid - midSize + shift) / 3);
+            // counts the extra y tiles.
+            const extra = (mid - midSize + shift) % 3;
+            // map used for mapgen.
+            const map: IRoom[][] = [];
+            for (let i = 0; i < a; i++) {
+                map[i] = new Array(b);
+            }
+            let yStart = 1;
+                const yEnd = mid - midSize + shift - 1;
+                let room = this.makeRoom(0, 0, 0, 0);
+                let start = 0;
+                if (extra === 2) {
+                    for (let i = 0; i < a; i++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yStart,
+                            yStart + 1,
+                            yStart + 2,
+                        );
+                        map[i][0] = room;
+                        // getMutableTile(9+i, 2).isWall = true
+                    }
+                    start = 1;
+                    yStart += 1;
+                    for (let i = 0; i < a; i++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (i * 3),
+                            MMstart + 2 + (i * 3),
+                            yEnd - 2,
+                            yEnd - 1 ,
+                            yEnd,
+                        );
+                        map[i][b - 1] = room;
+                        // getMutableTile(9+i, 1+b).isWall = true
+                    }
+                    b -= 1;
+                }
+                else if (extra === 1) {
+                    shiftDir = this.manager.random.int(2, 0);
+                    if (shiftDir === 1) {
+                        for (let i = 0; i < a; i++) {
+                            room = this.makeRoom(
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yStart,
+                                yStart + 1,
+                                yStart + 2,
+                            );
+                            map[i][0] = room;
+                            // getMutableTile(9+i, 2).isWall = true
+                        }
+                        start = 1;
+                        yStart += 1;
+                    }
+                    else {
+                        for (let i = 0; i < a; i++) {
+                            room = this.makeRoom(
+                                MMstart + 1 + (i * 3),
+                                MMstart + 2 + (i * 3),
+                                yEnd - 2,
+                                yEnd - 1,
+                                yEnd,
+                            );
+                            map[i][b - 1] = room;
+                            // getMutableTile(9+i, 1+b).isWall = true
+                        }
+                        b -= 1;
+                    }
+                }
+                for (let x = 0; x < a; x++) {
+                    for (let y = start; y < b; y++) {
+                        room = this.makeRoom(
+                            MMstart + 1 + (x * 3),
+                            MMstart + 2 + (x * 3),
+                            yStart + (y * 3),
+                            yStart + 1 + (y * 3),
+                        );
+                        map[x][y] = room;
+                        // getMutableTile(9+x, 2+y).isWall = true
+                    }
+                }
+                // add doors into the center room
+                shiftDir = this.manager.random.int(map.length, 0);
+                for (let x = 0; x < map.length; x++) {
+                    if (shiftDir !== x) {
+                        map[x][map[0].length - 1].DSouth = true;
+                    }
+                }
+                // add doors into the other side of the middle area
+                shiftDir = this.manager.random.int(map[0].length, 0);
+                for (let y = 0; y < map[0].length; y++) {
+                    if (shiftDir !== y) {
+                        map[map.length - 1][y].DEast = true;
+                    }
+                }
+                // add doors into the side room area.
+                shiftDir = this.manager.random.int(map[0].length, 0);
+                for (let y = 0; y < map[0].length; y++) {
+                    if (shiftDir !== y) {
+                        map[0][y].DWest = true;
+                    }
+                }
+                this.roomFill(map, getMutableTile);*/
+        // determines the number of rooms on the x axis
+        const a = Math.round((x2 - x1 + 1) / 3); // MUST be a whole number
+        // determines the number of rooms on the y axis
+        let b = Math.round((y2 - y1 + 1) / 3);
+        // counts the extra y tiles.
+        const extra = (y2 - y1 + 1) % 3;
+        // map used for mapgen.
+        const map: IRoom[][] = [];
+        // variables to decide random things.
+        let shift = 0;
+        for (let i = 0; i < a; i++) {
+            map[i] = new Array(b);
+        }
+        let yStart = y1;
+        let room = this.makeRoom(0, 0, 0, 0);
+        let start = 0;
+        if (extra === 2) {
+            for (let i = 0; i < a; i++) {
+                room = this.makeRoom(
+                    x1 + (i * 3),
+                    x1 + 1 + (i * 3),
+                    yStart,
+                    yStart + 1,
+                    yStart + 2,
+                );
+                map[i][0] = room;
+            }
+            start = 1;
+            yStart += 1;
+            for (let i = 0; i < a; i++) {
+                room = this.makeRoom(
+                    x1 + (i * 3),
+                    x1 + 1 + (i * 3),
+                    y2 - 2,
+                    y2 - 1 ,
+                    y2,
+                );
+                map[i][b - 1] = room;
+            }
+            b -= 1;
+        }
+        else if (extra === 1) {
+            shift = this.manager.random.int(2, 0);
+            if (shift === 1) {
+                for (let i = 0; i < a; i++) {
+                    room = this.makeRoom(
+                        x1 + (i * 3),
+                        x1 + 1 + (i * 3),
+                        yStart,
+                        yStart + 1,
+                        yStart + 2,
+                    );
+                    map[i][0] = room;
+                }
+                start = 1;
+                yStart += 1;
+            }
+            else {
+                for (let i = 0; i < a; i++) {
+                    room = this.makeRoom(
+                        x1 + (i * 3),
+                        x1 + 1 + (i * 3),
+                        y2 - 2,
+                        y2 - 1,
+                        y2,
+                    );
+                    map[i][b - 1] = room;
+                }
+                b -= 1;
+            }
+        }
+        for (let x = 0; x < a; x++) {
+            for (let y = start; y < b; y++) {
+                room = this.makeRoom(
+                    x1 + (x * 3),
+                    x1 + 1 + (x * 3),
+                    yStart + (y * 3),
+                    yStart + 1 + (y * 3),
+                );
+                map[x][y] = room;
+            }
+        }
+        if (DNorth) {
+            // add doors into the North
+            shift = this.manager.random.int(map.length, 0);
+            for (let x = 0; x < map.length; x++) {
+                if (shift !== x) {
+                    map[x][0].DNorth = true;
+                }
+            }
+        }
+        if (DSouth) {
+            // add doors to the south
+            shift = this.manager.random.int(map.length, 0);
+            for (let x = 0; x < map.length; x++) {
+                if (shift !== x) {
+                    map[x][map[0].length - 1].DSouth = true;
+                }
+            }
+        }
+        if (DEast) {
+            // add doors to the east.
+            shift = this.manager.random.int(map[0].length, 0);
+            for (let y = 0; y < map[0].length; y++) {
+                if (shift !== y) {
+                    map[map.length - 1][y].DEast = true;
+                }
+            }
+        }
+        if (DWest) {
+            // add doors ito the west.
+            shift = this.manager.random.int(map[0].length, 0);
+            for (let y = 0; y < map[0].length; y++) {
+                if (shift !== y) {
+                    map[0][y].DWest = true;
+                }
+            }
+        }
+        this.roomFill(map, getMutableTile);
     }
 
     /**
@@ -1113,240 +1459,67 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
-        // re-calculating connect for doors
-        connect = map.length * map[0].length / 2;
-        connect = Math.floor(connect * 1.5);
-        // resetting unconnected to make sure it is empty.
-        unconnected.length = 0;
-        // tracking connected rooms.
-        const connected: IPoint[] = [];
-        // grabs a random rooms
-        find = roomList[this.manager.random.int(roomList.length, 0)];
-        // mark it as connected
-        connected.push({x: find.x, y: find.y});
-        // add every valid direction to the unconnected list.
-        if (map[find.x][find.y - 1]) {
-            unconnected.push({ x: find.x, y: find.y - 1});
-        }
-        if (map[find.x][find.y + 1]) {
-            unconnected.push({ x: find.x, y: find.y + 1 });
-        }
-        if (map[find.x + 1]) {
-            unconnected.push({ x: find.x + 1, y: find.y });
-        }
-        if (map[find.x - 1]) {
-            unconnected.push({ x: find.x - 1, y: find.y });
-        }
-        for (let v = 0; v < connect; v++) {
-            if (unconnected.length > 0 && false) { // TODO: remove && false to test this code
-                done = false;
-                // grabs a unconnected room.
-                const index = this.manager.random.int(unconnected.length, 0);
-                // tracks it's value.
-                find = unconnected[index];
-                // picks a random direction.
+        // making each room make a unique connection.
+        // iterating over the lists in map.
+        for (let x = 0; x < map.length; x++) {
+            // iterating over each list's values.
+            for (let y = 0; y < map[x].length; y++) {
+                // getting a random direction.
                 let dir = this.manager.random.int(4, 0);
-                // makes sure a direction is chosen.
-                while (!done) {
-                    // if the chosen direction is north.
-                    if (dir === 0) {
-                        // makes sure the direction exists and is connected.
-                        if (map[find.x][find.y - 1] && this.has(connected, find.x, find.y - 1) >= 0) {
-                            // mark the end of the loop and connect it.
-                            done = true;
-                            map[find.x][find.y - 1].DSouth = true;
-                            map[find.x][find.y].DNorth = true;
-                            // remove it from the unconnected list.
-                            unconnected.splice(index, 1);
-                            // mark it as connected.
-                            connected.push({x: find.x , y: find.y});
-                            // add all valid adjacent rooms that are in neither list.
-                            if (map[find.x][find.y + 1] && this.has(unconnected, find.x, find.y + 1) === -1
-                                                      && this.has(connected, find.x, find.y + 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y + 1});
-                            }
-                            if (map[find.x + 1] && this.has(unconnected, find.x + 1, find.y) === -1
-                                              && this.has(connected, find.x + 1, find.y) === -1) {
-                                unconnected.push({x: find.x + 1, y: find.y});
-                            }
-                            if (map[find.x - 1] && this.has(unconnected, find.x - 1, find.y) === -1
-                                              && this.has(connected, find.x - 1, find.y) === -1) {
-                                unconnected.push({x: find.x - 1, y: find.y});
-                            }
-                        }
-                        // otherwise, move onto the next direction.
-                        else {
-                            dir++;
-                        }
-                    }
-                    // if the chosen direction is east.
-                    else if (dir === 1) {
-                        // makes sure the direction exists and is connected.
-                        if (map[find.x + 1] && this.has(connected, find.x + 1, find.y) >= 0) {
-                            // mark the end of the loop and connect it.
-                            done = true;
-                            map[find.x + 1][find.y].DWest = true;
-                            map[find.x][find.y].DEast = true;
-                            // remove it from the unconnected list.
-                            unconnected.splice(index, 1);
-                            // mark it as connected.
-                            connected.push({x: find.x , y: find.y});
-                            // add all valid adjacent rooms that are in neither list.
-                            if (map[find.x][find.y + 1] && this.has(unconnected, find.x, find.y + 1) === -1
-                                                      && this.has(connected, find.x, find.y + 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y + 1});
-                            }
-                            if (map[find.x][find.y - 1] && this.has(unconnected, find.x, find.y - 1) === -1
-                                                      && this.has(connected, find.x, find.y - 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y - 1});
-                            }
-                            if (map[find.x - 1] && this.has(unconnected, find.x - 1, find.y) === -1
-                                              && this.has(connected, find.x - 1, find.y) === -1) {
-                                unconnected.push({x: find.x - 1, y: find.y});
-                            }
-                        }
-                        // otherwise, move onto the next direction.
-                        else {
-                            dir++;
-                        }
-                    }
-                    // if the chosen direction is south.
-                    else if (dir === 2) {
-                        // makes sure the direction exists and is connected.
-                        if (map[find.x][find.y + 1] && this.has(connected, find.x, find.y + 1) >= 0) {
-                            // mark the end of the loop and connect it.
-                            done = true;
-                            map[find.x][find.y + 1].DNorth = true;
-                            map[find.x][find.y].DSouth = true;
-                            // remove it from the unconnected list.
-                            unconnected.splice(index, 1);
-                            // mark it as connected.
-                            connected.push({x: find.x , y: find.y});
-                            // add all valid adjacent rooms that are in neither list.
-                            if (map[find.x][find.y - 1] && this.has(unconnected, find.x, find.y - 1) === -1
-                                                      && this.has(connected, find.x, find.y - 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y - 1});
-                            }
-                            if (map[find.x + 1] && this.has(unconnected, find.x + 1, find.y) === -1
-                                              && this.has(connected, find.x + 1, find.y) === -1) {
-                                unconnected.push({x: find.x + 1, y: find.y});
-                            }
-                            if (map[find.x - 1] && this.has(unconnected, find.x - 1, find.y) === -1
-                                              && this.has(connected, find.x - 1, find.y) === -1) {
-                                unconnected.push({x: find.x - 1, y: find.y});
-                            }
-                        }
-                        // otherwise, move onto the next direction.
-                        else {
-                            dir++;
-                        }
-                    }
-                    // if the chosen direction is west.
-                    else {
-                        // makes sure the direction exists and is connected.
-                        if (map[find.x - 1] && this.has(connected, find.x - 1, find.y) >= 0) {
-                            // mark the end of the loop and connect it.
-                            done = true;
-                            map[find.x - 1][find.y].DEast = true;
-                            map[find.x][find.y].DWest = true;
-                            // remove it from the unconnected list.
-                            unconnected.splice(index, 1);
-                            // mark it as connected.
-                            connected.push({x: find.x , y: find.y});
-                            // add all valid adjacent rooms that are in neither list.
-                            if (map[find.x][find.y + 1] && this.has(unconnected, find.x, find.y + 1) === -1
-                                                      && this.has(connected, find.x, find.y + 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y + 1});
-                            }
-                            if (map[find.x][find.y - 1] && this.has(unconnected, find.x, find.y - 1) === -1
-                                                      && this.has(connected, find.x, find.y - 1) === -1) {
-                                unconnected.push({x: find.x, y: find.y - 1});
-                            }
-                            if (map[find.x + 1] && this.has(unconnected, find.x + 1, find.y) === -1
-                                              && this.has(connected, find.x + 1, find.y) === -1) {
-                                unconnected.push({x: find.x + 1, y: find.y});
-                            }
-                        }
-                        // otherwise, move onto the next direction.
-                        else {
-                            dir++;
-                        }
-                    }
-                    /*if (num > 4) {
-                        unconnected.splice(index, 1);
-                        if (unconnected.length > 0) {
-                            index = this.manager.random.int(unconnected.length, 0);
-                            find = unconnected[index];
-                        }
-                        else {
-                            done = true;
-                        }
-                    }*/
-                }
-            }
-            // if all rooms are reachable.
-            else {
-                // makes sure it picks a valid direction.
+                // setting the flag variable.
                 done = false;
-                // as long as a valid direction isn't chosen.
+                // making sure it picks a direction.
                 while (!done) {
-                    // grab a room.
-                    find = roomList[this.manager.random.int(roomList.length, 0)];
-                    // grabs a random direction.
-                    let dir = this.manager.random.int(4, 0);
-                    // if the direction is north.
+                    // if it picks north.
                     if (dir === 0) {
-                        // if the direction exists.
-                        if (map[find.x][find.y - 1]) {
-                            // mark the loop done and connect them.
+                        // if it doesn't have that connection and the room exists.
+                        if (!map[x][y].DNorth && map[x][y - 1]) {
+                            // set the flag and make the connection.
                             done = true;
-                            map[find.x][find.y - 1].DSouth = true;
-                            map[find.x][find.y].DNorth = true;
+                            map[x][y].DNorth = true;
+                            map[x][y - 1].DSouth = true;
                         }
-                        // otherwise move onto the next direction.
                         else {
-                            dir += 1;
+                            // going to the next direction.
+                            dir++;
                         }
                     }
-                    // if the direction is east.
                     else if (dir === 1) {
-                        // if the direction exists.
-                        if (map[find.x + 1]) {
-                            // mark the loop done and connect them.
+                        // if it doesn't have that connection and the room exists.
+                        if (!map[x][y].DEast && map[x + 1]) {
+                            // set the flag and make the connection.
                             done = true;
-                            map[find.x + 1][find.y].DWest = true;
-                            map[find.x][find.y].DEast = true;
+                            map[x][y].DEast = true;
+                            map[x + 1][y].DWest = true;
                         }
-                        // otherwise move onto the next direction.
                         else {
-                            dir += 1;
+                            // going to the next direction.
+                            dir++;
                         }
                     }
-                    // if the direction is south.
                     else if (dir === 2) {
-                        // if the direction exists.
-                        if (map[find.x][find.y + 1]) {
-                            // mark the loop done and connect them.
+                        // if it doesn't have that connection and the room exists.
+                        if (!map[x][y].DSouth && map[x][y + 1]) {
+                            // set the flag and make the connection.
                             done = true;
-                            map[find.x][find.y + 1].DNorth = true;
-                            map[find.x][find.y].DSouth = true;
+                            map[x][y].DSouth = true;
+                            map[x][y + 1].DNorth = true;
                         }
-                        // otherwise move onto the next direction.
                         else {
-                            dir += 1;
+                            // going to the next direction.
+                            dir++;
                         }
                     }
-                    // if the direction is west.
                     else {
-                        // if the direction exists.
-                        if (map[find.x - 1]) {
-                            // mark the loop done and connect them.
+                        // if it doesn't have that connection and the room exists.
+                        if (!map[x][y].DWest && map[x - 1]) {
+                            // set the flag and make the connection.
                             done = true;
-                            map[find.x - 1][find.y].DEast = true;
-                            map[find.x][find.y].DWest = true;
+                            map[x][y].DWest = true;
+                            map[x - 1][y].DEast = true;
                         }
-                        // otherwise move onto the next direction.
                         else {
+                            // going to the next direction.
                             dir = 0;
                         }
                     }
@@ -1383,24 +1556,24 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      */
     private draw(map: IRoom[][], getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
-        /*for(let x = 0; x < map.length; x++) {
-            for(let y = 0; y < map[0].length; y++) {
-                this.game.getTileUnsafe(map[x][y].x1, map[x][y].y1).owner = this.players[0];
-                this.game.getTileUnsafe(map[x][y].x1, map[x][y].y1).type = "generator";
-                this.game.getTileUnsafe(map[x][y].x1, map[x][y].y2).owner = this.players[0];
-                this.game.getTileUnsafe(map[x][y].x1, map[x][y].y2).type = "generator";
-                this.game.getTileUnsafe(map[x][y].x2, map[x][y].y1).owner = this.players[0];
-                this.game.getTileUnsafe(map[x][y].x2, map[x][y].y1).type = "generator";
-                this.game.getTileUnsafe(map[x][y].x2, map[x][y].y2).owner = this.players[0];
-                this.game.getTileUnsafe(map[x][y].x2, map[x][y].y2).type = "generator";
-                if(map[x][y].y3 !== -1) {
-                    this.game.getTileUnsafe(map[x][y].x1, map[x][y].y3).owner = this.players[0];
-                    this.game.getTileUnsafe(map[x][y].x1, map[x][y].y3).type = "generator";
-                    this.game.getTileUnsafe(map[x][y].x2, map[x][y].y3).owner = this.players[0];
-                    this.game.getTileUnsafe(map[x][y].x2, map[x][y].y3).type = "generator";
+        for (const x of map) {
+            for (const y of x) {
+                getMutableTile(y.x1, y.y1).owner = this.players[0];
+                getMutableTile(y.x1, y.y1).type = "generator";
+                getMutableTile(y.x1, y.y2).owner = this.players[0];
+                getMutableTile(y.x1, y.y2).type = "generator";
+                getMutableTile(y.x2, y.y1).owner = this.players[0];
+                getMutableTile(y.x2, y.y1).type = "generator";
+                getMutableTile(y.x2, y.y2).owner = this.players[0];
+                getMutableTile(y.x2, y.y2).type = "generator";
+                if (y.y3 !== -1) {
+                    getMutableTile(y.x1, y.y3).owner = this.players[0];
+                    getMutableTile(y.x1, y.y3).type = "generator";
+                    getMutableTile(y.x2, y.y3).owner = this.players[0];
+                    getMutableTile(y.x2, y.y3).type = "generator";
                 }
             }
-        }*/
+        }
         // iterate through the rooms of the map.
         for (const rooms of map) {
             for (const room of rooms) {
