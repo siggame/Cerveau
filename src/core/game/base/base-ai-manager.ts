@@ -146,7 +146,7 @@ export class BaseAIManager {
      * NOTE: while game logic runs a delta will probably be sent out.
      */
     private async requestedRun<T>(
-        callerReference: IGameObjectReference,
+        callerReference: Readonly<IGameObjectReference>,
         functionName: string,
         unsanitizedArgs: UnknownObject,
     ): Promise<T | undefined> {
@@ -174,9 +174,9 @@ export class BaseAIManager {
      * this run command, or undefined if the command is incomprehensible.
      */
     private async tryToRun<T>(
-        callerReference: IGameObjectReference,
+        callerReference: Readonly<IGameObjectReference>,
         functionName: string,
-        unsanitizedArgs: UnknownObject,
+        unsanitizedArgs: Readonly<UnknownObject>,
     ): Promise<T | undefined> {
         if (!this.client.player) {
             this.client.disconnect(
@@ -327,7 +327,7 @@ ${JSON.stringify(mapToObject(argsMap))}
      *
      * @param order The order to send
      */
-    private sendOrder(order: IOrder): void {
+    private sendOrder(order: Readonly<IOrder>): void {
         const simpleOrder = {
             name: order.name,
             index: order.index,
@@ -356,7 +356,10 @@ ${JSON.stringify(mapToObject(argsMap))}
      * @param unsanitizedReturned - The value they returned from executing
      * that order.
      */
-    private finishedOrder(orderIndex: number, unsanitizedReturned: unknown): void {
+    private finishedOrder(
+        orderIndex: number,
+        unsanitizedReturned: unknown,
+    ): void {
         const order = this.orders.get(orderIndex);
         if (!order || !this.client.player) {
             this.client.disconnect(

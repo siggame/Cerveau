@@ -91,14 +91,14 @@ export class Building extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IBuildingProperties & {
+        args: Readonly<IBuildingProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             owner: Player;
             x: number;
             y: number;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

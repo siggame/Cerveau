@@ -134,7 +134,7 @@ export class SpidersGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: SpidersGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

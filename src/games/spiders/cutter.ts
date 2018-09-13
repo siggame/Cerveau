@@ -32,12 +32,12 @@ export class Cutter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: SpiderlingArgs & ICutterProperties & {
+        args: Readonly<SpiderlingArgs & ICutterProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

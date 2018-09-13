@@ -52,12 +52,12 @@ export class Furnishing extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IFurnishingProperties & {
+        args: Readonly<IFurnishingProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

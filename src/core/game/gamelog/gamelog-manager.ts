@@ -72,7 +72,7 @@ export class GamelogManager {
      * representation of the gamelog.
      * @returns A promise that resolves to the filename written.
      */
-    public log(gamelog: IGamelog): Promise<string> {
+    public log(gamelog: Readonly<IGamelog>): Promise<string> {
         const serialized = JSON.stringify(gamelog);
         const filename = filenameFor(gamelog);
 

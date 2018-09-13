@@ -61,13 +61,13 @@ export class Structure extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IStructureProperties & {
+        args: Readonly<IStructureProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             tile: Tile;
             type: StructureType;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

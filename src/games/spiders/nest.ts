@@ -55,12 +55,12 @@ export class Nest extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: INestProperties & {
+        args: Readonly<INestProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

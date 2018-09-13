@@ -70,7 +70,7 @@ export class Session {
     private fatal?: Error;
 
     /** All the clients in this game. */
-    private readonly clients: BaseClient[];
+    private readonly clients: ReadonlyArray<BaseClient>;
 
     /**
      * The scribe that logs events (deltas) from the game, to make the gamelog.
@@ -81,7 +81,7 @@ export class Session {
     private readonly gameManager: BaseGameManager;
 
     /** The namespace of the game we are running. */
-    private readonly gameNamespace: IBaseGameNamespace;
+    private readonly gameNamespace: Readonly<IBaseGameNamespace>;
 
     /** The game we are running. The GameManager actually creates it. */
     private readonly game: BaseGame;
@@ -99,9 +99,9 @@ export class Session {
      */
     constructor(args: {
         id: string;
-        gameNamespace: IBaseGameNamespace;
+        gameNamespace: Readonly<IBaseGameNamespace>;
         gameSettingsManager: BaseGameSettingsManager;
-        clients: BaseClient[];
+        clients: ReadonlyArray<BaseClient>;
     }) {
         this.id = args.id;
         this.gameNamespace = args.gameNamespace;
@@ -210,7 +210,7 @@ ${fatal.message}`,
      * Called when the game ends, so that this thread "ends"
      * @param gamelog The gamelog we made to send back to the master thread.
      */
-    private async end(gamelog?: IGamelog): Promise<void> {
+    private async end(gamelog?: Readonly<IGamelog>): Promise<void> {
         if (this.timeout) {
             // then we are done, so we cannot timeout
             clearTimeout(this.timeout);
@@ -304,7 +304,7 @@ ${fatal.message}`,
      * @param type - the type of delta that ocurred
      * @param [data] - any additional data about what caused the delta
      */
-    private readonly sendDeltas = (delta: IDelta) => {
+    private readonly sendDeltas = (delta: Readonly<IDelta>) => {
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games

@@ -78,12 +78,12 @@ export class Job extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IJobProperties & {
+        args: Readonly<IJobProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

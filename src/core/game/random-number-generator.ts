@@ -27,7 +27,7 @@ export class RandomNumberGenerator {
         const max = Math.round(Math.max(upper, lower));
         const min = Math.round(Math.min(upper, lower));
 
-        return Math.abs(this.random.int32() % max) + min;
+        return Math.abs(this.random.int32() % (max - min)) + min;
     }
 
     /**

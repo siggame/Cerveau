@@ -11,14 +11,14 @@ import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
  * @param args - The creation args
  * @returns A new DeltaMergeable wrapping an Object.
  */
-export function createObject(args: {
+export function createObject(args: Readonly<{
     key: string;
     initialValue?: any;
     parent?: DeltaMergeable;
-    childTypes?: ITypedObject<ISanitizableType>;
-    childType?: ISanitizableType;
+    childTypes?: Readonly<ITypedObject<ISanitizableType>>;
+    childType?: Readonly<ISanitizableType>;
     transform?: DeltaTransform<object>;
-}): DeltaMergeable<UnknownObject> {
+}>): DeltaMergeable<UnknownObject> {
     const deltaMergeables: ITypedObject<DeltaMergeable> = {};
     const container = new DeltaMergeable<object>({
         key: args.key,

@@ -49,14 +49,14 @@ export class YoungGun extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IYoungGunProperties & {
+        args: Readonly<IYoungGunProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             owner: Player;
             tile: Tile;
             previousTile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

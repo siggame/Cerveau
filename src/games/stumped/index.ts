@@ -492,7 +492,9 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Beaver hooked up in the game and ready for you to use.
      */
-    public beaver<T extends BeaverArgs>(args: T): Beaver & T {
+    public beaver<T extends BeaverArgs>(
+        args: Readonly<T>,
+    ): Beaver & T {
         return this.createGameObject("Beaver", Beaver, args);
     }
 
@@ -503,7 +505,9 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(args: T): Job & T {
+    public job<T extends JobArgs>(
+        args: Readonly<T>,
+    ): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -514,7 +518,9 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
-    public spawner<T extends SpawnerArgs>(args: T): Spawner & T {
+    public spawner<T extends SpawnerArgs>(
+        args: Readonly<T>,
+    ): Spawner & T {
         return this.createGameObject("Spawner", Spawner, args);
     }
 
@@ -525,7 +531,9 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: T): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 

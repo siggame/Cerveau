@@ -159,7 +159,7 @@ export class SaloonGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: SaloonGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

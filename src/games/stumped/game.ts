@@ -145,7 +145,7 @@ export class StumpedGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: StumpedGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 

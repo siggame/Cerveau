@@ -53,8 +53,8 @@ export class GameObject extends BaseClasses.GameObject {
      */
     constructor(
         // never directly created by game developers
-        args: IGameObjectProperties,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<IGameObjectProperties>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

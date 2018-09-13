@@ -60,7 +60,7 @@ type Serialized =
  * @returns True if the object is a game object reference
  */
 export function isGameObjectReference(
-    obj: UnknownObject,
+    obj: Readonly<UnknownObject>,
 ): obj is { id: string } {
     return isEmptyExceptFor(obj, "id");
 }

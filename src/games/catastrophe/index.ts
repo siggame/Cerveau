@@ -536,7 +536,9 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(args: T): Job & T {
+    public job<T extends JobArgs>(
+        args: Readonly<T>,
+    ): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -547,7 +549,9 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Structure hooked up in the game and ready for you to use.
      */
-    public structure<T extends StructureArgs>(args: T): Structure & T {
+    public structure<T extends StructureArgs>(
+        args: Readonly<T>,
+    ): Structure & T {
         return this.createGameObject("Structure", Structure, args);
     }
 
@@ -558,7 +562,9 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: T): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -569,7 +575,9 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(args: T): Unit & T {
+    public unit<T extends UnitArgs>(
+        args: Readonly<T>,
+    ): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
 

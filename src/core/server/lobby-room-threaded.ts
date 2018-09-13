@@ -113,7 +113,7 @@ export class ThreadedRoom extends Room {
      * @param gamelog - The gamelog sent from the session.
      * @returns A promise that resolves once we've cleaned up.
      */
-    protected async cleanUp(gamelog: IGamelog): Promise<void> {
+    protected async cleanUp(gamelog: Readonly<IGamelog>): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
         await super.cleanUp(gamelog);
     }

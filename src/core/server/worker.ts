@@ -62,7 +62,10 @@ if (!required.Namespace) {
 const gameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
-process.on("message", (message: MessageFromMainThread, socket?: Socket) => {
+process.on("message", (
+    message: Readonly<MessageFromMainThread>,
+    socket?: Socket,
+) => {
     if (typeof message !== "object" || !message || !message.type) {
         throw new Error(`Could not understand message from parent thread to worker: '${message}'`);
     }

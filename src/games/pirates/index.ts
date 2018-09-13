@@ -459,7 +459,9 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public port<T extends PortArgs>(args: T): Port & T {
+    public port<T extends PortArgs>(
+        args: Readonly<T>,
+    ): Port & T {
         return this.createGameObject("Port", Port, args);
     }
 
@@ -470,7 +472,9 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: T): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -481,7 +485,9 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(args: T): Unit & T {
+    public unit<T extends UnitArgs>(
+        args: Readonly<T>,
+    ): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
 

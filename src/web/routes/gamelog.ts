@@ -60,7 +60,7 @@ export function registerRouteGamelog(app: Express): void {
      *     "error": "Gamelog not found."
      * }
      */
-    app.get("/gamelog/:filename", async (req, res, next) => {
+    app.get("/gamelog/:filename", async (req, res) => {
         const params = req.params as {
             filename: unknown;
         };

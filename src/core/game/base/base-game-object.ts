@@ -18,7 +18,7 @@ export interface IBaseGameObjectRequiredData {
     gameObjectName: string;
     gameObjectsDeltaMergeable: DeltaMergeable;
     game: BaseGame;
-    schema: IBaseGameObjectSchema;
+    schema: Readonly<IBaseGameObjectSchema>;
 }
 
 /**
@@ -52,8 +52,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * the game, and set default values for the sub class.
      */
     constructor(
-        data: IBaseGameObjectData,
-        requiredData: IBaseGameObjectRequiredData,
+        data: Readonly<IBaseGameObjectData>,
+        requiredData: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super({
             key: requiredData.id,

@@ -34,12 +34,12 @@ export class Spitter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: SpiderlingArgs & ISpitterProperties & {
+        args: Readonly<SpiderlingArgs & ISpitterProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

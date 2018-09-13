@@ -40,12 +40,12 @@ export class BroodMother extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: SpiderArgs & IBroodMotherProperties & {
+        args: Readonly<SpiderArgs & IBroodMotherProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             nest: Nest;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

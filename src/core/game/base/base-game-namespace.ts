@@ -45,10 +45,10 @@ export interface IBaseGameNamespace {
 /**
  * Should be invoked by all games to format their namespace correctly.
  *
- * @param namespace - The base game namespace to use.
- * @returns A fresh game namespace ready to be used to play games with.
+ * @param namespace - The base game namespace to use. Will be mutated.
+ * @returns The same game namespace ready to be used to play games with.
  */
-export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace {
+export function makeNamespace(namespace: IBaseGameNamespace): Readonly<IBaseGameNamespace> {
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
         if (!obj) {
             throw new Error(`unexpected non object in namespace ${namespace.gameName}`);
@@ -68,5 +68,5 @@ export function makeNamespace(namespace: IBaseGameNamespace): IBaseGameNamespace
         }
     }
 
-    return namespace;
+    return Object.freeze(namespace);
 }

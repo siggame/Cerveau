@@ -9,15 +9,15 @@ import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";
  * @param args - The arguments required to hook up a new game object.
  * @returns The newly created game object.
  */
-export function createGameObject< T extends BaseGameObject>(args: {
+export function createGameObject<T extends BaseGameObject>(args: Readonly<{
     id: string;
     game: BaseGame;
     GameObjectClass: typeof BaseGameObject;
     gameObjectName: string;
     gameObjectsDeltaMergeable: DeltaMergeable;
-    gameNamespace: IBaseGameNamespace;
-    data: IBaseGameObjectData;
-}): T {
+    gameNamespace: Readonly<IBaseGameNamespace>;
+    data: Readonly<IBaseGameObjectData>;
+}>): T {
     const schema = args.gameNamespace.gameObjectsSchema[args.gameObjectName];
 
     if (!schema) {
@@ -73,7 +73,7 @@ export class BaseGameObjectFactory {
     protected createGameObject<T extends BaseGameObject>(
         gameObjectName: string,
         GameObjectClass: typeof BaseGameObject,
-        data: IBaseGameObjectData,
+        data: Readonly<IBaseGameObjectData>,
     ): T {
         return createGameObject({
             id: this.generateID(),

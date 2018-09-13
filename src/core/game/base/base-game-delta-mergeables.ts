@@ -20,8 +20,8 @@ export class BaseGameDeltaMergeables {
     constructor(args: {
         key: string;
         parent?: DeltaMergeable;
-        attributesSchema: ITypedObject<ISanitizableType>;
-        initialValues: UnknownObject;
+        attributesSchema: Readonly<ITypedObject<ISanitizableType>>;
+        initialValues: Readonly<UnknownObject>;
     }) {
         this.deltaMergeable = createDeltaMergeable({
             key: args.key,

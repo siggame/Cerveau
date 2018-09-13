@@ -399,7 +399,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Building hooked up in the game and ready for you to use.
      */
-    public building<T extends BuildingArgs>(args: T): Building & T {
+    public building<T extends BuildingArgs>(
+        args: Readonly<T>,
+    ): Building & T {
         return this.createGameObject("Building", Building, args);
     }
 
@@ -411,7 +413,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new FireDepartment hooked up in the game and ready for you to
      * use.
      */
-    public fireDepartment<T extends FireDepartmentArgs>(args: T): FireDepartment & T {
+    public fireDepartment<T extends FireDepartmentArgs>(
+        args: Readonly<T>,
+    ): FireDepartment & T {
         return this.createGameObject("FireDepartment", FireDepartment, args);
     }
 
@@ -422,7 +426,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Forecast hooked up in the game and ready for you to use.
      */
-    public forecast<T extends ForecastArgs>(args: T): Forecast & T {
+    public forecast<T extends ForecastArgs>(
+        args: Readonly<T>,
+    ): Forecast & T {
         return this.createGameObject("Forecast", Forecast, args);
     }
 
@@ -435,7 +441,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */
-    public policeDepartment<T extends PoliceDepartmentArgs>(args: T): PoliceDepartment & T {
+    public policeDepartment<T extends PoliceDepartmentArgs>(
+        args: Readonly<T>,
+    ): PoliceDepartment & T {
         return this.createGameObject("PoliceDepartment", PoliceDepartment, args);
     }
 
@@ -446,7 +454,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Warehouse hooked up in the game and ready for you to use.
      */
-    public warehouse<T extends WarehouseArgs>(args: T): Warehouse & T {
+    public warehouse<T extends WarehouseArgs>(
+        args: Readonly<T>,
+    ): Warehouse & T {
         return this.createGameObject("Warehouse", Warehouse, args);
     }
 
@@ -458,7 +468,9 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * @returns A new WeatherStation hooked up in the game and ready for you to
      * use.
      */
-    public weatherStation<T extends WeatherStationArgs>(args: T): WeatherStation & T {
+    public weatherStation<T extends WeatherStationArgs>(
+        args: Readonly<T>,
+    ): WeatherStation & T {
         return this.createGameObject("WeatherStation", WeatherStation, args);
     }
 

@@ -12,11 +12,11 @@ import { IBasePlayer, IBasePlayerData } from "./base-player";
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
     sessionID: string;
-    playingClients: BasePlayingClient[];
+    playingClients: ReadonlyArray<BasePlayingClient>;
     rootDeltaMergeable: DeltaMergeable;
-    playerIDs: string[];
-    namespace: IBaseGameNamespace;
-    schema: IBaseGameObjectSchema;
+    playerIDs: ReadonlyArray<string>;
+    namespace: Readonly<IBaseGameNamespace>;
+    schema: Readonly<IBaseGameObjectSchema>;
     manager: BaseGameManager;
     gameCreated: Event<{
         game: BaseGame;

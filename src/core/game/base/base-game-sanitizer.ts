@@ -13,7 +13,7 @@ export class BaseGameSanitizer {
      *
      * @param namespace - The game namespace we are sanitizing for.
      */
-    constructor(protected readonly namespace: IBaseGameNamespace) {
+    constructor(protected readonly namespace: Readonly<IBaseGameNamespace>) {
     }
 
     /**
@@ -26,7 +26,7 @@ export class BaseGameSanitizer {
      */
     public sanitizeOrderArgs(
         aiFunctionName: string,
-        args: Array<unknown>, // TODO: unknown[] when tslint gets sane
+        args: ReadonlyArray<unknown>,
     ): Error | Array<unknown> {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -77,7 +77,7 @@ export class BaseGameSanitizer {
     public validateRunArgs(
         gameObject: BaseGameObject,
         functionName: string,
-        args: UnknownObject,
+        args: Readonly<UnknownObject>,
     ): Error | Map<string, unknown> | { invalid: string } {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {

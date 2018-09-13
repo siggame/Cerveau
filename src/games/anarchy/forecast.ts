@@ -51,14 +51,14 @@ export class Forecast extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IForecastProperties & {
+        args: Readonly<IForecastProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             direction: "North" | "East" | "South" | "West";
             intensity: number;
             controllingPlayer: Player;
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
