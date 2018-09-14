@@ -335,7 +335,6 @@ export class NewtonianGame extends BaseClasses.Game {
         // Decides if the rooms shifts upwards or downwards
         /** used to determine random shifts and doorways */
         let shiftDir = this.manager.random.int(2, 0);
-        shiftDir = 0; // TODO: delete this, this is test code
         /** Determines the ship of the middle room */
         if (shiftDir === 1) {
             shift = -shift;
@@ -549,117 +548,10 @@ export class NewtonianGame extends BaseClasses.Game {
             }
             // if the room is bigger
             else {
-                // determines the number of rooms on the x axis
-                /*const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
-                // determines the number of rooms on the y axis
-                let b = Math.floor((mid - midSize + shift) / 3);
-                // counts the extra y tiles.
-                const extra = (mid - midSize + shift) % 3;
-                // map used for mapgen.
-                const map: IRoom[][] = [];
-                for (let i = 0; i < a; i++) {
-                    map[i] = new Array(b);
-                }
-                let yStart = 1;
-                const yEnd = mid - midSize + shift - 1;
-                let room = this.makeRoom(0, 0, 0, 0);
-                let start = 0;
-                if (extra === 2) {
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yStart,
-                            yStart + 1,
-                            yStart + 2,
-                        );
-                        map[i][0] = room;
-                        // getMutableTile(9+i, 2).isWall = true
-                    }
-                    start = 1;
-                    yStart += 1;
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yEnd - 2,
-                            yEnd - 1 ,
-                            yEnd,
-                        );
-                        map[i][b - 1] = room;
-                        // getMutableTile(9+i, 1+b).isWall = true
-                    }
-                    b -= 1;
-                }
-                else if (extra === 1) {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yStart,
-                                yStart + 1,
-                                yStart + 2,
-                            );
-                            map[i][0] = room;
-                            // getMutableTile(9+i, 2).isWall = true
-                        }
-                        start = 1;
-                        yStart += 1;
-                    }
-                    else {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yEnd - 2,
-                                yEnd - 1,
-                                yEnd,
-                            );
-                            map[i][b - 1] = room;
-                            // getMutableTile(9+i, 1+b).isWall = true
-                        }
-                        b -= 1;
-                    }
-                }
-                for (let x = 0; x < a; x++) {
-                    for (let y = start; y < b; y++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (x * 3),
-                            MMstart + 2 + (x * 3),
-                            yStart + (y * 3),
-                            yStart + 1 + (y * 3),
-                        );
-                        map[x][y] = room;
-                        // getMutableTile(9+x, 2+y).isWall = true
-                    }
-                }
-                // add doors into the center room
-                shiftDir = this.manager.random.int(map.length, 0);
-                for (let x = 0; x < map.length; x++) {
-                    if (shiftDir !== x) {
-                        map[x][map[0].length - 1].DSouth = true;
-                    }
-                }
-                // add doors into the other side of the middle area
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[map.length - 1][y].DEast = true;
-                    }
-                }
-                // add doors into the side room area.
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[0][y].DWest = true;
-                    }
-                }
-                this.roomFill(map, getMutableTile);*/
-                this.roomCalc(MMstart + 1, (this.mapWidth + 1) / 2, 1,
+                // generates the rooms.
+                this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2, 1,
                               mid - midSize + shift - 1, getMutableTile,
-                              false, true, true, true);
+                              false, true, true, false);
             }
         }
         // bottom area
@@ -832,123 +724,25 @@ export class NewtonianGame extends BaseClasses.Game {
             // generate a very large area.
             }
             else {
-                // determines the number of rooms on the x axis
-                const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
-                // determines the number of rooms on the y axis
-                let b = Math.floor((this.mapHeight - (mid + midSize + shift)) / 3);
-                // counts the extra y tiles.
-                const extra = (mid + midSize + shift) % 3;
-                // map used for mapgen.
-                const map: IRoom[][] = [];
-                for (let i = 0; i < a; i++) {
-                    map[i] = new Array(b);
-                }
-                let yStart = mid + midSize + shift + 1;
-                const yEnd = this.mapHeight - 1;
-                let room = this.makeRoom(0, 0, 0, 0);
-                let start = 0;
-                if (extra === 2) {
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yStart,
-                            yStart + 1,
-                            yStart + 2,
-                        );
-                        map[i][0] = room;
-                        // getMutableTile(9+i, 2).isWall = true
-                    }
-                    start = 1;
-                    yStart += 1;
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yEnd - 2,
-                            yEnd - 1 ,
-                            yEnd,
-                        );
-                        map[i][b - 1] = room;
-                        // getMutableTile(9+i, 1+b).isWall = true
-                    }
-                    b -= 1;
-                }
-                else if (extra === 1) {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yStart,
-                                yStart + 1,
-                                yStart + 2,
-                            );
-                            map[i][0] = room;
-                            // getMutableTile(9+i, 2).isWall = true
-                        }
-                        start = 1;
-                        yStart += 1;
-                    }
-                    else {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yEnd - 2,
-                                yEnd - 1,
-                                yEnd,
-                            );
-                            map[i][b - 1] = room;
-                            // getMutableTile(9+i, 1+b).isWall = true
-                        }
-                        b -= 1;
-                    }
-                }
-                for (let x = 0; x < a; x++) {
-                    for (let y = start; y < b; y++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (x * 3),
-                            MMstart + 2 + (x * 3),
-                            yStart + (y * 3),
-                            yStart + 1 + (y * 3),
-                        );
-                        map[x][y] = room;
-                        // getMutableTile(9+x, 2+y).isWall = true
-                    }
-                }
-                // add doors into the center room
-                shiftDir = this.manager.random.int(map.length, 0);
-                for (let x = 0; x < map.length; x++) {
-                    if (shiftDir !== x) {
-                        map[x][0].DNorth = true;
-                    }
-                }
-                // add doors into the other side of the middle area
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[map.length - 1][y].DEast = true;
-                    }
-                }
-                // add doors into the side room area.
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[0][y].DWest = true;
-                    }
-                }
-                this.roomFill(map, getMutableTile);
+                // generates the rooms.
+                this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2,
+                              mid + midSize + shift + 1,
+                              this.mapHeight - 2, getMutableTile,
+                              true, true, false, false);
             }
         }
         // generate Side area
+        this.roomCalc(RMstart + 1, MMstart - 1, 1,
+                      this.mapHeight - 2, getMutableTile,
+                      false, true, false, true);
         // Math.floor(Math.random() * 3)
         // mirror map
         for (let x = 0; x < this.mapWidth / 2; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const copy = getMutableTile(x, y).isWall;
                 getMutableTile((this.mapWidth - 1 - x), y).isWall = copy;
+                const copy2 = getMutableTile(x, y).decoration;
+                getMutableTile((this.mapWidth - 1 - x), y).decoration = copy2;
                 if (getMutableTile(x, y).machine) {
                     const mach = getMutableTile(x, y).machine;
                     if (mach === undefined) {
@@ -1030,128 +824,16 @@ export class NewtonianGame extends BaseClasses.Game {
                      getMutableTile: (x: number, y: number) => MutableRequired<Tile>,
                      DNorth: boolean = false, DEast: boolean = false,
                      DSouth: boolean = false, DWest: boolean = false): void {
-            // determines the number of rooms on the x axis
-            /*
-            this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2, 1,
-                          mid - midSize + shift - 1, getMutableTile,
-                          false, true, true, true);
-            const a = Math.floor(((this.mapWidth - 1) / 2 - MMstart) / 3); // MUST be a whole number
-            // determines the number of rooms on the y axis
-            let b = Math.floor((mid - midSize + shift) / 3);
-            // counts the extra y tiles.
-            const extra = (mid - midSize + shift) % 3;
-            // map used for mapgen.
-            const map: IRoom[][] = [];
-            for (let i = 0; i < a; i++) {
-                map[i] = new Array(b);
-            }
-            let yStart = 1;
-                const yEnd = mid - midSize + shift - 1;
-                let room = this.makeRoom(0, 0, 0, 0);
-                let start = 0;
-                if (extra === 2) {
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yStart,
-                            yStart + 1,
-                            yStart + 2,
-                        );
-                        map[i][0] = room;
-                        // getMutableTile(9+i, 2).isWall = true
-                    }
-                    start = 1;
-                    yStart += 1;
-                    for (let i = 0; i < a; i++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (i * 3),
-                            MMstart + 2 + (i * 3),
-                            yEnd - 2,
-                            yEnd - 1 ,
-                            yEnd,
-                        );
-                        map[i][b - 1] = room;
-                        // getMutableTile(9+i, 1+b).isWall = true
-                    }
-                    b -= 1;
-                }
-                else if (extra === 1) {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yStart,
-                                yStart + 1,
-                                yStart + 2,
-                            );
-                            map[i][0] = room;
-                            // getMutableTile(9+i, 2).isWall = true
-                        }
-                        start = 1;
-                        yStart += 1;
-                    }
-                    else {
-                        for (let i = 0; i < a; i++) {
-                            room = this.makeRoom(
-                                MMstart + 1 + (i * 3),
-                                MMstart + 2 + (i * 3),
-                                yEnd - 2,
-                                yEnd - 1,
-                                yEnd,
-                            );
-                            map[i][b - 1] = room;
-                            // getMutableTile(9+i, 1+b).isWall = true
-                        }
-                        b -= 1;
-                    }
-                }
-                for (let x = 0; x < a; x++) {
-                    for (let y = start; y < b; y++) {
-                        room = this.makeRoom(
-                            MMstart + 1 + (x * 3),
-                            MMstart + 2 + (x * 3),
-                            yStart + (y * 3),
-                            yStart + 1 + (y * 3),
-                        );
-                        map[x][y] = room;
-                        // getMutableTile(9+x, 2+y).isWall = true
-                    }
-                }
-                // add doors into the center room
-                shiftDir = this.manager.random.int(map.length, 0);
-                for (let x = 0; x < map.length; x++) {
-                    if (shiftDir !== x) {
-                        map[x][map[0].length - 1].DSouth = true;
-                    }
-                }
-                // add doors into the other side of the middle area
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[map.length - 1][y].DEast = true;
-                    }
-                }
-                // add doors into the side room area.
-                shiftDir = this.manager.random.int(map[0].length, 0);
-                for (let y = 0; y < map[0].length; y++) {
-                    if (shiftDir !== y) {
-                        map[0][y].DWest = true;
-                    }
-                }
-                this.roomFill(map, getMutableTile);*/
         // determines the number of rooms on the x axis
-        const a = Math.round((x2 - x1 + 1) / 3); // MUST be a whole number
+        const a = Math.floor((x2 - x1 + 2) / 3); // MUST be a whole number
         // determines the number of rooms on the y axis
-        let b = Math.round((y2 - y1 + 1) / 3);
+        let b = Math.floor((y2 - y1 + 2) / 3);
         // counts the extra y tiles.
-        const extra = (y2 - y1 + 1) % 3;
-        // map used for mapgen.
-        const map: IRoom[][] = [];
+        const extra = (y2 - y1 + 2) % 3;
         // variables to decide random things.
         let shift = 0;
+        // map used for mapgen.
+        const map: IRoom[][] = [];
         for (let i = 0; i < a; i++) {
             map[i] = new Array(b);
         }
@@ -1468,6 +1150,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 let dir = this.manager.random.int(4, 0);
                 // setting the flag variable.
                 done = false;
+                let num = 0;
                 // making sure it picks a direction.
                 while (!done) {
                     // if it picks north.
@@ -1482,6 +1165,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             // going to the next direction.
                             dir++;
+                            num++;
                         }
                     }
                     else if (dir === 1) {
@@ -1495,6 +1179,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             // going to the next direction.
                             dir++;
+                            num++;
                         }
                     }
                     else if (dir === 2) {
@@ -1508,6 +1193,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             // going to the next direction.
                             dir++;
+                            num++;
                         }
                     }
                     else {
@@ -1521,7 +1207,11 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             // going to the next direction.
                             dir = 0;
+                            num++;
                         }
+                    }
+                    if (num > 4) {
+                        done = true;
                     }
                 }
             }
@@ -1556,7 +1246,7 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      */
     private draw(map: IRoom[][], getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
-        for (const x of map) {
+        /*for (const x of map) {
             for (const y of x) {
                 getMutableTile(y.x1, y.y1).owner = this.players[0];
                 getMutableTile(y.x1, y.y1).type = "generator";
@@ -1573,7 +1263,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     getMutableTile(y.x2, y.y3).type = "generator";
                 }
             }
-        }
+        }*/
         // iterate through the rooms of the map.
         for (const rooms of map) {
             for (const room of rooms) {
@@ -1660,12 +1350,16 @@ export class NewtonianGame extends BaseClasses.Game {
                         map[x][y - 1].DSouth = false;
                     }
                     // figure out which part of the wall to make the door.
-                    shift = this.manager.random.int(2, 0);
-                    if (shift === 0) {
-                        getMutableTile(room.x1, room.y1 - 1).isWall = false;
-                    }
-                    else {
-                        getMutableTile(room.x2, room.y1 - 1).isWall = false;
+                    if (room.WNorth === true) {
+                        shift = this.manager.random.int(2, 0);
+                        if (shift === 0) {
+                            getMutableTile(room.x1, room.y1 - 1).isWall = false;
+                            getMutableTile(room.x1, room.y1 - 1).decoration = 1;
+                        }
+                        else {
+                            getMutableTile(room.x2, room.y1 - 1).isWall = false;
+                            getMutableTile(room.x2, room.y1 - 1).decoration = 1;
+                        }
                     }
                 }
                 // if there is a door to the east.
@@ -1674,27 +1368,34 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (map[x + 1]) {
                         map[x + 1][y].DWest = false;
                     }
-                    if (room.y3 === -1) {
-                        // figure out which part of the wall to make the door.
-                        shift = this.manager.random.int(2, 0);
-                        if (shift === 0) {
-                            getMutableTile(room.x2 + 1, room.y1).isWall = false;
+                    if (room.WEast === true) {
+                        if (room.y3 === -1) {
+                            // figure out which part of the wall to make the door.
+                            shift = this.manager.random.int(2, 0);
+                            if (shift === 0) {
+                                getMutableTile(room.x2 + 1, room.y1).isWall = false;
+                                getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x2 + 1, room.y2).isWall = false;
+                                getMutableTile(room.x2 + 1, room.y2).decoration = 1;
+                            }
                         }
                         else {
-                            getMutableTile(room.x2 + 1, room.y2).isWall = false;
-                        }
-                    }
-                    else {
-                        // figure out which part of the wall to make the door.
-                        shift = this.manager.random.int(3, 0);
-                        if (shift === 0) {
-                            getMutableTile(room.x2 + 1, room.y1).isWall = false;
-                        }
-                        else if (shift === 1) {
-                            getMutableTile(room.x2 + 1, room.y2).isWall = false;
-                        }
-                        else {
-                            getMutableTile(room.x2 + 1, room.y3).isWall = false;
+                            // figure out which part of the wall to make the door.
+                            shift = this.manager.random.int(3, 0);
+                            if (shift === 0) {
+                                getMutableTile(room.x2 + 1, room.y1).isWall = false;
+                                getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                            }
+                            else if (shift === 1) {
+                                getMutableTile(room.x2 + 1, room.y2).isWall = false;
+                                getMutableTile(room.x2 + 1, room.y2).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x2 + 1, room.y3).isWall = false;
+                                getMutableTile(room.x2 + 1, room.y3).decoration = 1;
+                            }
                         }
                     }
                 }
@@ -1705,20 +1406,26 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                     // figure out which part of the wall to make the door.
                     shift = this.manager.random.int(2, 0);
-                    if (room.y3 === -1) {
-                        if (shift === 0) {
-                            getMutableTile(room.x1, room.y2 + 1).isWall = false;
+                    if (room.WSouth === true) {
+                        if (room.y3 === -1) {
+                            if (shift === 0) {
+                                getMutableTile(room.x1, room.y2 + 1).isWall = false;
+                                getMutableTile(room.x1, room.y2 + 1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x2, room.y2 + 1).isWall = false;
+                                getMutableTile(room.x2, room.y2 + 1).decoration = 1;
+                            }
                         }
                         else {
-                            getMutableTile(room.x2, room.y2 + 1).isWall = false;
-                        }
-                    }
-                    else {
-                        if (shift === 0) {
-                            getMutableTile(room.x1, room.y3 + 1).isWall = false;
-                        }
-                        else {
-                            getMutableTile(room.x2, room.y3 + 1).isWall = false;
+                            if (shift === 0) {
+                                getMutableTile(room.x1, room.y3 + 1).isWall = false;
+                                getMutableTile(room.x1, room.y3 + 1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x2, room.y3 + 1).isWall = false;
+                                getMutableTile(room.x2, room.y3 + 1).decoration = 1;
+                            }
                         }
                     }
                 }
@@ -1727,27 +1434,34 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (map[x - 1]) {
                         map[x - 1][y].DEast = false;
                     }
-                    if (room.y3 === -1) {
-                        // figure out which part of the wall to make the door.
-                        shift = this.manager.random.int(2, 0);
-                        if (shift === 0) {
-                            getMutableTile(room.x1 - 1, room.y1).isWall = false;
+                    if (room.WWest === true) {
+                        if (room.y3 === -1) {
+                            // figure out which part of the wall to make the door.
+                            shift = this.manager.random.int(2, 0);
+                            if (shift === 0) {
+                                getMutableTile(room.x1 - 1, room.y1).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x1 - 1, room.y2).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y2).decoration = 1;
+                            }
                         }
                         else {
-                            getMutableTile(room.x1 - 1, room.y2).isWall = false;
-                        }
-                    }
-                    else {
-                        // figure out which part of the wall to make the door.
-                        shift = this.manager.random.int(3, 0);
-                        if (shift === 0) {
-                            getMutableTile(room.x1 - 1, room.y1).isWall = false;
-                        }
-                        else if (shift === 1) {
-                            getMutableTile(room.x1 - 1, room.y2).isWall = false;
-                        }
-                        else {
-                            getMutableTile(room.x1 - 1, room.y3).isWall = false;
+                            // figure out which part of the wall to make the door.
+                            shift = this.manager.random.int(3, 0);
+                            if (shift === 0) {
+                                getMutableTile(room.x1 - 1, room.y1).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y1).decoration = 1;
+                            }
+                            else if (shift === 1) {
+                                getMutableTile(room.x1 - 1, room.y2).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y2).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x1 - 1, room.y3).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y3).decoration = 1;
+                            }
                         }
                     }
                 }
