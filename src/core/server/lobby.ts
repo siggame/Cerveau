@@ -325,7 +325,7 @@ There's probably another Cerveau server running on this same computer.`);
         const GAMES_DIR = "src/games/";
         let dirs = await getDirs(GAMES_DIR);
 
-        if (Config.GAME_NAMES_TO_LOAD) {
+        if (Config.GAME_NAMES_TO_LOAD.length > 0) {
             const gameDirs = Config.GAME_NAMES_TO_LOAD.map(unCapitalizeFirstLetter);
 
             const unknownGameNames = getMinusArray(gameDirs, dirs);

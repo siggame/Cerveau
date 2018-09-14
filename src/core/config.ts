@@ -63,7 +63,7 @@ export interface IArgs {
     GAME_SETTINGS_ENABLED: boolean;
 
     /** The names of specific games to [try] to load, to speed up ts-node startup times */
-    GAME_NAMES_TO_LOAD?: ReadonlyArray<string>;
+    GAME_NAMES_TO_LOAD: ReadonlyArray<string>;
 
     /** should existing gamelogs be loaded from the disk to the web interface/api */
     LOAD_EXISTING_GAMELOGS: boolean;
@@ -211,9 +211,11 @@ for (const key of Object.keys(parsedArgs)) {
 
     const arg = parserArgByDest.get(key);
     if (arg && arg.nargs && !Array.isArray(value)) { // It is not an array, but should be (probably string from dotenv)
-        value = String(value)
-            .split(",") // Split on commas to create an array
-            .map((str) => str.trim()); // And trim each string of whitespace
+        value = value === undefined
+            ? []
+            : String(value)
+                .split(",") // Split on commas to create an array
+                .map((str) => str.trim()); // And trim each string of whitespace
     }
 
     // tslint:disable-next-line:no-any no-unsafe-any
