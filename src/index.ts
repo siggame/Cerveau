@@ -7,16 +7,15 @@ process.title = "Cerveau Game Server";
 import { lstatSync } from "fs";
 
 try {
-    if (!lstatSync("./node_modules/").isDirectory()) {
-        throw new Error(// tslint:disable-next-line:no-multiline-string
-`ERROR: "node_modules/" not found.
-Did you forget to run 'npm install'?`,
-        );
+    const lstat = lstatSync("./node_modules/");
+    if (!lstat.isDirectory()) {
+        throw new Error(); // to trigger catch below
     }
 }
 catch (err) {
     // tslint:disable-next-line no-console
-    console.error(err);
+    console.error(`ERROR: "node_modules/" not found.
+    Did you forget to run 'npm install'?`);
     process.exit(1);
 }
 

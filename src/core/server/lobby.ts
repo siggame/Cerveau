@@ -11,17 +11,20 @@ import { Room } from "./lobby-room";
 import { SerialRoom } from "./lobby-room-serial";
 import { ThreadedRoom } from "./lobby-room-threaded";
 
-const RoomClass: typeof Room = Config.SINGLE_THREADED
-    ? SerialRoom
-    : ThreadedRoom;
-
 // external imports
 import * as ws from "lark-websocket";
 import * as net from "net";
+import { join } from "path";
 import * as querystring from "querystring";
 import * as readline from "readline";
 import { sanitizeNumber } from "~/core/sanitize";
 import { IGamesExport } from "~/core/server/games-export";
+
+const GAMES_DIR = join(__dirname, "../../games/");
+
+const RoomClass: typeof Room = Config.SINGLE_THREADED
+    ? SerialRoom
+    : ThreadedRoom;
 
 /*
     Clients connect like this:
@@ -322,7 +325,6 @@ There's probably another Cerveau server running on this same computer.`);
      * process exits with code 1.
      */
     private async initializeGames(): Promise<void | never> {
-        const GAMES_DIR = "src/games/";
         let dirs = await getDirs(GAMES_DIR);
 
         if (Config.GAME_NAMES_TO_LOAD.length > 0) {
