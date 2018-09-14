@@ -2,8 +2,8 @@
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
-import { capitalizeFirstLetter, getDirs,
-         isNil, ITypedObject, UnknownObject } from "~/utils";
+import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
+         ITypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
 import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -105,6 +105,10 @@ export class Lobby {
                 );
 
                 resolve();
+            }).catch((err) => {
+                logger.error("Fatal exception initializing games!");
+                logger.error(String(err));
+                process.exit(1); // kills the entire game server
             });
         });
 
@@ -297,9 +301,9 @@ export class Lobby {
         });
 
         listener.on("error", (err: Error & { code: string }) => {
-            logger.error(err.code !== "EADDRINUSE"
-            ? String(err)
-            : `Lobby cannot listen on port ${port} for game connections.
+            logger.error(err.code !== "EADDRINUSE" // Very common error for devs
+                ? String(err)
+                : `Lobby cannot listen on port ${port} for game connections.
 Address is already in use.
 
 There's probably another Cerveau server running on this same computer.`);
@@ -319,10 +323,23 @@ There's probably another Cerveau server running on this same computer.`);
      */
     private async initializeGames(): Promise<void | never> {
         const GAMES_DIR = "src/games/";
-        const dirs = await getDirs(GAMES_DIR);
+        let dirs = await getDirs(GAMES_DIR);
+
+        if (Config.GAME_NAMES_TO_LOAD) {
+            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(unCapitalizeFirstLetter);
+
+            const unknownGameNames = getMinusArray(gameDirs, dirs);
+            if (unknownGameNames.length > 0) {
+                throw new Error(`Cannot find directories to load for the selected games: ${
+                    unknownGameNames.map((name) => `"${capitalizeFirstLetter(name)}"`).join(", ")
+                }`);
+            }
+
+            // The selected game directories look fine! load them instead.
+            dirs = gameDirs;
+        }
 
         for (const dir of dirs) {
-
             let gameNamespace: IBaseGameNamespace | undefined;
             try {
                 const data = await import(GAMES_DIR + dir) as IGamesExport;
@@ -330,11 +347,9 @@ There's probably another Cerveau server running on this same computer.`);
             }
             catch (err) {
                 const errorGameName = capitalizeFirstLetter(dir);
-                logger.error(`⚠️ Could not load game ${errorGameName} ⚠️
+                throw new Error(`⚠️ Could not load game ${errorGameName} ⚠️
 ---
 ${err}`);
-
-                return process.exit(1); // kills the entire game server
             }
             const gameName = gameNamespace.gameName;
             logger.info(`🕹️ ${gameName} game loaded 🕹️`);

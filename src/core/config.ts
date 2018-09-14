@@ -62,6 +62,9 @@ export interface IArgs {
     /** if the game settings are enabled */
     GAME_SETTINGS_ENABLED: boolean;
 
+    /** The names of specific games to [try] to load, to speed up ts-node startup times */
+    GAME_NAMES_TO_LOAD?: ReadonlyArray<string>;
+
     /** should existing gamelogs be loaded from the disk to the web interface/api */
     LOAD_EXISTING_GAMELOGS: boolean;
 
@@ -90,7 +93,7 @@ export interface IArgs {
     SESSION_TIMEOUTS_ENABLED: boolean;
 
     /** The config for worker threads, if this is a worker thread, undefined if master thread */
-    WORKER_DATA?: IWorkerGameSessionData;
+    WORKER_DATA?: Readonly<IWorkerGameSessionData>;
 }
 
 const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
@@ -109,7 +112,7 @@ const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
     [["--title"], {action: "store", dest: "MAIN_TITLE", defaultValue: "Cerveau",
         help: "the title of this game sever for the web interface"}],
 
-    [["--password"], {action: "store", dest: "authenticate", defaultValue: "",
+    [["--password"], {action: "store", dest: "AUTH_PASSWORD", defaultValue: "",
         help: "forces clients to send a valid password to be able to play"}],
 
     [["--profile"], {action: "storeTrue", dest: "RUN_PROFILER",
@@ -126,6 +129,9 @@ const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
 
     [["--single-threaded"], {action: "storeTrue", dest: "SINGLE_THREADED",
         help: "If game sessions should be ran on the master thread, for easier debugging of game logic"}],
+
+    [["--only-load"], {nargs: "+", dest: "GAME_NAMES_TO_LOAD",
+        help: "The names of specific games to [try] to load, to speed up ts-node startup times"}],
 
     [["--visualizer-url"], {action: "store", dest: "VISUALIZER_URL",
         help: "the base url the a remote visualizer to send clients to",
@@ -166,6 +172,11 @@ const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
         help: "the updater will not try to autoUpdate when updates are found"}],
 ];
 
+const parserArgByDest = new Map<string, ArgumentOptions>();
+for (const [, arg] of parserArgs) {
+    parserArgByDest.set(arg.dest, arg);
+}
+
 const parser = new ArgumentParser({description:
     "Run the JavaScript client with options to connect to a game server. Must provide a game name to play.",
 });
@@ -189,10 +200,24 @@ for (const key of Object.keys(parsedArgs)) {
     // if the command line value is the default value, and an env value was set
     // use the env value, otherwise use the command line value which will be the
     // default/cli value
-    // tslint:disable-next-line:no-any
-    (args as any)[key] = commandLineValue === defaults[key] && envValue
+    let value = commandLineValue === defaults[key] && envValue
         ? unstringify(envValue)
         : commandLineValue;
+
+    if (value === null) {
+        // We want undefined to be correct for ? types.
+        value = undefined;
+    }
+
+    const arg = parserArgByDest.get(key);
+    if (arg && arg.nargs && !Array.isArray(value)) { // It is not an array, but should be (probably string from dotenv)
+        value = String(value)
+            .split(",") // Split on commas to create an array
+            .map((str) => str.trim()); // And trim each string of whitespace
+    }
+
+    // tslint:disable-next-line:no-any no-unsafe-any
+    (args as any)[key] = value;
 }
 
 // not exposed because this is an easy thing to fuck up everything else with if you change it
