@@ -494,6 +494,67 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
+        const reason = this.invalidate(player, false);
+        if (reason) {
+            return reason;
+        }
+
+        if (!this.tile) {
+            return `${this} is not on a Tile!`;
+        }
+
+        if (!tile) {
+            return `${this} can only pick things up off tiles that exist`;
+        }
+
+        if (tile !== this.tile && !this.tile.hasNeighbor(tile)) {
+            return `${this} can only pickup resources on or adjacent to its tile.`;
+        }
+
+        let totalMaterialOnTile = 0;
+
+        switch (material) {
+            case "redium ore": {
+                totalMaterialOnTile = tile.rediumOre;
+                break;
+            }
+            case "redium": {
+                totalMaterialOnTile = tile.redium;
+                break;
+            }
+            case "blueium": {
+                totalMaterialOnTile = tile.blueium;
+                break;
+            }
+            case "blueium ore": {
+                totalMaterialOnTile = tile.blueiumOre;
+            }
+        }
+
+        const pickUpAll = amount <= 0;
+
+        let actualAmount = pickUpAll
+            ? totalMaterialOnTile
+            : Math.min(totalMaterialOnTile, amount);
+
+        // Amount of materials the unit is currently carrying
+        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+
+        if (currentLoad === this.job.carryLimit) {
+            return `${this} is already carrying as many resources as it can.`;
+        }
+
+        if (actualAmount <= 0) {
+            return `There are no resources on ${tile} for ${this} to pickup.`;
+        }
+
+        // looks valid, let's update amount to the computed value
+        actualAmount = Math.min(
+            actualAmount,
+            this.job.carryLimit - currentLoad,
+        );
+
+        return { amount: actualAmount };
         // <<-- /Creer-Merge: invalidate-pickup -->>
     }
 
@@ -515,10 +576,29 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
-        // Add logic here for pickup.
+        switch (material) {
+            case "redium ore": {
+                tile.rediumOre -= amount;
+                this.rediumOre += amount;
+                break;
+            }
+            case "redium": {
+                tile.redium -= amount;
+                this.redium += amount;
+                break;
+            }
+            case "blueium": {
+                tile.blueium -= amount;
+                this.blueium += amount;
+                break;
+            }
+            case "blueium ore": {
+                tile.blueiumOre -= amount;
+                this.blueiumOre += amount;
+            }
+        }
 
-        // TODO: replace this with actual logic
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: pickup -->>
     }
