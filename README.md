@@ -20,7 +20,7 @@ spiritual successor to it.
   develop in.
 * Easy generation of new games using the [Creer][creer] codegen.
   * Most of the game code is easy to replace using generatedObjName.js files to
-    ease Creer codegene re-runs.
+    ease Creer codegen re-runs.
 * Games can be turn based or real time, with turn based code abstracted into an
   inheritable class.
   * More game prototypes can be added easily as new classes for re-use
@@ -33,7 +33,7 @@ spiritual successor to it.
   * Optional support for client side logic
     (though this is generally frowned upon).
 * Web interface to check on gamelogs and server status.
-* Leverages TypeScript for type safety.
+* Leverages TypeScript for type safety and eases developer on-boarding.
 * Latest ES features by keeping up to date with Node.js releases.
 * Truly multi-threaded. As opposed to using Node's internal thread pool,
   each game session is spun off to a separate process to run until the game is
@@ -83,6 +83,32 @@ the status of the game server.
 By default games can be played on port 3000, and the website starts on the game
 port + 80, so 3080 by default. Websocket clients on port 3088.
 
+### Faster development
+
+By default, using `npm start` has a long startup time as each file has to be
+transpiled by TypeScript before being ran. If you are actively developing a
+game your best workflow will be to open two terminals (split view in VSC):
+
+#### First Terminal = Watcher
+
+This will watch for code changes, and re-compile them to JS when a file
+changes.
+
+```bash
+npm run build:watch
+```
+
+#### Second Terminal = Run Transpiled Code
+
+```bash
+npm run js
+```
+
+With these two terminals up are you good to go! Because by default games are
+multi-threaded, if you make a change to a file, the next time you play that
+game the new code will run. You don't have to tear down the `npm run js`
+process!
+
 ## How to add games
 
 Use [Creer][creer] to generate some base code given the basic game structure.
@@ -96,7 +122,7 @@ the clients.
 Once you've generated a game, and generated its files via Creer, and bunch of
 files will be generated that need **you** to add logic to.
 
-So for exmaple, if you have a `Unit` class with a `move(tile)` fuction, you'd
+So for example, if you have a `Unit` class with a `move(tile)` function, you'd
 go to `src/games/game-name/unit.ts`.
 
 Then you'd look for two functions: `invalidateMove()` and `move()`.
