@@ -248,7 +248,6 @@ export class NewtonianGame extends BaseClasses.Game {
             return tile;
         };
 
-        // TODO: Machine list
         // marks where the spawn area ends and the rooms begin.
         const RMstart = Math.floor(this.mapWidth * 0.105);
         // marks where the middle area of the map begins.
@@ -326,15 +325,16 @@ export class NewtonianGame extends BaseClasses.Game {
         const midSize = this.manager.random.int(6, 3);
         // Determine the rooms offset
         // 0-7, 6 mean y = 0, 7 means y = maxHeight
-        // let shift = this.manager.random.int(Math.floor(this.mapHeight / 2) - midSize);
-        let shift = Math.floor(this.mapHeight / 2) - midSize - 5; // TODO: delete after testing
+        let shift = this.manager.random.int(Math.floor(this.mapHeight / 2) - midSize);
+        // let shift = Math.floor(this.mapHeight / 2) - midSize - 5; // for testing
         // Edge case handling to make sure walls don't touch.
         if (shift === Math.floor(this.mapHeight / 2) - midSize - 1) {
             shift += 1;
         }
         // Decides if the rooms shifts upwards or downwards
         /** used to determine random shifts and doorways */
-        let shiftDir = this.manager.random.int(2, 0);
+        let shiftDir = this.manager.random.int(2, 0); // 0 = small south, 1 = small north
+        // shiftDir = 1; // used for testing.
         /** Determines the ship of the middle room */
         if (shiftDir === 1) {
             shift = -shift;
@@ -364,20 +364,6 @@ export class NewtonianGame extends BaseClasses.Game {
         // Adds the machine to the list
         this.machines.push(machine);
 
-        // Clear out center hallway walls that would run through the center
-        // room. also creats the top and bottom walls.
-        // TODO: Check if I should just not make them in the first place.
-        for (let x = MMstart + 1; x < (this.mapWidth / 2) - 1; x++) {
-            getMutableTile(x, mid + midSize + shift).isWall = true;
-            getMutableTile(x, mid - midSize + shift).isWall = true;
-
-            /*if (x === Math.floor(this.mapWidth / 2) - 1) {
-                for (let y = mid - midSize + 1 + shift; y < mid + midSize + shift; y++) {
-                    getMutableTile(x, y).isWall = false;
-                }
-            }*/
-        }
-
         // generates structures that fill in the rest of the center area
         // top area
         // makes sure there is a top area.
@@ -385,166 +371,13 @@ export class NewtonianGame extends BaseClasses.Game {
             // if it has the smallest possible space and still exist, hallway time.
             if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 2)) {
                 getMutableTile(MMstart, 1).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 1).isWall = false;
+                getMutableTile(MMstart, 1).decoration = 1;
             }
             // if there are 2 spaces. TODO: see if I can fold this into normal mapgen.
-            else if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 3)) {
-                const midSplit = this.manager.random.int(4, 0);
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 1).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 2).isWall = true;
-                }
-                // determines the first rooms extra door
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(MMstart, 1).isWall = false;
-                }
-                else {
-                    getMutableTile(MMstart, 2).isWall = false;
-                }
-                // determines the second room's extra door
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 1).isWall = false;
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 2).isWall = false;
-                }
-            }
-            // if there is 3 spaces. TODO: see if I can fold this into normal mapgen.
-            else if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 4)) {
-                const midSplit = this.manager.random.int(3, 0);
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart + 3 + midSplit, 1).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 2).isWall = true;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 2).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 3).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 1).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 3).isWall = true;
-                }
-                // determines the first rooms extra door
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart, 1).isWall = false;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart, 2).isWall = false;
-                }
-                else {
-                    getMutableTile(MMstart, 3).isWall = false;
-                }
-                // determines the second room's extra door
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 1).isWall = false;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 2).isWall = false;
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 3).isWall = false;
-                }
-            }
-            // if there are 4 spaces. TODO: see if I can fold this into normal mapgen.
             else if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 5)) {
-                const midSplit = this.manager.random.int(2, 0);
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart + 3 + midSplit, 1).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 2).isWall = true;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 2).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 3).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 1).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 3).isWall = true;
-                }
-                getMutableTile(MMstart, 4).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 1).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 2).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 4).isWall = false;
-                for (let x = MMstart + 1; x <= Math.floor(this.mapWidth / 2); x++) {
-                    getMutableTile(x, 3).isWall = true;
-                }
-                shiftDir = Math.floor(this.manager.random.int(1, 0));
-                if (shiftDir === 1) {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        getMutableTile(Math.floor(this.mapWidth / 2) - 2, 1).isWall = true;
-                    }
-                    else {
-                        getMutableTile(Math.floor(this.mapWidth / 2) - 2, 2).isWall = true;
-                    }
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 2, 1).isWall = true;
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 2, 2).isWall = true;
-                    if (midSplit === 1) {
-                        shiftDir = this.manager.random.int(2, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 3, 3).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 4, 3).isWall = false;
-                        }
-                    }
-                    else {
-                        shiftDir = this.manager.random.int(3, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 3, 3).isWall = false;
-                        }
-                        else if (shiftDir === 2) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 4, 3).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 5, 3).isWall = false;
-                        }
-                    }
-                }
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 0) {
-                    if (midSplit === 1) {
-                        shiftDir = this.manager.random.int(2, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 8, 3).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 7, 3).isWall = false;
-                        }
-                    }
-                    else {
-                        shiftDir = this.manager.random.int(3, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 6, 3).isWall = false;
-                        }
-                        else if (shiftDir === 2) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 7, 3).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 8, 3).isWall = false;
-                        }
-                    }
-                }
-                else {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        getMutableTile(MMstart, 2).isWall = false;
-                    }
-                    else {
-                        getMutableTile(MMstart, 1).isWall = false;
-                    }
-                }
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 3).isWall = false;
+                this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2, 1,
+                              mid - midSize + shift - 3, getMutableTile,
+                              false, true, true, false);
             }
             // if the room is bigger
             else {
@@ -559,169 +392,14 @@ export class NewtonianGame extends BaseClasses.Game {
             // generate for smallest leftover area - make a hallway
             if (shift === Math.floor(this.mapHeight / 2) - midSize - 2) {
                 getMutableTile(MMstart, 21).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 21).isWall = false;
+                getMutableTile(MMstart, 21).decoration = 1;
             }
             // generate 2 tall area. TODO: try and fold this into the normal mapGen.
-            else if (shift === Math.floor(this.mapHeight / 2) - midSize - 3) {
-                const midSplit = this.manager.random.int(3, 0);
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 20).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 21).isWall = true;
-                }
-                // determines the first rooms extra door
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(MMstart, 21).isWall = false;
-                }
-                else {
-                    getMutableTile(MMstart, 20).isWall = false;
-                }
-                // determines the second room's extra door
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 21).isWall = false;
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 20).isWall = false;
-                }
-            }
-            // generate a 3 tall area. TODO: try and fold this into the normal mapGen.
-            else if (shift === Math.floor(this.mapHeight / 2) - midSize - 4) {
-                const midSplit = this.manager.random.int(3, 0);
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart + 3 + midSplit, 19).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 20).isWall = true;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 20).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 21).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 19).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 21).isWall = true;
-                }
-                // determines the first rooms extra door
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart, 19).isWall = false;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart, 20).isWall = false;
-                }
-                else {
-                    getMutableTile(MMstart, 21).isWall = false;
-                }
-                // determines the second room's extra door
-                shiftDir = this.manager.random.int(3, 0);
-                if (shiftDir === 0) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 19).isWall = false;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 20).isWall = false;
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 1, 21).isWall = false;
-                }
-            }
-            // generate a 5 tall area. TODO: try and fold this into the normal mapGen.
             else if (shift === Math.floor(this.mapHeight / 2) - midSize - 5) {
-                // figure out where to split the area
-                const midSplit = this.manager.random.int(2, 0);
-                shiftDir = this.manager.random.int(3, 0);
-                // place the seperating wall with a hole in it.
-                if (shiftDir === 0) {
-                    getMutableTile(MMstart + 3 + midSplit, 19).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 20).isWall = true;
-                }
-                else if (shiftDir === 1) {
-                    getMutableTile(MMstart + 3 + midSplit, 20).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 21).isWall = true;
-                }
-                else {
-                    getMutableTile(MMstart + 3 + midSplit, 19).isWall = true;
-                    getMutableTile(MMstart + 3 + midSplit, 21).isWall = true;
-                }
-                getMutableTile(MMstart, 18).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 21).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 20).isWall = false;
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 18).isWall = false;
-                for (let x = MMstart + 1; x <= Math.floor(this.mapWidth / 2); x++) {
-                    getMutableTile(x, 19).isWall = true;
-                }
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 1) {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        getMutableTile(Math.floor(this.mapWidth / 2) - 2, 20).isWall = true;
-                    }
-                    else {
-                        getMutableTile(Math.floor(this.mapWidth / 2) - 2, 21).isWall = true;
-                    }
-                }
-                else {
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 2, 20).isWall = true;
-                    getMutableTile(Math.floor(this.mapWidth / 2) - 2, 21).isWall = true;
-                    if (midSplit === 1) {
-                        shiftDir = this.manager.random.int(2, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 3, 19).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 4, 19).isWall = false;
-                        }
-                    }
-                    else {
-                        shiftDir = this.manager.random.int(3, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 3, 19).isWall = false;
-                        }
-                        else if (shiftDir === 2) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 4, 19).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 5, 19).isWall = false;
-                        }
-                    }
-                }
-                shiftDir = this.manager.random.int(2, 0);
-                if (shiftDir === 0) {
-                    if (midSplit === 1) {
-                        shiftDir = this.manager.random.int(2, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 8, 19).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 7, 19).isWall = false;
-                        }
-                    }
-                    else {
-                        shiftDir = this.manager.random.int(3, 0);
-                        if (shiftDir === 1) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 6, 19).isWall = false;
-                        }
-                        else if (shiftDir === 2) {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 7, 19).isWall = false;
-                        }
-                        else {
-                            getMutableTile(Math.floor(this.mapWidth / 2) - 8, 19).isWall = false;
-                        }
-                    }
-                }
-                else {
-                    shiftDir = this.manager.random.int(2, 0);
-                    if (shiftDir === 1) {
-                        getMutableTile(MMstart, 20).isWall = false;
-                    }
-                    else {
-                        getMutableTile(MMstart, 21).isWall = false;
-                    }
-                }
-                getMutableTile(Math.floor(this.mapWidth / 2) - 1, 19).isWall = false;
-            // generate a very large area.
+                this.roomCalc(MMstart + 1, (this.mapWidth - 1) / 2,
+                              mid + midSize + shift + 3,
+                              this.mapHeight - 2, getMutableTile,
+                              true, true, false, false);
             }
             else {
                 // generates the rooms.
@@ -734,7 +412,8 @@ export class NewtonianGame extends BaseClasses.Game {
         // generate Side area
         this.roomCalc(RMstart + 1, MMstart - 1, 1,
                       this.mapHeight - 2, getMutableTile,
-                      false, true, false, true);
+                      false, true, false, true,
+                      Math.min((this.mapHeight * this.mapWidth) / 790));
         // Math.floor(Math.random() * 3)
         // mirror map
         for (let x = 0; x < this.mapWidth / 2; x++) {
@@ -818,12 +497,14 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param DEast - If there should be doors to the East.
      * @param DSouth - If there should be doors to the south.
      * @param DWest - If there should be doors to the west.
+     * @param machines - The number of machines you want added to the map.
      * @returns - nothing, calls the next stage
      */
     private roomCalc(x1: number, x2: number, y1: number, y2: number,
                      getMutableTile: (x: number, y: number) => MutableRequired<Tile>,
                      DNorth: boolean = false, DEast: boolean = false,
-                     DSouth: boolean = false, DWest: boolean = false): void {
+                     DSouth: boolean = false, DWest: boolean = false,
+                     machines: number = 0): void {
         // determines the number of rooms on the x axis
         const a = Math.floor((x2 - x1 + 2) / 3); // MUST be a whole number
         // determines the number of rooms on the y axis
@@ -834,15 +515,19 @@ export class NewtonianGame extends BaseClasses.Game {
         let shift = 0;
         // map used for mapgen.
         const map: IRoom[][] = [];
+        // sets sets up the rest of the map.
         for (let i = 0; i < a; i++) {
             map[i] = new Array(b);
         }
+        // marks the start location of the y axis.
         let yStart = y1;
-        let room = this.makeRoom(0, 0, 0, 0);
+        // grabs a room.
         let start = 0;
+        // if there is 2 extra spots
         if (extra === 2) {
+            // make the northern 3 tall rooms.
             for (let i = 0; i < a; i++) {
-                room = this.makeRoom(
+                const room = this.makeRoom(
                     x1 + (i * 3),
                     x1 + 1 + (i * 3),
                     yStart,
@@ -851,10 +536,12 @@ export class NewtonianGame extends BaseClasses.Game {
                 );
                 map[i][0] = room;
             }
+            // make that the first room exists and is 3 tall.
             start = 1;
             yStart += 1;
+            // make the southern 3 tall rooms.
             for (let i = 0; i < a; i++) {
-                room = this.makeRoom(
+                const room = this.makeRoom(
                     x1 + (i * 3),
                     x1 + 1 + (i * 3),
                     y2 - 2,
@@ -863,13 +550,17 @@ export class NewtonianGame extends BaseClasses.Game {
                 );
                 map[i][b - 1] = room;
             }
+            // mark that the southern rooms are done.
             b -= 1;
         }
+        // if there is one extra spot.
         else if (extra === 1) {
             shift = this.manager.random.int(2, 0);
+            // if the north is chosen.
             if (shift === 1) {
+                // make the northern 3 tall rooms.
                 for (let i = 0; i < a; i++) {
-                    room = this.makeRoom(
+                    const room = this.makeRoom(
                         x1 + (i * 3),
                         x1 + 1 + (i * 3),
                         yStart,
@@ -878,12 +569,15 @@ export class NewtonianGame extends BaseClasses.Game {
                     );
                     map[i][0] = room;
                 }
+                // make that the first room exists and is 3 tall.
                 start = 1;
                 yStart += 1;
             }
+            // if the south is chosen.
             else {
+                // make the southern 3 tall rooms.
                 for (let i = 0; i < a; i++) {
-                    room = this.makeRoom(
+                    const room = this.makeRoom(
                         x1 + (i * 3),
                         x1 + 1 + (i * 3),
                         y2 - 2,
@@ -892,12 +586,15 @@ export class NewtonianGame extends BaseClasses.Game {
                     );
                     map[i][b - 1] = room;
                 }
+                // mark that the southern rooms are done.
                 b -= 1;
             }
         }
+        // create the rest of the rooms by iterating over the rest of the map.
         for (let x = 0; x < a; x++) {
             for (let y = start; y < b; y++) {
-                room = this.makeRoom(
+                // create and add the room.
+                const room = this.makeRoom(
                     x1 + (x * 3),
                     x1 + 1 + (x * 3),
                     yStart + (y * 3),
@@ -906,6 +603,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 map[x][y] = room;
             }
         }
+        // if it should add doors to the north.
         if (DNorth) {
             // add doors into the North
             shift = this.manager.random.int(map.length, 0);
@@ -915,6 +613,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
+        // if it should add doors to the south.
         if (DSouth) {
             // add doors to the south
             shift = this.manager.random.int(map.length, 0);
@@ -924,6 +623,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
+        // if there should be doors to the east.
         if (DEast) {
             // add doors to the east.
             shift = this.manager.random.int(map[0].length, 0);
@@ -933,6 +633,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
+        // if there should be doors to the west
         if (DWest) {
             // add doors ito the west.
             shift = this.manager.random.int(map[0].length, 0);
@@ -942,34 +643,238 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
-        this.roomFill(map, getMutableTile);
+        // go about filling out the details of the map.
+        this.roomFill(map, machines, getMutableTile);
     }
 
     /**
      * TODO: document
      *
-     * @param map - TODO: document
+     * @param map - a 2D array that contains room structs that contain map information.
+     * @param machines - the number of machines to be added to the map.
      * @param getMutableTile - A function that gets a mutable tile given an (x, y)
      */
-    private roomFill(map: IRoom[][], getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
+    private roomFill(map: IRoom[][], machines: number,
+                     getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
         // tracks every room in the map list that is unconnected.
         const unconnected: IPoint[] = [];
         // master list of random rooms in a easy to grab fashion.
         const roomList: IPoint[] = [];
+        // tracks all rooms that are eligible to get machines.
+        const machRooms: IPoint[] = [];
         // tracks the number of connections that need to be made.
         let connect = Math.floor((map.length * map[0].length) / 2);
-        // used to grab a specific set from unconnected and roomList
-        let find = { x: 0, y: 0 };
         // used to track if a direction has been chosen.
         let done = false;
-        // adds extra connects for more rooms connections.
-        connect += Math.floor(connect * this.manager.random.float(0.5, 0.25));
         // adds all the points to the two lists
         for (let x = 0; x < map.length; x++) {
             for (let y = 0; y < map[0].length; y++) {
                 unconnected.push({x, y});
                 roomList.push({x, y});
+                machRooms.push({x, y});
             }
+        }
+        // add machines to the map
+        if (machines > 0) {
+            // place the machines
+            for (let i = 0; i < machines - 1; i++) {
+                // grabs a random room's location.
+                const index = this.manager.random.int(machRooms.length, 0);
+                // grabs the room.
+                const find = machRooms[index];
+                // marks it being chosen
+                machRooms.splice(index, 1);
+                // removes it's neighbors
+                let check = this.has(machRooms, find.x, find.y - 1);
+                // if the rooms is in the list.
+                if (check !== -1) {
+                    // removes the room
+                    machRooms.splice(check, 1);
+                }
+                check = this.has(machRooms, find.x + 1, find.y);
+                // if the rooms is in the list.
+                if (check !== -1) {
+                    // removes the room
+                    machRooms.splice(check, 1);
+                }
+                check = this.has(machRooms, find.x, find.y + 1);
+                // if the rooms is in the list.
+                if (check !== -1) {
+                    // removes the room
+                    machRooms.splice(check, 1);
+                }
+                check = this.has(machRooms, find.x - 1, find.y);
+                // if the rooms is in the list.
+                if (check !== -1) {
+                    // removes the room
+                    machRooms.splice(check, 1);
+                }
+                // adds the machine.
+                const room = map[find.x][find.y];
+                // sets up a location to be set.
+                let loc = getMutableTile(0, 0);
+                // if the rooms is 2 tall.
+                if (room.y3 === -1) {
+                    // if the room is 2 wide.
+                    if (room.x3 === -1) {
+                        // gets a random location.
+                        let place = this.manager.random.int(4, 0);
+                        // check to protect against machine blocked doorways.
+                        if (find.x === map.length - 1) {
+                            place = this.manager.random.int(2, 0);
+                        }
+                        // if it is the upper left tile.
+                        if (place === 0) {
+                            loc = getMutableTile(room.x1, room.y1);
+                        }
+                        // if it is the upper left tile.
+                        else if (place === 1) {
+                            loc = getMutableTile(room.x1, room.y2);
+                        }
+                        // if it is the lower right tile.
+                        else if (place === 2) {
+                            loc = getMutableTile(room.x2, room.y1);
+                        }
+                        // if it is the upper right tile.
+                        else {
+                            loc = getMutableTile(room.x2, room.y2);
+                        }
+                    }
+                    // if the room is 3 wide.
+                    else {
+                        // gets a random location.
+                        let place = this.manager.random.int(6, 0);
+                        // check to protect against machine blocked doorways.
+                        if (find.x === map.length - 1) {
+                            place = this.manager.random.int(4, 0);
+                        }
+                        // if it is the lower left tile.
+                        if (place === 0) {
+                            loc = getMutableTile(room.x1, room.y1);
+                        }
+                        // if it is the upper left tile.
+                        else if (place === 1) {
+                            loc = getMutableTile(room.x1, room.y2);
+                        }
+                        // if it is the lower middle tile.
+                        else if (place === 2) {
+                            loc = getMutableTile(room.x2, room.y1);
+                        }
+                        // if it is the upper middle tile.
+                        else if (place === 3) {
+                            loc = getMutableTile(room.x2, room.y2);
+                        }
+                        // if it is the lower right tile.
+                        else if (place === 4) {
+                            loc = getMutableTile(room.x3, room.y1);
+                        }
+                        // if it is the upper right tile.
+                        else {
+                            loc = getMutableTile(room.x3, room.y2);
+                        }
+                    }
+                }
+                // if the room is 3 tall.
+                else {
+                    // if the room is 2 wide.
+                    if (room.x3 === -1) {
+                        // gets a random location.
+                        let place = this.manager.random.int(6, 0);
+                        // check to protect against machine blocked doorways.
+                        if (find.x === map.length - 1) {
+                            place = this.manager.random.int(3, 0);
+                        }
+                        // if it is the lower left tile.
+                        if (place === 0) {
+                            loc = getMutableTile(room.x1, room.y1);
+                        }
+                        // if it is the middle left tile.
+                        else if (place === 1) {
+                            loc = getMutableTile(room.x1, room.y2);
+                        }
+                        // if it is the upper left tile.
+                        else if (place === 2) {
+                            loc = getMutableTile(room.x1, room.y3);
+                        }
+                        // if it is the lower right tile.
+                        else if (place === 3) {
+                            loc = getMutableTile(room.x2, room.y1);
+                        }
+                        // if it is the middle right tile.
+                        else if (place === 4) {
+                            loc = getMutableTile(room.x2, room.y2);
+                        }
+                        // if it is the upper right tile.
+                        else {
+                            loc = getMutableTile(room.x2, room.y3);
+                        }
+                    }
+                    // if the room is 3 wide.
+                    else {
+                        // gets a random location.
+                        let place = this.manager.random.int(9, 0);
+                        // check to protect against machine blocked doorways.
+                        if (find.x === map.length - 1) {
+                            place = this.manager.random.int(6, 0);
+                        }
+                        // if it is the lower left tile.
+                        if (place === 0) {
+                            loc = getMutableTile(room.x1, room.y1);
+                        }
+                        // if it is the middle left tile.
+                        else if (place === 1) {
+                            loc = getMutableTile(room.x1, room.y2);
+                        }
+                        // if it is the upper left tile.
+                        else if (place === 2) {
+                            loc = getMutableTile(room.x1, room.y3);
+                        }
+                        // if it is the lower middle tile.
+                        else if (place === 3) {
+                            loc = getMutableTile(room.x2, room.y1);
+                        }
+                        // if it is the center tile.
+                        else if (place === 4) {
+                            loc = getMutableTile(room.x2, room.y2);
+                        }
+                        // if it is the upper middle tile.
+                        else if (place === 5) {
+                            loc = getMutableTile(room.x2, room.y3);
+                        }
+                        // if it is the lower right tile.
+                        else if (place === 6) {
+                            loc = getMutableTile(room.x3, room.y1);
+                        }
+                        // if it is the middle right tile.
+                        else if (place === 7) {
+                            loc = getMutableTile(room.x3, room.y2);
+                        }
+                        // if it is the upper right tile.
+                        else {
+                            loc = getMutableTile(room.x3, room.y3);
+                        }
+                    }
+                }
+                // Generate the run time for the machines
+                const time = this.manager.random.int(2, 9);
+                // makes the machine
+                const machine = this.manager.create.machine({
+                    oreType: "redium",
+                    refineTime: time,
+                    refineInput: (Math.floor(time / 2) + 1),
+                    refineOutput: Math.floor(time / 2),
+                    tile: loc as Tile,
+                });
+                // Assigned the tile it's machine.
+                loc.machine = machine;
+                // Adds the machine to the list
+                this.machines.push(machine);
+            }
+        }
+        // adds extra connects for more rooms connections.
+        connect += Math.floor(connect * this.manager.random.float(0.5, 0.25));
+        if (roomList.length <= 4) {
+            connect = this.manager.random.int(1, -1);
         }
         for (let i = 0; i <= connect; i++) {
             // used to make the map-gen favor connecting unconnected rooms.
@@ -977,7 +882,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 // grabs a random room. Also used to remove it from the list.
                 const index = this.manager.random.int(unconnected.length, 0);
                 // grabs the room.
-                find = unconnected[index];
+                const find = unconnected[index];
                 // resets done.
                 done = false;
                 // picks a random direction.
@@ -1079,7 +984,7 @@ export class NewtonianGame extends BaseClasses.Game {
             // every room as been connected, do a simpler random connection.
             else {
                 // grabs a random room.
-                find = roomList[this.manager.random.int(roomList.length, 0)];
+                const find = roomList[this.manager.random.int(roomList.length, 0)];
                 // makes sure it picks a valid direction
                 done = false;
                 // picks a random direction/
@@ -1216,7 +1121,6 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
-
         // actually draws all the walls and doors.
         this.draw(map, getMutableTile);
     }
@@ -1246,7 +1150,8 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      */
     private draw(map: IRoom[][], getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
-        /*for (const x of map) {
+        /* Test code to help visualize where it actually places rooms.
+        for (const x of map) {
             for (const y of x) {
                 getMutableTile(y.x1, y.y1).owner = this.players[0];
                 getMutableTile(y.x1, y.y1).type = "generator";
@@ -1296,42 +1201,132 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
                 // if there is a wall to the north, draw it.
                 if (room.WNorth === true) {
-                    getMutableTile(room.x1, room.y1 - 1).isWall = true;
-                    getMutableTile(room.x2, room.y1 - 1).isWall = true;
+                    // if the room is 3 wide.
+                    if (room.x3 !== -1) {
+                        getMutableTile(room.x1, room.y1 - 1).isWall = true;
+                        getMutableTile(room.x2, room.y1 - 1).isWall = true;
+                        getMutableTile(room.x3, room.y1 - 1).isWall = true;
+                    }
+                    // if the room is 2 wide.
+                    else {
+                        getMutableTile(room.x1, room.y1 - 1).isWall = true;
+                        getMutableTile(room.x2, room.y1 - 1).isWall = true;
+                    }
                 }
                 // if there is a wall to the east, draw it.
                 if (room.WEast === true) {
-                    if (room.y3 !== -1) {
-                        getMutableTile(room.x2 + 1, room.y1).isWall = true;
-                        getMutableTile(room.x2 + 1, room.y2).isWall = true;
-                        getMutableTile(room.x2 + 1, room.y3).isWall = true;
+                    // if the room is 3 wide.
+                    if (room.x3 !== -1) {
+                        // if the room is 3 tall.
+                        if (room.y3 !== -1) {
+                            // place the wall as long as it doesn't cover up a door.
+                            if (getMutableTile(room.x3 + 1, room.y1).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y1).isWall = true;
+                            }
+                            if (getMutableTile(room.x3 + 1, room.y2).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y2).isWall = true;
+                            }
+                            if (getMutableTile(room.x3 + 1, room.y3).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y3).isWall = true;
+                            }
+                        }
+                        // if it is 2 tall.
+                        else {
+                            // place the wall as long as it doesn't cover up a door.
+                            if (getMutableTile(room.x3 + 1, room.y1).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y1).isWall = true;
+                            }
+                            if (getMutableTile(room.x3 + 1, room.y2).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y2).isWall = true;
+                            }
+                        }
                     }
+                    // if the room is 2 wide.
                     else {
-                        getMutableTile(room.x2 + 1, room.y1).isWall = true;
-                        getMutableTile(room.x2 + 1, room.y2).isWall = true;
+                        // if the room is 3 tall.
+                        if (room.y3 !== -1) {
+                            // place the wall as long as it doesn't cover up a door.
+                            if (getMutableTile(room.x2 + 1, room.y1).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y1).isWall = true;
+                            }
+                            if (getMutableTile(room.x2 + 1, room.y2).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y2).isWall = true;
+                            }
+                            if (getMutableTile(room.x2 + 1, room.y3).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y3).isWall = true;
+                            }
+                        }
+                        // if it is 2 tall.
+                        else {
+                            // place the wall as long as it doesn't cover up a door.
+                            if (getMutableTile(room.x2 + 1, room.y1).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y1).isWall = true;
+                            }
+                            if (getMutableTile(room.x2 + 1, room.y2).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y2).isWall = true;
+                            }
+                        }
                     }
                 }
                 // if there is a wall to the south, drawn it.
                 if (room.WSouth === true) {
-                    if (room.y3 !== -1) {
-                        getMutableTile(room.x1, room.y3 + 1).isWall = true;
-                        getMutableTile(room.x2, room.y3 + 1).isWall = true;
+                    // if the room is 3 wide.
+                    if (room.x3 !== -1) {
+                        // if the room is 3 tall.
+                        if (room.y3 !== -1) {
+                            // place the wall as long as it doesn't cover up a door.
+                            getMutableTile(room.x1, room.y3 + 1).isWall = true;
+                            getMutableTile(room.x2, room.y3 + 1).isWall = true;
+                            getMutableTile(room.x3, room.y3 + 1).isWall = true;
+                        }
+                        // if the room is 2 tall.
+                        else {
+                            // place the wall as long as it doesn't cover up a door.
+                            getMutableTile(room.x1, room.y2 + 1).isWall = true;
+                            getMutableTile(room.x2, room.y2 + 1).isWall = true;
+                            getMutableTile(room.x3, room.y2 + 1).isWall = true;
+                        }
                     }
+                    // if the room is 2 wide.
                     else {
-                        getMutableTile(room.x1, room.y2 + 1).isWall = true;
-                        getMutableTile(room.x2, room.y2 + 1).isWall = true;
+                        // if the room is 3 tall.
+                        if (room.y3 !== -1) {
+                            // place the wall as long as it doesn't cover up a door.
+                            getMutableTile(room.x1, room.y3 + 1).isWall = true;
+                            getMutableTile(room.x2, room.y3 + 1).isWall = true;
+                        }
+                        // if the room is 2 tall.
+                        else {
+                            // place the wall as long as it doesn't cover up a door.
+                            getMutableTile(room.x1, room.y2 + 1).isWall = true;
+                            getMutableTile(room.x2, room.y2 + 1).isWall = true;
+                        }
                     }
                 }
                 // if there is a wall to the west, draw it.
                 if (room.WWest === true) {
+                    // if the room is 3 tall.
                     if (room.y3 !== -1) {
-                        getMutableTile(room.x1 - 1, room.y1).isWall = true;
-                        getMutableTile(room.x1 - 1, room.y2).isWall = true;
-                        getMutableTile(room.x1 - 1, room.y3).isWall = true;
+                        // place the wall as long as it doesn't cover up a door.
+                        if (getMutableTile(room.x1 - 1, room.y1).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y1).isWall = true;
+                        }
+                        if (getMutableTile(room.x1 - 1, room.y2).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y2).isWall = true;
+                        }
+                        if (getMutableTile(room.x1 - 1, room.y3).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y3).isWall = true;
+                        }
                     }
+                    // if the room is 2 tall.
                     else {
-                        getMutableTile(room.x1 - 1, room.y1).isWall = true;
-                        getMutableTile(room.x1 - 1, room.y2).isWall = true;
+                        // place the wall as long as it doesn't cover up a door.
+                        if (getMutableTile(room.x1 - 1, room.y1).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y1).isWall = true;
+                        }
+                        if (getMutableTile(room.x1 - 1, room.y2).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y2).isWall = true;
+                        }
                     }
                 }
             }
@@ -1351,14 +1346,91 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                     // figure out which part of the wall to make the door.
                     if (room.WNorth === true) {
-                        shift = this.manager.random.int(2, 0);
-                        if (shift === 0) {
-                            getMutableTile(room.x1, room.y1 - 1).isWall = false;
-                            getMutableTile(room.x1, room.y1 - 1).decoration = 1;
+                        // if the room is 3 wide.
+                        if (room.x3 !== -1) {
+                            // pick a random spot.
+                            shift = this.manager.random.int(3, 0);
+                            // if this spot is blocked off or there is a door on the other-side.
+                            if (shift === 0) {
+                                if (getMutableTile(room.x1, room.y1 - 2).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1 - 2).isWall ||
+                                    getMutableTile(room.x1, room.y1 - 2).decoration === 1) {
+                                    // try a different spot.
+                                    shift = this.manager.random.int(2, 0);
+                                    shift++;
+                                }
+                            }
+                            else if (shift === 1) {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x2, room.y1 - 2).machine !== undefined ||
+                                    getMutableTile(room.x2, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x2, room.y1 - 2).isWall ||
+                                    getMutableTile(room.x2, room.y1 - 2).decoration === 1) {
+                                    // try a different spot..
+                                    shift = this.manager.random.int(2, 0);
+                                    if (shift === 1) {
+                                        shift++;
+                                    }
+                                }
+                            }
+                            else {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x3, room.y1 - 2).machine !== undefined ||
+                                    getMutableTile(room.x3, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x3, room.y1 - 2).isWall ||
+                                    getMutableTile(room.x3, room.y1 - 2).decoration === 1) {
+                                    // try a different spot.
+                                    shift = this.manager.random.int(2, 0);
+                                }
+                            }
+                            // depending on the spot chosen, add the door.
+                            if (shift === 0) {
+                                getMutableTile(room.x1, room.y1 - 1).isWall = false;
+                                getMutableTile(room.x1, room.y1 - 1).decoration = 1;
+                            }
+                            else if (shift === 1) {
+                                getMutableTile(room.x2, room.y1 - 1).isWall = false;
+                                getMutableTile(room.x2, room.y1 - 1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x3, room.y1 - 1).isWall = false;
+                                getMutableTile(room.x3, room.y1 - 1).decoration = 1;
+                            }
                         }
+                        // if the room is 2 wide.
                         else {
-                            getMutableTile(room.x2, room.y1 - 1).isWall = false;
-                            getMutableTile(room.x2, room.y1 - 1).decoration = 1;
+                            // pick a random spot.
+                            shift = this.manager.random.int(2, 0);
+                            // if this spot is blocked off or there is a door on the other-side.
+                            if (shift === 0) {
+                                if (getMutableTile(room.x1, room.y1 - 2).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1 - 2).isWall ||
+                                    getMutableTile(room.x1, room.y1 - 2).decoration === 1) {
+                                    // try the other spot.
+                                    shift = 1;
+                                }
+                            }
+                            else {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x2, room.y1 - 2).machine !== undefined ||
+                                    getMutableTile(room.x2, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x2, room.y1 - 2).isWall ||
+                                    getMutableTile(room.x2, room.y1 - 2).decoration === 1) {
+                                    // try the other spot.
+                                    shift = 0;
+                                }
+                            }
+                            // depending on the spot chosen, add the door.
+                            if (shift === 0) {
+                                getMutableTile(room.x1, room.y1 - 1).isWall = false;
+                                getMutableTile(room.x1, room.y1 - 1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x2, room.y1 - 1).isWall = false;
+                                getMutableTile(room.x2, room.y1 - 1).decoration = 1;
+                            }
                         }
                     }
                 }
@@ -1369,32 +1441,184 @@ export class NewtonianGame extends BaseClasses.Game {
                         map[x + 1][y].DWest = false;
                     }
                     if (room.WEast === true) {
-                        if (room.y3 === -1) {
-                            // figure out which part of the wall to make the door.
-                            shift = this.manager.random.int(2, 0);
-                            if (shift === 0) {
-                                getMutableTile(room.x2 + 1, room.y1).isWall = false;
-                                getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                        // if the room is 3 wide.
+                        if (room.x3 !== -1) {
+                            // if the room is 2 tall.
+                            if (room.y3 !== -1) {
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(3, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3 + 2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x3 + 2, room.y1).isWall ||
+                                        getMutableTile(room.x3 + 2, room.y1).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        shift++;
+                                    }
+                                }
+                                else if (shift === 1) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3 + 2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x3 + 2, room.y2).isWall ||
+                                        getMutableTile(room.x3 + 2, room.y2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        if (shift === 1) {
+                                            shift++;
+                                        }
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3 + 2, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x3 + 2, room.y3).isWall ||
+                                        getMutableTile(room.x3 + 2, room.y3).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x3 + 1, room.y1).isWall = false;
+                                    getMutableTile(room.x3 + 1, room.y1).decoration = 1;
+                                }
+                                else if (shift === 1) {
+                                    getMutableTile(room.x3 + 1, room.y2).isWall = false;
+                                    getMutableTile(room.x3 + 1, room.y2).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x3 + 1, room.y3).isWall = false;
+                                    getMutableTile(room.x3 + 1, room.y3).decoration = 1;
+                                }
                             }
+                            // if the room is 3 tall.
                             else {
-                                getMutableTile(room.x2 + 1, room.y2).isWall = false;
-                                getMutableTile(room.x2 + 1, room.y2).decoration = 1;
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(2, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3 + 2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x3 + 2, room.y1).isWall ||
+                                        getMutableTile(room.x3 + 2, room.y1).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 1;
+                                    }
+                                }
+                                // if the room is 3 tall.
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3 + 2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x3 + 2, room.y2).isWall ||
+                                        getMutableTile(room.x3 + 2, room.y2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 0;
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x3 + 1, room.y1).isWall = false;
+                                    getMutableTile(room.x3 + 1, room.y1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x3 + 1, room.y2).isWall = false;
+                                    getMutableTile(room.x3 + 1, room.y2).decoration = 1;
+                                }
                             }
                         }
+                        // if the room is 2 wide.
                         else {
-                            // figure out which part of the wall to make the door.
-                            shift = this.manager.random.int(3, 0);
-                            if (shift === 0) {
-                                getMutableTile(room.x2 + 1, room.y1).isWall = false;
-                                getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                            // if the room is 3 tall.
+                            if (room.y3 !== -1) {
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(3, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2 + 2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x2 + 2, room.y1).isWall ||
+                                        getMutableTile(room.x2 + 2, room.y1).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        shift++;
+                                    }
+                                }
+                                else if (shift === 1) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2 + 2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2 + 2, room.y2).isWall ||
+                                        getMutableTile(room.x2 + 2, room.y2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        if (shift === 1) {
+                                            shift++;
+                                        }
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2 + 2, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x2 + 2, room.y3).isWall ||
+                                        getMutableTile(room.x2 + 2, room.y3).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x2 + 1, room.y1).isWall = false;
+                                    getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                                }
+                                else if (shift === 1) {
+                                    getMutableTile(room.x2 + 1, room.y2).isWall = false;
+                                    getMutableTile(room.x2 + 1, room.y2).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x2 + 1, room.y3).isWall = false;
+                                    getMutableTile(room.x2 + 1, room.y3).decoration = 1;
+                                }
                             }
-                            else if (shift === 1) {
-                                getMutableTile(room.x2 + 1, room.y2).isWall = false;
-                                getMutableTile(room.x2 + 1, room.y2).decoration = 1;
-                            }
+                            // if the room is 2 tall.
                             else {
-                                getMutableTile(room.x2 + 1, room.y3).isWall = false;
-                                getMutableTile(room.x2 + 1, room.y3).decoration = 1;
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(2, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2 + 2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y1).machine !== undefined ||
+                                        getMutableTile(room.x2 + 2, room.y1).isWall ||
+                                        getMutableTile(room.x2 + 2, room.y1).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 1;
+                                    }
+                                }
+                                // if the room is 3 tall.
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2 + 2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2 + 2, room.y2).isWall ||
+                                        getMutableTile(room.x2 + 2, room.y2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 0;
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x2 + 1, room.y1).isWall = false;
+                                    getMutableTile(room.x2 + 1, room.y1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x2 + 1, room.y2).isWall = false;
+                                    getMutableTile(room.x2 + 1, room.y2).decoration = 1;
+                                }
                             }
                         }
                     }
@@ -1404,27 +1628,183 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (map[x][y + 1]) {
                         map[x][y + 1].DNorth = false;
                     }
-                    // figure out which part of the wall to make the door.
-                    shift = this.manager.random.int(2, 0);
                     if (room.WSouth === true) {
-                        if (room.y3 === -1) {
-                            if (shift === 0) {
-                                getMutableTile(room.x1, room.y2 + 1).isWall = false;
-                                getMutableTile(room.x1, room.y2 + 1).decoration = 1;
+                        // if the room is 3 wide.
+                        if (room.x3 !== -1) {
+                            // if the room is 3 tall.
+                            if (room.y3 !== -1) {
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(3, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x1, room.y3 + 2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y3 + 2).isWall ||
+                                        getMutableTile(room.x1, room.y3 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        shift++;
+                                    }
+                                }
+                                else if (shift === 1) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2, room.y3 + 2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y3 + 2).isWall ||
+                                        getMutableTile(room.x2, room.y3 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        if (shift === 1) {
+                                            shift++;
+                                        }
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3, room.y3 + 2).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y3 + 2).isWall ||
+                                        getMutableTile(room.x3, room.y3 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x1, room.y3 + 1).isWall = false;
+                                    getMutableTile(room.x1, room.y3 + 1).decoration = 1;
+                                }
+                                else if (shift === 1) {
+                                    getMutableTile(room.x2, room.y3 + 1).isWall = false;
+                                    getMutableTile(room.x2, room.y3 + 1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x3, room.y3 + 1).isWall = false;
+                                    getMutableTile(room.x3, room.y3 + 1).decoration = 1;
+                                }
                             }
+                            // if the room is 2 tall.
                             else {
-                                getMutableTile(room.x2, room.y2 + 1).isWall = false;
-                                getMutableTile(room.x2, room.y2 + 1).decoration = 1;
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(3, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x1, room.y2 + 2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y2 + 2).isWall ||
+                                        getMutableTile(room.x1, room.y2 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        shift++;
+                                    }
+                                }
+                                else if (shift === 1) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2, room.y2 + 2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2 + 2).isWall ||
+                                        getMutableTile(room.x2, room.y2 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                        if (shift === 1) {
+                                            shift++;
+                                        }
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x3, room.y2 + 2).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x3, room.y2 + 2).isWall ||
+                                        getMutableTile(room.x3, room.y2 + 2).decoration === 1) {
+                                        // try a different spot.
+                                        shift = this.manager.random.int(2, 0);
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x1, room.y2 + 1).isWall = false;
+                                    getMutableTile(room.x1, room.y2 + 1).decoration = 1;
+                                }
+                                else if (shift === 1) {
+                                    getMutableTile(room.x2, room.y2 + 1).isWall = false;
+                                    getMutableTile(room.x2, room.y2 + 1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x2, room.y2 + 1).isWall = false;
+                                    getMutableTile(room.x2, room.y2 + 1).decoration = 1;
+                                }
                             }
                         }
+                        // if the room is 2 wide.
                         else {
-                            if (shift === 0) {
-                                getMutableTile(room.x1, room.y3 + 1).isWall = false;
-                                getMutableTile(room.x1, room.y3 + 1).decoration = 1;
+                            // if the room is 3 tall.
+                            if (room.y3 !== -1) {
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(2, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x1, room.y3 + 2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y3 + 2).isWall ||
+                                        getMutableTile(room.x1, room.y3 + 2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 1;
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2, room.y3 + 2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y3).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y3 + 2).isWall ||
+                                        getMutableTile(room.x2, room.y3 + 2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 0;
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x1, room.y3 + 1).isWall = false;
+                                    getMutableTile(room.x1, room.y3 + 1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x2, room.y3 + 1).isWall = false;
+                                    getMutableTile(room.x2, room.y3 + 1).decoration = 1;
+                                }
                             }
+                            // if the room is 2 tall.
                             else {
-                                getMutableTile(room.x2, room.y3 + 1).isWall = false;
-                                getMutableTile(room.x2, room.y3 + 1).decoration = 1;
+                                // figure out which part of the wall to make the door.
+                                shift = this.manager.random.int(2, 0);
+                                if (shift === 0) {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x1, room.y2 + 2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x1, room.y2 + 2).isWall ||
+                                        getMutableTile(room.x1, room.y2 + 2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 1;
+                                    }
+                                }
+                                else {
+                                    // if this spot is blocked off or there is a door on the other-side.
+                                    if (getMutableTile(room.x2, room.y2 + 2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2).machine !== undefined ||
+                                        getMutableTile(room.x2, room.y2 + 2).isWall ||
+                                        getMutableTile(room.x2, room.y2 + 2).decoration === 1) {
+                                        // try the other spot.
+                                        shift = 0;
+                                    }
+                                }
+                                // depending on the spot chosen, add the door.
+                                if (shift === 0) {
+                                    getMutableTile(room.x1, room.y2 + 1).isWall = false;
+                                    getMutableTile(room.x1, room.y2 + 1).decoration = 1;
+                                }
+                                else {
+                                    getMutableTile(room.x2, room.y2 + 1).isWall = false;
+                                    getMutableTile(room.x2, room.y2 + 1).decoration = 1;
+                                }
                             }
                         }
                     }
@@ -1435,21 +1815,45 @@ export class NewtonianGame extends BaseClasses.Game {
                         map[x - 1][y].DEast = false;
                     }
                     if (room.WWest === true) {
-                        if (room.y3 === -1) {
-                            // figure out which part of the wall to make the door.
-                            shift = this.manager.random.int(2, 0);
-                            if (shift === 0) {
-                                getMutableTile(room.x1 - 1, room.y1).isWall = false;
-                                getMutableTile(room.x1 - 1, room.y1).decoration = 1;
-                            }
-                            else {
-                                getMutableTile(room.x1 - 1, room.y2).isWall = false;
-                                getMutableTile(room.x1 - 1, room.y2).decoration = 1;
-                            }
-                        }
-                        else {
+                        // if the room is 3 tall.
+                        if (room.y3 !== -1) {
                             // figure out which part of the wall to make the door.
                             shift = this.manager.random.int(3, 0);
+                            if (shift === 0) {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x1 - 2, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1 - 2, room.y1).isWall ||
+                                    getMutableTile(room.x1 - 2, room.y1).decoration === 1) {
+                                    // try a different spot.
+                                    shift = this.manager.random.int(2, 0);
+                                    shift++;
+                                }
+                            }
+                            else if (shift === 1) {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x1 - 2, room.y2).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y2).machine !== undefined ||
+                                    getMutableTile(room.x1 - 2, room.y2).isWall ||
+                                    getMutableTile(room.x1 - 2, room.y2).decoration === 1) {
+                                    // try a different spot.
+                                    shift = this.manager.random.int(2, 0);
+                                    if (shift === 1) {
+                                        shift++;
+                                    }
+                                }
+                            }
+                            else {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x1 - 2, room.y3).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y3).machine !== undefined ||
+                                    getMutableTile(room.x1 - 2, room.y3).isWall ||
+                                    getMutableTile(room.x1 - 2, room.y3).decoration === 1) {
+                                    // try a different spot.
+                                    shift = this.manager.random.int(2, 0);
+                                }
+                            }
+                            // depending on the spot chosen, add the door.
                             if (shift === 0) {
                                 getMutableTile(room.x1 - 1, room.y1).isWall = false;
                                 getMutableTile(room.x1 - 1, room.y1).decoration = 1;
@@ -1461,6 +1865,39 @@ export class NewtonianGame extends BaseClasses.Game {
                             else {
                                 getMutableTile(room.x1 - 1, room.y3).isWall = false;
                                 getMutableTile(room.x1 - 1, room.y3).decoration = 1;
+                            }
+                        }
+                        else {
+                            // figure out which part of the wall to make the door.
+                            shift = this.manager.random.int(2, 0);
+                            if (shift === 0) {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x1 - 2, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y1).machine !== undefined ||
+                                    getMutableTile(room.x1 - 2, room.y1).isWall ||
+                                    getMutableTile(room.x1 - 2, room.y1).decoration === 1) {
+                                    // try the other spot.
+                                    shift = 1;
+                                }
+                            }
+                            else {
+                                // if this spot is blocked off or there is a door on the other-side.
+                                if (getMutableTile(room.x1 - 2, room.y2).machine !== undefined ||
+                                    getMutableTile(room.x1, room.y2).machine !== undefined ||
+                                    getMutableTile(room.x1 - 2, room.y2).isWall ||
+                                    getMutableTile(room.x1 - 2, room.y2).decoration === 1) {
+                                    // try the other spot.
+                                    shift = 0;
+                                }
+                            }
+                            // depending on the spot chosen, add the door.
+                            if (shift === 0) {
+                                getMutableTile(room.x1 - 1, room.y1).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y1).decoration = 1;
+                            }
+                            else {
+                                getMutableTile(room.x1 - 1, room.y2).isWall = false;
+                                getMutableTile(room.x1 - 1, room.y2).decoration = 1;
                             }
                         }
                     }
