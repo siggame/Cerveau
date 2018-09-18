@@ -44,7 +44,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
-        		
+        
 		/* Game-Manager Materials
 		 *
 		 * This goes into the before turn function, because we want it to have
@@ -53,7 +53,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 		 * conveyers move units and materials ontop of them.
 		 */
 		 
-		 // <<-- /Creer-Merge: before-turn -->>
+        this.manageMaterials();
+		 
+        // <<-- /Creer-Merge: before-turn -->>
 		
     }
 
@@ -111,6 +113,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
-
+	
+    private manageMaterials(): void {
+        return;
+    }
+	
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
