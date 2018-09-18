@@ -44,7 +44,17 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
-        // <<-- /Creer-Merge: before-turn -->>
+        		
+		/* Game-Manager Materials
+		 *
+		 * This goes into the before turn function, because we want it to have
+		 * some love. Select the player who's turns it currently isn't,
+		 * and spawn materials on their side of the base. Make sure all
+		 * conveyers move units and materials ontop of them.
+		 */
+		 
+		 // <<-- /Creer-Merge: before-turn -->>
+		
     }
 
     /**
