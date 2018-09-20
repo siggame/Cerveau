@@ -117,36 +117,34 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     private convayMaterials(x: number, y: number): void {
         
         start = getMutableTile(x, y);
-        if (start.type == "conveyor"){
+        if (start.type == "conveyor") {
             if (start.direction == "north") {
                 end = start.tileNorth;
             }
-        if (start.direction == "east") {
+            if (start.direction == "east") {
                 end = tileEast;
             }
-        }
-        if (start.direction == "south") {
+            if (start.direction == "south") {
                 end = tileSouth;
             }
-        }
-        if (start.direction == "west") {
+            if (start.direction == "west") {
                 end = tileWest;
             }
-        }
-        
-        end.rediumOre += start.rediumOre;
-        start.rediumOre = 0;
-        end.redium += start.redium;
-        start.redium = 0;
-        end.blueiumOre += start.blueiumOre;
-        start.blueiumOre = 0;
-        end.blueium += start.blueium;
-        start.blueium = 0;
-        
-        if (!end.unit && start.unit) {
-            start.unit.tile = end
-            end.unit = start.unit
-            start.unit = undefined;
+			
+			end.rediumOre += start.rediumOre;
+            start.rediumOre = 0;
+            end.redium += start.redium;
+            start.redium = 0;
+            end.blueiumOre += start.blueiumOre;
+            start.blueiumOre = 0;
+            end.blueium += start.blueium;
+            start.blueium = 0;
+			
+		    if (!end.unit && start.unit) {
+                start.unit.tile = end
+                end.unit = start.unit
+                start.unit = undefined;
+            }
         }
         
         return;
