@@ -106,18 +106,14 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     // any additional protected/private methods you need can be added here
 	
-	/* Game-Manager Materials
+	/* convayMaterials
 	 *
-	 * This goes into the before turn function
-	 * Select the player who's turns it currently isn't, and spawn materials
-	 * on their side of the base.
-	 * Makes sure all conveyers move units and materials ontop of them.
+	 * This function moves materials and units on covayers
 	 */
-	
     private convayMaterials(x: number, y: number): void {
         
         start = getMutableTile(x, y);
-        if (start.type == "conveyor") {
+        if (start.type == "conveyor" && start.direction != "blank") {
             if (start.direction == "north") {
                 end = start.tileNorth;
             }
@@ -131,6 +127,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 end = tileWest;
             }
 			
+			// Transfers materials
 			end.rediumOre += start.rediumOre;
             start.rediumOre = 0;
             end.redium += start.redium;
@@ -140,6 +137,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             end.blueium += start.blueium;
             start.blueium = 0;
 			
+			// Moves units if they exist and the destination is unoccupied
 		    if (!end.unit && start.unit) {
                 start.unit.tile = end
                 end.unit = start.unit
@@ -150,14 +148,22 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return;
     }
 
-	
+	/* Game-Manager Materials
+	 *
+	 * This goes into the before turn function
+	 * Select the player who's turns it currently isn't, and spawn materials
+	 * on their side of the base.
+	 * Makes sure all conveyers move units and materials ontop of them.
+	 */
     private manageMaterials(): void {
 		
 		// players[0] is on x = 0 side
 		// Right is Redium
         
+		// Amount of ore spawned
 		const spawnAmount = 1;
 		
+		// Moves materials and units on the left side
 		convayMaterials(2, 17)
 		convayMaterials(3, 17)
 		convayMaterials(4, 17)
@@ -168,6 +174,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 		convayMaterials(2, 20)
 		convayMaterials(1, 20)
 		
+		// Moves materials and units on the right side
         convayMaterials(this.mapWidth - 2, 17)
 		convayMaterials(this.mapWidth - 3, 17)
 		convayMaterials(this.mapWidth - 4, 17)
@@ -178,6 +185,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 		convayMaterials(this.mapWidth - 2, 20)
 		convayMaterials(this.mapWidth - 1, 20)
 		
+		// Spawns the appropriate ore at the start of the conveyor
+		// on the side of the the player who's turns it currently isn't
 		x: number;
         y: number;
 		if (!this.players[0].currentPlayer) {
