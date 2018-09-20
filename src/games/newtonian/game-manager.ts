@@ -132,7 +132,13 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     }
                     tile.unit.blueium = 0;
                     // if there's an enemy intern in your generator...
-                    
+                    if (tile.unit.job.title === "intern" && tile.unit.owner !== this.game.currentPlayer) {
+                        // the intern dies
+                        tile.unit.health = 0;
+                        // the player gains internium (+resources to both scores)
+                        this.game.currentPlayer.pressure += (tile.unit.blueium * this.game.refinedValue);
+                        this.game.currentPlayer.heat += (tile.unit.redium * this.game.refinedValue);
+                    }
                     // RIP intern
                 }
             }
