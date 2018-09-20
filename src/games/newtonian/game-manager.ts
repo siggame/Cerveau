@@ -157,12 +157,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      */
     private manageMaterials(): void { // Entirely untested
         
-        // players[0] is on x = 0 side
-        // Right is Redium
-        
-        // Amount of ore spawned
-        const spawnAmount = 1;
-        
+        // Order matters
         // Moves materials and units on the left side
         this.convayMaterials(2, 17)
         this.convayMaterials(3, 17)
@@ -174,6 +169,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.convayMaterials(2, 20)
         this.convayMaterials(1, 20)
         
+        // Order matters
         // Moves materials and units on the right side
         this.convayMaterials(this.mapWidth - 2, 17)
         this.convayMaterials(this.mapWidth - 3, 17)
@@ -185,20 +181,23 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.convayMaterials(this.mapWidth - 2, 20)
         this.convayMaterials(this.mapWidth - 1, 20)
         
+        // players[0] is on x = 0 side
+        // Right is Redium
+        
+        // Amount of ore spawned
+        const spawnAmount = 1;
+        
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
         x: number;
-        y: number;
         if (this.players[0].currentPlayer) {
             x = 1;
-            y = 20;
-            loc = getMutableTile(x, y);
+            loc = getMutableTile(x, 20);
             loc.blueiumOre += spawnAmount;
         }
         else {
             x = this.mapWidth - 1;
-            y = 20;
-            loc = getMutableTile(x, y);
+            loc = getMutableTile(x, 20);
             loc.rediumOre += spawnAmount;
         }
         
