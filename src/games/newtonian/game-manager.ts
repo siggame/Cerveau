@@ -45,8 +45,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
          
-        this.manageMaterials();
-         
         // <<-- /Creer-Merge: before-turn -->>
         
     }
@@ -62,7 +60,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
         // code spawning below this:
-        //
+        
+        this.manageMaterials();
+        
         // code the generator below this:
         //
         // <<-- /Creer-Merge: after-turn -->>
@@ -118,13 +118,13 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 end = start.tileNorth;
             }
             if (start.direction == "east") {
-                end = tileEast;
+                end = start.tileEast;
             }
             if (start.direction == "south") {
-                end = tileSouth;
+                end = start.tileSouth;
             }
             if (start.direction == "west") {
-                end = tileWest;
+                end = start.tileWest;
             }
             
             // Transfers materials
@@ -150,7 +150,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     /* Game-Manager Materials
      *
-     * This goes into the before turn function
+     * This goes into the after turn function
      * Select the player who's turns it currently isn't, and spawn materials
      * on their side of the base.
      * Makes sure all conveyers move units and materials ontop of them.
@@ -189,7 +189,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // on the side of the the player who's turns it currently isn't
         x: number;
         y: number;
-        if (!this.players[0].currentPlayer) {
+        if (this.players[0].currentPlayer) {
             x = 1;
             y = 20;
             loc = getMutableTile(x, y);
