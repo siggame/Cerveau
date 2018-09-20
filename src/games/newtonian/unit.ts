@@ -139,7 +139,13 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        //poss check if tile passed is not within range of current tile of unit
+        //make sure tile is adjacent
+        if(tile.tileEast !== undefined) {
+            
+        }
+        
+
+        //make sure valid target
 
         // <<-- /Creer-Merge: invalidate-act -->>
     }
@@ -158,23 +164,29 @@ export class Unit extends GameObject {
 
         // Add logic here for act.
         //checking if player object is Physicist
-        if(this.job.title == "physicist") {
-            if(tile.machine != undefined) {
+        if(this.job.title === "physicist") {
+            if(tile.machine !== undefined) {
                 if(tile.machine.oreType == "blueium") {
-
+                    if(tile.blueiumOre >= tile.machine.refineInput) {
+                        tile.machine.worked++;
+                    }
                 }
-                else if(tile.machine)
-                //start machine running process if enough material
+                if(tile.machine.oreType === "redium") {
+                    if(tile.rediumOre >== tile.machine.refineInput) {
+                        tile.machine.worked++;
+                    }
+                }
             }
-                //machine on that tile start running process
-
+            else if(tile.unit.job.title === "manager") {
+                tile.unit.stun;
+            }
         }
-        else if(this.job.title == "manager") {
+        else if(this.job.title === "manager") {
             //if machine on that tile
                 //machine on that tile start running process
 
         }
-        else if(this.job.title == "intern") {
+        else if(this.job.title === "intern") {
             //if machine on that tile
                 //machine on that tile start running process
 
