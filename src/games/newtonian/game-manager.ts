@@ -106,7 +106,37 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         ? this.game.spawnTime : player.managerSpawn - 1;
 
         // code the generator below this:
-        //
+        // iterate through each tile on the map
+        for (const tile of this.game.tiles) {
+            // focus specifically on generator tiles owned by the current player
+            if (tile.type === "generator" && tile.owner === this.game.currentPlayer) {
+                // if the tile has redium or blueium, heat and pressure are increased accordingly
+                // the redium and blueium is then removed from the map
+                if (tile.redium > 0) {
+                    this.game.currentPlayer.pressure += (tile.redium * this.game.refinedValue);
+                }
+                tile.redium = 0;
+                if (tile.blueium > 0) {
+                    this.game.currentPlayer.heat += (tile.blueium * this.game.refinedValue);
+                }
+                tile.blueium = 0;
+                // if there's a unit on a generator tile...
+                if (tile.unit !== undefined) {
+                    // scores the refined materials on the unit before removing them
+                    if (tile.unit.redium > 0) {
+                        this.game.currentPlayer.heat += (tile.unit.redium * this.game.refinedValue);
+                    }
+                    tile.unit.redium = 0;
+                    if (tile.unit.blueium > 0) {
+                        this.game.currentPlayer.pressure += (tile.unit.blueium * this.game.refinedValue);
+                    }
+                    tile.unit.blueium = 0;
+                    // if there's an enemy intern in your generator...
+                    
+                    // RIP intern
+                }
+            }
+        }
         // <<-- /Creer-Merge: after-turn -->>
     }
 
