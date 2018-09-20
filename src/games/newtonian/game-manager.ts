@@ -116,6 +116,24 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 	
     private manageMaterials(): void {
 		
+		// players[0] is on x = 0 side
+		// Right is Redium
+        
+		x: number;
+        y: number;
+		if (!this.players[0].currentPlayer) {
+		    x = 1;
+			y = 20;
+			loc = getMutableTile(x, y);
+			loc.blueiumOre++;
+		}
+		else {
+			x = this.mapWidth - 1;
+			y = 20;
+			loc = getMutableTile(x, y);
+			loc.rediumOre++;
+		}
+        
         return;
     }
 	
