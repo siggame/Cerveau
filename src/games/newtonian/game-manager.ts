@@ -189,15 +189,12 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
-        x: number;
         if (this.players[0].currentPlayer) {
-            x = 1;
-            loc = getMutableTile(x, 20);
+            loc = getMutableTile(1, 20);
             loc.blueiumOre += spawnAmount;
         }
         else {
-            x = this.mapWidth - 1;
-            loc = getMutableTile(x, 20);
+            loc = getMutableTile(this.mapWidth - 1, 20);
             loc.rediumOre += spawnAmount;
         }
         
