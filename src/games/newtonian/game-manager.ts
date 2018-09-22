@@ -108,7 +108,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     
     /* convayMaterials
      *
-     * This function moves materials and units on covayers
+     * This function moves materials and units on conveyor
      */
     private convayMaterials(x: number, y: number): void { // Entirely untested
         
