@@ -61,6 +61,39 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
+        // Spawning location to start with.
+        let spawnX:number = 1;
+        let spawnY:number = 1;
+        // Number of units For the target player.
+        let units:number[] = [0,0,0];
+        // The player who to spawn for.
+        let player:Player = game.currentPlayer.opponent;
+        // The unit type to try and spawn.
+        let spawnType:number = -1;
+
+        // Checking to make sure if my tile is the right tile.
+        if(game.currentPlayer === game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+          spawnX = game.mapWidth - spawnX;
+          if(game.currentPlayer === game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+            console.log("error in spawning");
+          }
+        }
+        // Iterate through all the player's units to find how many of each type there are. 
+        for(let u in player.units) {
+          units[(u.job === game.units[0] ? 0 : u.job === game.units[1] ? 1 : 3)]++;
+        }
+         
+        if(game.internCap > units[0] && player.internSpawn === 0) {
+          // TODO: Insert spawning function HERE for Intern
+        }
+
+        else if(game.physicistCap > units[1] && player.physicistSpawn === 0) { 
+          // TODO: Insert spawning function HERE for Physicist 
+        }
+        
+        else if(game.managerCap > units[2] && player.managerSpawn === 0) {
+          // TODO: Insert spawning function HERE for Managers 
+        }
 
         // code the generator below this:
         //
