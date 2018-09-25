@@ -64,7 +64,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
-
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
         // The player who to spawn for.
