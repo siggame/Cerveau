@@ -61,7 +61,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
         // code spawning below this:
-
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
         // The player who to spawn for.
