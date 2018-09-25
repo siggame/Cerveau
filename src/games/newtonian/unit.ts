@@ -139,13 +139,60 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        //make sure tile is adjacent
-        if(tile.tileEast !== undefined) {
-            
+        // make sure the unit is on the planet.... wait...
+        if (!tile) {
+            return `${this}, gratz. You proved flat earthers correct.`;
+        }
+        // make sure the tile is next to the unit
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+            return `${this} can only travel to an adjacent tile.`;
         }
         
-
         //make sure valid target
+        if (this.job.title === "physicist") {
+            if (tile.unit) {
+                if (tile.unit.job.title !== "manager") {
+                    return `${this} tried to act on ${tile.unit} which is not a manager`;
+                }
+            }
+            else if (!tile.machine) {
+                return `${this} tried to act on ${tile} which does not contain a machine`;
+            }
+            else {
+                return `${this} tried to act on ${tile} which is doesn't contain a unit or machine`;
+            }
+        }
+
+        if (this.job.title === "manager") {
+            if (tile.unit)
+            {
+                if (tile.unit.job.title !== "intern")
+                {
+                    return `${this} tried to act on ${tile.unit} which is not a intern`;
+                }
+            }
+            else {
+                return `${this} tried to act on ${tile} which is doesn't contain a unit`;
+            }
+        }
+
+        if (this.job.title === "intern") {
+            if (tile.unit) {
+                if (tile.unit.job.title !== "physicist") {
+                    return `${this} tried to act on ${tile.unit} which is not a physicist`;
+                }
+            }
+            else if (!tile.machine) {
+                return `${this} tried to act on ${tile} which does not contain a machine`;
+            }
+            else if (tile.machine.worked <= 1) {
+                return `${this} tried to act on ${tile} which was not worked enough`;
+            }
+            else {
+                return `${this} tried to act on ${tile} which is doesn't contain a unit or machine`;
+            }
+        }
 
         // <<-- /Creer-Merge: invalidate-act -->>
     }
@@ -164,36 +211,42 @@ export class Unit extends GameObject {
 
         // Add logic here for act.
         //checking if player object is Physicist
-        if(this.job.title === "physicist") {
-            if(tile.machine !== undefined) {
-                if(tile.machine.oreType == "blueium") {
-                    if(tile.blueiumOre >= tile.machine.refineInput) {
+        if (this.job.title === "physicist") {
+            if (tile.machine) {
+                if (tile.machine.oreType === "blueium") {
+                    if (tile.blueiumOre >= tile.machine.refineInput) {
                         tile.machine.worked++;
                     }
                 }
-                if(tile.machine.oreType === "redium") {
-                    if(tile.rediumOre >== tile.machine.refineInput) {
+                if (tile.machine.oreType === "redium") {
+                    if (tile.rediumOre >= tile.machine.refineInput) {
                         tile.machine.worked++;
                     }
                 }
             }
-            else if(tile.unit.job.title === "manager") {
-                tile.unit.stun;
+            else if (tile.unit) {
+                tile.unit.stunTime += this.game.stunTime;
             }
         }
-        else if(this.job.title === "manager") {
-            //if machine on that tile
-                //machine on that tile start running process
+
+        else if (this.job.title === "manager") {
+            if(tile.unit)
+            {
+                tile.unit.stunTime += this.game.stunTime;
+            }
 
         }
-        else if(this.job.title === "intern") {
-            //if machine on that tile
-                //machine on that tile start running process
-
+        else if (this.job.title === "intern") {
+            if(tile.machine) {
+                tile.machine.worked = 1;
+            }
+            else if(tile.unit) {
+                tile.unit.stunTime += this.game.stunTime;
+            }
         }
 
         // TODO: replace this with actual logic
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: act -->>
     }
@@ -431,7 +484,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // makes sure the player is the owner of the unit.
-        const reason = this.invalidate(player, false);
+        const reason = this.invalidate(player, true);
         if (reason) {
             return reason;
         }
@@ -454,10 +507,6 @@ export class Unit extends GameObject {
         // Make sure there isn't a machine there.
         if (tile.machine) {
             return `${this} cannot walk over machines. They are expensive`;
-        }
-        // Make sure the unit hasn't acted.
-        if (this.acted) {
-            return `${this} has already acted this turn. Or not enough coffee`;
         }
         // Make sure the tile isn't ocuppied.
         if (tile.unit) {
@@ -659,9 +708,17 @@ export class Unit extends GameObject {
         if (this.owner !== player) {
             return `${this} isn't owned by you.`;
         }
-
+        // Make sure the unit hasn't acted.
         if (checkAction && this.acted) {
-            return `${this} cannot perform another action this turn.`;
+            return `${this} has already acted this turn. Or not enough coffee`;
+        }
+        // make sure the unit can function
+        if (this.stunTime > 0) {
+            return `${this} is stunned and cannot move.`;
+        }
+        // Make sure the unit is alive.
+        if (this.health <= 0) {
+            return `${this} is fuel.`;
         }
         // Make sure the unit is alive.
         if (this.health <= 0) {
