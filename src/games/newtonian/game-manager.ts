@@ -65,7 +65,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
         // The player who to spawn for.
-        const player: Player = this.game.currentPlayer;
+        const player: Player = this.game.currentPlayer.opponent;
 
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
