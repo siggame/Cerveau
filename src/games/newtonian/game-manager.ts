@@ -358,7 +358,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 spawnY = 1;
                 spawnX += playerIndex * -1;
             }
-
         }
         // Return failure. We finished looking over all the spawn for Unit spawning.
 
