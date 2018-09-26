@@ -105,8 +105,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         player.physicistSpawn = (units[1] === this.game.physicistCap)
           ? this.game.spawnTime : player.physicistSpawn - 1;
         player.managerSpawn = (units[2] === this.game.managerCap)
-        ? this.game.spawnTime : player.managerSpawn - 1;
-
+         ? this.game.spawnTime : player.managerSpawn - 1;
         // code the generator below this:
         // iterate through each tile on the map
         for (const tile of this.game.tiles) {
@@ -290,7 +289,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     /**
      * Attempts to spawn in a unit for a given player.
-     *
      * @param player - The player that will own the unit.
      * @param job - The job of the unit.
      * @returns True if unit is spawned, otherwise returns false.
