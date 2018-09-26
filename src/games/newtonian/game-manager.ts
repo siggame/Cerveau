@@ -61,38 +61,41 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
-        // Spawning location to start with.
-        let spawnX:number = 1;
-        let spawnY:number = 1;
         // Number of units For the target player.
         let units:number[] = [0,0,0];
         // The player who to spawn for.
-        let player:Player = game.currentPlayer.opponent;
+        let player:Player = game.currentPlayer;
         // The unit type to try and spawn.
         let spawnType:number = -1;
 
-        // Checking to make sure if my tile is the right tile.
-        if(game.currentPlayer === game.tiles[spawnX + spawnY * game.mapWidth].owner) {
-          spawnX = game.mapWidth - spawnX;
-          if(game.currentPlayer === game.tiles[spawnX + spawnY * game.mapWidth].owner) {
-            console.log("error in spawning");
-          }
-        }
         // Iterate through all the player's units to find how many of each type there are. 
         for(let u in player.units) {
           units[(u.job === game.units[0] ? 0 : u.job === game.units[1] ? 1 : 3)]++;
         }
          
+        // If Intern Cap has not been met then try to spawn an Intern.
         if(game.internCap > units[0] && player.internSpawn === 0) {
-          // TODO: Insert spawning function HERE for Intern
+          if(spawnUnit(player, game.jobs[0]) {
+            player.internSpawn = game.spawnTime;
+          }
         }
 
+        // If Physicist Cap has not been met then try to spawn an Physicist.
         else if(game.physicistCap > units[1] && player.physicistSpawn === 0) { 
-          // TODO: Insert spawning function HERE for Physicist 
+          if(game.internCap > units[0] && player.internSpawn === 0) {
+            if(spawnUnit(player, game.jobs[0]) {
+              player.internSpawn = game.spawnTime;
+            }
+          }
         }
         
+        // If Manager Cap has not been met then try to spawn an Manager.
         else if(game.managerCap > units[2] && player.managerSpawn === 0) {
-          // TODO: Insert spawning function HERE for Managers 
+          if(game.internCap > units[0] && player.internSpawn === 0) {
+            if(spawnUnit(player, game.jobs[0]) {
+              player.internSpawn = game.spawnTime;
+            }
+          }
         }
 
         // code the generator below this:
@@ -240,5 +243,76 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return;
     }
 
+    /**
+     * Attempts to spawn in a unit for a given player.
+     *  
+     * @param player - The player that will own the unit.
+     * @param job - The job of the unit.
+     * @returns True if unit is spawned, otherwise returns false.
+     */
+    protected spawnUnit(player: Player, job: Job): boolean {
+      // X coord for spawning.
+      let spawnX: number = 1;
+
+      // Y coord for spawning.
+      let spawnY: number = 1;
+
+      // The playerIndex for the game.players array.
+      // Used for knowing which direction to move along the X axis.
+      let playerIndex = (player === game.players[0]? 0 : 1);
+
+      // Check to make sure the tile we are starting on is the right player Tile.
+      if(player !== game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+        // If wrong tile, try the other side to see if that is the right spawn area.
+        spawnX = game.mapWidth - spawnX;
+        // Double check that we now have the right tile. If this fails, need to
+        // Revaluate how to find spawn.
+        if(player !== game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+          // Something is wrong and did not find the right tile.
+          console.log("error in spawning");
+        }
+      }
+     
+      // Loop to keep looking for an open tile to spawn the Unit.
+      // TODO: optimize so that it doesn't iterate over every column before terminating.
+      while(spawnX < game.mapWidth && spawnX > 0) {
+        // Tile that we are trying to spawn on.
+        let tile: Tile = game.tiles[spawnX + spawnY * game.mapWidth];
+        // Check to see if the tile is still from the spawn area.
+        // If not increment the column and reset to row 1. Continue on to the next iteration.
+        if(tile.owner !== player) {
+          spawnX += playerIndex * -1;
+          spawnY = 1;
+          continue;
+        }
+        
+        // Check to see if there is a Unit on the tile.
+        // If there is move down a row.
+        if(tile.unit) {
+          spawnY++;
+          continue;
+        }
+        // Else spawn in Unit and return success to spawning.
+        else {
+          tile.unit = this.create.unit({
+            acted: false;
+            health: job.health;
+            job: job;
+            owner: player;
+            tile: tile;
+        }
+        return true;
+      }
+
+      // Check to make sure spawnY stays in bounds.
+      // TODO: optimize so that it doesn't iterate over every row before moving columns.
+      if(spawnY >= game.mapHeight) {
+        spawnY = 1;
+        spawnX += playerIndex * -1;
+      }
+
+      // Return failure. We finished looking over all the spawn for Unit spawning.
+      return false;
+    }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
