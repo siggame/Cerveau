@@ -4,6 +4,9 @@ import { BaseClasses, NewtonianGame, NewtonianGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { Job } from "./job";
+import { Player } from "./player";
+import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -62,48 +65,49 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
         // The player who to spawn for.
-        const player: Player = game.currentPlayer;
-        // The unit type to try and spawn.
-        const spawnType: number = -1;
+        const player: Player = this.game.currentPlayer;
 
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
-            units[(u.job === game.units[0] ? 0 : u.job === game.units[1] ? 1 : 3)]++;
+            units[(
+                u.job === this.game.units[0].job
+                ? 0 : u.job === this.game.units[1].job ? 1 : 3
+            )]++;
         }
 
         // If Intern Cap has not been met then try to spawn an Intern.
-        if (game.internCap > units[0] && player.internSpawn === 0) {
-            if (spawnUnit(player, game.jobs[0]) {
-                player.internSpawn = game.spawnTime;
+        if (this.game.internCap > units[0] && player.internSpawn === 0) {
+            if (this.spawnUnit(player, this.game.jobs[0])) {
+                player.internSpawn = this.game.spawnTime;
             }
         }
 
         // If Physicist Cap has not been met then try to spawn an Physicist.
-        else if (game.physicistCap > units[1] && player.physicistSpawn === 0) {
-            if (game.internCap > units[0] && player.internSpawn === 0) {
-                if (spawnUnit(player, game.jobs[0]) {
-                    player.internSpawn = game.spawnTime;
+        else if (this.game.physicistCap > units[1] && player.physicistSpawn === 0) {
+            if (this.game.internCap > units[0] && player.internSpawn === 0) {
+                if (this.spawnUnit(player, this.game.jobs[0])) {
+                    player.internSpawn = this.game.spawnTime;
                 }
             }
         }
 
         // If Manager Cap has not been met then try to spawn an Manager.
-        else if (game.managerCap > units[2] && player.managerSpawn === 0) {
-            if (game.internCap > units[0] && player.internSpawn === 0) {
-                if (spawnUnit(player, game.jobs[0]) {
-                    player.internSpawn = game.spawnTime;
+        else if (this.game.managerCap > units[2] && player.managerSpawn === 0) {
+            if (this.game.internCap > units[0] && player.internSpawn === 0) {
+                if (this.spawnUnit(player, this.game.jobs[0])) {
+                    player.internSpawn = this.game.spawnTime;
                 }
             }
         }
 
         // Manager Incrementing spawner Timers
 
-        player.internSpawn = (gunits[0] === game.internCap)
-          ? game.spawnTime : player.internSpawn - 1;
-        player.physicistSpawn = (gunits[1] === game.physicistCap)
-          ? game.spawnTime : player.physicistSpawn - 1;
-        player.managerSpawn = (gunits[2] === game.managerCap)
-        ? game.spawnTime : player.managerSpawn - 1;
+        player.internSpawn = (units[0] === this.game.internCap)
+          ? this.game.spawnTime : player.internSpawn - 1;
+        player.physicistSpawn = (units[1] === this.game.physicistCap)
+          ? this.game.spawnTime : player.physicistSpawn - 1;
+        player.managerSpawn = (units[2] === this.game.managerCap)
+        ? this.game.spawnTime : player.managerSpawn - 1;
 
         // code the generator below this:
         //
@@ -164,25 +168,26 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // The playerIndex for the game.players array.
         // Used for knowing which direction to move along the X axis.
-        const playerIndex = (player === game.players[0] ? 0 : 1);
+        const playerIndex = (player === this.game.players[0] ? 0 : 1);
 
         // Check to make sure the tile we are starting on is the right player Tile.
-        if (player !== game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+        if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
             // If wrong tile, try the other side to see if that is the right spawn area.
-            spawnX = game.mapWidth - spawnX;
+            spawnX = this.game.mapWidth - spawnX;
             // Double check that we now have the right tile. If this fails, need to
             // Revaluate how to find spawn.
-            if (player !== game.tiles[spawnX + spawnY * game.mapWidth].owner) {
+            if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
                 // Something is wrong and did not find the right tile.
+                // typescript doesn't like this. \/
                 // console.log("error in spawning");
             }
         }
 
         // Loop to keep looking for an open tile to spawn the Unit.
         // TODO: optimize so that it doesn't iterate over every column before terminating.
-        while (spawnX < game.mapWidth && spawnX > 0) {
+        while (spawnX < this.game.mapWidth && spawnX > 0) {
             // Tile that we are trying to spawn on.
-            const tile: Tile = game.tiles[spawnX + spawnY * game.mapWidth];
+            const tile: Tile = this.game.tiles[spawnX + spawnY * this.game.mapWidth];
             // Check to see if the tile is still from the spawn area.
             // If not increment the column and reset to row 1. Continue on to the next iteration.
             if (tile.owner !== player) {
@@ -201,25 +206,26 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             else {
                 tile.unit = this.create.unit({
                     acted: false,
-                    health: job.healthr,
+                    health: job.health,
                     job,
                     owner: player,
                     tile,
-                };
+                });
 
                 return true;
             }
 
             // Check to make sure spawnY stays in bounds.
             // TODO: optimize so that it doesn't iterate over every row before moving columns.
-            if (spawnY >= game.mapHeight) {
+            if (spawnY >= this.game.mapHeight) {
                 spawnY = 1;
                 spawnX += playerIndex * -1;
             }
 
-            // Return failure. We finished looking over all the spawn for Unit spawning.
-            return false;
         }
+        // Return failure. We finished looking over all the spawn for Unit spawning.
+
+        return false;
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
