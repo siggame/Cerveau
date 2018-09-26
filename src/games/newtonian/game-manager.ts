@@ -317,6 +317,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     tile,
                 });
 
+                player.units.push(tile.unit);
+                this.game.units.push(tile.unit);
+
                 return true;
             }
 
