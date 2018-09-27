@@ -1175,7 +1175,7 @@ export class NewtonianGame extends BaseClasses.Game {
      */
     private draw(map: IRoom[][], getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
         // Test code to help visualize where it actually places rooms.
-        for (const x of map) {
+        /*for (const x of map) {
             for (const y of x) {
                 getMutableTile(y.x1, y.y1).owner = this.players[0];
                 getMutableTile(y.x1, y.y1).type = "generator";
@@ -1212,7 +1212,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     getMutableTile(y.x3, y.y2).type = "generator";
                 }
             }
-        }
+        }*/
         // iterate through the rooms of the map.
         for (const rooms of map) {
             for (const room of rooms) {
