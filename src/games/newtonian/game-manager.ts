@@ -76,27 +76,23 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
 
         // If Intern Cap has not been met then try to spawn an Intern.
-        if (this.game.internCap > units[0] && player.internSpawn === 0) {
+        if (this.game.internCap > units[0] && player.internSpawn <= 0) {
             if (this.spawnUnit(player, this.game.jobs[0])) {
                 player.internSpawn = this.game.spawnTime;
             }
         }
 
         // If Physicist Cap has not been met then try to spawn an Physicist.
-        else if (this.game.physicistCap > units[1] && player.physicistSpawn === 0) {
-            if (this.game.internCap > units[0] && player.internSpawn === 0) {
-                if (this.spawnUnit(player, this.game.jobs[0])) {
-                    player.internSpawn = this.game.spawnTime;
-                }
+        else if (this.game.physicistCap > units[1] && player.physicistSpawn <= 0) {
+            if (this.spawnUnit(player, this.game.jobs[1])) {
+                player.physicistSpawn = this.game.spawnTime;
             }
         }
 
         // If Manager Cap has not been met then try to spawn an Manager.
-        else if (this.game.managerCap > units[2] && player.managerSpawn === 0) {
-            if (this.game.internCap > units[0] && player.internSpawn === 0) {
-                if (this.spawnUnit(player, this.game.jobs[0])) {
-                    player.internSpawn = this.game.spawnTime;
-                }
+        else if (this.game.managerCap > units[2] && player.managerSpawn <= 0) {
+            if (this.spawnUnit(player, this.game.jobs[2])) {
+                player.managerSpawn = this.game.spawnTime;
             }
         }
 
