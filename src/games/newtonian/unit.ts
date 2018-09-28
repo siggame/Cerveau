@@ -148,8 +148,8 @@ export class Unit extends GameObject {
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only travel to an adjacent tile.`;
         }
-        
-        //make sure valid target
+
+        // make sure valid target
         if (this.job.title === "physicist") {
             if (tile.unit) {
                 if (tile.unit.job.title !== "manager") {
@@ -165,10 +165,8 @@ export class Unit extends GameObject {
         }
 
         if (this.job.title === "manager") {
-            if (tile.unit)
-            {
-                if (tile.unit.job.title !== "intern")
-                {
+            if (tile.unit) {
+                if (tile.unit.job.title !== "intern") {
                     return `${this} tried to act on ${tile.unit} which is not a intern`;
                 }
             }
@@ -210,7 +208,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: act -->>
 
         // Add logic here for act.
-        //checking if player object is Physicist
+        // checking if player object is Physicist
         if (this.job.title === "physicist") {
             if (tile.machine) {
                 if (tile.machine.oreType === "blueium") {
@@ -230,17 +228,16 @@ export class Unit extends GameObject {
         }
 
         else if (this.job.title === "manager") {
-            if(tile.unit)
-            {
+            if (tile.unit) {
                 tile.unit.stunTime += this.game.stunTime;
             }
 
         }
         else if (this.job.title === "intern") {
-            if(tile.machine) {
+            if (tile.machine) {
                 tile.machine.worked = 1;
             }
-            else if(tile.unit) {
+            else if (tile.unit) {
                 tile.unit.stunTime += this.game.stunTime;
             }
         }
