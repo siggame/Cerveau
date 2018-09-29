@@ -220,8 +220,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     // any additional protected/private methods you need can be added here
 
-    /* conveyMaterials
-     *
+    /**
+     * conveyMaterials
      * This function moves materials and units on conveyor
      */
     private conveyMaterials(x: number, y: number): void { // Entirely untested
@@ -271,8 +271,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return;
     }
 
-    /* Game-Manager Materials
-     *
+    /**
+     * Game-Manager Materials
      * This goes into the after turn function
      * Select the player who's turns it currently isn't, and spawn materials
      * on their side of the base.
