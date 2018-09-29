@@ -281,32 +281,13 @@ export class Unit extends GameObject {
     ): void | string | IUnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
-        if(!player || this.owner != player)
-        {
+        if (!player || this.owner !== player) {
             return `${this} resisted your attempts at mind control, ${player}!`;
         }
-        if(material === "redium" && this.redium < amount)
-        {
-            amount = this.redium;
-        }
-        if(material === "redium ore" && this.rediumOre < amount)
-        {
-            amount = this.rediumOre;
-        }
-        if(material === "blueium" && this.blueium < amount)
-        { 
-            amount = this.blueium;
-        }
-        if(material === "blueium ore" && this.blueiumOre < amount)
-        {
-            amount = this.blueiumOre;
-        }
-        if(tile.isWall)
-        {
+        if (tile.isWall) {
             return `${this} can't place stuff on a wall. That just don't work, my friend.`;
         }
-        if(!tile)
-        {
+        if (!tile) {
             return `${this} is trippin'. Ain't nothin' there, dawg.`;
         }
         if (this.acted) {
@@ -323,8 +304,9 @@ export class Unit extends GameObject {
         }
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth && this.tile
             !== tile.tileWest && this.tile !== tile.tileNorth) {
-             return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
+            return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
         }
+
         return;
         // <<-- /Creer-Merge: invalidate-drop -->>
     }
@@ -346,40 +328,50 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
+        let amt = amount;
+
+        if (material === "redium" && this.redium < amount) {
+            amt = this.redium;
+        }
+        if (material === "redium ore" && this.rediumOre < amount) {
+            amt = this.rediumOre;
+        }
+        if (material === "blueium" && this.blueium < amount) {
+            amt = this.blueium;
+        }
+        if (material === "blueium ore" && this.blueiumOre < amount) {
+            amt = this.blueiumOre;
+        }
 
         // If amount <= 0, the unit will drop all resources.
-        if(amount <= 0) 
-        {
+        if (amount <= 0) {
             tile.blueium += this.blueium;
             tile.blueiumOre += this.blueiumOre;
             tile.redium += this.redium;
             tile.rediumOre += this.rediumOre;
-            this.blueium = this.redium = this.blueiumOre = this. rediumOre = 0;
+            this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
         }
         // Drops certain amount of redium ore.
-        else if (material === "redium ore")
-        {
-            tile.rediumOre += amount;
-            this.rediumOre -= amount;
+        else if (material === "redium ore") {
+            tile.rediumOre += amt;
+            this.rediumOre -= amt;
         }
         // Drops certain amount of redium.
-        else if (material === "redium")
-        {
-            tile.redium += amount;
-            this.redium -= amount; 
+        else if (material === "redium") {
+            tile.redium += amt;
+            this.redium -= amt;
         }
         // Drops certain amount of blueium.
-        else if (material === "blueium")
-        {
-            tile.blueium += amount;
-            this.blueium -= amount;
+        else if (material === "blueium") {
+            tile.blueium += amt;
+            this.blueium -= amt;
         }
         // Drops certain amount of blueium ore.
-        else if (material === "blueium ore")
-        {
-            tile.blueiumOre += amount;
-            this.blueiumOre -= amount;
+        else if (material === "blueium ore") {
+            tile.blueiumOre += amt;
+            this.blueiumOre -= amt;
         }
+
         return true;
 
         // <<-- /Creer-Merge: drop -->>
