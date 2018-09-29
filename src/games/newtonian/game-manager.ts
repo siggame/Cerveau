@@ -182,6 +182,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.secondaryWinConditions(reason);
     }
 
+    // <<-- Creer-Merge: protected-private-methods -->>
+
+    // any additional protected/private methods you need can be added here
+
     /**
      * Attempts to spawn in a unit for a given player.
      * @param player - The player that will own the unit.
@@ -216,9 +220,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return false;
     }
 
-    // <<-- Creer-Merge: protected-private-methods -->>
-
-    // any additional protected/private methods you need can be added here
 
     /**
      * conveyMaterials
