@@ -72,8 +72,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
             units[(
-                u.job === this.game.units[0].job
-                ? 0 : u.job === this.game.units[1].job ? 1 : 3
+                u.job.title === this.game.jobs[0].title
+                ? 0 : u.job.title === this.game.jobs[1].title ? 1 : 2
             )]++;
         }
 
@@ -100,11 +100,11 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // Manager Incrementing spawner Timers
 
-        player.internSpawn = (units[0] === this.game.internCap)
+        player.internSpawn = (units[0] >= this.game.internCap)
           ? this.game.spawnTime : player.internSpawn - 1;
-        player.physicistSpawn = (units[1] === this.game.physicistCap)
+        player.physicistSpawn = (units[1] >= this.game.physicistCap)
           ? this.game.spawnTime : player.physicistSpawn - 1;
-        player.managerSpawn = (units[2] === this.game.managerCap)
+        player.managerSpawn = (units[2] >= this.game.managerCap)
          ? this.game.spawnTime : player.managerSpawn - 1;
 
         // code the generator below this:
