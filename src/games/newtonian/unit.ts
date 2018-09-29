@@ -184,58 +184,44 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        //Handle possible player invalidations here:
-        if (!player)
-        {
+        // Handle possible player invalidations here:
+        if (!player) {
             return "Player does not exist.";
         }
-
-        //Handle possible tile invalidations here:
-        if (!tile)
-        {
+        // Handle possible tile invalidations here:
+        if (!tile) {
             return "Tile to attack doesn't exist.";
         }
-        if (tile.tileNorth != this.tile || tile.tileSouth != this.tile
-            || tile.tileEast != this.tile || tile.tileSouth != this.tile)
-        {
+        if (tile.tileNorth !== this.tile || tile.tileSouth !== this.tile
+            || tile.tileEast !== this.tile || tile.tileSouth !== this.tile) {
             return "Out of range.";
         }
-        if (tile.isWall === true)
-        {
+        if (tile.isWall === true) {
             return "You hurt your hand attacking the wall.";
         }
-        if (tile.unit === undefined)
-        {
+        if (tile.unit === undefined) {
             return "No unit to attack.";
         }
-        if (tile.unit.owner === player)
-        {
+        if (tile.unit.owner === player) {
             return "Cannot attack own unit!";
         }
-
-        //Handle possible unit invalidations here:
-        if (this.owner === undefined)
-        {
-            "Attacking unit has no owner."
+        // Handle possible unit invalidations here:
+        if (this.owner === undefined) {
+            return "Attacking unit has no owner.";
         }
-        if (this.job === undefined)
-        {
+        if (this.job === undefined) {
             return "This unit does not have a defined job.";
         }
-        if (this.acted)
-        {
+        if (this.acted) {
             return "Unit cannot act twice.";
         }
-        if (!this.tile)
-        {
+        if (!this.tile) {
             return "Unit is not occupying a tile";
         }
-        if (this.health <= 0)
-        {
+        if (this.health <= 0) {
             return "Unit cannot attack while dead.";
         }
-        if (this.stunTime > 0)
-        {
+        if (this.stunTime > 0) {
             return "Cannot attack while stunned.";
         }
 
@@ -252,27 +238,24 @@ export class Unit extends GameObject {
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
-        //Write logic here
-        try
-        {
-            if (tile.unit === undefined)
-            {
-                throw "Unit on tile is undefined."
+        // Write logic here
+        try {
+            if (tile.unit === undefined) {
+                throw new Error("Unit on tile is undefined.");
             }
-            tile.unit.health = tile.unit.health - this.job.damage
-            if (tile.unit.health <= 0)
-            {
-                tile.unit.health = 0; //set unit's health to zero
-                tile.unit = undefined; //Unlink tile 
-                this.tile = undefined; // and dead unit
+            tile.unit.health = tile.unit.health - this.job.damage;
+            if (tile.unit.health <= 0) {
+                tile.unit.health = 0; // set unit's health to zero.
+                tile.unit = undefined; // Unlink tile.
+                this.tile = undefined; // and dead unit.
             }
         }
-        catch(err)
-        {
-            return false; //if error occurs, return false
+        catch (err) {
+            return false; // if error occurs, return false.
         }
-        this.acted = true; //unit has acted
-        return true; //return true by default
+        this.acted = true; // unit has acted
+
+        return true; // return true by default
         // <<-- /Creer-Merge: attack -->>
     }
 
