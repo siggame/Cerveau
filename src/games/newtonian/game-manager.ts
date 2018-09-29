@@ -220,7 +220,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     // any additional protected/private methods you need can be added here
 
-    /* convayMaterials
+    /* conveyMaterials
      *
      * This function moves materials and units on conveyor
      */
@@ -328,6 +328,39 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
 
         return;
+    }
+    /**
+     * Attempts to spawn in a unit for a given player.
+     * @param player - The player that will own the unit.
+     * @param job - The job of the unit.
+     * @returns True if unit is spawned, otherwise returns false.
+     */
+    protected spawnUnit(player: Player, job: Job): boolean {
+        // Iterate through each player's spawn tiles to find a spot to spawn unit.
+        for (const tile of player.spawnTiles) {
+            // Check to see if there is a Unit on the tile.
+            // If there is move on to the next tile.
+            if (tile.unit) {
+                continue;
+            }
+            // Else spawn in Unit and return success to spawning.
+            else {
+                tile.unit = this.create.unit({
+                    acted: false,
+                    health: job.health,
+                    job,
+                    owner: player,
+                    tile,
+                });
+                player.units.push(tile.unit);
+                this.game.units.push(tile.unit);
+
+                return true;
+            }
+        }
+
+        // Return failure. We finished looking over all the spawn for Unit spawning.
+        return false;
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
