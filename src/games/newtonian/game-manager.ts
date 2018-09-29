@@ -64,11 +64,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
         // The player who to spawn for.
-<<<<<<< HEAD
         const player: Player = this.game.currentPlayer.opponent;
-=======
-        const player: Player = this.game.currentPlayer;
->>>>>>> Fixed all compile errors but did not test for proper functionality.
 
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
@@ -79,43 +75,23 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
 
         // If Intern Cap has not been met then try to spawn an Intern.
-<<<<<<< HEAD
         if (this.game.internCap > units[0] && player.internSpawn <= 0) {
-=======
-        if (this.game.internCap > units[0] && player.internSpawn === 0) {
->>>>>>> Fixed all compile errors but did not test for proper functionality.
             if (this.spawnUnit(player, this.game.jobs[0])) {
                 player.internSpawn = this.game.spawnTime;
             }
         }
 
         // If Physicist Cap has not been met then try to spawn an Physicist.
-<<<<<<< HEAD
         else if (this.game.physicistCap > units[1] && player.physicistSpawn <= 0) {
             if (this.spawnUnit(player, this.game.jobs[1])) {
                 player.physicistSpawn = this.game.spawnTime;
-=======
-        else if (this.game.physicistCap > units[1] && player.physicistSpawn === 0) {
-            if (this.game.internCap > units[0] && player.internSpawn === 0) {
-                if (this.spawnUnit(player, this.game.jobs[0])) {
-                    player.internSpawn = this.game.spawnTime;
-                }
->>>>>>> Fixed all compile errors but did not test for proper functionality.
             }
         }
 
         // If Manager Cap has not been met then try to spawn an Manager.
-<<<<<<< HEAD
         else if (this.game.managerCap > units[2] && player.managerSpawn <= 0) {
             if (this.spawnUnit(player, this.game.jobs[2])) {
                 player.managerSpawn = this.game.spawnTime;
-=======
-        else if (this.game.managerCap > units[2] && player.managerSpawn === 0) {
-            if (this.game.internCap > units[0] && player.internSpawn === 0) {
-                if (this.spawnUnit(player, this.game.jobs[0])) {
-                    player.internSpawn = this.game.spawnTime;
-                }
->>>>>>> Fixed all compile errors but did not test for proper functionality.
             }
         }
 
@@ -126,12 +102,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         player.physicistSpawn = (units[1] === this.game.physicistCap)
           ? this.game.spawnTime : player.physicistSpawn - 1;
         player.managerSpawn = (units[2] === this.game.managerCap)
-<<<<<<< HEAD
          ? this.game.spawnTime : player.managerSpawn - 1;
-=======
-        ? this.game.spawnTime : player.managerSpawn - 1;
-
->>>>>>> Fixed all compile errors but did not test for proper functionality.
         // code the generator below this:
         // iterate through each tile on the map
         for (const tile of this.game.tiles) {
@@ -269,12 +240,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     owner: player,
                     tile,
                 });
-<<<<<<< HEAD
-
                 player.units.push(tile.unit);
                 this.game.units.push(tile.unit);
-=======
->>>>>>> Fixed all compile errors but did not test for proper functionality.
 
                 return true;
             }
@@ -285,10 +252,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 spawnY = 1;
                 spawnX += playerIndex * -1;
             }
-<<<<<<< HEAD
-=======
-
->>>>>>> Fixed all compile errors but did not test for proper functionality.
         }
         // Return failure. We finished looking over all the spawn for Unit spawning.
 
