@@ -47,7 +47,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
+
         // <<-- /Creer-Merge: before-turn -->>
+
     }
 
     /**
@@ -60,6 +62,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
+        this.manageMaterials();
         // code spawning below this:
         // Number of units For the target player.
         const units: number[] = [0, 0, 0];
@@ -103,6 +106,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
           ? this.game.spawnTime : player.physicistSpawn - 1;
         player.managerSpawn = (units[2] === this.game.managerCap)
          ? this.game.spawnTime : player.managerSpawn - 1;
+
         // code the generator below this:
         // iterate through each tile on the map
         for (const tile of this.game.tiles) {
@@ -178,10 +182,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.secondaryWinConditions(reason);
     }
 
-    // <<-- Creer-Merge: protected-private-methods -->>
-
-    // any additional protected/private methods you need can be added here
-
     /**
      * Attempts to spawn in a unit for a given player.
      * @param player - The player that will own the unit.
@@ -189,46 +189,11 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * @returns True if unit is spawned, otherwise returns false.
      */
     protected spawnUnit(player: Player, job: Job): boolean {
-        // X coord for spawning.
-        let spawnX: number = 1;
-
-        // Y coord for spawning.
-        let spawnY: number = 1;
-
-        // The playerIndex for the game.players array.
-        // Used for knowing which direction to move along the X axis.
-        const playerIndex = (player === this.game.players[0] ? 0 : 1);
-
-        // Check to make sure the tile we are starting on is the right player Tile.
-        if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
-            // If wrong tile, try the other side to see if that is the right spawn area.
-            spawnX = this.game.mapWidth - spawnX;
-            // Double check that we now have the right tile. If this fails, need to
-            // Revaluate how to find spawn.
-            if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
-                // Something is wrong and did not find the right tile.
-                // typescript doesn't like this. \/
-                // console.log("error in spawning");
-            }
-        }
-
-        // Loop to keep looking for an open tile to spawn the Unit.
-        // TODO: optimize so that it doesn't iterate over every column before terminating.
-        while (spawnX < this.game.mapWidth && spawnX > 0) {
-            // Tile that we are trying to spawn on.
-            const tile: Tile = this.game.tiles[spawnX + spawnY * this.game.mapWidth];
-            // Check to see if the tile is still from the spawn area.
-            // If not increment the column and reset to row 1. Continue on to the next iteration.
-            if (tile.owner !== player) {
-                spawnX += playerIndex * -1;
-                spawnY = 1;
-                continue;
-            }
-
+        // Iterate through each player's spawn tiles to find a spot to spawn unit.
+        for (const tile of player.spawnTiles) {
             // Check to see if there is a Unit on the tile.
-            // If there is move down a row.
+            // If there is move on to the next tile.
             if (tile.unit) {
-                spawnY++;
                 continue;
             }
             // Else spawn in Unit and return success to spawning.
@@ -245,17 +210,124 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
                 return true;
             }
+        }
 
-            // Check to make sure spawnY stays in bounds.
-            // TODO: optimize so that it doesn't iterate over every row before moving columns.
-            if (spawnY >= this.game.mapHeight) {
-                spawnY = 1;
-                spawnX += playerIndex * -1;
+        // Return failure. We finished looking over all the spawn for Unit spawning.
+        return false;
+    }
+
+    // <<-- Creer-Merge: protected-private-methods -->>
+
+    // any additional protected/private methods you need can be added here
+
+    /* conveyMaterials
+     *
+     * This function moves materials and units on conveyor
+     */
+    private conveyMaterials(x: number, y: number): void { // Entirely untested
+
+        const start: Tile | undefined = this.game.tiles[x + y * this.game.mapWidth];
+        let end: Tile | undefined = start ? start : undefined;
+
+        if (!start) {
+            return;
+        }
+
+        if (start.type === "conveyor" && start.direction !== "blank") {
+            if (start.direction === "north") {
+                end = start.tileNorth;
+            }
+            if (start.direction === "east") {
+                end = start.tileEast;
+            }
+            if (start.direction === "south") {
+                end = start.tileSouth;
+            }
+            if (start.direction === "west") {
+                end = start.tileWest;
+            }
+            if (!end) {
+                return;
+            }
+
+            // Transfers materials
+            end.rediumOre += start.rediumOre;
+            start.rediumOre = 0;
+            end.redium += start.redium;
+            start.redium = 0;
+            end.blueiumOre += start.blueiumOre;
+            start.blueiumOre = 0;
+            end.blueium += start.blueium;
+            start.blueium = 0;
+
+            // Moves units if they exist and the destination is unoccupied
+            if (!end.unit && start.unit) {
+                start.unit.tile = end;
+                end.unit = start.unit;
+                start.unit = undefined;
             }
         }
-        // Return failure. We finished looking over all the spawn for Unit spawning.
 
-        return false;
+        return;
+    }
+
+    /* Game-Manager Materials
+     *
+     * This goes into the after turn function
+     * Select the player who's turns it currently isn't, and spawn materials
+     * on their side of the base.
+     * Makes sure all conveyers move units and materials ontop of them.
+     */
+    private manageMaterials(): void { // Entirely untested
+
+        let loc: Tile | undefined;
+
+        // Order matters
+        // Moves materials and units on the left side
+        this.conveyMaterials(2, 17);
+        this.conveyMaterials(3, 17);
+        this.conveyMaterials(4, 17);
+        this.conveyMaterials(4, 18);
+        this.conveyMaterials(4, 19);
+        this.conveyMaterials(4, 20);
+        this.conveyMaterials(3, 20);
+        this.conveyMaterials(2, 20);
+        this.conveyMaterials(1, 20);
+
+        // Order matters
+        // Moves materials and units on the right side
+        this.conveyMaterials(this.game.mapWidth - 2, 17);
+        this.conveyMaterials(this.game.mapWidth - 3, 17);
+        this.conveyMaterials(this.game.mapWidth - 4, 17);
+        this.conveyMaterials(this.game.mapWidth - 4, 18);
+        this.conveyMaterials(this.game.mapWidth - 4, 19);
+        this.conveyMaterials(this.game.mapWidth - 4, 20);
+        this.conveyMaterials(this.game.mapWidth - 3, 20);
+        this.conveyMaterials(this.game.mapWidth - 2, 20);
+        this.conveyMaterials(this.game.mapWidth - 1, 20);
+
+        // players[0] is on x = 0 side
+        // Right is Redium
+
+        // Amount of ore spawned
+        const spawnAmount = 1;
+
+        // Spawns the appropriate ore at the start of the conveyor
+        // on the side of the the player who's turns it currently isn't
+        if (this.game.players[0] === this.game.currentPlayer) {
+            loc = this.game.getTile(1, 20);
+            if (loc) {
+                loc.blueiumOre += spawnAmount;
+            }
+        }
+        else {
+            loc = this.game.getTile(this.game.mapWidth - 1, 20);
+            if (loc) {
+                loc.rediumOre += spawnAmount;
+            }
+        }
+
+        return;
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
