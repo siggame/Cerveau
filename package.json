@@ -36,6 +36,7 @@
     "json5": "2.0.1",
     "lark-websocket": "git://github.com/JacobFischer/lark-websocket.git#95a4947ee1b20bc3ae8155f3c405d61fcc1f97d9",
     "moment": "2.22.2",
+    "npm": "^6.4.1",
     "sanitize-filename": "1.6.1",
     "seedrandom": "2.4.4",
     "ts-node": "7.0.1",

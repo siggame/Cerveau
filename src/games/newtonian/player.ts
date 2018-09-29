@@ -2,6 +2,7 @@ import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBaseNewtonianPlayer } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
+import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
@@ -22,12 +23,18 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
     public readonly clientType!: string;
 
     /**
+     * Every generator Tile owned by this Player. (listed from the outer edges
+     * inward, from top to bottom).
+     */
+    public generatorTiles!: Tile[];
+
+    /**
      * The amount of heat this Player has.
      */
     public heat!: number;
 
     /**
-     * Time left till a intern spawns.
+     * The time left till a intern spawns. (0 to spawnTime).
      */
     public internSpawn!: number;
 
@@ -37,7 +44,7 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
     public lost!: boolean;
 
     /**
-     * Time left till a manager spawns.
+     * The time left till a manager spawns. (0 to spawnTime).
      */
     public managerSpawn!: number;
 
@@ -52,7 +59,7 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
     public readonly opponent!: Player;
 
     /**
-     * Time left till a physicist spawns.
+     * The time left till a physicist spawns. (0 to spawnTime).
      */
     public physicistSpawn!: number;
 
@@ -70,6 +77,12 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
      * The reason why the player won the game.
      */
     public reasonWon!: string;
+
+    /**
+     * All the tiles this Player's units can spawn on. (listed from the outer
+     * edges inward, from top to bottom).
+     */
+    public spawnTiles!: Tile[];
 
     /**
      * The amount of time (in ns) remaining for this AI to send commands.
@@ -102,8 +115,8 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: IBaseNewtonianPlayer,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<IBaseNewtonianPlayer>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

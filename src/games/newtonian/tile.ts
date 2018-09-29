@@ -12,7 +12,7 @@ import { Unit } from "./unit";
 
 /**
  * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
- * 'west'). blank mean no conveyor.
+ * 'west'). blank means conveyor doesn't move.
  */
 export type TileDirection = "blank" | "north" | "east" | "south" | "west";
 
@@ -36,24 +36,24 @@ export class Tile extends GameObject implements BaseTile {
     public blueiumOre!: number;
 
     /**
-     * (Visualizer only) Different tile tipes, cracked, slightly dirty, ect.
+     * (Visualizer only) Different tile types, cracked, slightly dirty, etc.
      * This has no effect on gameplay, but feel free to use it if you want.
      */
     public decoration!: number;
 
     /**
      * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank mean no conveyor.
+     * 'west'). blank means conveyor doesn't move.
      */
     public readonly direction!: "blank" | "north" | "east" | "south" | "west";
 
     /**
-     * Weither or not the tile is a wall.
+     * Whether or not the tile is a wall.
      */
     public readonly isWall!: boolean;
 
     /**
-     * The machine on this Tile if present, otherwise undefined.
+     * The Machine on this Tile if present, otherwise undefined.
      */
     public readonly machine?: Machine;
 
@@ -134,8 +134,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: ITileProperties,
-        required: IBaseGameObjectRequiredData,
+        args: Readonly<ITileProperties>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

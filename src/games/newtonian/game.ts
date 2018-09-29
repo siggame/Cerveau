@@ -48,7 +48,7 @@ export class NewtonianGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
-     * Determins the rate at which the highest value victory points degrade.
+     * Percent loss from the difference of Heat and Pressure. (0 to 1).
      */
     public readonly degradeRate!: number;
 
@@ -60,12 +60,13 @@ export class NewtonianGame extends BaseClasses.Game {
     public gameObjects!: {[id: string]: GameObject};
 
     /**
-     * How many interns a player can have.
+     * The maximum number of interns a player can have.
      */
     public readonly internCap!: number;
 
     /**
-     * Every job in the game.
+     * A list of all jobs. first item is intern, second is physicists, and
+     * third is manager.
      */
     public jobs!: Job[];
 
@@ -75,7 +76,7 @@ export class NewtonianGame extends BaseClasses.Game {
     public machines!: Machine[];
 
     /**
-     * How many managers a player can have.
+     * The maximum number of managers a player can have.
      */
     public readonly managerCap!: number;
 
@@ -90,12 +91,17 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly mapWidth!: number;
 
     /**
+     * The number of materials that spawn per spawn cycle.
+     */
+    public readonly materialSpawn!: number;
+
+    /**
      * The maximum number of turns before the game will automatically end.
      */
     public readonly maxTurns!: number;
 
     /**
-     * How many physicists a player can have.
+     * The maximum number of physicists a player can have.
      */
     public readonly physicistCap!: number;
 
@@ -105,7 +111,8 @@ export class NewtonianGame extends BaseClasses.Game {
     public players!: Player[];
 
     /**
-     * How much each refined ore adds when put in the generator.
+     * The amount of victory points added when a refined ore is consumed by the
+     * generator.
      */
     public readonly refinedValue!: number;
 
@@ -115,12 +122,12 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly session!: string;
 
     /**
-     * The number of turns between spawning unit waves.
+     * The amount of turns it takes a unit to spawn.
      */
     public readonly spawnTime!: number;
 
     /**
-     * How many turns a unit is stunned.
+     * The amount of turns a unit cannot do anything when stunned.
      */
     public readonly stunTime!: number;
 
@@ -137,7 +144,7 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly timeAddedPerTurn!: number;
 
     /**
-     * How many turns a unit is immune to being stunned.
+     * The number turns a unit is immune to being stunned.
      */
     public readonly timeImmune!: number;
 
@@ -162,7 +169,7 @@ export class NewtonianGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: NewtonianGameSettingsManager,
-        required: IBaseGameRequiredData,
+        required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -346,7 +353,7 @@ export class NewtonianGame extends BaseClasses.Game {
             mShift = -mShift;
         }
 
-        // Generate the run time for the machiens
+        // Generate the run time for the machines
         const time = this.manager.random.int(2, 9);
         // determines the tile that machine will be on.
         const loc = getMutableTile(MMstart + 1, mid + shift + mShift);

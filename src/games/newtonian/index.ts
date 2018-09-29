@@ -78,7 +78,7 @@ export interface IGameObjectProperties {
 /** All the possible properties for an Job. */
 export interface IJobProperties {
     /**
-     * How many combined resources a beaver with this Job can hold at once.
+     * How many combined resources a unit with this Job can hold at once.
      */
     carryLimit?: number;
 
@@ -107,23 +107,25 @@ export interface IJobProperties {
 /** All the possible properties for an Machine. */
 export interface IMachineProperties {
     /**
-     * What type of ore the machine takes it, also determins the type of
-     * material it outputs.
+     * What type of ore the machine takes it. Also determines the type of
+     * material it outputs. (redium or blueium).
      */
     oreType?: "redium" | "blueium";
 
     /**
-     * The amount of ore that needs to be inputted into the machine.
+     * The amount of ore that needs to be inputted into the machine for it to
+     * be worked.
      */
     refineInput?: number;
 
     /**
-     * The amount of material that out of the machine after running.
+     * The amount of refined ore that is returned after the machine has been
+     * fully worked.
      */
     refineOutput?: number;
 
     /**
-     * The amount of turns this machine takes to refine the ore.
+     * The number of times this machine needs to be worked to refine ore.
      */
     refineTime?: number;
 
@@ -133,12 +135,7 @@ export interface IMachineProperties {
     tile?: Tile;
 
     /**
-     * Time till the machine finishes running.
-     */
-    timeLeft?: number;
-
-    /**
-     * Tracks how many times this machine has been worked.
+     * Tracks how many times this machine has been worked. (0 to refineTime).
      */
     worked?: number;
 
@@ -153,12 +150,18 @@ export interface IPlayerProperties {
     clientType?: string;
 
     /**
+     * Every generator Tile owned by this Player. (listed from the outer edges
+     * inward, from top to bottom).
+     */
+    generatorTiles?: Tile[];
+
+    /**
      * The amount of heat this Player has.
      */
     heat?: number;
 
     /**
-     * Time left till a intern spawns.
+     * The time left till a intern spawns. (0 to spawnTime).
      */
     internSpawn?: number;
 
@@ -168,7 +171,7 @@ export interface IPlayerProperties {
     lost?: boolean;
 
     /**
-     * Time left till a manager spawns.
+     * The time left till a manager spawns. (0 to spawnTime).
      */
     managerSpawn?: number;
 
@@ -183,7 +186,7 @@ export interface IPlayerProperties {
     opponent?: Player;
 
     /**
-     * Time left till a physicist spawns.
+     * The time left till a physicist spawns. (0 to spawnTime).
      */
     physicistSpawn?: number;
 
@@ -201,6 +204,12 @@ export interface IPlayerProperties {
      * The reason why the player won the game.
      */
     reasonWon?: string;
+
+    /**
+     * All the tiles this Player's units can spawn on. (listed from the outer
+     * edges inward, from top to bottom).
+     */
+    spawnTiles?: Tile[];
 
     /**
      * The amount of time (in ns) remaining for this AI to send commands.
@@ -232,24 +241,24 @@ export interface ITileProperties {
     blueiumOre?: number;
 
     /**
-     * (Visualizer only) Different tile tipes, cracked, slightly dirty, ect.
+     * (Visualizer only) Different tile types, cracked, slightly dirty, etc.
      * This has no effect on gameplay, but feel free to use it if you want.
      */
     decoration?: number;
 
     /**
      * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank mean no conveyor.
+     * 'west'). blank means conveyor doesn't move.
      */
     direction?: "blank" | "north" | "east" | "south" | "west";
 
     /**
-     * Weither or not the tile is a wall.
+     * Whether or not the tile is a wall.
      */
     isWall?: boolean;
 
     /**
-     * The machine on this Tile if present, otherwise undefined.
+     * The Machine on this Tile if present, otherwise undefined.
      */
     machine?: Machine;
 
@@ -319,17 +328,19 @@ export interface ITileProperties {
 /** All the possible properties for an Unit. */
 export interface IUnitProperties {
     /**
-     * Whether this Unit has performed its action this turn.
+     * Whether or not this Unit has performed its action this turn.
      */
     acted?: boolean;
 
     /**
-     * The amount of blueium carried by this unit.
+     * The amount of blueium carried by this unit. (0 to job carry capacity -
+     * other carried items).
      */
     blueium?: number;
 
     /**
-     * The amount of blueium ore carried by this unit.
+     * The amount of blueium ore carried by this unit. (0 to job carry capacity
+     * - other carried items).
      */
     blueiumOre?: number;
 
@@ -339,12 +350,12 @@ export interface IUnitProperties {
     health?: number;
 
     /**
-     * The Job this Unit does.
+     * The Job this Unit has.
      */
     job?: Job;
 
     /**
-     * How many more times this Unit may move this turn.
+     * The number of moves this unit has left this turn.
      */
     moves?: number;
 
@@ -354,22 +365,24 @@ export interface IUnitProperties {
     owner?: Player;
 
     /**
-     * The amount of redium carried by this unit.
+     * The amount of redium carried by this unit. (0 to job carry capacity -
+     * other carried items).
      */
     redium?: number;
 
     /**
-     * The amount of redium ore carried by this unit.
+     * The amount of redium ore carried by this unit. (0 to job carry capacity
+     * - other carried items).
      */
     rediumOre?: number;
 
     /**
-     * Duration of stun immunity.
+     * Duration of stun immunity. (0 to timeImmune).
      */
     stunImmune?: number;
 
     /**
-     * Duration the unit is stunned.
+     * Duration the unit is stunned. (0 to the game constant stunTime).
      */
     stunTime?: number;
 
@@ -415,8 +428,8 @@ export interface IUnitDropArgs {
      */
     tile?: Tile;
     /**
-     * The amount of materials to dropped. Amounts <= 0 will drop all the
-     * materials on the Unit.
+     * The number of materials to dropped. Amounts <= 0 will drop all the
+     * materials.
      */
     amount?: number;
     /**
@@ -444,12 +457,12 @@ export interface IUnitMoveArgs {
  */
 export interface IUnitPickupArgs {
     /**
-     * The tile the materials will be dropped on.
+     * The tile the materials will be picked up from.
      */
     tile?: Tile;
     /**
      * The amount of materials to pick up. Amounts <= 0 will pick up all the
-     * materials on the Unit.
+     * materials that the unit can.
      */
     amount?: number;
     /**
@@ -504,7 +517,9 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(args: T): Job & T {
+    public job<T extends JobArgs>(
+        args: Readonly<T>,
+    ): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -515,7 +530,9 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Machine hooked up in the game and ready for you to use.
      */
-    public machine<T extends MachineArgs>(args: T): Machine & T {
+    public machine<T extends MachineArgs>(
+        args: Readonly<T>,
+    ): Machine & T {
         return this.createGameObject("Machine", Machine, args);
     }
 
@@ -526,7 +543,9 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: T): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -537,7 +556,9 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(args: T): Unit & T {
+    public unit<T extends UnitArgs>(
+        args: Readonly<T>,
+    ): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
 
@@ -625,6 +646,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
                 mapWidth: {
+                    typeName: "int",
+                },
+                materialSpawn: {
                     typeName: "int",
                 },
                 maxTurns: {
@@ -752,9 +776,6 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Tile,
                     nullable: false,
                 },
-                timeLeft: {
-                    typeName: "int",
-                },
                 worked: {
                     typeName: "int",
                 },
@@ -767,6 +788,14 @@ export const Namespace = makeNamespace({
             attributes: {
                 clientType: {
                     typeName: "string",
+                },
+                generatorTiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Tile,
+                        nullable: false,
+                    },
                 },
                 heat: {
                     typeName: "int",
@@ -799,6 +828,14 @@ export const Namespace = makeNamespace({
                 },
                 reasonWon: {
                     typeName: "string",
+                },
+                spawnTiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Tile,
+                        nullable: false,
+                    },
                 },
                 timeRemaining: {
                     typeName: "float",

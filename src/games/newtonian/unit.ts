@@ -15,17 +15,19 @@ import { Tile } from "./tile";
  */
 export class Unit extends GameObject {
     /**
-     * Whether this Unit has performed its action this turn.
+     * Whether or not this Unit has performed its action this turn.
      */
     public acted!: boolean;
 
     /**
-     * The amount of blueium carried by this unit.
+     * The amount of blueium carried by this unit. (0 to job carry capacity -
+     * other carried items).
      */
     public blueium!: number;
 
     /**
-     * The amount of blueium ore carried by this unit.
+     * The amount of blueium ore carried by this unit. (0 to job carry capacity
+     * - other carried items).
      */
     public blueiumOre!: number;
 
@@ -35,12 +37,12 @@ export class Unit extends GameObject {
     public health!: number;
 
     /**
-     * The Job this Unit does.
+     * The Job this Unit has.
      */
     public readonly job: Job;
 
     /**
-     * How many more times this Unit may move this turn.
+     * The number of moves this unit has left this turn.
      */
     public moves!: number;
 
@@ -50,22 +52,24 @@ export class Unit extends GameObject {
     public owner?: Player;
 
     /**
-     * The amount of redium carried by this unit.
+     * The amount of redium carried by this unit. (0 to job carry capacity -
+     * other carried items).
      */
     public redium!: number;
 
     /**
-     * The amount of redium ore carried by this unit.
+     * The amount of redium ore carried by this unit. (0 to job carry capacity
+     * - other carried items).
      */
     public rediumOre!: number;
 
     /**
-     * Duration of stun immunity.
+     * Duration of stun immunity. (0 to timeImmune).
      */
     public stunImmune!: number;
 
     /**
-     * Duration the unit is stunned.
+     * Duration the unit is stunned. (0 to the game constant stunTime).
      */
     public stunTime!: number;
 
@@ -89,13 +93,13 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IUnitProperties & {
+        args: Readonly<IUnitProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             job: Job;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -129,10 +133,7 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitActArgs {
         // <<-- Creer-Merge: invalidate-act -->>
-        const reason = this.invalidate(player, true);
-        if (reason) {
-            return reason;
-        }
+
         // Check all the arguments for act here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -142,8 +143,9 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Makes the unit do something to a machine on its tile. Interns sabotage,
-     * physicists run, and managers protect.
+     * Makes the unit do something to a machine adjacent to its tile. Interns
+     * sabotage, physicists work. Interns stun physicist, physicist stuns
+     * manager, manager stuns intern.
      *
      * @param player - The player that called this.
      * @param tile - The tile the unit acts on.
@@ -176,10 +178,7 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
-        const reason = this.invalidate(player, true);
-        if (reason) {
-            return reason;
-        }
+
         // Check all the arguments for attack here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -189,7 +188,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Attacks a unit on a ajacent tile.
+     * Attacks a unit on an adjacent tile.
      *
      * @param player - The player that called this.
      * @param tile - The Tile to attack.
@@ -213,8 +212,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dropped on.
-     * @param amount - The amount of materials to dropped. Amounts <= 0 will
-     * drop all the materials on the Unit.
+     * @param amount - The number of materials to dropped. Amounts <= 0 will
+     * drop all the materials.
      * @param material - The material the unit will drop.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -237,12 +236,12 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Drops material at the units feat
+     * Drops materials at the units feet or adjacent tile.
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dropped on.
-     * @param amount - The amount of materials to dropped. Amounts <= 0 will
-     * drop all the materials on the Unit.
+     * @param amount - The number of materials to dropped. Amounts <= 0 will
+     * drop all the materials.
      * @param material - The material the unit will drop.
      * @returns True if successfully deposited, false otherwise.
      */
@@ -288,13 +287,9 @@ export class Unit extends GameObject {
         if (!tile) {
             return `${this}, gratz. You proved flat earthers correct.`;
         }
-        // Make sure the unit is alive.
-        if (this.health <= 0) {
-            return `${this} is fuel.`;
-        }
-        // make sure the unit can function
-        if (this.stunTime > 0) {
-            return `${this} is stunned and cannot move.`;
+        // make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is on a tile that doesn't exist and it should be dead.`;
         }
         // Make sure there isn't a wall there. Ouch.
         if (tile.isWall) {
@@ -316,10 +311,14 @@ export class Unit extends GameObject {
         if (tile.unit) {
             return `${this} cannot walk through units. Yet.....`;
         }
-        // make sure the tile is next to the unit
+        // make sure the tile is next to the unit.
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only travel to an adjacent tile.`;
+        }
+        // make sure they aren't entering a spawn area.
+        if (tile.type === "spawn" && this.tile.type !== "spawn") {
+            return `${this} is entering a invalid tile. Units cannot re-enter the spawn area upon leaving.`;
         }
 
         return;
@@ -358,9 +357,9 @@ export class Unit extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The tile the materials will be dropped on.
+     * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
-     * pick up all the materials on the Unit.
+     * pick up all the materials that the unit can.
      * @param material - The material the unit will pick up.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -373,10 +372,7 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): void | string | IUnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
-        const reason = this.invalidate(player, false);
-        if (reason) {
-            return reason;
-        }
+
         // Check all the arguments for pickup here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -386,12 +382,12 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Picks up material at the units feat
+     * Picks up material at the units feet or adjacent tile.
      *
      * @param player - The player that called this.
-     * @param tile - The tile the materials will be dropped on.
+     * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
-     * pick up all the materials on the Unit.
+     * pick up all the materials that the unit can.
      * @param material - The material the unit will pick up.
      * @returns True if successfully deposited, false otherwise.
      */
@@ -434,6 +430,14 @@ export class Unit extends GameObject {
 
         if (checkAction && this.acted) {
             return `${this} cannot perform another action this turn.`;
+        }
+        // Make sure the unit is alive.
+        if (this.health <= 0) {
+            return `${this} is fuel.`;
+        }
+        // make sure the unit can function
+        if (this.stunTime > 0) {
+            return `${this} is stunned and cannot move.`;
         }
     }
 
