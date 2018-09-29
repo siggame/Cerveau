@@ -8,33 +8,35 @@ import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * What type of ore the machine takes it, also determins the type of material
- * it outputs.
+ * What type of ore the machine takes it. Also determines the type of material
+ * it outputs. (redium or blueium).
  */
 export type MachineOreType = "redium" | "blueium";
 
 /**
- * A machine on a tile.
+ * A machine in the game. Used to refine ore.
  */
 export class Machine extends GameObject {
     /**
-     * What type of ore the machine takes it, also determins the type of
-     * material it outputs.
+     * What type of ore the machine takes it. Also determines the type of
+     * material it outputs. (redium or blueium).
      */
     public readonly oreType!: "redium" | "blueium";
 
     /**
-     * The amount of ore that needs to be inputted into the machine.
+     * The amount of ore that needs to be inputted into the machine for it to
+     * be worked.
      */
     public readonly refineInput!: number;
 
     /**
-     * The amount of material that out of the machine after running.
+     * The amount of refined ore that is returned after the machine has been
+     * fully worked.
      */
     public readonly refineOutput!: number;
 
     /**
-     * The amount of turns this machine takes to refine the ore.
+     * The number of times this machine needs to be worked to refine ore.
      */
     public readonly refineTime!: number;
 
@@ -44,12 +46,7 @@ export class Machine extends GameObject {
     public readonly tile: Tile;
 
     /**
-     * Time till the machine finishes running.
-     */
-    public timeLeft!: number;
-
-    /**
-     * Tracks how many times this machine has been worked.
+     * Tracks how many times this machine has been worked. (0 to refineTime).
      */
     public worked!: number;
 
@@ -68,13 +65,13 @@ export class Machine extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IMachineProperties & {
+        args: Readonly<IMachineProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             tile: Tile;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

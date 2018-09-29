@@ -20,51 +20,58 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
 
         // Newtonian game specific settings
         degradeRate: {
-            description: "Determins the rate at which the highest value "
-                       + "victory points degrade.",
+            description: "Percent loss from the difference of Heat and "
+                       + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 2,
+            default: 0.2,
             // <<-- /Creer-Merge: degradeRate -->>
         },
         internCap: {
-            description: "How many interns a player can have.",
+            description: "The maximum number of interns a player can have.",
             // <<-- Creer-Merge: internCap -->>
             default: 3,
             // <<-- /Creer-Merge: internCap -->>
         },
         managerCap: {
-            description: "How many managers a player can have.",
+            description: "The maximum number of managers a player can have.",
             // <<-- Creer-Merge: managerCap -->>
             default: 3,
             // <<-- /Creer-Merge: managerCap -->>
         },
+        materialSpawn: {
+            description: "The number of materials that spawn per spawn cycle.",
+            // <<-- Creer-Merge: materialSpawn -->>
+            default: 2,
+            // <<-- /Creer-Merge: materialSpawn -->>
+        },
         physicistCap: {
-            description: "How many physicists a player can have.",
+            description: "The maximum number of physicists a player can have.",
             // <<-- Creer-Merge: physicistCap -->>
             default: 3,
             // <<-- /Creer-Merge: physicistCap -->>
         },
         refinedValue: {
-            description: "How much each refined ore adds when put in the "
-                       + "generator.",
+            description: "The amount of victory points added when a refined "
+                       + "ore is consumed by the generator.",
             // <<-- Creer-Merge: refinedValue -->>
             default: 5,
             // <<-- /Creer-Merge: refinedValue -->>
         },
         spawnTime: {
-            description: "The number of turns between spawning unit waves.",
+            description: "The amount of turns it takes a unit to spawn.",
             // <<-- Creer-Merge: spawnTime -->>
             default: 5,
             // <<-- /Creer-Merge: spawnTime -->>
         },
         stunTime: {
-            description: "How many turns a unit is stunned.",
+            description: "The amount of turns a unit cannot do anything when "
+                       + "stunned.",
             // <<-- Creer-Merge: stunTime -->>
             default: 2,
             // <<-- /Creer-Merge: stunTime -->>
         },
         timeImmune: {
-            description: "How many turns a unit is immune to being stunned.",
+            description: "The number turns a unit is immune to being stunned.",
             // <<-- Creer-Merge: timeImmune -->>
             default: 4,
             // <<-- /Creer-Merge: timeImmune -->>

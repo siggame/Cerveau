@@ -7,11 +7,11 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Information about a units's job.
+ * Information about a unit's job.
  */
 export class Job extends GameObject {
     /**
-     * How many combined resources a beaver with this Job can hold at once.
+     * How many combined resources a unit with this Job can hold at once.
      */
     public readonly carryLimit!: number;
 
@@ -50,12 +50,12 @@ export class Job extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: IJobProperties & {
+        args: Readonly<IJobProperties & {
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
-        },
-        required: IBaseGameObjectRequiredData,
+        }>,
+        required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
