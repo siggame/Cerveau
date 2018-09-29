@@ -161,6 +161,24 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
         // Add logic here checking for the primary win condition(s)
+        if ((this.game.players[0].heat + this.game.players[0].pressure) === 400 &&
+            (this.game.players[1].heat + this.game.players[1].pressure) === 400) {
+            this.secondaryWinConditions("Both players achieved fusion at the same time.");
+
+            return true;
+        }
+        else if (this.game.players[0].heat + this.game.players[0].pressure === 400) {
+            this.declareWinner("You achieved fusion!", this.game.players[0]);
+            this.declareLosers("Your opponents achieved fusion.", this.game.players[1]);
+
+            return true;
+        }
+        else if (this.game.players[1].heat + this.game.players[1].pressure === 400) {
+            this.declareWinner("You achieved fusion!", this.game.players[1]);
+            this.declareLosers("Your opponents achieved fusion.", this.game.players[0]);
+
+            return true;
+        }
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -175,6 +193,24 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
+        if (this.game.players[0].heat + this.game.players[0].pressure ===
+            this.game.players[1].heat + this.game.players[1].pressure) {
+            return;
+        }
+        if (this.game.players[0].heat + this.game.players[0].pressure >
+            this.game.players[1].heat + this.game.players[1].pressure) {
+            this.declareWinner("You achieved fusion!", this.game.players[0]);
+            this.declareLosers("Your opponents achieved fusion.", this.game.players[1]);
+
+            return;
+        }
+        else if (this.game.players[1].heat + this.game.players[1].pressure >
+            this.game.players[0].heat + this.game.players[0].pressure) {
+            this.declareWinner("You achieved fusion!", this.game.players[1]);
+            this.declareLosers("Your opponents achieved fusion.", this.game.players[2]);
+
+            return;
+        }
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         // This will end the game.
