@@ -17,7 +17,7 @@ interface IRoom {
     // room locations to be stored.
     x1: number; y1: number;
     x2: number; y2: number;
-    x3: number; y3: number; // x3 is there, but not supported for now TODO: add support for x3
+    x3: number; y3: number;
     // tracks doors and walls.
     WNorth: boolean; WEast: boolean; WSouth: boolean; WWest: boolean;
     DNorth: boolean; DEast: boolean; DSouth: boolean; DWest: boolean;
@@ -284,22 +284,24 @@ export class NewtonianGame extends BaseClasses.Game {
         }
 
         // --- Set spawn area --- \\
-        for (let x = 1; x <= startEnd - 1; x++) {
-            for (let y = 1; y < spawnEnd; y++) {
+        for (let y = 1; y < spawnEnd; y++) {
+            for (let x = 1; x <= startEnd - 1; x++) {
                 const tile = getMutableTile(x, y);
 
                 tile.owner = this.players[0];
                 tile.type = "spawn";
+                this.players[0].spawnTiles.push(tile as Tile);
             }
         }
 
         // --- Set generator area --- \\
-        for (let x = 1; x <= startEnd - 1; x++) {
-            for (let y = spawnEnd + 1; y < genEnd; y++) {
+        for (let y = spawnEnd + 1; y < genEnd; y++) {
+            for (let x = 1; x <= startEnd - 1; x++) {
                 const tile = getMutableTile(x, y);
 
                 tile.owner = this.players[0];
                 tile.type = "generator";
+                this.players[0].generatorTiles.push(tile as Tile);
             }
         }
 
@@ -425,8 +427,8 @@ export class NewtonianGame extends BaseClasses.Game {
         // Math.floor(Math.random() * 3)
         // mirror map
         // TODO: copy units.
-        for (let x = 0; x < this.mapWidth / 2; x++) {
-            for (let y = 0; y < this.mapHeight; y++) {
+        for (let y = 0; y < this.mapHeight; y++) {
+            for (let x = 0; x < this.mapWidth / 2; x++) {
                 const copy = getMutableTile(x, y).isWall;
                 getMutableTile((this.mapWidth - 1 - x), y).isWall = copy;
                 const copy2 = getMutableTile(x, y).decoration;
@@ -447,12 +449,16 @@ export class NewtonianGame extends BaseClasses.Game {
                     this.machines.push(machine2);
                 }
                 else if (getMutableTile(x, y).type === "spawn") {
-                    getMutableTile((this.mapWidth - 1 - x), y).type = "spawn";
-                    getMutableTile((this.mapWidth - 1 - x), y).owner = this.players[1];
+                    const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    tile.type = "spawn";
+                    tile.owner = this.players[1];
+                    this.players[1].spawnTiles.push(tile as Tile);
                 }
                 else if (getMutableTile(x, y).type === "generator") {
-                    getMutableTile((this.mapWidth - 1 - x), y).type = "generator";
-                    getMutableTile((this.mapWidth - 1 - x), y).owner = this.players[1];
+                    const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    tile.type = "generator";
+                    tile.owner = this.players[1];
+                    this.players[1].spawnTiles.push(tile as Tile);
                 }
                 else if (getMutableTile(x, y).type === "conveyor") {
                     getMutableTile((this.mapWidth - 1 - x), y).type = "conveyor";
