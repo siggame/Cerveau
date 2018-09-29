@@ -137,7 +137,12 @@ export class Unit extends GameObject {
         // Check all the arguments for act here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        // changing its value in this scope is enough.// check widespread reasons.
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
 
         // make sure the unit is on the planet.... wait...
         if (!tile) {
@@ -329,47 +334,44 @@ export class Unit extends GameObject {
         // Check all the arguments for attack here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // Handle possible player invalidations here:
-        if (!player) {
-            return "Player does not exist.";
+        // changing its value in this scope is enough.// check widespread reasons.
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
         }
+
         // Handle possible tile invalidations here:
         if (!tile) {
-            return "Tile to attack doesn't exist.";
+            return `${this} is trying to attack a tile that doesn't exist`;
         }
+        // make sure the tile is in range.
         if (tile.tileNorth !== this.tile || tile.tileSouth !== this.tile
             || tile.tileEast !== this.tile || tile.tileSouth !== this.tile) {
-            return "Out of range.";
+            return `${this} is trying to attack ${tile} which is too far away.`;
         }
+        // check if the unit is attacking a wall (not needed but we try to be funny).
         if (tile.isWall === true) {
-            return "You hurt your hand attacking the wall.";
+            return `${this} hurt its hand attacking a wall.`;
         }
+        // make sure the the unit is attacking a unit.
         if (tile.unit === undefined) {
-            return "No unit to attack.";
+            return `${this} is attacking ${tile} that doesn't have a unit.`;
         }
+        // make sure you aren't attacking a friend.
         if (tile.unit.owner === player) {
-            return "Cannot attack own unit!";
+            return `${this} is trying to attack the ally: ${tile.unit}`;
         }
         // Handle possible unit invalidations here:
         if (this.owner === undefined) {
-            return "Attacking unit has no owner.";
+            return `${this} is attacking a unit that has no owner. Report this to the game Devs`;
         }
+        // make sure the unit has a job.
         if (this.job === undefined) {
-            return "This unit does not have a defined job.";
-        }
-        if (this.acted) {
-            return "Unit cannot act twice.";
+            return `${this} doesn't have a job. That shouldn't be possible.`;
         }
         if (!this.tile) {
-            return "Unit is not occupying a tile";
-        }
-        if (this.health <= 0) {
-            return "Unit cannot attack while dead.";
-        }
-        if (this.stunTime > 0) {
-            return "Cannot attack while stunned.";
+            return `${this} is trying to attack things in the afterlife. Stop it.`;
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
@@ -426,32 +428,30 @@ export class Unit extends GameObject {
         amount: number,
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): void | string | IUnitDropArgs {
-        // <<-- Creer-Merge: invalidate-drop -->>
-
-        if (!player || this.owner !== player) {
-            return `${this} resisted your attempts at mind control, ${player}!`;
+        // <<-- Creer-Merge: invalidate-drop -->>// check widespread reasons.
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
         }
+
+        // make sure there isn't a wall there.
         if (tile.isWall) {
             return `${this} can't place stuff on a wall. That just don't work, my friend.`;
         }
+        // make sure the target tile exists.
         if (!tile) {
-            return `${this} is trippin'. Ain't nothin' there, dawg.`;
+            return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
-        if (this.acted) {
-            return `${this} has already acted. You should pay more.`;
+        // make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is probably dead. It can't drop things.`;
         }
-        if (this.stunTime > 0) {
-            return `${this} is stunned. They are too busy doing nothing`;
-        }
-        if (this.health <= 0) {
-            return `${this} is dead. Too bad about the wife and kids...`;
-        }
-        if (player !== this.game.currentPlayer) {
-            return `Wait your turn, ${player}!`;
-        }
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth && this.tile
-            !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
+        // make sure it is selecting a ajacent tile.
+        if (tile !== this.tile && this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth && this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth) {
+            return `${this} can only drop things to an adjacent tile or it's tile. Did you flunk geography?`;
         }
 
         return;
@@ -541,8 +541,9 @@ export class Unit extends GameObject {
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
-        // makes sure the player is the owner of the unit.
+        // check widespread reasons.
         const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
         if (reason) {
             return reason;
         }
@@ -573,7 +574,7 @@ export class Unit extends GameObject {
         // make sure the tile is next to the unit.
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} can only travel to an adjacent tile.`;
+            return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
         }
         // make sure they aren't entering a spawn area.
         if (tile.type === "spawn" && this.tile.type !== "spawn") {
@@ -637,25 +638,31 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
+        // check common invalidates.
         const reason = this.invalidate(player, false);
+        // if there is a reason, report it.
         if (reason) {
             return reason;
         }
-
+        // make sure the unit is on a tile.
         if (!this.tile) {
             return `${this} is not on a Tile!`;
         }
-
+        // make sure the target tile exists.
         if (!tile) {
             return `${this} can only pick things up off tiles that exist`;
         }
-
-        if (tile !== this.tile && !this.tile.hasNeighbor(tile)) {
+        // make sure the tile is adjacent to the current tile, or its tile.
+        if (tile !== this.tile && this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth && this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth) {
             return `${this} can only pickup resources on or adjacent to its tile.`;
         }
 
+        // tracks the material to be picked up.
         let totalMaterialOnTile = 0;
 
+        // sets up the amount of material.
         switch (material) {
             case "redium ore": {
                 totalMaterialOnTile = tile.rediumOre;
@@ -674,30 +681,20 @@ export class Unit extends GameObject {
             }
         }
 
-        const pickUpAll = amount <= 0;
-
-        let actualAmount = pickUpAll
+        const actualAmount = amount <= 0
             ? totalMaterialOnTile
             : Math.min(totalMaterialOnTile, amount);
 
         // Amount of materials the unit is currently carrying
         const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
-
+        // if the unit can't carry anymore.
         if (currentLoad === this.job.carryLimit) {
             return `${this} is already carrying as many resources as it can.`;
         }
-
+        // if there is nothing to pickup.
         if (actualAmount <= 0) {
             return `There are no resources on ${tile} for ${this} to pickup.`;
         }
-
-        // looks valid, let's update amount to the computed value
-        actualAmount = Math.min(
-            actualAmount,
-            this.job.carryLimit - currentLoad,
-        );
-
-        return { amount: actualAmount };
         // <<-- /Creer-Merge: invalidate-pickup -->>
     }
 
@@ -718,26 +715,51 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
+        let totalMaterialOnTile = 0;
 
         switch (material) {
             case "redium ore": {
-                tile.rediumOre -= amount;
-                this.rediumOre += amount;
+                totalMaterialOnTile = tile.rediumOre;
                 break;
             }
             case "redium": {
-                tile.redium -= amount;
-                this.redium += amount;
+                totalMaterialOnTile = tile.redium;
                 break;
             }
             case "blueium": {
-                tile.blueium -= amount;
-                this.blueium += amount;
+                totalMaterialOnTile = tile.blueium;
                 break;
             }
             case "blueium ore": {
-                tile.blueiumOre -= amount;
-                this.blueiumOre += amount;
+                totalMaterialOnTile = tile.blueiumOre;
+            }
+        }
+
+        let actualAmount = amount <= 0 ? totalMaterialOnTile
+            : Math.min(totalMaterialOnTile, amount);
+        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+
+        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
+
+        switch (material) {
+            case "redium ore": {
+                tile.rediumOre -= actualAmount;
+                this.rediumOre += actualAmount;
+                break;
+            }
+            case "redium": {
+                tile.redium -= actualAmount;
+                this.redium += actualAmount;
+                break;
+            }
+            case "blueium": {
+                tile.blueium -= actualAmount;
+                this.blueium += actualAmount;
+                break;
+            }
+            case "blueium ore": {
+                tile.blueiumOre -= actualAmount;
+                this.blueiumOre += actualAmount;
             }
         }
 
@@ -777,14 +799,6 @@ export class Unit extends GameObject {
         // Make sure the unit is alive.
         if (this.health <= 0) {
             return `${this} is fuel.`;
-        }
-        // Make sure the unit is alive.
-        if (this.health <= 0) {
-            return `${this} is fuel.`;
-        }
-        // make sure the unit can function
-        if (this.stunTime > 0) {
-            return `${this} is stunned and cannot move.`;
         }
     }
 
