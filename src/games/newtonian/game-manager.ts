@@ -333,15 +333,15 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // Order matters
         // Moves materials and units on the right side
-        this.conveyMaterials(this.game.mapWidth - 2, 17);
         this.conveyMaterials(this.game.mapWidth - 3, 17);
         this.conveyMaterials(this.game.mapWidth - 4, 17);
-        this.conveyMaterials(this.game.mapWidth - 4, 18);
-        this.conveyMaterials(this.game.mapWidth - 4, 19);
+        this.conveyMaterials(this.game.mapWidth - 5, 17);
+        this.conveyMaterials(this.game.mapWidth - 5, 18);
+        this.conveyMaterials(this.game.mapWidth - 5, 19);
+        this.conveyMaterials(this.game.mapWidth - 5, 20);
         this.conveyMaterials(this.game.mapWidth - 4, 20);
         this.conveyMaterials(this.game.mapWidth - 3, 20);
         this.conveyMaterials(this.game.mapWidth - 2, 20);
-        this.conveyMaterials(this.game.mapWidth - 1, 20);
 
         // players[0] is on x = 0 side
         // Right is Redium
@@ -358,10 +358,11 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             }
         }
         else {
-            loc = this.game.getTile(this.game.mapWidth - 1, 20);
+            loc = this.game.getTile(this.game.mapWidth - 2, 20);
             if (loc) {
                 loc.rediumOre += spawnAmount;
             }
+            else console.log("error!");
         }
 
         return;
