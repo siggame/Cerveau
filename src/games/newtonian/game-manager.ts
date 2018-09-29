@@ -44,9 +44,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
-         
+
         // <<-- /Creer-Merge: before-turn -->>
-        
+
     }
 
     /**
@@ -59,10 +59,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
-        // code spawning below this:
-        
         this.manageMaterials();
-        
+        // code spawning below this:
+
         // code the generator below this:
         //
         // <<-- /Creer-Merge: after-turn -->>
@@ -105,28 +104,33 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
-    
+
     /* convayMaterials
      *
      * This function moves materials and units on conveyor
      */
-    private convayMaterials(x: number, y: number): void { // Entirely untested
-        
-        start = getMutableTile(x, y);
-        if (start.type == "conveyor" && start.direction != "blank") {
-            if (start.direction == "north") {
+    private conveyMaterials(x: number, y: number): void { // Entirely untested
+
+        let start: Tile;
+        let end: Tile;
+
+        start = this.game.tiles[x + y * this.game.mapWidth];
+        end = start;
+
+        if (start.type === "conveyor" && start.direction !== "blank") {
+            if (start.direction === "north") {
                 end = start.tileNorth;
             }
-            if (start.direction == "east") {
+            if (start.direction === "east") {
                 end = start.tileEast;
             }
-            if (start.direction == "south") {
+            if (start.direction === "south") {
                 end = start.tileSouth;
             }
-            if (start.direction == "west") {
+            if (start.direction === "west") {
                 end = start.tileWest;
             }
-            
+
             // Transfers materials
             end.rediumOre += start.rediumOre;
             start.rediumOre = 0;
@@ -136,15 +140,15 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             start.blueiumOre = 0;
             end.blueium += start.blueium;
             start.blueium = 0;
-            
+
             // Moves units if they exist and the destination is unoccupied
             if (!end.unit && start.unit) {
-                start.unit.tile = end
-                end.unit = start.unit
+                start.unit.tile = end;
+                end.unit = start.unit;
                 start.unit = undefined;
             }
         }
-        
+
         return;
     }
 
@@ -156,50 +160,52 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * Makes sure all conveyers move units and materials ontop of them.
      */
     private manageMaterials(): void { // Entirely untested
-        
+
+        let loc: Tile;
+
         // Order matters
         // Moves materials and units on the left side
-        this.convayMaterials(2, 17)
-        this.convayMaterials(3, 17)
-        this.convayMaterials(4, 17)
-        this.convayMaterials(4, 18)
-        this.convayMaterials(4, 19)
-        this.convayMaterials(4, 20)
-        this.convayMaterials(3, 20)
-        this.convayMaterials(2, 20)
-        this.convayMaterials(1, 20)
-        
+        this.conveyMaterials(2, 17);
+        this.conveyMaterials(3, 17);
+        this.conveyMaterials(4, 17);
+        this.conveyMaterials(4, 18);
+        this.conveyMaterials(4, 19);
+        this.conveyMaterials(4, 20);
+        this.conveyMaterials(3, 20);
+        this.conveyMaterials(2, 20);
+        this.conveyMaterials(1, 20);
+
         // Order matters
         // Moves materials and units on the right side
-        this.convayMaterials(this.mapWidth - 2, 17)
-        this.convayMaterials(this.mapWidth - 3, 17)
-        this.convayMaterials(this.mapWidth - 4, 17)
-        this.convayMaterials(this.mapWidth - 4, 18)
-        this.convayMaterials(this.mapWidth - 4, 19)
-        this.convayMaterials(this.mapWidth - 4, 20)
-        this.convayMaterials(this.mapWidth - 3, 20)
-        this.convayMaterials(this.mapWidth - 2, 20)
-        this.convayMaterials(this.mapWidth - 1, 20)
-        
+        this.conveyMaterials(this.game.mapWidth - 2, 17);
+        this.conveyMaterials(this.game.mapWidth - 3, 17);
+        this.conveyMaterials(this.game.mapWidth - 4, 17);
+        this.conveyMaterials(this.game.mapWidth - 4, 18);
+        this.conveyMaterials(this.game.mapWidth - 4, 19);
+        this.conveyMaterials(this.game.mapWidth - 4, 20);
+        this.conveyMaterials(this.game.mapWidth - 3, 20);
+        this.conveyMaterials(this.game.mapWidth - 2, 20);
+        this.conveyMaterials(this.game.mapWidth - 1, 20);
+
         // players[0] is on x = 0 side
         // Right is Redium
-        
+
         // Amount of ore spawned
         const spawnAmount = 1;
-        
+
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
-        if (this.players[0].currentPlayer) {
-            loc = getMutableTile(1, 20);
+        if (this.game.players[0] === this.game.currentPlayer) {
+            loc = this.game.getTile(1, 20);
             loc.blueiumOre += spawnAmount;
         }
         else {
-            loc = getMutableTile(this.mapWidth - 1, 20);
+            loc = this.game.getTile(this.game.mapWidth - 1, 20);
             loc.rediumOre += spawnAmount;
         }
-        
+
         return;
     }
-    
+
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
