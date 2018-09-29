@@ -182,6 +182,40 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.secondaryWinConditions(reason);
     }
 
+    /**
+     * Attempts to spawn in a unit for a given player.
+     * @param player - The player that will own the unit.
+     * @param job - The job of the unit.
+     * @returns True if unit is spawned, otherwise returns false.
+     */
+    protected spawnUnit(player: Player, job: Job): boolean {
+        // Iterate through each player's spawn tiles to find a spot to spawn unit.
+        for (const tile of player.spawnTiles) {
+            // Check to see if there is a Unit on the tile.
+            // If there is move on to the next tile.
+            if (tile.unit) {
+                continue;
+            }
+            // Else spawn in Unit and return success to spawning.
+            else {
+                tile.unit = this.create.unit({
+                    acted: false,
+                    health: job.health,
+                    job,
+                    owner: player,
+                    tile,
+                });
+                player.units.push(tile.unit);
+                this.game.units.push(tile.unit);
+
+                return true;
+            }
+        }
+
+        // Return failure. We finished looking over all the spawn for Unit spawning.
+        return false;
+    }
+
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
@@ -192,11 +226,12 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      */
     private conveyMaterials(x: number, y: number): void { // Entirely untested
 
-        let start: Tile;
-        let end: Tile;
+        const start: Tile | undefined = this.game.tiles[x + y * this.game.mapWidth];
+        let end: Tile | undefined = start ? start : undefined;
 
-        start = this.game.tiles[x + y * this.game.mapWidth];
-        end = start;
+        if (!start) {
+            return;
+        }
 
         if (start.type === "conveyor" && start.direction !== "blank") {
             if (start.direction === "north") {
@@ -210,6 +245,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             }
             if (start.direction === "west") {
                 end = start.tileWest;
+            }
+            if (!end) {
+                return;
             }
 
             // Transfers materials
@@ -242,7 +280,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      */
     private manageMaterials(): void { // Entirely untested
 
-        let loc: Tile;
+        let loc: Tile | undefined;
 
         // Order matters
         // Moves materials and units on the left side
@@ -278,48 +316,18 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // on the side of the the player who's turns it currently isn't
         if (this.game.players[0] === this.game.currentPlayer) {
             loc = this.game.getTile(1, 20);
-            loc.blueiumOre += spawnAmount;
+            if (loc) {
+                loc.blueiumOre += spawnAmount;
+            }
         }
         else {
             loc = this.game.getTile(this.game.mapWidth - 1, 20);
-            loc.rediumOre += spawnAmount;
+            if (loc) {
+                loc.rediumOre += spawnAmount;
+            }
         }
 
         return;
-    }
-
-    /**
-     * Attempts to spawn in a unit for a given player.
-     * @param player - The player that will own the unit.
-     * @param job - The job of the unit.
-     * @returns True if unit is spawned, otherwise returns false.
-     */
-    protected spawnUnit(player: Player, job: Job): boolean {
-        // Iterate through each player's spawn tiles to find a spot to spawn unit.
-        for (const tile of player.spawnTiles) {
-            // Check to see if there is a Unit on the tile.
-            // If there is move on to the next tile.
-            if (tile.unit) {
-                continue;
-            }
-            // Else spawn in Unit and return success to spawning.
-            else {
-                tile.unit = this.create.unit({
-                    acted: false,
-                    health: job.health,
-                    job,
-                    owner: player,
-                    tile,
-                });
-                player.units.push(tile.unit);
-                this.game.units.push(tile.unit);
-
-                return true;
-            }
-        }
-
-        // Return failure. We finished looking over all the spawn for Unit spawning.
-        return false;
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
