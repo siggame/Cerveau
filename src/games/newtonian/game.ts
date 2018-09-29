@@ -458,7 +458,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     const tile = getMutableTile((this.mapWidth - 1 - x), y);
                     tile.type = "generator";
                     tile.owner = this.players[1];
-                    this.players[1].spawnTiles.push(tile as Tile);
+                    this.players[1].generatorTiles.push(tile as Tile);
                 }
                 else if (getMutableTile(x, y).type === "conveyor") {
                     getMutableTile((this.mapWidth - 1 - x), y).type = "conveyor";
