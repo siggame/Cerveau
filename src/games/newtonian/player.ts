@@ -100,6 +100,10 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
     public won!: boolean;
 
     // <<-- Creer-Merge: attributes -->>
+    /**
+     * Tracks conveyors on the players side of the map.
+     */
+    public conveyors!: Tile[];
 
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined

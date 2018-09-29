@@ -154,7 +154,6 @@ export class NewtonianGame extends BaseClasses.Game {
     public units!: Unit[];
 
     // <<-- Creer-Merge: attributes -->>
-
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
@@ -214,7 +213,7 @@ export class NewtonianGame extends BaseClasses.Game {
             }),
 
             this.manager.create.job({
-                title: "physicists",
+                title: "physicist",
                 carryLimit: 1,
                 damage: 4,
                 health: 12,
@@ -323,10 +322,23 @@ export class NewtonianGame extends BaseClasses.Game {
             { x: 1, y: 17, direction: "blank" },
         ];
         for (const { x, y, direction } of conveyors) {
-            const tile = getMutableTile(x, y);
+            let tile = getMutableTile(x, y);
 
             tile.type = "conveyor";
             tile.direction = direction;
+            this.players[0].conveyors.push(tile as Tile);
+            tile = getMutableTile((this.mapWidth - 1 - x), y);
+            tile.type = "conveyor";
+            // TODO: use this.invertTileDirection
+            let dir = direction;
+            if (dir === "east") {
+                dir = "west";
+            }
+            else if (dir === "west") {
+                dir = "east";
+            }
+            getMutableTile((this.mapWidth - 1 - x), y).direction = dir;
+            this.players[1].conveyors.push(tile as Tile);
         }
         // TODO: spawn in one of each unit.
 
@@ -459,18 +471,6 @@ export class NewtonianGame extends BaseClasses.Game {
                     tile.type = "generator";
                     tile.owner = this.players[1];
                     this.players[1].generatorTiles.push(tile as Tile);
-                }
-                else if (getMutableTile(x, y).type === "conveyor") {
-                    getMutableTile((this.mapWidth - 1 - x), y).type = "conveyor";
-                    // TODO: use this.invertTileDirection
-                    let { direction } = getMutableTile(x, y);
-                    if (direction === "east") {
-                        direction = "west";
-                    }
-                    else if (direction === "west") {
-                        direction = "east";
-                    }
-                    getMutableTile((this.mapWidth - 1 - x), y).direction = direction;
                 }
             }
         }
