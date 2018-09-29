@@ -103,6 +103,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
           ? this.game.spawnTime : player.physicistSpawn - 1;
         player.managerSpawn = (units[2] === this.game.managerCap)
          ? this.game.spawnTime : player.managerSpawn - 1;
+
         // code the generator below this:
         // iterate through each tile on the map
         for (const tile of this.game.tiles) {
@@ -189,46 +190,11 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * @returns True if unit is spawned, otherwise returns false.
      */
     protected spawnUnit(player: Player, job: Job): boolean {
-        // X coord for spawning.
-        let spawnX: number = 1;
-
-        // Y coord for spawning.
-        let spawnY: number = 1;
-
-        // The playerIndex for the game.players array.
-        // Used for knowing which direction to move along the X axis.
-        const playerIndex = (player === this.game.players[0] ? 0 : 1);
-
-        // Check to make sure the tile we are starting on is the right player Tile.
-        if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
-            // If wrong tile, try the other side to see if that is the right spawn area.
-            spawnX = this.game.mapWidth - spawnX;
-            // Double check that we now have the right tile. If this fails, need to
-            // Revaluate how to find spawn.
-            if (player !== this.game.tiles[spawnX + spawnY * this.game.mapWidth].owner) {
-                // Something is wrong and did not find the right tile.
-                // typescript doesn't like this. \/
-                // console.log("error in spawning");
-            }
-        }
-
-        // Loop to keep looking for an open tile to spawn the Unit.
-        // TODO: optimize so that it doesn't iterate over every column before terminating.
-        while (spawnX < this.game.mapWidth && spawnX > 0) {
-            // Tile that we are trying to spawn on.
-            const tile: Tile = this.game.tiles[spawnX + spawnY * this.game.mapWidth];
-            // Check to see if the tile is still from the spawn area.
-            // If not increment the column and reset to row 1. Continue on to the next iteration.
-            if (tile.owner !== player) {
-                spawnX += playerIndex * -1;
-                spawnY = 1;
-                continue;
-            }
-
+        // Iterate through each player's spawn tiles to find a spot to spawn unit.
+        for (const tile of player.spawnTiles) {
             // Check to see if there is a Unit on the tile.
-            // If there is move down a row.
+            // If there is move on to the next tile.
             if (tile.unit) {
-                spawnY++;
                 continue;
             }
             // Else spawn in Unit and return success to spawning.
@@ -245,16 +211,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
                 return true;
             }
-
-            // Check to make sure spawnY stays in bounds.
-            // TODO: optimize so that it doesn't iterate over every row before moving columns.
-            if (spawnY >= this.game.mapHeight) {
-                spawnY = 1;
-                spawnX += playerIndex * -1;
-            }
         }
-        // Return failure. We finished looking over all the spawn for Unit spawning.
 
+        // Return failure. We finished looking over all the spawn for Unit spawning.
         return false;
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
