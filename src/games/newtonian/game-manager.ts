@@ -261,8 +261,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * This function moves materials and units on conveyor
      */
     private conveyMaterials(conveyors: Tile[]): void {
-
-        for (const tile of conveyors) {
+        for (let i = conveyors.length - 1; i >= 0; i--) {
+            const tile = conveyors[i];
             let end: Tile | undefined = tile ? tile : undefined;
             if (tile.type === "conveyor" && tile.direction !== "blank") {
                 if (tile.direction === "north") {
@@ -278,7 +278,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     end = tile.tileWest;
                 }
                 if (!end) {
-                    return;
+                    continue;
                 }
 
                 // Transfers materials
@@ -310,15 +310,15 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * on their side of the base.
      * Makes sure all conveyers move units and materials ontop of them.
      */
-    private manageMaterials(): void { // Entirely untested
+    private manageMaterials(): void {
 
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
         if (this.game.players[0] === this.game.currentPlayer) {
-            this.game.currentPlayer.conveyors[0].blueiumOre += this.game.materialSpawn;
+            this.game.players[0].conveyors[0].rediumOre += this.game.materialSpawn;
         }
         else {
-            this.game.currentPlayer.conveyors[0].rediumOre += this.game.materialSpawn;
+            this.game.players[1].conveyors[0].rediumOre += this.game.materialSpawn;
         }
         this.conveyMaterials(this.game.players[0].conveyors);
         this.conveyMaterials(this.game.players[1].conveyors);

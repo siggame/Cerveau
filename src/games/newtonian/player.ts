@@ -125,6 +125,7 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.conveyors = [];
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }

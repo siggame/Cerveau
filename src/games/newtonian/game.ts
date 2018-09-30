@@ -337,7 +337,7 @@ export class NewtonianGame extends BaseClasses.Game {
             else if (dir === "west") {
                 dir = "east";
             }
-            getMutableTile((this.mapWidth - 1 - x), y).direction = dir;
+            tile.direction = dir;
             this.players[1].conveyors.push(tile as Tile);
         }
         // TODO: spawn in one of each unit.
