@@ -13,13 +13,15 @@ import { SerialRoom } from "./lobby-room-serial";
 import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
-import * as ws from "lark-websocket";
+import * as larkWebsocket from "lark-websocket";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
 import * as readline from "readline";
 import { sanitizeNumber } from "~/core/sanitize";
 import { IGamesExport } from "~/core/server/games-export";
+
+const ws = larkWebsocket as typeof net;
 
 const GAMES_DIR = join(__dirname, "../../games/");
 
@@ -29,12 +31,13 @@ const RoomClass: typeof Room = Config.SINGLE_THREADED
 
 /*
     Clients connect like this:
-    Lobby -> Room -> new thread -> Session
+    Lobby -> Room -> [new thread] -> Session
 */
 
 /**
  * The server that clients initially connect to before being moved to their
  * game lobby.
+ *
  * Basically creates and manages game sessions.
  */
 export class Lobby {
@@ -95,25 +98,29 @@ export class Lobby {
      * There should only be 1 Lobby per program running at a time.
      */
     private constructor() {
-        this.gamesInitializedPromise = new Promise((resolve) => {
-            this.initializeGames().then(() => {
+        this.gamesInitializedPromise = new Promise<void>(async (resolve) => {
+            await this.initializeGames();
+
+            await Promise.all([ // so they can initialize asynchronously
                 this.initializeListener(
                     Config.TCP_PORT,
                     net.createServer,
                     TCPClient,
-                );
+                ),
                 this.initializeListener(
                     Config.WS_PORT,
-                    (ws as { createServer: typeof net.createServer }).createServer,
+                    ws.createServer,
                     WSClient,
-                );
+                ),
+            ]);
 
-                resolve();
-            }).catch((err) => {
-                logger.error("Fatal exception initializing games!");
-                logger.error(String(err));
-                process.exit(1); // kills the entire game server
-            });
+            logger.info("🎉 Everything is ready! 🎉");
+
+            resolve();
+        }).catch((err) => {
+            logger.error("Fatal exception initializing games!");
+            logger.error(String(err));
+            process.exit(1); // kills the entire game server
         });
 
         const rl = readline.createInterface({
@@ -287,12 +294,13 @@ export class Lobby {
      * @param port - The port to listen on for this server.
      * @param createServer - The required module's createServer method.
      * @param clientClass - The class constructor for clients of this listener.
+     * @returns Once the listener is listening.
      */
     private initializeListener(
         port: number,
         createServer: (callback: (socket: net.Socket) => void) => net.Server,
         clientClass: typeof BaseClient,
-    ): void {
+    ): Promise<void> {
         const listener = createServer((socket) => {
             this.addSocket(socket, clientClass);
         });
@@ -300,9 +308,7 @@ export class Lobby {
         // Place a ' ' (space) before the 'Client' part of the class name.
         const clientName = clientClass.name.replace(/(Client)/g, " $1");
 
-        listener.listen(port, "0.0.0.0", () => {
-            logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
-        });
+        this.listenerServers.push(listener);
 
         listener.on("error", (err: Error & { code: string }) => {
             logger.error(err.code !== "EADDRINUSE" // Very common error for devs
@@ -315,7 +321,13 @@ There's probably another Cerveau server running on this same computer.`);
             process.exit(1);
         });
 
-        this.listenerServers.push(listener);
+        return new Promise((resolve) => {
+            listener.listen(port, "0.0.0.0", () => {
+                logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
+
+                resolve();
+            });
+        });
     }
 
     /**
