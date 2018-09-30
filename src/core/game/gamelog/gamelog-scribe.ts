@@ -1,4 +1,4 @@
-import { IDelta, IDeltaData, IDisconnectDeltaData, IFinishedDeltaData,
+import { IDelta, IDisconnectDeltaData, IFinishedDeltaData,
          IGamelog, IOrderedDeltaData, IRanDeltaData,
        } from "cadre-ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
@@ -137,7 +137,7 @@ export class GamelogScribe {
      * @param data - The data about why it changed, such as what data made the
      * delta occur.
      */
-    private add(type: string, data?: Readonly<IDeltaData>): void {
+    private add(type: string, data?: Readonly<IDelta["data"]>): void {
         if (this.finalized) {
             return; // Gamelog is finalized, we can't add things.
         }

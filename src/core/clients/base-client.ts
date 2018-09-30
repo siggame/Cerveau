@@ -1,6 +1,5 @@
-import { IDelta, IDeltaData } from "cadre-ts-utils/cadre";
+import { ServerEvent } from "cadre-ts-utils/cadre";
 import * as ClientEvents from "cadre-ts-utils/cadre/events/client";
-import * as ServerEvents from "cadre-ts-utils/cadre/events/server";
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
@@ -25,10 +24,10 @@ export class BaseClient {
 
     /** The events clients emit (send). */
     public readonly sent = events({
-        finished: new Event<ClientEvents.IFinishedData>(),
-        run: new Event<ClientEvents.IRunData>(),
-        play: new Event<ClientEvents.IPlayData>(),
-        alias: new Event<string>(),
+        finished: new Event<ClientEvents.FinishedEvent["data"]>(),
+        run: new Event<ClientEvents.RunEvent["data"]>(),
+        play: new Event<ClientEvents.PlayEvent["data"]>(),
+        alias: new Event<ClientEvents.AliasEvent["data"]>(),
     });
 
     /** The name of this client. */
@@ -242,7 +241,10 @@ export class BaseClient {
      */
     public async disconnect(fatalMessage?: string): Promise<void> {
         if (fatalMessage) {
-            await this.send("fatal", {message: fatalMessage});
+            await this.send({
+                event: "fatal",
+                data: { message: fatalMessage },
+            });
         }
 
         this.disconnected();
@@ -282,27 +284,16 @@ export class BaseClient {
         this.ourPlayer = player;
     }
 
-    public send(event: "over", data: ServerEvents.IOverData): Promise<void>;
-    public send(event: "fatal", data: ServerEvents.IFatalData): Promise<void>;
-    public send(event: "start", data: ServerEvents.IStartData): Promise<void>;
-    public send(event: "order", data: ServerEvents.IOrderData): Promise<void>;
-    public send(event: "invalid", data: ServerEvents.IInvalidData): Promise<void>;
-    public send(event: "ran", data: unknown): Promise<void>;
-    public send(event: "named", data: string): Promise<void>;
-    public send(event: "lobbied", data: ServerEvents.ILobbiedData): Promise<void>;
-    public send(event: "delta", data: IDeltaData): Promise<void>;
-    public send(event: "metaDelta", data: IDelta): Promise<void>;
-
     /**
      * Sends the message of type event to this client as a json string EOT_CHAR
      * terminated.
      *
-     * @param event - The event name.
-     * @param data - The object to send about the event being sent.
+     * @param event - The event to send. Must be an expected server event.
      * @returns After the data is sent.
      */
-    public async send(event: string, data: unknown): Promise<void> {
-        return this.sendRaw(JSON.stringify({ event, data }));
+    public async send(event: ServerEvent): Promise<void> {
+        // event.epoch = Number(new Date()); -- Disabled for now
+        return this.sendRaw(JSON.stringify(event));
     }
 
     /**

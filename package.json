@@ -26,7 +26,7 @@
     "@types/v8-profiler": "0.0.5",
     "argparse": "1.0.10",
     "body-parser": "1.18.3",
-    "cadre-ts-utils": "github:siggame/Cadre-TS-Utils#f2923f5087a23dccb82aba1caf22f369b8a4fc5d",
+    "cadre-ts-utils": "github:siggame/Cadre-TS-Utils#16d39fe6b98895d2c66d83ee3adc17a2de22765a",
     "chess.js": "0.10.2",
     "delay": "4.0.1",
     "dotenv": "6.0.0",
@@ -50,7 +50,7 @@
     "husky": "0.14.3",
     "shx": "0.3.2",
     "tslint": "5.11.0",
-    "typescript": "3.0.3"
+    "typescript": "3.1.1"
   },
   "_optionalDependencies": {
     "v8-profiler": "5.7.0"

@@ -1,5 +1,5 @@
 // internal imports
-import { IPlayData } from "cadre-ts-utils/cadre";
+import { PlayEvent } from "cadre-ts-utils/cadre";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
@@ -471,7 +471,7 @@ ${err}`);
      */
     private async clientSentPlay(
         client: BaseClient,
-        data: Readonly<IPlayData>,
+        data: Readonly<PlayEvent["data"]>,
     ): Promise<void> {
         const playData = this.validatePlayData(data);
 
@@ -534,10 +534,13 @@ ${err}`);
             room.addGameSettings(playData.validGameSettings);
         }
 
-        client.send("lobbied", {
-            gameName: data.gameName,
-            gameSession: room.id,
-            constants: SHARED_CONSTANTS,
+        client.send({
+            event: "lobbied",
+            data: {
+                gameName: data.gameName,
+                gameSession: room.id,
+                constants: SHARED_CONSTANTS,
+            },
         });
 
         if (room.canStart()) {
@@ -597,8 +600,8 @@ ${err}`);
      * @returns - Human readable text why the data is not valid.
      */
     private validatePlayData(
-        data?: Readonly<IPlayData>,
-    ): string | (IPlayData & { validGameSettings: UnknownObject }) {
+        data?: Readonly<PlayEvent["data"]>,
+    ): string | (PlayEvent["data"] & { validGameSettings: UnknownObject }) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -694,7 +697,7 @@ Must be one string in the url parameters format.${footer}`;
             return;
         }
 
-        client.send("named", gameName);
+        client.send({ event: "named", data: gameName });
     }
 
     /**

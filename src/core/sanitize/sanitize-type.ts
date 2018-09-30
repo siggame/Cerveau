@@ -61,10 +61,10 @@ export function sanitizeType(
                 return asArray;
             }
 
+            // re-use the array because it may be one of our Proxy wrapped arrays, otherwise map() would be prefered
             for (let i = 0; i < asArray.length; i++) {
                 asArray[i] = sanitizeType(type.valueType, asArray[i], allowError);
             }
-            value = asArray;
             break;
         case "gameObject": // assume game object
             value = sanitizeGameObject(obj, type.gameObjectClass, allowError);
@@ -85,15 +85,11 @@ export function sanitizeType(
         if (!found && type.typeName === "string") {
             // Try to see if the string is found via a case-insensitive
             // search.
-            const lowered: string = (value as string).toLowerCase();
-            for (const literal of literals) {
-                const loweredLiteral = (literal as string).toLowerCase();
-
-                if (lowered === loweredLiteral) {
-                    value = literal; // we found the literal value
-                    found = true;
-                    break;
-                }
+            const lowered = (value as string).toLowerCase();
+            const matchingLiteral = literals.find((literal) => (literal as string).toLowerCase() === lowered);
+            if (matchingLiteral !== undefined) { // we found it!
+                found = true;
+                value = matchingLiteral;
             }
         }
 

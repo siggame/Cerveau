@@ -171,8 +171,9 @@ export class Session {
         this.events.start.emit();
 
         for (const client of this.clients) {
-            client.send("start", {
-                playerID: client.player && client.player.id,
+            client.send({
+                event: "start",
+                data: { playerID: client.player && client.player.id },
             });
         }
 
@@ -307,12 +308,10 @@ ${fatal.message}`,
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
-                if (client.sendMetaDeltas) {
-                    client.send("metaDelta", delta);
-                }
-                else {
-                    client.send("delta", delta.game);
-                }
+                client.send(client.sendMetaDeltas
+                    ? { event: "meta-delta", data: delta }
+                    : { event: "delta", data: delta.game },
+                );
             }
         }
 
@@ -343,7 +342,10 @@ ${visualizerURL}
 ---`;
 
         for (const client of this.clients) {
-            client.send("over", { gamelogURL, visualizerURL, message });
+            client.send({
+                event: "over",
+                data: { gamelogURL, visualizerURL, message },
+            });
         }
 
         this.end(gamelog);

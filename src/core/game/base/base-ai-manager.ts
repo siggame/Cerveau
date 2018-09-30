@@ -241,7 +241,10 @@ export class BaseAIManager {
         // If the game said the run is invalid for all runs
         if (invalid) {
             // Tell the client it is invalid
-            this.client.send("invalid", { message: invalid });
+            this.client.send({
+                event: "invalid",
+                data: { message: invalid },
+            });
         }
         else {
             // else, the game is ok with trying to have
@@ -288,7 +291,10 @@ ${JSON.stringify(mapToObject(argsMap))}
             if (invalid) {
                 // Their arguments did not validate,
                 // so they get told it was invalid
-                this.client.send("invalid", { message: invalid });
+                this.client.send({
+                    event: "invalid",
+                    data: { message: invalid },
+                });
             }
             else {
                 // It's valid!
@@ -317,7 +323,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             returned,
         });
 
-        this.client.send("ran", returned);
+        this.client.send({ event: "ran", data: returned });
 
         return returned as T;
     }
@@ -345,7 +351,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             order: simpleOrder,
         });
 
-        this.client.send("order", simpleOrder);
+        this.client.send({ event: "order", data: simpleOrder });
     }
 
     /**
@@ -394,10 +400,13 @@ ${JSON.stringify(mapToObject(argsMap))}
         });
 
         if (invalid) {
-            this.client.send("invalid", {
-                message: `Return value (${quoteIfString(
-                    unsanitizedReturned,
-                )}) from finished order invalid! ${invalid}`,
+            this.client.send({
+                event: "invalid",
+                data: {
+                    message: `Return value (${quoteIfString(
+                        unsanitizedReturned,
+                    )}) from finished order invalid! ${invalid}`,
+                },
             });
 
             order.errors++;
