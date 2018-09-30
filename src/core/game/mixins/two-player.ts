@@ -3,11 +3,11 @@
 // tslint:disable:no-empty-interface
 // ^ because the some mixins have nothing to add
 
-import { IBasePlayer } from "~/core/game";
+import { BasePlayer } from "~/core/game";
 import * as Base from "./base";
 
 /** A player in a two player game, that has a guaranteed opponent. */
-export interface ITwoPlayerPlayer extends IBasePlayer {
+export interface ITwoPlayerPlayer extends BasePlayer {
     opponent: ITwoPlayerPlayer;
 }
 

@@ -7,7 +7,7 @@ import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace
 import { BaseGameObject } from "./base-game-object";
 import { createGameObject } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
-import { IBasePlayer, IBasePlayerData } from "./base-player";
+import { BasePlayer, IBasePlayerData } from "./base-player";
 
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
@@ -52,7 +52,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
     /**
      * The players playing this game.
      */
-    public readonly players!: IBasePlayer[];
+    public readonly players!: BasePlayer[];
 
     /**
      * Initializes a game. Should **only** be done by this game's manager.
@@ -88,7 +88,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
                 clientType: client.programmingLanguage || "Unknown",
             };
 
-            const player = createGameObject<IBasePlayer>({
+            const player = createGameObject<BasePlayer>({
                 id: requiredData.playerIDs[i],
                 game: this,
                 gameObjectsDeltaMergeable,

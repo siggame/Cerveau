@@ -1,8 +1,8 @@
-import { Event, events } from "ts-typed-events";
-import { BaseClient } from "~/core/clients";
 import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
-       } from "~/core/game//gamelog/gamelog-interfaces";
+       } from "cadre-ts-utils/cadre";
+import { Event, events } from "ts-typed-events";
+import { BaseClient } from "~/core/clients";
 import { serialize, unSerialize } from "~/core/serializer";
 import { capitalizeFirstLetter, mapToObject,
          quoteIfString, UnknownObject } from "~/utils";
@@ -10,7 +10,7 @@ import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameSanitizer } from "./base-game-sanitizer";
-import { IBasePlayer } from "./base-player";
+import { BasePlayer } from "./base-player";
 
 /** Represents an order sent to an AI. */
 interface IOrder {
@@ -48,7 +48,7 @@ export class BaseAIManager {
 
     /** **This one too** */
     public invalidateRun!: (
-        player: IBasePlayer,
+        player: BasePlayer,
         gameObject: BaseGameObject,
         functionName: string,
         args: Map<string, unknown>,

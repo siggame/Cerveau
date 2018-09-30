@@ -3,12 +3,12 @@
 // tslint:disable:no-empty-interface
 // ^ because the some mixins have nothing to add
 
-import { BaseGameObject, IBasePlayer } from "~/core/game";
-import { nextWrapAround } from "~/utils";
+import { BaseGameObject, BasePlayer } from "~/core/game";
+import { getNextWrapAround } from "~/utils";
 import * as Base from "./base";
 
 /** A player in a turn based game */
-export interface ITurnBasedPlayer extends IBasePlayer {}
+export interface ITurnBasedPlayer extends BasePlayer {}
 
 /**
  * A base game that is turn based, with helper functions that should be common
@@ -91,7 +91,7 @@ export function mixTurnBased<
         public readonly timeAddedPerTurn!: number; // 1 sec in ns
 
         /** The current player (player whose turn it is). */
-        public currentPlayer!: IBasePlayer;
+        public currentPlayer!: BasePlayer;
 
         /** The current turn number, starting at 0. */
         public currentTurn!: number;
@@ -133,7 +133,7 @@ export function mixTurnBased<
          * valid.
          */
         protected invalidateRun(
-            player: IBasePlayer,
+            player: BasePlayer,
             gameObject: BaseGameObject,
             functionName: string,
             args: Map<string, unknown>,
@@ -234,7 +234,7 @@ export function mixTurnBased<
                 // advance the turn.
                 this.game.currentTurn++;
 
-                const nextPlayer = nextWrapAround(
+                const nextPlayer = getNextWrapAround(
                     this.game.players,
                     this.game.currentPlayer,
                 );

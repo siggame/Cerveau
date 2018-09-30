@@ -1,3 +1,5 @@
+import { IDelta, IFinishedDeltaData, IGamelog, IOrderedDeltaData, IRanDeltaData,
+       } from "cadre-ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
@@ -12,9 +14,6 @@ import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
 import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
-import { IDelta, IFinishedDeltaData, IGamelog,
-         IOrderedDeltaData, IRanDeltaData,
-       } from "~/core/game/gamelog/gamelog-interfaces";
 import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
 import { filenameFor, getURL, getVisualizerURL,
        } from "~/core/game/gamelog/gamelog-utils";

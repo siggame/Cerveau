@@ -1,8 +1,8 @@
+import { IGamelog } from "cadre-ts-utils/cadre";
 import * as cluster from "cluster";
 import * as path from "path";
 import { events } from "ts-typed-events";
 import { Config } from "~/core";
-import { IGamelog } from "~/core/game";
 import { Room } from "./lobby-room";
 import { IWorkerGameSessionData, MessageFromMainThread } from "./worker";
 
@@ -42,8 +42,8 @@ export class ThreadedRoom extends Room {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         const workerSessionData: IWorkerGameSessionData = {
-            // tslint:disable-next-line:no-any no-unsafe-any - used by debugger
-            mainDebugPort: (process as any)._debugPort,
+            mainDebugPort: (process as NodeJS.Process & { _debugPort?: number}
+            )._debugPort,
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,
             gameSettings: this.gameSettingsManager.values,

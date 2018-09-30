@@ -1,6 +1,6 @@
+import { IDeltaData } from "cadre-ts-utils/cadre";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, BaseGameObject } from "~/core/game";
-import { IDeltaData } from "~/core/game/gamelog";
 import { isObject, objectHasProperty, UnknownObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
 

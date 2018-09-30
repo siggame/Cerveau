@@ -1,6 +1,7 @@
+import { IGamelog, IGamelogWinnerLoser } from "cadre-ts-utils/cadre";
 import { events, Signal } from "ts-typed-events";
-import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace, IGamelog,
-         IGamelogWinnerLoser } from "~/core/game";
+import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
+       } from "~/core/game";
 import { logger } from "~/core/logger";
 import { removeElements, UnknownObject } from "~/utils";
 import { BaseClient } from "../clients/";

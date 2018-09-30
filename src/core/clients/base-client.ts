@@ -1,11 +1,12 @@
+import { IDelta, IDeltaData } from "cadre-ts-utils/cadre";
+import * as ClientEvents from "cadre-ts-utils/cadre/events/client";
+import * as ServerEvents from "cadre-ts-utils/cadre/events/server";
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
-import { BaseAIManager, IBasePlayer, IDelta, IDeltaData } from "~/core/game/";
+import { BaseAIManager, BasePlayer } from "~/core/game/";
 import { logger } from "~/core/logger";
 import { isObject, objectHasProperty, ParsedJSON } from "~/utils";
-import * as ClientEvents from "./events-client";
-import * as ServerEvents from "./events-server";
 
 const DEFAULT_STR = "Unknown";
 
@@ -36,7 +37,7 @@ export class BaseClient {
     }
 
     /** The Player in the game this client controls. Undefined if spectating. */
-    public get player(): IBasePlayer | undefined {
+    public get player(): BasePlayer | undefined {
         return this.ourPlayer;
     }
 
@@ -85,7 +86,7 @@ export class BaseClient {
     private timedOut: boolean = false;
 
     /** Our player in the game. */
-    private ourPlayer?: IBasePlayer;
+    private ourPlayer?: BasePlayer;
 
     /** The name of the player, use player to get. */
     private ourName: string = DEFAULT_STR;
@@ -277,7 +278,7 @@ export class BaseClient {
      *
      * @param player - The player this ai controls.
      */
-    public setPlayer(player: IBasePlayer): void {
+    public setPlayer(player: BasePlayer): void {
         this.ourPlayer = player;
     }
 

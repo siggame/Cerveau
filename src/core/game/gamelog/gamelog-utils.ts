@@ -1,7 +1,7 @@
+import { IGamelog } from "cadre-ts-utils/cadre";
 import { basename } from "path";
 import * as sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";
-import { IGamelog } from "~/core/game";
 import { momentString } from "~/utils";
 
 /** The extension for gamelog files */

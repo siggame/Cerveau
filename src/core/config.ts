@@ -3,7 +3,7 @@
 import { ArgumentOptions, ArgumentParser } from "argparse";
 import { config } from "dotenv";
 import { IWorkerGameSessionData } from "~/core/server/worker";
-import { UnknownObject, unstringify } from "~/utils";
+import { UnknownObject, unStringify } from "~/utils";
 
 /**
  * Set this to true while real life tournaments are on going and competitors
@@ -201,7 +201,7 @@ for (const key of Object.keys(parsedArgs)) {
     // use the env value, otherwise use the command line value which will be the
     // default/cli value
     let value = commandLineValue === defaults[key] && envValue
-        ? unstringify(envValue)
+        ? unStringify(envValue)
         : commandLineValue;
 
     if (value === null) {
@@ -218,7 +218,7 @@ for (const key of Object.keys(parsedArgs)) {
                 .map((str) => str.trim()); // And trim each string of whitespace
     }
 
-    // tslint:disable-next-line:no-any no-unsafe-any
+    // tslint:disable-next-line:no-any no-unsafe-any - have to set for IArgs
     (args as any)[key] = value;
 }
 

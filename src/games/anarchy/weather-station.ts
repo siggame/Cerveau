@@ -5,7 +5,7 @@ import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { nextWrapAround, previousWrapAround } from "~/utils";
+import { getNextWrapAround, getPreviousWrapAround } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -170,8 +170,8 @@ export class WeatherStation extends Building {
         }
 
         const wrapAround = counterclockwise
-            ? previousWrapAround
-            : nextWrapAround;
+            ? getPreviousWrapAround
+            : getNextWrapAround;
 
         const direction = wrapAround(this.game.directions, this.game.nextForecast.direction);
         if (!direction) {

@@ -1,11 +1,12 @@
+import { IDelta, IDeltaData, IDisconnectDeltaData, IFinishedDeltaData,
+         IGamelog, IOrderedDeltaData, IRanDeltaData,
+       } from "cadre-ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
-         IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+import { BaseGame } from "~/core/game";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { Session } from "~/core/server";
-import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
 
 /** Observes a game and creates a gamelog by transcribing its events */
 export class GamelogScribe {

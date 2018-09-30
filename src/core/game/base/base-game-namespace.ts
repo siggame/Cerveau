@@ -5,7 +5,7 @@ import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
-import { IBasePlayer } from "./base-player";
+import { BasePlayer } from "./base-player";
 
 /** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
@@ -31,7 +31,7 @@ export interface IBaseGameNamespace {
     GameManager: typeof BaseGameManager;
     GameObjectFactory: typeof BaseGameObjectFactory;
     GameSettingsManager: typeof BaseGameSettingsManager;
-    Player: Constructor<IBasePlayer>;
+    Player: Constructor<BasePlayer>;
 
     gameName: string;
     gameObjectsSchema: {

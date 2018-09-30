@@ -8,11 +8,10 @@ import { Player } from "./player";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, euclideanDistance, IPoint, MutableRequired,
-       } from "~/utils";
+import { arrayHasElements, euclideanDistance, IPoint, Mutable } from "~/utils";
 
 /** A Player that can mutate before the game begins */
-type MutablePlayer = MutableRequired<Player>;
+type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**

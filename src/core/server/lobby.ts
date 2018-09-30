@@ -1,10 +1,11 @@
 // internal imports
+import { IPlayData } from "cadre-ts-utils/cadre";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
 import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
          ITypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
-import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
+import { BaseClient, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";

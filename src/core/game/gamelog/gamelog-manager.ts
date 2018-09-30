@@ -1,9 +1,9 @@
+import { IGamelog } from "cadre-ts-utils/cadre";
 import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";
 import { Config } from "~/core/config";
 import * as utils from "~/utils";
-import { IGamelog } from "./gamelog-interfaces";
 import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
        } from "./gamelog-utils";
 

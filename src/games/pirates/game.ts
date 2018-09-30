@@ -10,7 +10,7 @@ import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 
-import { arrayHasElements, MutableRequired } from "~/utils";
+import { arrayHasElements, Mutable } from "~/utils";
 import * as BallGens from "./game-ball-gen";
 // Generate some meta-balls for the islands
 const ballGens = Object.values(BallGens);
@@ -22,10 +22,10 @@ const ballGens = Object.values(BallGens);
 // This is basically the only place forcing mutations is safe however.
 
 /** A Player that can be changed before the game starts. */
-type MutablePlayer = MutableRequired<Player>;
+type MutablePlayer = Mutable<Player>;
 
 /** A Tile that can be changed before the game starts. */
-type MutableTile = MutableRequired<Tile>;
+type MutableTile = Mutable<Tile>;
 
 // <<-- /Creer-Merge: imports -->>
 
