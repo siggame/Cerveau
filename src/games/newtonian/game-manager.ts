@@ -90,14 +90,14 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
 
         // If Physicist Cap has not been met then try to spawn an Physicist.
-        else if (this.game.physicistCap > units[1] && player.physicistSpawn <= 0) {
+        if (this.game.physicistCap > units[1] && player.physicistSpawn <= 0) {
             if (this.spawnUnit(player, this.game.jobs[1])) {
                 player.physicistSpawn = this.game.spawnTime;
             }
         }
 
         // If Manager Cap has not been met then try to spawn an Manager.
-        else if (this.game.managerCap > units[2] && player.managerSpawn <= 0) {
+        if (this.game.managerCap > units[2] && player.managerSpawn <= 0) {
             if (this.spawnUnit(player, this.game.jobs[2])) {
                 player.managerSpawn = this.game.spawnTime;
             }
@@ -247,7 +247,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     acted: false,
                     health: job.health,
                     job,
-                    moves: job.moves,
                     owner: player,
                     tile,
                     moves: job.moves,
