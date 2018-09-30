@@ -247,6 +247,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     acted: false,
                     health: job.health,
                     job,
+                    moves: job.moves,
                     owner: player,
                     tile,
                 });
