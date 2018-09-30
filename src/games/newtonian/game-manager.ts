@@ -4,6 +4,7 @@ import { BaseClasses, NewtonianGame, NewtonianGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
 import { Job } from "./job";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -61,6 +62,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         await super.afterTurn();
 
         // <<-- Creer-Merge: after-turn -->>
+        // clean up dead units
+        this.updateArrays();
+        // update units
+        this.updateUnits();
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
@@ -325,6 +330,39 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.conveyMaterials(this.game.players[1].conveyors);
 
         return;
+    }
+
+    /** Updates all arrays in the game with new/dead game objects */
+    private updateArrays(): void {
+        // Properly remove all killed units
+        for (let i = 0; i < this.game.units.length; i++) {
+            const unit = this.game.units[i];
+            if (!unit.tile || unit.health <= 0) {
+                if (unit.tile) {
+                    unit.tile.unit = undefined;
+                    unit.tile = undefined;
+                }
+
+                if (unit.owner) {
+                    // Remove this unit from the player's units array
+                    removeElements(unit.owner.units, unit);
+                }
+
+                // Remove this unit from the game's units array
+                this.game.units.splice(i, 1);
+                i--; // Make sure we don't skip an element
+            }
+        }
+    }
+
+    /** Updates all units */
+    private updateUnits(): void {
+        for (const unit of this.game.units) {
+            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+            }
+        }
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
