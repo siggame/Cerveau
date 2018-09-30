@@ -602,9 +602,13 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: move -->>
 
         // Add logic here for move.
-        tile.unit = undefined;
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to move from!`);
+        }
+        this.tile.unit = undefined;
         this.tile = tile;
         tile.unit = this;
+        this.moves -= 1;
 
         return true;
 

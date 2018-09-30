@@ -218,6 +218,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.secondaryWinConditions(reason);
     }
 
+    // <<-- Creer-Merge: protected-private-methods -->>
+
+    // any additional protected/private methods you need can be added here
+
     /**
      * Attempts to spawn in a unit for a given player.
      * @param player - The player that will own the unit.
@@ -252,13 +256,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return false;
     }
 
-    // <<-- Creer-Merge: protected-private-methods -->>
-
-    // any additional protected/private methods you need can be added here
-
     /**
      * conveyMaterials
      * This function moves materials and units on conveyor
+     * @param conveyors - a list of conveyors.
      */
     private conveyMaterials(conveyors: Tile[]): void {
         for (let i = conveyors.length - 1; i >= 0; i--) {
@@ -315,7 +316,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
         if (this.game.players[0] === this.game.currentPlayer) {
-            this.game.players[0].conveyors[0].rediumOre += this.game.materialSpawn;
+            this.game.players[0].conveyors[0].blueiumOre += this.game.materialSpawn;
         }
         else {
             this.game.players[1].conveyors[0].rediumOre += this.game.materialSpawn;
