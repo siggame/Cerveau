@@ -250,6 +250,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                     moves: job.moves,
                     owner: player,
                     tile,
+                    moves: job.moves,
                 });
                 player.units.push(tile.unit);
                 this.game.units.push(tile.unit);
