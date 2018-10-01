@@ -474,7 +474,6 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
-        // <<-- /Creer-Merge: constructor -->>
     }
 
     /**
@@ -640,13 +639,8 @@ export class NewtonianGame extends BaseClasses.Game {
             // add doors into the North
             shift = this.manager.random.int(mapW, 0);
             for (let x = 0; x < mapW; x++) {
-                if (shift !== x) {
-                    if (map[x][0] !== undefined) {
-                        map[x][0].DNorth = true;
-                    }
-                    else if (map[x][0] === undefined) {
-                        throw new Error(`Cannot get a tile for map generation at (${x}, ${0}) data: ${mapW}, ${mapH}`);
-                    }
+                if (shift !== x || mapW === 1) {
+                    map[x][0].DNorth = true;
                 }
             }
         }
@@ -655,7 +649,7 @@ export class NewtonianGame extends BaseClasses.Game {
             // add doors to the south
             shift = this.manager.random.int(mapW, 0);
             for (let x = 0; x < mapW; x++) {
-                if (shift !== x) {
+                if (shift !== x || mapW === 1) {
                     map[x][mapH - 1].DSouth = true;
                 }
             }
@@ -665,7 +659,7 @@ export class NewtonianGame extends BaseClasses.Game {
             // add doors to the east.
             shift = this.manager.random.int(mapH, 0);
             for (let y = 0; y < mapH; y++) {
-                if (shift !== y) {
+                if (shift !== y || mapH === 1) {
                     map[mapW - 1][y].DEast = true;
                 }
             }
@@ -675,7 +669,7 @@ export class NewtonianGame extends BaseClasses.Game {
             // add doors ito the west.
             shift = this.manager.random.int(mapH, 0);
             for (let y = 0; y < mapH; y++) {
-                if (shift !== y) {
+                if (shift !== y || mapH === 1) {
                     map[0][y].DWest = true;
                 }
             }

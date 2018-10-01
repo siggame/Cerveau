@@ -66,6 +66,23 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.updateArrays();
         // update units
         this.updateUnits();
+        // update Heat and pressure.
+        const play1 = this.game.players[0];
+        const play2 = play1.opponent;
+        const diff1 = Math.abs(play1.pressure - play1.heat);
+        const diff2 = Math.abs(play2.pressure - play2.heat);
+        if (play1.pressure > play1.heat) {
+            play1.pressure -= diff1 * this.game.degradeRate;
+        }
+        else if (play1.pressure < play1.heat) {
+            play1.heat -= diff1 * this.game.degradeRate;
+        }
+        if (play2.pressure > play2.heat) {
+            play2.pressure -= diff2 * this.game.degradeRate;
+        }
+        else if (play2.pressure < play2.heat) {
+            play2.heat -= diff2 * this.game.degradeRate;
+        }
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
