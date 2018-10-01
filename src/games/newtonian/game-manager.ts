@@ -225,7 +225,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         else if (this.game.players[1].heat + this.game.players[1].pressure >
             this.game.players[0].heat + this.game.players[0].pressure) {
             this.declareWinner(`${reason}: You were closer to achieving fusion`, this.game.players[1]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[2]);
+            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[0]);
 
             return;
         }
