@@ -1,5 +1,5 @@
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { Constructor, ITypedObject } from "~/utils";
+import { Constructor, TypedObject } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";
@@ -10,8 +10,8 @@ import { BasePlayer } from "./base-player";
 /** Namespace schema for a base game object */
 export interface IBaseGameObjectSchema {
     parentClassName?: string;
-    attributes: ITypedObject<ISanitizableType & { defaultValue?: unknown }>;
-    functions: ITypedObject<IBaseGameObjectFunctionSchema>;
+    attributes: TypedObject<ISanitizableType & { defaultValue?: unknown }>;
+    functions: TypedObject<IBaseGameObjectFunctionSchema>;
 }
 
 /** Namespace schema for functions that game objects can invoke */

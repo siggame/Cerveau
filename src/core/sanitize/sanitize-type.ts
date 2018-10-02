@@ -19,7 +19,7 @@ import { sanitizeString } from "./sanitize-string";
  * @returns A value now sanitized and guaranteed to be of that type.
  */
 export function sanitizeType(
-    type: ISanitizableType,
+    type: Readonly<ISanitizableType>,
     obj: unknown,
     allowError: boolean = true,
 ): unknown {

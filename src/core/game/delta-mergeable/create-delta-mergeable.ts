@@ -2,7 +2,7 @@
 // ^ as DeltaMergeables are black magic anyways
 
 import { ISanitizableType, sanitizeType } from "~/core/sanitize/";
-import { ITypedObject } from "~/utils";
+import { TypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
 import { createObject } from "./delta-mergeable-object";
@@ -53,7 +53,7 @@ function sanitize(type: Readonly<ISanitizableType>): (
 export function createDeltaMergeable(args: {
     key: string;
     type: Readonly<ISanitizableType>;
-    childTypes?: Readonly<ITypedObject<ISanitizableType>>;
+    childTypes?: Readonly<TypedObject<ISanitizableType>>;
     parent?: DeltaMergeable;
     initialValue?: any;
 }): DeltaMergeable {

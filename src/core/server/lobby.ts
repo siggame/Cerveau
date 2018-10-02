@@ -4,7 +4,7 @@ import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
 import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
-         ITypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
+         TypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
 import { BaseClient, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -61,7 +61,7 @@ export class Lobby {
     public readonly gamesInitializedPromise: Promise<void>;
 
     /** All the namespaces for games we can play, indexed by gameName. */
-    public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
+    public readonly gameNamespaces: TypedObject<IBaseGameNamespace> = {};
 
     /** The logger instance that manages game logs. */
     public readonly gamelogManager = new GamelogManager();

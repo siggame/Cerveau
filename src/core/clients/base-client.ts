@@ -5,7 +5,7 @@ import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
 import { BaseAIManager, BasePlayer } from "~/core/game/";
 import { logger } from "~/core/logger";
-import { isObject, objectHasProperty, ParsedJSON } from "~/utils";
+import { isObject, Json, objectHasProperty } from "~/utils";
 
 const DEFAULT_STR = "Unknown";
 
@@ -243,7 +243,10 @@ export class BaseClient {
         if (fatalMessage) {
             await this.send({
                 event: "fatal",
-                data: { message: fatalMessage },
+                data: {
+                    message: fatalMessage,
+                    timedOut: this.timedOut,
+                },
             });
         }
 
@@ -386,7 +389,7 @@ export class BaseClient {
      * @param json - The json formatted string to parse.
      * @returns The parsed json structure, or undefined if malformed json.
      */
-    protected parseData(json: unknown): ParsedJSON | undefined {
+    protected parseData(json: unknown): Json | undefined {
         let invalid = "";
 
         if (typeof json !== "string") {
@@ -394,7 +397,7 @@ export class BaseClient {
         }
         else {
             try {
-                return JSON.parse(json) as ParsedJSON;
+                return JSON.parse(json) as Json;
             }
             catch (err) {
                 invalid = "Sent malformed JSON.";
