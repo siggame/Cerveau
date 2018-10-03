@@ -3,8 +3,7 @@ import { PlayEvent } from "cadre-ts-utils/cadre";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
-import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
-         TypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
+import { getDirs, isNil, TypedObject, UnknownObject } from "~/utils";
 import { BaseClient, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -14,6 +13,7 @@ import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
 import * as larkWebsocket from "lark-websocket";
+import { capitalize, difference, lowerFirst } from "lodash";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
@@ -341,12 +341,12 @@ There's probably another Cerveau server running on this same computer.`);
         let dirs = await getDirs(GAMES_DIR);
 
         if (Config.GAME_NAMES_TO_LOAD.length > 0) {
-            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(unCapitalizeFirstLetter);
+            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(lowerFirst);
 
-            const unknownGameNames = getMinusArray(gameDirs, dirs);
+            const unknownGameNames = difference(gameDirs, dirs);
             if (unknownGameNames.length > 0) {
                 throw new Error(`Cannot find directories to load for the selected games: ${
-                    unknownGameNames.map((name) => `"${capitalizeFirstLetter(name)}"`).join(", ")
+                    unknownGameNames.map((name) => `"${capitalize(name)}"`).join(", ")
                 }`);
             }
 
@@ -361,8 +361,8 @@ There's probably another Cerveau server running on this same computer.`);
                 gameNamespace = data.Namespace;
             }
             catch (err) {
-                const errorGameName = capitalizeFirstLetter(dir);
-                throw new Error(`⚠️ Could not load game ${errorGameName} ⚠️
+                const errorGameName = capitalize(dir);
+                throw new Error(`⚠️ Could not load game '${errorGameName}' ⚠️
 ---
 ${err}`);
             }

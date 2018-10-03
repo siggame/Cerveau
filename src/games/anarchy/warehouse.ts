@@ -4,7 +4,8 @@ import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { clamp, manhattanDistance } from "~/utils";
+import { clamp } from "lodash";
+import { manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**

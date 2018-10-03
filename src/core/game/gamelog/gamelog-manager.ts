@@ -3,7 +3,7 @@ import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";
 import { Config } from "~/core/config";
-import * as utils from "~/utils";
+import { gunzipFile, stringToMoment } from "~/utils";
 import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
        } from "./gamelog-utils";
 
@@ -127,7 +127,7 @@ export class GamelogManager {
             return undefined;
         }
 
-        return utils.gunzipFile(gamelogPath);
+        return gunzipFile(gamelogPath);
     }
 
     /**
@@ -197,7 +197,7 @@ export class GamelogManager {
                     // Then we can figure out what the game is based on just
                     // the filename.
                     const [gameName, session, epochString] = split;
-                    const epoch = Number(utils.stringToMoment(epochString));
+                    const epoch = Number(stringToMoment(epochString));
 
                     this.gamelogInfos.push({
                         epoch,

@@ -1,11 +1,11 @@
 import { IFinishedDeltaData, IGameObjectReference,
          IOrderedDeltaData, IRanDeltaData,
        } from "cadre-ts-utils/cadre";
+import { capitalize } from "lodash";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, mapToObject,
-         quoteIfString, UnknownObject } from "~/utils";
+import { mapToObject, quoteIfString, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -251,7 +251,7 @@ export class BaseAIManager {
             // the calling game object try to invalidate the run
             let argsMap = (sanitizedArgs as Map<string, unknown>);
 
-            const invalidateName = `invalidate${capitalizeFirstLetter(functionName)}`;
+            const invalidateName = `invalidate${capitalize(functionName)}`;
             //  ↙ We are getting this function via reflection, no easier way to do this.
             // tslint:disable-next-line:no-any no-unsafe-any
             const validated = (gameObject as any)[invalidateName](
