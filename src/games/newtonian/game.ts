@@ -1260,11 +1260,17 @@ export class NewtonianGame extends BaseClasses.Game {
                 // if there is a wall to the north, draw it.
                 if (room.WNorth === true) {
                     // if the room is 3 wide.
-                    getMutableTile(room.x1, room.y1 - 1).isWall = true;
-                    getMutableTile(room.x2, room.y1 - 1).isWall = true;
+                    this.drawWall(room.x1, room.y1 - 1, getMutableTile(room.x1, room.y1 - 1).decoration,
+                                  getMutableTile);
+                    this.drawWall(room.x2, room.y1 - 1, getMutableTile(room.x2, room.y1 - 1).decoration,
+                                  getMutableTile);
+                    // getMutableTile(room.x1, room.y1 - 1).isWall = true; // TODO: DELETE
+                    // getMutableTile(room.x2, room.y1 - 1).isWall = true; // TODO: DELETE
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
-                        getMutableTile(room.x3, room.y1 - 1).isWall = true;
+                        this.drawWall(room.x3, room.y1 - 1, getMutableTile(room.x3, room.y1 - 1).decoration,
+                                      getMutableTile);
+                        // getMutableTile(room.x3, room.y1 - 1).isWall = true; // TODO: DELETE
                     }
                 }
                 // if there is a wall to the east, draw it.
@@ -1272,35 +1278,47 @@ export class NewtonianGame extends BaseClasses.Game {
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
-                        if (getMutableTile(room.x3 + 1, room.y1).decoration !== 1) {
-                            getMutableTile(room.x3 + 1, room.y1).isWall = true;
-                        }
-                        if (getMutableTile(room.x3 + 1, room.y2).decoration !== 1) {
-                            getMutableTile(room.x3 + 1, room.y2).isWall = true;
-                        }
+                        this.drawWall(room.x3 + 1, room.y1, getMutableTile(room.x3 + 1, room.y1).decoration,
+                                      getMutableTile);
+                        this.drawWall(room.x3 + 1, room.y2, getMutableTile(room.x3 + 1, room.y2).decoration,
+                                      getMutableTile);
+                        /*if (getMutableTile(room.x3 + 1, room.y1).decoration !== 1) {
+                            getMutableTile(room.x3 + 1, room.y1).isWall = true; // TODO: DELETE
+                        }*/
+                        /*if (getMutableTile(room.x3 + 1, room.y2).decoration !== 1) {
+                            getMutableTile(room.x3 + 1, room.y2).isWall = true; // TODO: DELETE
+                        }*/
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
+                            this.drawWall(room.x3 + 1, room.y3, getMutableTile(room.x3 + 1, room.y3).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            if (getMutableTile(room.x3 + 1, room.y3).decoration !== 1) {
-                                getMutableTile(room.x3 + 1, room.y3).isWall = true;
-                            }
+                            /*if (getMutableTile(room.x3 + 1, room.y3).decoration !== 1) {
+                                getMutableTile(room.x3 + 1, room.y3).isWall = true; // TODO: DELETE
+                            }*/
                         }
                     }
                     // if the room is 2 wide.
                     else {
+                        this.drawWall(room.x2 + 1, room.y1, getMutableTile(room.x2 + 1, room.y1).decoration,
+                                      getMutableTile);
+                        this.drawWall(room.x2 + 1, room.y2, getMutableTile(room.x2 + 1, room.y2).decoration,
+                                      getMutableTile);
                         // place the wall as long as it doesn't cover up a door.
-                        if (getMutableTile(room.x2 + 1, room.y1).decoration !== 1) {
-                            getMutableTile(room.x2 + 1, room.y1).isWall = true;
+                        /*if (getMutableTile(room.x2 + 1, room.y1).decoration !== 1) {
+                            getMutableTile(room.x2 + 1, room.y1).isWall = true; // TODO: DELETE
                         }
                         if (getMutableTile(room.x2 + 1, room.y2).decoration !== 1) {
-                            getMutableTile(room.x2 + 1, room.y2).isWall = true;
-                        }
+                            getMutableTile(room.x2 + 1, room.y2).isWall = true; // TODO: DELETE
+                        }*/
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
+                            this.drawWall(room.x2 + 1, room.y3, getMutableTile(room.x2 + 1, room.y3).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            if (getMutableTile(room.x2 + 1, room.y3).decoration !== 1) {
-                                getMutableTile(room.x2 + 1, room.y3).isWall = true;
-                            }
+                            /*if (getMutableTile(room.x2 + 1, room.y3).decoration !== 1) {
+                                getMutableTile(room.x2 + 1, room.y3).isWall = true; // TODO: DELETE
+                            }*/
                         }
                     }
                 }
@@ -1310,50 +1328,76 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (room.x3 !== -1) {
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
+                            this.drawWall(room.x1, room.y3 + 1, getMutableTile(room.x1, room.y3 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x2, room.y3 + 1, getMutableTile(room.x2, room.y3 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x3, room.y3 + 1, getMutableTile(room.x3, room.y3 + 1).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            getMutableTile(room.x1, room.y3 + 1).isWall = true;
-                            getMutableTile(room.x2, room.y3 + 1).isWall = true;
-                            getMutableTile(room.x3, room.y3 + 1).isWall = true;
+                            /* getMutableTile(room.x1, room.y3 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x2, room.y3 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x3, room.y3 + 1).isWall = true; // TODO: DELETE*/
                         }
                         // if the room is 2 tall.
                         else {
+                            this.drawWall(room.x1, room.y2 + 1, getMutableTile(room.x1, room.y2 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x2, room.y2 + 1, getMutableTile(room.x2, room.y2 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x3, room.y2 + 1, getMutableTile(room.x3, room.y2 + 1).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            getMutableTile(room.x1, room.y2 + 1).isWall = true;
-                            getMutableTile(room.x2, room.y2 + 1).isWall = true;
-                            getMutableTile(room.x3, room.y2 + 1).isWall = true;
+                            /* getMutableTile(room.x1, room.y2 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x2, room.y2 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x3, room.y2 + 1).isWall = true; // TODO: DELETE*/
                         }
                     }
                     // if the room is 2 wide.
                     else {
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
+                            this.drawWall(room.x1, room.y3 + 1, getMutableTile(room.x1, room.y3 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x2, room.y3 + 1, getMutableTile(room.x2, room.y3 + 1).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            getMutableTile(room.x1, room.y3 + 1).isWall = true;
-                            getMutableTile(room.x2, room.y3 + 1).isWall = true;
+                            /* getMutableTile(room.x1, room.y3 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x2, room.y3 + 1).isWall = true; // TODO: DELETE*/
                         }
                         // if the room is 2 tall.
                         else {
+                            this.drawWall(room.x1, room.y2 + 1, getMutableTile(room.x1, room.y2 + 1).decoration,
+                                          getMutableTile);
+                            this.drawWall(room.x2, room.y2 + 1, getMutableTile(room.x2, room.y2 + 1).decoration,
+                                          getMutableTile);
                             // place the wall as long as it doesn't cover up a door.
-                            getMutableTile(room.x1, room.y2 + 1).isWall = true;
-                            getMutableTile(room.x2, room.y2 + 1).isWall = true;
+                            /* getMutableTile(room.x1, room.y2 + 1).isWall = true; // TODO: DELETE
+                            getMutableTile(room.x2, room.y2 + 1).isWall = true; // TODO: DELETE*/
                         }
                     }
                 }
                 // if there is a wall to the west, draw it.
                 if (room.WWest === true) {
+                    this.drawWall(room.x1 - 1, room.y1, getMutableTile(room.x1 - 1, room.y1).decoration,
+                                  getMutableTile);
+                    this.drawWall(room.x1 - 1, room.y2, getMutableTile(room.x1 - 1, room.y2).decoration,
+                                  getMutableTile);
                     // place the wall as long as it doesn't cover up a door.
-                    if (getMutableTile(room.x1 - 1, room.y1).decoration !== 1) {
-                        getMutableTile(room.x1 - 1, room.y1).isWall = true;
+                    /*if (getMutableTile(room.x1 - 1, room.y1).decoration !== 1) {
+                        getMutableTile(room.x1 - 1, room.y1).isWall = true; // TODO: DELETE
                     }
                     if (getMutableTile(room.x1 - 1, room.y2).decoration !== 1) {
-                        getMutableTile(room.x1 - 1, room.y2).isWall = true;
-                    }
+                        getMutableTile(room.x1 - 1, room.y2).isWall = true; // TODO: DELETE
+                    }*/
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
+                        this.drawWall(room.x1 - 1, room.y3, getMutableTile(room.x1 - 1, room.y3).decoration,
+                                      getMutableTile);
                         // place the wall as long as it doesn't cover up a door.
-                        if (getMutableTile(room.x1 - 1, room.y3).decoration !== 1) {
-                            getMutableTile(room.x1 - 1, room.y3).isWall = true;
-                        }
+                        /*if (getMutableTile(room.x1 - 1, room.y3).decoration !== 1) {
+                            getMutableTile(room.x1 - 1, room.y3).isWall = true; // TODO: DELETE
+                        }*/
                     }
                 }
             }
@@ -1934,7 +1978,7 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * this makes sure the room is in the list. I was uncreative with the name.
+     * this draws a corner if there aren't room connections in that direction.
      *
      * @param x - the x point the corner will be placed at.
      * @param y - the y point the corner will be placed at.
@@ -1948,7 +1992,22 @@ export class NewtonianGame extends BaseClasses.Game {
         if (dir1 === true || dir2 === true) {
             getMutableTile(x, y).isWall = true;
         }
+    }
 
+    /**
+     * this draws walls and makes sure that there isn't a door there.
+     *
+     * @param x - the x point the corner will be placed at.
+     * @param y - the y point the corner will be placed at.
+     * @param decoration - The decoration value of the location to check for doors.
+     * @param getMutableTile - the function for it to grab tiles.
+     * @returns nothing.
+     */
+    private drawWall(x: number, y: number, decoration: number,
+                     getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
+        if (decoration !== 1) {
+            getMutableTile(x, y).isWall = true;
+        }
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
