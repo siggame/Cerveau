@@ -151,7 +151,7 @@ export class Unit extends GameObject {
         // make sure the tile is next to the unit
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} can only travel to an adjacent tile.`;
+            return `${this} can only act on an adjacent tile.`;
         }
         // make sure valid target
         // if the unit is a physicist
@@ -166,10 +166,6 @@ export class Unit extends GameObject {
             // if there isn't a machine.
             else if (!tile.machine) {
                 return `${this} tried to act on ${tile} which does not contain a machine`;
-            }
-            // if there isn't a machine or unit.
-            else {
-                return `${this} tried to act on ${tile} which is doesn't contain a unit or machine`;
             }
         }
         // if the unit is a manager.
