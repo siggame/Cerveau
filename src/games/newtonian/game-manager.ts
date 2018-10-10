@@ -71,16 +71,16 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         const diff1 = Math.abs(play1.pressure - play1.heat);
         const diff2 = Math.abs(play2.pressure - play2.heat);
         if (play1.pressure > play1.heat) {
-            play1.pressure -= diff1 * this.game.degradeRate;
+            play1.pressure -= Math.floor(diff1 * this.game.degradeRate);
         }
         else if (play1.pressure < play1.heat) {
-            play1.heat -= diff1 * this.game.degradeRate;
+            play1.heat -= Math.floor(diff1 * this.game.degradeRate);
         }
         if (play2.pressure > play2.heat) {
-            play2.pressure -= diff2 * this.game.degradeRate;
+            play2.pressure -= Math.floor(diff2 * this.game.degradeRate);
         }
         else if (play2.pressure < play2.heat) {
-            play2.heat -= diff2 * this.game.degradeRate;
+            play2.heat -= Math.floor(diff2 * this.game.degradeRate);
         }
         // add logic here after the current player's turn starts
         this.manageMaterials();
@@ -182,19 +182,19 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
         // Add logic here checking for the primary win condition(s)
-        if ((this.game.players[0].heat + this.game.players[0].pressure) === 400 &&
-            (this.game.players[1].heat + this.game.players[1].pressure) === 400) {
+        if ((this.game.players[0].heat + this.game.players[0].pressure) === this.game.victoryAmount &&
+            (this.game.players[1].heat + this.game.players[1].pressure) === this.game.victoryAmount) {
             this.secondaryWinConditions("Both players achieved fusion at the same time.");
 
             return true;
         }
-        else if (this.game.players[0].heat + this.game.players[0].pressure === 400) {
+        else if (this.game.players[0].heat + this.game.players[0].pressure === this.game.victoryAmount) {
             this.declareWinner("You achieved fusion!", this.game.players[0]);
             this.declareLosers("Your opponents achieved fusion.", this.game.players[1]);
 
             return true;
         }
-        else if (this.game.players[1].heat + this.game.players[1].pressure === 400) {
+        else if (this.game.players[1].heat + this.game.players[1].pressure === this.game.victoryAmount) {
             this.declareWinner("You achieved fusion!", this.game.players[1]);
             this.declareLosers("Your opponents achieved fusion.", this.game.players[0]);
 
