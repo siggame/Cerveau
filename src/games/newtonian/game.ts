@@ -1226,36 +1226,35 @@ export class NewtonianGame extends BaseClasses.Game {
                 // TODO: Iterate through rooms, skilling one every time, checking for diagonal connects to not draw
                 // corners.
                 // draw the northern corners
+                this.drawCorner(room.x1 - 1, room.y1 - 1, room.WNorth, room.WWest, getMutableTile);
                 // if the room is 2 wide.
                 if (room.x3 === -1) {
-                    getMutableTile(room.x1 - 1, room.y1 - 1).isWall = true;
-                    getMutableTile(room.x2 + 1, room.y1 - 1).isWall = true;
+                    this.drawCorner(room.x2 + 1, room.y1 - 1, room.WNorth, room.WEast, getMutableTile);
                     // draw the southern corners, account for different heights
                     // if the room is 2 tall.
                     if (room.y3 === -1) {
-                        getMutableTile(room.x1 - 1, room.y2 + 1).isWall = true;
-                        getMutableTile(room.x2 + 1, room.y2 + 1).isWall = true;
+                        this.drawCorner(room.x1 - 1, room.y2 + 1, room.WSouth, room.WWest, getMutableTile);
+                        this.drawCorner(room.x2 + 1, room.y2 + 1, room.WSouth, room.WEast, getMutableTile);
                     }
                     // if the room is 3 tall.
                     else {
-                        getMutableTile(room.x1 - 1, room.y3 + 1).isWall = true;
-                        getMutableTile(room.x2 + 1, room.y3 + 1).isWall = true;
+                        this.drawCorner(room.x1 - 1, room.y3 + 1, room.WSouth, room.WWest, getMutableTile);
+                        this.drawCorner(room.x2 + 1, room.y3 + 1, room.WSouth, room.WEast, getMutableTile);
                     }
                 }
                 // if the room is 3 wide.
                 else {
-                    getMutableTile(room.x1 - 1, room.y1 - 1).isWall = true;
-                    getMutableTile(room.x3 + 1, room.y1 - 1).isWall = true;
+                    this.drawCorner(room.x3 + 1, room.y1 - 1, room.WNorth, room.WEast, getMutableTile);
                     // draw the southern corners, account for different heights
                     // if the room is 2 tall.
                     if (room.y3 === -1) {
-                        getMutableTile(room.x1 - 1, room.y2 + 1).isWall = true;
-                        getMutableTile(room.x3 + 1, room.y2 + 1).isWall = true;
+                        this.drawCorner(room.x1 - 1, room.y2 + 1, room.WSouth, room.WWest, getMutableTile);
+                        this.drawCorner(room.x3 + 1, room.y2 + 1, room.WSouth, room.WEast, getMutableTile);
                     }
                     // if the room is 3 tall.
                     else {
-                        getMutableTile(room.x1 - 1, room.y3 + 1).isWall = true;
-                        getMutableTile(room.x3 + 1, room.y3 + 1).isWall = true;
+                        this.drawCorner(room.x1 - 1, room.y3 + 1, room.WSouth, room.WWest, getMutableTile);
+                        this.drawCorner(room.x3 + 1, room.y3 + 1, room.WSouth, room.WEast, getMutableTile);
                     }
                 }
                 // if there is a wall to the north, draw it.
@@ -1932,6 +1931,24 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
+    }
+
+    /**
+     * this makes sure the room is in the list. I was uncreative with the name.
+     *
+     * @param x - the x point the corner will be placed at.
+     * @param y - the y point the corner will be placed at.
+     * @param dir1 - direction one to check to see if the corner should be placed.
+     * @param dir2 - direction two to check to see if the corner should be placed.
+     * @param getMutableTile - the function for it to grab tiles.
+     * @returns nothing.
+     */
+    private drawCorner(x: number, y: number, dir1: boolean, dir2: boolean,
+                       getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
+        if (dir1 === true || dir2 === true) {
+            getMutableTile(x, y).isWall = true;
+        }
+
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
