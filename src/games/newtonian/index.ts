@@ -433,7 +433,8 @@ export interface IUnitDropArgs {
      */
     amount?: number;
     /**
-     * The material the unit will drop.
+     * The material the unit will drop. 'redium', 'blueium', 'redium ore', or
+     * 'blueium ore'.
      */
     material?: "redium ore" | "redium" | "blueium" | "blueium ore";
 }
@@ -466,7 +467,8 @@ export interface IUnitPickupArgs {
      */
     amount?: number;
     /**
-     * The material the unit will pick up.
+     * The material the unit will pick up. 'redium', 'blueium', 'redium ore',
+     * or 'blueium ore'.
      */
     material?: "redium ore" | "redium" | "blueium" | "blueium ore";
 }
@@ -698,6 +700,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Unit,
                         nullable: false,
                     },
+                },
+                victoryAmount: {
+                    typeName: "int",
                 },
             },
             functions: {

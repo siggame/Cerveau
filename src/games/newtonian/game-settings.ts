@@ -23,19 +23,19 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "Percent loss from the difference of Heat and "
                        + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 0.2,
+            default: 0.05,
             // <<-- /Creer-Merge: degradeRate -->>
         },
         internCap: {
             description: "The maximum number of interns a player can have.",
             // <<-- Creer-Merge: internCap -->>
-            default: 3,
+            default: 5,
             // <<-- /Creer-Merge: internCap -->>
         },
         managerCap: {
             description: "The maximum number of managers a player can have.",
             // <<-- Creer-Merge: managerCap -->>
-            default: 3,
+            default: 5,
             // <<-- /Creer-Merge: managerCap -->>
         },
         materialSpawn: {
@@ -47,7 +47,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         physicistCap: {
             description: "The maximum number of physicists a player can have.",
             // <<-- Creer-Merge: physicistCap -->>
-            default: 3,
+            default: 5,
             // <<-- /Creer-Merge: physicistCap -->>
         },
         refinedValue: {
@@ -75,6 +75,13 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: timeImmune -->>
             default: 4,
             // <<-- /Creer-Merge: timeImmune -->>
+        },
+        victoryAmount: {
+            description: "The amount of combined heat and pressure that you "
+                       + "need to win.",
+            // <<-- Creer-Merge: victoryAmount -->>
+            default: 0,
+            // <<-- /Creer-Merge: victoryAmount -->>
         },
         // <<-- Creer-Merge: schema -->>
 

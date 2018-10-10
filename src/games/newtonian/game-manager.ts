@@ -50,7 +50,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // add logic here for before the current player's turn starts
 
         // <<-- /Creer-Merge: before-turn -->>
-
     }
 
     /**
