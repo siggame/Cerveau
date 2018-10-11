@@ -575,7 +575,7 @@ export class Unit extends GameObject {
             return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
         }
         // make sure they aren't entering a spawn area.
-        if (tile.type === "spawn" && this.tile.type !== "spawn") {
+        if (tile.type === "spawn" && this.owner !== tile.owner) {
             return `${this} is entering a invalid tile. Units cannot re-enter the spawn area upon leaving.`;
         }
 
@@ -789,7 +789,7 @@ export class Unit extends GameObject {
             return `It isn't your turn, ${player}.`;
         }
 
-        if (this.owner !== player) {
+        if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
         }
         // Make sure the unit hasn't acted.

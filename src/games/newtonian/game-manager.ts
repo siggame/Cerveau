@@ -375,6 +375,12 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 unit.acted = false;
                 unit.moves = unit.job.moves;
             }
+            if (unit.tile && unit.tile.owner === unit.owner) {
+                unit.health += Math.ceil(unit.job.health * .25);
+                if (unit.health > unit.job.health) {
+                    unit.health = unit.job.health;
+                }
+            }
         }
     }
     // <<-- /Creer-Merge: protected-private-methods -->>
