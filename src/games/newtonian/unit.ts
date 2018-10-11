@@ -342,8 +342,8 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (tile.tileNorth !== this.tile || tile.tileSouth !== this.tile
-            || tile.tileEast !== this.tile || tile.tileSouth !== this.tile) {
+        if (tile.tileNorth !== this.tile && tile.tileSouth !== this.tile
+            && tile.tileEast !== this.tile && tile.tileWest !== this.tile) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
