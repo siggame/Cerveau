@@ -980,77 +980,123 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
             }
         }
+        // cleanup List to reduce memory usage
+        unconnected.length = 0;
+        // Que of rooms to be connected
+        const toConnectQue: IPoint[] = [];
+        // used to track rooms that are connected.
+        const connected: IPoint[] = [];
+        // find a starting room.
+        const start = roomList[this.manager.random.int(roomList.length, 0)];
+        // add starting room.
+        connected.push(start);
+        // add existing neighbors to the que
+        if (map[start.x - 1]) {
+            toConnectQue.push({x: start.x - 1, y: start.y});
+        }
+        if (map[start.x + 1]) {
+            toConnectQue.push({x: start.x + 1, y: start.y});
+        }
+        if (map[start.x][start.y - 1]) {
+            toConnectQue.push({x: start.x, y: start.y - 1});
+        }
+        if (map[start.x][start.y + 1]) {
+            toConnectQue.push({x: start.x, y: start.y + 1});
+        }
         // making each room make a unique connection.
-        // iterating over the lists in map.
-        for (let x = 0; x < map.length; x++) {
-            // iterating over each list's values.
-            for (let y = 0; y < map[x].length; y++) {
-                // getting a random direction.
-                let dir = this.manager.random.int(4, 0);
-                // setting the flag variable.
-                done = false;
-                let num = 0;
-                // making sure it picks a direction.
-                while (!done) {
-                    // if it picks north.
-                    if (dir === 0) {
-                        // if it doesn't have that connection and the room exists.
-                        if (!map[x][y].DNorth && map[x][y - 1]) {
-                            // set the flag and make the connection.
-                            done = true;
-                            map[x][y].DNorth = true;
-                            map[x][y - 1].DSouth = true;
-                        }
-                        else {
-                            // going to the next direction.
-                            dir++;
-                            num++;
-                        }
+        while (toConnectQue.length !== 0) {
+            // grab the index of the room to be worked with.
+            const index = this.manager.random.int(toConnectQue.length, 0);
+            // grab the room info.
+            const find = toConnectQue[index];
+            // mark that the room hasn't been found.
+            let found = false;
+            // pick a random direction.
+            let rot = this.manager.random.int(4, 0);
+            // until a room is found.
+            while (!found) {
+                // check if the north exists and is connected.
+                if (rot === 0 && map[find.x][find.y - 1] && this.has(connected, find.x, find.y - 1) >= 0) {
+                    // connect it.
+                    map[find.x][find.y].DNorth = true;
+                    map[find.x][find.y - 1].DSouth = true;
+                    // remove it from the connection queue.
+                    toConnectQue.splice(index, 1);
+                    // add the room to the connected list.
+                    connected.push(find);
+                    // mark that a connection was found.
+                    found = true;
+                }
+                else {
+                    // if this direction is invalid, move onto the next one.
+                    rot++;
+                }
+                if (rot === 1 && map[find.x + 1] && this.has(connected, find.x + 1, find.y) >= 0) {
+                    // connect it.
+                    map[find.x][find.y].DEast = true;
+                    map[find.x + 1][find.y].DWest = true;
+                    // remove it from the connection queue.
+                    toConnectQue.splice(index, 1);
+                    // add the room to the connected list.
+                    connected.push(find);
+                    // mark that a connection was found.
+                    found = true;
+                }
+                else {
+                    // if this direction is invalid, move onto the next one.
+                    rot++;
+                }
+                if (rot === 2 && map[find.x][find.y + 1] && this.has(connected, find.x, find.y + 1) >= 0) {
+                    // connect it.
+                    map[find.x][find.y].DSouth = true;
+                    map[find.x][find.y + 1].DNorth = true;
+                    // remove it from the connection queue.
+                    toConnectQue.splice(index, 1);
+                    // add the room to the connected list.
+                    connected.push(find);
+                    // mark that a connection was found.
+                    found = true;
+                }
+                else {
+                    // if this direction is invalid, move onto the next one.
+                    rot++;
+                }
+                if (map[find.x - 1] && this.has(connected, find.x - 1, find.y) >= 0) {
+                    // connect it.
+                    map[find.x][find.y].DWest = true;
+                    map[find.x - 1][find.y].DEast = true;
+                    // remove it from the connection queue.
+                    toConnectQue.splice(index, 1);
+                    // add the room to the connected list.
+                    connected.push(find);
+                    // mark that a connection was found.
+                    found = true;
+                }
+                else {
+                    // if this direction is invalid, move onto the next one.
+                    rot = 0;
+                }
+                // if a connection was found.
+                if (found) {
+                    // if the room to the left isn't in either list and exists, add it to the queue
+                    if (map[find.x - 1] && this.has(connected, find.x - 1, find.y) === -1 &&
+                        this.has(toConnectQue, find.x - 1, find.y) === -1) {
+                        toConnectQue.push({x: find.x - 1, y: find.y});
                     }
-                    else if (dir === 1) {
-                        // if it doesn't have that connection and the room exists.
-                        if (!map[x][y].DEast && map[x + 1]) {
-                            // set the flag and make the connection.
-                            done = true;
-                            map[x][y].DEast = true;
-                            map[x + 1][y].DWest = true;
-                        }
-                        else {
-                            // going to the next direction.
-                            dir++;
-                            num++;
-                        }
+                    // if the room to the right isn't in either list and exists, add it to the queue
+                    if (map[find.x + 1] && this.has(connected, find.x + 1, find.y) === -1 &&
+                    this.has(toConnectQue, find.x + 1, find.y) === -1) {
+                        toConnectQue.push({x: find.x + 1, y: find.y});
                     }
-                    else if (dir === 2) {
-                        // if it doesn't have that connection and the room exists.
-                        if (!map[x][y].DSouth && map[x][y + 1]) {
-                            // set the flag and make the connection.
-                            done = true;
-                            map[x][y].DSouth = true;
-                            map[x][y + 1].DNorth = true;
-                        }
-                        else {
-                            // going to the next direction.
-                            dir++;
-                            num++;
-                        }
+                    // if the room above isn't in either list and exists, add it to the queue
+                    if (map[find.x][find.y - 1] && this.has(connected, find.x, find.y - 1) === -1 &&
+                    this.has(toConnectQue, find.x, find.y - 1) === -1) {
+                        toConnectQue.push({x: find.x, y: find.y - 1});
                     }
-                    else {
-                        // if it doesn't have that connection and the room exists.
-                        if (!map[x][y].DWest && map[x - 1]) {
-                            // set the flag and make the connection.
-                            done = true;
-                            map[x][y].DWest = true;
-                            map[x - 1][y].DEast = true;
-                        }
-                        else {
-                            // going to the next direction.
-                            dir = 0;
-                            num++;
-                        }
-                    }
-                    if (num > 4) {
-                        done = true;
+                    // if the room below isn't in either list and exists, add it to the queue
+                    if (map[find.x][find.y + 1] && this.has(connected, find.x, find.y + 1) === -1 &&
+                    this.has(toConnectQue, find.x, find.y + 1) === -1) {
+                        toConnectQue.push({x: find.x, y: find.y + 1});
                     }
                 }
             }
@@ -1143,7 +1189,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                 }
                 // if there is a wall to the north, draw it.
-                if (room.WNorth === true) {
+                if (room.WNorth) {
                     // if the room is 3 wide.
                     this.drawWall(room.x1, room.y1 - 1, getMutableTile);
                     this.drawWall(room.x2, room.y1 - 1, getMutableTile);
@@ -1153,7 +1199,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                 }
                 // if there is a wall to the east, draw it.
-                if (room.WEast === true) {
+                if (room.WEast) {
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
@@ -1178,7 +1224,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                 }
                 // if there is a wall to the south, drawn it.
-                if (room.WSouth === true) {
+                if (room.WSouth) {
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
@@ -1201,7 +1247,7 @@ export class NewtonianGame extends BaseClasses.Game {
                     }
                 }
                 // if there is a wall to the west, draw it.
-                if (room.WWest === true) {
+                if (room.WWest) {
                     // place the wall as long as it doesn't cover up a door.
                     this.drawWall(room.x1 - 1, room.y1, getMutableTile);
                     this.drawWall(room.x1 - 1, room.y2, getMutableTile);
