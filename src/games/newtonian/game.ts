@@ -345,8 +345,14 @@ export class NewtonianGame extends BaseClasses.Game {
             tile.direction = dir;
             this.players[1].conveyors.push(tile as Tile);
         }
-        // TODO: spawn in one of each unit.
-
+        for (let i = 0; i < 6; i++) {
+            this.spawnUnit(this.players[Math.floor(i / 3)], this.jobs[i % 3]);
+        }
+        for (let i = 0; i < 2; i++) {
+            this.players[i].internSpawn = this.spawnTime;
+            this.players[i].physicistSpawn = this.spawnTime;
+            this.players[i].managerSpawn = this.spawnTime;
+        }
         // --- Generate center --- \\
         // Determine the size of the center room
         const midSize = this.manager.random.int(6, 3);
@@ -564,7 +570,7 @@ export class NewtonianGame extends BaseClasses.Game {
         let shiftY = 0;
         // create the rest of the rooms by iterating over the rest of the map.
         for (let x = 0; x < mapW; x++) {
-            for (let y = 0/*start*/; y < mapH; y++) {
+            for (let y = 0; y < mapH; y++) {
                 // create and add the room.
                 // if the room is 3 wide.
                 if (x === xLarge[shiftX]) {
@@ -682,7 +688,7 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * TODO: document
+     * Generates the room connections and doorway connections.
      *
      * @param map - a 2D array that contains room structs that contain map information.
      * @param machines - the number of machines to be added to the map.
@@ -1493,6 +1499,37 @@ export class NewtonianGame extends BaseClasses.Game {
         }
 
         return -1;
+    }
+
+    /**
+     * Attempts to spawn in a unit for a given player.
+     * @param player - The player that will own the unit.
+     * @param job - The job of the unit.
+     */
+    private spawnUnit(player: Player, job: Job): void {
+        // Iterate through each player's spawn tiles to find a spot to spawn unit.
+        for (const tile of player.spawnTiles) {
+            // Check to see if there is a Unit on the tile.
+            // If there is move on to the next tile.
+            if (tile.unit) {
+                continue;
+            }
+            // Else spawn in Unit and return success to spawning.
+            else {
+                tile.unit = this.manager.create.unit({
+                    acted: false,
+                    health: job.health,
+                    job,
+                    owner: player,
+                    tile,
+                    moves: job.moves,
+                });
+                player.units.push(tile.unit);
+                this.units.push(tile.unit);
+
+                return;
+            }
+        }
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
