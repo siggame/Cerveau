@@ -208,6 +208,7 @@ export class NewtonianGame extends BaseClasses.Game {
     // <<-- Creer-Merge: protected-private-functions -->>
     /** Creates all the Jobs in the game */
     private createJobs(): void {
+        // push all three jobs.
         this.jobs.push(
             this.manager.create.job({
                 title: "intern",
@@ -334,7 +335,6 @@ export class NewtonianGame extends BaseClasses.Game {
             this.players[0].conveyors.push(tile as Tile);
             tile = getMutableTile((this.mapWidth - 1 - x), y);
             tile.type = "conveyor";
-            // TODO: use this.invertTileDirection
             let dir = direction;
             if (dir === "east") {
                 dir = "west";
@@ -345,9 +345,11 @@ export class NewtonianGame extends BaseClasses.Game {
             tile.direction = dir;
             this.players[1].conveyors.push(tile as Tile);
         }
+        // spawns one of each unit for each player.
         for (let i = 0; i < 6; i++) {
             this.spawnUnit(this.players[Math.floor(i / 3)], this.jobs[i % 3]);
         }
+        // sets up spawn times.
         for (let i = 0; i < 2; i++) {
             this.players[i].internSpawn = this.spawnTime;
             this.players[i].physicistSpawn = this.spawnTime;
@@ -383,7 +385,6 @@ export class NewtonianGame extends BaseClasses.Game {
         // determines the tile that machine will be on.
         const loc = getMutableTile(MMstart + 1, mid + shift + mShift);
         // makes the machine
-        // TODO: FIX CREATE!
         const machine = this.manager.create.machine({
             oreType: "redium",
             refineTime: time,
@@ -445,20 +446,23 @@ export class NewtonianGame extends BaseClasses.Game {
                       this.mapHeight - 2, getMutableTile,
                       false, true, false, true,
                       Math.min((this.mapHeight * this.mapWidth) / 790));
-        // Math.floor(Math.random() * 3)
         // mirror map
-        // TODO: copy units.
+        // iterate over every tile from the created half.
         for (let y = 0; y < this.mapHeight; y++) {
             for (let x = 0; x < this.mapWidth / 2; x++) {
-                const copy = getMutableTile(x, y).isWall;
-                getMutableTile((this.mapWidth - 1 - x), y).isWall = copy;
-                const copy2 = getMutableTile(x, y).decoration;
-                getMutableTile((this.mapWidth - 1 - x), y).decoration = copy2;
+                // copies walls.
+                getMutableTile((this.mapWidth - 1 - x), y).isWall = getMutableTile(x, y).isWall;
+                // copies decoration values.
+                getMutableTile((this.mapWidth - 1 - x), y).decoration = getMutableTile(x, y).decoration;
+                // check for a machine.
                 if (getMutableTile(x, y).machine) {
+                    // grab the machine.
                     const mach = getMutableTile(x, y).machine;
+                    // doubly make sure it exists, because typescript.
                     if (mach === undefined) {
                         throw new Error(`The machine you are copying: ${mach}, doesn't exist!`);
                     }
+                    // make a new machine.
                     const machine2 = this.manager.create.machine({
                         oreType: "blueium",
                         refineTime: mach.refineTime,
@@ -466,19 +470,28 @@ export class NewtonianGame extends BaseClasses.Game {
                         refineOutput: mach.refineOutput,
                         tile: getMutableTile((this.mapWidth - 1 - x), y) as Tile,
                     });
+                    // add te machine to the data.
                     getMutableTile((this.mapWidth - 1 - x), y).machine = machine2;
                     this.machines.push(machine2);
                 }
+                // if the tile is a spawn tile, copy it.
                 else if (getMutableTile(x, y).type === "spawn") {
+                    // grab the mirror tile.
                     const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    // add the information.
                     tile.type = "spawn";
                     tile.owner = this.players[1];
+                    // push it to the list.
                     this.players[1].spawnTiles.push(tile as Tile);
                 }
+                // if the tile is a generator tile, copy it.
                 else if (getMutableTile(x, y).type === "generator") {
+                    // grab the mirror tile.
                     const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    // add the information.
                     tile.type = "generator";
                     tile.owner = this.players[1];
+                    // push it to the list.
                     this.players[1].generatorTiles.push(tile as Tile);
                 }
             }
@@ -1160,7 +1173,6 @@ export class NewtonianGame extends BaseClasses.Game {
         // iterate through the rooms of the map.
         for (const rooms of map) {
             for (const room of rooms) {
-                // TODO: Iterate through rooms, skilling one every time, checking for diagonal connects to not draw
                 // corners.
                 // draw the northern corners
                 this.drawCorner(room.x1 - 1, room.y1 - 1, room.WNorth, room.WWest, getMutableTile);
@@ -1266,7 +1278,6 @@ export class NewtonianGame extends BaseClasses.Game {
             }
         }
         // iterate over the map in order to draw rooms.
-        // TODO: account for machines, to make sure doors won't be dead ends.
         for (let x = 0; x < map.length; x++) {
             for (let y = 0; y < map[0].length; y++) {
                 const room = map[x][y];
@@ -1284,19 +1295,25 @@ export class NewtonianGame extends BaseClasses.Game {
                         const size = room.x3 === -1 ? 2 : 3;
                         // pick a random spot.
                         shift = this.manager.random.int(size, 0);
+                        // used to count attempts to make sure the best outcome is reached.
                         let temp = 0;
+                        //  decide which spot the door should be on.
                         for (let i = 0; i < size; i++) {
+                            // if the loop is at the current shift.
                             if (shift === i) {
+                                // check if it would create a path-able doorway.
                                 if (((getMutableTile(room.x1 + i, room.y1 - 2).machine !== undefined ||
                                     getMutableTile(room.x1 + i, room.y1).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 + i, room.y1 - 2).isWall ||
                                     getMutableTile(room.x1 + i, room.y1 - 2).decoration === 1) {
                                     // try a different spot.
                                     shift++;
+                                    // if the current shift is invalid, make it valid. Restart the loop.
                                     if (shift >= size) {
                                         shift = 0;
+                                        i = 0;
                                     }
-                                    i = 0;
+                                    // note the attempt.
                                     temp++;
                                 }
                             }
@@ -1326,19 +1343,24 @@ export class NewtonianGame extends BaseClasses.Game {
                         const roomX = room.x3 === -1 ? room.x2 : room.x3;
                         // figure out which part of the wall to make the door.
                         shift = this.manager.random.int(size, 0);
+                        // used to count attempts to make sure the best outcome is reached.
                         let temp = 0;
                         for (let i = 0; i < size; i++) {
+                            // if the loop is at the current shift.
                             if (shift === i) {
+                                // check if it would create a path-able doorway.
                                 if (((getMutableTile(roomX + 2, room.y1 + i).machine !== undefined ||
                                     getMutableTile(roomX, room.y1 + i).machine !== undefined) && temp < size) ||
                                     getMutableTile(roomX + 2, room.y1 + i).isWall ||
                                     getMutableTile(roomX + 2, room.y1 + i).decoration === 1) {
                                     // try a different spot.
                                     shift++;
+                                    // if the current shift is invalid, make it valid. Restart the loop.
                                     if (shift >= size) {
                                         shift = 0;
+                                        i = 0;
                                     }
-                                    i = 0;
+                                    // note the attempt.
                                     temp++;
                                 }
                             }
@@ -1367,19 +1389,24 @@ export class NewtonianGame extends BaseClasses.Game {
                         const roomY = room.y3 === -1 ? room.y2 : room.y3;
                         // figure out which part of the wall to make the door.
                         shift = this.manager.random.int(size, 0);
+                        // used to count attempts to make sure the best outcome is reached.
                         let temp = 0;
                         for (let i = 0; i < size; i++) {
+                            // if the loop is at the current shift.
                             if (shift === i) {
+                                // check if it would create a path-able doorway.
                                 if (((getMutableTile(room.x1 + i, roomY + 2).machine !== undefined ||
                                     getMutableTile(room.x1 + i, roomY).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 + i, roomY + 2).isWall ||
                                     getMutableTile(room.x1 + i, roomY + 2).decoration === 1) {
                                     // try a different spot.
                                     shift++;
+                                    // if the current shift is invalid, make it valid. Restart the loop.
                                     if (shift >= size) {
                                         shift = 0;
+                                        i = 0;
                                     }
-                                    i = 0;
+                                    // note the attempt.
                                     temp++;
                                 }
                             }
@@ -1406,19 +1433,24 @@ export class NewtonianGame extends BaseClasses.Game {
                         const size = room.y3 === -1 ? 2 : 3;
                         // figure out which part of the wall to make the door.
                         shift = this.manager.random.int(size, 0);
+                        // used to count attempts to make sure the best outcome is reached.
                         let temp = 0;
                         for (let i = 0; i < size; i++) {
+                            // if the loop is at the current shift.
                             if (shift === i) {
+                                // check if it would create a path-able doorway.
                                 if (((getMutableTile(room.x1 - 2, room.y1 + i).machine !== undefined ||
                                     getMutableTile(room.x1, room.y1 + i).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 - 2, room.y1 + i).isWall ||
                                     getMutableTile(room.x1 - 2, room.y1 + i).decoration === 1) {
                                     // try a different spot.
                                     shift++;
+                                    // if the current shift is invalid, make it valid. Restart the loop.
                                     if (shift >= size) {
                                         shift = 0;
+                                        i = 0;
                                     }
-                                    i = 0;
+                                    // note the attempt.
                                     temp++;
                                 }
                             }

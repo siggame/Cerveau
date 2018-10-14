@@ -146,7 +146,7 @@ export class Unit extends GameObject {
 
         // make sure the unit is on the planet.... wait...
         if (!tile) {
-            return `${this}, gratz. You proved flat earthers correct.`;
+            return `${this}, is trying to act on a tile that doesn't exist`;
         }
         // make sure the tile is next to the unit
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
@@ -161,6 +161,17 @@ export class Unit extends GameObject {
                 // if the target isn't a manager.
                 if (tile.unit.job.title !== "manager") {
                     return `${this} tried to act on ${tile.unit} which is not a manager`;
+                }
+            }
+            // if there isn't a machine.
+            else if (tile.machine) {
+                if (tile.machine.worked <= 0) {
+                    if (tile.machine.oreType === "redium" && tile.rediumOre < tile.machine.refineInput) {
+                        return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
+                    }
+                    else if (tile.machine.oreType === "blueium" && tile.blueiumOre < tile.machine.refineInput) {
+                        return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
+                    }
                 }
             }
             // if there isn't a machine.
@@ -198,10 +209,6 @@ export class Unit extends GameObject {
             else if (tile.machine.worked <= 1) {
                 return `${this} tried to act on ${tile} which was not worked enough`;
             }
-            // if there isn't a machine or unit.
-            else {
-                return `${this} tried to act on ${tile} which is doesn't contain a unit or machine`;
-            }
         }
 
         // <<-- /Creer-Merge: invalidate-act -->>
@@ -220,88 +227,64 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: act -->>
 
         // Add logic here for act.
-        // checking if player object is Physicist
-        if (this.job.title === "physicist") {
-            // if their target is a machine
-            if (tile.machine) {
-                // if it is a blueium machine.
-                if (tile.machine.oreType === "blueium") {
-                    // if the machine has been worked
-                    if (tile.machine.worked > 0) {
-                        // work the machine.
-                        tile.machine.worked++;
-                    }
-                    // if it has enough ore to start being worked.
-                    else if (tile.blueiumOre >= tile.machine.refineInput) {
-                        // work the machine.
-                        tile.machine.worked++;
-                        // grab it's input.
-                        tile.blueiumOre -= tile.machine.refineInput;
-                    }
-                    // resolve the machine being worked.
-                    if (tile.machine.worked === tile.machine.refineTime) {
-                        // add the refined material.
-                        tile.blueium += tile.machine.refineOutput;
-                        // reset the work cycle.
-                        tile.machine.worked = 0;
-                    }
+        // checking if player object is Physicist and is targeting a machine
+        if (this.job.title === "physicist" && tile.machine) {
+            // if it is a blueium machine.
+            if (tile.machine.oreType === "blueium") {
+                // if the machine has been worked
+                if (tile.machine.worked > 0) {
+                    // work the machine.
+                    tile.machine.worked++;
                 }
-                // if it is a redium machine.
-                if (tile.machine.oreType === "redium") {
-                    // if the machine has been worked
-                    if (tile.machine.worked > 0) {
-                        // work the machine.
-                        tile.machine.worked++;
-                    }
-                    // if it has enough ore to start being worked.
-                    else if (tile.rediumOre >= tile.machine.refineInput) {
-                        // work the machine.
-                        tile.machine.worked++;
-                        // grab it's input.
-                        tile.rediumOre -= tile.machine.refineInput;
-                    }
-                    // resolve the machine being worked.
-                    if (tile.machine.worked === tile.machine.refineTime) {
-                        // add the refined material.
-                        tile.redium += tile.machine.refineOutput;
-                        // reset the work cycle.
-                        tile.machine.worked = 0;
-                    }
+                // if it has enough ore to start being worked.
+                else {
+                    // work the machine.
+                    tile.machine.worked++;
+                    // grab it's input.
+                    tile.blueiumOre -= tile.machine.refineInput;
+                }
+                // resolve the machine being worked.
+                if (tile.machine.worked === tile.machine.refineTime) {
+                    // add the refined material.
+                    tile.blueium += tile.machine.refineOutput;
+                    // reset the work cycle.
+                    tile.machine.worked = 0;
                 }
             }
-            // if the target is a unit, stun it.
-            else if (tile.unit) {
-                // stun the unit.
-                tile.unit.stunTime += this.game.stunTime;
-                // make it immune.
-                tile.unit.stunImmune += this.game.timeImmune;
+            // if it is a redium machine.
+            if (tile.machine.oreType === "redium") {
+                // if the machine has been worked
+                if (tile.machine.worked > 0) {
+                    // work the machine.
+                    tile.machine.worked++;
+                }
+                // if it has enough ore to start being worked.
+                else {
+                    // work the machine.
+                    tile.machine.worked++;
+                    // grab it's input.
+                    tile.rediumOre -= tile.machine.refineInput;
+                }
+                // resolve the machine being worked.
+                if (tile.machine.worked === tile.machine.refineTime) {
+                    // add the refined material.
+                    tile.redium += tile.machine.refineOutput;
+                    // reset the work cycle.
+                    tile.machine.worked = 0;
+                }
             }
         }
-        // checking if player object is manager
-        else if (this.job.title === "manager") {
-            // if the target is a unit, stun it.
-            if (tile.unit) {
-                // stun the unit.
-                tile.unit.stunTime += this.game.stunTime;
-                // make it immune.
-                tile.unit.stunImmune += this.game.timeImmune;
-            }
-
+        // checking if player object is intern and their target is a machine
+        else if (this.job.title === "intern" && tile.machine) {
+            // reset it's work cycle, because you are mean.
+            tile.machine.worked = 1;
         }
-        // checking if player object is intern
-        else if (this.job.title === "intern") {
-            // if the target is a machine, delay it.
-            if (tile.machine) {
-                // reset it's work cycle, because you are mean.
-                tile.machine.worked = 1;
-            }
-            // if the target is a unit, stun it.
-            else if (tile.unit) {
-                // stun the unit.
-                tile.unit.stunTime += this.game.stunTime;
-                // make it immune.
-                tile.unit.stunImmune += this.game.timeImmune;
-            }
+        // if the target is a unit, stun it.
+        else if (tile.unit) {
+            // stun the unit.
+            tile.unit.stunTime += this.game.stunTime;
+            // make it immune.
+            tile.unit.stunImmune += this.game.timeImmune;
         }
 
         // TODO: replace this with actual logic
@@ -348,7 +331,7 @@ export class Unit extends GameObject {
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
         if (tile.isWall === true) {
-            return `${this} hurt its hand attacking a wall.`;
+            return `${this} hurt its hand attacking a wall on tile ${tile}.`;
         }
         // make sure the the unit is attacking a unit.
         if (tile.unit === undefined) {
@@ -356,18 +339,15 @@ export class Unit extends GameObject {
         }
         // make sure you aren't attacking a friend.
         if (tile.unit.owner === player) {
-            return `${this} is trying to attack the ally: ${tile.unit}`;
+            return `${this} is trying to attack the ally: ${tile.unit} on tile ${tile}`;
         }
         // Handle possible unit invalidations here:
         if (this.owner === undefined) {
-            return `${this} is attacking a unit that has no owner. Report this to the game Devs`;
+            return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
         }
         // make sure the unit has a job.
         if (this.job === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
-        }
-        if (!this.tile) {
-            return `${this} is trying to attack things in the afterlife. Stop it.`;
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
@@ -384,19 +364,14 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: attack -->>
 
         // Write logic here
-        try {
-            if (tile.unit === undefined) {
-                throw new Error("Unit on tile is undefined.");
-            }
-            tile.unit.health = tile.unit.health - this.job.damage;
-            if (tile.unit.health <= 0) {
-                tile.unit.health = 0; // set unit's health to zero.
-                tile.unit = undefined; // Unlink tile.
-                this.tile = undefined; // and dead unit.
-            }
+        if (tile.unit === undefined) {
+            throw new Error("Unit on tile is undefined.");
         }
-        catch (err) {
-            return false; // if error occurs, return false.
+        tile.unit.health = tile.unit.health - this.job.damage;
+        if (tile.unit.health <= 0) {
+            tile.unit.health = 0; // set unit's health to zero.
+            tile.unit = undefined; // Unlink tile.
+            this.tile = undefined; // and dead unit.
         }
         this.acted = true; // unit has acted
 
@@ -434,21 +409,16 @@ export class Unit extends GameObject {
 
         // make sure there isn't a wall there.
         if (tile.isWall) {
-            return `${this} can't place stuff on a wall. That just don't work, my friend.`;
+            return `${this} can't place stuff on a wall on tile ${tile}.`;
         }
         // make sure the target tile exists.
         if (!tile) {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
-        // make sure the unit is on a tile.
-        if (!this.tile) {
-            return `${this} is probably dead. It can't drop things.`;
-        }
         // make sure it is selecting a ajacent tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast &&
-            this.tile !== tile.tileSouth && this.tile !== tile.tileWest &&
-            this.tile !== tile.tileNorth) {
-            return `${this} can only drop things to an adjacent tile or it's tile. Did you flunk geography?`;
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+            return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
         return;
@@ -547,15 +517,11 @@ export class Unit extends GameObject {
         }
         // make sure the unit is on the planet.... wait...
         if (!tile) {
-            return `${this}, gratz. You proved flat earthers correct.`;
-        }
-        // make sure the unit is on a tile.
-        if (!this.tile) {
-            return `${this} is on a tile that doesn't exist and it should be dead.`;
+            return `${this}, gratz. You proved flat earthers correct. Target tile doesn't exist.`;
         }
         // Make sure there isn't a wall there. Ouch.
         if (tile.isWall) {
-            return `${this} cannot walk through solid matter. Yet....`;
+            return `${this} cannot walk through solid matter on tile ${tile}. Yet....`;
         }
         // Make sure the unit still has moves
         if (this.moves <= 0) {
@@ -563,20 +529,20 @@ export class Unit extends GameObject {
         }
         // Make sure there isn't a machine there.
         if (tile.machine) {
-            return `${this} cannot walk over machines. They are expensive`;
+            return `${this} cannot walk over the machine on tile ${tile}. It is expensive.`;
         }
         // Make sure the tile isn't ocuppied.
         if (tile.unit) {
-            return `${this} cannot walk through units. Yet.....`;
+            return `${this} cannot walk through the unit on tile ${tile}. Yet.....`;
         }
         // make sure the tile is next to the unit.
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} can only travel to an adjacent tile. Did you flunk geography?`;
+            return `${this} can only travel to an adjacent tile. Tile ${tile} too far away.`;
         }
         // make sure they aren't entering a spawn area.
         if (tile.type === "spawn" && this.owner !== tile.owner) {
-            return `${this} is entering a invalid tile. Units cannot re-enter the spawn area upon leaving.`;
+            return `${this} is entering a invalid tile. Units cannot enter opponents spawn area.`;
         }
 
         return;
@@ -647,19 +613,14 @@ export class Unit extends GameObject {
         if (reason) {
             return reason;
         }
-        // make sure the unit is on a tile.
-        if (!this.tile) {
-            return `${this} is not on a Tile!`;
-        }
         // make sure the target tile exists.
         if (!tile) {
             return `${this} can only pick things up off tiles that exist`;
         }
         // make sure the tile is adjacent to the current tile, or its tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast &&
-            this.tile !== tile.tileSouth && this.tile !== tile.tileWest &&
-            this.tile !== tile.tileNorth) {
-            return `${this} can only pickup resources on or adjacent to its tile.`;
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+            return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
         // tracks the material to be picked up.
@@ -802,7 +763,11 @@ export class Unit extends GameObject {
         }
         // Make sure the unit is alive.
         if (this.health <= 0) {
-            return `${this} is fuel.`;
+            return `${this} is dead, probably fuel too.`;
+        }
+        // make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is dead and cannot do things from the afterlife.`;
         }
     }
 
