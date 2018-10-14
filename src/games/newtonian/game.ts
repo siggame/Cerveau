@@ -23,6 +23,11 @@ interface IRoom {
     DNorth: boolean; DEast: boolean; DSouth: boolean; DWest: boolean;
 }
 
+/*interface IConveyor {
+    x: number; y: number;
+    direction: Tile["direction"];
+}*/
+
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
@@ -268,7 +273,7 @@ export class NewtonianGame extends BaseClasses.Game {
         const spawnEnd = Math.floor(this.mapHeight * 0.304);
         // marks where the generator room in the spawn area ends.
         const genEnd = Math.floor(this.mapHeight * 0.653);
-        // marks how many tiles wide the spawn and generator are.
+        // marks how many tiles wide the spawn and generator are, as well as conveyors.
         const startEnd = Math.floor(this.mapWidth * 0.073);
         // used to track the maps mid-point.
         const mid = Math.floor(this.mapHeight / 2);
@@ -315,21 +320,19 @@ export class NewtonianGame extends BaseClasses.Game {
             x: number;
             y: number;
             direction: Tile["direction"];
-        }> = [
-            { x: 1, y: 20, direction: "east" },
-            { x: 2, y: 20, direction: "east" },
-            { x: 3, y: 20, direction: "east" },
-            { x: 4, y: 20, direction: "north" },
-            { x: 4, y: 19, direction: "north" },
-            { x: 4, y: 18, direction: "north" },
-            { x: 4, y: 17, direction: "west" },
-            { x: 3, y: 17, direction: "west" },
-            { x: 2, y: 17, direction: "west" },
-            { x: 1, y: 17, direction: "blank" },
-        ];
+        }> = [];
+        for (let x = 1; x < startEnd - 1; x++) {
+            conveyors.push({x, y: this.mapHeight - 3, direction: "east"});
+        }
+        for (let y = this.mapHeight - 3; y > genEnd + 2; y--) {
+            conveyors.push({x: startEnd - 1, y, direction: "north"});
+        }
+        for (let x = startEnd - 1; x > 1; x--) {
+            conveyors.push({x, y: genEnd + 2, direction: "west"});
+        }
+        conveyors.push({x: 1, y: genEnd + 2, direction: "blank"});
         for (const { x, y, direction } of conveyors) {
             let tile = getMutableTile(x, y);
-
             tile.type = "conveyor";
             tile.direction = direction;
             this.players[0].conveyors.push(tile as Tile);
