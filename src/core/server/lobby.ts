@@ -1,6 +1,5 @@
 // internal imports
 import { PlayEvent } from "cadre-ts-utils/cadre";
-import { capitalize, difference, lowerFirst } from "lodash";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
@@ -14,6 +13,7 @@ import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
 import * as larkWebsocket from "lark-websocket";
+import { capitalize, difference, lowerFirst } from "lodash";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
