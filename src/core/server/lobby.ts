@@ -1,10 +1,10 @@
 // internal imports
 import { PlayEvent } from "cadre-ts-utils/cadre";
+import { capitalize, difference, lowerFirst } from "lodash";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
-import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
-         TypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
+import { getDirs, Immutable, isNil, UnknownObject } from "~/utils";
 import { BaseClient, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
@@ -44,7 +44,7 @@ export class Lobby {
     /**
      * Gets, and starts up the lobby singleton, if it has not started already.
      *
-     * @returns The Lobby singleton
+     * @returns The Lobby singleton.
      */
     public static getInstance(): Lobby { // tslint:disable-line:function-name
         if (!Lobby.instance) {
@@ -61,7 +61,7 @@ export class Lobby {
     public readonly gamesInitializedPromise: Promise<void>;
 
     /** All the namespaces for games we can play, indexed by gameName. */
-    public readonly gameNamespaces: TypedObject<IBaseGameNamespace> = {};
+    public readonly gameNamespaces = new Map<string, Immutable<IBaseGameNamespace>>();
 
     /** The logger instance that manages game logs. */
     public readonly gamelogManager = new GamelogManager();
@@ -99,6 +99,7 @@ export class Lobby {
      */
     private constructor() {
         this.gamesInitializedPromise = new Promise<void>(async (resolve) => {
+            // Purposely wait for games to initialize before listeners
             await this.initializeGames();
 
             await Promise.all([ // so they can initialize asynchronously
@@ -178,10 +179,10 @@ export class Lobby {
      * @param gameAlias - an alias for the game you want
      * @returns the game class constructor, if found
      */
-    public getGameNamespace(gameAlias: string): IBaseGameNamespace | undefined {
+    public getGameNamespace(gameAlias: string): Immutable<IBaseGameNamespace> | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
         if (gameName) {
-            return this.gameNamespaces[gameName];
+            return this.gameNamespaces.get(gameName);
         }
     }
 
@@ -195,7 +196,7 @@ export class Lobby {
     public setup(data: {
         gameAlias: string;
         session: string;
-        gameSettings: Readonly<UnknownObject>;
+        gameSettings: Immutable<UnknownObject>;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -341,12 +342,12 @@ There's probably another Cerveau server running on this same computer.`);
         let dirs = await getDirs(GAMES_DIR);
 
         if (Config.GAME_NAMES_TO_LOAD.length > 0) {
-            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(unCapitalizeFirstLetter);
+            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(lowerFirst);
 
-            const unknownGameNames = getMinusArray(gameDirs, dirs);
+            const unknownGameNames = difference(gameDirs, dirs);
             if (unknownGameNames.length > 0) {
                 throw new Error(`Cannot find directories to load for the selected games: ${
-                    unknownGameNames.map((name) => `"${capitalizeFirstLetter(name)}"`).join(", ")
+                    unknownGameNames.map((name) => `"${capitalize(name)}"`).join(", ")
                 }`);
             }
 
@@ -355,13 +356,13 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         for (const dir of dirs) {
-            let gameNamespace: IBaseGameNamespace | undefined;
+            let gameNamespace: Immutable<IBaseGameNamespace> | undefined;
             try {
                 const data = await import(GAMES_DIR + dir) as IGamesExport;
                 gameNamespace = data.Namespace;
             }
             catch (err) {
-                const errorGameName = capitalizeFirstLetter(dir);
+                const errorGameName = capitalize(dir);
                 throw new Error(`⚠️ Could not load game ${errorGameName} ⚠️
 ---
 ${err}`);
@@ -375,7 +376,7 @@ ${err}`);
                 this.gameAliasToName.set(alias.toLowerCase(), gameName);
             }
 
-            this.gameNamespaces[gameName] = gameNamespace;
+            this.gameNamespaces.set(gameName, gameNamespace);
 
             this.rooms.set(gameName, new Map());
             this.roomsPlaying.set(gameName, new Map());
@@ -483,7 +484,7 @@ ${err}`);
      */
     private async clientSentPlay(
         client: BaseClient,
-        data: Readonly<PlayEvent["data"]>,
+        data: Immutable<PlayEvent["data"]>,
     ): Promise<void> {
         const playData = this.validatePlayData(data);
 
@@ -498,8 +499,8 @@ ${err}`);
         try {
             authenticationError = await this.authenticate(
                 playData.gameName,
-                playData.playerName,
-                playData.password,
+                playData.playerName || "",
+                playData.password || "",
             );
         }
         catch (error) {
@@ -512,7 +513,7 @@ ${err}`);
             return;
         }
 
-        const room = this.getOrCreateRoom(data.gameName, data.requestedSession);
+        const room = this.getOrCreateRoom(data.gameName, data.requestedSession || undefined);
 
         if (typeof room === "string") {
             client.disconnect(room);
@@ -534,9 +535,9 @@ ${err}`);
         }
 
         client.setInfo({
-            name: playData.playerName,
+            name: playData.playerName || undefined,
             type: playData.clientType,
-            index: playData.playerIndex,
+            index: playData.playerIndex || undefined,
         });
 
         room.addClient(client);
@@ -754,9 +755,9 @@ Must be one string in the url parameters format.${footer}`;
                 // Tell all clients we are shutting down, and asynchronously
                 // wait for the socket to confirm the data was sent before
                 // proceeding.
-                await Promise.all([...this.clients].map((client) => {
-                    client.disconnect("Sorry, the server is shutting down.");
-                }));
+                await Promise.all([...this.clients].map((client) => (
+                    client.disconnect("Sorry, the server is shutting down.")
+                )));
             }
             catch (rejection) {
                 // We don't care.

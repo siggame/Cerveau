@@ -5,7 +5,7 @@ import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
 import { BaseAIManager, BasePlayer } from "~/core/game/";
 import { logger } from "~/core/logger";
-import { isObject, Json, objectHasProperty } from "~/utils";
+import { Immutable, isObject, Json, objectHasProperty } from "~/utils";
 
 const DEFAULT_STR = "Unknown";
 
@@ -24,10 +24,10 @@ export class BaseClient {
 
     /** The events clients emit (send). */
     public readonly sent = events({
-        finished: new Event<ClientEvents.FinishedEvent["data"]>(),
-        run: new Event<ClientEvents.RunEvent["data"]>(),
-        play: new Event<ClientEvents.PlayEvent["data"]>(),
-        alias: new Event<ClientEvents.AliasEvent["data"]>(),
+        finished: new Event<Immutable<ClientEvents.FinishedEvent["data"]>>(),
+        run: new Event<Immutable<ClientEvents.RunEvent["data"]>>(),
+        play: new Event<Immutable<ClientEvents.PlayEvent["data"]>>(),
+        alias: new Event<Immutable<ClientEvents.AliasEvent["data"]>>(),
     });
 
     /** The name of this client. */
@@ -294,7 +294,7 @@ export class BaseClient {
      * @param event - The event to send. Must be an expected server event.
      * @returns After the data is sent.
      */
-    public async send(event: ServerEvent): Promise<void> {
+    public async send(event: Immutable<ServerEvent>): Promise<void> {
         // event.epoch = Number(new Date()); -- Disabled for now
         return this.sendRaw(JSON.stringify(event));
     }

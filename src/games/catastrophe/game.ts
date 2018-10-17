@@ -11,7 +11,6 @@ import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 import { arrayHasElements, Mutable, removeElements } from "~/utils";
-import { JobTitle } from "./job";
 import { jobStats } from "./jobs-stats";
 import { StructureType } from "./structure";
 
@@ -196,7 +195,7 @@ export class CatastropheGame extends BaseClasses.Game {
             const stats = jobStats[title];
             this.jobs.push(
                 this.manager.create.job({
-                    title: title as JobTitle,
+                    title: title as Job["title"],
                     ...stats,
                 }),
             );

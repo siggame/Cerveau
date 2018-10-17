@@ -1,5 +1,5 @@
 import * as random from "seedrandom";
-import { NonEmptyArray, shuffle } from "~/utils";
+import { Immutable, NonEmptyArray, shuffle } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {
@@ -141,7 +141,7 @@ export class RandomNumberGenerator {
      *
      * const chosen: string = rng.fromWeights(map);
      */
-    public fromWeights<T>(map: Map<T, number>): T {
+    public fromWeights<T>(map: Immutable<Map<T, number>>): T {
         let sum = 0;
         for (const num of map.values()) {
             sum += num;
@@ -152,7 +152,7 @@ export class RandomNumberGenerator {
         for (const [item, weight] of map) {
             upTo += weight;
             if (upTo >= choice) {
-                return item;
+                return item as T; // They can mutate the item, we don't care.
             }
         }
 

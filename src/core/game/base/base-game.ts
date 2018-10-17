@@ -1,6 +1,7 @@
 import { Event } from "ts-typed-events";
 import { BasePlayingClient } from "~/core/clients";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
+import { Immutable } from "~/utils";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
 import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";
@@ -12,11 +13,11 @@ import { BasePlayer, IBasePlayerData } from "./base-player";
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
     sessionID: string;
-    playingClients: ReadonlyArray<BasePlayingClient>;
+    playingClients: Readonly<BasePlayingClient[]>; // clients will mutate
     rootDeltaMergeable: DeltaMergeable;
-    playerIDs: ReadonlyArray<string>;
-    namespace: Readonly<IBaseGameNamespace>;
-    schema: Readonly<IBaseGameObjectSchema>;
+    playerIDs: Immutable<string[]>;
+    namespace: Immutable<IBaseGameNamespace>;
+    schema: Immutable<IBaseGameObjectSchema>;
     manager: BaseGameManager;
     gameCreated: Event<{
         game: BaseGame;
@@ -60,7 +61,10 @@ export class BaseGame extends BaseGameDeltaMergeables {
      * @param settingsManager - The settings manager for this instance.
      * @param requiredData - The required initialization data.
      */
-    constructor(protected settingsManager: BaseGameSettingsManager, requiredData: IBaseGameRequiredData) {
+    constructor(
+        protected settingsManager: BaseGameSettingsManager,
+        requiredData: Readonly<IBaseGameRequiredData>, // not Immutable, as some of the values will mutate
+    ) {
         super({
             key: "game",
             parent: requiredData.rootDeltaMergeable,

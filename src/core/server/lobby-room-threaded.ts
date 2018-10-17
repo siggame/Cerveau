@@ -3,6 +3,7 @@ import * as cluster from "cluster";
 import * as path from "path";
 import { events } from "ts-typed-events";
 import { Config } from "~/core";
+import { Immutable } from "~/utils";
 import { Room } from "./lobby-room";
 import { IWorkerGameSessionData, MessageFromMainThread } from "./worker";
 
@@ -113,7 +114,7 @@ export class ThreadedRoom extends Room {
      * @param gamelog - The gamelog sent from the session.
      * @returns A promise that resolves once we've cleaned up.
      */
-    protected async cleanUp(gamelog: Readonly<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog: Immutable<IGamelog>): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
         await super.cleanUp(gamelog);
     }

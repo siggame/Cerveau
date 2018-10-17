@@ -2,7 +2,7 @@ import { Event, Signal } from "ts-typed-events";
 import { BasePlayingClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
-import { Mutable, UnknownObject } from "~/utils";
+import { Immutable, Mutable, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
@@ -67,7 +67,7 @@ export class BaseGameManager {
      * @param gameOverCallback - A callback to invoke once the game is over.
      */
     constructor(
-        private readonly namespace: Readonly<IBaseGameNamespace>,
+        private readonly namespace: Immutable<IBaseGameNamespace>,
         settingsManager: BaseGameSettingsManager,
         playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,

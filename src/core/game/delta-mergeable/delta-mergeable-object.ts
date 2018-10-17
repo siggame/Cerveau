@@ -2,7 +2,7 @@
 // ^ as DeltaMergeables are black magic anyways
 
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { TypedObject, UnknownObject } from "~/utils";
+import { Immutable, TypedObject, UnknownObject } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
 
@@ -15,8 +15,8 @@ export function createObject(args: Readonly<{
     key: string;
     initialValue?: any;
     parent?: DeltaMergeable;
-    childTypes?: Readonly<TypedObject<ISanitizableType>>;
-    childType?: Readonly<ISanitizableType>;
+    childTypes?: Immutable<TypedObject<ISanitizableType>>;
+    childType?: Immutable<ISanitizableType>;
     transform?: DeltaTransform<object>;
 }>): DeltaMergeable<UnknownObject> {
     const deltaMergeables: TypedObject<DeltaMergeable> = {};

@@ -1,5 +1,6 @@
 import { Event } from "ts-typed-events";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
+import { Immutable } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";
@@ -15,7 +16,7 @@ export function createGameObject<T extends BaseGameObject>(args: Readonly<{
     GameObjectClass: typeof BaseGameObject;
     gameObjectName: string;
     gameObjectsDeltaMergeable: DeltaMergeable;
-    gameNamespace: Readonly<IBaseGameNamespace>;
+    gameNamespace: Immutable<IBaseGameNamespace>;
     data: Readonly<IBaseGameObjectData>;
 }>): T {
     const schema = args.gameNamespace.gameObjectsSchema[args.gameObjectName];
@@ -49,12 +50,12 @@ export class BaseGameObjectFactory {
      * @param gameCreated - An event that will emit once that game is created.
      */
     constructor(
-        private readonly namespace: IBaseGameNamespace,
+        private readonly namespace: Immutable<IBaseGameNamespace>,
         private readonly generateID: () => string,
-        gameCreated: Event<{
+        gameCreated: Event<Readonly<{
             game: BaseGame;
             gameObjectsDeltaMergeable: DeltaMergeable;
-        }>,
+        }>>,
     ) {
         gameCreated.once(({game, gameObjectsDeltaMergeable}) => {
             this.game = game;
@@ -73,7 +74,7 @@ export class BaseGameObjectFactory {
     protected createGameObject<T extends BaseGameObject>(
         gameObjectName: string,
         GameObjectClass: typeof BaseGameObject,
-        data: Readonly<IBaseGameObjectData>,
+        data: Immutable<IBaseGameObjectData>,
     ): T {
         return createGameObject({
             id: this.generateID(),

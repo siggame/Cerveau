@@ -1,5 +1,5 @@
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { Constructor, TypedObject } from "~/utils";
+import { Constructor, Immutable, TypedObject } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
 import { BaseGameManager } from "./base-game-manager";
@@ -48,7 +48,9 @@ export interface IBaseGameNamespace {
  * @param namespace - The base game namespace to use. Will be mutated.
  * @returns The same game namespace ready to be used to play games with.
  */
-export function makeNamespace(namespace: IBaseGameNamespace): Readonly<IBaseGameNamespace> {
+export function makeNamespace<T extends IBaseGameNamespace>(
+    namespace: Readonly<T>, // readonly as keys do not change, but their values do mutate a bit.
+): Immutable<T> { // do not mutate the returned namespaces
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
         if (!obj) {
             throw new Error(`unexpected non object in namespace ${namespace.gameName}`);
@@ -68,5 +70,5 @@ export function makeNamespace(namespace: IBaseGameNamespace): Readonly<IBaseGame
         }
     }
 
-    return Object.freeze(namespace);
+    return Object.freeze(namespace) as Immutable<T>;
 }

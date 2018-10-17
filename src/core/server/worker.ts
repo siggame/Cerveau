@@ -12,7 +12,7 @@ import * as Clients from "~/core/clients";
 import { Config } from "~/core/config";
 import { logger } from "~/core/logger";
 import { Session } from "~/core/server/session";
-import { UnknownObject } from "~/utils";
+import { Immutable, UnknownObject } from "~/utils";
 import { IGamesExport } from "./games-export";
 
 /**
@@ -63,7 +63,7 @@ const gameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
 process.on("message", (
-    message: Readonly<MessageFromMainThread>,
+    message: Immutable<MessageFromMainThread>,
     socket?: Socket,
 ) => {
     if (typeof message !== "object" || !message || !message.type) {

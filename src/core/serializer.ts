@@ -3,8 +3,8 @@
  * and from serialize-able objects when communicating between client <--> sever
  */
 
-import { isEmptyExceptFor, isObject,
-         mapToObject, TypedObject, UnknownObject } from "~/utils";
+import { Immutable, isEmptyExceptFor, isObject, mapToObject, TypedObject,
+         UnknownObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
@@ -60,7 +60,7 @@ type Serialized =
  * @returns True if the object is a game object reference
  */
 export function isGameObjectReference(
-    obj: Readonly<UnknownObject>,
+    obj: Immutable<UnknownObject>,
 ): obj is { id: string } {
     return isEmptyExceptFor(obj, "id");
 }

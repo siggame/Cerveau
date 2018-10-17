@@ -240,9 +240,7 @@ export function mixTurnBased<
                 );
 
                 if (!nextPlayer) {
-                    throw new Error(
-                        "Cannot find the next player for their turn!",
-                    );
+                    throw new Error("Cannot find the next player for their turn!");
                 }
 
                 this.game.currentPlayer = nextPlayer;

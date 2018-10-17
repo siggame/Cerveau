@@ -1,5 +1,6 @@
 import { BasePlayer, IBaseGameObjectSchema } from "~/core/game";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
+import { Immutable } from "~/utils";
 import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
@@ -18,7 +19,7 @@ export interface IBaseGameObjectRequiredData {
     gameObjectName: string;
     gameObjectsDeltaMergeable: DeltaMergeable;
     game: BaseGame;
-    schema: Readonly<IBaseGameObjectSchema>;
+    schema: Immutable<IBaseGameObjectSchema>;
 }
 
 /**
@@ -52,7 +53,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * the game, and set default values for the sub class.
      */
     constructor(
-        data: Readonly<IBaseGameObjectData>,
+        data: Immutable<IBaseGameObjectData>,
         requiredData: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super({

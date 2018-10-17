@@ -1,4 +1,4 @@
-import { IDelta } from "cadre-ts-utils/cadre";
+import { Delta } from "cadre-ts-utils/cadre";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, BaseGameObject } from "~/core/game";
 import { isObject, objectHasProperty, UnknownObject } from "~/utils";
@@ -10,7 +10,7 @@ export class DeltaManager {
     public readonly rootDeltaMergeable: DeltaMergeable;
 
     /** The current delta state we are building. */
-    private delta: IDelta["game"] = {};
+    private delta: Delta["game"] = {};
 
     /** Manages delta states on behalf of a game */
     constructor() {
@@ -34,7 +34,7 @@ export class DeltaManager {
      * @returns - The delta formatted object representing the true delta
      * state of the game, with nothing hidden.
      */
-    public dump(): IDelta["game"] {
+    public dump(): Delta["game"] {
         const state = this.delta;
         this.delta = {};
 

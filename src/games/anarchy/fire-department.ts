@@ -5,7 +5,7 @@ import { Building } from "./building";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { clamp } from "~/utils";
+import { clamp } from "lodash";
 // <<-- /Creer-Merge: imports -->>
 
 /**
