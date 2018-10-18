@@ -233,7 +233,7 @@ export class NewtonianGame extends BaseClasses.Game {
 
             this.manager.create.job({
                 title: "manager",
-                carryLimit: 0,
+                carryLimit: 3,
                 damage: 4,
                 health: 16,
                 moves: 5,
