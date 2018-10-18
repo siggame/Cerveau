@@ -2,7 +2,7 @@
 // ^ as DeltaMergeables are black magic anyways
 
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { Immutable, TypedObject, UnknownObject } from "~/utils";
+import { Immutable, objectHasProperty, TypedObject, UnknownObject } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
 
@@ -52,11 +52,11 @@ export function createObject(args: Readonly<{
                 // then we need to create this new child we've never seen before
 
                 let type: ISanitizableType | undefined;
-                if (args.childTypes && Object.prototype.hasOwnProperty.call(args.childTypes, property)) {
+                if (args.childTypes && objectHasProperty(args.childTypes, property)) {
                     type = args.childTypes[property] as ISanitizableType;
                 }
                 else if (args.childType) {
-                    type = args.childType as ISanitizableType;
+                    type = args.childType;
                 }
 
                 if (!type) {

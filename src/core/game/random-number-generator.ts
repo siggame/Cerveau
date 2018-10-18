@@ -152,7 +152,7 @@ export class RandomNumberGenerator {
         for (const [item, weight] of map) {
             upTo += weight;
             if (upTo >= choice) {
-                return item as T; // They can mutate the item, we don't care.
+                return item; // They can mutate the item, we don't care.
             }
         }
 

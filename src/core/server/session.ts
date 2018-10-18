@@ -1,5 +1,4 @@
-import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta,
-       } from "cadre-ts-utils/cadre";
+import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "cadre-ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
@@ -15,8 +14,7 @@ import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
-import { filenameFor, getURL, getVisualizerURL,
-       } from "~/core/game/gamelog/gamelog-utils";
+import { filenameFor, getURL, getVisualizerURL } from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/logger";
 import { Immutable, isObjectEmpty, momentString } from "~/utils";
 
