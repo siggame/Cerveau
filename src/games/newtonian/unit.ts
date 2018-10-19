@@ -369,9 +369,13 @@ export class Unit extends GameObject {
         }
         tile.unit.health = tile.unit.health - this.job.damage;
         if (tile.unit.health <= 0) {
+           /*  tile.blueium += tile.unit.blueium;
+            tile.redium += tile.unit.redium;
+            tile.blueiumOre += tile.unit.blueiumOre;
+            tile.rediumOre += tile.unit.rediumOre; */
             tile.unit.health = 0; // set unit's health to zero.
+            tile.unit.tile = undefined; // unlink dead unit.
             tile.unit = undefined; // Unlink tile.
-            this.tile = undefined; // and dead unit.
         }
         this.acted = true; // unit has acted
 
@@ -630,18 +634,30 @@ export class Unit extends GameObject {
         switch (material) {
             case "redium ore": {
                 totalMaterialOnTile = tile.rediumOre;
+                if (this.job.title === "manager") {
+                    return `${this} cannot pick up ore!`;
+                }
                 break;
             }
             case "redium": {
                 totalMaterialOnTile = tile.redium;
+                if (this.job.title === "intern") {
+                    return `${this} cannot pick up refined ore!`;
+                }
                 break;
             }
             case "blueium": {
                 totalMaterialOnTile = tile.blueium;
+                if (this.job.title === "intern") {
+                    return `${this} cannot pick up refined ore!`;
+                }
                 break;
             }
             case "blueium ore": {
                 totalMaterialOnTile = tile.blueiumOre;
+                if (this.job.title === "manager") {
+                    return `${this} cannot pick up ore!`;
+                }
             }
         }
 
