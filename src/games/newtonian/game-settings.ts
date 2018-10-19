@@ -29,13 +29,13 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         internCap: {
             description: "The maximum number of interns a player can have.",
             // <<-- Creer-Merge: internCap -->>
-            default: 5,
+            default: 4,
             // <<-- /Creer-Merge: internCap -->>
         },
         managerCap: {
             description: "The maximum number of managers a player can have.",
             // <<-- Creer-Merge: managerCap -->>
-            default: 3,
+            default: 4,
             // <<-- /Creer-Merge: managerCap -->>
         },
         materialSpawn: {
@@ -47,7 +47,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         physicistCap: {
             description: "The maximum number of physicists a player can have.",
             // <<-- Creer-Merge: physicistCap -->>
-            default: 3,
+            default: 4,
             // <<-- /Creer-Merge: physicistCap -->>
         },
         refinedValue: {

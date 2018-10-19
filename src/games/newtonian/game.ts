@@ -233,7 +233,7 @@ export class NewtonianGame extends BaseClasses.Game {
 
             this.manager.create.job({
                 title: "manager",
-                carryLimit: 0,
+                carryLimit: 3,
                 damage: 4,
                 health: 16,
                 moves: 5,
@@ -446,9 +446,9 @@ export class NewtonianGame extends BaseClasses.Game {
         }
         // generate Side area
         this.roomCalc(RMstart + 1, MMstart - 1, 1,
-                      this.mapHeight - 2, getMutableTile,
-                      false, true, false, true,
-                      Math.min((this.mapHeight * this.mapWidth) / 790));
+                        this.mapHeight - 2, getMutableTile,
+                        false, true, false, true,
+                        Math.min((this.mapHeight * this.mapWidth) / 790));
         // mirror map
         // iterate over every tile from the created half.
         for (let y = 0; y < this.mapHeight; y++) {
