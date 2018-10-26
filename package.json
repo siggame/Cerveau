@@ -73,7 +73,8 @@
     "rebuild": "npm run clean && npm run build",
     "link:symbolic": "shx ln -s ./src/web/styles dist/web/styles && shx ln -s ./src/web/views dist/web/views",
     "link:copy": "shx cp -R ./src/web/styles dist/web/styles && shx cp -R ./src/web/views dist/web/views",
-    "apidoc": "apidoc -i ./src/web/routes/ -o ./api-docs",
+    "docs": "npm run docs:api",
+    "docs:api": "apidoc -i ./src/web/routes/ -o ./docs",
     "lint": "tslint --config tslint.json --project tsconfig.json",
     "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix --force"
   },
