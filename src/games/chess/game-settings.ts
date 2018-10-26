@@ -83,10 +83,7 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
         // <<-- Creer-Merge: invalidate -->>
 
         if (settings.fen && settings.pgn) {
-            return new Error(
-                "Cannot set FEN and PGN at the same time. "
-              + "Use only one for an initial board state.",
-            );
+            return new Error("Cannot set FEN and PGN at the same time. Use only one for an initial board state.");
         }
 
         if (settings.fen) {

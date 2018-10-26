@@ -1,11 +1,13 @@
 // Put constant values here to be sent to clients,
 // they will not be able to be changed thanks to Object.freeze
 
+import { IDeltaMergeConstants } from "cadre-ts-utils/cadre";
+
 /**
  * These constants will be sent to clients.
  * (hence shared between the server here and clients)
  */
-export const SHARED_CONSTANTS = Object.freeze({
+export const SHARED_CONSTANTS = Object.freeze<IDeltaMergeConstants>({
     /**
      * Special symbol that indicates a delta's key was removed when this value
      * is present.

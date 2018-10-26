@@ -1,8 +1,8 @@
+import { IGamelog } from "cadre-ts-utils/cadre";
 import { basename } from "path";
 import * as sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";
-import { IGamelog } from "~/core/game";
-import { momentString } from "~/utils";
+import { Immutable, momentString } from "~/utils";
 
 /** The extension for gamelog files */
 export const GAMELOG_EXTENSION = ".json.gz";
@@ -62,7 +62,7 @@ export function getURL(
  * @returns - Undefined if no visualizer set, url to the gamelog in visualizer otherwise
  */
 export function getVisualizerURL(
-    gamelogOrFilename: Readonly<IGamelog> | string,
+    gamelogOrFilename: Immutable<IGamelog> | string,
     visualizerURL?: string,
 ): string | undefined {
     const vis = Config.VISUALIZER_URL;

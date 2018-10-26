@@ -1,3 +1,4 @@
+import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "cadre-ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
@@ -12,14 +13,10 @@ import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
 import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
-import { IDelta, IFinishedDeltaData, IGamelog,
-         IOrderedDeltaData, IRanDeltaData,
-       } from "~/core/game/gamelog/gamelog-interfaces";
 import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
-import { filenameFor, getURL, getVisualizerURL,
-       } from "~/core/game/gamelog/gamelog-utils";
+import { filenameFor, getURL, getVisualizerURL } from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/logger";
-import { isObjectEmpty, momentString } from "~/utils";
+import { Immutable, isObjectEmpty, momentString } from "~/utils";
 
 let profiler: Profiler | undefined;
 import("v8-profiler")
@@ -52,12 +49,12 @@ export class Session {
         gameOver: new Signal(),
 
         /** Emitted once this session is over and we can be deleted. */
-        ended: new Event<Error | IGamelog>(),
+        ended: new Event<Error | Immutable<IGamelog>>(),
 
         // -- Events proxies through from AIs in our game -- \\
-        aiOrdered: new Event<IOrderedDeltaData>(),
-        aiRan: new Event<IRanDeltaData>(),
-        aiFinished: new Event<IFinishedDeltaData>(),
+        aiOrdered: new Event<Immutable<IOrderDelta["data"]>>(),
+        aiRan: new Event<Immutable<IRanDelta["data"]>>(),
+        aiFinished: new Event<Immutable<IFinishedDelta["data"]>>(),
     });
 
     /** The session ID. */
@@ -81,7 +78,7 @@ export class Session {
     private readonly gameManager: BaseGameManager;
 
     /** The namespace of the game we are running. */
-    private readonly gameNamespace: Readonly<IBaseGameNamespace>;
+    private readonly gameNamespace: Immutable<IBaseGameNamespace>;
 
     /** The game we are running. The GameManager actually creates it. */
     private readonly game: BaseGame;
@@ -99,7 +96,7 @@ export class Session {
      */
     constructor(args: {
         id: string;
-        gameNamespace: Readonly<IBaseGameNamespace>;
+        gameNamespace: Immutable<IBaseGameNamespace>;
         gameSettingsManager: BaseGameSettingsManager;
         clients: ReadonlyArray<BaseClient>;
     }) {
@@ -172,8 +169,9 @@ export class Session {
         this.events.start.emit();
 
         for (const client of this.clients) {
-            client.send("start", {
-                playerID: client.player && client.player.id,
+            client.send({
+                event: "start",
+                data: { playerID: client.player && client.player.id },
             });
         }
 
@@ -304,16 +302,14 @@ ${fatal.message}`,
      * @param type - the type of delta that ocurred
      * @param [data] - any additional data about what caused the delta
      */
-    private readonly sendDeltas = (delta: Readonly<IDelta>) => {
+    private readonly sendDeltas = (delta: Immutable<Delta>) => {
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
-                if (client.sendMetaDeltas) {
-                    client.send("metaDelta", delta);
-                }
-                else {
-                    client.send("delta", delta.game);
-                }
+                client.send(client.sendMetaDeltas
+                    ? { event: "meta-delta", data: delta }
+                    : { event: "delta", data: delta.game },
+                );
             }
         }
 
@@ -344,7 +340,10 @@ ${visualizerURL}
 ---`;
 
         for (const client of this.clients) {
-            client.send("over", { gamelogURL, visualizerURL, message });
+            client.send({
+                event: "over",
+                data: { gamelogURL, visualizerURL, message },
+            });
         }
 
         this.end(gamelog);

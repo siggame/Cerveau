@@ -1,5 +1,5 @@
 import * as random from "seedrandom";
-import { ArrayWithOneOrMore, shuffle } from "~/utils";
+import { Immutable, NonEmptyArray, shuffle } from "~/utils";
 
 /** A simple class wrapper for generating random numbers */
 export class RandomNumberGenerator {
@@ -62,7 +62,7 @@ export class RandomNumberGenerator {
      * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.
      */
-    public element<T>(array: ArrayWithOneOrMore<T>): T;
+    public element<T>(array: NonEmptyArray<T>): T;
 
     /**
      * Selects a random element from an array using the PRNG.
@@ -78,7 +78,7 @@ export class RandomNumberGenerator {
      * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.
      */
-    public element<T>(array: ArrayWithOneOrMore<T>): T {
+    public element<T>(array: NonEmptyArray<T>): T {
         return array[Math.floor(this.float() * array.length)];
     }
 
@@ -91,7 +91,7 @@ export class RandomNumberGenerator {
      * The array is mutated if it contained elements, as the return value is
      * removed.
      */
-    public pop<T>(array: ArrayWithOneOrMore<T>): T;
+    public pop<T>(array: NonEmptyArray<T>): T;
 
     /**
      * Selects a random element from an array using the PRNG, and pops it
@@ -141,7 +141,7 @@ export class RandomNumberGenerator {
      *
      * const chosen: string = rng.fromWeights(map);
      */
-    public fromWeights<T>(map: Map<T, number>): T {
+    public fromWeights<T>(map: Immutable<Map<T, number>>): T {
         let sum = 0;
         for (const num of map.values()) {
             sum += num;
@@ -152,7 +152,7 @@ export class RandomNumberGenerator {
         for (const [item, weight] of map) {
             upTo += weight;
             if (upTo >= choice) {
-                return item;
+                return item; // They can mutate the item, we don't care.
             }
         }
 

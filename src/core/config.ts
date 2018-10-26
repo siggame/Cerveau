@@ -3,7 +3,7 @@
 import { ArgumentOptions, ArgumentParser } from "argparse";
 import { config } from "dotenv";
 import { IWorkerGameSessionData } from "~/core/server/worker";
-import { UnknownObject, unstringify } from "~/utils";
+import { Immutable, UnknownObject, unStringify } from "~/utils";
 
 /**
  * Set this to true while real life tournaments are on going and competitors
@@ -63,7 +63,7 @@ export interface IArgs {
     GAME_SETTINGS_ENABLED: boolean;
 
     /** The names of specific games to [try] to load, to speed up ts-node startup times */
-    GAME_NAMES_TO_LOAD: ReadonlyArray<string>;
+    GAME_NAMES_TO_LOAD: Immutable<string[]>;
 
     /** should existing gamelogs be loaded from the disk to the web interface/api */
     LOAD_EXISTING_GAMELOGS: boolean;
@@ -93,7 +93,7 @@ export interface IArgs {
     SESSION_TIMEOUTS_ENABLED: boolean;
 
     /** The config for worker threads, if this is a worker thread, undefined if master thread */
-    WORKER_DATA?: Readonly<IWorkerGameSessionData>;
+    WORKER_DATA?: Immutable<IWorkerGameSessionData>;
 }
 
 const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
@@ -201,7 +201,7 @@ for (const key of Object.keys(parsedArgs)) {
     // use the env value, otherwise use the command line value which will be the
     // default/cli value
     let value = commandLineValue === defaults[key] && envValue
-        ? unstringify(envValue)
+        ? unStringify(envValue)
         : commandLineValue;
 
     if (value === null) {
@@ -218,7 +218,7 @@ for (const key of Object.keys(parsedArgs)) {
                 .map((str) => str.trim()); // And trim each string of whitespace
     }
 
-    // tslint:disable-next-line:no-any no-unsafe-any
+    // tslint:disable-next-line:no-any no-unsafe-any - have to set for IArgs
     (args as any)[key] = value;
 }
 

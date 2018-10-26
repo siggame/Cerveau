@@ -25,9 +25,9 @@ export class WSClient extends BaseClient {
      * @returns The net socket used for WS communications.
      */
     public getNetSocket(): net.Socket {
-        // hackish, as we are grabbing a private socket out of the lark-websocket client, but works.
-        // tslint:disable-next-line:no-any no-unsafe-any
-        return (this.socket as any)._socket;
+        // hackish, as we are grabbing a private socket out of the
+        // lark-websocket client, but works.
+        return (this.socket as net.Socket & { _socket: net.Socket })._socket;
     }
 
     /**

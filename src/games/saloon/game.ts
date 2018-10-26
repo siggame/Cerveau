@@ -12,10 +12,10 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 
 import * as gaussian from "gaussian";
-import { MutableRequired } from "~/utils";
+import { Mutable } from "~/utils";
 
 /** A player that can mutate before the game starts */
-type MutablePlayer = MutableRequired<Player>;
+type MutablePlayer = Mutable<Player>;
 
 // <<-- /Creer-Merge: imports -->>
 

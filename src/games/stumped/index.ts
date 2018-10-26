@@ -9,7 +9,7 @@
 
 // base game classes
 import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, IBasePlayer,
+         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
          makeNamespace } from "~/core/game";
 
 // mixins
@@ -24,7 +24,7 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * must implement from mixed in game logic.
  */
 export interface IBaseStumpedPlayer extends
-    IBasePlayer,
+    BasePlayer,
     ITwoPlayerPlayer,
     ITurnBasedPlayer,
     ITiledPlayer {

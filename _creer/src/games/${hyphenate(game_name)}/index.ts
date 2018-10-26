@@ -9,7 +9,7 @@
 
 // base game classes
 ${shared['cerveau']['imports']({
-    "~/core/game": [ 'BaseAI', 'BaseGame', 'BaseGameManager', 'BaseGameObject', 'BaseGameObjectFactory', 'BaseGameSettingsManager', 'IBasePlayer', 'makeNamespace' ]
+    "~/core/game": [ 'BaseAI', 'BaseGame', 'BaseGameManager', 'BaseGameObject', 'BaseGameObjectFactory', 'BaseGameSettingsManager', 'BasePlayer', 'makeNamespace' ]
 })}
 // mixins<%
 

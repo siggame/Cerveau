@@ -10,13 +10,12 @@ import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, MutableRequired, removeElements } from "~/utils";
-import { JobTitle } from "./job";
+import { arrayHasElements, Mutable, removeElements } from "~/utils";
 import { jobStats } from "./jobs-stats";
 import { StructureType } from "./structure";
 
 /** A player that we can mutate before the game begins */
-type MutablePlayer = MutableRequired<Player>;
+type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -196,7 +195,7 @@ export class CatastropheGame extends BaseClasses.Game {
             const stats = jobStats[title];
             this.jobs.push(
                 this.manager.create.job({
-                    title: title as JobTitle,
+                    title: title as Job["title"],
                     ...stats,
                 }),
             );
