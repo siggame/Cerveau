@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import { events, Signal } from "ts-typed-events";
-import { httpRequest, safelyParseJSON } from "~/utils";
+import { httpRequest, isObject, safelyParseJSON } from "~/utils";
 import { logger } from "./logger";
 
 const UPDATE_INTERVAL = 1000; // 1 sec in ms
@@ -96,16 +96,23 @@ Updater shuting down.`;
         }
 
         // If we got here, we got the data from GitHub, and it parsed correctly
-        if (!githubData ||
-            !Array.isArray(githubData) ||
-            !githubData[0] || // tslint:disable-line:no-unsafe-any - isArray should be updated to unknown[]
-            !githubData[0].sha // tslint:disable-line:no-unsafe-any  ^
-        ) {
+        if (!githubData || !Array.isArray(githubData)) {
             return `GitHub data appears malformed.
 Updater shuting down.`;
         }
 
-        const headSHA = String(githubData[0].sha).toLowerCase().trim(); // tslint:disable-line:no-unsafe-any
+        const first = githubData && Array.isArray(githubData) && githubData[0];
+        if (!first) {
+            return `GitHub data appears malformed.
+Updater shuting down.`;
+        }
+
+        if (!isObject(first) || Array.isArray(first) || !first.sha) {
+            return `GitHub data appears malformed.
+Updater shuting down.`;
+        }
+
+        const headSHA = String(first.sha).toLowerCase().trim(); // tslint:disable-line:no-unsafe-any
 
         if (this.sha !== headSHA) {
             this.updateFound = true;

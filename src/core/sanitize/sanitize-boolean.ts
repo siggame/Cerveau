@@ -47,7 +47,7 @@ export function sanitizeBoolean(
         case "string":
             // we know this cast is safe, ts does not know how to follow
             // switch statements for type inferring ATM
-            const lowered = (b as string).toLowerCase();
+            const lowered = b.toLowerCase();
             if (lowered === "true") {
                 // They sent some form of "true" as a string,
                 // so make it the boolean true

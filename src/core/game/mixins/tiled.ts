@@ -3,8 +3,9 @@
 // tslint:disable:no-empty-interface
 // ^ because the some mixins have nothing to add
 
-import { BaseGameObject, IBasePlayer } from "~/core/game";
-import { IPoint, MutableRequired } from "~/utils";
+import { BaseGameObject, BaseGameObjectFactory, BasePlayer,
+       } from "~/core/game";
+import { IPoint, Mutable } from "~/utils";
 import * as Base from "./base";
 
 /** The possible directions a tile can be in */
@@ -15,7 +16,7 @@ const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] =
                        [ "North", "South", "East", "West" ];
 
 /** A player in a tile based game. */
-export interface ITiledPlayer extends IBasePlayer {}
+export interface ITiledPlayer extends BasePlayer {}
 
 /** A base tile for super tiles to extend */
 export abstract class BaseTile extends BaseGameObject {
@@ -122,7 +123,7 @@ export abstract class BaseTile extends BaseGameObject {
 }
 
 /** A tile that is mutable */
-type MutableBaseTile = MutableRequired<BaseTile>;
+type MutableBaseTile = Mutable<BaseTile>;
 
 /**
  * A game that has a grid based map of tiles. This handles creating that
@@ -198,10 +199,10 @@ export function mixTiled<
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
                     const i = x + y * this.mapWidth;
-                    // tslint:disable-next-line:no-any no-unsafe-any
-                    this.tiles[i] = (this.manager.create as any).tile({x, y});
-                    // any because we don't mix a new BaseGameObject Factory,
-                    // however all managers will have a Tile so no worries.
+                    this.tiles[i] = (this.manager.create as (BaseGameObjectFactory & {
+                        // All Tiled games should have this method
+                        tile(args: { x: number; y: number }): BaseTile;
+                    })).tile({x, y});
                 }
             }
 

@@ -1,10 +1,10 @@
 // internal imports
+import { PlayEvent } from "cadre-ts-utils/cadre";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
-import { capitalizeFirstLetter, getDirs, getMinusArray, isNil,
-         ITypedObject, unCapitalizeFirstLetter, UnknownObject } from "~/utils";
-import { BaseClient, IPlayData, TCPClient, WSClient } from "../clients";
+import { getDirs, Immutable, isNil, UnknownObject } from "~/utils";
+import { BaseClient, TCPClient, WSClient } from "../clients";
 import { GamelogManager, IBaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
@@ -12,13 +12,16 @@ import { SerialRoom } from "./lobby-room-serial";
 import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
-import * as ws from "lark-websocket";
+import * as larkWebsocket from "lark-websocket";
+import { capitalize, difference, lowerFirst } from "lodash";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
 import * as readline from "readline";
 import { sanitizeNumber } from "~/core/sanitize";
 import { IGamesExport } from "~/core/server/games-export";
+
+const ws = larkWebsocket as typeof net;
 
 const GAMES_DIR = join(__dirname, "../../games/");
 
@@ -28,19 +31,20 @@ const RoomClass: typeof Room = Config.SINGLE_THREADED
 
 /*
     Clients connect like this:
-    Lobby -> Room -> new thread -> Session
+    Lobby -> Room -> [new thread] -> Session
 */
 
 /**
  * The server that clients initially connect to before being moved to their
  * game lobby.
+ *
  * Basically creates and manages game sessions.
  */
 export class Lobby {
     /**
      * Gets, and starts up the lobby singleton, if it has not started already.
      *
-     * @returns The Lobby singleton
+     * @returns The Lobby singleton.
      */
     public static getInstance(): Lobby { // tslint:disable-line:function-name
         if (!Lobby.instance) {
@@ -57,7 +61,7 @@ export class Lobby {
     public readonly gamesInitializedPromise: Promise<void>;
 
     /** All the namespaces for games we can play, indexed by gameName. */
-    public readonly gameNamespaces: ITypedObject<IBaseGameNamespace> = {};
+    public readonly gameNamespaces = new Map<string, Immutable<IBaseGameNamespace>>();
 
     /** The logger instance that manages game logs. */
     public readonly gamelogManager = new GamelogManager();
@@ -94,25 +98,30 @@ export class Lobby {
      * There should only be 1 Lobby per program running at a time.
      */
     private constructor() {
-        this.gamesInitializedPromise = new Promise((resolve) => {
-            this.initializeGames().then(() => {
+        this.gamesInitializedPromise = new Promise<void>(async (resolve) => {
+            // Purposely wait for games to initialize before listeners
+            await this.initializeGames();
+
+            await Promise.all([ // so they can initialize asynchronously
                 this.initializeListener(
                     Config.TCP_PORT,
                     net.createServer,
                     TCPClient,
-                );
+                ),
                 this.initializeListener(
                     Config.WS_PORT,
-                    (ws as { createServer: typeof net.createServer }).createServer,
+                    ws.createServer,
                     WSClient,
-                );
+                ),
+            ]);
 
-                resolve();
-            }).catch((err) => {
-                logger.error("Fatal exception initializing games!");
-                logger.error(String(err));
-                process.exit(1); // kills the entire game server
-            });
+            logger.info("🎉 Everything is ready! 🎉");
+
+            resolve();
+        }).catch((err) => {
+            logger.error("Fatal exception initializing games!");
+            logger.error(String(err));
+            process.exit(1); // kills the entire game server
         });
 
         const rl = readline.createInterface({
@@ -170,10 +179,10 @@ export class Lobby {
      * @param gameAlias - an alias for the game you want
      * @returns the game class constructor, if found
      */
-    public getGameNamespace(gameAlias: string): IBaseGameNamespace | undefined {
+    public getGameNamespace(gameAlias: string): Immutable<IBaseGameNamespace> | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
         if (gameName) {
-            return this.gameNamespaces[gameName];
+            return this.gameNamespaces.get(gameName);
         }
     }
 
@@ -187,7 +196,7 @@ export class Lobby {
     public setup(data: {
         gameAlias: string;
         session: string;
-        gameSettings: Readonly<UnknownObject>;
+        gameSettings: Immutable<UnknownObject>;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -286,12 +295,13 @@ export class Lobby {
      * @param port - The port to listen on for this server.
      * @param createServer - The required module's createServer method.
      * @param clientClass - The class constructor for clients of this listener.
+     * @returns Once the listener is listening.
      */
     private initializeListener(
         port: number,
         createServer: (callback: (socket: net.Socket) => void) => net.Server,
         clientClass: typeof BaseClient,
-    ): void {
+    ): Promise<void> {
         const listener = createServer((socket) => {
             this.addSocket(socket, clientClass);
         });
@@ -299,9 +309,7 @@ export class Lobby {
         // Place a ' ' (space) before the 'Client' part of the class name.
         const clientName = clientClass.name.replace(/(Client)/g, " $1");
 
-        listener.listen(port, "0.0.0.0", () => {
-            logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
-        });
+        this.listenerServers.push(listener);
 
         listener.on("error", (err: Error & { code: string }) => {
             logger.error(err.code !== "EADDRINUSE" // Very common error for devs
@@ -314,7 +322,13 @@ There's probably another Cerveau server running on this same computer.`);
             process.exit(1);
         });
 
-        this.listenerServers.push(listener);
+        return new Promise((resolve) => {
+            listener.listen(port, "0.0.0.0", () => {
+                logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
+
+                resolve();
+            });
+        });
     }
 
     /**
@@ -328,12 +342,12 @@ There's probably another Cerveau server running on this same computer.`);
         let dirs = await getDirs(GAMES_DIR);
 
         if (Config.GAME_NAMES_TO_LOAD.length > 0) {
-            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(unCapitalizeFirstLetter);
+            const gameDirs = Config.GAME_NAMES_TO_LOAD.map(lowerFirst);
 
-            const unknownGameNames = getMinusArray(gameDirs, dirs);
+            const unknownGameNames = difference(gameDirs, dirs);
             if (unknownGameNames.length > 0) {
                 throw new Error(`Cannot find directories to load for the selected games: ${
-                    unknownGameNames.map((name) => `"${capitalizeFirstLetter(name)}"`).join(", ")
+                    unknownGameNames.map((name) => `"${capitalize(name)}"`).join(", ")
                 }`);
             }
 
@@ -342,13 +356,13 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         for (const dir of dirs) {
-            let gameNamespace: IBaseGameNamespace | undefined;
+            let gameNamespace: Immutable<IBaseGameNamespace> | undefined;
             try {
                 const data = await import(GAMES_DIR + dir) as IGamesExport;
                 gameNamespace = data.Namespace;
             }
             catch (err) {
-                const errorGameName = capitalizeFirstLetter(dir);
+                const errorGameName = capitalize(dir);
                 throw new Error(`⚠️ Could not load game ${errorGameName} ⚠️
 ---
 ${err}`);
@@ -362,7 +376,7 @@ ${err}`);
                 this.gameAliasToName.set(alias.toLowerCase(), gameName);
             }
 
-            this.gameNamespaces[gameName] = gameNamespace;
+            this.gameNamespaces.set(gameName, gameNamespace);
 
             this.rooms.set(gameName, new Map());
             this.roomsPlaying.set(gameName, new Map());
@@ -470,7 +484,7 @@ ${err}`);
      */
     private async clientSentPlay(
         client: BaseClient,
-        data: Readonly<IPlayData>,
+        data: Immutable<PlayEvent["data"]>,
     ): Promise<void> {
         const playData = this.validatePlayData(data);
 
@@ -485,8 +499,8 @@ ${err}`);
         try {
             authenticationError = await this.authenticate(
                 playData.gameName,
-                playData.playerName,
-                playData.password,
+                playData.playerName || "",
+                playData.password || "",
             );
         }
         catch (error) {
@@ -499,7 +513,7 @@ ${err}`);
             return;
         }
 
-        const room = this.getOrCreateRoom(data.gameName, data.requestedSession);
+        const room = this.getOrCreateRoom(data.gameName, data.requestedSession || undefined);
 
         if (typeof room === "string") {
             client.disconnect(room);
@@ -521,9 +535,9 @@ ${err}`);
         }
 
         client.setInfo({
-            name: playData.playerName,
+            name: playData.playerName || undefined,
             type: playData.clientType,
-            index: playData.playerIndex,
+            index: playData.playerIndex || undefined,
         });
 
         room.addClient(client);
@@ -533,10 +547,13 @@ ${err}`);
             room.addGameSettings(playData.validGameSettings);
         }
 
-        client.send("lobbied", {
-            gameName: data.gameName,
-            gameSession: room.id,
-            constants: SHARED_CONSTANTS,
+        client.send({
+            event: "lobbied",
+            data: {
+                gameName: data.gameName,
+                gameSession: room.id,
+                constants: SHARED_CONSTANTS,
+            },
         });
 
         if (room.canStart()) {
@@ -596,8 +613,8 @@ ${err}`);
      * @returns - Human readable text why the data is not valid.
      */
     private validatePlayData(
-        data?: Readonly<IPlayData>,
-    ): string | (IPlayData & { validGameSettings: UnknownObject }) {
+        data?: Readonly<PlayEvent["data"]>,
+    ): string | (PlayEvent["data"] & { validGameSettings: UnknownObject }) {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -693,7 +710,7 @@ Must be one string in the url parameters format.${footer}`;
             return;
         }
 
-        client.send("named", gameName);
+        client.send({ event: "named", data: gameName });
     }
 
     /**
@@ -738,9 +755,9 @@ Must be one string in the url parameters format.${footer}`;
                 // Tell all clients we are shutting down, and asynchronously
                 // wait for the socket to confirm the data was sent before
                 // proceeding.
-                await Promise.all([...this.clients].map((client) => {
-                    client.disconnect("Sorry, the server is shutting down.");
-                }));
+                await Promise.all([...this.clients].map((client) => (
+                    client.disconnect("Sorry, the server is shutting down.")
+                )));
             }
             catch (rejection) {
                 // We don't care.

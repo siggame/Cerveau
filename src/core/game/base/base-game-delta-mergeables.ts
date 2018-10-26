@@ -3,7 +3,7 @@
 
 import { createDeltaMergeable, DeltaMergeable } from "~/core/game/delta-mergeable";
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
-import { ITypedObject, objectHasProperty, UnknownObject } from "~/utils";
+import { Immutable, objectHasProperty, TypedObject, UnknownObject } from "~/utils";
 
 /**
  * The base class all delta mergeable instances in (and of) the game inherit
@@ -19,9 +19,9 @@ export class BaseGameDeltaMergeables {
      */
     constructor(args: {
         key: string;
-        parent?: DeltaMergeable;
-        attributesSchema: Readonly<ITypedObject<ISanitizableType>>;
-        initialValues: Readonly<UnknownObject>;
+        parent?: DeltaMergeable; // will mutate as it gets a new child
+        attributesSchema: Immutable<TypedObject<ISanitizableType>>;
+        initialValues: Immutable<{[key: string]: unknown}>;
     }) {
         this.deltaMergeable = createDeltaMergeable({
             key: args.key,
@@ -42,8 +42,7 @@ export class BaseGameDeltaMergeables {
             }
 
             let initialValue = objectHasProperty(schema, "defaultValue")
-                // TODO: objectHasProperty should infer this
-                ? (schema as ISanitizableType & { defaultValue: unknown }).defaultValue
+                ? schema.defaultValue
                 : undefined;
 
             if (objectHasProperty(args.initialValues, key)) {

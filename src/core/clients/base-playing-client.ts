@@ -1,5 +1,5 @@
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
-import { IBasePlayer } from "~/core/game/base/base-player";
+import { BasePlayer } from "~/core/game/base/base-player";
 import { BaseClient } from "./base-client";
 
 /**
@@ -7,6 +7,6 @@ import { BaseClient } from "./base-client";
  */
 export type BasePlayingClient = BaseClient & {
     aiManager: BaseAIManager;
-    player: IBasePlayer;
+    player: BasePlayer;
     isSpectating: false;
 };

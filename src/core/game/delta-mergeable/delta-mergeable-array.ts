@@ -3,6 +3,7 @@
 
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { Immutable } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
 
@@ -46,7 +47,7 @@ class DeltaArray<T> extends Array<T> {
  */
 export function createArray<T = any>(args: {
     key: string;
-    childType: Readonly<ISanitizableType>;
+    childType: Immutable<ISanitizableType>;
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;

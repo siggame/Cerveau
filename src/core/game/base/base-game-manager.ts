@@ -2,17 +2,17 @@ import { Event, Signal } from "ts-typed-events";
 import { BasePlayingClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
-import { MutableRequired, UnknownObject } from "~/utils";
+import { Immutable, Mutable, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
-import { IBasePlayer } from "./base-player";
+import { BasePlayer } from "./base-player";
 
 /**
  * A game where we can mutate readonly properties in it, as we are THE MANAGER.
  */
-type MutableGame = MutableRequired<BaseGame>;
+type MutableGame = Mutable<BaseGame>;
 
 /**
  * the base game plugin new games should inherit from.
@@ -52,7 +52,7 @@ export class BaseGameManager {
     private nextGameObjectID = 0;
 
     /** Mapping of a player to their client. */
-    private playerToClient = new Map<IBasePlayer, BasePlayingClient>();
+    private playerToClient = new Map<BasePlayer, BasePlayingClient>();
 
     /**
      * Creates a new game manager, and in turn it's game. Should be done by
@@ -67,7 +67,7 @@ export class BaseGameManager {
      * @param gameOverCallback - A callback to invoke once the game is over.
      */
     constructor(
-        private readonly namespace: Readonly<IBaseGameNamespace>,
+        private readonly namespace: Immutable<IBaseGameNamespace>,
         settingsManager: BaseGameSettingsManager,
         playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,
@@ -85,7 +85,7 @@ export class BaseGameManager {
         this.random = new RandomNumberGenerator(settings.randomSeed);
 
         const invalidateRun = (
-            player: IBasePlayer,
+            player: BasePlayer,
             gameObject: BaseGameObject,
             functionName: string,
             args: Map<string, unknown>,
@@ -152,7 +152,7 @@ export class BaseGameManager {
      */
     public declareLoser(
         reason: string,
-        loser: IBasePlayer,
+        loser: BasePlayer,
     ): void {
         this.declareLosers(reason, loser);
     }
@@ -166,7 +166,7 @@ export class BaseGameManager {
      */
     public declareLosers(
         reason: string,
-        ...losers: IBasePlayer[]
+        ...losers: BasePlayer[]
     ): void {
         for (const player of losers) {
             this.setPlayerLost(player, reason);
@@ -182,7 +182,7 @@ export class BaseGameManager {
      */
     public declareWinner(
         reason: string,
-        winner: IBasePlayer,
+        winner: BasePlayer,
     ): void {
         this.declareWinners(reason, winner);
     }
@@ -196,7 +196,7 @@ export class BaseGameManager {
      */
     public declareWinners(
         reason: string,
-        ...winners: IBasePlayer[]
+        ...winners: BasePlayer[]
     ): void {
         for (const player of winners) {
             player.lost = false;
@@ -292,7 +292,7 @@ export class BaseGameManager {
      * @returns A string if the run is invalid, nothing if valid.
      */
     protected invalidateRun(
-        player: IBasePlayer,
+        player: BasePlayer,
         gameObject: BaseGameObject,
         functionName: string,
         args: Map<string, unknown>,
@@ -307,7 +307,7 @@ export class BaseGameManager {
      *
      * @param player - The player whose client disconnected.
      */
-    private playerDisconnected(player: IBasePlayer): void {
+    private playerDisconnected(player: BasePlayer): void {
         if (player && !this.isOver) {
             this.declareLoser("Disconnected during gameplay.", player);
 
@@ -353,7 +353,7 @@ export class BaseGameManager {
      * @param loser the loser
      * @param reason the reason they lost
      */
-    private setPlayerLost(loser: IBasePlayer, reason: string): void {
+    private setPlayerLost(loser: BasePlayer, reason: string): void {
         loser.lost = true;
         loser.reasonLost = reason;
         loser.won = false;
@@ -381,7 +381,7 @@ export class BaseGameManager {
      * @param player - The player to get the client for.
      * @returns A client, always.
      */
-    private unsafeGetClient(player: IBasePlayer): BasePlayingClient {
+    private unsafeGetClient(player: BasePlayer): BasePlayingClient {
         const client = this.playerToClient.get(player);
 
         if (!client) {

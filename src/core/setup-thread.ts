@@ -5,19 +5,21 @@
 import { readFileSync } from "fs";
 import { parse } from "json5";
 import { register } from "tsconfig-paths";
+import { Tsconfig } from "tsconfig-paths/lib/tsconfig-loader";
 
 /**
  * Sets up a thread and registers runtime TypeScript functions to easier
  * debugging.
  */
 export function setupThread(): void {
-    const tsconfig = parse(readFileSync("tsconfig.json").toString()) as {
-        compilerOptions: {
-            paths: {
-                [key: string]: string[];
-            };
-        };
-    };
+    // yes read in sync. We don't want async stuff running without having their
+    // tsconfig paths setup, or they will probably break.
+    const file = readFileSync("tsconfig.json");
+    const tsconfig = parse(file.toString()) as Tsconfig;
+
+    if (!tsconfig.compilerOptions || !tsconfig.compilerOptions.paths) {
+        throw new Error("Cannot setup thread as tsconfig has no paths!");
+    }
 
     register({
         baseUrl: "./",

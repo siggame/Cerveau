@@ -5,7 +5,8 @@ import { Nest } from "./nest";
 import { Spiderling } from "./spiderling";
 
 // <<-- Creer-Merge: imports -->>
-import { clamp, removeElementFrom } from "~/utils";
+import { clamp } from "lodash";
+import { removeElementFrom } from "~/utils";
 import { Cutter } from "./cutter";
 import { Spider } from "./spider";
 import { Weaver } from "./weaver";
