@@ -16,7 +16,7 @@ deploy:
   provider: pages
   skip-cleanup: true
   verbose: true
-  local-dir: api-docs/
+  local-dir: docs/
   github-token: $GH_TOKEN
   on:
     branch: master
