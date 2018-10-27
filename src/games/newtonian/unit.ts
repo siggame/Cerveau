@@ -369,10 +369,10 @@ export class Unit extends GameObject {
         }
         tile.unit.health = tile.unit.health - this.job.damage;
         if (tile.unit.health <= 0) {
-           /*  tile.blueium += tile.unit.blueium;
+            tile.blueium += tile.unit.blueium;
             tile.redium += tile.unit.redium;
             tile.blueiumOre += tile.unit.blueiumOre;
-            tile.rediumOre += tile.unit.rediumOre; */
+            tile.rediumOre += tile.unit.rediumOre;
             tile.unit.health = 0; // set unit's health to zero.
             tile.unit.tile = undefined; // unlink dead unit.
             tile.unit = undefined; // Unlink tile.
