@@ -124,14 +124,14 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         // Tiled settings
         mapWidth: {
             // <<-- Creer-Merge: map-width -->>
-            default: 69,
+            default: 59,
             // <<-- /Creer-Merge: map-width -->>
             min: 2,
             description: "The width (in Tiles) for the game map to be initialized to.",
         },
         mapHeight: {
             // <<-- Creer-Merge: map-height -->>
-            default: 23,
+            default: 33,
             // <<-- /Creer-Merge: map-height -->>
             min: 2,
             description: "The height (in Tiles) for the game map to be initialized to.",
