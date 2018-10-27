@@ -274,7 +274,7 @@ export class NewtonianGame extends BaseClasses.Game {
         // marks where the generator room in the spawn area ends.
         const genEnd = Math.floor(this.mapHeight * 0.653);
         // marks how many tiles wide the spawn and generator are, as well as conveyors.
-        const startEnd = Math.floor(this.mapWidth * 0.073);
+        const startEnd = Math.ceil(this.mapWidth * 0.073);
         // used to track the maps mid-point.
         const mid = Math.floor(this.mapHeight / 2);
         // iterates over the map and adds basic structure.
