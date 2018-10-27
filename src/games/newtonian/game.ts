@@ -348,9 +348,9 @@ export class NewtonianGame extends BaseClasses.Game {
             tile.direction = dir;
             this.players[1].conveyors.push(tile as Tile);
         }
-        // spawns one of each unit for each player.
-        for (let i = 0; i < 6; i++) {
-            this.spawnUnit(this.players[Math.floor(i / 3)], this.jobs[i % 3]);
+        // spawns one of each unit for the first player.
+        for (let i = 0; i < 3; i++) {
+            this.spawnUnit(this.players[0], this.jobs[i % 3]);
         }
         // sets up spawn times.
         for (let i = 0; i < 2; i++) {
@@ -498,6 +498,10 @@ export class NewtonianGame extends BaseClasses.Game {
                     this.players[1].generatorTiles.push(tile as Tile);
                 }
             }
+        }
+        // spawns one of each unit for the first player.
+        for (let i = 0; i < 3; i++) {
+            this.spawnUnit(this.players[1], this.jobs[i % 3]);
         }
     }
 
