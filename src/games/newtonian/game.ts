@@ -448,7 +448,7 @@ export class NewtonianGame extends BaseClasses.Game {
         this.roomCalc(RMstart + 1, MMstart - 1, 1,
                         this.mapHeight - 2, getMutableTile,
                         false, true, false, true,
-                        Math.min((this.mapHeight * this.mapWidth) / 790));
+                        Math.min((this.mapHeight * this.mapWidth) / 700));
         // mirror map
         // iterate over every tile from the created half.
         for (let y = 0; y < this.mapHeight; y++) {
