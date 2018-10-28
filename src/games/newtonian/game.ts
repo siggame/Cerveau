@@ -434,7 +434,6 @@ export class NewtonianGame extends BaseClasses.Game {
                               mid + midSize + shift + 3,
                               this.mapHeight - 2, getMutableTile,
                               true, true, false, false);
-                getMutableTile(4, 5).isWall = true;
             }
             else {
                 // generates the rooms.
@@ -553,8 +552,6 @@ export class NewtonianGame extends BaseClasses.Game {
         // determines the number of rooms on the y axis
         const mapH = Math.floor((y2 - y1 + 2) / 3);
         if (mapH === 0) {
-            getMutableTile(3, 4).isWall = true;
-
             return;
         }
         // map used for mapgen.
