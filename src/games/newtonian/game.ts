@@ -164,6 +164,10 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly victoryAmount!: number;
 
     // <<-- Creer-Merge: attributes -->>
+    /**
+     * This is a const used to modify the amount of walls that receive the decoration value of 1.
+     */
+    private readonly cubeConst: number = 20;
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
@@ -1175,6 +1179,8 @@ export class NewtonianGame extends BaseClasses.Game {
             }
         }*/
         // iterate through the rooms of the map.
+        let v: number = 0;
+        let w: number = 0;
         for (const rooms of map) {
             for (const room of rooms) {
                 // corners.
@@ -1212,74 +1218,107 @@ export class NewtonianGame extends BaseClasses.Game {
                 }
                 // if there is a wall to the north, draw it.
                 if (room.WNorth) {
+                    const rand = this.manager.random.int(this.cubeConst);
+                    const cube: boolean = map[v][w - 1] && rand <= 8 && ((!map[v][w - 1].WEast && !room.WEast) ||
+                                    (!map[v][w - 1].WWest && !room.WWest)) ? true : false;
                     // if the room is 3 wide.
                     this.drawWall(room.x1, room.y1 - 1, getMutableTile);
+                    getMutableTile(room.x1, room.y1 - 1).decoration = cube ? 1 : 0;
                     this.drawWall(room.x2, room.y1 - 1, getMutableTile);
+                    getMutableTile(room.x2, room.y1 - 1).decoration = cube ? 1 : 0;
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         this.drawWall(room.x3, room.y1 - 1, getMutableTile);
+                        getMutableTile(room.x3, room.y1 - 1).decoration = cube ? 1 : 0;
                     }
                 }
                 // if there is a wall to the east, draw it.
                 if (room.WEast) {
+                    const rand = this.manager.random.int(this.cubeConst);
+                    const cube: boolean = map[v + 1] && rand <= 8 && ((!map[v + 1][w].WNorth && !room.WNorth) ||
+                                        (!map[v + 1][w].WSouth && !room.WSouth)) ? true : false;
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x3 + 1, room.y1, getMutableTile);
+                        getMutableTile(room.x3 + 1, room.y1).decoration = cube ? 1 : 0;
                         this.drawWall(room.x3 + 1, room.y2, getMutableTile);
+                        getMutableTile(room.x3 + 1, room.y2).decoration = cube ? 1 : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
                             this.drawWall(room.x3 + 1, room.y3, getMutableTile);
+                            getMutableTile(room.x3 + 1, room.y3).decoration = cube ? 1 : 0;
                         }
                     }
                     // if the room is 2 wide.
                     else {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x2 + 1, room.y1, getMutableTile);
+                        getMutableTile(room.x2 + 1, room.y1).decoration = cube ? 1 : 0;
                         this.drawWall(room.x2 + 1, room.y2, getMutableTile);
+                        getMutableTile(room.x2 + 1, room.y2).decoration = cube ? 1 : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
                             this.drawWall(room.x2 + 1, room.y3, getMutableTile);
+                            getMutableTile(room.x2 + 1, room.y3).decoration = cube ? 1 : 0;
                         }
                     }
                 }
                 // if there is a wall to the south, drawn it.
                 if (room.WSouth) {
+                    const rand = this.manager.random.int(this.cubeConst);
+                    const cube: boolean = map[v][w + 1] && rand <= 8 && ((!map[v][w + 1].WEast && !room.WEast) ||
+                                        (!map[v][w + 1].WWest && !room.WWest)) ? true : false;
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1, room.y3 + 1, getMutableTile);
+                        getMutableTile(room.x1, room.y3 + 1).decoration = cube ? 1 : 0;
                         this.drawWall(room.x2, room.y3 + 1, getMutableTile);
+                        getMutableTile(room.x2, room.y3 + 1).decoration = cube ? 1 : 0;
                         // if the room is 3 wide.
                         if (room.x3 !== -1) {
                             this.drawWall(room.x3, room.y3 + 1, getMutableTile);
+                            getMutableTile(room.x3, room.y3 + 1).decoration = cube ? 1 : 0;
                         }
                         // if the room is 2 tall.
                     }
                     else {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1, room.y2 + 1, getMutableTile);
+                        getMutableTile(room.x1, room.y2 + 1).decoration = cube ? 1 : 0;
                         this.drawWall(room.x2, room.y2 + 1, getMutableTile);
+                        getMutableTile(room.x2, room.y2 + 1).decoration = cube ? 1 : 0;
                         // if the room is 3 wide.
                         if (room.x3 !== -1) {
                             this.drawWall(room.x3, room.y2 + 1, getMutableTile);
+                            getMutableTile(room.x3, room.y2 + 1).decoration = cube ? 1 : 0;
                         }
                     }
                 }
                 // if there is a wall to the west, draw it.
                 if (room.WWest) {
+                    const rand = this.manager.random.int(this.cubeConst);
+                    const cube: boolean = map[v - 1] && rand <= 8 && ((!map[v - 1][w].WNorth && !room.WNorth) ||
+                                        (!map[v - 1][w].WSouth && !room.WSouth)) ? true : false;
                     // place the wall as long as it doesn't cover up a door.
                     this.drawWall(room.x1 - 1, room.y1, getMutableTile);
+                    getMutableTile(room.x1 - 1, room.y1).decoration = cube ? 1 : 0;
                     this.drawWall(room.x1 - 1, room.y2, getMutableTile);
+                    getMutableTile(room.x1 - 1, room.y2).decoration = cube ? 1 : 0;
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1 - 1, room.y3, getMutableTile);
+                        getMutableTile(room.x1 - 1, room.y3).decoration = cube ? 1 : 0;
                     }
                 }
+                w++;
             }
+            v++;
+            w = 0;
         }
         // iterate over the map in order to draw rooms.
         for (let x = 0; x < map.length; x++) {
