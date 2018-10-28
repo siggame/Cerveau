@@ -1,4 +1,4 @@
-import { Delta } from "cadre-ts-utils/cadre";
+import { Delta } from "@cadre/ts-utils/cadre";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, BaseGameObject } from "~/core/game";
 import { isObject, objectHasProperty, UnknownObject } from "~/utils";

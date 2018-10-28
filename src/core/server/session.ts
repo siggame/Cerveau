@@ -1,4 +1,4 @@
-import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "cadre-ts-utils/cadre";
+import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "@cadre/ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";

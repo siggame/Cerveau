@@ -1,5 +1,4 @@
-import { IFinishedDelta, IGameObjectReference, IOrderDelta, IRanDelta,
-       } from "cadre-ts-utils/cadre";
+import { IFinishedDelta, IGameObjectReference, IOrderDelta, IRanDelta } from "@cadre/ts-utils/cadre";
 import { capitalize } from "lodash";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";

@@ -1,5 +1,5 @@
 import { Delta, IDisconnectDelta, IFinishedDelta, IGamelog, IOrderDelta,
-         IOverDelta, IRanDelta, IStartDelta } from "cadre-ts-utils/cadre";
+         IOverDelta, IRanDelta, IStartDelta } from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";

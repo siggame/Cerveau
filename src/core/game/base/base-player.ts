@@ -1,4 +1,4 @@
-import { IBasePlayer } from "cadre-ts-utils/cadre";
+import { IBasePlayer } from "@cadre/ts-utils/cadre";
 import { BaseAI } from "./base-ai";
 import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";
 

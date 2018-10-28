@@ -1,5 +1,5 @@
-import { ServerEvent } from "cadre-ts-utils/cadre";
-import * as ClientEvents from "cadre-ts-utils/cadre/events/client";
+import { ServerEvent } from "@cadre/ts-utils/cadre";
+import * as ClientEvents from "@cadre/ts-utils/cadre/events/client";
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";

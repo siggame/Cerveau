@@ -1,4 +1,4 @@
-import { IGamelog } from "cadre-ts-utils/cadre";
+import { IGamelog } from "@cadre/ts-utils/cadre";
 import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";

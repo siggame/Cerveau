@@ -1,4 +1,4 @@
-import { IGamelog } from "cadre-ts-utils/cadre";
+import { IGamelog } from "@cadre/ts-utils/cadre";
 import * as cluster from "cluster";
 import * as path from "path";
 import { events } from "ts-typed-events";

@@ -1,7 +1,7 @@
 // Put constant values here to be sent to clients,
 // they will not be able to be changed thanks to Object.freeze
 
-import { IDeltaMergeConstants } from "cadre-ts-utils/cadre";
+import { IDeltaMergeConstants } from "@cadre/ts-utils/cadre";
 
 /**
  * These constants will be sent to clients.

@@ -1,4 +1,4 @@
-import { IGamelog } from "cadre-ts-utils/cadre";
+import { IGamelog } from "@cadre/ts-utils/cadre";
 import { basename } from "path";
 import * as sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";

@@ -1,5 +1,5 @@
 // internal imports
-import { PlayEvent } from "cadre-ts-utils/cadre";
+import { PlayEvent } from "@cadre/ts-utils/cadre";
 import { Config } from "~/core/config";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";

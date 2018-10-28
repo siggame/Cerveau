@@ -1,4 +1,4 @@
-import { IGamelog, IGamelogWinnerLoser } from "cadre-ts-utils/cadre";
+import { IGamelog, IGamelogWinnerLoser } from "@cadre/ts-utils/cadre";
 import { events, Signal } from "ts-typed-events";
 import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
        } from "~/core/game";
