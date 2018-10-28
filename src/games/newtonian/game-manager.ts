@@ -363,6 +363,12 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     /** Updates all units */
     private updateUnits(): void {
         for (const unit of this.game.units) {
+            if (unit.stunTime > 0) {
+                unit.stunTime--;
+            }
+            if (unit.stunImmune > 0) {
+                unit.stunImmune--;
+            }
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
                 unit.moves = unit.job.moves;
