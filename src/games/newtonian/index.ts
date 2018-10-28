@@ -98,9 +98,9 @@ export interface IJobProperties {
     moves?: number;
 
     /**
-     * The Job title.
+     * The Job title. 'intern', 'manager', or 'physicist'.
      */
-    title?: string;
+    title?: "intern" | "manager" | "physicist";
 
 }
 
@@ -754,6 +754,8 @@ export const Namespace = makeNamespace({
                 },
                 title: {
                     typeName: "string",
+                    defaultValue: "intern",
+                    literals: ["intern", "manager", "physicist"],
                 },
             },
             functions: {

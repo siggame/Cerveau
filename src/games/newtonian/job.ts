@@ -7,6 +7,11 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The Job title. 'intern', 'manager', or 'physicist'.
+ */
+export type JobTitle = "intern" | "manager" | "physicist";
+
+/**
  * Information about a unit's job.
  */
 export class Job extends GameObject {
@@ -31,9 +36,9 @@ export class Job extends GameObject {
     public readonly moves!: number;
 
     /**
-     * The Job title.
+     * The Job title. 'intern', 'manager', or 'physicist'.
      */
-    public readonly title!: string;
+    public readonly title!: "intern" | "manager" | "physicist";
 
     // <<-- Creer-Merge: attributes -->>
 
