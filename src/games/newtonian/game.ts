@@ -165,7 +165,7 @@ export class NewtonianGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: attributes -->>
     /**
-     * This is a const used to modify the amount of walls that receive the decoration value of 1.
+     * This is a const used to modify the amount of walls that receive the decoration value of 1/2.
      */
     private readonly cubeConst: number = 20;
     // Any additional member attributes can go here
@@ -410,7 +410,7 @@ export class NewtonianGame extends BaseClasses.Game {
         if (shift !== -(Math.floor(this.mapHeight / 2) - midSize)) {
             // if it has the smallest possible space and still exist, hallway time.
             if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 2)) {
-                this.drawDoor(MMstart, 1, getMutableTile);
+                this.drawDoor(MMstart, 1, 2, getMutableTile);
             }
             // if there are 2 spaces.
             else if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 5)) {
@@ -430,7 +430,7 @@ export class NewtonianGame extends BaseClasses.Game {
         if (shift !== Math.floor(this.mapHeight / 2) + midSize) {
             // generate for smallest leftover area - make a hallway
             if (shift === Math.floor(this.mapHeight / 2) + midSize - 2) {
-                this.drawDoor(MMstart, 21, getMutableTile);
+                this.drawDoor(MMstart, 21, 2, getMutableTile);
             }
             // generate 2 tall area.
             else if (shift === Math.floor(this.mapHeight / 2) - midSize - 5) {
@@ -1241,28 +1241,28 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (room.x3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x3 + 1, room.y1, getMutableTile);
-                        getMutableTile(room.x3 + 1, room.y1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x3 + 1, room.y1).decoration = cube ? 2 : 0;
                         this.drawWall(room.x3 + 1, room.y2, getMutableTile);
-                        getMutableTile(room.x3 + 1, room.y2).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x3 + 1, room.y2).decoration = cube ? 2 : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
                             this.drawWall(room.x3 + 1, room.y3, getMutableTile);
-                            getMutableTile(room.x3 + 1, room.y3).decoration = cube ? 1 : 0;
+                            getMutableTile(room.x3 + 1, room.y3).decoration = cube ? 2 : 0;
                         }
                     }
                     // if the room is 2 wide.
                     else {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x2 + 1, room.y1, getMutableTile);
-                        getMutableTile(room.x2 + 1, room.y1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x2 + 1, room.y1).decoration = cube ? 2 : 0;
                         this.drawWall(room.x2 + 1, room.y2, getMutableTile);
-                        getMutableTile(room.x2 + 1, room.y2).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x2 + 1, room.y2).decoration = cube ? 2 : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
                             this.drawWall(room.x2 + 1, room.y3, getMutableTile);
-                            getMutableTile(room.x2 + 1, room.y3).decoration = cube ? 1 : 0;
+                            getMutableTile(room.x2 + 1, room.y3).decoration = cube ? 2 : 0;
                         }
                     }
                 }
@@ -1305,14 +1305,14 @@ export class NewtonianGame extends BaseClasses.Game {
                                         (!map[v - 1][w].WSouth && !room.WSouth)) ? true : false;
                     // place the wall as long as it doesn't cover up a door.
                     this.drawWall(room.x1 - 1, room.y1, getMutableTile);
-                    getMutableTile(room.x1 - 1, room.y1).decoration = cube ? 1 : 0;
+                    getMutableTile(room.x1 - 1, room.y1).decoration = cube ? 2 : 0;
                     this.drawWall(room.x1 - 1, room.y2, getMutableTile);
-                    getMutableTile(room.x1 - 1, room.y2).decoration = cube ? 1 : 0;
+                    getMutableTile(room.x1 - 1, room.y2).decoration = cube ? 2 : 0;
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1 - 1, room.y3, getMutableTile);
-                        getMutableTile(room.x1 - 1, room.y3).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x1 - 1, room.y3).decoration = cube ? 2 : 0;
                     }
                 }
                 w++;
@@ -1348,7 +1348,8 @@ export class NewtonianGame extends BaseClasses.Game {
                                 if (((getMutableTile(room.x1 + i, room.y1 - 2).machine !== undefined ||
                                     getMutableTile(room.x1 + i, room.y1).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 + i, room.y1 - 2).isWall ||
-                                    getMutableTile(room.x1 + i, room.y1 - 2).decoration === 1) {
+                                    getMutableTile(room.x1 + i, room.y1 - 2).decoration === 1 ||
+                                    getMutableTile(room.x1 + i, room.y1 - 2).decoration === 2) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1363,13 +1364,13 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1, room.y1 - 1, getMutableTile);
+                            this.drawDoor(room.x1, room.y1 - 1, 1, getMutableTile);
                         }
                         else if (shift === 1) {
-                            this.drawDoor(room.x2, room.y1 - 1, getMutableTile);
+                            this.drawDoor(room.x2, room.y1 - 1, 1, getMutableTile);
                         }
                         else {
-                            this.drawDoor(room.x3, room.y1 - 1, getMutableTile);
+                            this.drawDoor(room.x3, room.y1 - 1, 1, getMutableTile);
                         }
                     }
                 }
@@ -1395,7 +1396,8 @@ export class NewtonianGame extends BaseClasses.Game {
                                 if (((getMutableTile(roomX + 2, room.y1 + i).machine !== undefined ||
                                     getMutableTile(roomX, room.y1 + i).machine !== undefined) && temp < size) ||
                                     getMutableTile(roomX + 2, room.y1 + i).isWall ||
-                                    getMutableTile(roomX + 2, room.y1 + i).decoration === 1) {
+                                    getMutableTile(roomX + 2, room.y1 + i).decoration === 1 ||
+                                    getMutableTile(roomX + 2, room.y1 + i).decoration === 2) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1410,13 +1412,13 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(roomX + 1, room.y1, getMutableTile);
+                            this.drawDoor(roomX + 1, room.y1, 2, getMutableTile);
                         }
                         else if (shift === 1) {
-                            this.drawDoor(roomX + 1, room.y2, getMutableTile);
+                            this.drawDoor(roomX + 1, room.y2, 2, getMutableTile);
                         }
                         else {
-                            this.drawDoor(roomX + 1, room.y3, getMutableTile);
+                            this.drawDoor(roomX + 1, room.y3, 2, getMutableTile);
                         }
                     }
                 }
@@ -1441,7 +1443,8 @@ export class NewtonianGame extends BaseClasses.Game {
                                 if (((getMutableTile(room.x1 + i, roomY + 2).machine !== undefined ||
                                     getMutableTile(room.x1 + i, roomY).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 + i, roomY + 2).isWall ||
-                                    getMutableTile(room.x1 + i, roomY + 2).decoration === 1) {
+                                    getMutableTile(room.x1 + i, roomY + 2).decoration === 1 ||
+                                    getMutableTile(room.x1 + i, roomY + 2).decoration === 2) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1456,13 +1459,13 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1, roomY + 1, getMutableTile);
+                            this.drawDoor(room.x1, roomY + 1, 1, getMutableTile);
                         }
                         else if (shift === 1) {
-                            this.drawDoor(room.x2, roomY + 1, getMutableTile);
+                            this.drawDoor(room.x2, roomY + 1, 1, getMutableTile);
                         }
                         else {
-                            this.drawDoor(room.x3, roomY + 1, getMutableTile);
+                            this.drawDoor(room.x3, roomY + 1, 1, getMutableTile);
                         }
                     }
                 }
@@ -1485,7 +1488,8 @@ export class NewtonianGame extends BaseClasses.Game {
                                 if (((getMutableTile(room.x1 - 2, room.y1 + i).machine !== undefined ||
                                     getMutableTile(room.x1, room.y1 + i).machine !== undefined) && temp < size) ||
                                     getMutableTile(room.x1 - 2, room.y1 + i).isWall ||
-                                    getMutableTile(room.x1 - 2, room.y1 + i).decoration === 1) {
+                                    getMutableTile(room.x1 - 2, room.y1 + i).decoration === 1 ||
+                                    getMutableTile(room.x1 - 2, room.y1 + i).decoration === 2) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1500,13 +1504,13 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1 - 1, room.y1, getMutableTile);
+                            this.drawDoor(room.x1 - 1, room.y1, 2, getMutableTile);
                         }
                         else if (shift === 1) {
-                            this.drawDoor(room.x1 - 1, room.y2, getMutableTile);
+                            this.drawDoor(room.x1 - 1, room.y2, 2, getMutableTile);
                         }
                         else {
-                            this.drawDoor(room.x1 - 1, room.y3, getMutableTile);
+                            this.drawDoor(room.x1 - 1, room.y3, 2, getMutableTile);
                         }
                     }
                 }
@@ -1550,12 +1554,14 @@ export class NewtonianGame extends BaseClasses.Game {
      *
      * @param x - the x point the corner will be placed at.
      * @param y - the y point the corner will be placed at.
+     * @param d - decoration value of the door. Default of 1
      * @param getMutableTile - the function for it to grab tiles.
      * @returns nothing.
      */
-    private drawDoor(x: number, y: number, getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
+    private drawDoor(x: number, y: number, d: number = 1,
+                     getMutableTile: (x: number, y: number) => MutableRequired<Tile>): void {
         getMutableTile(x, y).isWall = false;
-        getMutableTile(x, y).decoration = 1;
+        getMutableTile(x, y).decoration = d;
     }
 
     /**
