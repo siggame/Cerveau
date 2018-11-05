@@ -1,5 +1,5 @@
 import { sanitizeArray, sanitizeType } from "~/core/sanitize/";
-import { objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
+import { Immutable, objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
@@ -13,7 +13,7 @@ export class BaseGameSanitizer {
      *
      * @param namespace - The game namespace we are sanitizing for.
      */
-    constructor(protected readonly namespace: Readonly<IBaseGameNamespace>) {
+    constructor(protected readonly namespace: Immutable<IBaseGameNamespace>) {
     }
 
     /**
@@ -26,7 +26,7 @@ export class BaseGameSanitizer {
      */
     public sanitizeOrderArgs(
         aiFunctionName: string,
-        args: ReadonlyArray<unknown>,
+        args: Immutable<Array<unknown>>,
     ): Error | Array<unknown> {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
@@ -142,7 +142,7 @@ export class BaseGameSanitizer {
     private validateGameObject(
         gameObject: BaseGameObject,
         functionName: string,
-    ): Error | IBaseGameObjectFunctionSchema {
+    ): Error | Immutable<IBaseGameObjectFunctionSchema> {
         if (
             !gameObject ||
             !(gameObject instanceof BaseGameObject) ||

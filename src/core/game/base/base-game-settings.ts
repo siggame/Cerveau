@@ -1,5 +1,6 @@
 import { sanitizeBoolean } from "~/core";
-import { objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
+import { Immutable, objectHasProperty, quoteIfString, UnknownObject,
+       } from "~/utils";
 
 /** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
@@ -64,7 +65,7 @@ export class BaseGameSettingsManager {
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public addSettings(invalidatedSettings: UnknownObject): void | Error {
+    public addSettings(invalidatedSettings: Immutable<UnknownObject>): void | Error {
         const validated = this.invalidateSettings(invalidatedSettings);
 
         if (validated instanceof Error) {
@@ -81,7 +82,7 @@ export class BaseGameSettingsManager {
      * game settings as an object.
      */
     public invalidateSettings(
-        invalidatedSettings: Readonly<UnknownObject>,
+        invalidatedSettings: Immutable<UnknownObject>,
     ): Readonly<UnknownObject> | Error {
         const sanitized: UnknownObject = {};
 
@@ -150,7 +151,7 @@ export class BaseGameSettingsManager {
         return lines.join("\n");
     }
 
-    /** resets the values to their initial (default) values */
+    /** Resets the values to their initial (default) values. */
     public reset(): void {
         this.values = this.initialValues(this.schema);
     }
@@ -158,15 +159,17 @@ export class BaseGameSettingsManager {
     /**
      * Gets the hypothetical max amount of time (in ns) that a player can use
      * doing client side logic.
-     * @returns the number representing how much time they can use, in ns.
+     *
+     * @returns The number representing how much time they can use, in ns.
      */
     public getMaxPlayerTime(): number {
         return this.values.playerStartingTime;
     }
 
     /**
-     * Makes a schema object from an interface
-     * @param schema The schema to make it from
+     * Makes a schema object from an interface.
+     *
+     * @param schema - The schema to make it from.
      * @returns the schema, now frozen
      */
     protected makeSchema<T extends ISettingsSchemas>(schema: T): Readonly<T> {
@@ -174,9 +177,10 @@ export class BaseGameSettingsManager {
     }
 
     /**
-     * Generates initial values from defaults in a settings schema
-     * @param schema The schema to build defaults from
-     * @returns The defaults from that schema
+     * Generates initial values from defaults in a settings schema.
+     *
+     * @param schema The schema to build defaults from.
+     * @returns The defaults from that schema.
      */
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
@@ -198,12 +202,14 @@ export class BaseGameSettingsManager {
     }
 
     /**
-     * Attempts to invalidate some settings sent to us
-     * @param someSettings a subset of the valid settings to attempt to validate
-     * @returns an Error if invalid, otherwise the validated settings
+     * Attempts to invalidate some settings sent to us.
+     *
+     * @param someSettings - A subset of the valid settings to attempt to
+     * validate.
+     * @returns an Error if invalid, otherwise the validated settings.
      */
     protected invalidate(
-        someSettings: Readonly<UnknownObject>,
+        someSettings: Immutable<UnknownObject>,
     ): Readonly<UnknownObject> | Error {
         // Use our current values and the new ones to form a settings
         // object to try to validate against

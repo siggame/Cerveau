@@ -9,7 +9,7 @@
 
 // base game classes
 import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, IBasePlayer,
+         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
          makeNamespace } from "~/core/game";
 
 // mixins
@@ -20,7 +20,7 @@ import { ITwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
  * must implement from mixed in game logic.
  */
 export interface IBaseChessPlayer extends
-    IBasePlayer,
+    BasePlayer,
     ITwoPlayerPlayer {
 }
 

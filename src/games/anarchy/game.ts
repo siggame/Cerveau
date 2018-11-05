@@ -8,7 +8,7 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, ArrayUtils, IPoint } from "~/utils";
+import { arrayHasElements, IPoint, make2D } from "~/utils";
 
 const DIRECTIONAL_OFFSETS = {
     North: { x: 0, y: -1 },
@@ -132,7 +132,7 @@ export class AnarchyGame extends BaseClasses.Game {
     // <<-- Creer-Merge: attributes -->>
 
     /** A handy 2D grid of all the buildings. */
-    public readonly buildingsGrid = ArrayUtils.make2D<Building>(this.mapWidth, this.mapHeight);
+    public readonly buildingsGrid = make2D<Building>(this.mapWidth, this.mapHeight);
 
     /** The valid cardinal directions buildings can be in. */
     public readonly directions: ["North", "East", "South", "West"] = [

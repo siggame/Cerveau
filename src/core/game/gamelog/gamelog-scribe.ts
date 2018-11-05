@@ -1,18 +1,19 @@
+import { Delta, IDisconnectDelta, IFinishedDelta, IGamelog, IOrderDelta,
+         IOverDelta, IRanDelta, IStartDelta } from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { BaseGame, IDelta, IDeltaData, IDisconnectDeltaData,
-         IFinishedDeltaData, IRanDeltaData } from "~/core/game";
+import { BaseGame } from "~/core/game";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { Session } from "~/core/server";
-import { IGamelog, IOrderedDeltaData } from "./gamelog-interfaces";
+import { Immutable } from "~/utils";
 
 /** Observes a game and creates a gamelog by transcribing its events */
 export class GamelogScribe {
     /** The events the game logger emits when it logs something. */
     public readonly events = events({
         /** Emitted every time a new delta is logged to the gamelog. */
-        logged: new Event<IDelta>(),
+        logged: new Event<Immutable<Delta>>(),
     });
 
     /** The gamelog we are building up. */
@@ -32,7 +33,7 @@ export class GamelogScribe {
     constructor(
         game: BaseGame,
         session: Session,
-        clients: ReadonlyArray<BaseClient>,
+        clients: Immutable<BaseClient[]>,
         private readonly deltaManager: DeltaManager,
     ) {
         this.gamelog = {
@@ -48,24 +49,24 @@ export class GamelogScribe {
 
         // this assumes the GameManager goes first
         session.events.start.on(() => {
-            this.add("start");
+            this.add<IStartDelta>("start");
         });
 
         session.events.gameOver.on(() => {
-            this.add("over");
+            this.add<IOverDelta>("over");
             this.finalizeGamelog(clients);
         });
 
         session.events.aiOrdered.on((ordered) => {
-            this.add("order", ordered);
+            this.add<IOrderDelta>("order", ordered);
         });
 
         session.events.aiFinished.on((finished) => {
-            this.add("finished", finished);
+            this.add<IFinishedDelta>("finished", finished);
         });
 
         session.events.aiRan.on((ran) => {
-            this.add("ran", ran);
+            this.add<IRanDelta>("ran", ran);
         });
 
         for (const client of clients) {
@@ -76,7 +77,7 @@ export class GamelogScribe {
             const { id } = client.player;
             client.events.disconnected.on(() => {
 
-                this.add("disconnect", {
+                this.add<IDisconnectDelta>("disconnect", {
                     player: { id },
                     timeout: client.hasTimedOut(),
                 });
@@ -90,11 +91,11 @@ export class GamelogScribe {
      * @param clients - The list of clients that played this game.
      * @returns The gamelog that was generated.
      */
-    private finalizeGamelog(clients: ReadonlyArray<BaseClient>): void {
+    private finalizeGamelog(clients: Immutable<BaseClient[]>): void {
         // update the winners and losers of the gamelog
         for (let i = 0; i < clients.length; i++) {
             const client = clients[i];
-            const player = client.player;
+            const { player } = client;
 
             if (!player) {
                 continue; // they are a spectator and don't matter to the gamelog.
@@ -122,13 +123,6 @@ export class GamelogScribe {
         this.finalized = true;
     }
 
-    private add(type: "start"): void;
-    private add(type: "over"): void; // tslint:disable-line:unified-signatures
-    private add(type: "disconnect", data: IDisconnectDeltaData): void;
-    private add(type: "order", data: IOrderedDeltaData): void;
-    private add(type: "ran", data: IRanDeltaData): void;
-    private add(type: "finished", data: IFinishedDeltaData): void;
-
     /**
      * Adds a delta for some reason, and emits that we logged it.
      *
@@ -136,18 +130,18 @@ export class GamelogScribe {
      * @param data - The data about why it changed, such as what data made the
      * delta occur.
      */
-    private add(type: string, data?: Readonly<IDeltaData>): void {
+    private add<T extends Delta>(type: T["type"], data?: Immutable<T["data"]>): void {
         if (this.finalized) {
             return; // Gamelog is finalized, we can't add things.
         }
 
-        const delta: IDelta = {
+        const delta = {
             type,
             data,
             game: this.deltaManager.dump(),
         };
 
-        this.gamelog.deltas.push(delta);
-        this.events.logged.emit(delta);
+        this.gamelog.deltas.push(delta as T);
+        this.events.logged.emit(delta as T);
     }
 }

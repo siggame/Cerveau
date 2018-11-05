@@ -8,15 +8,15 @@ script:
 
 before_deploy:
   # build the docs for the API
-  - npm run api-docs
+  - npm run docs
   # file to tell GitHub pages not to try to run jekyll stuff (can break urls)
-  - touch api-docs/.nojekyll
+  - touch docs/.nojekyll
 
 deploy:
   provider: pages
   skip-cleanup: true
   verbose: true
-  local-dir: api-docs/
+  local-dir: docs/
   github-token: $GH_TOKEN
   on:
     branch: master

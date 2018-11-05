@@ -1,6 +1,6 @@
 {
   "name": "cerveau",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "description": "The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.",
   "repository": {
     "type": "git",
@@ -9,17 +9,18 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@types/argparse": "1.0.34",
+    "@cadre/ts-utils": "1.0.5",
+    "@types/argparse": "1.0.35",
     "@types/body-parser": "1.17.0",
     "@types/chess.js": "0.10.0",
-    "@types/delay": "3.1.0",
     "@types/dotenv": "4.0.3",
     "@types/express": "4.16.0",
     "@types/express-handlebars": "0.0.30",
     "@types/fs-extra": "5.0.4",
     "@types/gaussian": "1.1.1",
     "@types/json5": "0.0.30",
-    "@types/node": "10.9.4",
+    "@types/lodash": "4.14.117",
+    "@types/node": "10.12.0",
     "@types/sanitize-filename": "1.1.28",
     "@types/seedrandom": "2.4.27",
     "@types/uuid": "3.4.4",
@@ -27,14 +28,15 @@
     "argparse": "1.0.10",
     "body-parser": "1.18.3",
     "chess.js": "0.10.2",
-    "delay": "4.0.1",
-    "dotenv": "6.0.0",
-    "express": "4.16.3",
+    "delay": "4.1.0",
+    "dotenv": "6.1.0",
+    "express": "4.16.4",
     "express-handlebars": "3.0.0",
     "fs-extra": "7.0.0",
     "gaussian": "1.1.0",
-    "json5": "2.0.1",
-    "lark-websocket": "git://github.com/JacobFischer/lark-websocket.git#95a4947ee1b20bc3ae8155f3c405d61fcc1f97d9",
+    "json5": "2.1.0",
+    "lark-websocket": "github:JacobFischer/lark-websocket.git#95a4947ee1b20bc3ae8155f3c405d61fcc1f97d9",
+    "lodash": "4.17.11",
     "moment": "2.22.2",
     "npm": "^6.4.1",
     "sanitize-filename": "1.6.1",
@@ -42,18 +44,17 @@
     "ts-node": "7.0.1",
     "ts-typed-events": "1.1.1",
     "tsconfig-paths": "3.6.0",
-    "tslint-microsoft-contrib": "5.2.1",
     "uuid": "3.3.2",
     "winston": "3.1.0"
   },
   "devDependencies": {
     "apidoc": "0.17.6",
-    "husky": "0.14.3",
+    "copyfiles": "2.1.0",
+    "husky": "1.1.2",
     "shx": "0.3.2",
+    "tslib": "1.9.3",
     "tslint": "5.11.0",
-    "tslint-eslint-rules": "5.4.0",
-    "tslint-no-math-random": "1.0.1",
-    "typescript": "3.0.3"
+    "typescript": "3.1.3"
   },
   "_optionalDependencies": {
     "v8-profiler": "5.7.0"
@@ -64,16 +65,24 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "npm run lint && npm run build:test",
-    "build": "tsc",
+    "build": "npm run build:assets && tsc",
+    "build:assets": "copyfiles -u 1 \"src/**/*.hbs\" \"src/**/*.css\" dist/",
     "build:test": "tsc --noEmit",
-    "build:watch": "tsc --watch",
+    "build:watch": "npm run build -- --watch",
     "js": "node dist/index.js",
     "clean": "shx rm -rf dist",
     "rebuild": "npm run clean && npm run build",
-    "apidoc": "apidoc -i ./src/web/routes/ -o ./api-docs",
+    "link:symbolic": "shx ln -s ./src/web/styles dist/web/styles && shx ln -s ./src/web/views dist/web/views",
+    "link:copy": "shx cp -R ./src/web/styles dist/web/styles && shx cp -R ./src/web/views dist/web/views",
+    "docs": "npm run docs:api",
+    "docs:api": "apidoc -i ./src/web/routes/ -o ./docs",
     "lint": "tslint --config tslint.json --project tsconfig.json",
-    "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix --force",
-    "precommit": "npm test"
+    "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix --force"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
   },
   "_moduleAliases": {
     "src": "dist/"

@@ -1,16 +1,14 @@
+import { IFinishedDelta, IGameObjectReference, IOrderDelta, IRanDelta } from "@cadre/ts-utils/cadre";
+import { capitalize } from "lodash";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
-import { IFinishedDeltaData, IGameObjectReference,
-         IOrderedDeltaData, IRanDeltaData,
-       } from "~/core/game//gamelog/gamelog-interfaces";
 import { serialize, unSerialize } from "~/core/serializer";
-import { capitalizeFirstLetter, mapToObject,
-         quoteIfString, UnknownObject } from "~/utils";
+import { Immutable, mapToObject, quoteIfString, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
 import { IBaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameSanitizer } from "./base-game-sanitizer";
-import { IBasePlayer } from "./base-player";
+import { BasePlayer } from "./base-player";
 
 /** Represents an order sent to an AI. */
 interface IOrder {
@@ -38,9 +36,9 @@ const MAX_ORDER_ERRORS = 10;
 export class BaseAIManager {
     /** The events this AI (manager) emits */
     public readonly events = events({
-        ordered: new Event<IOrderedDeltaData>(),
-        finished: new Event<IFinishedDeltaData>(),
-        ran: new Event<IRanDeltaData>(),
+        ordered: new Event<Immutable<IOrderDelta["data"]>>(),
+        finished: new Event<Immutable<IFinishedDelta["data"]>>(),
+        ran: new Event<Immutable<IRanDelta["data"]>>(),
     });
 
     /** **This must be set externally before use** */
@@ -48,7 +46,7 @@ export class BaseAIManager {
 
     /** **This one too** */
     public invalidateRun!: (
-        player: IBasePlayer,
+        player: BasePlayer,
         gameObject: BaseGameObject,
         functionName: string,
         args: Map<string, unknown>,
@@ -71,7 +69,7 @@ export class BaseAIManager {
     constructor(
         private readonly client: BaseClient,
         private readonly gameSanitizer: BaseGameSanitizer,
-        private readonly namespace: IBaseGameNamespace,
+        private readonly namespace: Immutable<IBaseGameNamespace>,
     ) {
         this.client.sent.finished.on((finished) => {
             this.finishedOrder(finished.orderIndex, finished.returned);
@@ -146,9 +144,9 @@ export class BaseAIManager {
      * NOTE: while game logic runs a delta will probably be sent out.
      */
     private async requestedRun<T>(
-        callerReference: Readonly<IGameObjectReference>,
+        callerReference: Immutable<IGameObjectReference>,
         functionName: string,
-        unsanitizedArgs: UnknownObject,
+        unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
         this.client.pauseTicking();
 
@@ -174,9 +172,9 @@ export class BaseAIManager {
      * this run command, or undefined if the command is incomprehensible.
      */
     private async tryToRun<T>(
-        callerReference: Readonly<IGameObjectReference>,
+        callerReference: Immutable<IGameObjectReference>,
         functionName: string,
-        unsanitizedArgs: Readonly<UnknownObject>,
+        unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
         if (!this.client.player) {
             this.client.disconnect(
@@ -241,14 +239,17 @@ export class BaseAIManager {
         // If the game said the run is invalid for all runs
         if (invalid) {
             // Tell the client it is invalid
-            this.client.send("invalid", { message: invalid });
+            this.client.send({
+                event: "invalid",
+                data: { message: invalid },
+            });
         }
         else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
             let argsMap = (sanitizedArgs as Map<string, unknown>);
 
-            const invalidateName = `invalidate${capitalizeFirstLetter(functionName)}`;
+            const invalidateName = `invalidate${capitalize(functionName)}`;
             //  ↙ We are getting this function via reflection, no easier way to do this.
             // tslint:disable-next-line:no-any no-unsafe-any
             const validated = (gameObject as any)[invalidateName](
@@ -277,8 +278,7 @@ export class BaseAIManager {
 ${JSON.stringify(validated)}
 from:
 ${JSON.stringify(mapToObject(argsMap))}
-`,
-);
+`);
                 }
                 else if (newArgsMap instanceof Map) {
                     argsMap = newArgsMap;
@@ -288,7 +288,10 @@ ${JSON.stringify(mapToObject(argsMap))}
             if (invalid) {
                 // Their arguments did not validate,
                 // so they get told it was invalid
-                this.client.send("invalid", { message: invalid });
+                this.client.send({
+                    event: "invalid",
+                    data: { message: invalid },
+                });
             }
             else {
                 // It's valid!
@@ -317,7 +320,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             returned,
         });
 
-        this.client.send("ran", returned);
+        this.client.send({ event: "ran", data: returned });
 
         return returned as T;
     }
@@ -327,7 +330,7 @@ ${JSON.stringify(mapToObject(argsMap))}
      *
      * @param order The order to send
      */
-    private sendOrder(order: Readonly<IOrder>): void {
+    private sendOrder(order: Immutable<IOrder>): void {
         const simpleOrder = {
             name: order.name,
             index: order.index,
@@ -345,7 +348,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             order: simpleOrder,
         });
 
-        this.client.send("order", simpleOrder);
+        this.client.send({ event: "order", data: simpleOrder });
     }
 
     /**
@@ -394,10 +397,13 @@ ${JSON.stringify(mapToObject(argsMap))}
         });
 
         if (invalid) {
-            this.client.send("invalid", {
-                message: `Return value (${quoteIfString(
-                    unsanitizedReturned,
-                )}) from finished order invalid! ${invalid}`,
+            this.client.send({
+                event: "invalid",
+                data: {
+                    message: `Return value (${quoteIfString(
+                        unsanitizedReturned,
+                    )}) from finished order invalid! ${invalid}`,
+                },
             });
 
             order.errors++;

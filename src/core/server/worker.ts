@@ -12,7 +12,7 @@ import * as Clients from "~/core/clients";
 import { Config } from "~/core/config";
 import { logger } from "~/core/logger";
 import { Session } from "~/core/server/session";
-import { UnknownObject } from "~/utils";
+import { Immutable, UnknownObject } from "~/utils";
 import { IGamesExport } from "./games-export";
 
 /**
@@ -33,7 +33,7 @@ export type MessageFromMainThread = { type: "done" } | {
 
 /** This interface we expect to be set via the process.env for us. */
 export interface IWorkerGameSessionData {
-    mainDebugPort: number;
+    mainDebugPort?: number;
     sessionID: string;
     gameName: string;
     gameSettings: UnknownObject;
@@ -63,7 +63,7 @@ const gameNamespace = required.Namespace;
 
 const clients: Clients.BaseClient[] = [];
 process.on("message", (
-    message: Readonly<MessageFromMainThread>,
+    message: Immutable<MessageFromMainThread>,
     socket?: Socket,
 ) => {
     if (typeof message !== "object" || !message || !message.type) {
@@ -78,8 +78,7 @@ process.on("message", (
 
         const info = message.clientInfo;
         const { className } = info;
-        // tslint:disable-next-line:no-any no-unsafe-any - because we are indexing the object for a * import
-        const baseClientClass: typeof Clients.BaseClient | undefined = (Clients as any)[className];
+        const baseClientClass = (Clients as { [key: string]: typeof Clients.BaseClient | undefined })[className];
 
         if (!baseClientClass) {
             throw new Error(`Session cannot handle client ${className}`);

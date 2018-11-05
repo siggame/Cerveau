@@ -1,7 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import { promisify } from "util";
-import * as zlib from "zlib";
+import { createReadStream, readdir, stat } from "fs-extra";
+import { join } from "path";
+import { createGunzip } from "zlib";
 
 /**
  * Simple function to get director names in a directory.
@@ -15,16 +14,17 @@ async function getDirsOrFiles(
     sourcePath: string,
     onlyDirs: boolean = false,
 ): Promise<string[]> {
-    const files = await promisify(fs.readdir)(sourcePath);
-    const results: string[] = [];
+    const read = (await Promise.all(
+        (await readdir(sourcePath)).map(async (file) => ({
+            file,
+            stats: await stat(join(sourcePath, file)),
+        })),
+    ));
 
-    for (const file of files) {
-        const stats = await promisify(fs.stat)(path.join(sourcePath, file));
-        if ((onlyDirs && stats.isDirectory()) ||
-            (!onlyDirs && stats.isFile())) {
-            results.push(file);
-        }
-    }
+    const onlyOfType = read.filter(({ stats }) =>
+        (onlyDirs && stats.isDirectory()) || (!onlyDirs && stats.isFile()),
+    );
+    const results = onlyOfType.map(({ file }) => file);
 
     return results.sort();
 }
@@ -60,17 +60,16 @@ export async function getFiles(sourcePath: string): Promise<string[]> {
 export function gunzipFile(filePath: string): Promise<Buffer> {
     const buffers: Buffer[] = [];
 
-    return new Promise<Buffer>((resolve, reject) => {
-        fs.createReadStream(filePath)
-            .on("error", reject)
-            .pipe(zlib.createGunzip()) // Un-Gzip
-            .on("data", (buffer: Buffer) => {
-                buffers.push(buffer); // will be a Buffer
-            })
-            .on("end", () => {
-                resolve(Buffer.concat(buffers));
-            });
-    });
+    return new Promise<Buffer>((resolve, reject) => createReadStream(filePath)
+        .on("error", reject)
+        .pipe(createGunzip()) // Un-Gzip
+        .on("data", (buffer: Buffer) => {
+            buffers.push(buffer); // will be a Buffer
+        })
+        .on("end", () => {
+            resolve(Buffer.concat(buffers));
+        }),
+    );
 }
 
 /**
