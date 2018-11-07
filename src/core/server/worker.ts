@@ -53,7 +53,7 @@ const workerData = Config.WORKER_DATA;
 process.title = `${workerData.gameName} - ${workerData.sessionID}`;
 
 // tslint:disable-next-line:no-var-requires non-literal-require - as we need it to be synchronous and dynamic
-const required = require(`src/games/${workerData.gameName.toLowerCase()}/`) as IGamesExport;
+const required = require(`~/games/${workerData.gameName.toLowerCase()}/`) as IGamesExport;
 
 if (!required.Namespace) {
     throw new Error("Error required game namespace not found!");
