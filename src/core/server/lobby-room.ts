@@ -1,8 +1,9 @@
+import { IGamelog, IGamelogWinnerLoser } from "@cadre/ts-utils/cadre";
 import { events, Signal } from "ts-typed-events";
-import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace, IGamelog,
-         IGamelogWinnerLoser } from "~/core/game";
+import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
+       } from "~/core/game";
 import { logger } from "~/core/logger";
-import { removeElements, UnknownObject } from "~/utils";
+import { Immutable, removeElements, UnknownObject } from "~/utils";
 import { BaseClient } from "../clients/";
 import { Updater } from "../updater";
 
@@ -50,7 +51,7 @@ export class Room {
      */
     constructor(
         public readonly id: string,
-        public readonly gameNamespace: Readonly<IBaseGameNamespace>,
+        public readonly gameNamespace: Immutable<IBaseGameNamespace>,
         protected readonly gamelogManager: GamelogManager,
         private readonly updater?: Updater,
     ) {
@@ -142,7 +143,7 @@ export class Room {
      * @param settings - the key/value pair settings to add
      * @returns An error if the settings were invalid, otherwise nothing
      */
-    public addGameSettings(settings: Readonly<UnknownObject>): void | Error {
+    public addGameSettings(settings: Immutable<UnknownObject>): void | Error {
         return this.gameSettingsManager.addSettings(settings);
     }
 
@@ -161,10 +162,11 @@ export class Room {
      * @param gamelog The gamelog resulting from the game played in the session
      * @returns A promise that resolves once the gamelog is written to disk.
      */
-    protected async cleanUp(gamelog: Readonly<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog: Immutable<IGamelog>): Promise<void> {
         this.over = true;
-        this.winners = gamelog.winners;
-        this.losers = gamelog.losers;
+        // copy their winners and losers to ours.
+        this.winners = gamelog.winners.slice();
+        this.losers = gamelog.losers.slice();
 
         // Undefined to signify the gamelog does not exist,
         // as it has not be written to the file system yet

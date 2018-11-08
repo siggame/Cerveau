@@ -9,7 +9,7 @@
 
 // base game classes
 ${shared['cerveau']['imports']({
-    "~/core/game": [ 'BaseAI', 'BaseGame', 'BaseGameManager', 'BaseGameObject', 'BaseGameObjectFactory', 'BaseGameSettingsManager', 'IBasePlayer', 'makeNamespace' ]
+    "~/core/game": [ 'BaseAI', 'BaseGame', 'BaseGameManager', 'BaseGameObject', 'BaseGameObjectFactory', 'BaseGameSettingsManager', 'BasePlayer', 'makeNamespace' ]
 })}
 // mixins<%
 
@@ -43,7 +43,7 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * must implement from mixed in game logic.
  */
 export interface IBase${game_name}Player extends
-    IBasePlayer${',\n    '.join([''] + [m for m in mixed_players])} {
+    BasePlayer${',\n    '.join([''] + [m for m in mixed_players])} {
 }
 <% base_index = 1 %>
 const base0 = {

@@ -3,6 +3,7 @@
         "target": "esnext",
         "module": "commonjs",
         "moduleResolution": "node",
+        "importHelpers": true,
 
         "strict": true,
         "strictNullChecks": true,
@@ -19,7 +20,7 @@
         "outDir": "dist",
         "baseUrl": "./",
         "paths": {
-            "~/*": ["src/*", "dist/*"]  // dist for tsconfig-paths to resolve
+            "~/*": ["src/*", "dist/*"] // dist for tsconfig-paths to resolve
         }
     },
     "include": [

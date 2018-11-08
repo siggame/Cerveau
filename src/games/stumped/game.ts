@@ -11,13 +11,13 @@ import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 
-import { MutableRequired } from "~/utils";
+import { Mutable } from "~/utils";
 import { jobStats } from "./job-stats";
 
 /**
  * A tile that can be mutated. Should only be used during game initialization.
  */
-type MutableTile = MutableRequired<Tile>;
+type MutableTile = Mutable<Tile>;
 
 // <<-- /Creer-Merge: imports -->>
 

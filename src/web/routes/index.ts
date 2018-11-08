@@ -36,8 +36,8 @@ export function registerRouteIndex(app: Express): void {
 
     const lobby = Lobby.getInstance();
     lobby.gamesInitializedPromise.then(() => {
-        for (const gameName of Object.keys(lobby.gameNamespaces).sort()) {
-            const namespace = lobby.gameNamespaces[gameName];
+        for (const gameName of Array.from(lobby.gameNamespaces.keys()).sort()) {
+            const namespace = lobby.gameNamespaces.get(gameName);
             if (!namespace) {
                 throw new Error(`${namespace} is not a game namespace!`);
             }

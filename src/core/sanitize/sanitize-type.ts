@@ -1,4 +1,4 @@
-import { isNil } from "~/utils";
+import { Immutable, isNil } from "~/utils";
 import { ISanitizableType } from "./sanitizable-interfaces";
 import { sanitizeArray } from "./sanitize-array";
 import { sanitizeBoolean } from "./sanitize-boolean";
@@ -12,14 +12,14 @@ import { sanitizeString } from "./sanitize-string";
  * Sanitizes a value to a specified type. If it does not match at all, then the
  * default value for that type is returned.
  *
- * @param type The type to coerce to.
- * @param obj The value to coerce from.
+ * @param type - The type to coerce to.
+ * @param obj - The value to coerce from.
  * @param allowError - If errors should be allowed to be returned if they
  * cannot be reasonable sanitized.
  * @returns A value now sanitized and guaranteed to be of that type.
  */
 export function sanitizeType(
-    type: ISanitizableType,
+    type: Immutable<ISanitizableType>,
     obj: unknown,
     allowError: boolean = true,
 ): unknown {
@@ -51,7 +51,11 @@ export function sanitizeType(
             }
 
             for (const key of Object.keys(asObj)) {
-                asObj[key] = sanitizeType(type.valueType, asObj[key], allowError);
+                asObj[key] = sanitizeType(
+                    type.valueType,
+                    asObj[key],
+                    allowError,
+                );
             }
             value = asObj;
             break;
@@ -61,10 +65,15 @@ export function sanitizeType(
                 return asArray;
             }
 
+            // Re-use the array because it may be one of our Proxy wrapped
+            // arrays, otherwise map() would be prefered
             for (let i = 0; i < asArray.length; i++) {
-                asArray[i] = sanitizeType(type.valueType, asArray[i], allowError);
+                asArray[i] = sanitizeType(
+                    type.valueType,
+                    asArray[i],
+                    allowError,
+                );
             }
-            value = asArray;
             break;
         case "gameObject": // assume game object
             value = sanitizeGameObject(obj, type.gameObjectClass, allowError);
@@ -85,22 +94,21 @@ export function sanitizeType(
         if (!found && type.typeName === "string") {
             // Try to see if the string is found via a case-insensitive
             // search.
-            const lowered: string = (value as string).toLowerCase();
-            for (const literal of literals) {
-                const loweredLiteral = (literal as string).toLowerCase();
-
-                if (lowered === loweredLiteral) {
-                    value = literal; // we found the literal value
-                    found = true;
-                    break;
-                }
+            const lowered = (value as string).toLowerCase();
+            const matchingLiteral = literals.find((literal) =>
+                (literal as string).toLowerCase() === lowered,
+            );
+            if (matchingLiteral !== undefined) { // we found it!
+                found = true;
+                value = matchingLiteral;
             }
         }
 
         if (!found) {
             if (allowError) {
                 // the value they sent was not one of the literals
-                return new Error(`${value} is not an expected value from literals [${literals.join(", ")}]`);
+                return new Error(`${value} is not an expected value from literals [${literals.join(", ")}]`,
+                );
             }
             else {
                 // Couldn't be found at all, default to first literal value.

@@ -1,5 +1,6 @@
-import { IBaseGameObjectSchema, IBasePlayer } from "~/core/game";
+import { BasePlayer, IBaseGameObjectSchema } from "~/core/game";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
+import { Immutable } from "~/utils";
 import { BaseGame } from "./base-game";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
@@ -18,7 +19,7 @@ export interface IBaseGameObjectRequiredData {
     gameObjectName: string;
     gameObjectsDeltaMergeable: DeltaMergeable;
     game: BaseGame;
-    schema: Readonly<IBaseGameObjectSchema>;
+    schema: Immutable<IBaseGameObjectSchema>;
 }
 
 /**
@@ -52,7 +53,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * the game, and set default values for the sub class.
      */
     constructor(
-        data: Readonly<IBaseGameObjectData>,
+        data: Immutable<IBaseGameObjectData>,
         requiredData: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super({
@@ -82,7 +83,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
             // tslint:disable-next-line:no-any
-            return `Player "${(this as any as IBasePlayer).name}" #${this.id}`;
+            return `Player "${(this as any as BasePlayer).name}" #${this.id}`;
         }
 
         return `${this.gameObjectName} #${this.id}`;
@@ -98,7 +99,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * @returns The arguments, as all input is valid.
      */
     protected invalidateLog(
-        player: IBasePlayer,
+        player: BasePlayer,
         message: string,
     ): undefined | string | { message?: string } {
         if (message.length > MAX_LOG_LENGTH) {
@@ -114,7 +115,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * object.
      * @param message - The string to log.
      */
-    protected async log(player: IBasePlayer, message: string): Promise<void> {
+    protected async log(player: BasePlayer, message: string): Promise<void> {
         this.logs.push(message);
     }
 }

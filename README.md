@@ -117,7 +117,7 @@ Then fill in the functions for the functions to you make in your game objects.
 Everything else should be handled by the base classes in both this server and
 the clients.
 
-### Implimenting game logic
+### Implementing game logic
 
 Once you've generated a game, and generated its files via Creer, and bunch of
 files will be generated that need **you** to add logic to.

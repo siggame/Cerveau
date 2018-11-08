@@ -3,8 +3,8 @@
  * and from serialize-able objects when communicating between client <--> sever
  */
 
-import { isEmptyExceptFor, isObject,
-         ITypedObject, mapToObject, UnknownObject } from "~/utils";
+import { Immutable, isEmptyExceptFor, isObject, mapToObject, TypedObject,
+         UnknownObject } from "~/utils";
 import { SHARED_CONSTANTS } from "./constants";
 import { BaseGame, BaseGameObject } from "./game/";
 
@@ -32,7 +32,7 @@ type BaseSerializable =
 /** All seriabliable types */
 type Serializable =
     BaseSerializable |
-    ITypedObject<BaseSerializable> |
+    TypedObject<BaseSerializable> |
     Map<string, BaseSerializable> |
     BaseSerializable[]
 ;
@@ -50,7 +50,7 @@ type BaseSerialized =
 type Serialized =
     BaseSerialized |
     BaseSerialized[] |
-    ITypedObject<BaseSerialized>
+    TypedObject<BaseSerialized>
 ;
 
 /**
@@ -60,7 +60,7 @@ type Serialized =
  * @returns True if the object is a game object reference
  */
 export function isGameObjectReference(
-    obj: Readonly<UnknownObject>,
+    obj: Immutable<UnknownObject>,
 ): obj is { id: string } {
     return isEmptyExceptFor(obj, "id");
 }
@@ -102,7 +102,7 @@ export function serialize(state: unknown): Serialized {
         serialized[key] = serialize(value);
     }
 
-    return serialized as {}; // it is actually ITypedObject<Serialized> but that gets mad
+    return serialized as {}; // it is actually TypedObject<Serialized> but that gets mad
 }
 
 /**
@@ -126,8 +126,7 @@ export function unSerialize<T = Serializable>(
             ? []
             : {};
 
-        for (const key of Object.keys(data)) {
-            const value = data[key];
+        for (const [ key, value ] of Object.entries(data)) {
             if (isObject(value)) {
                 result[key] = isGameObjectReference(value)
                     ? game.gameObjects[value.id] // it's a tracked game object

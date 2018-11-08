@@ -7,10 +7,10 @@ import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import * as chessjs from "chess.js";
-import { MutableRequired } from "~/utils";
+import { Mutable } from "~/utils";
 
 /** A player that can be mutated BEFORE the game starts */
-type MutablePlayer = MutableRequired<Player>;
+type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**

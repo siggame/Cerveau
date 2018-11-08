@@ -29,5 +29,4 @@ node_modules
 
 # generated docs via apidoc or jsdoc
 docs
-api-docs
 dist

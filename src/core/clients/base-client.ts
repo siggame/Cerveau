@@ -1,11 +1,11 @@
+import { ServerEvent } from "@cadre/ts-utils/cadre";
+import * as ClientEvents from "@cadre/ts-utils/cadre/events/client";
 import * as net from "net";
 import { Event, events, Signal } from "ts-typed-events";
 import { Config } from "~/core/config";
-import { BaseAIManager, IBasePlayer, IDelta, IDeltaData } from "~/core/game/";
+import { BaseAIManager, BasePlayer } from "~/core/game/";
 import { logger } from "~/core/logger";
-import { isObject, objectHasProperty, ParsedJSON } from "~/utils";
-import * as ClientEvents from "./events-client";
-import * as ServerEvents from "./events-server";
+import { Immutable, isObject, Json, objectHasProperty } from "~/utils";
 
 const DEFAULT_STR = "Unknown";
 
@@ -24,10 +24,10 @@ export class BaseClient {
 
     /** The events clients emit (send). */
     public readonly sent = events({
-        finished: new Event<ClientEvents.IFinishedData>(),
-        run: new Event<ClientEvents.IRunData>(),
-        play: new Event<ClientEvents.IPlayData>(),
-        alias: new Event<string>(),
+        finished: new Event<Immutable<ClientEvents.FinishedEvent["data"]>>(),
+        run: new Event<Immutable<ClientEvents.RunEvent["data"]>>(),
+        play: new Event<Immutable<ClientEvents.PlayEvent["data"]>>(),
+        alias: new Event<Immutable<ClientEvents.AliasEvent["data"]>>(),
     });
 
     /** The name of this client. */
@@ -36,7 +36,7 @@ export class BaseClient {
     }
 
     /** The Player in the game this client controls. Undefined if spectating. */
-    public get player(): IBasePlayer | undefined {
+    public get player(): BasePlayer | undefined {
         return this.ourPlayer;
     }
 
@@ -85,7 +85,7 @@ export class BaseClient {
     private timedOut: boolean = false;
 
     /** Our player in the game. */
-    private ourPlayer?: IBasePlayer;
+    private ourPlayer?: BasePlayer;
 
     /** The name of the player, use player to get. */
     private ourName: string = DEFAULT_STR;
@@ -241,7 +241,13 @@ export class BaseClient {
      */
     public async disconnect(fatalMessage?: string): Promise<void> {
         if (fatalMessage) {
-            await this.send("fatal", {message: fatalMessage});
+            await this.send({
+                event: "fatal",
+                data: {
+                    message: fatalMessage,
+                    timedOut: this.timedOut,
+                },
+            });
         }
 
         this.disconnected();
@@ -277,31 +283,20 @@ export class BaseClient {
      *
      * @param player - The player this ai controls.
      */
-    public setPlayer(player: IBasePlayer): void {
+    public setPlayer(player: BasePlayer): void {
         this.ourPlayer = player;
     }
-
-    public send(event: "over", data: ServerEvents.IOverData): Promise<void>;
-    public send(event: "fatal", data: ServerEvents.IFatalData): Promise<void>;
-    public send(event: "start", data: ServerEvents.IStartData): Promise<void>;
-    public send(event: "order", data: ServerEvents.IOrderData): Promise<void>;
-    public send(event: "invalid", data: ServerEvents.IInvalidData): Promise<void>;
-    public send(event: "ran", data: unknown): Promise<void>;
-    public send(event: "named", data: string): Promise<void>;
-    public send(event: "lobbied", data: ServerEvents.ILobbiedData): Promise<void>;
-    public send(event: "delta", data: IDeltaData): Promise<void>;
-    public send(event: "metaDelta", data: IDelta): Promise<void>;
 
     /**
      * Sends the message of type event to this client as a json string EOT_CHAR
      * terminated.
      *
-     * @param event - The event name.
-     * @param data - The object to send about the event being sent.
+     * @param event - The event to send. Must be an expected server event.
      * @returns After the data is sent.
      */
-    public async send(event: string, data: unknown): Promise<void> {
-        return this.sendRaw(JSON.stringify({ event, data }));
+    public async send(event: Immutable<ServerEvent>): Promise<void> {
+        // event.epoch = Number(new Date()); -- Disabled for now
+        return this.sendRaw(JSON.stringify(event));
     }
 
     /**
@@ -394,7 +389,7 @@ export class BaseClient {
      * @param json - The json formatted string to parse.
      * @returns The parsed json structure, or undefined if malformed json.
      */
-    protected parseData(json: unknown): ParsedJSON | undefined {
+    protected parseData(json: unknown): Json | undefined {
         let invalid = "";
 
         if (typeof json !== "string") {
@@ -402,7 +397,7 @@ export class BaseClient {
         }
         else {
             try {
-                return JSON.parse(json) as ParsedJSON;
+                return JSON.parse(json) as Json;
             }
             catch (err) {
                 invalid = "Sent malformed JSON.";
