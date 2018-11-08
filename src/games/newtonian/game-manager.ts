@@ -134,13 +134,13 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 // if the tile has redium or blueium, heat and pressure are increased accordingly
                 // the redium and blueium is then removed from the map
                 if (tile.redium > 0) {
-                    this.game.currentPlayer.pressure += (tile.redium * this.game.refinedValue);
+                    this.game.currentPlayer.heat += (tile.redium * this.game.refinedValue);
+                    tile.redium = 0;
                 }
-                tile.redium = 0;
                 if (tile.blueium > 0) {
-                    this.game.currentPlayer.heat += (tile.blueium * this.game.refinedValue);
+                    this.game.currentPlayer.pressure += (tile.blueium * this.game.refinedValue);
+                    tile.blueium = 0;
                 }
-                tile.blueium = 0;
                 // if there's a unit on a generator tile...
                 if (tile.unit !== undefined) {
                     // scores the refined materials on the unit before removing them
@@ -157,8 +157,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                         // the intern dies
                         tile.unit.health = 0;
                         // the player gains internium (+resources to both scores)
-                        this.game.currentPlayer.pressure += (tile.unit.blueium * this.game.refinedValue);
-                        this.game.currentPlayer.heat += (tile.unit.redium * this.game.refinedValue);
+                        this.game.currentPlayer.pressure += ((tile.unit.blueium + 1) * this.game.refinedValue);
+                        this.game.currentPlayer.heat += ((tile.unit.redium + 1) * this.game.refinedValue);
                     }
                     // RIP intern
                 }
