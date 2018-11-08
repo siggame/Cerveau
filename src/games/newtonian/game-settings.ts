@@ -80,7 +80,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "The amount of combined heat and pressure that you "
                        + "need to win.",
             // <<-- Creer-Merge: victoryAmount -->>
-            default: 200,
+            default: 2000,
             // <<-- /Creer-Merge: victoryAmount -->>
         },
         // <<-- Creer-Merge: schema -->>
