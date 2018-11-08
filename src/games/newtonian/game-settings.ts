@@ -23,7 +23,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "Percent loss from the difference of Heat and "
                        + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 0.05,
+            default: 0.00,
             // <<-- /Creer-Merge: degradeRate -->>
         },
         internCap: {
@@ -108,7 +108,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         // Turn based settings
         timeAddedPerTurn: {
             // <<-- Creer-Merge: time-added-per-turn -->>
-            default: 1e9, // 1 sec in ns,
+            default: 2e9, // 2 sec in ns,
             // <<-- /Creer-Merge: time-added-per-turn -->>
             min: 0,
             description: "The amount of time (in nano-seconds) to add after each player performs a turn.",

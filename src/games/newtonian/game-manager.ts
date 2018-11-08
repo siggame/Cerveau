@@ -174,19 +174,19 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
         // Add logic here checking for the primary win condition(s)
-        if ((this.game.players[0].heat + this.game.players[0].pressure) === this.game.victoryAmount &&
-            (this.game.players[1].heat + this.game.players[1].pressure) === this.game.victoryAmount) {
+        if ((this.game.players[0].heat * this.game.players[0].pressure) === this.game.victoryAmount &&
+            (this.game.players[1].heat * this.game.players[1].pressure) === this.game.victoryAmount) {
             this.secondaryWinConditions("Both players achieved fusion at the same time.");
 
             return true;
         }
-        else if (this.game.players[0].heat + this.game.players[0].pressure === this.game.victoryAmount) {
+        else if (this.game.players[0].heat * this.game.players[0].pressure === this.game.victoryAmount) {
             this.declareWinner("You achieved fusion!", this.game.players[0]);
             this.declareLosers("Your opponents achieved fusion.", this.game.players[1]);
 
             return true;
         }
-        else if (this.game.players[1].heat + this.game.players[1].pressure === this.game.victoryAmount) {
+        else if (this.game.players[1].heat * this.game.players[1].pressure === this.game.victoryAmount) {
             this.declareWinner("You achieved fusion!", this.game.players[1]);
             this.declareLosers("Your opponents achieved fusion.", this.game.players[0]);
 
@@ -206,15 +206,15 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
-        if (this.game.players[0].heat + this.game.players[0].pressure >
-            this.game.players[1].heat + this.game.players[1].pressure) {
+        if (this.game.players[0].heat * this.game.players[0].pressure >
+            this.game.players[1].heat * this.game.players[1].pressure) {
             this.declareWinner(`${reason}: You were closer to achieving fusion`, this.game.players[0]);
             this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[1]);
 
             return;
         }
-        else if (this.game.players[1].heat + this.game.players[1].pressure >
-            this.game.players[0].heat + this.game.players[0].pressure) {
+        else if (this.game.players[1].heat * this.game.players[1].pressure >
+            this.game.players[0].heat * this.game.players[0].pressure) {
             this.declareWinner(`${reason}: You were closer to achieving fusion`, this.game.players[1]);
             this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[0]);
 
