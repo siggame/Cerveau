@@ -228,6 +228,10 @@ export function mixTiled<
          * @returns The Tile at (x, y) if valid, null otherwise.
          */
         public getTile(x: number, y: number): BaseTile | undefined {
+            if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
+                return undefined;
+            }
+
             return this.tiles[x + y * this.mapWidth];
         }
 
