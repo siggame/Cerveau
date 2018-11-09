@@ -8,6 +8,18 @@ import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+
+const materialNameToVariableName = (material: Required<IUnitPickupArgs>["material"]) => {
+    switch (material) {
+        case "redium":
+        case "blueium":
+            return material;
+        case "redium ore":
+            return "rediumOre";
+        case "blueium ore":
+            return "blueiumOre";
+    }
+};
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -447,20 +459,8 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
-        let amt = amount;
-
-        if (material === "redium" && this.redium < amount) {
-            amt = this.redium;
-        }
-        if (material === "redium ore" && this.rediumOre < amount) {
-            amt = this.rediumOre;
-        }
-        if (material === "blueium" && this.blueium < amount) {
-            amt = this.blueium;
-        }
-        if (material === "blueium ore" && this.blueiumOre < amount) {
-            amt = this.blueiumOre;
-        }
+        const memberName = materialNameToVariableName(material);
+        const amt = Math.min(this[memberName], amount);
 
         // If amount <= 0, the unit will drop all resources.
         if (amount <= 0) {
@@ -470,25 +470,9 @@ export class Unit extends GameObject {
             tile.rediumOre += this.rediumOre;
             this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
         }
-        // Drops certain amount of redium ore.
-        else if (material === "redium ore") {
-            tile.rediumOre += amt;
-            this.rediumOre -= amt;
-        }
-        // Drops certain amount of redium.
-        else if (material === "redium") {
-            tile.redium += amt;
-            this.redium -= amt;
-        }
-        // Drops certain amount of blueium.
-        else if (material === "blueium") {
-            tile.blueium += amt;
-            this.blueium -= amt;
-        }
-        // Drops certain amount of blueium ore.
-        else if (material === "blueium ore") {
-            tile.blueiumOre += amt;
-            this.blueiumOre -= amt;
+        else {
+            tile[memberName] += amt;
+            this[memberName] -= amt;
         }
 
         return true;
@@ -696,53 +680,18 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
-        let totalMaterialOnTile = 0;
+        const memberName = materialNameToVariableName(material);
+        const totalMaterialOnTile = tile[memberName];
 
-        switch (material) {
-            case "redium ore": {
-                totalMaterialOnTile = tile.rediumOre;
-                break;
-            }
-            case "redium": {
-                totalMaterialOnTile = tile.redium;
-                break;
-            }
-            case "blueium": {
-                totalMaterialOnTile = tile.blueium;
-                break;
-            }
-            case "blueium ore": {
-                totalMaterialOnTile = tile.blueiumOre;
-            }
-        }
-
-        let actualAmount = amount <= 0 ? totalMaterialOnTile
+        let actualAmount = amount <= 0
+            ? totalMaterialOnTile
             : Math.min(totalMaterialOnTile, amount);
         const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
 
         actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
 
-        switch (material) {
-            case "redium ore": {
-                tile.rediumOre -= actualAmount;
-                this.rediumOre += actualAmount;
-                break;
-            }
-            case "redium": {
-                tile.redium -= actualAmount;
-                this.redium += actualAmount;
-                break;
-            }
-            case "blueium": {
-                tile.blueium -= actualAmount;
-                this.blueium += actualAmount;
-                break;
-            }
-            case "blueium ore": {
-                tile.blueiumOre -= actualAmount;
-                this.blueiumOre += actualAmount;
-            }
-        }
+        tile[memberName] -= actualAmount;
+        this[memberName] += actualAmount;
 
         return true;
 

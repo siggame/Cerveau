@@ -8,6 +8,11 @@ import { removeElements } from "~/utils";
 import { Job } from "./job";
 import { Player } from "./player";
 import { Tile } from "./tile";
+
+// Scores a list of players for easy game win checking
+const score = (players: Player[]) => players
+    .map((player) => ({ player, score: player.heat * player.pressure }))
+    .sort((a, b) => b.score - a.score);
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -78,9 +83,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.manageMaterials();
         // code spawning below this:
         // Number of units For the target player.
-        const units: number[] = [0, 0, 0];
+        const units = [0, 0, 0];
         // The player who to spawn for.
-        const player: Player = this.game.currentPlayer.opponent;
+        const player = this.game.currentPlayer.opponent;
 
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
@@ -173,22 +178,17 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
+        const winners = score(this.game.players).filter((p) => p.score === this.game.victoryAmount);
+
         // Add logic here checking for the primary win condition(s)
-        if ((this.game.players[0].heat * this.game.players[0].pressure) === this.game.victoryAmount &&
-            (this.game.players[1].heat * this.game.players[1].pressure) === this.game.victoryAmount) {
+        if (winners.length === this.game.players.length) {
             this.secondaryWinConditions("Both players achieved fusion at the same time.");
 
             return true;
         }
-        else if (this.game.players[0].heat * this.game.players[0].pressure === this.game.victoryAmount) {
-            this.declareWinner("You achieved fusion!", this.game.players[0]);
-            this.declareLosers("Your opponents achieved fusion.", this.game.players[1]);
-
-            return true;
-        }
-        else if (this.game.players[1].heat * this.game.players[1].pressure === this.game.victoryAmount) {
-            this.declareWinner("You achieved fusion!", this.game.players[1]);
-            this.declareLosers("Your opponents achieved fusion.", this.game.players[0]);
+        else if (winners.length === 1) {
+            this.declareWinner("You achieved fusion!", winners[0].player);
+            this.declareLosers("Your opponents achieved fusion.", winners[0].player.opponent);
 
             return true;
         }
@@ -206,17 +206,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
-        if (this.game.players[0].heat * this.game.players[0].pressure >
-            this.game.players[1].heat * this.game.players[1].pressure) {
-            this.declareWinner(`${reason}: You were closer to achieving fusion`, this.game.players[0]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[1]);
-
-            return;
-        }
-        else if (this.game.players[1].heat * this.game.players[1].pressure >
-            this.game.players[0].heat * this.game.players[0].pressure) {
-            this.declareWinner(`${reason}: You were closer to achieving fusion`, this.game.players[1]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[0]);
+        const scored = score(this.game.players);
+        if (scored[0].score !== scored[1].score) {
+            this.declareWinner(`${reason}: You were closer to achieving fusion`, scored[0].player);
+            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, scored[1].player);
 
             return;
         }
@@ -340,22 +333,19 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     /** Updates all arrays in the game with new/dead game objects */
     private updateArrays(): void {
         // Properly remove all killed units
-        for (let i = 0; i < this.game.units.length; i++) {
-            const unit = this.game.units[i];
-            if (!unit.tile || unit.health <= 0) {
-                if (unit.tile) {
-                    unit.tile.unit = undefined;
-                    unit.tile = undefined;
-                }
+        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
 
-                if (unit.owner) {
-                    // Remove this unit from the player's units array
-                    removeElements(unit.owner.units, unit);
-                }
-
-                // Remove this unit from the game's units array
-                this.game.units.splice(i, 1);
-                i--; // Make sure we don't skip an element
+        // remove dead units from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.units, ...deadUnits);
+        }
+        // and remove them from the game
+        removeElements(this.game.units, ...deadUnits);
+         // mark them dead
+        for (const unit of deadUnits) {
+            if (unit.tile) {
+                unit.tile.unit = undefined;
+                unit.tile = undefined;
             }
         }
     }
