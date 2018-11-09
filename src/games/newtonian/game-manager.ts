@@ -21,7 +21,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-Newtonian",
+            "MegaMinerAI-22-Newtonian",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
