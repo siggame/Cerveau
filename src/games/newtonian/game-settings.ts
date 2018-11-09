@@ -23,7 +23,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "Percent loss from the difference of Heat and "
                        + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 0.00,
+            default: 0.05,
             min: 0,
             max: 1,
             // <<-- /Creer-Merge: degradeRate -->>
