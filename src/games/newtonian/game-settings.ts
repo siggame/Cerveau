@@ -23,7 +23,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "Percent loss from the difference of Heat and "
                        + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
-            default: 0.05,
+            default: 0.00,
             min: 0,
             max: 1,
             // <<-- /Creer-Merge: degradeRate -->>
@@ -82,7 +82,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "The amount of combined heat and pressure that you "
                        + "need to win.",
             // <<-- Creer-Merge: victoryAmount -->>
-            default: 200,
+            default: 800,
             min: 1,
             // <<-- /Creer-Merge: victoryAmount -->>
         },
