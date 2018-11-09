@@ -7,19 +7,7 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
-
-const materialNameToVariableName = (material: Required<IUnitPickupArgs>["material"]) => {
-    switch (material) {
-        case "redium":
-        case "blueium":
-            return material;
-        case "redium ore":
-            return "rediumOre";
-        case "blueium ore":
-            return "blueiumOre";
-    }
-};
-
+// any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -161,7 +149,8 @@ export class Unit extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         // make sure the tile is next to the unit
-        if (tile.hasNeighbor(this.tile)) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only act on an adjacent tile.`;
         }
         // make sure valid target
@@ -336,7 +325,8 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (tile.hasNeighbor(this.tile)) {
+        if (tile.tileNorth !== this.tile && tile.tileSouth !== this.tile
+            && tile.tileEast !== this.tile && tile.tileWest !== this.tile) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
@@ -429,8 +419,9 @@ export class Unit extends GameObject {
         if (!tile) {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
-        // make sure it is selecting a adjacent tile.
-        if (tile.hasNeighbor(this.tile)) {
+        // make sure it is selecting a ajacent tile.
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -456,8 +447,20 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
-        const memberName = materialNameToVariableName(material);
-        const amt = Math.min(this[memberName], amount);
+        let amt = amount;
+
+        if (material === "redium" && this.redium < amount) {
+            amt = this.redium;
+        }
+        if (material === "redium ore" && this.rediumOre < amount) {
+            amt = this.rediumOre;
+        }
+        if (material === "blueium" && this.blueium < amount) {
+            amt = this.blueium;
+        }
+        if (material === "blueium ore" && this.blueiumOre < amount) {
+            amt = this.blueiumOre;
+        }
 
         // If amount <= 0, the unit will drop all resources.
         if (amount <= 0) {
@@ -468,9 +471,24 @@ export class Unit extends GameObject {
             this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
         }
         // Drops certain amount of redium ore.
-        else {
-            tile[memberName] += amt;
-            this[memberName] -= amt;
+        else if (material === "redium ore") {
+            tile.rediumOre += amt;
+            this.rediumOre -= amt;
+        }
+        // Drops certain amount of redium.
+        else if (material === "redium") {
+            tile.redium += amt;
+            this.redium -= amt;
+        }
+        // Drops certain amount of blueium.
+        else if (material === "blueium") {
+            tile.blueium += amt;
+            this.blueium -= amt;
+        }
+        // Drops certain amount of blueium ore.
+        else if (material === "blueium ore") {
+            tile.blueiumOre += amt;
+            this.blueiumOre -= amt;
         }
 
         return true;
@@ -522,7 +540,8 @@ export class Unit extends GameObject {
             return `${this} cannot walk through the unit on tile ${tile}. Yet.....`;
         }
         // make sure the tile is next to the unit.
-        if (tile.hasNeighbor(this.tile)) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only travel to an adjacent tile. Tile ${tile} too far away.`;
         }
         // make sure they aren't entering a spawn area.
@@ -603,7 +622,8 @@ export class Unit extends GameObject {
             return `${this} can only pick things up off tiles that exist`;
         }
         // make sure the tile is adjacent to the current tile, or its tile.
-        if (tile.hasNeighbor(this.tile)) {
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -676,18 +696,53 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
-        const memberName = materialNameToVariableName(material);
-        const totalMaterialOnTile = tile[memberName];
+        let totalMaterialOnTile = 0;
 
-        let actualAmount = amount <= 0
-            ? totalMaterialOnTile
+        switch (material) {
+            case "redium ore": {
+                totalMaterialOnTile = tile.rediumOre;
+                break;
+            }
+            case "redium": {
+                totalMaterialOnTile = tile.redium;
+                break;
+            }
+            case "blueium": {
+                totalMaterialOnTile = tile.blueium;
+                break;
+            }
+            case "blueium ore": {
+                totalMaterialOnTile = tile.blueiumOre;
+            }
+        }
+
+        let actualAmount = amount <= 0 ? totalMaterialOnTile
             : Math.min(totalMaterialOnTile, amount);
         const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
 
         actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
 
-        tile[memberName] -= actualAmount;
-        this[memberName] += actualAmount;
+        switch (material) {
+            case "redium ore": {
+                tile.rediumOre -= actualAmount;
+                this.rediumOre += actualAmount;
+                break;
+            }
+            case "redium": {
+                tile.redium -= actualAmount;
+                this.redium += actualAmount;
+                break;
+            }
+            case "blueium": {
+                tile.blueium -= actualAmount;
+                this.blueium += actualAmount;
+                break;
+            }
+            case "blueium ore": {
+                tile.blueiumOre -= actualAmount;
+                this.blueiumOre += actualAmount;
+            }
+        }
 
         return true;
 

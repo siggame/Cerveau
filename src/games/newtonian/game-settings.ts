@@ -24,36 +24,30 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                        + "Pressure. (0 to 1).",
             // <<-- Creer-Merge: degradeRate -->>
             default: 0.05,
-            min: 0,
-            max: 1,
             // <<-- /Creer-Merge: degradeRate -->>
         },
         internCap: {
             description: "The maximum number of interns a player can have.",
             // <<-- Creer-Merge: internCap -->>
             default: 4,
-            min: 0,
             // <<-- /Creer-Merge: internCap -->>
         },
         managerCap: {
             description: "The maximum number of managers a player can have.",
             // <<-- Creer-Merge: managerCap -->>
             default: 4,
-            min: 0,
             // <<-- /Creer-Merge: managerCap -->>
         },
         materialSpawn: {
             description: "The number of materials that spawn per spawn cycle.",
             // <<-- Creer-Merge: materialSpawn -->>
             default: 2,
-            min: 0,
             // <<-- /Creer-Merge: materialSpawn -->>
         },
         physicistCap: {
             description: "The maximum number of physicists a player can have.",
             // <<-- Creer-Merge: physicistCap -->>
             default: 4,
-            min: 0,
             // <<-- /Creer-Merge: physicistCap -->>
         },
         refinedValue: {
@@ -61,14 +55,12 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                        + "ore is consumed by the generator.",
             // <<-- Creer-Merge: refinedValue -->>
             default: 5,
-            min: 1,
             // <<-- /Creer-Merge: refinedValue -->>
         },
         spawnTime: {
             description: "The amount of turns it takes a unit to spawn.",
             // <<-- Creer-Merge: spawnTime -->>
             default: 5,
-            min: 1,
             // <<-- /Creer-Merge: spawnTime -->>
         },
         stunTime: {
@@ -76,21 +68,19 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                        + "stunned.",
             // <<-- Creer-Merge: stunTime -->>
             default: 2,
-            min: 1,
             // <<-- /Creer-Merge: stunTime -->>
         },
         timeImmune: {
             description: "The number turns a unit is immune to being stunned.",
             // <<-- Creer-Merge: timeImmune -->>
             default: 4,
-            min: 1,
             // <<-- /Creer-Merge: timeImmune -->>
         },
         victoryAmount: {
             description: "The amount of combined heat and pressure that you "
                        + "need to win.",
             // <<-- Creer-Merge: victoryAmount -->>
-            default: 2000,
+            default: 200,
             min: 1,
             // <<-- /Creer-Merge: victoryAmount -->>
         },
