@@ -337,8 +337,8 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (tile.tileNorth !== this.tile && tile.tileSouth !== this.tile
-            && tile.tileEast !== this.tile && tile.tileWest !== this.tile) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
@@ -431,7 +431,7 @@ export class Unit extends GameObject {
         if (!tile) {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
-        // make sure it is selecting a ajacent tile.
+        // make sure it is selecting a adjacent tile.
         if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
