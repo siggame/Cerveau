@@ -7,6 +7,7 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
 
 const materialNameToVariableName = (material: Required<IUnitPickupArgs>["material"]) => {
     switch (material) {
@@ -19,7 +20,6 @@ const materialNameToVariableName = (material: Required<IUnitPickupArgs>["materia
             return "blueiumOre";
     }
 };
-
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -470,7 +470,6 @@ export class Unit extends GameObject {
             tile.rediumOre += this.rediumOre;
             this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
         }
-        // Drops certain amount of redium ore.
         else {
             tile[memberName] += amt;
             this[memberName] -= amt;

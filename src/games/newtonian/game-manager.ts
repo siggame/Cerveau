@@ -11,9 +11,8 @@ import { Tile } from "./tile";
 
 // Scores a list of players for easy game win checking
 const score = (players: Player[]) => players
-    .map((player) => ({ player, score: player.heat + player.pressure }))
+    .map((player) => ({ player, score: player.heat * player.pressure }))
     .sort((a, b) => b.score - a.score);
-
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -206,8 +205,8 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
+        // Add logic here for the secondary win conditions
         const scored = score(this.game.players);
-
         if (scored[0].score !== scored[1].score) {
             this.declareWinner(`${reason}: You were closer to achieving fusion`, scored[0].player);
             this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, scored[1].player);
@@ -342,8 +341,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
-
-        // mark them dead
+         // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
                 unit.tile.unit = undefined;
