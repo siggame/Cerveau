@@ -227,9 +227,9 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Makes the unit do something to a machine adjacent to its tile. Interns
-     * sabotage, physicists work. Interns stun physicist, physicist stuns
-     * manager, manager stuns intern.
+     * Makes the unit do something to a machine or unit adjacent to its tile.
+     * Interns sabotage, physicists work. Interns stun physicist, physicist
+     * stuns manager, manager stuns intern.
      *
      * @param player - The player that called this.
      * @param tile - The tile the unit acts on.

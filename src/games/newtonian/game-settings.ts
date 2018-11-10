@@ -19,14 +19,12 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         ...(super.schema || (this as any).schema),
 
         // Newtonian game specific settings
-        degradeRate: {
-            description: "Percent loss from the difference of Heat and "
-                       + "Pressure. (0 to 1).",
-            // <<-- Creer-Merge: degradeRate -->>
-            default: 0.00,
-            min: 0,
-            max: 1,
-            // <<-- /Creer-Merge: degradeRate -->>
+        RegenerateRate: {
+            description: "The percent of max HP regained when a unit end their "
+                       + "turn on a tile owned by their player.",
+            // <<-- Creer-Merge: RegenerateRate -->>
+            default: 0.25,
+            // <<-- /Creer-Merge: RegenerateRate -->>
         },
         internCap: {
             description: "The maximum number of interns a player can have.",

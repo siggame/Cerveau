@@ -600,6 +600,9 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
+                RegenerateRate: {
+                    typeName: "float",
+                },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -607,9 +610,6 @@ export const Namespace = makeNamespace({
                 },
                 currentTurn: {
                     typeName: "int",
-                },
-                degradeRate: {
-                    typeName: "float",
                 },
                 gameObjects: {
                     typeName: "dictionary",

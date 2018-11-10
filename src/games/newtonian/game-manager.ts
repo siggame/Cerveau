@@ -70,15 +70,6 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         this.updateArrays();
         // update units
         this.updateUnits();
-        // update Heat and pressure.
-        const play = this.game.currentPlayer;
-        const diff = Math.abs(play.pressure - play.heat);
-        if (play.pressure > play.heat) {
-            play.pressure -= Math.floor(diff * this.game.degradeRate);
-        }
-        else if (play.pressure < play.heat) {
-            play.heat -= Math.floor(diff * this.game.degradeRate);
-        }
         // add logic here after the current player's turn starts
         this.manageMaterials();
         // code spawning below this:
@@ -364,7 +355,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
                 unit.moves = unit.job.moves;
             }
             if (unit.tile && unit.tile.owner === unit.owner) {
-                unit.health += Math.ceil(unit.job.health * .25);
+                unit.health += Math.ceil(unit.job.health * this.game.RegenerateRate);
                 if (unit.health > unit.job.health) {
                     unit.health = unit.job.health;
                 }
