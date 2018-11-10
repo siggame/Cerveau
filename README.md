@@ -72,7 +72,8 @@ Node v9 is the supported version. It may run on older/newer versions,
 
 ``` bash
 npm install
-npm start
+npm run build
+npm run js
 ```
 
 That's it, your server is running! Now start up two Cadre clients such as the
