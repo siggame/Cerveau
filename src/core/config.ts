@@ -10,7 +10,7 @@ import { Immutable, UnknownObject, unStringify } from "~/utils";
  * are cloning this repo. Otherwise keep on false during development so you
  * can easily move between branches and commits without it being fussy.
  */
-const UPDATER_ENABLED_BY_DEFAULT = false;
+const UPDATER_ENABLED_BY_DEFAULT = true;
 
 // loads the config from an optional `.env` file
 config();
