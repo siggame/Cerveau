@@ -108,7 +108,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         // Base settings
         playerStartingTime: {
             // <<-- Creer-Merge: player-starting-time -->>
-            default: 6e10, // 1 min in ns
+            default: 12e10, // 1 min in ns
             // <<-- /Creer-Merge: player-starting-time -->>
             min: 0,
             description: "The starting time (in ns) for each player.",
