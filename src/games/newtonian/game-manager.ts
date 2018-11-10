@@ -11,7 +11,7 @@ import { Tile } from "./tile";
 
 // Scores a list of players for easy game win checking
 const score = (players: Player[]) => players
-    .map((player) => ({ player, score: player.heat * player.pressure }))
+    .map((player) => ({ player, score: Math.max(player.heat, 1) * Math.max(player.pressure, 1) }))
     .sort((a, b) => b.score - a.score);
 // <<-- /Creer-Merge: imports -->>
 
