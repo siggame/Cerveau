@@ -178,7 +178,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        const winners = score(this.game.players).filter((p) => p.score === this.game.victoryAmount);
+        const winners = score(this.game.players).filter((p) => p.score >= this.game.victoryAmount);
 
         // Add logic here checking for the primary win condition(s)
         if (winners.length === this.game.players.length) {
