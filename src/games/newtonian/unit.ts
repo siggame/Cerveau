@@ -161,7 +161,8 @@ export class Unit extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         // make sure the tile is next to the unit
-        if (tile.hasNeighbor(this.tile)) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only act on an adjacent tile.`;
         }
         // make sure valid target
@@ -336,7 +337,8 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (tile.hasNeighbor(this.tile)) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
@@ -430,7 +432,8 @@ export class Unit extends GameObject {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
         // make sure it is selecting a adjacent tile.
-        if (tile.hasNeighbor(this.tile)) {
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -522,7 +525,8 @@ export class Unit extends GameObject {
             return `${this} cannot walk through the unit on tile ${tile}. Yet.....`;
         }
         // make sure the tile is next to the unit.
-        if (tile.hasNeighbor(this.tile)) {
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only travel to an adjacent tile. Tile ${tile} too far away.`;
         }
         // make sure they aren't entering a spawn area.
@@ -603,7 +607,8 @@ export class Unit extends GameObject {
             return `${this} can only pick things up off tiles that exist`;
         }
         // make sure the tile is adjacent to the current tile, or its tile.
-        if (tile.hasNeighbor(this.tile)) {
+        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
