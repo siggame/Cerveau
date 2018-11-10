@@ -56,7 +56,7 @@ export function registerRouteIndex(app: Express): void {
 
             games.push({
                 name: gameName,
-                description: "TODO: do",
+                description: "", // TODO: do
                 settings,
             });
         }
