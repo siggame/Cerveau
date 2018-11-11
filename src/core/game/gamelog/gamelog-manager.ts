@@ -4,8 +4,7 @@ import { basename, join } from "path";
 import { createGzip } from "zlib";
 import { Config } from "~/core/config";
 import { gunzipFile, Immutable, stringToMoment } from "~/utils";
-import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL,
-       } from "./gamelog-utils";
+import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL } from "./gamelog-utils";
 
 /** The default gamelogs directory */
 const DEFAULT_LOGS_DIR = join(Config.LOGS_DIR, "gamelogs/");
@@ -167,7 +166,12 @@ export class GamelogManager {
     public async getGamelogFileStream(
         filename: string,
     ): Promise<undefined | fs.ReadStream> {
-        const path = await this.checkGamelog(filename);
+        const lastGameInfo = this.gamelogInfos[this.gamelogInfos.length - 1];
+        const filenameToCheck = (filename === "random" && lastGameInfo)
+            ? lastGameInfo.filename
+            : filename;
+
+        const path = await this.checkGamelog(filenameToCheck);
 
         if (!path) {
             return;

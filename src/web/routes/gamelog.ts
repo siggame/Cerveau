@@ -70,9 +70,7 @@ export function registerRouteGamelog(app: Express): void {
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
         const filename = String(params.filename);
-        const stream = await lobby.gamelogManager.getGamelogFileStream(
-            filename,
-        );
+        const stream = await lobby.gamelogManager.getGamelogFileStream(filename);
 
         if (!stream) {
             res.status(404);

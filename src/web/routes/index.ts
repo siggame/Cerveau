@@ -36,7 +36,7 @@ export function registerRouteIndex(app: Express): void {
 
     const lobby = Lobby.getInstance();
     lobby.gamesInitializedPromise.then(() => {
-        for (const gameName of Object.keys(lobby.gameNamespaces.keys()).sort()) {
+        for (const gameName of Array.from(lobby.gameNamespaces.keys()).sort()) {
             const namespace = lobby.gameNamespaces.get(gameName);
             if (!namespace) {
                 throw new Error(`${namespace} is not a game namespace!`);
@@ -56,7 +56,7 @@ export function registerRouteIndex(app: Express): void {
 
             games.push({
                 name: gameName,
-                description: "TODO: do",
+                description: "", // TODO: do
                 settings,
             });
         }
