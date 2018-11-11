@@ -427,7 +427,7 @@ export class Unit extends GameObject {
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
     ): void | string | IUnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
-        const reason = this.invalidate(player, true);
+        const reason = this.invalidate(player, false);
         // if there is a reason, return it.
         if (reason) {
             return reason;
