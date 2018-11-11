@@ -366,6 +366,10 @@ export class Unit extends GameObject {
         if (this.job === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
         }
+        // make sure the unit hasn't moved.
+        if (this.moves < this.job.moves) {
+            return `${this} has already moved this turn and cannot attack`;
+        }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
