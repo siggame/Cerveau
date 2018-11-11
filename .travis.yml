@@ -1,6 +1,7 @@
 language: node_js
-node_js:
-  - "10.7.0"
+
+before_script:
+  - npm install
 
 script:
   # run linter and check to make sure TypeScript can build the source code

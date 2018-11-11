@@ -27,6 +27,9 @@ dist
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
-# generated docs via apidoc or jsdoc
+# generated files
 docs
 dist
+
+# too many devs stumble over this and commit merge conflicts. Easier to just deal with the chore or re-generating
+.package-lock.json
