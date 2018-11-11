@@ -352,8 +352,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             }
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
-                unit.moves = unit.job.moves;
+                unit.moves = unit.attacked ? unit.job.moves + 1 : unit.job.moves;
             }
+            unit.attacked = false;
             if (unit.tile && unit.tile.owner === unit.owner) {
                 unit.health += Math.ceil(unit.job.health * this.game.RegenerateRate);
                 if (unit.health > unit.job.health) {

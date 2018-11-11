@@ -23,7 +23,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             description: "The percent of max HP regained when a unit end their "
                        + "turn on a tile owned by their player.",
             // <<-- Creer-Merge: RegenerateRate -->>
-            default: 0.25,
+            default: 0.5,
             // <<-- /Creer-Merge: RegenerateRate -->>
         },
         internCap: {

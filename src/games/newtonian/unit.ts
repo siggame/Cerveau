@@ -95,6 +95,10 @@ export class Unit extends GameObject {
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
+    /**
+     * tracks if a unit was attacked.
+     */
+    public attacked: boolean;
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -117,6 +121,7 @@ export class Unit extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.job = args.job;
+        this.attacked = false;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -380,6 +385,7 @@ export class Unit extends GameObject {
             throw new Error("Unit on tile is undefined.");
         }
         tile.unit.health = tile.unit.health - this.job.damage;
+        tile.unit.attacked = true;
         if (tile.unit.health <= 0) {
             tile.blueium += tile.unit.blueium;
             tile.redium += tile.unit.redium;
