@@ -303,6 +303,7 @@ export class Unit extends GameObject {
             // make it immune.
             tile.unit.stunImmune += this.game.timeImmune;
         }
+        this.acted = true;
 
         // TODO: replace this with actual logic
         return true;
