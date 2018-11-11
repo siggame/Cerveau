@@ -372,6 +372,10 @@ ${JSON.stringify(mapToObject(argsMap))}
             return; // we have no order to resolve or reject
         }
 
+        // Remove this order as it's finished
+        this.orders.delete(orderIndex);
+
+        // And check to make sure if they have no orders we stop ticking their timer
         if (this.orders.size === 0) {
             // No orders remaining, stop their timer as we are not waiting on
             // them for anything
@@ -422,8 +426,6 @@ ${JSON.stringify(mapToObject(argsMap))}
                 return;
             }
         }
-
-        this.orders.delete(orderIndex);
 
         if (invalid) {
             order.reject(validated); // will be an Error
