@@ -20,6 +20,8 @@ export function registerRouteGamelog(app: Express): void {
      * @apiParam {string} filename The filename (with no extension) of the
      * gamelog, this is sent to clients when a game is over,
      * and in status when a game is over.
+     * Optionally can also be the string "latest", to get the latest gamelog
+     * logged, if there is any.
      *
      * @apiSuccessExample {json} Gamelog found
      * {

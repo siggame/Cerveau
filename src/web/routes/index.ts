@@ -6,6 +6,7 @@ import { Lobby } from "~/core/server";
 
 export * from "./archives";
 export * from "./gamelog";
+export * from "./gamelogs";
 export * from "./status";
 
 // var getGameInfos = require("./getGameInfos");

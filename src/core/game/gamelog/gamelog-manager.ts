@@ -167,7 +167,7 @@ export class GamelogManager {
         filename: string,
     ): Promise<undefined | fs.ReadStream> {
         const lastGameInfo = this.gamelogInfos[this.gamelogInfos.length - 1];
-        const filenameToCheck = (filename === "random" && lastGameInfo)
+        const filenameToCheck = (filename === "latest" && lastGameInfo)
             ? lastGameInfo.filename
             : filename;
 
