@@ -740,7 +740,7 @@ Must be one string in the url parameters format.${footer}`;
     private async shutDown(): Promise<void> {
         if (!this.isShuttingDown) {
             this.isShuttingDown = true;
-            logger.info("Ω Shutting down gracefully Ω");
+            logger.info("🔚 Shutting down gracefully 🔚");
 
             const n = Array
                 .from(this.roomsPlaying)
