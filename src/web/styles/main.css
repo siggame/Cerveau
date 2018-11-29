@@ -189,10 +189,21 @@ table tr:nth-child(odd) {
 	color:var(--color-complement-light);
 }
 
-.pagination {
+.pagination, .more-gamelogs {
 	display: block;
 	width: 100%;
 	text-align: center;
+	margin-top: 0.5em;
+}
+
+.pagination a {
+	padding: 0 0.5em;
+}
+
+.pagination a:not([href]) {
+	cursor: default;
+	opacity: 0;
+	pointer-events: none;
 }
 
 

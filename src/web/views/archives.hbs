@@ -3,11 +3,7 @@
 	{{> gamelogs}}
 
 	<section class="pagination">
-	{{#if newerUri}}
-		<a class="newer" href="{{newerUri}}">Newer</a>
-	{{/if}}
-	{{#if olderUri}}
-		<a class="older" href="{{olderUri}}">Older</a>
-	{{/if}}
+		<a class="newer" {{#if newerUri}}href="{{newerUri}}"{{/if}}>&laquo; Newer</a>
+		<a class="older" {{#if olderUri}}href="{{olderUri}}"{{/if}}>Older &raquo;</a>
 	</section>
 </section>

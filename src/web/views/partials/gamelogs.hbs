@@ -16,14 +16,3 @@
 	</tr>
 {{/each}}
 </table>
-<script type="text/javascript">
-// Have the web browser rewrite urls to inject the hostname they used to reach this web interface
-$('.gamelog-vis-link a').each(function() {
-	var $this = $(this);
-	var href = $this.attr('href');
-
-	if (href.includes('__HOSTNAME__')) { // then rewrite it
-		$this.attr('href', href.replace('__HOSTNAME__', location.hostname));
-	}
-});
-</script>

@@ -6,7 +6,7 @@ import { Immutable, objectHasProperty, quoteIfString, UnknownObject,
 export type PossibleSettingValue = string | number | boolean | string[];
 
 /** An individual setting in a schema. */
-export interface ISettingsSchema<T> {
+export interface ISettingsSchema<T extends PossibleSettingValue = PossibleSettingValue> {
     readonly default: T;
     readonly description: string;
     readonly min?: T extends number ? number : never;
@@ -15,7 +15,7 @@ export interface ISettingsSchema<T> {
 
 /** The base settings schemas all implement. */
 export interface ISettingsSchemas {
-    [key: string]: ISettingsSchema<PossibleSettingValue>;
+    [key: string]: ISettingsSchema;
 }
 
 /**

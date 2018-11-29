@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Config } from "~/core/config";
-import { IGamelogInfo } from "~/core/game";
-import { Lobby } from "../../core/server";
+import { Lobby } from "~/core/server/lobby";
+import { formatGamelogInfos } from "~/web/utils";
 
 const DEFAULT_PAGE_COUNT = 20;
 
@@ -24,7 +24,7 @@ export function registerRouteArchives(app: Express): void {
             pageCount: unknown;
         };
 
-        const gameName = String(params.gameName) || "all";
+        const gameName = String(params.gameName || "all");
 
         let pageStart = Number(params.pageStart);
         if (isNaN(pageStart)) {
@@ -36,23 +36,19 @@ export function registerRouteArchives(app: Express): void {
             pageCount = DEFAULT_PAGE_COUNT; // starting page
         }
 
-        const logs = lobby.gamelogManager.gamelogInfos;
-
-        const startIndex = Math.max(logs.length - (pageStart * pageCount), 0);
+        const { gamelogInfos } = lobby.gamelogManager;
+        const startIndex = Math.max(gamelogInfos.length - (pageStart * pageCount), 0);
         const endIndex = startIndex + pageCount;
 
         // Because logs (all the gamelogs GamelogManager found) is pre-sorted
         // with the newest gamelogs at the END, startIndex starts at the end.
         // We want to first show the NEWEST gamelogs.
-        const gamelogs: IGamelogInfo[] = [];
-        for (let i = endIndex - 1; i >= startIndex; i--) {
-            const log = logs[i];
-            if (log) {
-                gamelogs.push(log);
-            }
-        }
+        const gamelogs = formatGamelogInfos(gamelogInfos
+            .slice(startIndex, endIndex)
+            .reverse(),
+        req.headers.host);
 
-        const newerUri = endIndex < logs.length
+        const newerUri = endIndex < gamelogInfos.length
             ? (`/archives/${gameName}/${pageStart - 1}`)
             : undefined;
 
