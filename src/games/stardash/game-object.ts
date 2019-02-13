@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { BaseClasses, IGameObjectProperties } from "./";
-import { StarDashGame } from "./game";
-import { StarDashGameManager } from "./game-manager";
+import { StardashGame } from "./game";
+import { StardashGameManager } from "./game-manager";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -13,10 +13,10 @@ import { StarDashGameManager } from "./game-manager";
  */
 export class GameObject extends BaseClasses.GameObject {
     /** The game this game object is in */
-    public readonly game!: StarDashGame;
+    public readonly game!: StardashGame;
 
     /** The manager of the game that controls this */
-    public readonly manager!: StarDashGameManager;
+    public readonly manager!: StardashGameManager;
 
     /**
      * String representing the top level Class that this game object is an

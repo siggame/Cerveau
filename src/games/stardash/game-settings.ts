@@ -6,9 +6,9 @@ import { BaseClasses } from "./";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The settings manager for the StarDash game.
+ * The settings manager for the Stardash game.
  */
-export class StarDashGameSettingsManager extends BaseClasses.GameSettings {
+export class StardashGameSettingsManager extends BaseClasses.GameSettings {
     /**
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
@@ -18,7 +18,7 @@ export class StarDashGameSettingsManager extends BaseClasses.GameSettings {
         // tslint:disable-next-line:no-any
         ...(super.schema || (this as any).schema),
 
-        // StarDash game specific settings
+        // Stardash game specific settings
         dashDistance: {
             description: "The distance traveled each turn by dashing.",
             // <<-- Creer-Merge: dashDistance -->>

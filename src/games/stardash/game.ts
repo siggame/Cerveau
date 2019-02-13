@@ -1,9 +1,9 @@
 import { IBaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Body } from "./body";
-import { StarDashGameManager } from "./game-manager";
+import { StardashGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
-import { StarDashGameSettingsManager } from "./game-settings";
+import { StardashGameSettingsManager } from "./game-settings";
 import { Job } from "./job";
 import { Player } from "./player";
 import { Unit } from "./unit";
@@ -16,9 +16,9 @@ import { Unit } from "./unit";
  * Collect of the most of the rarest mineral orbiting aroung the sun and
  * outcompete your competetor.
  */
-export class StarDashGame extends BaseClasses.Game {
+export class StardashGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it */
-    public readonly manager!: StarDashGameManager;
+    public readonly manager!: StardashGameManager;
 
     /** The settings used to initialize the game, as set by players */
     public readonly settings = Object.freeze(this.settingsManager.values);
@@ -147,7 +147,7 @@ export class StarDashGame extends BaseClasses.Game {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        protected settingsManager: StarDashGameSettingsManager,
+        protected settingsManager: StardashGameSettingsManager,
         required: Readonly<IBaseGameRequiredData>,
     ) {
         super(settingsManager, required);
@@ -286,7 +286,7 @@ export class StarDashGame extends BaseClasses.Game {
             this.manager.create.body({
                 bodyType: "asteroid",
                 materialType: "Mythicite",
-                radius: 90,
+                radius: 95,
                 x: 1167,
                 y: 650,
             }),

@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseStarDashPlayer } from "./";
+import { IBaseStardashPlayer } from "./";
 import { AI } from "./ai";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
@@ -12,7 +12,7 @@ import { Unit } from "./unit";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseStarDashPlayer {
+export class Player extends GameObject implements IBaseStardashPlayer {
     /** The AI controlling this Player */
     public readonly ai!: AI;
 
@@ -93,7 +93,7 @@ export class Player extends GameObject implements IBaseStarDashPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseStarDashPlayer>,
+        args: Readonly<IBaseStardashPlayer>,
         required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
