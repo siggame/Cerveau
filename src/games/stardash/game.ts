@@ -6,6 +6,7 @@ import { GameObject } from "./game-object";
 import { StardashGameSettingsManager } from "./game-settings";
 import { Job } from "./job";
 import { Player } from "./player";
+import { Projectile } from "./projectile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
@@ -110,6 +111,11 @@ export class StardashGame extends BaseClasses.Game {
      * The amount of distance missiles travel through space.
      */
     public readonly projectileSpeed!: number;
+
+    /**
+     * Every projectile in the game.
+     */
+    public projectiles!: Projectile[];
 
     /**
      * The regeneration rate of asteroids.
