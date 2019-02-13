@@ -215,11 +215,9 @@ export class StarDashGame extends BaseClasses.Game {
         );
     }
 
-    /* 
-     *
-     */
+    /** Generates the map for testing */
     private createMap(): void {
-        // push all three jobs.
+        // push all the bodies that are made in the generator.
         this.bodies.push(
             this.manager.create.body({
                 bodyType: "planet",
