@@ -100,6 +100,7 @@ export class Unit extends GameObject {
     constructor(
         args: Readonly<IUnitProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            job: Job;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -108,6 +109,7 @@ export class Unit extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.job = args.job;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -136,6 +138,11 @@ export class Unit extends GameObject {
         enemy: Unit,
     ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
 
         // Check all the arguments for attack here and try to
         // return a string explaining why the input is wrong.
@@ -179,6 +186,11 @@ export class Unit extends GameObject {
         body: Body,
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
 
         // Check all the arguments for mine here and try to
         // return a string explaining why the input is wrong.
@@ -224,6 +236,21 @@ export class Unit extends GameObject {
         y: number,
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+
+        if ((((this.x - x) ** 2 + (this.y - y) ** 2) ** .5) > this.moves) {
+            return `${this} can only move ${this.moves} distance!`;
+        }
+
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+            return `${this} is dead and cannot move.`;
+        }
+
+        // make sure it can move there without collision?
 
         // Check all the arguments for move here and try to
         // return a string explaining why the input is wrong.
@@ -274,6 +301,11 @@ export class Unit extends GameObject {
         y: number,
     ): void | string | IUnitOpenArgs {
         // <<-- Creer-Merge: invalidate-open -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
 
         // Check all the arguments for open here and try to
         // return a string explaining why the input is wrong.
@@ -378,6 +410,11 @@ export class Unit extends GameObject {
         material: "genarium" | "rarium" | "legendarium" | "Mythicite",
     ): void | string | IUnitTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
 
         // Check all the arguments for transfer here and try to
         // return a string explaining why the input is wrong.
