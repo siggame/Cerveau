@@ -201,6 +201,11 @@ export interface IPlayerProperties {
     opponent?: Player;
 
     /**
+     * Every Projectile owned by this Player.
+     */
+    projectiles?: Projectile[];
+
+    /**
      * The reason why the player lost the game.
      */
     reasonLost?: string;
@@ -625,6 +630,14 @@ export const Namespace = makeNamespace({
                 projectileSpeed: {
                     typeName: "int",
                 },
+                projectiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Projectile,
+                        nullable: false,
+                    },
+                },
                 regenerateRate: {
                     typeName: "float",
                 },
@@ -784,6 +797,14 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Player,
                     nullable: false,
+                },
+                projectiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Projectile,
+                        nullable: false,
+                    },
                 },
                 reasonLost: {
                     typeName: "string",

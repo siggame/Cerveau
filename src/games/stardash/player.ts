@@ -3,6 +3,7 @@ import { IBaseStardashPlayer } from "./";
 import { AI } from "./ai";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
+import { Projectile } from "./projectile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
@@ -46,6 +47,11 @@ export class Player extends GameObject implements IBaseStardashPlayer {
      * This player's opponent in the game.
      */
     public readonly opponent!: Player;
+
+    /**
+     * Every Projectile owned by this Player.
+     */
+    public projectiles!: Projectile[];
 
     /**
      * The reason why the player lost the game.
