@@ -160,6 +160,11 @@ export interface IJobProperties {
      */
     title?: "corvette" | "missleboat" | "martyr" | "transport" | "miner";
 
+    /**
+     * How much money it costs to spawn a unit.
+     */
+    unitCost?: number;
+
 }
 
 /** All the possible properties for an Player. */
@@ -224,6 +229,35 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
+
+}
+
+/** All the possible properties for an Projectile. */
+export interface IProjectileProperties {
+    /**
+     * The Player that owns and can control this Unit.
+     */
+    owner?: Player;
+
+    /**
+     * The radius of the circle this projectile occupies.
+     */
+    radius?: number;
+
+    /**
+     * The unit that is being attacked by this projectile.
+     */
+    target?: Unit;
+
+    /**
+     * The x value this projectile is on.
+     */
+    x?: number;
+
+    /**
+     * The y value this projectile is on.
+     */
+    y?: number;
 
 }
 
@@ -357,19 +391,15 @@ export interface IUnitOpenArgs {
 }
 
 /**
- * Argument overrides for Unit's pathable function. If you return an object of
+ * Argument overrides for Unit's shootDown function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitPathableArgs {
+export interface IUnitShootDownArgs {
     /**
-     * The x position of the destination you wish to check to.
+     * The projectile being shot down.
      */
-    x?: number;
-    /**
-     * The y position of the destination you wish to check to.
-     */
-    y?: number;
+    missile?: Projectile;
 }
 
 /**
@@ -398,6 +428,7 @@ export * from "./body";
 export * from "./game-object";
 export * from "./job";
 export * from "./player";
+export * from "./projectile";
 export * from "./unit";
 export * from "./game";
 export * from "./game-manager";
@@ -407,6 +438,7 @@ import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
+import { Projectile } from "./projectile";
 import { Unit } from "./unit";
 
 import { AI } from "./ai";
@@ -419,6 +451,9 @@ export type BodyArgs = FirstArgumentFromConstructor<typeof Body>;
 
 /** The arguments used to construct a Job */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
+
+/** The arguments used to construct a Projectile */
+export type ProjectileArgs = FirstArgumentFromConstructor<typeof Projectile>;
 
 /** The arguments used to construct a Unit */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
@@ -452,6 +487,20 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
         args: Readonly<T>,
     ): Job & T {
         return this.createGameObject("Job", Job, args);
+    }
+
+    /**
+     * Creates a new Projectile in the Game and tracks it for all players.
+     *
+     * @param args - Data about the Projectile to set. Any keys matching a
+     * property in the game object's class will be automatically set for you.
+     * @returns A new Projectile hooked up in the game and ready for you to
+     * use.
+     */
+    public projectile<T extends ProjectileArgs>(
+        args: Readonly<T>,
+    ): Projectile & T {
+        return this.createGameObject("Projectile", Projectile, args);
     }
 
     /**
@@ -550,6 +599,9 @@ export const Namespace = makeNamespace({
                 minAsteroid: {
                     typeName: "int",
                 },
+                miningSpeed: {
+                    typeName: "int",
+                },
                 oreRarity1: {
                     typeName: "float",
                 },
@@ -569,6 +621,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Player,
                         nullable: false,
                     },
+                },
+                projectileSpeed: {
+                    typeName: "int",
                 },
                 regenerateRate: {
                     typeName: "float",
@@ -698,6 +753,9 @@ export const Namespace = makeNamespace({
                     defaultValue: "corvette",
                     literals: ["corvette", "missleboat", "martyr", "transport", "miner"],
                 },
+                unitCost: {
+                    typeName: "int",
+                },
             },
             functions: {
             },
@@ -749,6 +807,32 @@ export const Namespace = makeNamespace({
                 },
                 won: {
                     typeName: "boolean",
+                },
+            },
+            functions: {
+            },
+        },
+        Projectile: {
+            parentClassName: "GameObject",
+            attributes: {
+                owner: {
+                    typeName: "gameObject",
+                    gameObjectClass: Player,
+                    nullable: true,
+                },
+                radius: {
+                    typeName: "float",
+                },
+                target: {
+                    typeName: "gameObject",
+                    gameObjectClass: Unit,
+                    nullable: false,
+                },
+                x: {
+                    typeName: "float",
+                },
+                y: {
+                    typeName: "float",
                 },
             },
             functions: {
@@ -862,15 +946,13 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
-                pathable: {
+                shootDown: {
                     args: [
                         {
-                            argName: "x",
-                            typeName: "float",
-                        },
-                        {
-                            argName: "y",
-                            typeName: "float",
+                            argName: "missile",
+                            typeName: "gameObject",
+                            gameObjectClass: Projectile,
+                            nullable: false,
                         },
                     ],
                     invalidValue: false,

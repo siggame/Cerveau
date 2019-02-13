@@ -75,6 +75,11 @@ export class StardashGame extends BaseClasses.Game {
     public readonly minAsteroid!: number;
 
     /**
+     * The rate at which miners grab minerals from asteroids.
+     */
+    public readonly miningSpeed!: number;
+
+    /**
      * The rarity modifier of the most common ore. This controls how much
      * spawns.
      */
@@ -100,6 +105,11 @@ export class StardashGame extends BaseClasses.Game {
      * List of all the players in the game.
      */
     public players!: Player[];
+
+    /**
+     * The amount of distance missiles travel through space.
+     */
+    public readonly projectileSpeed!: number;
 
     /**
      * The regeneration rate of asteroids.
@@ -199,7 +209,7 @@ export class StardashGame extends BaseClasses.Game {
 
             this.manager.create.job({
                 title: "transport",
-                carryLimit: 20,
+                carryLimit: 100,
                 damage: 0,
                 health: 100,
                 moves: 10,
@@ -207,7 +217,7 @@ export class StardashGame extends BaseClasses.Game {
 
             this.manager.create.job({
                 title: "miner",
-                carryLimit: 10,
+                carryLimit: 20,
                 damage: 0,
                 health: 100,
                 moves: 10,

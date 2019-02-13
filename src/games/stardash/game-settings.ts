@@ -39,6 +39,13 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             default: 250,
             // <<-- /Creer-Merge: minAsteroid -->>
         },
+        miningSpeed: {
+            description: "The rate at which miners grab minerals from "
+                       + "asteroids.",
+            // <<-- Creer-Merge: miningSpeed -->>
+            default: 5,
+            // <<-- /Creer-Merge: miningSpeed -->>
+        },
         oreRarity1: {
             description: "The rarity modifier of the most common ore. This "
                        + "controls how much spawns.",
@@ -63,8 +70,15 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         planetRechargeRate: {
             description: "The amount of energy the planets restore each round.",
             // <<-- Creer-Merge: planetRechargeRate -->>
-            default: 0,
+            default: 50,
             // <<-- /Creer-Merge: planetRechargeRate -->>
+        },
+        projectileSpeed: {
+            description: "The amount of distance missiles travel through "
+                       + "space.",
+            // <<-- Creer-Merge: projectileSpeed -->>
+            default: 9,
+            // <<-- /Creer-Merge: projectileSpeed -->>
         },
         regenerateRate: {
             description: "The regeneration rate of asteroids.",

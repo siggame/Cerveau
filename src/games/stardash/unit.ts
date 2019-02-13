@@ -1,10 +1,11 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitAttackArgs, IUnitMineArgs, IUnitMoveArgs, IUnitOpenArgs,
-         IUnitPathableArgs, IUnitProperties, IUnitTransferArgs } from "./";
+         IUnitProperties, IUnitShootDownArgs, IUnitTransferArgs } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
+import { Projectile } from "./projectile";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -277,6 +278,11 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: move -->>
 
         // Add logic here for move.
+        this.moves -= ((x - this.x) ** 2) + ((y - this.y) ** 2) ** .5;
+        this.x = x;
+        this.y = y;
+
+        // magic code that updates the units grid position.
 
         // TODO: replace this with actual logic
         return false;
@@ -340,53 +346,49 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Invalidation function for pathable. Try to find a reason why the passed
+     * Invalidation function for shootDown. Try to find a reason why the passed
      * in parameters are invalid, and return a human readable string telling
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param x - The x position of the destination you wish to check to.
-     * @param y - The y position of the destination you wish to check to.
+     * @param missile - The projectile being shot down.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidatePathable(
+    protected invalidateShootDown(
         player: Player,
-        x: number,
-        y: number,
-    ): void | string | IUnitPathableArgs {
-        // <<-- Creer-Merge: invalidate-pathable -->>
+        missile: Projectile,
+    ): void | string | IUnitShootDownArgs {
+        // <<-- Creer-Merge: invalidate-shootDown -->>
 
-        // Check all the arguments for pathable here and try to
+        // Check all the arguments for shootDown here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        // <<-- /Creer-Merge: invalidate-pathable -->>
+        // <<-- /Creer-Merge: invalidate-shootDown -->>
     }
 
     /**
-     * tell you if there is a open path to that location.
+     * Attacks the specified projectile.
      *
      * @param player - The player that called this.
-     * @param x - The x position of the destination you wish to check to.
-     * @param y - The y position of the destination you wish to check to.
-     * @returns True if pathable by this unit, false otherwise.
+     * @param missile - The projectile being shot down.
+     * @returns True if successfully attacked, false otherwise.
      */
-    protected async pathable(
+    protected async shootDown(
         player: Player,
-        x: number,
-        y: number,
+        missile: Projectile,
     ): Promise<boolean> {
-        // <<-- Creer-Merge: pathable -->>
+        // <<-- Creer-Merge: shootDown -->>
 
-        // Add logic here for pathable.
+        // Add logic here for shootDown.
 
         // TODO: replace this with actual logic
         return false;
 
-        // <<-- /Creer-Merge: pathable -->>
+        // <<-- /Creer-Merge: shootDown -->>
     }
 
     /**
