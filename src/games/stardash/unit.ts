@@ -110,6 +110,7 @@ export class Unit extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.job = args.job;
+        this.radius = 10;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }

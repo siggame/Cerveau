@@ -20,10 +20,10 @@ import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the StarDash game
+ * The interface the Player for the Stardash game
  * must implement from mixed in game logic.
  */
-export interface IBaseStarDashPlayer extends
+export interface IBaseStardashPlayer extends
     BasePlayer,
     ITwoPlayerPlayer,
     ITurnBasedPlayer {
@@ -42,28 +42,28 @@ const base2 = mixTurnBased(base1);
 
 const mixed = base2;
 
-/** The base AI class for the StarDash game will mixin logic. */
-class BaseStarDashAI extends mixed.AI {}
+/** The base AI class for the Stardash game will mixin logic. */
+class BaseStardashAI extends mixed.AI {}
 
-/** The base Game class for the StarDash game will mixin logic. */
-class BaseStarDashGame extends mixed.Game {}
+/** The base Game class for the Stardash game will mixin logic. */
+class BaseStardashGame extends mixed.Game {}
 
-/** The base GameManager class for the StarDash game will mixin logic. */
-class BaseStarDashGameManager extends mixed.GameManager {}
+/** The base GameManager class for the Stardash game will mixin logic. */
+class BaseStardashGameManager extends mixed.GameManager {}
 
-/** The base GameObject class for the StarDash game will mixin logic. */
-class BaseStarDashGameObject extends mixed.GameObject {}
+/** The base GameObject class for the Stardash game will mixin logic. */
+class BaseStardashGameObject extends mixed.GameObject {}
 
-/** The base GameSettings class for the StarDash game will mixin logic. */
-class BaseStarDashGameSettings extends mixed.GameSettings {}
+/** The base GameSettings class for the Stardash game will mixin logic. */
+class BaseStardashGameSettings extends mixed.GameSettings {}
 
 /** The Base classes that game classes build off of. */
 export const BaseClasses = {
-    AI: BaseStarDashAI,
-    Game: BaseStarDashGame,
-    GameManager: BaseStarDashGameManager,
-    GameObject: BaseStarDashGameObject,
-    GameSettings: BaseStarDashGameSettings,
+    AI: BaseStardashAI,
+    Game: BaseStardashGame,
+    GameManager: BaseStardashGameManager,
+    GameObject: BaseStardashGameObject,
+    GameSettings: BaseStardashGameSettings,
 };
 
 // Now all the base classes are created;
@@ -410,9 +410,9 @@ import { Player } from "./player";
 import { Unit } from "./unit";
 
 import { AI } from "./ai";
-import { StarDashGame } from "./game";
-import { StarDashGameManager } from "./game-manager";
-import { StarDashGameSettingsManager } from "./game-settings";
+import { StardashGame } from "./game";
+import { StardashGameManager } from "./game-manager";
+import { StardashGameSettingsManager } from "./game-settings";
 
 /** The arguments used to construct a Body */
 export type BodyArgs = FirstArgumentFromConstructor<typeof Body>;
@@ -425,9 +425,9 @@ export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
  * The factory that **must** be used to create any game objects in
- * the StarDash game.
+ * the Stardash game.
  */
-export class StarDashGameObjectFactory extends BaseGameObjectFactory {
+export class StardashGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Body in the Game and tracks it for all players.
      *
@@ -470,23 +470,23 @@ export class StarDashGameObjectFactory extends BaseGameObjectFactory {
 }
 
 /**
- * The shared namespace for StarDash that is used to
+ * The shared namespace for Stardash that is used to
  * initialize each game instance.
  */
 export const Namespace = makeNamespace({
     AI,
-    Game: StarDashGame,
-    GameManager: StarDashGameManager,
-    GameObjectFactory: StarDashGameObjectFactory,
-    GameSettingsManager: StarDashGameSettingsManager,
+    Game: StardashGame,
+    GameManager: StardashGameManager,
+    GameObjectFactory: StardashGameObjectFactory,
+    GameSettingsManager: StardashGameSettingsManager,
     Player,
 
     // These are generated metadata that allow delta-merging values from
     // clients.
     // They are never intended to be directly interfaced with outside of the
     // Cerveau core developers.
-    gameName: "StarDash",
-    gameSettingsManager: new StarDashGameSettingsManager(),
+    gameName: "Stardash",
+    gameSettingsManager: new StardashGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
             attributes: {
