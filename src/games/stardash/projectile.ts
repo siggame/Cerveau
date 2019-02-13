@@ -1,56 +1,41 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IJobProperties } from "./";
+import { IProjectileProperties } from "./";
 import { GameObject } from "./game-object";
+import { Player } from "./player";
+import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The Job title. 'corvette', 'missleboat', 'martyr', 'transport', or 'miner'.
- * (in this order from 0-4).
+ * Tracks any projectiles moving through space.
  */
-export type JobTitle = "corvette" | "missleboat" | "martyr" | "transport" | "miner";
-
-/**
- * Information about a unit's job.
- */
-export class Job extends GameObject {
+export class Projectile extends GameObject {
     /**
-     * How many combined resources a unit with this Job can hold at once.
+     * The Player that owns and can control this Unit.
      */
-    public readonly carryLimit!: number;
+    public owner?: Player;
 
     /**
-     * The amount of damage this Job does per attack.
+     * The radius of the circle this projectile occupies.
      */
-    public readonly damage!: number;
+    public radius!: number;
 
     /**
-     * The amount of starting health this Job has.
+     * The unit that is being attacked by this projectile.
      */
-    public readonly energy!: number;
+    public target: Unit;
 
     /**
-     * The distance this job can move per turn.
+     * The x value this projectile is on.
      */
-    public readonly moves!: number;
+    public x!: number;
 
     /**
-     * The reserve the martyr use to protect allies.
+     * The y value this projectile is on.
      */
-    public readonly shield!: number;
-
-    /**
-     * The Job title. 'corvette', 'missleboat', 'martyr', 'transport', or
-     * 'miner'. (in this order from 0-4).
-     */
-    public readonly title!: "corvette" | "missleboat" | "martyr" | "transport" | "miner";
-
-    /**
-     * How much money it costs to spawn a unit.
-     */
-    public readonly unitCost!: number;
+    public y!: number;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -61,14 +46,15 @@ export class Job extends GameObject {
     // <<-- /Creer-Merge: attributes -->>
 
     /**
-     * Called when a Job is created.
+     * Called when a Projectile is created.
      *
      * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IJobProperties & {
+        args: Readonly<IProjectileProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            target: Unit;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -77,6 +63,7 @@ export class Job extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.target = args.target;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
