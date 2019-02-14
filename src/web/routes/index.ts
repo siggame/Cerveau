@@ -8,6 +8,7 @@ import { formatGamelogInfos } from "~/web/utils";
 export * from "./archives";
 export * from "./gamelog";
 export * from "./gamelogs";
+export * from "./setup";
 export * from "./status";
 
 /** Setting for the view to expect. */
