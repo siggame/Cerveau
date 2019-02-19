@@ -13,6 +13,11 @@ import { Unit } from "./unit";
  */
 export class Projectile extends GameObject {
     /**
+     * The amount of remaining distance the projectile can move.
+     */
+    public fuel!: number;
+
+    /**
      * The Player that owns and can control this Unit.
      */
     public owner?: Player;

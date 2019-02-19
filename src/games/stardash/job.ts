@@ -37,6 +37,11 @@ export class Job extends GameObject {
     public readonly moves!: number;
 
     /**
+     * The distance at which this job can effect things.
+     */
+    public readonly range!: number;
+
+    /**
      * The reserve the martyr use to protect allies.
      */
     public readonly shield!: number;
