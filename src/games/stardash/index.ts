@@ -150,6 +150,11 @@ export interface IJobProperties {
     moves?: number;
 
     /**
+     * The distance at which this job can effect things.
+     */
+    range?: number;
+
+    /**
      * The reserve the martyr use to protect allies.
      */
     shield?: number;
@@ -240,6 +245,11 @@ export interface IPlayerProperties {
 /** All the possible properties for an Projectile. */
 export interface IProjectileProperties {
     /**
+     * The amount of remaining distance the projectile can move.
+     */
+    fuel?: number;
+
+    /**
      * The Player that owns and can control this Unit.
      */
     owner?: Player;
@@ -315,6 +325,11 @@ export interface IUnitProperties {
      * The Player that owns and can control this Unit.
      */
     owner?: Player;
+
+    /**
+     * The martyr ship that is currently shielding this ship if any.
+     */
+    protector?: Unit;
 
     /**
      * The radius of the circle this unit occupies.
@@ -758,6 +773,9 @@ export const Namespace = makeNamespace({
                 moves: {
                     typeName: "int",
                 },
+                range: {
+                    typeName: "int",
+                },
                 shield: {
                     typeName: "int",
                 },
@@ -836,6 +854,9 @@ export const Namespace = makeNamespace({
         Projectile: {
             parentClassName: "GameObject",
             attributes: {
+                fuel: {
+                    typeName: "int",
+                },
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -891,6 +912,11 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
+                    nullable: true,
+                },
+                protector: {
+                    typeName: "gameObject",
+                    gameObjectClass: Unit,
                     nullable: true,
                 },
                 radius: {

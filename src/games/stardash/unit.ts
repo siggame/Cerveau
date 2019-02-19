@@ -64,6 +64,11 @@ export class Unit extends GameObject {
     public owner?: Player;
 
     /**
+     * The martyr ship that is currently shielding this ship if any.
+     */
+    public protector?: Unit;
+
+    /**
      * The radius of the circle this unit occupies.
      */
     public radius!: number;
