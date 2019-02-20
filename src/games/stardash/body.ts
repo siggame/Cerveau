@@ -108,6 +108,17 @@ export class Body extends GameObject {
         title: string,
     ): void | string | IBodySpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        //if (this.owner !== player || this.owner === undefined) {
+        //    return `${this} isn't owned by you.`;
+        //}
+        // Make sure the unit hasn't acted.
+        if (this.bodyType == "planet") {
+            return `${this} isn't a planet, so you can't make ships here`;
+        }
 
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.
