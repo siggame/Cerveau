@@ -257,8 +257,6 @@ export class Unit extends GameObject {
             return `${this} is dead and cannot move.`;
         }
 
-        // make sure it can move there without collision?
-
         // Check all the arguments for move here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -286,6 +284,8 @@ export class Unit extends GameObject {
         this.moves -= ((x - this.x) ** 2) + ((y - this.y) ** 2) ** .5;
         this.x = x;
         this.y = y;
+
+        // detect collisions and flag ship, or resolve.
 
         // magic code that updates the units grid position.
 
