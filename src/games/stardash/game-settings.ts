@@ -19,6 +19,12 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         ...(super.schema || (this as any).schema),
 
         // Stardash game specific settings
+        dashBlock: {
+            description: "Radius of the no dash zone around the sun.",
+            // <<-- Creer-Merge: dashBlock -->>
+            default: 0,
+            // <<-- /Creer-Merge: dashBlock -->>
+        },
         dashDistance: {
             description: "The distance traveled each turn by dashing.",
             // <<-- Creer-Merge: dashDistance -->>
@@ -85,6 +91,12 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: regenerateRate -->>
             default: 0,
             // <<-- /Creer-Merge: regenerateRate -->>
+        },
+        shipRadius: {
+            description: "The standard size of ships.",
+            // <<-- Creer-Merge: shipRadius -->>
+            default: 0,
+            // <<-- /Creer-Merge: shipRadius -->>
         },
         sizeX: {
             description: "The size of the map in the X direction.",

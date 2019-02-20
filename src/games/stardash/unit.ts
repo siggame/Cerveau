@@ -328,7 +328,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * tells you if your ship can be at that location.
+     * tells you if your ship can dash to that location.
      *
      * @param player - The player that called this.
      * @param x - The x position of the location you wish to check.
