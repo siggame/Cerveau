@@ -21,6 +21,16 @@ export class Unit extends GameObject {
     public acted!: boolean;
 
     /**
+     * The x value this unit is dashing to.
+     */
+    public dashX!: number;
+
+    /**
+     * The y value this unit is dashing to.
+     */
+    public dashY!: number;
+
+    /**
      * The remaining health of a unit.
      */
     public energy!: number;

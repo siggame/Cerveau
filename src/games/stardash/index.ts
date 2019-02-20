@@ -289,6 +289,16 @@ export interface IUnitProperties {
     acted?: boolean;
 
     /**
+     * The x value this unit is dashing to.
+     */
+    dashX?: number;
+
+    /**
+     * The y value this unit is dashing to.
+     */
+    dashY?: number;
+
+    /**
      * The remaining health of a unit.
      */
     energy?: number;
@@ -901,6 +911,12 @@ export const Namespace = makeNamespace({
             attributes: {
                 acted: {
                     typeName: "boolean",
+                },
+                dashX: {
+                    typeName: "float",
+                },
+                dashY: {
+                    typeName: "float",
                 },
                 energy: {
                     typeName: "int",
