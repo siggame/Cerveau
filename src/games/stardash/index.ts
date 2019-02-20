@@ -87,6 +87,11 @@ export interface IBodyProperties {
     materialType?: "none" | "genarium" | "rarium" | "legendarium" | "Mythicite";
 
     /**
+     * The Player that owns and can control this Unit.
+     */
+    owner?: Player;
+
+    /**
      * The radius of the circle that this body takes up.
      */
     radius?: number;
@@ -588,6 +593,9 @@ export const Namespace = makeNamespace({
                 currentTurn: {
                     typeName: "int",
                 },
+                dashBlock: {
+                    typeName: "int",
+                },
                 dashDistance: {
                     typeName: "int",
                 },
@@ -659,6 +667,9 @@ export const Namespace = makeNamespace({
                 session: {
                     typeName: "string",
                 },
+                shipRadius: {
+                    typeName: "int",
+                },
                 sizeX: {
                     typeName: "int",
                 },
@@ -695,6 +706,11 @@ export const Namespace = makeNamespace({
                     typeName: "string",
                     defaultValue: "none",
                     literals: ["none", "genarium", "rarium", "legendarium", "Mythicite"],
+                },
+                owner: {
+                    typeName: "gameObject",
+                    gameObjectClass: Player,
+                    nullable: true,
                 },
                 radius: {
                     typeName: "float",

@@ -37,6 +37,11 @@ export class Body extends GameObject {
     public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "Mythicite";
 
     /**
+     * The Player that owns and can control this Unit.
+     */
+    public owner?: Player;
+
+    /**
      * The radius of the circle that this body takes up.
      */
     public radius!: number;

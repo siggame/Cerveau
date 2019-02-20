@@ -41,6 +41,11 @@ export class StardashGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
+     * Radius of the no dash zone around the sun.
+     */
+    public readonly dashBlock!: number;
+
+    /**
      * The distance traveled each turn by dashing.
      */
     public readonly dashDistance!: number;
@@ -126,6 +131,11 @@ export class StardashGame extends BaseClasses.Game {
      * A unique identifier for the game instance that is being played.
      */
     public readonly session!: string;
+
+    /**
+     * The standard size of ships.
+     */
+    public readonly shipRadius!: number;
 
     /**
      * The size of the map in the X direction.
