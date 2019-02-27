@@ -206,6 +206,7 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: 10,
                 range: 100,
+                unitCost: 100,
             }),
 
             this.manager.create.job({
@@ -215,6 +216,7 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: 10,
                 range: 300,
+                unitCost: 125,
             }),
 
             this.manager.create.job({
@@ -224,6 +226,8 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: 10,
                 range: 105,
+                unitCost: 150,
+                shield: 1000,
             }),
 
             this.manager.create.job({
@@ -232,7 +236,8 @@ export class StardashGame extends BaseClasses.Game {
                 damage: 0,
                 health: 100,
                 moves: 10,
-                range: 0,
+                range: 100,
+                unitCost: 75,
             }),
 
             this.manager.create.job({
@@ -242,6 +247,7 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: 10,
                 range: 100,
+                unitCost: 75,
             }),
         );
     }
