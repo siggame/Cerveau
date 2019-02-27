@@ -95,7 +95,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         shipRadius: {
             description: "The standard size of ships.",
             // <<-- Creer-Merge: shipRadius -->>
-            default: 0,
+            default: 20,
             // <<-- /Creer-Merge: shipRadius -->>
         },
         sizeX: {
