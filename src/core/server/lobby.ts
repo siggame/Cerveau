@@ -538,6 +538,7 @@ ${err}`);
             name: playData.playerName || undefined,
             type: playData.clientType,
             index: playData.playerIndex || undefined,
+            metaDeltas: playData.metaDeltas || false,
         });
 
         room.addClient(client);

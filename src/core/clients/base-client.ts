@@ -262,10 +262,12 @@ export class BaseClient {
         name?: string;
         type?: string;
         index?: number;
+        metaDeltas?: boolean;
     }): void {
         this.ourName = info.name || DEFAULT_STR;
         this.ourProgrammingLanguageType = info.type || DEFAULT_STR;
         this.ourPlayerIndex = info.index;
+        this.sendMetaDeltas = Boolean(info.metaDeltas);
 
         if (this.ourName.length > 80) {
             // We don't want players to be able to use stupidly long names.
