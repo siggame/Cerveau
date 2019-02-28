@@ -3,7 +3,6 @@
 import { BaseClasses, ChessGame, ChessGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
-
 import { Move } from "chess.js";
 
 /**
@@ -14,6 +13,20 @@ import { Move } from "chess.js";
  */
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
+}
+
+/**
+ * Cleans a move so chess.js can accept a wider range of moves.
+ *
+ * @param move - The SAN move to clean
+ * @returns A new SAN move that more easily works with chess.js
+ */
+function cleanMove(move: string): string {
+    if (move === "0-0" || move === "0-0-0") {
+        return move.replace(/0/g, "O"); // replace all `0` characters with `O` as chess.js expects for castling
+    }
+
+    return move;
 }
 // <<-- /Creer-Merge: imports -->>
 
@@ -64,7 +77,9 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
         const move = await player.ai.makeMove();
 
-        const valid = this.game.chess.move(move, { sloppy: true });
+        const cleanedMove = cleanMove(move);
+
+        const valid = this.game.chess.move(cleanedMove, { sloppy: true });
 
         if (!valid) {
             this.declareLoser(`Made an invalid move ("${move}").`, player);
