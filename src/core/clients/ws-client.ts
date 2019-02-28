@@ -71,13 +71,10 @@ export class WSClient extends BaseClient {
      * @param str - The raw string to send. Should be EOT_CHAR terminated.
      * @returns A promise that resolves after it sends the data.
      */
-    protected sendRaw(str: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            super.sendRaw(str);
-
-            // this.socket.send(str);
-            this.socket.write(str, resolve);
-        });
+    protected async sendRaw(str: string): Promise<void> {
+        // super hack-y, lark-websocket kind of needs TS defs...
+        const socket = this.socket as net.Socket & { send(str: string): void };
+        socket.send(str);
     }
 
     /**
