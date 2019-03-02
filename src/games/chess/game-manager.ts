@@ -3,7 +3,7 @@
 import { BaseClasses, ChessGame, ChessGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
-import { Move } from "chess.js";
+import { ChessInstance, Move } from "chess.js";
 
 /**
  * Checks if the move a capture, promotion, or pawn movement
@@ -13,20 +13,6 @@ import { Move } from "chess.js";
  */
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
-}
-
-/**
- * Cleans a move so chess.js can accept a wider range of moves.
- *
- * @param move - The SAN move to clean
- * @returns A new SAN move that more easily works with chess.js
- */
-function cleanMove(move: string): string {
-    if (move === "0-0" || move === "0-0-0") {
-        return move.replace(/0/g, "O"); // replace all `0` characters with `O` as chess.js expects for castling
-    }
-
-    return move;
 }
 // <<-- /Creer-Merge: imports -->>
 
@@ -77,7 +63,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
         const move = await player.ai.makeMove();
 
-        const cleanedMove = cleanMove(move);
+        const cleanedMove = this.cleanMove(move, this.game.chess);
 
         const valid = this.game.chess.move(cleanedMove, { sloppy: true });
 
@@ -205,6 +191,41 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
         return true; // if we got here the last 8 moves are repeats,
                      // so it is in STFR
+    }
+
+    /**
+     * Cleans a move so chess.js can accept a wider range of moves.
+     *
+     * @param uncleanedMoved - The SAN move to clean
+     * @param chess - The chess.js instance to use for move hints
+     * @returns A new SAN move that more easily works with chess.js
+     */
+    private cleanMove(uncleanedMoved: string, chess: ChessInstance): string {
+        const move = uncleanedMoved.replace(/\s/g, ""); // remove all whitespace from move
+
+        // First check for 0 vs O casteling
+        if (move === "0-0" || move === "0-0-0") {
+            return move.replace(/0/g, "O"); // replace all `0` characters with `O` as chess.js expects for castling
+        }
+
+        // Next check for UCI (Universal Chess Inferface) formatting
+        const from = move[0] + move[1]; // first two chars are expected to be from square
+        const to = move[2] + move[3]; // second two chars are expected to be to square
+        const promotion = move[4]; // fifth char _might_ be the promotion char
+
+        // \-> now check all moves to see if the from, to, and promotion match. If so use the SAN for it
+        const moves = chess.moves({ verbose: true });
+        const ourMove = moves.find((valid) => valid.from === from
+                                           && valid.to === to
+                                           && valid.promotion === promotion,
+        );
+
+        if (ourMove) {
+            return ourMove.san;
+        }
+
+        // nothing matching, let's hope their move was valid!
+        return move;
     }
 
     // <<-- /Creer-Merge: protected-private-methods -->>
