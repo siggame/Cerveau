@@ -672,7 +672,7 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
 
             let settings: UnknownObject = {};
             try {
-                settings = (querystring.parse(data.gameSettings));
+                settings = querystring.parse(data.gameSettings);
             }
             catch (err) {
                 return `Game settings incorrectly formatted.
@@ -745,7 +745,7 @@ Must be one string in the url parameters format.${footer}`;
 
             const n = Array
                 .from(this.roomsPlaying)
-                .reduce((sum, [name, rooms]) => sum + rooms.size, 0);
+                .reduce((sum, [, rooms]) => sum + rooms.size, 0);
 
             logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
             if (n === 0) {
