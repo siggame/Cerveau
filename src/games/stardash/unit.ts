@@ -161,6 +161,31 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        // make sure the the unit is attacking a unit.
+        if (!enemy) {
+            return `${this} is attacking unit that doesn't exist.`;
+        }
+        // Handle possible coordinate invalidations here:
+        if ((enemy.x < 0) || (enemy.y < 0)) {
+            return `${this} is trying to attack a location that doesn't exist`;
+        }
+        // make sure the target is in range.
+        if ((this.job.range + enemy.radius) <= Math.sqrt(((this.x - enemy.x) ** 2) + ((this.y - enemy.y) ** 2))) {
+            return `${this} is trying to attack a location which is too far away.`;
+        }
+        // make sure you aren't attacking a friend.
+        if (enemy.owner === player) {
+            return `${this} is trying to attack the ally: ${enemy.job.title} at ${enemy.x}, ${enemy.y}`;
+        }
+        // Handle possible unit invalidations here:
+        if (enemy.owner === undefined) {
+            return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
+        }
+        // make sure the unit has a job.
+        if (this.job === undefined) {
+            return `${this} doesn't have a job. That shouldn't be possible.`;
+        }
+
         // Check all the arguments for attack here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -179,10 +204,37 @@ export class Unit extends GameObject {
     protected async attack(player: Player, enemy: Unit): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
-        // Add logic here for attack.
+        // Add logic here for attack. 
 
-        // TODO: replace this with actual logic
-        return false;
+        let attackDamage = this.job.damage;
+
+        if (enemy.protector)  //if enemy is protected by a martyr
+        {
+            if(enemy.protector.energy > attackDamage)
+            {
+                enemy.protector.energy -= attackDamage;
+            }
+            else if (enemy.protector.energy <= attackDamage)
+            {
+                attackDamage -= enemy.protector.energy;
+                enemy.energy -= attackDamage;
+            }
+        }
+        else //if no martyr in range
+        {
+            enemy.energy -= attackDamage;
+        }
+
+        if (enemy.energy <= 0)
+        {
+            enemy.x = -1;  //set unit's location to out of bounds
+            enemy.y = -1;
+            enemy.energy = 0; // set unit's health to zero.
+        }
+
+        this.acted = true; // unit has acted
+        
+        return true; // return true by default
 
         // <<-- /Creer-Merge: attack -->>
     }
