@@ -45,7 +45,7 @@ export class BaseGameSettingsManager {
     /**
      * The current settings' values
      */
-    public values = this.initialValues(this.schema);
+    public values = this.initialValues(this.schema, true);
 
     /**
      * Creates a game settings manager with optional initial values
@@ -53,7 +53,7 @@ export class BaseGameSettingsManager {
      */
     public constructor(values?: UnknownObject) {
         if (values) {
-            this.addSettings(values);
+            Object.assign(this.values, values);
         }
     }
 
@@ -69,6 +69,9 @@ export class BaseGameSettingsManager {
         const validated = this.invalidateSettings(invalidatedSettings);
 
         if (validated instanceof Error) {
+            return validated;
+        }
+        else {
             Object.assign(this.values, validated);
         }
     }
@@ -153,7 +156,7 @@ export class BaseGameSettingsManager {
 
     /** Resets the values to their initial (default) values. */
     public reset(): void {
-        this.values = this.initialValues(this.schema);
+        this.values = this.initialValues(this.schema, true);
     }
 
     /**
@@ -179,11 +182,13 @@ export class BaseGameSettingsManager {
     /**
      * Generates initial values from defaults in a settings schema.
      *
-     * @param schema The schema to build defaults from.
+     * @param schema - The schema to build defaults from.
+     * @param pure - If this should be pure and not consider current values
      * @returns The defaults from that schema.
      */
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
+        pure?: boolean,
     ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W>
         ? (W extends never[]
             ? string[]
@@ -192,8 +197,10 @@ export class BaseGameSettingsManager {
         : never
     } {
         const values: UnknownObject = {};
-        for (const [key, value] of Object.entries(this.schema)) {
-            values[key] = value.default;
+        for (const [key, value] of Object.entries(schema)) {
+            values[key] = (pure || !objectHasProperty(this.values, key))
+                ? value.default
+                : this.values[key];
         }
 
         // lol, try accurately casting to that monstrosity of a type
