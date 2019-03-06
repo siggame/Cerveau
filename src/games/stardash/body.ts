@@ -113,17 +113,39 @@ export class Body extends GameObject {
         title: string,
     ): void | string | IBodySpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
+        // Check if it is the spawning player's turn
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
         }
-
-        //if (this.owner !== player || this.owner === undefined) {
-        //    return `${this} isn't owned by you.`;
-        //}
-        // Make sure the unit hasn't acted.
-        if (this.bodyType == "planet") {
-            return `${this} isn't a planet, so you can't make ships here`;
+        // Check if the supplied title is valid
+        if (title !== "corvette" && title !== "missleboat" && "martyr" &&
+            title !== "transport" && title !== "miner") {
+            return `You must supply a valid job title.`;
         }
+        // Check if the body is controlled by the player
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+        // Check if the body is indeed a planet
+        if (this.bodyType !== "planet") {
+            return `${this} isn't a planet, so you can't make ships here.`;
+        }
+        // Check if the player is trying to spawn the unit too far from their planet's surface
+        if ( sqrt(pow((x - this.x), 2) + pow((y - this.y), 2)) > this.radius ) {
+            return `You must spawn units on your planet!`;
+        }
+        // Check if the player has the resources to spawn the ship
+        // Slow solution; proposed: identify input job and check individual cost?
+        // Unsure of how to implement above proposal
+        if ((player.money < 75 && (title === "miner" || title === "transport")) ||
+            (player.money < 100 && title === "corvette") || (player.money < 125 && title === "missleboat") ||
+            (player.money < 150 && title === "martyr")) {
+            return `You do not have enough resources to spawn this ship.`;
+        }
+        // Check if the space in which the player is trying to spawn the unit is occupied
+        // Unsure of how to do this; cannot find any tile entity that could be checked for this
+        // Solution: check all units' coordinates and disqualify if a match?
+        // Unsure of how to implement above proposal; loop through this.game.units?
 
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.
@@ -150,10 +172,112 @@ export class Body extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: spawn -->>
 
-        // Add logic here for spawn.
+        if ( title === "corvette" ) {
+        	// Deduct ship cost from player's balance
+        	player.money -= 100;
+        	// Adds desired unit to player's unit arsenal
+        	// Unsure if correct implementation
+        	player.units.push(this.game.manager.create.unit({
+        		acted: 1,
+        		energy: 100,
+        		genarium: 0,
+        		isDashing: 0,
+        		job: this.game.jobs[0],
+        		legendarium: 0,
+        		moves: 0; // correct?
+        		mythicite: 0,
+        		owner: player,
+        		rarium: 0;
+        		x: x,
+        		y: y,
+        	}))
+        }
 
-        // TODO: replace this with actual logic
-        return false;
+        else if ( title === "missleboat" ) {
+        	// Deduct ship cost from player's balance
+        	player.money -= 125;
+        	// Adds desired unit to player's unit arsenal
+        	// Unsure if correct implementation
+        	player.units.push(this.game.manager.create.unit({
+        		acted: 1,
+        		energy: 100,
+        		genarium: 0,
+        		isDashing: 0,
+        		job: this.game.jobs[1],
+        		legendarium: 0,
+        		moves: 0; // correct?
+        		mythicite: 0,
+        		owner: player,
+        		rarium: 0;
+        		x: x,
+        		y: y,
+        	}))
+        }
+
+        else if ( title === "martyr" ) {
+        	// Deduct ship cost from player's balance
+        	player.money -= 125;
+        	// Adds desired unit to player's unit arsenal
+        	// Unsure if correct implementation
+        	player.units.push(this.game.manager.create.unit({
+        		acted: 1,
+        		energy: 100,
+        		genarium: 0,
+        		isDashing: 0,
+        		job: this.game.jobs[2],
+        		legendarium: 0,
+        		moves: 0; // correct?
+        		mythicite: 0,
+        		owner: player,
+        		rarium: 0;
+        		x: x,
+        		y: y,
+        	}))
+        }
+
+        else if ( title === "transport" ) {
+        	// Deduct ship cost from player's balance
+        	player.money -= 75;
+        	// Adds desired unit to player's unit arsenal
+        	// Unsure if correct implementation
+        	player.units.push(this.game.manager.create.unit({
+        		acted: 1,
+        		energy: 100,
+        		genarium: 0,
+        		isDashing: 0,
+        		job: this.game.jobs[3],
+        		legendarium: 0,
+        		moves: 0; // correct?
+        		mythicite: 0,
+        		owner: player,
+        		rarium: 0;
+        		x: x,
+        		y: y,
+        	}))
+        }
+
+        else {
+        	// Deduct ship cost from player's balance
+        	player.money -= 75;
+        	// Adds desired unit to player's unit arsenal
+        	// Unsure if correct implementation
+        	player.units.push(this.game.manager.create.unit({
+        		acted: 1,
+        		energy: 100,
+        		genarium: 0,
+        		isDashing: 0,
+        		job: this.game.jobs[4],
+        		legendarium: 0,
+        		moves: 0; // correct?
+        		mythicite: 0,
+        		owner: player,
+        		rarium: 0;
+        		x: x,
+        		y: y,
+        	}))
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: spawn -->>
     }
