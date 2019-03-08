@@ -356,11 +356,10 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: mine -->
 
         // This will set the asteroids owner to the player controlling the
-        // mining ship, and then will add up to the mining rate number of ore
-        // to the miner.
+        // mining ship.
         body.owner = player;
 
-        // Add ore to miner
+        // Add ore to miner based on the mining rate vs what is in the body.
         let actualAmount = Math.min(body.amount, this.game.miningSpeed);
         const currentLoad = this.genarium + this.legendarium + this.mythicite +
                             this.rarium;
