@@ -261,73 +261,6 @@ export class Unit extends GameObject {
         if (reason) {
             return reason;
         }
-        
-        // Should already be checked
-        // if (this.acted) {
-        //     return `${this} has already acted!`
-        // }
-        
-        if (!Body) {
-            return `Body doesn't exist`;
-        }
-        
-        if (Body.BodyBodyType != "asteroid") {
-            return `This body must be an asteroid!`  
-        }
-        
-        if ((this.BodyMaterialType == "none") || (Body.amount <= 0)) {
-            return `This body does not have any materials to mine!`
-        }
-        
-        if (this.job.range < Math.sqrt(this.xDist ** 2 + this.yDist ** 2)) {
-            return `This body is too far away to mine!`;
-        }
-        
-        if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold materials!`
-        }
-        
-        let currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-        if (this.job.carryLimit <= currentLoad) {
-            return `${this} cannot hold any more materials!`
-        }
-
-        // make sure a body was given.
-        if (!body) {
-            return `Body doesn't exist`;
-        }
-
-        // make sure it is an asteroid.
-        if (body.bodyType !== "asteroid") {
-            return `${body} must be an asteroid!`;
-        }
-
-        // make sure the ship is a miner.
-        if (this.job.title !== "miner") {
-            return `${this} must be a miner ship.`;
-        }
-
-        // make sure it has some material to mine.
-        if ((body.materialType === "none") || (body.amount <= 0)) {
-            return `${body} does not have any materials to mine!`;
-        }
-
-        // make sure the asteroid is in range.
-        if (this.job.range < Math.sqrt(this.x ** 2 + this.y ** 2)) {
-            return `${this} is too far away from ${body} to mine!`;
-        }
-
-        // make sure the unit can hold things.
-        if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold materials!`;
-        }
-
-        // make sure the unit can carry more materials.
-        const currentLoad = this.genarium + this.rarium + this.legendarium +
-                          this.mythicite;
-        if (this.job.carryLimit <= currentLoad) {
-            return `${this} cannot hold any more materials!`;
-        }
 
         // make sure a body was given.
         if (!body) {
@@ -738,17 +671,6 @@ export class Unit extends GameObject {
             ? totalResourceOnShip
             : Math.min(totalResourceOnShip, amount);
 
-<<<<<<< HEAD
-        // grab the resources on the ship.
-        const totalResourceOnShip = unit[material];
-        // grab the current materials on the ship.
-        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-
-        // correct the acutal amount to account for a negative argument.
-        let actualAmount = amount <= 0
-            ? totalResourceOnShip
-            : Math.min(totalResourceOnShip, amount);
-
         // account for carry limit.
         actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
 
@@ -757,13 +679,6 @@ export class Unit extends GameObject {
         this[material] += actualAmount;
 
         // return it was successful.
-=======
-        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
-
-        unit[material] -= actualAmount;
-        this[material] += actualAmount;
-
->>>>>>> Added Unit.Transfer and InvalidateTransfer
         return true;
 
         // <<-- /Creer-Merge: transfer -->>
