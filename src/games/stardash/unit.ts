@@ -298,6 +298,7 @@ export class Unit extends GameObject {
         // this.legendarium
         // this.mythicite
         // this.rarium
+        // miningSpeed
         
         
         return false;
