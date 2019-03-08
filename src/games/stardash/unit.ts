@@ -461,6 +461,7 @@ export class Unit extends GameObject {
         y: number,
     ): void | string | IUnitOpenArgs {
         // <<-- Creer-Merge: invalidate-open -->>
+
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
