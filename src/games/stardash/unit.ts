@@ -293,6 +293,11 @@ export class Unit extends GameObject {
         
         // Add ore to miner
         
+        // this.acted
+        // this.genarium
+        // this.legendarium
+        // this.mythicite
+        // this.rarium
         
         
         return false;
