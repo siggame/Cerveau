@@ -253,8 +253,18 @@ export class Unit extends GameObject {
         if (body.materialType == "genarium") {
             this.genarium += body.amount;
         }
+        if (body.materialType == "legendarium") {
+            this.legendarium += body.amount;
+        }
+        if (body.materialType == "mythicite") {
+            this.mythicite += body.amount;
+        }
+        if (body.materialType == "rarium") {
+            this.rarium += body.amount;
+        }
+        this.acted = true;
         
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: mine -->>
     }
