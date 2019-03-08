@@ -289,7 +289,7 @@ export class Unit extends GameObject {
         
         // Set astroid owener to player
         
-        
+        Body.owner = Player
         
         // Add ore to miner
         
