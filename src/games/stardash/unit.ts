@@ -392,7 +392,8 @@ export class Unit extends GameObject {
         // this.mythicite
         // this.rarium
         // miningSpeed
-        
+        // body.materialType
+        // body.amount
         
         return false;
 >>>>>>> Added comments to mine Unit.mine
