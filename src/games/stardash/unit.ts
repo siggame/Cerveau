@@ -765,6 +765,7 @@ export class Unit extends GameObject {
         if (checkAction && this.acted) {
             return `${this} has already acted this turn. Or not enough coffee`;
         }
+
         // Make sure the unit is alive.
         if (this.energy <= 0) {
             return `${this} is dead, and cannot do anything.`;
