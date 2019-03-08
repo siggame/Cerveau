@@ -738,7 +738,7 @@ export class Unit extends GameObject {
 
         const totalResourceOnShip = unit[material];
         const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-        
+
         let actualAmount = amount <= 0
             ? totalResourceOnShip
             : Math.min(totalResourceOnShip, amount);
