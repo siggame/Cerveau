@@ -352,7 +352,7 @@ export class Unit extends GameObject {
         this.acted = true;
 
         // return the action was successful.
-        return true;=
+        return true;
 
         // <<-- /Creer-Merge: mine -->>
     }
