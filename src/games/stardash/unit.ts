@@ -777,6 +777,7 @@ export class Unit extends GameObject {
             return `It isn't your turn, ${player}.`;
         }
 
+        // make sure the thing is owned by the player.
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
         }
