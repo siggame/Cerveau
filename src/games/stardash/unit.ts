@@ -321,8 +321,7 @@ export class Unit extends GameObject {
         // mining ship, and then will add up to the mining rate number of ore
         // to the miner.
 
-        // Set astroid owener to player
-
+        // Set astroid owner to player
         body.owner = player;
 
         // Add ore to miner
