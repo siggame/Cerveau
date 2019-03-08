@@ -380,6 +380,10 @@ export class Unit extends GameObject {
         // body.materialType
         // body.amount
         
+        if (body.materialType == "genarium") {
+            this.genarium += body.amount;
+        }
+        
         return false;
 >>>>>>> Added comments to mine Unit.mine
 
