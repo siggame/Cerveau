@@ -781,6 +781,7 @@ export class Unit extends GameObject {
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
         }
+
         // Make sure the unit hasn't acted.
         if (checkAction && this.acted) {
             return `${this} has already acted this turn. Or not enough coffee`;
