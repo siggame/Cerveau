@@ -772,6 +772,7 @@ export class Unit extends GameObject {
         player: Player,
         checkAction: boolean = false,
     ): string | undefined {
+        // make sure there is a player and it is their turn.
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
         }
