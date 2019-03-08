@@ -429,6 +429,7 @@ export class Unit extends GameObject {
         y: number,
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
+
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
