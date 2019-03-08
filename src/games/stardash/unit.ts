@@ -324,7 +324,7 @@ export class Unit extends GameObject {
         // Set astroid owner to player
         body.owner = player;
 
-        // Add ore to miner
+        // Add ore to miners
         let actualAmount = Math.min(body.amount, this.game.miningSpeed);
         const currentLoad = this.genarium + this.legendarium + this.mythicite +
                             this.rarium;
