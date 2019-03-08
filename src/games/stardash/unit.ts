@@ -277,11 +277,24 @@ export class Unit extends GameObject {
      * @returns True if successfully acted, false otherwise.
      */
     protected async mine(player: Player, body: Body): Promise<boolean> {
-        // <<-- Creer-Merge: mine -->>
-
-        // Add logic here for mine.
-
-        // TODO: replace this with actual logic
+        // <<-- Creer-Merge: mine -->
+        
+        // **********************************************************************
+        // ---------------------------------------------------------- H E R E ---
+        // **********************************************************************
+        
+        // This will set the asteroids owner to the player controlling the
+        // mining ship, and then will add up to the mining rate number of ore
+        // to the miner.
+        
+        // Set astroid owener to player
+        
+        
+        
+        // Add ore to miner
+        
+        
+        
         return false;
 
         // <<-- /Creer-Merge: mine -->>
