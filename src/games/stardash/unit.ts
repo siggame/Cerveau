@@ -339,7 +339,7 @@ export class Unit extends GameObject {
 
         // make sure a body was given.
         if (!body) {
-            return `Body doesn't exist`;
+            return `Body doesn't exist.`;
         }
 
         // make sure it is an asteroid.
