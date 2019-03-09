@@ -302,17 +302,18 @@ export class Unit extends GameObject {
         // body.materialType
         // body.amount
         
+        let actualAmount = Math.min(body.amount, this.StardashGame.miningSpeed)
         if (body.materialType == "genarium") {
-            this.genarium += body.amount;
+            this.genarium += actualAmount;
         }
         if (body.materialType == "legendarium") {
-            this.legendarium += body.amount;
+            this.legendarium += actualAmount;
         }
         if (body.materialType == "mythicite") {
-            this.mythicite += body.amount;
+            this.mythicite += actualAmount;
         }
         if (body.materialType == "rarium") {
-            this.rarium += body.amount;
+            this.rarium += actualAmount;
         }
         this.acted = true;
         
