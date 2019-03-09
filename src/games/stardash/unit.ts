@@ -250,7 +250,13 @@ export class Unit extends GameObject {
         // body.materialType
         // body.amount
         
-        let actualAmount = Math.min(body.amount, this.StardashGame.miningSpeed)
+        let actualAmount = Math.min(body.amount, this.StardashGame.miningSpeed);
+        let currentLoad = this.genarium + this.legendarium + this.mythicite + this.rarium;
+        
+        if (this.job.carryLimit < actualAmount + currentLoad) {
+             actualAmount = this.job.carryLimit - currentLoad;
+        }
+        
         if (body.materialType == "genarium") {
             this.genarium += actualAmount;
         }
