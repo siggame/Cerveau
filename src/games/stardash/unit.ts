@@ -256,6 +256,7 @@ export class Unit extends GameObject {
         body: Body,
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
+
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
