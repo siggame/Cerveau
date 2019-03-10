@@ -121,14 +121,6 @@ export class ChessGameManager extends BaseClasses.GameManager {
               + "vs. KN) for checkmate.",
             ];
         }
-
-        if (chess.in_draw()) {
-            return [
-                "Draw - 50-move rule: 50 moves completed with no pawn "
-              + "moved or piece captured.",
-            ];
-        }
-
         if (chess.in_stalemate()) {
             return [
                 "Stalemate - The side to move has been stalemated "
@@ -146,6 +138,19 @@ export class ChessGameManager extends BaseClasses.GameManager {
          && this.isInSimplifiedThreefoldRepetition()
         ) {
             return [ "Draw - Simplified threefold repetition occurred." ];
+        }
+
+        // chess.js checks for draws by checking:
+        // - 50-move rule
+        // - stalemate
+        // - insufficient material
+        // - three fold repetition
+        // Keeping this check last, guarantees everything but the 50-move rule have been checked
+        if (chess.in_draw()) {
+            return [
+                "Draw - 50-move rule: 50 moves completed with no pawn "
+              + "moved or piece captured.",
+            ];
         }
 
         return [];
