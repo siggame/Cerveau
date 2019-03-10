@@ -68,7 +68,11 @@ export class ChessGameManager extends BaseClasses.GameManager {
         const valid = this.game.chess.move(cleanedMove, { sloppy: true });
 
         if (!valid) {
-            this.declareLoser(`Made an invalid move ("${move}").`, player);
+            this.declareLoser(`Made an invalid move ('${move}').
+Valid moves: ${this.game.chess.moves()      // Take all valid moves,
+    .map((validMove) => `'${validMove}'`)   // Wrap them in '' quotes,
+    .join(", ")                             // Then finally add commas between each for readability
+}`, player);
             this.declareWinner(
                 "Opponent made an invalid move.",
                 player.opponent,
