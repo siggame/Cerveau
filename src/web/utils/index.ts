@@ -4,6 +4,12 @@ import { Immutable } from "~/utils";
 
 const defaultHostname = hostname();
 
+function formatHostname(url: string | undefined, host: string | undefined): string {
+    return url
+        ? url.replace("__HOSTNAME__", host || defaultHostname)
+        : "";
+}
+
 /**
  * Formats gamelog infos from the a game logger into the expected web format, filling in host names in the info.
  *
@@ -18,8 +24,7 @@ export function formatGamelogInfos(
     return gamelogInfos.map((info) => ({
         ...info,
         // replace __HOSTNAME__ with the request's host for them, or a default hostname
-        visualizerUrl: info.visualizerUrl
-            ? info.visualizerUrl.replace("__HOSTNAME__", host || defaultHostname)
-            : "",
+        visualizerUrl: formatHostname(info.visualizerUrl, host),
+        uri: formatHostname(info.uri, host),
     }));
 }

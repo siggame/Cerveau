@@ -1,4 +1,5 @@
 import { Express } from "express";
+import { URL } from "url";
 import { ISettingsSchema, ISettingsSchemas } from "~/core/game";
 import { Lobby } from "~/core/server";
 import { formatGamelogInfos } from "~/web/utils";
@@ -61,11 +62,14 @@ export function registerRouteIndex(app: Express): void {
 
     app.get("/", async (req, res) => {
         const logs = lobby.gamelogManager.gamelogInfos;
+        const hostUrl = req.headers.host
+            ? new URL(`http://${req.headers.host}/`) // tslint:disable-line:no-http-string
+            : undefined;
 
         const gamelogs = formatGamelogInfos(logs
             .slice(-MAX_GAMELOGS_ON_INDEX) // select the last 10 gamelogs from all the logs to render on the index
             .reverse(), // reverse the order, so that the last is the first element (latest) in the array
-        req.headers.host);
+        hostUrl && hostUrl.hostname);
 
         res.render("index.hbs", {
             games,
