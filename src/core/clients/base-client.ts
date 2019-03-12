@@ -402,7 +402,7 @@ export class BaseClient {
                 return JSON.parse(json) as Json;
             }
             catch (err) {
-                invalid = "Sent malformed JSON.";
+                invalid = `Sent malformed JSON: '${String(err)}'`;
             }
         }
 
