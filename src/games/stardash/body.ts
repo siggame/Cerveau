@@ -138,9 +138,11 @@ export class Body extends GameObject {
             return `You do not have enough resources to spawn this ship.`;
         }
         // Check if the space in which the player is trying to spawn the unit is occupied
-        // Unsure of how to do this; cannot find any tile entity that could be checked for this
-        // Solution: check all units' coordinates and disqualify if a match?
-        // Unsure of how to implement above proposal; loop through this.game.units?
+        // Implemented as advised
+        // Correct?
+        if (!(x.isopen()) && !(y.isopen())) {
+        	return `This space is occupied. You cannot spawn a ship here.`
+        }
 
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.
