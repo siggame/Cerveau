@@ -274,8 +274,17 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-mine -->>
 
         const reason = this.invalidate(player, true);
+        
         // if there is a reason, return it.
         
+        if (Body.BodyBodyType != "asteroid") {
+            return `This body must be an asteroid!`  
+        }
+             
+        if ((this.BodyMaterialType == "none") || (Body.amount <= 0)) {
+            return `This body does not have any materials to mine!`
+        }
+             
         if (this.job.carryLimit <= 0) {
             return `${this} cannot hold materials!`
         }
