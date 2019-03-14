@@ -281,16 +281,19 @@ export class Unit extends GameObject {
         if (Body.BodyBodyType != "asteroid") {
             return `This body must be an asteroid!`  
         }
-             
+        
         if ((this.BodyMaterialType == "none") || (Body.amount <= 0)) {
             return `This body does not have any materials to mine!`
         }
-             
+        
+        if (this.job.range < Math.sqrt(this.xDist ** 2 + this.yDist ** 2)) {
+            return `This body is too far away to mine!`;
+        }
+        
         if (this.job.carryLimit <= 0) {
             return `${this} cannot hold materials!`
         }
-
-        // Check that the ship has space
+        
         const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
         if (this.job.carryLimit <= currentLoad) {
             return `${this} cannot hold any more materials!`
