@@ -230,7 +230,7 @@ export class Unit extends GameObject {
             return `${this} cannot hold materials!`
         }
         
-        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
+        let currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
         if (this.job.carryLimit <= currentLoad) {
             return `${this} cannot hold any more materials!`
         }
