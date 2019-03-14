@@ -206,8 +206,15 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-mine -->>
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
-        if (reason) {
-            return reason;
+        
+        if (this.job.carryLimit <= 0) {
+            return `${this} cannot hold materials!`
+        }
+
+        // Check that the ship has space
+        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
+        if (this.job.carryLimit <= currentLoad) {
+            return `${this} cannot hold any more materials!`
         }
 
         // Check all the arguments for mine here and try to
