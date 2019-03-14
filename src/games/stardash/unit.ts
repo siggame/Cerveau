@@ -261,35 +261,6 @@ export class Unit extends GameObject {
         if (reason) {
             return reason;
         }
-        
-        if (this.acted) {
-            return `${this} has already acted!`
-        }
-        
-        if (!Body) {
-            return `Body doesn't exist`;
-        }
-        
-        if (Body.BodyBodyType != "asteroid") {
-            return `This body must be an asteroid!`  
-        }
-        
-        if ((this.BodyMaterialType == "none") || (Body.amount <= 0)) {
-            return `This body does not have any materials to mine!`
-        }
-        
-        if (this.job.range < Math.sqrt(this.xDist ** 2 + this.yDist ** 2)) {
-            return `This body is too far away to mine!`;
-        }
-        
-        if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold materials!`
-        }
-        
-        let currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-        if (this.job.carryLimit <= currentLoad) {
-            return `${this} cannot hold any more materials!`
-        }
 
         // make sure a body was given.
         if (!body) {
