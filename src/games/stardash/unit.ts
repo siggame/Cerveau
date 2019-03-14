@@ -261,9 +261,10 @@ export class Unit extends GameObject {
             return reason;
         }
         
-        if (this.acted) {
-            return `${this} has already acted!`
-        }
+        // Should already be checked
+        // if (this.acted) {
+        //     return `${this} has already acted!`
+        // }
         
         if (!Body) {
             return `Body doesn't exist`;
@@ -338,6 +339,7 @@ export class Unit extends GameObject {
         if (body.materialType == "rarium") {
             this.rarium += actualAmount;
         }
+        
         this.acted = true;
         
         return true;
