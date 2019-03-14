@@ -279,10 +279,6 @@ export class Unit extends GameObject {
     protected async mine(player: Player, body: Body): Promise<boolean> {
         // <<-- Creer-Merge: mine -->
         
-        // **********************************************************************
-        // ---------------------------------------------------------- H E R E ---
-        // **********************************************************************
-        
         // This will set the asteroids owner to the player controlling the
         // mining ship, and then will add up to the mining rate number of ore
         // to the miner.
@@ -293,18 +289,10 @@ export class Unit extends GameObject {
         
         // Add ore to miner
         
-        // this.acted
-        // this.genarium
-        // this.legendarium
-        // this.mythicite
-        // this.rarium
-        // miningSpeed
-        // body.materialType
-        // body.amount
-        
         let actualAmount = Math.min(body.amount, this.StardashGame.miningSpeed);
         let currentLoad = this.genarium + this.legendarium + this.mythicite + this.rarium;
         
+        // Makes sure amount added does not go over the carry limit
         if (this.job.carryLimit < actualAmount + currentLoad) {
              actualAmount = this.job.carryLimit - currentLoad;
         }
