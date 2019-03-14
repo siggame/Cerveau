@@ -329,7 +329,6 @@ export class Unit extends GameObject {
         let actualAmount = Math.min(body.amount, this.game.miningSpeed);
         const currentLoad = this.genarium + this.legendarium + this.mythicite +
                             this.rarium;
-
         // Makes sure amount added does not go over the carry limit
         if (this.job.carryLimit < actualAmount + currentLoad) {
             actualAmount = this.job.carryLimit - currentLoad;
