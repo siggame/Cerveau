@@ -261,6 +261,10 @@ export class Unit extends GameObject {
             return reason;
         }
         
+        if (!Body) {
+            return `Body doesn't exist`;
+        }
+        
         if (Body.BodyBodyType != "asteroid") {
             return `This body must be an asteroid!`  
         }
