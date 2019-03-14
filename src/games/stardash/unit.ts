@@ -259,8 +259,10 @@ export class Unit extends GameObject {
 
         // check widely consistent things.
         const reason = this.invalidate(player, true);
-        
         // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
         
         if (Body.BodyBodyType != "asteroid") {
             return `This body must be an asteroid!`  
