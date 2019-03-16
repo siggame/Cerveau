@@ -13,7 +13,8 @@
                 "--single-threaded",
                 "--no-timeout",
                 "--no-session-timeouts",
-                "--no-updater"
+                "--no-updater",
+                "--only-load", "Chess",
             ],
             "protocol": "inspector",
             "cwd": "${workspaceFolder}",

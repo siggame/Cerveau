@@ -4,6 +4,23 @@ import { BaseClient } from "./base-client" ;
 
 /** A client to the game server via a WS connection. */
 export class WSClient extends BaseClient {
+    /** The lark-websocket socket that semi-imitates net.Socket */
+    // TODO: document lark-websocket
+    protected socket!: net.Socket & {
+        /** The ACTUAL net.Socket */
+        _socket: net.Socket;
+
+        /** indicates if the connection is closed */
+        readonly closed: boolean;
+
+        /** remove from net.Socket */
+        write: never;
+
+        /** sends a string, use instead of write */
+        send(str: string): void;
+
+    };
+
     /**
      * Creates a client connected to a server.
      *
@@ -25,9 +42,7 @@ export class WSClient extends BaseClient {
      * @returns The net socket used for WS communications.
      */
     public getNetSocket(): net.Socket {
-        // hackish, as we are grabbing a private socket out of the
-        // lark-websocket client, but works.
-        return (this.socket as net.Socket & { _socket: net.Socket })._socket;
+        return this.socket._socket;
     }
 
     /**
@@ -72,9 +87,9 @@ export class WSClient extends BaseClient {
      * @returns A promise that resolves after it sends the data.
      */
     protected async sendRaw(str: string): Promise<void> {
-        // super hack-y, lark-websocket kind of needs TS defs...
-        const socket = this.socket as net.Socket & { send(str: string): void };
-        socket.send(str);
+        if (!this.socket.closed) {
+            this.socket.send(str);
+        }
     }
 
     /**
