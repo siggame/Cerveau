@@ -43,6 +43,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
         await super.beforeTurn();
 
         // <<-- Creer-Merge: before-turn -->>
+
+        // TODO: HANDLE COLLISION ID FOR UNITS. MAKE A DICTIONARY CONNECTED TO HANDLE COLLISION DAMAGE
+
         // add logic here for before the current player's turn starts
         // <<-- /Creer-Merge: before-turn -->>
     }

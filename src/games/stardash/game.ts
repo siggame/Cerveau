@@ -258,6 +258,7 @@ export class StardashGame extends BaseClasses.Game {
         this.bodies.push(
             this.manager.create.body({
                 bodyType: "planet",
+                owner: this.players[0],
                 materialType: "none",
                 radius: 150,
                 x: 200,
@@ -266,6 +267,7 @@ export class StardashGame extends BaseClasses.Game {
 
             this.manager.create.body({
                 bodyType: "planet",
+                owner: this.players[1],
                 materialType: "none",
                 radius: 150,
                 x: 3000,
@@ -283,6 +285,7 @@ export class StardashGame extends BaseClasses.Game {
             this.manager.create.body({
                 bodyType: "asteroid",
                 materialType: "genarium",
+                owner: this.players[0],
                 radius: 50,
                 x: 1600,
                 y: 400,
@@ -299,6 +302,7 @@ export class StardashGame extends BaseClasses.Game {
             this.manager.create.body({
                 bodyType: "asteroid",
                 materialType: "rarium",
+                owner: this.players[1],
                 radius: 50,
                 x: 2033,
                 y: 1150,
@@ -326,6 +330,98 @@ export class StardashGame extends BaseClasses.Game {
                 radius: 95,
                 x: 1167,
                 y: 650,
+            }),
+        );
+
+        this.units.push(
+            this.manager.create.unit({
+                owner: this.players[0],
+                job: this.jobs[0],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 300,
+                y: 800,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[0],
+                job: this.jobs[1],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 300,
+                y: 700,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[0],
+                job: this.jobs[2],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 300,
+                y: 800,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[0],
+                job: this.jobs[3],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 300,
+                y: 600,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[0],
+                job: this.jobs[4],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 300,
+                y: 900,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[1],
+                job: this.jobs[0],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 2900,
+                y: 800,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[1],
+                job: this.jobs[1],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 2900,
+                y: 700,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[1],
+                job: this.jobs[2],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 2900,
+                y: 800,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[1],
+                job: this.jobs[3],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 2900,
+                y: 600,
+            }),
+
+            this.manager.create.unit({
+                owner: this.players[1],
+                job: this.jobs[4],
+                radius: this.shipRadius,
+                energy: 100,
+                x: 2900,
+                y: 900,
             }),
         );
     }
