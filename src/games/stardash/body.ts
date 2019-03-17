@@ -15,7 +15,7 @@ export type BodyBodyType = "planet" | "asteroid" | "sun";
 /**
  * The type of material the celestial body has.
  */
-export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "Mythicite";
+export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
 /**
  * A celestial body located within the game.
@@ -34,7 +34,7 @@ export class Body extends GameObject {
     /**
      * The type of material the celestial body has.
      */
-    public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "Mythicite";
+    public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
     /**
      * The Player that owns and can control this Unit.
