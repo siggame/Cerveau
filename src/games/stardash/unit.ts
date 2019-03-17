@@ -679,6 +679,7 @@ export class Unit extends GameObject {
         material: "genarium" | "rarium" | "legendarium" | "mythicite",
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
+
         // grab the resources on the ship.
         const totalResourceOnShip = unit[material];
         // grab the current materials on the ship.
