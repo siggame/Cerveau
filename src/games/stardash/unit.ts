@@ -314,37 +314,6 @@ export class Unit extends GameObject {
         if (this.job.carryLimit <= currentLoad) {
             return `${this} cannot hold any more materials!`;
         }
-
-        // make sure a body was given.
-        if (!body) {
-            return `Body doesn't exist`;
-        }
-
-        // make sure it is an asteroid.
-        if (body.bodyType !== "asteroid") {
-            return `${body} must be an asteroid!`;
-        }
-
-        // make sure the ship is a miner.
-        if (this.job.title !== "miner") {
-            return `${this} must be a miner ship.`;
-        }
-
-        // make sure it has some material to mine.
-        if ((body.bodyType !== "asteroid") || (body.amount <= 0)) {
-            return `${body} does not have any materials to mine!`;
-        }
-
-        // make sure the asteroid is in range.
-        if (this.job.range < Math.sqrt(this.x ** 2 + this.y ** 2)) {
-            return `${this} is too far away from ${body} to mine!`;
-        }
-
-        // make sure the unit can hold things.
-        if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold materials!`;
-        }
-
         // Check all the arguments for mine here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
