@@ -664,9 +664,12 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
 
+        // grab the resources on the ship.
         const totalResourceOnShip = unit[material];
+        // grab the current materials on the ship.
         const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-        
+
+        // correct the acutal amount to account for a negative argument.
         let actualAmount = amount <= 0
             ? totalResourceOnShip
             : Math.min(totalResourceOnShip, amount);
