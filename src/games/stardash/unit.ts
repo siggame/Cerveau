@@ -535,6 +535,46 @@ export class Unit extends GameObject {
         missile: Projectile,
     ): void | string | IUnitShootDownArgs {
         // <<-- Creer-Merge: invalidate-shootDown -->>
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+
+        // if the projectile does not exist
+        if (!missile) {
+            return `${this} cannot shoot down a missile that does not exist.`;
+        }
+
+        // if the projectile is out of bounds of the map
+        if (missile.x < 0 || missile.x > 3200 || missile.y < 0 || missile.y > 1800) {
+            return `${this} cannot shoot down ${missile} which is out of bounds. Let it go.`;
+        }
+
+        // if the projectile belongs to the player trying to shoot it down
+        if (missile.owner === player) {
+            return `${this} is trying to shoot down ${missile} which is an ally.`;
+        }
+
+        // if this unit does not have an owner
+        if (this.owner === undefined || this.owner !== player) {
+            return `${this} either does not belong to you or is undefined.`;
+        }
+
+        // if this unit has already acted, it may not act again
+        if (this.acted) {
+            return `${this} has already acted.`;
+        }
+
+        // if this unit is NOT a corvette
+        if (this.job.title !== "corvette") {
+            return `${this} is not a corvette. It cannot shoot down missiles.`;
+        }
+
+        // if the projectile is out of the range of the corvette
+        if (Math.sqrt((missile.x - this.x) ** 2) + ((missile.y - this.y) ** 2) > this.job.range) {
+            return `${this} is too far away from the target.`;
+        }
 
         // Check all the arguments for shootDown here and try to
         // return a string explaining why the input is wrong.
@@ -559,8 +599,19 @@ export class Unit extends GameObject {
 
         // Add logic here for shootDown.
 
-        // TODO: replace this with actual logic
-        return false;
+        // take the missile and push it somewhere else!
+        // after doing this, the system will take care of the rest,
+        // such as removing it from the projectile list.
+        // thanks system!
+        missile.x = -1;
+        missile.y = -1;
+        missile.fuel = 0;
+
+        // the corvette has now acted
+        this.acted = true;
+
+        // logic has been added
+        return true;
 
         // <<-- /Creer-Merge: shootDown -->>
     }
