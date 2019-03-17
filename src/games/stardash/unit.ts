@@ -576,20 +576,20 @@ export class Unit extends GameObject {
             return `${this} is too far away to transfer materials with the target ship!`;
         }
 
-        // Check that the ship can hold cargo
+        // Check that the ship can hold car
         if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold cargo!`
+            return `${this} cannot hold cargo!`;
         }
 
         // Check that the ship has space
         const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
         if (currentLoad === this.job.carryLimit) {
-            return `${this} already has a full cargo hold!`
+            return `${this} already has a full cargo hold!`;
         }
 
         // Check that the target ship has the material
         if (unit[material] <= 0) {
-            return `${unit} does not have any ${material} for ${this} to take!`
+            return `${unit} does not have any ${material} for ${this} to take!`;
         }
 
         // <<-- /Creer-Merge: invalidate-transfer -->>
@@ -614,18 +614,24 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
 
+        // grab the resources on the ship.
         const totalResourceOnShip = unit[material];
+        // grab the current materials on the ship.
         const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
-        
+
+        // correct the acutal amount to account for a negative argument.
         let actualAmount = amount <= 0
             ? totalResourceOnShip
             : Math.min(totalResourceOnShip, amount);
 
+        // account for carry limit.
         actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
 
+        // shift the amounts for transfer.
         unit[material] -= actualAmount;
         this[material] += actualAmount;
 
+        // return it was successful.
         return true;
 
         // <<-- /Creer-Merge: transfer -->>
