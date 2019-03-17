@@ -156,6 +156,8 @@ export class Unit extends GameObject {
         enemy: Unit,
     ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
+
+        // check widely consistent things.
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
@@ -166,25 +168,35 @@ export class Unit extends GameObject {
         if (!enemy) {
             return `${this} is attacking unit that doesn't exist.`;
         }
+
         // Handle possible coordinate invalidations here:
         if ((enemy.x < 0) || (enemy.y < 0)) {
             return `${this} is trying to attack a location that doesn't exist.`;
         }
+
         // make sure the target is in range.
         if ((this.job.range + enemy.radius) <= Math.sqrt(((this.x - enemy.x) ** 2) + ((this.y - enemy.y) ** 2))) {
             return `${this} is trying to attack a location which is too far away.`;
         }
+
         // make sure you aren't attacking a friend.
         if (enemy.owner === player) {
             return `${this} is trying to attack the ally: ${enemy.job.title} at ${enemy.x}, ${enemy.y}`;
         }
+
         // Handle possible unit invalidations here:
         if (enemy.owner === undefined) {
             return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
         }
+
         // make sure the unit has a job.
         if (this.job === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
+        }
+
+        // make sure the unit is a attacking job
+        if (this.job.title !== "corvette" && this.job.title !== "missleboat") {
+            return `${this} is not a unit that can attack.`;
         }
 
         // Check all the arguments for attack here and try to
@@ -205,37 +217,48 @@ export class Unit extends GameObject {
     protected async attack(player: Player, enemy: Unit): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
 
-        // Add logic here for attack. 
+        // Do different attack based on the job of the unit.
+        if (this.job.title === "corvette") {
+            let attackDamage = this.job.damage;
 
-        let attackDamage = this.job.damage;
-
-        if (enemy.protector)  //if enemy is protected by a martyr
-        {
-            if(enemy.protector.energy > attackDamage)
-            {
-                enemy.protector.energy -= attackDamage;
+            // if enemy is protected by a martyr
+            if (enemy.protector) {
+                if (enemy.protector.energy > attackDamage) {
+                    enemy.protector.energy -= attackDamage;
+                }
+                else if (enemy.protector.energy <= attackDamage) {
+                    attackDamage -= enemy.protector.energy;
+                    enemy.protector.energy = 0;
+                    enemy.energy -= attackDamage;
+                }
             }
-            else if (enemy.protector.energy <= attackDamage)
-            {
-                attackDamage -= enemy.protector.energy;
+            // if no martyr in ranges
+            else {
                 enemy.energy -= attackDamage;
             }
+
+            if (enemy.energy <= 0) {
+                // set unit's location to out of bounds
+                enemy.x = -1;
+                enemy.y = -1;
+                enemy.energy = 0; // set unit's health to zero.
+            }
         }
-        else //if no martyr in range
-        {
-            enemy.energy -= attackDamage;
+        else {
+            this.manager.create.projectile({
+                fuel: this.game.projectileSpeed * 3,
+                owner: this.owner,
+                target: enemy,
+                x: this.x,
+                y: this.y,
+            });
         }
 
-        if (enemy.energy <= 0)
-        {
-            enemy.x = -1;  //set unit's location to out of bounds
-            enemy.y = -1;
-            enemy.energy = 0; // set unit's health to zero.
-        }
+        // flag that the unit has acted.
+        this.acted = true;
 
-        this.acted = true; // unit has acted
-        
-        return true; // return true by default
+        // return that the action was successful.
+        return true;
 
         // <<-- /Creer-Merge: attack -->>
     }
@@ -317,7 +340,7 @@ export class Unit extends GameObject {
         }
 
         // make sure it has some material to mine.
-        if ((body.materialType === "none") || (body.amount <= 0)) {
+        if ((body.bodyType !== "asteroid") || (body.amount <= 0)) {
             return `${body} does not have any materials to mine!`;
         }
 
@@ -329,50 +352,6 @@ export class Unit extends GameObject {
         // make sure the unit can hold things.
         if (this.job.carryLimit <= 0) {
             return `${this} cannot hold materials!`;
-        }
-
-        // make sure the unit can carry more materials.
-        const currentLoad = this.genarium + this.rarium + this.legendarium +
-                          this.mythicite;
-        if (this.job.carryLimit <= currentLoad) {
-            return `${this} cannot hold any more materials!`;
-        }
-
-        // make sure a body was given.
-        if (!body) {
-            return `Body doesn't exist`;
-        }
-
-        // make sure it is an asteroid.
-        if (body.bodyType !== "asteroid") {
-            return `${body} must be an asteroid!`;
-        }
-
-        // make sure the ship is a miner.
-        if (this.job.title !== "miner") {
-            return `${this} must be a miner ship.`;
-        }
-
-        // make sure it has some material to mine.
-        if ((body.materialType === "none") || (body.amount <= 0)) {
-            return `${body} does not have any materials to mine!`;
-        }
-
-        // make sure the asteroid is in range.
-        if (this.job.range < Math.sqrt(this.x ** 2 + this.y ** 2)) {
-            return `${this} is too far away from ${body} to mine!`;
-        }
-
-        // make sure the unit can hold things.
-        if (this.job.carryLimit <= 0) {
-            return `${this} cannot hold materials!`;
-        }
-
-        // make sure the unit can carry more materials.
-        const currentLoad = this.genarium + this.rarium + this.legendarium +
-                          this.mythicite;
-        if (this.job.carryLimit <= currentLoad) {
-            return `${this} cannot hold any more materials!`;
         }
 
         // Check all the arguments for mine here and try to
@@ -455,10 +434,12 @@ export class Unit extends GameObject {
             return reason;
         }
 
-        if ((((this.x - x) ** 2 + (this.y - y) ** 2) ** .5) > this.moves) {
+        // make sure the unit can move to that locaiton.
+        if (Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2) > this.moves) {
             return `${this} can only move ${this.moves} distance!`;
         }
 
+        // make sure the unit is in bounds.
         if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
             return `${this} is dead and cannot move.`;
         }
@@ -487,11 +468,9 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: move -->>
 
         // Add logic here for move.
-        this.moves -= ((x - this.x) ** 2) + ((y - this.y) ** 2) ** .5;
+        this.moves -= Math.sqrt((x - this.x) ** 2) + ((y - this.y) ** 2);
         this.x = x;
         this.y = y;
-
-        // detect collisions and flag ship, or resolve.
 
         // magic code that updates the units grid position.
 
