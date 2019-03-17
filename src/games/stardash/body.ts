@@ -35,11 +35,14 @@ export class Body extends GameObject {
      * The type of material the celestial body has.
      */
     public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+<<<<<<< HEAD
 
     /**
      * The Player that owns and can control this Unit.
      */
     public owner?: Player;
+=======
+>>>>>>> Fixed synthax errors for ts and removed trailing spaces. Added comments
 
     /**
      * The Player that owns and can control this Unit.
