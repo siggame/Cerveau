@@ -547,19 +547,49 @@ export class Unit extends GameObject {
         player: Player,
         unit: Unit,
         amount: number,
-        material: "genarium" | "rarium" | "legendarium" | "Mythicite",
+        material: "genarium" | "rarium" | "legendarium" | "mythicite",
     ): void | string | IUnitTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
+
+        // Check all the arguments for transfer here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // Check common invalidates
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
             return reason;
         }
 
-        // Check all the arguments for transfer here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        // Check that target ship exists
+        if (!unit) {
+            return `${this} can't create minerals out of thin space! The target ship doesn't exist.`;
+        }
+
+        // Check that target ship is in range
+        const xDist = this.x - unit.x;
+        const yDist = this.y - unit.y;
+        if (Math.sqrt(xDist ** 2 + yDist ** 2) > this.job.range) {
+            return `${this} is too far away to transfer materials with the target ship!`;
+        }
+
+        // Check that the ship can hold car
+        if (this.job.carryLimit <= 0) {
+            return `${this} cannot hold cargo!`;
+        }
+
+        // Check that the ship has space
+        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
+        if (currentLoad === this.job.carryLimit) {
+            return `${this} already has a full cargo hold!`;
+        }
+
+        // Check that the target ship has the material
+        if (unit[material] <= 0) {
+            return `${unit} does not have any ${material} for ${this} to take!`;
+        }
 
         // <<-- /Creer-Merge: invalidate-transfer -->>
     }
@@ -579,14 +609,29 @@ export class Unit extends GameObject {
         player: Player,
         unit: Unit,
         amount: number,
-        material: "genarium" | "rarium" | "legendarium" | "Mythicite",
+        material: "genarium" | "rarium" | "legendarium" | "mythicite",
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
 
-        // Add logic here for transfer.
+        // grab the resources on the ship.
+        const totalResourceOnShip = unit[material];
+        // grab the current materials on the ship.
+        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
 
-        // TODO: replace this with actual logic
-        return false;
+        // correct the acutal amount to account for a negative argument.
+        let actualAmount = amount <= 0
+            ? totalResourceOnShip
+            : Math.min(totalResourceOnShip, amount);
+
+        // account for carry limit.
+        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
+
+        // shift the amounts for transfer.
+        unit[material] -= actualAmount;
+        this[material] += actualAmount;
+
+        // return it was successful.
+        return true;
 
         // <<-- /Creer-Merge: transfer -->>
     }
