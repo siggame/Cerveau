@@ -170,8 +170,8 @@ export class Unit extends GameObject {
         }
 
         // Handle possible coordinate invalidations here:
-        if ((enemy.x < 0) || (enemy.y < 0)) {
-            return `${this} is trying to attack a location that doesn't exist.`;
+        if ((enemy.x < 0) || (enemy.y < 0) || enemy.x > this.game.sizeX || enemy.y > this.game.sizeY) {
+            return `${this} is trying to attack a location that doesn't exist`;
         }
 
         // make sure the target is in range.
