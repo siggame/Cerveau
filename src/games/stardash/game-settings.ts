@@ -52,32 +52,38 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             default: 5,
             // <<-- /Creer-Merge: miningSpeed -->>
         },
-        oreRarity1: {
+        oreRarityGenarium: {
             description: "The rarity modifier of the most common ore. This "
                        + "controls how much spawns.",
-            // <<-- Creer-Merge: oreRarity1 -->>
-            default: 1,
-            // <<-- /Creer-Merge: oreRarity1 -->>
+            // <<-- Creer-Merge: oreRarityGenarium -->>
+            default: 0,
+            // <<-- /Creer-Merge: oreRarityGenarium -->>
         },
-        oreRarity2: {
+        oreRarityRarium: {
             description: "The rarity modifier of the second rarest ore. This "
                        + "controls how much spawns.",
-            // <<-- Creer-Merge: oreRarity2 -->>
-            default: 0.7,
-            // <<-- /Creer-Merge: oreRarity2 -->>
+            // <<-- Creer-Merge: oreRarityRarium -->>
+            default: 0,
+            // <<-- /Creer-Merge: oreRarityRarium -->>
         },
-        oreRarity3: {
+        oreRaritylegendarium: {
             description: "The rarity modifier of the rarest ore. This controls "
                        + "how much spawns.",
-            // <<-- Creer-Merge: oreRarity3 -->>
-            default: 0.4,
-            // <<-- /Creer-Merge: oreRarity3 -->>
+            // <<-- Creer-Merge: oreRaritylegendarium -->>
+            default: 0,
+            // <<-- /Creer-Merge: oreRaritylegendarium -->>
         },
         planetRechargeRate: {
             description: "The amount of energy the planets restore each round.",
             // <<-- Creer-Merge: planetRechargeRate -->>
             default: 50,
             // <<-- /Creer-Merge: planetRechargeRate -->>
+        },
+        projectileRadius: {
+            description: "The standard size of ships.",
+            // <<-- Creer-Merge: projectileRadius -->>
+            default: 0,
+            // <<-- /Creer-Merge: projectileRadius -->>
         },
         projectileSpeed: {
             description: "The amount of distance missiles travel through "

@@ -1,6 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitMineArgs, IUnitMoveArgs, IUnitOpenArgs,
-         IUnitProperties, IUnitShootDownArgs, IUnitTransferArgs } from "./";
+import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
+         IUnitOpenArgs, IUnitProperties, IUnitShootDownArgs, IUnitTransferArgs,
+       } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -79,15 +80,15 @@ export class Unit extends GameObject {
     public protector?: Unit;
 
     /**
-     * The radius of the circle this unit occupies.
-     */
-    public radius!: number;
-
-    /**
      * The amount of Rarium carried by this unit. (0 to job carry capacity -
      * other carried items).
      */
     public rarium!: number;
+
+    /**
+     * The sheild that a martyr ship has.
+     */
+    public shield!: number;
 
     /**
      * The x value this unit is on.
@@ -126,8 +127,12 @@ export class Unit extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.job = args.job;
-        this.radius = 10;
         this.acted = true;
+        this.legendarium = 0;
+        this.mythicite = 0;
+        this.rarium = 0;
+        this.genarium = 0;
+        this.isDashing = false;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -168,20 +173,16 @@ export class Unit extends GameObject {
         if (!enemy) {
             return `${this} is attacking unit that doesn't exist.`;
         }
-<<<<<<< HEAD
-        // Handle possible coordinate invalidations here.
-        if ((enemy.x < 0) || (enemy.y < 0) || enemy.x > this.game.sizeX || enemy.y > this.game.sizeY) {
-            return `${this} is trying to attack a location that doesn't exist`;
-=======
 
         // Handle possible coordinate invalidations here:
-        if ((enemy.x < 0) || (enemy.y < 0)) {
-            return `${this} is trying to attack a location that doesn't exist.`;
->>>>>>> Fixed code after nasty rebase error that caused git hub not to accept the resolution of merge conflicts.
+        if ((enemy.x < 0) || (enemy.y < 0) || enemy.x > this.game.sizeX ||
+            enemy.y > this.game.sizeY) {
+            return `${this} is trying to attack a location that doesn't exist`;
         }
 
         // make sure the target is in range.
-        if ((this.job.range + enemy.radius) <= Math.sqrt(((this.x - enemy.x) ** 2) + ((this.y - enemy.y) ** 2))) {
+        if ((this.job.range + this.game.shipRadius) <= Math.sqrt(((this.x -
+            enemy.x) ** 2) + ((this.y - enemy.y) ** 2))) {
             return `${this} is trying to attack a location which is too far away.`;
         }
 
@@ -243,11 +244,10 @@ export class Unit extends GameObject {
                 enemy.energy -= attackDamage;
             }
 
-            if (enemy.energy <= 0) {
+            if (enemy.energy < 0) {
                 // set unit's location to out of bounds
                 enemy.x = -1;
                 enemy.y = -1;
-                enemy.energy = 0; // set unit's health to zero.
             }
         }
         else {
@@ -267,6 +267,83 @@ export class Unit extends GameObject {
         return true;
 
         // <<-- /Creer-Merge: attack -->>
+    }
+
+    /**
+     * Invalidation function for dash. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param x - The x value of the destination's coordinates.
+     * @param y - The y value of the destination's coordinates.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateDash(
+        player: Player,
+        x: number,
+        y: number,
+    ): void | string | IUnitDashArgs {
+        // <<-- Creer-Merge: invalidate-dash -->>
+
+        // check widely consistent things.
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+
+        // make sure the unit can move to that locaiton.
+        if (this.energy > 10) {
+            return `${this} needs at least 10 energy and has ${this.energy}.`;
+        }
+
+        // make sure the dash is within range.
+        if (this.game.dashDistance < Math.sqrt(this.x ** 2 + this.y ** 2)) {
+            return `${this} is too far away from (${x}, ${y}) to dash there.`;
+        }
+
+        // make sure the unit is in bounds.
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY || this.energy < 0) {
+            return `${this} is dead and cannot move.`;
+        }
+
+        // Check all the arguments for dash here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-dash -->>
+    }
+
+    /**
+     * Causes the unit to dash towards the designated destination.
+     *
+     * @param player - The player that called this.
+     * @param x - The x value of the destination's coordinates.
+     * @param y - The y value of the destination's coordinates.
+     * @returns True if it moved, false otherwise.
+     */
+    protected async dash(
+        player: Player,
+        x: number,
+        y: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: dash -->>
+
+        // Add logic here for dash.
+        this.dashX = x;
+        this.dashY = y;
+        this.isDashing = true;
+        this.acted = true;
+        this.energy -= 10;
+
+        // return the action was successful.
+        return true;
+
+        // <<-- /Creer-Merge: dash -->>
     }
 
     /**
@@ -346,7 +423,7 @@ export class Unit extends GameObject {
      * @returns True if successfully acted, false otherwise.
      */
     protected async mine(player: Player, body: Body): Promise<boolean> {
-        // <<-- Creer-Merge: mine -->
+        // <<-- Creer-Merge: mine -->>
 
         // Set the asteroids owner to the ships owner.
         body.owner = player;
@@ -475,12 +552,6 @@ export class Unit extends GameObject {
     ): void | string | IUnitOpenArgs {
         // <<-- Creer-Merge: invalidate-open -->>
 
-        const reason = this.invalidate(player, true);
-        // if there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
-
         // Check all the arguments for open here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -490,7 +561,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * tells you if your ship can dash to that location.
+     * tells you if your ship can be at that location.
      *
      * @param player - The player that called this.
      * @param x - The x position of the location you wish to check.
@@ -528,6 +599,8 @@ export class Unit extends GameObject {
         missile: Projectile,
     ): void | string | IUnitShootDownArgs {
         // <<-- Creer-Merge: invalidate-shootDown -->>
+
+        // check widely consistent things.
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
@@ -746,7 +819,7 @@ export class Unit extends GameObject {
         }
 
         // Make sure the unit is alive.
-        if (this.energy <= 0) {
+        if (this.energy < 0) {
             return `${this} is dead, and cannot do anything.`;
         }
     }

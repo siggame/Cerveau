@@ -84,7 +84,7 @@ export interface IBodyProperties {
     /**
      * The type of material the celestial body has.
      */
-    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "Mythicite";
+    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
     /**
      * The Player that owns and can control this Unit.
@@ -260,11 +260,6 @@ export interface IProjectileProperties {
     owner?: Player;
 
     /**
-     * The radius of the circle this projectile occupies.
-     */
-    radius?: number;
-
-    /**
      * The unit that is being attacked by this projectile.
      */
     target?: Unit;
@@ -347,15 +342,15 @@ export interface IUnitProperties {
     protector?: Unit;
 
     /**
-     * The radius of the circle this unit occupies.
-     */
-    radius?: number;
-
-    /**
      * The amount of Rarium carried by this unit. (0 to job carry capacity -
      * other carried items).
      */
     rarium?: number;
+
+    /**
+     * The sheild that a martyr ship has.
+     */
+    shield?: number;
 
     /**
      * The x value this unit is on.
@@ -379,6 +374,22 @@ export interface IUnitAttackArgs {
      * The Unit being attacked.
      */
     enemy?: Unit;
+}
+
+/**
+ * Argument overrides for Unit's dash function. If you return an object of this
+ * interface from the invalidate functions, the value(s) you set will be used
+ * in the actual function.
+ */
+export interface IUnitDashArgs {
+    /**
+     * The x value of the destination's coordinates.
+     */
+    x?: number;
+    /**
+     * The y value of the destination's coordinates.
+     */
+    y?: number;
 }
 
 /**
@@ -456,7 +467,7 @@ export interface IUnitTransferArgs {
      * The material the unit will pick up. 'resource1', 'resource2', or
      * 'resource3'.
      */
-    material?: "genarium" | "rarium" | "legendarium" | "Mythicite";
+    material?: "genarium" | "rarium" | "legendarium" | "mythicite";
 }
 
 export * from "./body";
@@ -640,13 +651,13 @@ export const Namespace = makeNamespace({
                 miningSpeed: {
                     typeName: "int",
                 },
-                oreRarity1: {
+                oreRarityGenarium: {
                     typeName: "float",
                 },
-                oreRarity2: {
+                oreRarityRarium: {
                     typeName: "float",
                 },
-                oreRarity3: {
+                oreRaritylegendarium: {
                     typeName: "float",
                 },
                 planetRechargeRate: {
@@ -659,6 +670,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Player,
                         nullable: false,
                     },
+                },
+                projectileRadius: {
+                    typeName: "int",
                 },
                 projectileSpeed: {
                     typeName: "int",
@@ -715,7 +729,7 @@ export const Namespace = makeNamespace({
                 materialType: {
                     typeName: "string",
                     defaultValue: "none",
-                    literals: ["none", "genarium", "rarium", "legendarium", "Mythicite"],
+                    literals: ["none", "genarium", "rarium", "legendarium", "mythicite"],
                 },
                 owner: {
                     typeName: "gameObject",
@@ -888,9 +902,6 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Player,
                     nullable: true,
                 },
-                radius: {
-                    typeName: "float",
-                },
                 target: {
                     typeName: "gameObject",
                     gameObjectClass: Unit,
@@ -951,10 +962,10 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Unit,
                     nullable: true,
                 },
-                radius: {
-                    typeName: "float",
-                },
                 rarium: {
+                    typeName: "int",
+                },
+                shield: {
                     typeName: "int",
                 },
                 x: {
@@ -972,6 +983,22 @@ export const Namespace = makeNamespace({
                             typeName: "gameObject",
                             gameObjectClass: Unit,
                             nullable: false,
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                dash: {
+                    args: [
+                        {
+                            argName: "x",
+                            typeName: "float",
+                        },
+                        {
+                            argName: "y",
+                            typeName: "float",
                         },
                     ],
                     invalidValue: false,
@@ -1055,7 +1082,7 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "genarium",
-                            literals: ["genarium", "rarium", "legendarium", "Mythicite"],
+                            literals: ["genarium", "rarium", "legendarium", "mythicite"],
                         },
                     ],
                     invalidValue: false,
