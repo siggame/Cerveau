@@ -23,11 +23,6 @@ export class Projectile extends GameObject {
     public owner?: Player;
 
     /**
-     * The radius of the circle this projectile occupies.
-     */
-    public radius!: number;
-
-    /**
      * The unit that is being attacked by this projectile.
      */
     public target: Unit;

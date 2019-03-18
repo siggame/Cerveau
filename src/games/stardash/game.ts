@@ -89,18 +89,18 @@ export class StardashGame extends BaseClasses.Game {
      * The rarity modifier of the most common ore. This controls how much
      * spawns.
      */
-    public readonly oreRarity1!: number;
+    public readonly oreRarityGenarium!: number;
 
     /**
      * The rarity modifier of the second rarest ore. This controls how much
      * spawns.
      */
-    public readonly oreRarity2!: number;
+    public readonly oreRarityRarium!: number;
 
     /**
      * The rarity modifier of the rarest ore. This controls how much spawns.
      */
-    public readonly oreRarity3!: number;
+    public readonly oreRaritylegendarium!: number;
 
     /**
      * The amount of energy the planets restore each round.
@@ -111,6 +111,11 @@ export class StardashGame extends BaseClasses.Game {
      * List of all the players in the game.
      */
     public players!: Player[];
+
+    /**
+     * The standard size of ships.
+     */
+    public readonly projectileRadius!: number;
 
     /**
      * The amount of distance missiles travel through space.
@@ -326,7 +331,7 @@ export class StardashGame extends BaseClasses.Game {
 
             this.manager.create.body({
                 bodyType: "asteroid",
-                materialType: "Mythicite",
+                materialType: "mythicite",
                 radius: 95,
                 x: 1167,
                 y: 650,
