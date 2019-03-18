@@ -309,7 +309,7 @@ export class Unit extends GameObject {
         }
 
         // make sure it has some material to mine.
-        if ((body.materialType === "none") || (body.amount <= 0)) {
+        if ((body.bodyType !== "asteroid") || (body.amount <= 0)) {
             return `${body} does not have any materials to mine!`;
         }
 
