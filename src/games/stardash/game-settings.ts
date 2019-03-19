@@ -22,7 +22,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         dashBlock: {
             description: "Radius of the no dash zone around the sun.",
             // <<-- Creer-Merge: dashBlock -->>
-            default: 0,
+            default: 400,
             // <<-- /Creer-Merge: dashBlock -->>
         },
         dashDistance: {
@@ -30,6 +30,18 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: dashDistance -->>
             default: 1000,
             // <<-- /Creer-Merge: dashDistance -->>
+        },
+        genariumValue: {
+            description: "The value of every unit of genarium.",
+            // <<-- Creer-Merge: genariumValue -->>
+            default: 1,
+            // <<-- /Creer-Merge: genariumValue -->>
+        },
+        legendariumValue: {
+            description: "The value of every unit of legendarium.",
+            // <<-- Creer-Merge: legendariumValue -->>
+            default: 5,
+            // <<-- /Creer-Merge: legendariumValue -->>
         },
         maxAsteroid: {
             description: "The highest amount of material, barring rarity, that "
@@ -52,26 +64,39 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             default: 5,
             // <<-- /Creer-Merge: miningSpeed -->>
         },
+        mythiciteAmount: {
+            description: "The amount of mythicite that spawns at the start of "
+                       + "the game.",
+            // <<-- Creer-Merge: mythiciteAmount -->>
+            default: 1000,
+            // <<-- /Creer-Merge: mythiciteAmount -->>
+        },
         oreRarityGenarium: {
             description: "The rarity modifier of the most common ore. This "
                        + "controls how much spawns.",
             // <<-- Creer-Merge: oreRarityGenarium -->>
-            default: 0,
+            default: 5,
             // <<-- /Creer-Merge: oreRarityGenarium -->>
+        },
+        oreRarityLegendarium: {
+            description: "The rarity modifier of the rarest ore. This controls "
+                       + "how much spawns.",
+            // <<-- Creer-Merge: oreRarityLegendarium -->>
+            default: 1,
+            // <<-- /Creer-Merge: oreRarityLegendarium -->>
         },
         oreRarityRarium: {
             description: "The rarity modifier of the second rarest ore. This "
                        + "controls how much spawns.",
             // <<-- Creer-Merge: oreRarityRarium -->>
-            default: 0,
+            default: 2.5,
             // <<-- /Creer-Merge: oreRarityRarium -->>
         },
-        oreRaritylegendarium: {
-            description: "The rarity modifier of the rarest ore. This controls "
-                       + "how much spawns.",
-            // <<-- Creer-Merge: oreRaritylegendarium -->>
-            default: 0,
-            // <<-- /Creer-Merge: oreRaritylegendarium -->>
+        planetEnergyCap: {
+            description: "The amount of energy a planet can hold at once.",
+            // <<-- Creer-Merge: planetEnergyCap -->>
+            default: 20000,
+            // <<-- /Creer-Merge: planetEnergyCap -->>
         },
         planetRechargeRate: {
             description: "The amount of energy the planets restore each round.",
@@ -82,15 +107,21 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         projectileRadius: {
             description: "The standard size of ships.",
             // <<-- Creer-Merge: projectileRadius -->>
-            default: 0,
+            default: 5,
             // <<-- /Creer-Merge: projectileRadius -->>
         },
         projectileSpeed: {
             description: "The amount of distance missiles travel through "
                        + "space.",
             // <<-- Creer-Merge: projectileSpeed -->>
-            default: 9,
+            default: 10,
             // <<-- /Creer-Merge: projectileSpeed -->>
+        },
+        rariumValue: {
+            description: "The value of every unit of rarium.",
+            // <<-- Creer-Merge: rariumValue -->>
+            default: 2,
+            // <<-- /Creer-Merge: rariumValue -->>
         },
         regenerateRate: {
             description: "The regeneration rate of asteroids.",
