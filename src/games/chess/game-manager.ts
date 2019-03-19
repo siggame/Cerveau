@@ -150,7 +150,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         // - insufficient material
         // - three fold repetition
         // Keeping this check last, guarantees everything but the 50-move rule have been checked
-        if (chess.in_draw()) {
+        if (!chess.in_threefold_repetition() && chess.in_draw()) {
             return [
                 "Draw - 50-move rule: 50 moves completed with no pawn "
               + "moved or piece captured.",
