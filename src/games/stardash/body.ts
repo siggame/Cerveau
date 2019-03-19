@@ -22,7 +22,7 @@ export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | 
  */
 export class Body extends GameObject {
     /**
-     * The amount of material the object has.
+     * The amount of material the object has, or energy if it is a planet.
      */
     public amount!: number;
 
@@ -195,6 +195,7 @@ export class Body extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: spawn -->>
 
+        // store the units to be added.
         let unit;
 
         if (title === "corvette") {
@@ -203,73 +204,60 @@ export class Body extends GameObject {
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
-                acted: true,
-                energy: 100,
-                isDashing: false,
+                energy: this.game.jobs[0].energy,
                 job: this.game.jobs[0],
                 owner: player,
                 x,
                 y,
             });
         }
-
         else if (title === "missleboat") {
             // Deduct ship cost from player's balance
             player.money -= 125;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
-                acted: true,
-                energy: 100,
-                isDashing: false,
+                energy: this.game.jobs[1].energy,
                 job: this.game.jobs[1],
                 owner: player,
                 x,
                 y,
             });
         }
-
         else if (title === "martyr") {
             // Deduct ship cost from player's balance
             player.money -= 125;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
-                acted: true,
-                energy: 100,
-                isDashing: false,
+                energy: this.game.jobs[2].energy,
+                shield: this.game.jobs[2].shield,
                 job: this.game.jobs[2],
                 owner: player,
                 x,
                 y,
             });
         }
-
         else if (title === "transport") {
             // Deduct ship cost from player's balance
             player.money -= 75;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
-                acted: true,
-                energy: 100,
-                isDashing: false,
+                energy: this.game.jobs[3].energy,
                 job: this.game.jobs[3],
                 owner: player,
                 x,
                 y,
             });
         }
-
         else {
             // Deduct ship cost from player's balance
             player.money -= 75;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
-                acted: true,
-                energy: 100,
-                isDashing: false,
+                energy: this.game.jobs[4].energy,
                 job: this.game.jobs[4],
                 owner: player,
                 x,

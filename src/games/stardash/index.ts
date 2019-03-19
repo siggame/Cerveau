@@ -72,7 +72,7 @@ export const BaseClasses = {
 /** All the possible properties for an Body. */
 export interface IBodyProperties {
     /**
-     * The amount of material the object has.
+     * The amount of material the object has, or energy if it is a planet.
      */
     amount?: number;
 
@@ -631,6 +631,9 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
+                genariumValue: {
+                    typeName: "float",
+                },
                 jobs: {
                     typeName: "list",
                     valueType: {
@@ -638,6 +641,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Job,
                         nullable: false,
                     },
+                },
+                legendariumValue: {
+                    typeName: "float",
                 },
                 maxAsteroid: {
                     typeName: "int",
@@ -651,14 +657,20 @@ export const Namespace = makeNamespace({
                 miningSpeed: {
                     typeName: "int",
                 },
+                mythiciteAmount: {
+                    typeName: "float",
+                },
                 oreRarityGenarium: {
+                    typeName: "float",
+                },
+                oreRarityLegendarium: {
                     typeName: "float",
                 },
                 oreRarityRarium: {
                     typeName: "float",
                 },
-                oreRaritylegendarium: {
-                    typeName: "float",
+                planetEnergyCap: {
+                    typeName: "int",
                 },
                 planetRechargeRate: {
                     typeName: "int",
@@ -684,6 +696,9 @@ export const Namespace = makeNamespace({
                         gameObjectClass: Projectile,
                         nullable: false,
                     },
+                },
+                rariumValue: {
+                    typeName: "float",
                 },
                 regenerateRate: {
                     typeName: "float",

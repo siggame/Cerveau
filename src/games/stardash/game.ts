@@ -58,10 +58,20 @@ export class StardashGame extends BaseClasses.Game {
     public gameObjects!: {[id: string]: GameObject};
 
     /**
+     * The value of every unit of genarium.
+     */
+    public readonly genariumValue!: number;
+
+    /**
      * A list of all jobs. first item is corvette, second is missleboat, third
      * is martyr, fourth is transport, and fifth is miner.
      */
     public jobs!: Job[];
+
+    /**
+     * The value of every unit of legendarium.
+     */
+    public readonly legendariumValue!: number;
 
     /**
      * The highest amount of material, barring rarity, that can be in a
@@ -86,10 +96,20 @@ export class StardashGame extends BaseClasses.Game {
     public readonly miningSpeed!: number;
 
     /**
+     * The amount of mythicite that spawns at the start of the game.
+     */
+    public readonly mythiciteAmount!: number;
+
+    /**
      * The rarity modifier of the most common ore. This controls how much
      * spawns.
      */
     public readonly oreRarityGenarium!: number;
+
+    /**
+     * The rarity modifier of the rarest ore. This controls how much spawns.
+     */
+    public readonly oreRarityLegendarium!: number;
 
     /**
      * The rarity modifier of the second rarest ore. This controls how much
@@ -98,9 +118,9 @@ export class StardashGame extends BaseClasses.Game {
     public readonly oreRarityRarium!: number;
 
     /**
-     * The rarity modifier of the rarest ore. This controls how much spawns.
+     * The amount of energy a planet can hold at once.
      */
-    public readonly oreRaritylegendarium!: number;
+    public readonly planetEnergyCap!: number;
 
     /**
      * The amount of energy the planets restore each round.
@@ -126,6 +146,11 @@ export class StardashGame extends BaseClasses.Game {
      * Every projectile in the game.
      */
     public projectiles!: Projectile[];
+
+    /**
+     * The value of every unit of rarium.
+     */
+    public readonly rariumValue!: number;
 
     /**
      * The regeneration rate of asteroids.
@@ -164,6 +189,11 @@ export class StardashGame extends BaseClasses.Game {
     public units!: Unit[];
 
     // <<-- Creer-Merge: attributes -->>
+
+    /**
+     * stores mythicite that was lost via unit death.
+     */
+    public lostMythicite!: number;
 
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
@@ -337,6 +367,9 @@ export class StardashGame extends BaseClasses.Game {
                 y: 650,
             }),
         );
+
+        this.players[0].homeBase = this.bodies[0];
+        this.players[1].homeBase = this.bodies[1];
 
         this.units.push(
             this.manager.create.unit({
