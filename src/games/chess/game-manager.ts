@@ -14,6 +14,8 @@ import { ChessInstance, Move } from "chess.js";
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
 }
+
+const gameOver50TurnMessage = "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -45,6 +47,9 @@ export class ChessGameManager extends BaseClasses.GameManager {
     // <<-- /Creer-Merge: public-methods -->>
 
     // <<-- Creer-Merge: protected-private-methods -->>
+
+    /** How many turns till 50 move draw */
+    private turnsToDraw = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
     /** Starts the game play */
     protected start(): void {
@@ -85,6 +90,10 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         this.game.fen = this.game.chess.fen();
         this.game.history.push(valid.san);
 
+        this.turnsToDraw = (valid.piece === "p" || valid.captured)
+            ? 100 // reset turns, pawn was moved or piece captured
+            : Math.max(this.turnsToDraw - 1, 0); // else decrement by 1
+
         const [ loserReason, winnerReason ] = this.checkForGameOverReasons();
         if (loserReason) {
             if (winnerReason) {
@@ -120,10 +129,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         }
 
         if (chess.insufficient_material()) {
-            return [
-                "Draw - Insufficient material (K vs. K, K vs. KB, or K "
-              + "vs. KN) for checkmate.",
-            ];
+            return [ "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate." ];
         }
         if (chess.in_stalemate()) {
             return [
@@ -132,29 +138,33 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
             ];
         }
 
-        if (this.game.settings.enableTFR && chess.in_threefold_repetition()) {
-            return [
-                "Stalemate - Board position has occurred three or more times.",
-            ];
+        if (this.game.settings.enableTFR) {
+            if (chess.in_threefold_repetition()) {
+                return [ "Stalemate - Board position has occurred three or more times." ];
+            }
+
+            // chess.js checks for draws by checking:
+            // - 50-move rule
+            // - stalemate
+            // - insufficient material
+            // - three fold repetition
+            // Keeping this check last, guarantees everything but the 50-move rule have been checked
+            if (chess.in_draw()) {
+                return [ gameOver50TurnMessage ];
+            }
         }
 
-        if (this.game.settings.enableSTFR
-         && this.isInSimplifiedThreefoldRepetition()
-        ) {
-            return [ "Draw - Simplified threefold repetition occurred." ];
-        }
+        if (this.game.settings.enableSTFR) {
+            if (this.isInSimplifiedThreefoldRepetition()) {
+                return [ "Draw - Simplified threefold repetition occurred." ];
+            }
 
-        // chess.js checks for draws by checking:
-        // - 50-move rule
-        // - stalemate
-        // - insufficient material
-        // - three fold repetition
-        // Keeping this check last, guarantees everything but the 50-move rule have been checked
-        if (chess.in_draw()) {
-            return [
-                "Draw - 50-move rule: 50 moves completed with no pawn "
-              + "moved or piece captured.",
-            ];
+            // chess.js.in_draw() should be true at the same time, but we are tracking the turns anyways,
+            // and chess.js.in_draw() checks for more than the 50-turn rule so the checks following this one would
+            // never be reached, so we must do this check because simplified TFR is different
+            if (this.turnsToDraw <= 0) {
+                return [ gameOver50TurnMessage ];
+            }
         }
 
         return [];
