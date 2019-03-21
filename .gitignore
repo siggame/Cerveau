@@ -32,4 +32,4 @@ docs
 dist
 
 # too many devs stumble over this and commit merge conflicts. Easier to just deal with the chore or re-generating
-.package-lock.json
+package-lock.json
