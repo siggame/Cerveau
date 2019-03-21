@@ -12,7 +12,7 @@ export class ${game['name']}GameSettingsManager extends BaseClasses.GameSettings
      * generate the values, as well as basic type and range checking.
      */
     public schema = this.makeSchema({
-// HACK: `super` should work. but schema is undefined on it at run time.
+        // HACK: `super` should work. but schema is undefined on it at run time.
         // tslint:disable-next-line:no-any
         ...(super.schema || (this as any).schema),
 
@@ -95,7 +95,7 @@ ${merge('            // ', 'map-height',
     /**
      * The current values for the game's settings
      */
-    public values = this.initialValues(this.schema);
+    public values = this.initialValues(this.schema, true);
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
