@@ -37,8 +37,8 @@ export class ChessGame extends BaseClasses.Game {
     public gameObjects!: {[id: string]: GameObject};
 
     /**
-     * The list of [known] moves that have occured in the game, in Standard
-     * Algebriac Notation (SAN) format. The first element is the first move,
+     * The list of [known] moves that have occurred in the game, in Standard
+     * Algebraic Notation (SAN) format. The first element is the first move,
      * with the last being the most recent.
      */
     public history!: string[];

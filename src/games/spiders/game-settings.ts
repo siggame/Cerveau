@@ -1,3 +1,4 @@
+import { SettingsFromSchema } from "~/core/game/base/base-game-settings";
 import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
@@ -13,64 +14,67 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public schema = this.makeSchema({
-// HACK: `super` should work. but schema is undefined on it at run time.
-        // tslint:disable-next-line:no-any
-        ...(super.schema || (this as any).schema),
+    public get schema() { // tslint:disable-line:typedef
+        return {
+            // HACK: `super` should work. but schema is undefined on it at run time.
+            // tslint:disable-next-line:no-any
+            ...(super.schema || (this as any).schema),
 
-        // Spiders game specific settings
-        cutSpeed: {
-            description: "The speed at which Cutters work to do cut Webs.",
-            // <<-- Creer-Merge: cutSpeed -->>
-            default: 2,
-            // <<-- /Creer-Merge: cutSpeed -->>
-        },
-        eggsScalar: {
-            description: "Constant used to calculate how many eggs "
-                       + "BroodMothers get on their owner's turns.",
-            // <<-- Creer-Merge: eggsScalar -->>
-            default: 0.10,
-            // <<-- /Creer-Merge: eggsScalar -->>
-        },
-        initialWebStrength: {
-            description: "The starting strength for Webs.",
-            // <<-- Creer-Merge: initialWebStrength -->>
-            default: 5,
-            // <<-- /Creer-Merge: initialWebStrength -->>
-        },
-        maxWebStrength: {
-            description: "The maximum strength a web can be strengthened to.",
-            // <<-- Creer-Merge: maxWebStrength -->>
-            default: 15,
-            // <<-- /Creer-Merge: maxWebStrength -->>
-        },
-        movementSpeed: {
-            description: "The speed at which Spiderlings move on Webs.",
-            // <<-- Creer-Merge: movementSpeed -->>
-            default: 10,
-            // <<-- /Creer-Merge: movementSpeed -->>
-        },
-        spitSpeed: {
-            description: "The speed at which Spitters work to spit new Webs.",
-            // <<-- Creer-Merge: spitSpeed -->>
-            default: 24,
-            // <<-- /Creer-Merge: spitSpeed -->>
-        },
-        weavePower: {
-            description: "How much web strength is added or removed from Webs "
-                       + "when they are weaved.",
-            // <<-- Creer-Merge: weavePower -->>
-            default: 1,
-            // <<-- /Creer-Merge: weavePower -->>
-        },
-        weaveSpeed: {
-            description: "The speed at which Weavers work to do strengthens "
-                       + "and weakens on Webs.",
-            // <<-- Creer-Merge: weaveSpeed -->>
-            default: 16,
-            // <<-- /Creer-Merge: weaveSpeed -->>
-        },
-        // <<-- Creer-Merge: schema -->>
+            // Spiders game specific settings
+            cutSpeed: {
+                description: "The speed at which Cutters work to do cut Webs.",
+                // <<-- Creer-Merge: cutSpeed -->>
+                default: 2,
+                // <<-- /Creer-Merge: cutSpeed -->>
+            },
+            eggsScalar: {
+                description: "Constant used to calculate how many eggs "
+                           + "BroodMothers get on their owner's turns.",
+                // <<-- Creer-Merge: eggsScalar -->>
+                default: 0.10,
+                // <<-- /Creer-Merge: eggsScalar -->>
+            },
+            initialWebStrength: {
+                description: "The starting strength for Webs.",
+                // <<-- Creer-Merge: initialWebStrength -->>
+                default: 5,
+                // <<-- /Creer-Merge: initialWebStrength -->>
+            },
+            maxWebStrength: {
+                description: "The maximum strength a web can be strengthened "
+                           + "to.",
+                // <<-- Creer-Merge: maxWebStrength -->>
+                default: 15,
+                // <<-- /Creer-Merge: maxWebStrength -->>
+            },
+            movementSpeed: {
+                description: "The speed at which Spiderlings move on Webs.",
+                // <<-- Creer-Merge: movementSpeed -->>
+                default: 10,
+                // <<-- /Creer-Merge: movementSpeed -->>
+            },
+            spitSpeed: {
+                description: "The speed at which Spitters work to spit new "
+                           + "Webs.",
+                // <<-- Creer-Merge: spitSpeed -->>
+                default: 24,
+                // <<-- /Creer-Merge: spitSpeed -->>
+            },
+            weavePower: {
+                description: "How much web strength is added or removed from "
+                           + "Webs when they are weaved.",
+                // <<-- Creer-Merge: weavePower -->>
+                default: 1,
+                // <<-- /Creer-Merge: weavePower -->>
+            },
+            weaveSpeed: {
+                description: "The speed at which Weavers work to do "
+                           + "strengthens and weakens on Webs.",
+                // <<-- Creer-Merge: weaveSpeed -->>
+                default: 16,
+                // <<-- /Creer-Merge: weaveSpeed -->>
+            },
+            // <<-- Creer-Merge: schema -->>
 
         // you can add more settings here, e.g.:
         /*
@@ -81,39 +85,40 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
         },
         */
 
-        // <<-- /Creer-Merge: schema -->>
+            // <<-- /Creer-Merge: schema -->>
 
-        // Base settings
-        playerStartingTime: {
-            // <<-- Creer-Merge: player-starting-time -->>
-            default: 6e10, // 1 min in ns
-            // <<-- /Creer-Merge: player-starting-time -->>
-            min: 0,
-            description: "The starting time (in ns) for each player.",
-        },
+            // Base settings
+            playerStartingTime: {
+                // <<-- Creer-Merge: player-starting-time -->>
+                default: 6e10, // 1 min in ns
+                // <<-- /Creer-Merge: player-starting-time -->>
+                min: 0,
+                description: "The starting time (in ns) for each player.",
+            },
 
-        // Turn based settings
-        timeAddedPerTurn: {
-            // <<-- Creer-Merge: time-added-per-turn -->>
-            default: 1e9, // 1 sec in ns,
-            // <<-- /Creer-Merge: time-added-per-turn -->>
-            min: 0,
-            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
-        },
-        maxTurns: {
-            // <<-- Creer-Merge: max-turns -->>
-            default: 300,
-            // <<-- /Creer-Merge: max-turns -->>
-            min: 1,
-            description: "The maximum number of turns before the game is force ended and a winner is determined.",
-        },
+            // Turn based settings
+            timeAddedPerTurn: {
+                // <<-- Creer-Merge: time-added-per-turn -->>
+                default: 1e9, // 1 sec in ns,
+                // <<-- /Creer-Merge: time-added-per-turn -->>
+                min: 0,
+                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+            },
+            maxTurns: {
+                // <<-- Creer-Merge: max-turns -->>
+                default: 300,
+                // <<-- /Creer-Merge: max-turns -->>
+                min: 1,
+                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+            },
 
-    });
+        };
+    }
 
     /**
      * The current values for the game's settings
      */
-    public values = this.initialValues(this.schema);
+    public values!: SettingsFromSchema<SpidersGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not

@@ -1,3 +1,4 @@
+import { SettingsFromSchema } from "~/core/game/base/base-game-settings";
 import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
@@ -13,61 +14,63 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public schema = this.makeSchema({
-// HACK: `super` should work. but schema is undefined on it at run time.
-        // tslint:disable-next-line:no-any
-        ...(super.schema || (this as any).schema),
+    public get schema() { // tslint:disable-line:typedef
+        return {
+            // HACK: `super` should work. but schema is undefined on it at run time.
+            // tslint:disable-next-line:no-any
+            ...(super.schema || (this as any).schema),
 
-        // Checkers game specific settings
-        // <<-- Creer-Merge: schema -->>
+            // Checkers game specific settings
+            // <<-- Creer-Merge: schema -->>
 
         /** The width of the board (in tiles). */
-        boardWidth: {
-            default: 8,
-            min: 2,
-            description: "The width of the board (in tiles).",
-        },
+            boardWidth: {
+                default: 8,
+                min: 2,
+                description: "The width of the board (in tiles).",
+            },
 
-        /** The height of the board (in tiles). */
-        boardHeight: {
-            default: 8,
-            min: 2,
-            description: "The height of the board (in tiles).",
-        },
+            /** The height of the board (in tiles). */
+            boardHeight: {
+                default: 8,
+                min: 2,
+                description: "The height of the board (in tiles).",
+            },
 
-        // <<-- /Creer-Merge: schema -->>
+            // <<-- /Creer-Merge: schema -->>
 
-        // Base settings
-        playerStartingTime: {
-            // <<-- Creer-Merge: player-starting-time -->>
-            default: 6e10, // 1 min in ns
-            // <<-- /Creer-Merge: player-starting-time -->>
-            min: 0,
-            description: "The starting time (in ns) for each player.",
-        },
+            // Base settings
+            playerStartingTime: {
+                // <<-- Creer-Merge: player-starting-time -->>
+                default: 6e10, // 1 min in ns
+                // <<-- /Creer-Merge: player-starting-time -->>
+                min: 0,
+                description: "The starting time (in ns) for each player.",
+            },
 
-        // Turn based settings
-        timeAddedPerTurn: {
-            // <<-- Creer-Merge: time-added-per-turn -->>
-            default: 1e9, // 1 sec in ns,
-            // <<-- /Creer-Merge: time-added-per-turn -->>
-            min: 0,
-            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
-        },
-        maxTurns: {
-            // <<-- Creer-Merge: max-turns -->>
-            default: 200,
-            // <<-- /Creer-Merge: max-turns -->>
-            min: 1,
-            description: "The maximum number of turns before the game is force ended and a winner is determined.",
-        },
+            // Turn based settings
+            timeAddedPerTurn: {
+                // <<-- Creer-Merge: time-added-per-turn -->>
+                default: 1e9, // 1 sec in ns,
+                // <<-- /Creer-Merge: time-added-per-turn -->>
+                min: 0,
+                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+            },
+            maxTurns: {
+                // <<-- Creer-Merge: max-turns -->>
+                default: 200,
+                // <<-- /Creer-Merge: max-turns -->>
+                min: 1,
+                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+            },
 
-    });
+        };
+    }
 
     /**
      * The current values for the game's settings
      */
-    public values = this.initialValues(this.schema);
+    public values!: SettingsFromSchema<CheckersGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not

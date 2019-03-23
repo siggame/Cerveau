@@ -17,7 +17,7 @@ export class AI extends BaseClasses.AI {
     /**
      * This is called every time it is this AI.player's turn to make a move.
      *
-     * @returns A string in Standard Algebriac Notation (SAN) for the move you
+     * @returns A string in Standard Algebraic Notation (SAN) for the move you
      * want to make. If the move is invalid or not properly formatted you will
      * lose the game.
      */

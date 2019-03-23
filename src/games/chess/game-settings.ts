@@ -1,3 +1,4 @@
+import { SettingsFromSchema } from "~/core/game/base/base-game-settings";
 import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
@@ -15,56 +16,55 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public schema = this.makeSchema({
-        // HACK: `super` should work. but schema is undefined on it at run time.
-        // tslint:disable-next-line:no-any
-        ...(super.schema || (this as any).schema),
+    public get schema() { // tslint:disable-line:typedef
+        return {
+            // HACK: `super` should work. but schema is undefined on it at run time.
+            // tslint:disable-next-line:no-any
+            ...(super.schema || (this as any).schema),
 
-        // Chess game specific settings
-        fen: {
-            description: "Forsyth-Edwards Notation (fen), a notation that "
-                       + "describes the game board state.",
-            // <<-- Creer-Merge: fen -->>
-            default: "",
-            // <<-- /Creer-Merge: fen -->>
-        },
-        // <<-- Creer-Merge: schema -->>
+            // Chess game specific settings
+            fen: {
+                description: "Forsyth-Edwards Notation (fen), a notation that "
+                           + "describes the game board state.",
+                // <<-- Creer-Merge: fen -->>
+                default: "",
+                // <<-- /Creer-Merge: fen -->>
+            },
+            // <<-- Creer-Merge: schema -->>
 
-        pgn: {
-            description: "The starting board state in Portable Game Notation "
-                       + "(PGN).",
-            default: "",
-        },
+            pgn: {
+                description: "The starting board state in Portable Game Notation (PGN).",
+                default: "",
+            },
 
-        enableSTFR: {
-            description: "Enable non standard chess rule Simplified Three-Fold "
-                       + "Repetition rule.",
-            default: true,
-        },
+            enableSTFR: {
+                description: "Enable non standard chess rule Simplified Three-Fold Repetition rule.",
+                default: true,
+            },
 
-        enableTFR: {
-            description: "Enable the standard chess rule Three-Fold Repetition"
-                       + "rule.",
-            default: false,
-        },
+            enableTFR: {
+                description: "Enable the standard chess rule Three-Fold Repetition rule.",
+                default: false,
+            },
 
-        // <<-- /Creer-Merge: schema -->>
+            // <<-- /Creer-Merge: schema -->>
 
-        // Base settings
-        playerStartingTime: {
-            // <<-- Creer-Merge: player-starting-time -->>
-            default: 15 * 6e10, // 15 min in ns
-            // <<-- /Creer-Merge: player-starting-time -->>
-            min: 0,
-            description: "The starting time (in ns) for each player.",
-        },
+            // Base settings
+            playerStartingTime: {
+                // <<-- Creer-Merge: player-starting-time -->>
+                default: 15 * 6e10, // 15 min in ns
+                // <<-- /Creer-Merge: player-starting-time -->>
+                min: 0,
+                description: "The starting time (in ns) for each player.",
+            },
 
-    });
+        };
+    }
 
     /**
      * The current values for the game's settings
      */
-    public values = this.initialValues(this.schema, true);
+    public values!: SettingsFromSchema<ChessGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not

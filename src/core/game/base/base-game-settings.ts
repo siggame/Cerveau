@@ -18,6 +18,16 @@ export interface ISettingsSchemas {
     [key: string]: ISettingsSchema;
 }
 
+/** Given settings schema the type object we'd expect for that schema. */
+export type SettingsFromSchema<T extends ISettingsSchemas> = {
+    [K in keyof T] : T[K] extends ISettingsSchema<infer W>
+        ? (W extends never[]
+            ? string[]
+            : W
+        )
+        : never
+};
+
 /**
  * The base game settings manager that validates game settings and holds their
  * values.
@@ -26,21 +36,23 @@ export class BaseGameSettingsManager {
     /**
      * The schema used to build and validate settings' values.
      */
-    public readonly schema = this.makeSchema({
-        playerStartingTime: {
-            default: 6e10,
-            min: 0,
-            description: "The starting time (in ns) for each player.",
-        },
-        playerNames: {
-            default: [],
-            description: "The names of the players (overrides strings they send).",
-        },
-        randomSeed: {
-            default: "",
-            description: "The random seed, or empty for a random seed.",
-        },
-    });
+    public get schema() { // tslint:disable-line:typedef
+        return this.makeSchema({
+            playerStartingTime: {
+                default: 6e10,
+                min: 0,
+                description: "The starting time (in ns) for each player.",
+            },
+            playerNames: {
+                default: [],
+                description: "The names of the players (overrides strings they send).",
+            },
+            randomSeed: {
+                default: "",
+                description: "The random seed, or empty for a random seed.",
+            },
+        });
+    }
 
     /**
      * The current settings' values
@@ -189,13 +201,7 @@ export class BaseGameSettingsManager {
     protected initialValues<T extends ISettingsSchemas>(
         schema: T,
         pure?: boolean,
-    ): { [K in keyof T] : T[K] extends ISettingsSchema<infer W>
-        ? (W extends never[]
-            ? string[]
-            : W
-        )
-        : never
-    } {
+    ): SettingsFromSchema<T> {
         const values: UnknownObject = {};
         for (const [key, value] of Object.entries(schema)) {
             values[key] = (pure || !objectHasProperty(this.values, key))

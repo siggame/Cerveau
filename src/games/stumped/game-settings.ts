@@ -1,3 +1,4 @@
+import { SettingsFromSchema } from "~/core/game/base/base-game-settings";
 import { UnknownObject } from "~/utils";
 import { BaseClasses } from "./";
 
@@ -13,98 +14,100 @@ export class StumpedGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public schema = this.makeSchema({
-// HACK: `super` should work. but schema is undefined on it at run time.
-        // tslint:disable-next-line:no-any
-        ...(super.schema || (this as any).schema),
+    public get schema() { // tslint:disable-line:typedef
+        return {
+            // HACK: `super` should work. but schema is undefined on it at run time.
+            // tslint:disable-next-line:no-any
+            ...(super.schema || (this as any).schema),
 
-        // Stumped game specific settings
-        // <<-- Creer-Merge: schema -->>
+            // Stumped game specific settings
+            // <<-- Creer-Merge: schema -->>
 
-        /** THe maximum health a spawner can increase to. */
-        maxSpawnerHealth: {
-            default: 5,
-            min: 1,
-            description: "The maximum health a spawner can increase to.",
-        },
+            /** The maximum health a spawner can increase to. */
+            maxSpawnerHealth: {
+                default: 5,
+                min: 1,
+                description: "The maximum health a spawner can increase to.",
+            },
 
-        minBranchSpawners: {
-            default: 3,
-            min: 1,
-            description: "The minimum number of branch spawners to create.",
-        },
-        maxBranchSpawners: {
-            default: 12,
-            min: 1,
-            description: "The maximum number of branch spawners to create.",
-        },
+            minBranchSpawners: {
+                default: 3,
+                min: 1,
+                description: "The minimum number of branch spawners to create.",
+            },
+            maxBranchSpawners: {
+                default: 12,
+                min: 1,
+                description: "The maximum number of branch spawners to create.",
+            },
 
-        minFoodSpawners: {
-            default: 1,
-            min: 1,
-            description: "The minimum number of food spawners to create.",
-        },
-        maxFoodSpawners: {
-            default: 4,
-            min: 1,
-            description: "The maximum number of food spawners to create.",
-        },
+            minFoodSpawners: {
+                default: 1,
+                min: 1,
+                description: "The minimum number of food spawners to create.",
+            },
+            maxFoodSpawners: {
+                default: 4,
+                min: 1,
+                description: "The maximum number of food spawners to create.",
+            },
 
-        lodgesToWin: {
-            default: 10,
-            min: 2,
-            description: "How many branches are required to win.",
-        },
+            lodgesToWin: {
+                default: 10,
+                min: 2,
+                description: "How many branches are required to win.",
+            },
 
-        // <<-- /Creer-Merge: schema -->>
+            // <<-- /Creer-Merge: schema -->>
 
-        // Base settings
-        playerStartingTime: {
-            // <<-- Creer-Merge: player-starting-time -->>
-            default: 6e10, // 1 min in ns
-            // <<-- /Creer-Merge: player-starting-time -->>
-            min: 0,
-            description: "The starting time (in ns) for each player.",
-        },
+            // Base settings
+            playerStartingTime: {
+                // <<-- Creer-Merge: player-starting-time -->>
+                default: 6e10, // 1 min in ns
+                // <<-- /Creer-Merge: player-starting-time -->>
+                min: 0,
+                description: "The starting time (in ns) for each player.",
+            },
 
-        // Turn based settings
-        timeAddedPerTurn: {
-            // <<-- Creer-Merge: time-added-per-turn -->>
-            default: 1e9, // 1 sec in ns,
-            // <<-- /Creer-Merge: time-added-per-turn -->>
-            min: 0,
-            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
-        },
-        maxTurns: {
-            // <<-- Creer-Merge: max-turns -->>
-            default: 200,
-            // <<-- /Creer-Merge: max-turns -->>
-            min: 1,
-            description: "The maximum number of turns before the game is force ended and a winner is determined.",
-        },
+            // Turn based settings
+            timeAddedPerTurn: {
+                // <<-- Creer-Merge: time-added-per-turn -->>
+                default: 1e9, // 1 sec in ns,
+                // <<-- /Creer-Merge: time-added-per-turn -->>
+                min: 0,
+                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+            },
+            maxTurns: {
+                // <<-- Creer-Merge: max-turns -->>
+                default: 200,
+                // <<-- /Creer-Merge: max-turns -->>
+                min: 1,
+                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+            },
 
-        // Tiled settings
-        mapWidth: {
-            // <<-- Creer-Merge: map-width -->>
-            default: 32,
-            // <<-- /Creer-Merge: map-width -->>
-            min: 2,
-            description: "The width (in Tiles) for the game map to be initialized to.",
-        },
-        mapHeight: {
-            // <<-- Creer-Merge: map-height -->>
-            default: 16,
-            // <<-- /Creer-Merge: map-height -->>
-            min: 2,
-            description: "The height (in Tiles) for the game map to be initialized to.",
-        },
+            // Tiled settings
+            mapWidth: {
+                // <<-- Creer-Merge: map-width -->>
+                default: 32,
+                // <<-- /Creer-Merge: map-width -->>
+                min: 2,
+                description: "The width (in Tiles) for the game map to be initialized to.",
+            },
+            mapHeight: {
+                // <<-- Creer-Merge: map-height -->>
+                default: 16,
+                // <<-- /Creer-Merge: map-height -->>
+                min: 2,
+                description: "The height (in Tiles) for the game map to be initialized to.",
+            },
 
-    });
+        };
+    }
 
     /**
      * The current values for the game's settings
      */
-    public values = this.initialValues(this.schema);
+    public values!: SettingsFromSchema<StumpedGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
