@@ -18,6 +18,8 @@ import { filenameFor, getURL, getVisualizerURL } from "~/core/game/gamelog/gamel
 import { logger } from "~/core/logger";
 import { Immutable, isObjectEmpty, momentString } from "~/utils";
 
+const TIMEOUT_PADDING = 30 * 1000; // 30 sec padding for internal computations
+
 let profiler: Profiler | undefined;
 import("v8-profiler")
     .then((imported) => {
@@ -221,7 +223,13 @@ ${fatal.message}`,
         // and sit and listen forever
         await delay(1000); // 1 second
 
-        logger.info(`${this.gameName} - ${this.id} is over, exiting.`);
+        const message = `${this.gameName} - ${this.id} is over.`;
+        if (gamelog) {
+            logger.info(message);
+        }
+        else {
+            logger.warn(`${message} But no gamelog!`);
+        }
 
         this.events.ended.emit(
             this.fatal || gamelog || new Error("No gamelog!"),
@@ -278,7 +286,8 @@ ${fatal.message}`,
         // We now know the maximum number amount of time that all clients
         // can use accumulatively. However we need to account for server-side
         // processing time, so do a rough approximation and double it.
-        let timeoutTime = maxTime * 2 * 1e-6; // convert ns to ms
+        // some padding for internal computations
+        let timeoutTime = (maxTime * 2) * 1e-6 + TIMEOUT_PADDING; // convert ns to ms
 
         if (timeoutTime <= 0) {
             // It is invalid, so they probably set a custom timeout time of 0,

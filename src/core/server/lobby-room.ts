@@ -162,19 +162,22 @@ export class Room {
      * @param gamelog The gamelog resulting from the game played in the session
      * @returns A promise that resolves once the gamelog is written to disk.
      */
-    protected async cleanUp(gamelog: Immutable<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog?: Immutable<IGamelog>): Promise<void> {
         this.over = true;
-        // copy their winners and losers to ours.
-        this.winners = gamelog.winners.slice();
-        this.losers = gamelog.losers.slice();
 
-        // Undefined to signify the gamelog does not exist,
-        // as it has not be written to the file system yet
-        this.gamelogFilename = undefined;
+        if (gamelog) {
+            // copy their winners and losers to ours.
+            this.winners = gamelog.winners.slice();
+            this.losers = gamelog.losers.slice();
 
-        // Now write the gamelog, once written update our
-        // `gamelogFilename` to the actual slug to signify it can be
-        // read now
-        this.gamelogFilename = await this.gamelogManager.log(gamelog);
+            // Undefined to signify the gamelog does not exist,
+            // as it has not be written to the file system yet
+            this.gamelogFilename = undefined;
+
+            // Now write the gamelog, once written update our
+            // `gamelogFilename` to the actual slug to signify it can be
+            // read now
+            this.gamelogFilename = await this.gamelogManager.log(gamelog);
+        }
     }
 }

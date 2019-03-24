@@ -73,7 +73,7 @@ export class BaseGameManager {
         rootDeltaMergeable: DeltaMergeable,
         sessionID: string,
         gameStarted: Signal,
-        private gameOverCallback: () => void,
+        private readonly gameOverCallback: () => void,
     ) {
         const settings = settingsManager.values;
 

@@ -113,22 +113,23 @@ process.on("message", (
         });
 
         session.events.ended.once((data) => {
-            let gamelog = {};
-            let errorCode = 0;
-            if (data instanceof Error) {
-                logger.error(String(data));
-                errorCode = 1;
-            }
-            else {
-                gamelog = data;
+            const error = data instanceof Error
+                ? data
+                : undefined;
+            const gamelog = data instanceof Error
+                ? undefined
+                : data;
+
+            if (error) {
+                logger.error(`Worker thread ending because of error: ${error}`);
             }
 
             if (!process.send) {
                 throw new Error("Worker not on separate thread!");
             }
 
-            process.send({ gamelog }, () => {
-                process.exit(errorCode);
+            process.send({ gamelog, error }, () => {
+                process.exit(error ? 1 : 0);
             });
         });
     }
