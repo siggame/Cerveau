@@ -48,8 +48,8 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: protected-private-methods -->>
 
-    /** How many turns till 50 move draw */
-    private turnsToDraw = 100; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
+    /** How many turns till 50 move draw during simplified three fold repetition */
+    private halfMoveCountSTFR = 0; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
     /** Starts the game play */
     protected start(): void {
@@ -90,9 +90,12 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         this.game.fen = this.game.chess.fen();
         this.game.history.push(valid.san);
 
-        this.turnsToDraw = (valid.piece === "p" || valid.captured)
-            ? 100 // reset turns, pawn was moved or piece captured
-            : Math.max(this.turnsToDraw - 1, 0); // else decrement by 1
+        if (this.game.settings.enableSTFR) {
+            // if
+            this.halfMoveCountSTFR = checkMoveForSTFR(valid)
+                ? 0 // reset turns, pawn was moved or piece captured
+                : this.halfMoveCountSTFR + 1; // else increase by 1
+        }
 
         const [ loserReason, winnerReason ] = this.checkForGameOverReasons();
         if (loserReason) {
@@ -134,7 +137,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         if (chess.in_stalemate()) {
             return [
                 "Stalemate - The side to move has been stalemated "
-              + "because they are not in check but have no valid moves.",
+              + "because they are not in check, but have no valid moves.",
             ];
         }
 
@@ -162,7 +165,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
             // chess.js.in_draw() should be true at the same time, but we are tracking the turns anyways,
             // and chess.js.in_draw() checks for more than the 50-turn rule so the checks following this one would
             // never be reached, so we must do this check because simplified TFR is different
-            if (this.turnsToDraw <= 0) {
+            if (this.halfMoveCountSTFR >= 100) {
                 return [ gameOver50TurnMessage ];
             }
         }
