@@ -15,7 +15,7 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() { // tslint:disable-line:typedef
-        return {
+        return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
             ...(super.schema || (this as any).schema),
@@ -112,7 +112,7 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The maximum number of turns before the game is force ended and a winner is determined.",
             },
 
-        };
+        });
     }
 
     /**

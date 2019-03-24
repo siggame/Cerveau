@@ -150,23 +150,25 @@ export function mixTiled<
     /** The settings for a Tiled game */
     class TiledGameSettings extends base.GameSettings {
         /** The schema for a Tiled game, adding in configurable map sizes. */
-        public schema = this.makeSchema({
-            // HACK: super should work. but schema is undefined on it
-            // tslint:disable-next-line:no-any
-            ...(super.schema || (this as any).schema),
-            mapWidth: {
-                default: 32,
-                min: 2,
-                description: "The width (in Tiles) for the game map to be "
-                           + "initialized to.",
-            },
-            mapHeight: {
-                default: 16,
-                min: 2,
-                description: "The height (in Tiles) for the game map to be "
-                           + "initialized to.",
-            },
-        });
+        public get schema() { // tslint:disable-line:typedef
+            return this.makeSchema({
+                // HACK: super should work. but schema is undefined on it
+                // tslint:disable-next-line:no-any
+                ...(super.schema || (this as any).schema),
+                mapWidth: {
+                    default: 32,
+                    min: 2,
+                    description: "The width (in Tiles) for the game map to be "
+                            + "initialized to.",
+                },
+                mapHeight: {
+                    default: 16,
+                    min: 2,
+                    description: "The height (in Tiles) for the game map to be "
+                            + "initialized to.",
+                },
+            });
+        }
 
         /** The current settings values. */
         public values = this.initialValues(this.schema);

@@ -48,23 +48,25 @@ export function mixTurnBased<
     /** Game settings to control turn timing. */
     class TurnBaseGameSettings extends base.GameSettings {
         /** The schema for turn based settings. */
-        public schema = this.makeSchema({
-            // HACK: super should work. but schema is undefined on it
-            // tslint:disable-next-line:no-any
-            ...(super.schema || (this as any).schema),
-            timeAddedPerTurn: {
-                default: 1e9, // 1 sec in ns,
-                min: 0,
-                description: "The amount of time (in nano-seconds) to add "
-                           + "after each player performs a turn.",
-            },
-            maxTurns: {
-                default: 200,
-                min: 1,
-                description: "The maximum number of turns before the game is "
-                           + "force ended and a winner is determined.",
-            },
-        });
+        public get schema() { // tslint:disable-line:typedef
+            return this.makeSchema({
+                // HACK: super should work. but schema is undefined on it
+                // tslint:disable-next-line:no-any
+                ...(super.schema || (this as any).schema),
+                timeAddedPerTurn: {
+                    default: 1e9, // 1 sec in ns,
+                    min: 0,
+                    description: "The amount of time (in nano-seconds) to add "
+                            + "after each player performs a turn.",
+                },
+                maxTurns: {
+                    default: 200,
+                    min: 1,
+                    description: "The maximum number of turns before the game is "
+                            + "force ended and a winner is determined.",
+                },
+            });
+        }
 
         /** The values for turn based settings. */
         public values = this.initialValues(this.schema);
