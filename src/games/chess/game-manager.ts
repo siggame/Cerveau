@@ -206,7 +206,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
             //    Two moves are identical if the starting position (file and
             //    rank) and ending position (file and rank) of the moves are
             //    identical.
-            if (move.to !== nextMove.to || move.from !== nextMove.from) {
+            if (move.piece !== move.piece || move.to !== nextMove.to || move.from !== nextMove.from) {
                 return false; // has not occurred
             }
         }
