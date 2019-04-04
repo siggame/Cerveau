@@ -18,7 +18,7 @@ export class Projectile extends GameObject {
     public fuel!: number;
 
     /**
-     * The Player that owns and can control this Unit.
+     * The Player that owns and can control this Projectile.
      */
     public owner?: Player;
 
@@ -38,6 +38,11 @@ export class Projectile extends GameObject {
     public y!: number;
 
     // <<-- Creer-Merge: attributes -->>
+
+    /**
+     * tracks if the projectile is new.
+     */
+    public new!: boolean;
 
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
@@ -64,6 +69,7 @@ export class Projectile extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.target = args.target;
+        this.new = true;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }

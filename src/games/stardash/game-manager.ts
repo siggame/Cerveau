@@ -18,7 +18,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-StarDash",
+            "MegaMinerAI-23-StarDash",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -60,12 +60,12 @@ export class StardashGameManager extends BaseClasses.GameManager {
         await super.afterTurn();
 
         // <<-- Creer-Merge: after-turn -->>
+        // kill units. (handle collisions.)
+        this.updateArrays();
         // handle dashes
         this.updateUnits();
-        // handle collisions.
-        // this.collide();
-        // kill units.
-        this.updateArrays();
+        // make asteroids orbit
+        this.updateOrbit();
         // recharge the players homeworlds.
         this.game.players[0].homeBase.amount += this.game.regenerateRate;
         this.game.players[1].homeBase.amount += this.game.regenerateRate;
@@ -108,6 +108,22 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // declare the winner!
             this.declareWinner("You got the most mythicite!", this.game.players[1]);
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
+
+            // return that a win result was found.
+            return true;
+        }
+        else if (this.game.players[0].money < 75 && this.game.players[0].units.length === 0) {
+            // declare the winner!
+            this.declareWinner("You bankrupted your opponent.", this.game.players[1]);
+            this.declareLosers("You have no cash and no assets.", this.game.players[0]);
+
+            // return that a win result was found.
+            return true;
+        }
+        else if (this.game.players[1].money < 75 && this.game.players[1].units.length === 0) {
+            // declare the winner!
+            this.declareWinner("You bankrupted your opponent.", this.game.players[0]);
+            this.declareLosers("You have no cash and no assets.", this.game.players[1]);
 
             // return that a win result was found.
             return true;
@@ -192,20 +208,22 @@ export class StardashGameManager extends BaseClasses.GameManager {
      * Game-Manager update units.
      * This goes into the after turn function.
      * Makes the ships of the next player conclude their dashing, and resets
-     * their information.
+     * their information. Update martyr protections.
      */
     private updateUnits(): void {
         // only move the next player's units.
         if (this.game.currentPlayer === this.game.players[0]) {
             // iterate over each unit to check the dashing status.
             for (const unit of this.game.players[0].units) {
+                // set the protector to undefined as units have moved.
+                unit.protector = undefined;
                 // check if the unit is dashing.
                 if (unit.isDashing) {
                     // update it's location and conditions.
                     unit.x = unit.dashX;
-                    unit.dashX = -1;
+                    unit.dashX = -1000;
                     unit.y = unit.dashY;
-                    unit.dashY = -1;
+                    unit.dashY = -1000;
                     unit.isDashing = false;
                     unit.acted = true;
                 }
@@ -221,6 +239,8 @@ export class StardashGameManager extends BaseClasses.GameManager {
         else {
             // iterate over each unit to check the dashing status.
             for (const unit of this.game.players[1].units) {
+                // set the protector to undefined as units have moved.
+                unit.protector = undefined;
                 // check if the unit is dashing.
                 if (unit.isDashing) {
                     // update it's location and conditions.
@@ -241,8 +261,53 @@ export class StardashGameManager extends BaseClasses.GameManager {
             }
         }
 
+        // recharges player 0's home base.
+        this.game.players[0].homeBase.amount += this.game.planetRechargeRate;
+        // makes sure it stays below the energy cap.
+        if (this.game.players[0].homeBase.amount > this.game.planetEnergyCap) {
+            this.game.players[0].homeBase.amount = this.game.planetEnergyCap;
+        }
+        // recharges player 1's home base.
+        this.game.players[1].homeBase.amount += this.game.planetRechargeRate;
+        // makes sure it stays below the energy cap.
+        if (this.game.players[0].homeBase.amount > this.game.planetEnergyCap) {
+            this.game.players[0].homeBase.amount = this.game.planetEnergyCap;
+        }
+
+        // for each player, update martyr protection.
+        this.updateMartyr(0);
+        this.updateMartyr(1);
+
         // safety return.
         return;
+    }
+
+    /**
+     * Update martyr protections.
+     * This will take in the player to update protections for and update the
+     * martyr protections for all of their units.
+     * @param player: the player to be updated.
+     */
+    private updateMartyr(player: number): void {
+        // all martyr ships owned by the player that can protect.
+        const martyrs = this.game.players[player].units.filter((u) =>
+                      u.shield > 0 && u.job.title === "martyr");
+        // all units owned by the player that need to be guarded.
+        const units = this.game.players[player].units.filter((u) =>
+                      u.protector === undefined && u.job.title !== "martyr");
+        // iterate over martyr that can protect.
+        for (const martyr of martyrs) {
+            // iterate over every unprotected unit.
+            for (const unit of units) {
+                // if the unit isn't protected and is in range.
+                if (Math.sqrt(((unit.x - martyr.x) ** 2) +
+                    ((unit.y - martyr.y) ** 2)) < martyr.job.range) {
+                    // protected.
+                    unit.protector = martyr;
+                }
+            }
+        }
+
     }
 
     /**
@@ -272,9 +337,12 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 unit.mythicite = 0;
                 // if it is a friendly ship, recharge it.
                 if (unit.owner === baseA.owner) {
-                    const dif = unit.job.energy - unit.energy;
-                    unit.energy = unit.job.energy;
-                    baseA.amount -= dif;
+                    const dif = unit.job.energy - unit.energy + unit.job.shield - unit.shield;
+                    if (dif < baseA.amount) {
+                        unit.energy = unit.job.energy;
+                        unit.shield = unit.job.shield;
+                        baseA.amount -= dif;
+                    }
                 }
             }
             // if they are in the range of the player1 planet.
@@ -291,10 +359,13 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 unit.legendarium = 0;
                 unit.mythicite = 0;
                 // if it is a friendly ship, recharge it.
-                if (unit.owner === baseA.owner) {
-                    const dif = unit.job.energy - unit.energy;
-                    unit.energy = unit.job.energy;
-                    baseA.amount -= dif;
+                if (unit.owner === baseB.owner) {
+                    const dif = unit.job.energy - unit.energy + unit.job.shield - unit.shield;
+                    if (dif < baseB.amount) {
+                        unit.energy = unit.job.energy;
+                        unit.shield = unit.job.shield;
+                        baseB.amount -= dif;
+                    }
                 }
             }
         }
@@ -305,8 +376,73 @@ export class StardashGameManager extends BaseClasses.GameManager {
 
     /** Updates all arrays in the game with new/dead game objects */
     private updateArrays(): void {
-        // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => u.x < 0 || u.y < 0 || u.energy < 0);
+        // the sun
+        const sun = this.game.bodies[2];
+
+        // iterate over all projectiles in the game.
+        for (const mis of this.game.projectiles) {
+            // make sure we are only updating the last players missiles
+            if (mis.owner !== this.game.currentPlayer) {
+                continue;
+            }
+
+            // grab the distance between the projectile and it's target
+            const distance = Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2));
+            // grab the x difference between the projectile and it's target.
+            const difX = Math.abs(mis.x - mis.target.x);
+            // as long as the projectile isn't ontop of the target.
+            if (distance !== 0) {
+                // grab the angle difference between the target and the missile.
+                const angle = Math.acos(difX / distance);
+                // grab the change in x and y it can achieve.
+                const moveX = this.game.projectileSpeed * Math.cos(angle);
+                const moveY = this.game.projectileSpeed * Math.sin(angle);
+                // if the target is to the left, move left.
+                if (mis.x > mis.target.x) {
+                    mis.x -= moveX;
+                }
+                // otherwise move right.
+                else {
+                    mis.x += moveX;
+                }
+                // if the target is below, move down.
+                if (mis.y > mis.target.y) {
+                    mis.y -= moveY;
+                }
+                // otherwise move up.
+                else {
+                    mis.y += moveY;
+                }
+                // decrease the missiles fuel appropriately.
+                mis.fuel -= Math.sqrt(((moveX) ** 2) + ((moveY) ** 2));
+            }
+            // if the missile isn't new.
+            if (!mis.new) {
+                // if it is colliding with the target.
+                if (Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2)) <
+                                (this.game.projectileRadius + this.game.shipRadius)) {
+                    // kill the missile and the target.
+                    mis.x = -1;
+                    mis.y = -1;
+                    mis.fuel = -1;
+                    mis.target.x = -1;
+                    mis.target.y = -1;
+                    mis.target.energy = -1;
+                }
+            }
+            else {
+                // otherwise note it isn't new.
+                mis.new = false;
+            }
+        }
+
+        // Properly remove all killed units and ones that collide with the sun.
+        const deadUnits = this.game.units.filter((u) => u.x < 0 || u.y < 0 || u.energy < 0 ||
+                          Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius);
+
+        // Properly remove all killed units and ones that collide with the sun.
+        const deadProj = this.game.projectiles.filter((u) => u.x < 0 || u.y < 0 || u.fuel < 0 ||
+                          Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius);
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {
@@ -314,6 +450,51 @@ export class StardashGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
+
+        // remove dead projectiles from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.projectiles, ...deadProj);
+        }
+        // and remove them from the game
+        removeElements(this.game.projectiles, ...deadProj);
+    }
+
+    /** Updates asteroids orbiting the sun. */
+    private updateOrbit(): void {
+        // iterate over all bodies.
+        for (const ast of this.game.bodies) {
+            // skip them if they aren't a asteroid.
+            if (ast.bodyType !== "asteroid") {
+                continue;
+            }
+
+            // resets a asteroid's owner so other can mine it. Gives the old owner
+            // a chance to continue to claim it.
+            if (ast.owner !== this.game.currentPlayer) {
+                ast.owner = undefined;
+            }
+
+            // if a angle exists.
+            if (ast.angle) {
+                // move the asteroid.
+                ast.angle += 360 / this.game.turnsToOrbit;
+                ast.x = ast.getX();
+                ast.y = ast.getY();
+            }
+
+            // kill the asteroid if it is depleted.
+            if (ast.amount <= 0 && this.game.regenerateRate === 0) {
+                ast.x = -1;
+                ast.y = -1;
+            }
+        }
+
+        // Properly remove all killed asteroids.
+        const deadBodies = this.game.bodies.filter((u) => (u.x < 0 || u.y < 0)
+                                                && u.bodyType === "asteroid");
+
+        // and remove them from the game
+        removeElements(this.game.bodies, ...deadBodies);
     }
 
     // <<-- /Creer-Merge: protected-private-methods -->>

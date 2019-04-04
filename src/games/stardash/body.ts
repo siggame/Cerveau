@@ -1,5 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBodyProperties, IBodySpawnArgs } from "./";
+import { IBodyNextXArgs, IBodyNextYArgs, IBodyProperties, IBodySpawnArgs,
+       } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -45,7 +46,7 @@ export class Body extends GameObject {
 >>>>>>> Fixed synthax errors for ts and removed trailing spaces. Added comments
 
     /**
-     * The Player that owns and can control this Unit.
+     * The Player that owns and can control this Body.
      */
     public owner?: Player;
 
@@ -69,6 +70,16 @@ export class Body extends GameObject {
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
+
+    /**
+     * The angle the asteroid is relative to the sun.
+     */
+    public angle?: number;
+
+    /**
+     * The distance the asteroid is from the center of the sun.
+     */
+    public distance?: number;
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -95,11 +106,145 @@ export class Body extends GameObject {
 
     // <<-- Creer-Merge: public-functions -->>
 
+    /**
+     * Gets the x value of the asteroid at the current angle and distance.
+     *
+     * @param offset: the difference in angle you wish to apply. By base 0.
+     *
+     * @returns the x value at it's distance and angle
+     */
+    public getX(offset: number = 0): number {
+        // gets the location of the asteroid at the angle and distance.
+        if (this.distance && this.angle) {
+            return this.distance * Math.cos(((this.angle + offset) / 180) * Math.PI);
+        }
+        else {
+            return this.x;
+        }
+    }
+
+    /**
+     * Gets the y value of the asteroid at the current angle and distance.
+     *
+     * @param offset: the difference in angle you wish to apply. By base 0.
+     *
+     * @returns the y value at it's distance and angle
+     */
+    public getY(offset: number = 0): number {
+        // gets the location of the asteroid at the angle and distance.
+        if (this.distance && this.angle) {
+            return this.distance * Math.sin(((this.angle + offset) / 180) * Math.PI);
+        }
+        else {
+            return this.y;
+        }
+    }
+
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for nextX. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param num - The number of turns in the future you wish to check.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateNextX(
+        player: Player,
+        num: number,
+    ): void | string | IBodyNextXArgs {
+        // <<-- Creer-Merge: invalidate-nextX -->>
+
+        // Check all the arguments for nextX here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-nextX -->>
+    }
+
+    /**
+     * The x value of this body a number of turns from now. (0-how many you
+     * want).
+     *
+     * @param player - The player that called this.
+     * @param num - The number of turns in the future you wish to check.
+     * @returns The x position of the body the input number of turns in the
+     * future.
+     */
+    protected async nextX(player: Player, num: number): Promise<number> {
+        // <<-- Creer-Merge: nextX -->>
+
+        // Add logic here for nextX.
+
+        // gets the location of the asteroid at the angle and distance.
+        if (this.distance && this.angle) {
+            return this.distance * Math.cos(((this.angle + (num * 360 / this.game.turnsToOrbit)) / 180) * Math.PI);
+        }
+        else {
+            return this.x;
+        }
+
+        // <<-- /Creer-Merge: nextX -->>
+    }
+
+    /**
+     * Invalidation function for nextY. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param num - The number of turns in the future you wish to check.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateNextY(
+        player: Player,
+        num: number,
+    ): void | string | IBodyNextYArgs {
+        // <<-- Creer-Merge: invalidate-nextY -->>
+
+        // Check all the arguments for nextY here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-nextY -->>
+    }
+
+    /**
+     * The x value of this body a number of turns from now. (0-how many you
+     * want).
+     *
+     * @param player - The player that called this.
+     * @param num - The number of turns in the future you wish to check.
+     * @returns The x position of the body the input number of turns in the
+     * future.
+     */
+    protected async nextY(player: Player, num: number): Promise<number> {
+        // <<-- Creer-Merge: nextY -->>
+
+        // Add logic here for nextY.
+
+        // gets the location of the asteroid at the angle and distance.
+        if (this.distance && this.angle) {
+            return this.distance * Math.sin(((this.angle + (num * 360 / this.game.turnsToOrbit)) / 180) * Math.PI);
+        }
+        else {
+            return this.y;
+        }
+
+        // <<-- /Creer-Merge: nextY -->>
+    }
 
     /**
      * Invalidation function for spawn. Try to find a reason why the passed in

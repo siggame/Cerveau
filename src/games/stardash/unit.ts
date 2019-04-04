@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitOpenArgs, IUnitProperties, IUnitShootDownArgs, IUnitTransferArgs,
+         IUnitProperties, IUnitSafeArgs, IUnitShootDownArgs, IUnitTransferArgs,
        } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
@@ -230,12 +230,13 @@ export class Unit extends GameObject {
 
             // if enemy is protected by a martyr
             if (enemy.protector) {
-                if (enemy.protector.energy > attackDamage) {
-                    enemy.protector.energy -= attackDamage;
+                if (enemy.protector.shield > attackDamage) {
+                    enemy.protector.shield -= attackDamage;
                 }
-                else if (enemy.protector.energy <= attackDamage) {
-                    attackDamage -= enemy.protector.energy;
-                    enemy.protector.energy = 0;
+                else if (enemy.protector.shield <= attackDamage) {
+                    attackDamage -= enemy.protector.shield;
+                    enemy.protector.shield = 0;
+                    enemy.protector = undefined;
                     enemy.energy -= attackDamage;
                 }
             }
@@ -253,13 +254,18 @@ export class Unit extends GameObject {
             }
         }
         else {
-            this.manager.create.projectile({
+            // creates the missile to be fired.
+            const missile: Projectile = this.manager.create.projectile({
                 fuel: this.game.projectileSpeed * 3,
                 owner: this.owner,
                 target: enemy,
                 x: this.x,
                 y: this.y,
             });
+
+            // adds the projectiles.
+            this.game.projectiles.push(missile);
+            player.projectiles.push(missile);
         }
 
         // flag that the unit has acted.
@@ -298,18 +304,29 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit can move to that locaiton.
-        if (this.energy > 10) {
+        if (this.energy < 10) {
             return `${this} needs at least 10 energy and has ${this.energy}.`;
         }
 
         // make sure the dash is within range.
-        if (this.game.dashDistance < Math.sqrt(this.x ** 2 + this.y ** 2)) {
+        if (this.game.dashDistance > Math.sqrt(this.x ** 2 + this.y ** 2)) {
             return `${this} is too far away from (${x}, ${y}) to dash there.`;
         }
 
         // make sure the unit is in bounds.
         if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY || this.energy < 0) {
             return `${this} is dead and cannot move.`;
+        }
+
+        // make sure it isn't dashing through the sun zone
+        const sun = this.game.bodies[2];
+        const a = (this.y - y);
+        const b = (x - this.x);
+        const c = (this.x * y) - (x * this.y);
+        // grab the distance between the line and the circle at it's closest.
+        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        if (dist <= this.game.dashBlock) {
+            return `${this} cannot dash to those coordinates due to magnetic interference.`;
         }
 
         // Check all the arguments for dash here and try to
@@ -340,7 +357,7 @@ export class Unit extends GameObject {
         this.dashY = y;
         this.isDashing = true;
         this.acted = true;
-        this.energy -= 10;
+        this.energy -= this.game.dashCost;
 
         // return the action was successful.
         return true;
@@ -457,6 +474,9 @@ export class Unit extends GameObject {
         // mark the unit has acted.
         this.acted = true;
 
+        // remove the mined ore from the asteroid
+        body.amount -= actualAmount;
+
         // return the action was successful.
         return true;
 
@@ -495,8 +515,13 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit is in bounds.
-        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
             return `${this} is dead and cannot move.`;
+        }
+
+        // make sure the unit is in bounds.
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+            return `${this} cannot move off the map.`;
         }
 
         // Check all the arguments for move here and try to
@@ -536,7 +561,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Invalidation function for open. Try to find a reason why the passed in
+     * Invalidation function for safe. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
      *
@@ -547,19 +572,29 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateOpen(
+    protected invalidateSafe(
         player: Player,
         x: number,
         y: number,
-    ): void | string | IUnitOpenArgs {
-        // <<-- Creer-Merge: invalidate-open -->>
+    ): void | string | IUnitSafeArgs {
+        // <<-- Creer-Merge: invalidate-safe -->>
 
-        // Check all the arguments for open here and try to
+        // make sure the unit is in bounds.
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+            return `${this} cannot be off of the map.`;
+        }
+
+        // make sure the unit is in bounds.
+        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
+            return `${this} is dead, why do you bother checking?`;
+        }
+
+        // Check all the arguments for safe here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        // <<-- /Creer-Merge: invalidate-open -->>
+        // <<-- /Creer-Merge: invalidate-safe -->>
     }
 
     /**
@@ -570,19 +605,24 @@ export class Unit extends GameObject {
      * @param y - The y position of the location you wish to check.
      * @returns True if pathable by this unit, false otherwise.
      */
-    protected async open(
+    protected async safe(
         player: Player,
         x: number,
         y: number,
     ): Promise<boolean> {
-        // <<-- Creer-Merge: open -->>
+        // <<-- Creer-Merge: safe -->>
 
-        // Add logic here for open.
+        const sun = this.game.bodies[2];
+
+        // Add logic here for safe.
+        if (Math.sqrt((sun.x - x) ** 2 + (sun.y - y) ** 2) > sun.radius + this.game.shipRadius) {
+            return false;
+        }
 
         // TODO: replace this with actual logic
-        return false;
+        return true;
 
-        // <<-- /Creer-Merge: open -->>
+        // <<-- /Creer-Merge: safe -->>
     }
 
     /**
@@ -671,8 +711,8 @@ export class Unit extends GameObject {
         // after doing this, the system will take care of the rest,
         // such as removing it from the projectile list.
         // thanks system!
-        missile.x = -1;
-        missile.y = -1;
+        missile.x = -101;
+        missile.y = -101;
         missile.fuel = 0;
 
         // the corvette has now acted
@@ -817,7 +857,7 @@ export class Unit extends GameObject {
 
         // Make sure the unit hasn't acted.
         if (checkAction && this.acted) {
-            return `${this} has already acted this turn. Or not enough coffee.`;
+            return `${this} has already acted this turn.`;
         }
 
         // Make sure the unit is alive.
