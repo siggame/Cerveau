@@ -419,6 +419,11 @@ export class Unit extends GameObject {
             return `${this} cannot hold materials!`;
         }
 
+        // make sure mining of the mythicite is legal
+        if (this.game.currentTurn < this.game.orbitsProtected) {
+            return `${this} cannot mine the mythicite yet. It is protected for the first 12 turns.`;
+        }
+
         // make sure the unit can carry more materials.
         const currentLoad = this.genarium + this.rarium + this.legendarium +
                           this.mythicite;

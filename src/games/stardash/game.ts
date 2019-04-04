@@ -362,7 +362,12 @@ export class StardashGame extends BaseClasses.Game {
         this.generateAsteroids(50, this.sizeX / 128, this.sizeX / 40);
 
         // adds base units, 3 miners for each player.
-        this.units.push(
+        // list for each player
+        const player0: Unit[] = [];
+        const player1: Unit[] = [];
+
+        // add each players starting units.
+        player0.push(
             this.manager.create.unit({
                 owner: this.players[0],
                 job: this.jobs[4],
@@ -389,7 +394,9 @@ export class StardashGame extends BaseClasses.Game {
                 x: this.players[0].homeBase.x,
                 y: this.players[0].homeBase.y,
             }),
+        );
 
+        player1.push(
             this.manager.create.unit({
                 owner: this.players[1],
                 job: this.jobs[4],
@@ -417,6 +424,15 @@ export class StardashGame extends BaseClasses.Game {
                 y: this.players[1].homeBase.y,
             }),
         );
+
+        // add the untis to each player.
+        for (const unit of player0) {
+            this.units.push(unit);
+        }
+
+        for (const unit of player1) {
+            this.units.push(unit);
+        }
     }
 
     /**
