@@ -22,13 +22,19 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         dashBlock: {
             description: "Radius of the no dash zone around the sun.",
             // <<-- Creer-Merge: dashBlock -->>
-            default: 400,
+            default: 500,
             // <<-- /Creer-Merge: dashBlock -->>
+        },
+        dashCost: {
+            description: "The cost of dashing.",
+            // <<-- Creer-Merge: dashCost -->>
+            default: 10,
+            // <<-- /Creer-Merge: dashCost -->>
         },
         dashDistance: {
             description: "The distance traveled each turn by dashing.",
             // <<-- Creer-Merge: dashDistance -->>
-            default: 1000,
+            default: 500,
             // <<-- /Creer-Merge: dashDistance -->>
         },
         genariumValue: {
@@ -44,15 +50,15 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- /Creer-Merge: legendariumValue -->>
         },
         maxAsteroid: {
-            description: "The highest amount of material, barring rarity, that "
-                       + "can be in a asteroid.",
+            description: "The highest amount of material, that can be in a "
+                       + "asteroid.",
             // <<-- Creer-Merge: maxAsteroid -->>
             default: 1000,
             // <<-- /Creer-Merge: maxAsteroid -->>
         },
         minAsteroid: {
-            description: "The smallest amount of material, barring rarity, "
-                       + "that can be in a asteroid.",
+            description: "The smallest amount of material, that can be in a "
+                       + "asteroid.",
             // <<-- Creer-Merge: minAsteroid -->>
             default: 250,
             // <<-- /Creer-Merge: minAsteroid -->>
@@ -70,6 +76,13 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: mythiciteAmount -->>
             default: 1000,
             // <<-- /Creer-Merge: mythiciteAmount -->>
+        },
+        orbitsProtected: {
+            description: "The number of orbit updates you cannot mine the "
+                       + "mithicite asteroid.",
+            // <<-- Creer-Merge: orbitsProtected -->>
+            default: 12,
+            // <<-- /Creer-Merge: orbitsProtected -->>
         },
         oreRarityGenarium: {
             description: "The rarity modifier of the most common ore. This "
@@ -89,7 +102,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             description: "The rarity modifier of the second rarest ore. This "
                        + "controls how much spawns.",
             // <<-- Creer-Merge: oreRarityRarium -->>
-            default: 2.5,
+            default: 2,
             // <<-- /Creer-Merge: oreRarityRarium -->>
         },
         planetEnergyCap: {
@@ -114,7 +127,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             description: "The amount of distance missiles travel through "
                        + "space.",
             // <<-- Creer-Merge: projectileSpeed -->>
-            default: 10,
+            default: 100,
             // <<-- /Creer-Merge: projectileSpeed -->>
         },
         rariumValue: {
@@ -146,6 +159,13 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: sizeY -->>
             default: 1800,
             // <<-- /Creer-Merge: sizeY -->>
+        },
+        turnsToOrbit: {
+            description: "The number of turns it takes for a asteroid to orbit "
+                       + "the sun. (Asteroids move after each players turn).",
+            // <<-- Creer-Merge: turnsToOrbit -->>
+            default: 24,
+            // <<-- /Creer-Merge: turnsToOrbit -->>
         },
         // <<-- Creer-Merge: schema -->>
 

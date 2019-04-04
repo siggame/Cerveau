@@ -87,7 +87,7 @@ export interface IBodyProperties {
     materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
     /**
-     * The Player that owns and can control this Unit.
+     * The Player that owns and can control this Body.
      */
     owner?: Player;
 
@@ -106,6 +106,30 @@ export interface IBodyProperties {
      */
     y?: number;
 
+}
+
+/**
+ * Argument overrides for Body's nextX function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface IBodyNextXArgs {
+    /**
+     * The number of turns in the future you wish to check.
+     */
+    num?: number;
+}
+
+/**
+ * Argument overrides for Body's nextY function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface IBodyNextYArgs {
+    /**
+     * The number of turns in the future you wish to check.
+     */
+    num?: number;
 }
 
 /**
@@ -255,7 +279,7 @@ export interface IProjectileProperties {
     fuel?: number;
 
     /**
-     * The Player that owns and can control this Unit.
+     * The Player that owns and can control this Projectile.
      */
     owner?: Player;
 
@@ -421,11 +445,11 @@ export interface IUnitMoveArgs {
 }
 
 /**
- * Argument overrides for Unit's open function. If you return an object of this
+ * Argument overrides for Unit's safe function. If you return an object of this
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitOpenArgs {
+export interface IUnitSafeArgs {
     /**
      * The x position of the location you wish to check.
      */
@@ -617,6 +641,9 @@ export const Namespace = makeNamespace({
                 dashBlock: {
                     typeName: "int",
                 },
+                dashCost: {
+                    typeName: "int",
+                },
                 dashDistance: {
                     typeName: "int",
                 },
@@ -659,6 +686,9 @@ export const Namespace = makeNamespace({
                 },
                 mythiciteAmount: {
                     typeName: "float",
+                },
+                orbitsProtected: {
+                    typeName: "int",
                 },
                 oreRarityGenarium: {
                     typeName: "float",
@@ -718,6 +748,9 @@ export const Namespace = makeNamespace({
                 timeAddedPerTurn: {
                     typeName: "int",
                 },
+                turnsToOrbit: {
+                    typeName: "int",
+                },
                 units: {
                     typeName: "list",
                     valueType: {
@@ -762,6 +795,30 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
+                nextX: {
+                    args: [
+                        {
+                            argName: "num",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "int",
+                    },
+                },
+                nextY: {
+                    args: [
+                        {
+                            argName: "num",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "int",
+                    },
+                },
                 spawn: {
                     args: [
                         {
@@ -1051,7 +1108,7 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
-                open: {
+                safe: {
                     args: [
                         {
                             argName: "x",
