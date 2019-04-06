@@ -419,9 +419,14 @@ export class Unit extends GameObject {
             return `${this} cannot hold materials!`;
         }
 
-        // make sure mining of the mythicite is legal
+        // make sure mining of the mythicite is legal.
         if (this.game.currentTurn < this.game.orbitsProtected) {
             return `${this} cannot mine the mythicite yet. It is protected for the first 12 turns.`;
+        }
+
+        // make sure mining of your opponent doesn't own the asteroid.
+        if (body.owner !== undefined && body.owner !== player) {
+            return `${this} cannot mine the asteroid as it is owned by your opponent.`;
         }
 
         // make sure the unit can carry more materials.
