@@ -582,7 +582,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // check widely consistent things.
-        const reason = this.invalidate(player, true);
+        const reason = this.invalidate(player, false);
         // if there is a reason, return it.
         if (reason) {
             return reason;
