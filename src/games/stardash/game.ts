@@ -264,7 +264,7 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: this.sizeX / 50,
                 range: 500,
-                unitCost: 125,
+                unitCost: 100,
             }),
 
             // adds the martyr ship job.
@@ -284,7 +284,7 @@ export class StardashGame extends BaseClasses.Game {
                 title: "transport",
                 carryLimit: 100,
                 damage: 0,
-                health: 100,
+                health: 50,
                 moves: this.sizeX / 50,
                 range: 100,
                 unitCost: 75,
@@ -298,7 +298,7 @@ export class StardashGame extends BaseClasses.Game {
                 health: 100,
                 moves: this.sizeX / 50,
                 range: 100,
-                unitCost: 75,
+                unitCost: 150,
             }),
         );
     }
