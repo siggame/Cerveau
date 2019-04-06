@@ -74,12 +74,12 @@ export class Body extends GameObject {
     /**
      * The angle the asteroid is relative to the sun.
      */
-    public angle?: number;
+    public angle!: number;
 
     /**
      * The distance the asteroid is from the center of the sun.
      */
-    public distance?: number;
+    public distance!: number;
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -92,6 +92,8 @@ export class Body extends GameObject {
     constructor(
         args: Readonly<IBodyProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            angle: number;
+            distance: number;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -100,6 +102,8 @@ export class Body extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
+        this.angle = args.angle;
+        this.distance = args.distance;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -115,8 +119,8 @@ export class Body extends GameObject {
      */
     public getX(offset: number = 0): number {
         // gets the location of the asteroid at the angle and distance.
-        if (this.distance && this.angle) {
-            return this.distance * Math.cos(((this.angle + offset) / 180) * Math.PI);
+        if (this.distance > 0 && this.angle > 0) {
+            return this.distance * Math.cos(((this.angle + offset + 90) / 180) * Math.PI) + this.game.bodies[2].x;
         }
         else {
             return this.x;
@@ -132,8 +136,8 @@ export class Body extends GameObject {
      */
     public getY(offset: number = 0): number {
         // gets the location of the asteroid at the angle and distance.
-        if (this.distance && this.angle) {
-            return this.distance * Math.sin(((this.angle + offset) / 180) * Math.PI);
+        if (this.distance > 0 && this.angle > 0) {
+            return this.distance * Math.sin(((this.angle + offset + 90) / 180) * Math.PI) + this.game.bodies[2].y;
         }
         else {
             return this.y;

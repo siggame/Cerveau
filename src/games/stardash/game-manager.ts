@@ -225,7 +225,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     unit.y = unit.dashY;
                     unit.dashY = -1000;
                     unit.isDashing = false;
-                    unit.acted = true;
+
+                    // if it is a missleboat, it acted, otherwise it can act.
+                    unit.acted = (unit.job.title === "missleboat") ? true : false;
                 }
                 else {
                     // if it didn't dash, it gets to act.
@@ -249,7 +251,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     unit.y = unit.dashY;
                     unit.dashY = -1;
                     unit.isDashing = false;
-                    unit.acted = true;
+
+                    // if it is a missleboat, it acted, otherwise it can act.
+                    unit.acted = (unit.job.title === "missleboat") ? true : false;
                 }
                 else {
                     // if it didn't dash, it gets to act.
@@ -270,8 +274,8 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // recharges player 1's home base.
         this.game.players[1].homeBase.amount += this.game.planetRechargeRate;
         // makes sure it stays below the energy cap.
-        if (this.game.players[0].homeBase.amount > this.game.planetEnergyCap) {
-            this.game.players[0].homeBase.amount = this.game.planetEnergyCap;
+        if (this.game.players[1].homeBase.amount > this.game.planetEnergyCap) {
+            this.game.players[1].homeBase.amount = this.game.planetEnergyCap;
         }
 
         // for each player, update martyr protection.
@@ -395,8 +399,8 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 // grab the angle difference between the target and the missile.
                 const angle = Math.acos(difX / distance);
                 // grab the change in x and y it can achieve.
-                const moveX = this.game.projectileSpeed * Math.cos(angle);
-                const moveY = this.game.projectileSpeed * Math.sin(angle);
+                const moveX = Math.abs(this.game.projectileSpeed * Math.cos(angle));
+                const moveY = Math.abs(this.game.projectileSpeed * Math.sin(angle));
                 // if the target is to the left, move left.
                 if (mis.x > mis.target.x) {
                     mis.x -= moveX;
@@ -416,23 +420,17 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 // decrease the missiles fuel appropriately.
                 mis.fuel -= Math.sqrt(((moveX) ** 2) + ((moveY) ** 2));
             }
-            // if the missile isn't new.
-            if (!mis.new) {
-                // if it is colliding with the target.
-                if (Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2)) <
-                                (this.game.projectileRadius + this.game.shipRadius)) {
-                    // kill the missile and the target.
-                    mis.x = -1;
-                    mis.y = -1;
-                    mis.fuel = -1;
-                    mis.target.x = -1;
-                    mis.target.y = -1;
-                    mis.target.energy = -1;
-                }
-            }
-            else {
-                // otherwise note it isn't new.
-                mis.new = false;
+
+            // if it is colliding with the target.
+            if (Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2)) <
+                            (this.game.projectileRadius + this.game.shipRadius)) {
+                // kill the missile and the target.
+                mis.x = -1;
+                mis.y = -1;
+                mis.fuel = -1;
+                mis.target.x = -1;
+                mis.target.y = -1;
+                mis.target.energy = -1;
             }
         }
 
@@ -475,9 +473,12 @@ export class StardashGameManager extends BaseClasses.GameManager {
             }
 
             // if a angle exists.
-            if (ast.angle) {
+            if (ast.angle >= 0) {
                 // move the asteroid.
-                ast.angle += 360 / this.game.turnsToOrbit;
+                ast.angle -= 360 / this.game.turnsToOrbit;
+                if (ast.angle < 0) {
+                    ast.angle += 360;
+                }
                 ast.x = ast.getX();
                 ast.y = ast.getY();
             }
@@ -486,6 +487,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
             if (ast.amount <= 0 && this.game.regenerateRate === 0) {
                 ast.x = -1;
                 ast.y = -1;
+            }
+            else if (this.game.regenerateRate > 0) {
+                ast.amount += this.game.regenerateRate;
             }
         }
 

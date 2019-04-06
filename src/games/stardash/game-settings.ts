@@ -22,19 +22,19 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         dashBlock: {
             description: "Radius of the no dash zone around the sun.",
             // <<-- Creer-Merge: dashBlock -->>
-            default: 500,
+            default: 550,
             // <<-- /Creer-Merge: dashBlock -->>
         },
         dashCost: {
             description: "The cost of dashing.",
             // <<-- Creer-Merge: dashCost -->>
-            default: 10,
+            default: 1,
             // <<-- /Creer-Merge: dashCost -->>
         },
         dashDistance: {
             description: "The distance traveled each turn by dashing.",
             // <<-- Creer-Merge: dashDistance -->>
-            default: 500,
+            default: 50,
             // <<-- /Creer-Merge: dashDistance -->>
         },
         genariumValue: {

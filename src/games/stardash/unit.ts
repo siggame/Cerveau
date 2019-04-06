@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitSafeArgs, IUnitShootDownArgs, IUnitTransferArgs,
-       } from "./";
+import { IUnitAttackArgs, IUnitDashableArgs, IUnitDashArgs, IUnitMineArgs,
+         IUnitMoveArgs, IUnitProperties, IUnitSafeArgs, IUnitShootDownArgs,
+         IUnitTransferArgs } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -37,7 +37,7 @@ export class Unit extends GameObject {
     public energy!: number;
 
     /**
-     * The amount of Generium ore carried by this unit. (0 to job carry
+     * The amount of Genarium ore carried by this unit. (0 to job carry
      * capacity - other carried items).
      */
     public genarium!: number;
@@ -256,7 +256,7 @@ export class Unit extends GameObject {
         else {
             // creates the missile to be fired.
             const missile: Projectile = this.manager.create.projectile({
-                fuel: this.game.projectileSpeed * 3,
+                fuel: this.game.projectileSpeed * this.job.range / 100,
                 owner: this.owner,
                 target: enemy,
                 x: this.x,
@@ -303,14 +303,12 @@ export class Unit extends GameObject {
             return reason;
         }
 
+        // variables for ease of reference.
+        const trav = Math.sqrt(this.x ** 2 + this.y ** 2);
+        const cost = (trav / this.game.dashDistance) * this.game.dashCost;
         // make sure the unit can move to that locaiton.
-        if (this.energy < 10) {
-            return `${this} needs at least 10 energy and has ${this.energy}.`;
-        }
-
-        // make sure the dash is within range.
-        if (this.game.dashDistance > Math.sqrt(this.x ** 2 + this.y ** 2)) {
-            return `${this} is too far away from (${x}, ${y}) to dash there.`;
+        if (this.energy < cost) {
+            return `${this} needs at least ${cost} energy to move ${trav} and it has ${this.energy}.`;
         }
 
         // make sure the unit is in bounds.
@@ -326,7 +324,7 @@ export class Unit extends GameObject {
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
         if (dist <= this.game.dashBlock) {
-            return `${this} cannot dash to those coordinates due to magnetic interference.`;
+            return `${this} cannot dash to those coordinates due to magnetic interference from the sun.`;
         }
 
         // Check all the arguments for dash here and try to
@@ -356,13 +354,84 @@ export class Unit extends GameObject {
         this.dashX = x;
         this.dashY = y;
         this.isDashing = true;
-        this.acted = true;
+        if (this.job.title === "missleboat") {
+            this.acted = true;
+        }
         this.energy -= this.game.dashCost;
 
         // return the action was successful.
         return true;
 
         // <<-- /Creer-Merge: dash -->>
+    }
+
+    /**
+     * Invalidation function for dashable. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateDashable(
+        player: Player,
+        x: number,
+        y: number,
+    ): void | string | IUnitDashableArgs {
+        // <<-- Creer-Merge: invalidate-dashable -->>
+
+        // make sure the unit is in bounds.
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+            return `${this} cannot be off of the map.`;
+        }
+
+        // make sure the unit is in bounds.
+        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
+            return `${this} is dead, why do you bother checking?`;
+        }
+
+        // Check all the arguments for dashable here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-dashable -->>
+    }
+
+    /**
+     * tells you if your ship dash to that location.
+     *
+     * @param player - The player that called this.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
+     * @returns True if pathable by this unit, false otherwise.
+     */
+    protected async dashable(
+        player: Player,
+        x: number,
+        y: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: dashable -->>
+
+        // make sure it isn't dashing through the sun zone
+        const sun = this.game.bodies[2];
+        const a = (this.y - y);
+        const b = (x - this.x);
+        const c = (this.x * y) - (x * this.y);
+        // grab the distance between the line and the circle at it's closest.
+        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        if (dist <= this.game.dashBlock) {
+            return false;
+        }
+
+        // TODO: replace this with actual logic
+        return true;
+
+        // <<-- /Creer-Merge: dashable -->>
     }
 
     /**
@@ -529,6 +598,17 @@ export class Unit extends GameObject {
             return `${this} cannot move off the map.`;
         }
 
+        // make sure it isn't dashing through the sun zone
+        const sun = this.game.bodies[2];
+        const a = (this.y - y);
+        const b = (x - this.x);
+        const c = (this.x * y) - (x * this.y);
+        // grab the distance between the line and the circle at it's closest.
+        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        if (dist <= sun.radius) {
+            return `${this} cannot move to those coordinates due to clipping the sun.`;
+        }
+
         // Check all the arguments for move here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -557,6 +637,11 @@ export class Unit extends GameObject {
         this.x = x;
         this.y = y;
 
+        // if it is a missile boat, it can no longer fire
+        if (this.job.title === "missleboat") {
+            this.acted = true;
+        }
+
         // magic code that updates the units grid position.
 
         // TODO: replace this with actual logic
@@ -571,8 +656,8 @@ export class Unit extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param x - The x position of the location you wish to check.
-     * @param y - The y position of the location you wish to check.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -603,11 +688,11 @@ export class Unit extends GameObject {
     }
 
     /**
-     * tells you if your ship can be at that location.
+     * tells you if your ship can move to that location.
      *
      * @param player - The player that called this.
-     * @param x - The x position of the location you wish to check.
-     * @param y - The y position of the location you wish to check.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
      * @returns True if pathable by this unit, false otherwise.
      */
     protected async safe(
@@ -617,10 +702,14 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: safe -->>
 
+        // make sure it isn't dashing through the sun zone
         const sun = this.game.bodies[2];
-
-        // Add logic here for safe.
-        if (Math.sqrt((sun.x - x) ** 2 + (sun.y - y) ** 2) > sun.radius + this.game.shipRadius) {
+        const a = (this.y - y);
+        const b = (x - this.x);
+        const c = (this.x * y) - (x * this.y);
+        // grab the distance between the line and the circle at it's closest.
+        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        if (dist <= sun.radius) {
             return false;
         }
 

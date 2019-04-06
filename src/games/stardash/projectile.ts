@@ -39,11 +39,6 @@ export class Projectile extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /**
-     * tracks if the projectile is new.
-     */
-    public new!: boolean;
-
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
@@ -69,7 +64,6 @@ export class Projectile extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.target = args.target;
-        this.new = true;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
