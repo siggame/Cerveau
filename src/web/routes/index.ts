@@ -61,6 +61,7 @@ export function registerRouteIndex(app: Express): void {
     });
 
     app.get("/", async (req, res) => {
+        // get the current gamelogs
         const logs = lobby.gamelogManager.gamelogInfos;
         const hostUrl = req.headers.host
             ? new URL(`http://${req.headers.host}/`) // tslint:disable-line:no-http-string
@@ -71,11 +72,21 @@ export function registerRouteIndex(app: Express): void {
             .reverse(), // reverse the order, so that the last is the first element (latest) in the array
         hostUrl && hostUrl.hostname);
 
+        const activeRooms = lobby.getActiveRooms();
+
         res.render("index.hbs", {
             games,
             gamelogs,
             moreGamelogs: (gamelogs.length === MAX_GAMELOGS_ON_INDEX // If we're showing the max number of gamelogs now
                         && logs.length > gamelogs.length),           // and there are still more logs remaining to show
+            rooms: activeRooms.map((room) => ({
+                id: room.id,
+                gameName: room.gameNamespace.gameName,
+                isRunning: room.isRunning(),
+                clients: room.clients.map(({ name }) => name).join(", "),
+                timeCreated: Number(room.timeCreated),
+            })),
+            hasActiveRooms: activeRooms.length > 0,
         });
     });
 }

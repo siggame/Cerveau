@@ -11,7 +11,7 @@ import { Updater } from "../updater";
  * A container for the Lobby to contain clients and information about what they
  * want to play.
  */
-export class Room {
+export abstract class Room {
     /** The events emitted from this room. */
     public readonly events = events({
         over: new Signal(),
@@ -33,6 +33,9 @@ export class Room {
 
     /** Once the game is over, this will exist and be the list of losers */
     public losers?: IGamelogWinnerLoser[];
+
+    /** The time this room was created */
+    public readonly timeCreated = new Date();
 
     /** The manager we use to validate game settings against */
     protected readonly gameSettingsManager: BaseGameSettingsManager;
@@ -153,6 +156,8 @@ export class Room {
      * @returns Once the over event is emitted.
      */
     protected async handleOver(): Promise<void> {
+        this.clients.length = 0;
+
         this.events.over.emit();
     }
 

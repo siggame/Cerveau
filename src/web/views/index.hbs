@@ -17,6 +17,38 @@
 	</section>
 </section>
 
+<section id="lobby-rooms" class="info-block">
+	<h2>Active Rooms in Lobby</h2>
+	{{#if hasActiveRooms}}
+		<table>
+			<tr>
+				<th class="room-id">ID</th>
+				<th class="room-game-name">Game Name</th>
+				<th class="room-date">Created</th>
+				<th class="room-is-running">Running</th>
+				<th class="room-clients">Clients</th>
+			</tr>
+		{{#each rooms}}
+			<tr>
+				<td class="room-id">{{this.id}}</td>
+				<td class="room-game-name">{{this.gameName}}</td>
+				<td class="room-date">{{formatDate this.timeCreated "MMMM Do YYYY, h:mm:ss a"}}</td>
+				<td class="room-is-running">
+				{{#if this.isRunning}}
+					&#x2713;
+				{{else}}
+					&#x29b0;
+				{{/if}}
+				</td>
+				<td class="room-clients">{{this.clients}}</td>
+			</tr>
+		{{/each}}
+		</table>
+	{{else}}
+		<em class="no-active-rooms">No active rooms currently</em>
+	{{/if}}
+</section>
+
 <section id="gamelogs" class="info-block">
 	<h2>Game Archives</h2>
 	{{> gamelogs}}

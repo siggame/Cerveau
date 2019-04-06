@@ -93,7 +93,6 @@ export class ThreadedRoom extends Room {
             for (const client of this.clients) {
                 events.offAll(client.events);
             }
-            this.clients.length = 0;
         });
 
         // this message should only happen once, when the game is over

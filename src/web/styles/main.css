@@ -149,7 +149,7 @@ p:last-child {
 	margin-bottom: 0em;
 }
 
-table.gamelogs {
+.info-block table {
 	width: 100%;
 }
 
@@ -429,3 +429,7 @@ h4.game-settings {
 	font-size: 1.125em;
 }
 
+#lobby-rooms .no-active-rooms {
+	display: block;
+	text-align: center;
+}

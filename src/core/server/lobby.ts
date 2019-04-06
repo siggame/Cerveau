@@ -25,7 +25,7 @@ const ws = larkWebsocket as typeof net;
 
 const GAMES_DIR = join(__dirname, "../../games/");
 
-const RoomClass: typeof Room = Config.SINGLE_THREADED
+const RoomClass = Config.SINGLE_THREADED
     ? SerialRoom
     : ThreadedRoom;
 
@@ -238,6 +238,31 @@ export class Lobby {
         rooms.set(data.session, room);
 
         // if we got here the setup data looks valid, so let's setup the Room.
+    }
+
+    /**
+     * Gets all the Rooms in this lobby with active connections.
+     *
+     * @returns A list of rooms, in order of game name, then by room id, with active connections.
+     */
+    public getActiveRooms(): Room[] {
+        const rooms = new Array<Room>();
+        for (const gameName of Array.from(this.rooms.keys()).sort()) {
+            const roomForGameName = this.rooms.get(gameName);
+            if (!roomForGameName) {
+                throw new Error(`Cannot get rooms for game name '${gameName}'.`);
+            }
+            for (const id of Array.from(roomForGameName.keys()).sort()) {
+                const room = roomForGameName.get(id);
+                if (!room) {
+                    throw new Error(`Cannot get room for game name '${gameName}' of id '${id}'.`);
+                }
+
+                rooms.push(room);
+            }
+        }
+
+        return rooms;
     }
 
     /**
@@ -561,13 +586,15 @@ ${err}`);
             this.unTrackClients(...room.clients);
 
             const roomsPlayingThisGame = this.roomsPlaying.get(playData.gameName);
-            if (!roomsPlayingThisGame) {
+            const roomsForThisGame = this.rooms.get(playData.gameName);
+            if (!roomsPlayingThisGame || !roomsForThisGame) {
                 throw new Error(`Could not find rooms for ${data.gameName} to start`);
             }
             roomsPlayingThisGame.set(room.id, room);
 
             room.events.over.on(() => {
                 roomsPlayingThisGame.delete(room.id);
+                roomsForThisGame.delete(room.id);
 
                 if (this.isShuttingDown && this.roomsPlaying.size === 0) {
                     logger.info("Final game session exited. Shutdown complete.");
