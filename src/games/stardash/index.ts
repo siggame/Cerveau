@@ -323,7 +323,7 @@ export interface IUnitProperties {
     energy?: number;
 
     /**
-     * The amount of Generium ore carried by this unit. (0 to job carry
+     * The amount of Genarium ore carried by this unit. (0 to job carry
      * capacity - other carried items).
      */
     genarium?: number;
@@ -417,6 +417,22 @@ export interface IUnitDashArgs {
 }
 
 /**
+ * Argument overrides for Unit's dashable function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface IUnitDashableArgs {
+    /**
+     * The x position of the location you wish to arrive.
+     */
+    x?: number;
+    /**
+     * The y position of the location you wish to arrive.
+     */
+    y?: number;
+}
+
+/**
  * Argument overrides for Unit's mine function. If you return an object of this
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
@@ -451,11 +467,11 @@ export interface IUnitMoveArgs {
  */
 export interface IUnitSafeArgs {
     /**
-     * The x position of the location you wish to check.
+     * The x position of the location you wish to arrive.
      */
     x?: number;
     /**
-     * The y position of the location you wish to check.
+     * The y position of the location you wish to arrive.
      */
     y?: number;
 }
@@ -802,7 +818,7 @@ export const Namespace = makeNamespace({
                             typeName: "int",
                         },
                     ],
-                    invalidValue: false,
+                    invalidValue: -1,
                     returns: {
                         typeName: "int",
                     },
@@ -814,7 +830,7 @@ export const Namespace = makeNamespace({
                             typeName: "int",
                         },
                     ],
-                    invalidValue: false,
+                    invalidValue: -1,
                     returns: {
                         typeName: "int",
                     },
@@ -1063,6 +1079,22 @@ export const Namespace = makeNamespace({
                     },
                 },
                 dash: {
+                    args: [
+                        {
+                            argName: "x",
+                            typeName: "float",
+                        },
+                        {
+                            argName: "y",
+                            typeName: "float",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                dashable: {
                     args: [
                         {
                             argName: "x",
