@@ -310,6 +310,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     unit.protector = martyr;
                 }
             }
+
+            // make the martyr protect it'self
+            martyr.protector = martyr;
         }
 
     }
@@ -339,6 +342,11 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 unit.rarium = 0;
                 unit.legendarium = 0;
                 unit.mythicite = 0;
+                // thank them if they are the enemy
+                if (unit.owner !== baseA.owner) {
+                    // tslint:disable-next-line: no-console
+                    console.log("Thank you for the donation.");
+                }
                 // if it is a friendly ship, recharge it.
                 if (unit.owner === baseA.owner) {
                     const dif = unit.job.energy - unit.energy + unit.job.shield - unit.shield;

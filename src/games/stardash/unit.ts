@@ -323,7 +323,7 @@ export class Unit extends GameObject {
         const c = (this.x * y) - (x * this.y);
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius) {
+        if (dist <= sun.radius + this.game.shipRadius) {
             return `${this} cannot dash to those coordinates due to magnetic interference from the sun.`;
         }
 
@@ -536,7 +536,7 @@ export class Unit extends GameObject {
         const c = (this.x * y) - (x * this.y);
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius) {
+        if (dist <= sun.radius + this.game.shipRadius) {
             return `${this} cannot move to those coordinates due to clipping the sun.`;
         }
 
@@ -641,7 +641,7 @@ export class Unit extends GameObject {
         const c = (this.x * y) - (x * this.y);
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius) {
+        if (dist <= sun.radius + this.game.shipRadius) {
             return false;
         }
 
