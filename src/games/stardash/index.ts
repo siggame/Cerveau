@@ -329,9 +329,10 @@ export interface IUnitProperties {
     genarium?: number;
 
     /**
-     * Tracks wheither or not the ship is dashing.
+     * Tracks wheither or not the ship is dashing or Mining. If true, it cannot
+     * do anything else.
      */
-    isDashing?: boolean;
+    isBusy?: boolean;
 
     /**
      * The Job this Unit has.
@@ -1004,7 +1005,7 @@ export const Namespace = makeNamespace({
                 genarium: {
                     typeName: "int",
                 },
-                isDashing: {
+                isBusy: {
                     typeName: "boolean",
                 },
                 job: {

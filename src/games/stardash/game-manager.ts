@@ -217,21 +217,16 @@ export class StardashGameManager extends BaseClasses.GameManager {
             for (const unit of this.game.players[0].units) {
                 // set the protector to undefined as units have moved.
                 unit.protector = undefined;
+                // make it so the unit can act again
+                unit.acted = false;
                 // check if the unit is dashing.
-                if (unit.isDashing) {
+                if (unit.isBusy) {
                     // update it's location and conditions.
                     unit.x = unit.dashX;
                     unit.dashX = -1000;
                     unit.y = unit.dashY;
                     unit.dashY = -1000;
-                    unit.isDashing = false;
-
-                    // if it is a missleboat, it acted, otherwise it can act.
-                    unit.acted = (unit.job.title === "missileboat") ? true : false;
-                }
-                else {
-                    // if it didn't dash, it gets to act.
-                    unit.acted = false;
+                    unit.isBusy = false;
                 }
 
                 // resets the units moves.
@@ -243,21 +238,16 @@ export class StardashGameManager extends BaseClasses.GameManager {
             for (const unit of this.game.players[1].units) {
                 // set the protector to undefined as units have moved.
                 unit.protector = undefined;
+                // make it so the unit can act again
+                unit.acted = false;
                 // check if the unit is dashing.
-                if (unit.isDashing) {
+                if (unit.isBusy) {
                     // update it's location and conditions.
                     unit.x = unit.dashX;
-                    unit.dashX = -1;
+                    unit.dashX = -1000;
                     unit.y = unit.dashY;
-                    unit.dashY = -1;
-                    unit.isDashing = false;
-
-                    // if it is a missleboat, it acted, otherwise it can act.
-                    unit.acted = (unit.job.title === "missileboat") ? true : false;
-                }
-                else {
-                    // if it didn't dash, it gets to act.
-                    unit.acted = false;
+                    unit.dashY = -1000;
+                    unit.isBusy = false;
                 }
 
                 // resets the units moves.

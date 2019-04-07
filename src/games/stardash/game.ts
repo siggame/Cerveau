@@ -249,7 +249,7 @@ export class StardashGame extends BaseClasses.Game {
             this.manager.create.job({
                 title: "corvette",
                 carryLimit: 0,
-                damage: 10,
+                damage: 20,
                 health: 100,
                 moves: this.sizeX / 50,
                 range: 100,
