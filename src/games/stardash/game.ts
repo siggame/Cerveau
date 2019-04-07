@@ -43,11 +43,6 @@ export class StardashGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
-     * Radius of the no dash zone around the sun.
-     */
-    public readonly dashBlock!: number;
-
-    /**
      * The cost of dashing.
      */
     public readonly dashCost!: number;
@@ -70,7 +65,7 @@ export class StardashGame extends BaseClasses.Game {
     public readonly genariumValue!: number;
 
     /**
-     * A list of all jobs. first item is corvette, second is missleboat, third
+     * A list of all jobs. first item is corvette, second is missileboat, third
      * is martyr, fourth is transport, and fifth is miner.
      */
     public jobs!: Job[];
@@ -263,7 +258,7 @@ export class StardashGame extends BaseClasses.Game {
 
             // adds the missleboat ship job.
             this.manager.create.job({
-                title: "missleboat",
+                title: "missileboat",
                 carryLimit: 0,
                 damage: 100,
                 health: 100,

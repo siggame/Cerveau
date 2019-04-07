@@ -7,10 +7,10 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The Job title. 'corvette', 'missleboat', 'martyr', 'transport', or 'miner'.
+ * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or 'miner'.
  * (in this order from 0-4).
  */
-export type JobTitle = "corvette" | "missleboat" | "martyr" | "transport" | "miner";
+export type JobTitle = "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
 /**
  * Information about a unit's job.
@@ -47,10 +47,10 @@ export class Job extends GameObject {
     public readonly shield!: number;
 
     /**
-     * The Job title. 'corvette', 'missleboat', 'martyr', 'transport', or
+     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
      * 'miner'. (in this order from 0-4).
      */
-    public readonly title!: "corvette" | "missleboat" | "martyr" | "transport" | "miner";
+    public readonly title!: "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
     /**
      * How much money it costs to spawn a unit.
