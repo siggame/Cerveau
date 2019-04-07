@@ -108,7 +108,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         planetRechargeRate: {
             description: "The amount of energy the planets restore each round.",
             // <<-- Creer-Merge: planetRechargeRate -->>
-            default: 50,
+            default: 100,
             // <<-- /Creer-Merge: planetRechargeRate -->>
         },
         projectileRadius: {

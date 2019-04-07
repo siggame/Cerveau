@@ -43,9 +43,10 @@ export class Unit extends GameObject {
     public genarium!: number;
 
     /**
-     * Tracks wheither or not the ship is dashing.
+     * Tracks wheither or not the ship is dashing or Mining. If true, it cannot
+     * do anything else.
      */
-    public isDashing!: boolean;
+    public isBusy!: boolean;
 
     /**
      * The Job this Unit has.
@@ -132,7 +133,7 @@ export class Unit extends GameObject {
         this.mythicite = 0;
         this.rarium = 0;
         this.genarium = 0;
-        this.isDashing = false;
+        this.isBusy = false;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -297,7 +298,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-dash -->>
 
         // check widely consistent things.
-        const reason = this.invalidate(player, true);
+        const reason = this.invalidate(player, false);
         // if there is a reason, return it.
         if (reason) {
             return reason;
@@ -353,10 +354,8 @@ export class Unit extends GameObject {
         // Add logic here for dash.
         this.dashX = x;
         this.dashY = y;
-        this.isDashing = true;
-        if (this.job.title === "missileboat") {
-            this.acted = true;
-        }
+        this.isBusy = true;
+        this.moves = 0;
         this.energy -= this.game.dashCost;
 
         // return the action was successful.
@@ -392,6 +391,10 @@ export class Unit extends GameObject {
         // make sure a body was given.
         if (!body) {
             return `Body doesn't exist`;
+        }
+
+        if (body.owner !== undefined && body.owner !== player) {
+            return `${body} is already being mined by your opponent.`;
         }
 
         // make sure it is an asteroid.
@@ -479,6 +482,12 @@ export class Unit extends GameObject {
         // mark the unit has acted.
         this.acted = true;
 
+        // make sure it can't do anything else this turn
+        this.isBusy = true;
+        this.dashX = this.x;
+        this.dashY = this.y;
+        this.moves = 0;
+
         // remove the mined ore from the asteroid
         body.amount -= actualAmount;
 
@@ -508,7 +517,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // check widely consistent things.
-        const reason = this.invalidate(player, true);
+        const reason = this.invalidate(player, false);
         // if there is a reason, return it.
         if (reason) {
             return reason;
@@ -779,7 +788,7 @@ export class Unit extends GameObject {
         // changing its value in this scope is enough.
 
         // Check common invalidates
-        const reason = this.invalidate(player, true);
+        const reason = this.invalidate(player, false);
         // if there is a reason, return it.
         if (reason) {
             return reason;
@@ -879,6 +888,10 @@ export class Unit extends GameObject {
         // make sure the thing is owned by the player.
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
+        }
+
+        if (this.isBusy) {
+            return `${this} cannot do anything else as it is dashing or mining.`;
         }
 
         // Make sure the unit hasn't acted.
