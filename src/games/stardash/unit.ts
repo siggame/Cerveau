@@ -393,10 +393,6 @@ export class Unit extends GameObject {
             return `Body doesn't exist`;
         }
 
-        if (body.owner !== undefined && body.owner !== player) {
-            return `${body} is already being mined by your opponent.`;
-        }
-
         // make sure it is an asteroid.
         if (body.bodyType !== "asteroid") {
             return `${body} must be an asteroid!`;
