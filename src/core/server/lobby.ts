@@ -562,7 +562,9 @@ ${err}`);
         client.setInfo({
             name: playData.playerName || undefined,
             type: playData.clientType,
-            index: playData.playerIndex || undefined,
+            index: isNil(playData.playerIndex)
+                ? undefined
+                : playData.playerIndex,
             metaDeltas: playData.metaDeltas || false,
         });
 

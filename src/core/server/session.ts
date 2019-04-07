@@ -110,12 +110,39 @@ export class Session {
         // Now we have all our clients, so let's make the structures to play
         // the game with.
 
+        const n = this.gameNamespace.GameManager.requiredNumberOfPlayers;
+
         // NOTE: the game only knows about clients playing, this session will
         // care about spectators sending them deltas a such.
         // Therefore, the game never needs to know of their existence.
-        const playingClients = this.clients.filter(
-            (c) => !c.isSpectating,
-        ) as BasePlayingClient[];
+        const nonSpectators = this.clients.
+            filter((c) => !c.isSpectating) as BasePlayingClient[];
+
+        const playingClients = new Array<BasePlayingClient>(n);
+        const noIndexClients = [] as typeof nonSpectators;
+        for (const client of nonSpectators) {
+            const index = client.playerIndex;
+            if (index === undefined) {
+                noIndexClients.push(client);
+            }
+            else {
+                playingClients[index] = client;
+            }
+        }
+
+        // now we've filled in the clients that requested index, backfill those that did not
+        for (let i = 0; i < n; i++) {
+            const client = playingClients[i];
+            if (client) {
+                continue;
+            }
+
+            const clientNeedingIndex = noIndexClients.shift();
+            if (!clientNeedingIndex) {
+                break; // no more clients to add
+            }
+            playingClients[i] = clientNeedingIndex;
+        }
 
         const gameSanitizer = new BaseGameSanitizer(args.gameNamespace);
         for (const client of playingClients) {
