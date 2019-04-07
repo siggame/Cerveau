@@ -177,8 +177,9 @@ for (const [, arg] of parserArgs) {
     parserArgByDest.set(arg.dest, arg);
 }
 
-const parser = new ArgumentParser({description:
-    "Run the JavaScript client with options to connect to a game server. Must provide a game name to play.",
+const parser = new ArgumentParser({
+    addHelp: true,
+    description: "Runs the game server with various options for play",
 });
 
 const defaults: UnknownObject = {};
