@@ -227,7 +227,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     unit.isDashing = false;
 
                     // if it is a missleboat, it acted, otherwise it can act.
-                    unit.acted = (unit.job.title === "missleboat") ? true : false;
+                    unit.acted = (unit.job.title === "missileboat") ? true : false;
                 }
                 else {
                     // if it didn't dash, it gets to act.
@@ -253,7 +253,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     unit.isDashing = false;
 
                     // if it is a missleboat, it acted, otherwise it can act.
-                    unit.acted = (unit.job.title === "missleboat") ? true : false;
+                    unit.acted = (unit.job.title === "missileboat") ? true : false;
                 }
                 else {
                     // if it didn't dash, it gets to act.

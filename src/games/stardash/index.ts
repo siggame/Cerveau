@@ -189,10 +189,10 @@ export interface IJobProperties {
     shield?: number;
 
     /**
-     * The Job title. 'corvette', 'missleboat', 'martyr', 'transport', or
+     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
      * 'miner'. (in this order from 0-4).
      */
-    title?: "corvette" | "missleboat" | "martyr" | "transport" | "miner";
+    title?: "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
     /**
      * How much money it costs to spawn a unit.
@@ -417,22 +417,6 @@ export interface IUnitDashArgs {
 }
 
 /**
- * Argument overrides for Unit's dashable function. If you return an object of
- * this interface from the invalidate functions, the value(s) you set will be
- * used in the actual function.
- */
-export interface IUnitDashableArgs {
-    /**
-     * The x position of the location you wish to arrive.
-     */
-    x?: number;
-    /**
-     * The y position of the location you wish to arrive.
-     */
-    y?: number;
-}
-
-/**
  * Argument overrides for Unit's mine function. If you return an object of this
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
@@ -652,9 +636,6 @@ export const Namespace = makeNamespace({
                     nullable: false,
                 },
                 currentTurn: {
-                    typeName: "int",
-                },
-                dashBlock: {
                     typeName: "int",
                 },
                 dashCost: {
@@ -910,7 +891,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "corvette",
-                    literals: ["corvette", "missleboat", "martyr", "transport", "miner"],
+                    literals: ["corvette", "missileboat", "martyr", "transport", "miner"],
                 },
                 unitCost: {
                     typeName: "int",
@@ -1079,22 +1060,6 @@ export const Namespace = makeNamespace({
                     },
                 },
                 dash: {
-                    args: [
-                        {
-                            argName: "x",
-                            typeName: "float",
-                        },
-                        {
-                            argName: "y",
-                            typeName: "float",
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-                dashable: {
                     args: [
                         {
                             argName: "x",

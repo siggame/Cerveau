@@ -276,7 +276,7 @@ export class Body extends GameObject {
         }
 
         // Check if the supplied title is valid
-        if (title !== "corvette" && title !== "missleboat" && title !== "martyr"
+        if (title !== "corvette" && title !== "missileboat" && title !== "martyr"
             && title !== "transport" && title !== "miner") {
             return `You must supply a valid job title.`;
         }
@@ -301,7 +301,7 @@ export class Body extends GameObject {
         // Unsure of how to implement above proposal
         if ((player.money < 75 && (title === "miner" || title === "transport")) ||
             (player.money < 100 && title === "corvette") || (player.money < 125 &&
-            title === "missleboat") || (player.money < 150 && title === "martyr")) {
+            title === "missileboat") || (player.money < 150 && title === "martyr")) {
             return `You do not have enough resources to spawn this ship.`;
         }
 
@@ -360,7 +360,7 @@ export class Body extends GameObject {
                 y,
             });
         }
-        else if (title === "missleboat") {
+        else if (title === "missileboat") {
             // Deduct ship cost from player's balance
             player.money -= 125;
             // Adds desired unit to player's unit arsenal

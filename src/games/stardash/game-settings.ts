@@ -19,12 +19,6 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         ...(super.schema || (this as any).schema),
 
         // Stardash game specific settings
-        dashBlock: {
-            description: "Radius of the no dash zone around the sun.",
-            // <<-- Creer-Merge: dashBlock -->>
-            default: 550,
-            // <<-- /Creer-Merge: dashBlock -->>
-        },
         dashCost: {
             description: "The cost of dashing.",
             // <<-- Creer-Merge: dashCost -->>
