@@ -127,7 +127,7 @@ export class Unit extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         this.job = args.job;
-        this.acted = true;
+        this.acted = false;
         this.legendarium = 0;
         this.mythicite = 0;
         this.rarium = 0;
