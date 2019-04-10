@@ -32,7 +32,7 @@ export class Unit extends GameObject {
     public dashY!: number;
 
     /**
-     * The remaining health of a unit.
+     * The remaining health of the unit.
      */
     public energy!: number;
 

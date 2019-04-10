@@ -274,6 +274,11 @@ export interface IPlayerProperties {
 /** All the possible properties for an Projectile. */
 export interface IProjectileProperties {
     /**
+     * The remaining health of the projectile.
+     */
+    energy?: number;
+
+    /**
      * The amount of remaining distance the projectile can move.
      */
     fuel?: number;
@@ -318,7 +323,7 @@ export interface IUnitProperties {
     dashY?: number;
 
     /**
-     * The remaining health of a unit.
+     * The remaining health of the unit.
      */
     energy?: number;
 
@@ -964,6 +969,9 @@ export const Namespace = makeNamespace({
         Projectile: {
             parentClassName: "GameObject",
             attributes: {
+                energy: {
+                    typeName: "int",
+                },
                 fuel: {
                     typeName: "int",
                 },

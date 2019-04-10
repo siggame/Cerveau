@@ -276,7 +276,7 @@ export class StardashGame extends BaseClasses.Game {
                 moves: this.sizeX / 50,
                 range: 105,
                 unitCost: 150,
-                shield: 500,
+                shield: 100,
             }),
 
             // adds the transport ship job.
