@@ -285,10 +285,10 @@ export class StardashGameManager extends BaseClasses.GameManager {
     private updateMartyr(player: number): void {
         // all martyr ships owned by the player that can protect.
         const martyrs = this.game.players[player].units.filter((u) =>
-                      u.shield > 0 && u.job.title === "martyr");
+                      u.job.title === "martyr");
         // all units owned by the player that need to be guarded.
         const units = this.game.players[player].units.filter((u) =>
-                      u.protector === undefined && u.job.title !== "martyr");
+                      u.protector === undefined && u.shield <= 0);
         // iterate over martyr that can protect.
         for (const martyr of martyrs) {
             // regen martyr shields.
@@ -307,7 +307,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 }
             }
 
-            // make the martyr protect it'self
+            // make the martyr protect it's self
             martyr.protector = martyr;
         }
 

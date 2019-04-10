@@ -234,6 +234,35 @@ export class StardashGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: public-functions -->>
 
+    /**
+     * Updates the protector for a unit.
+     *
+     * @param unit: the unit that needs it's protector updated.
+     */
+    public updateProtector(unit: Unit): void {
+        // if it has no owner, cancel the function.
+        if (unit.owner === undefined) {
+            return;
+        }
+        // reset the units protector
+        unit.protector = undefined;
+        // all martyr ships owned by the player that can protect.
+        const martyrs = unit.owner.units.filter((u) =>
+                      u.shield > 0 && u.job.title === "martyr");
+        // iterate over martyr that can protect.
+        for (const martyr of martyrs) {
+            // if the unit isn't protected and is in range.
+            if (Math.sqrt(((unit.x - martyr.x) ** 2) +
+                ((unit.y - martyr.y) ** 2)) < martyr.job.range) {
+                // protected.
+                unit.protector = martyr;
+
+                // escape the function.
+                return;
+            }
+        }
+    }
+
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.

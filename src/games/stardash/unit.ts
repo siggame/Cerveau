@@ -231,14 +231,42 @@ export class Unit extends GameObject {
 
             // if enemy is protected by a martyr
             if (enemy.protector) {
-                if (enemy.protector.shield > attackDamage) {
+                // damage the shield if it will absorb it all.
+                if (enemy.protector.shield >= attackDamage) {
                     enemy.protector.shield -= attackDamage;
+                    // if it emptied the martyr sheild, grab a new martyr.
+                    enemy.protector = undefined;
+                    this.game.updateProtector(enemy);
                 }
-                else if (enemy.protector.shield <= attackDamage) {
+                // otherwise, grab a new martyr and deal the damage to the new shield.
+                // Note, there is no reasons why this should ever run.
+                else if (enemy.protector.shield < attackDamage) {
+                    // deal the damage and update the shield.
                     attackDamage -= enemy.protector.shield;
                     enemy.protector.shield = 0;
-                    enemy.protector = undefined;
-                    enemy.energy -= attackDamage;
+                    // keep cycling through protectors until the damage is gone or there is no protector.
+                    while (enemy.protector !== undefined && attackDamage > 0) {
+                        // if it emptied the martyr sheild, grab a new martyr.
+                        this.game.updateProtector(enemy);
+                        // handle shield damage
+                        if (enemy.protector) {
+                            // if the shield is stronger, damage the shield.
+                            if (enemy.protector.shield >= attackDamage) {
+                                enemy.protector.shield -= attackDamage;
+                                attackDamage = 0;
+                            }
+                            // kill the shield and update the damage.
+                            else {
+                                // deal the damage and update the shield.
+                                attackDamage -= enemy.protector.shield;
+                                enemy.protector.shield = 0;
+                            }
+                        }
+                    }
+                    // if there is left over damage, deal it.
+                    if (attackDamage > 0) {
+                        enemy.energy -= attackDamage;
+                    }
                 }
             }
             // if no martyr in ranges
@@ -262,6 +290,7 @@ export class Unit extends GameObject {
                 target: enemy,
                 x: this.x,
                 y: this.y,
+                energy: this.game.jobs[0].damage * 2,
             });
 
             // adds the projectiles.
@@ -711,13 +740,13 @@ export class Unit extends GameObject {
         }
 
         // if this unit is NOT a corvette
-        if (this.job.title !== "corvette") {
-            return `${this} is not a corvette. It cannot shoot down missiles.`;
+        if (this.job.title !== "corvette" && this.job.title !== "missileboat") {
+            return `${this} is not a corvette or missileboat. It cannot shoot down missiles.`;
         }
 
         // if the projectile is out of the range of the corvette
-        if (Math.sqrt((missile.x - this.x) ** 2) + ((missile.y - this.y) ** 2) > this.job.range) {
-            return `${this} is too far away from the target.`;
+        if (Math.sqrt((missile.x - this.x) ** 2) + ((missile.y - this.y) ** 2) > this.game.jobs[0].range) {
+            return `${this} is too far away from the target. Must be within attack range for a corvette.`;
         }
 
         // Check all the arguments for shootDown here and try to
@@ -743,13 +772,20 @@ export class Unit extends GameObject {
 
         // Add logic here for shootDown.
 
-        // take the missile and push it somewhere else!
-        // after doing this, the system will take care of the rest,
-        // such as removing it from the projectile list.
-        // thanks system!
-        missile.x = -101;
-        missile.y = -101;
-        missile.fuel = 0;
+        // damage the missile.
+        if (this.job.title === "corvette") {
+            missile.energy -= this.job.damage;
+        }
+        else {
+            missile.energy = 0;
+        }
+
+        // if the missile is dead, kill it. The only thing that dies at 0 energy.
+        if (missile.energy <= 0) {
+            missile.x = -101;
+            missile.y = -101;
+            missile.fuel = 0;
+        }
 
         // the corvette has now acted
         this.acted = true;
