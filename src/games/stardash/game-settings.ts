@@ -47,14 +47,14 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             description: "The highest amount of material, that can be in a "
                        + "asteroid.",
             // <<-- Creer-Merge: maxAsteroid -->>
-            default: 1000,
+            default: 250,
             // <<-- /Creer-Merge: maxAsteroid -->>
         },
         minAsteroid: {
             description: "The smallest amount of material, that can be in a "
                        + "asteroid.",
             // <<-- Creer-Merge: minAsteroid -->>
-            default: 250,
+            default: 100,
             // <<-- /Creer-Merge: minAsteroid -->>
         },
         miningSpeed: {
