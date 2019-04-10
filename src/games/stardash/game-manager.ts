@@ -291,6 +291,12 @@ export class StardashGameManager extends BaseClasses.GameManager {
                       u.protector === undefined && u.job.title !== "martyr");
         // iterate over martyr that can protect.
         for (const martyr of martyrs) {
+            // regen martyr shields.
+            martyr.shield += this.game.jobs[1].damage;
+            // keep it under the cap.
+            if (martyr.job.shield < martyr.shield) {
+                martyr.shield = martyr.job.shield;
+            }
             // iterate over every unprotected unit.
             for (const unit of units) {
                 // if the unit isn't protected and is in range.
