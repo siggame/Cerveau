@@ -182,8 +182,7 @@ export class Unit extends GameObject {
         }
 
         // make sure the target is in range.
-        if ((this.job.range + this.game.shipRadius) <= Math.sqrt(((this.x -
-            enemy.x) ** 2) + ((this.y - enemy.y) ** 2))) {
+        if ((this.job.range + this.game.shipRadius) <= this.distance(this.x, this.y, enemy.x, enemy.y)) {
             return `${this} is trying to attack a location which is too far away.`;
         }
 
@@ -334,7 +333,7 @@ export class Unit extends GameObject {
         }
 
         // variables for ease of reference.
-        const trav = Math.sqrt(this.x ** 2 + this.y ** 2);
+        const trav = this.distance(this.x, this.y, x, y);
         const cost = (trav / this.game.dashDistance) * this.game.dashCost;
         // make sure the unit can move to that locaiton.
         if (this.energy < cost) {
@@ -438,7 +437,7 @@ export class Unit extends GameObject {
         }
 
         // make sure the asteroid is in range.
-        if (this.job.range < Math.sqrt(this.x ** 2 + this.y ** 2)) {
+        if (this.job.range < this.distance(this.x, this.y, body.x, body.y)) {
             return `${this} is too far away from ${body} to mine!`;
         }
 
@@ -554,7 +553,7 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit can move to that locaiton.
-        if (Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2) > this.moves) {
+        if (this.distance(this.x, this.y, x, y) > this.moves) {
             return `${this} can only move ${this.moves} distance!`;
         }
 
@@ -603,7 +602,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: move -->>
 
         // Add logic here for move.
-        this.moves -= Math.sqrt((x - this.x) ** 2) + ((y - this.y) ** 2);
+        this.moves -= this.distance(this.x, this.y, x, y);
         this.x = x;
         this.y = y;
 
@@ -745,7 +744,7 @@ export class Unit extends GameObject {
         }
 
         // if the projectile is out of the range of the corvette
-        if (Math.sqrt((missile.x - this.x) ** 2) + ((missile.y - this.y) ** 2) > this.game.jobs[0].range) {
+        if (this.distance(this.x, this.y, missile.x, missile.y) > this.game.jobs[0].range) {
             return `${this} is too far away from the target. Must be within attack range for a corvette.`;
         }
 
@@ -837,9 +836,7 @@ export class Unit extends GameObject {
         }
 
         // Check that target ship is in range
-        const xDist = this.x - unit.x;
-        const yDist = this.y - unit.y;
-        if (Math.sqrt(xDist ** 2 + yDist ** 2) > this.job.range) {
+        if (this.distance(this.x, this.y, unit.x, unit.y) > this.job.range) {
             return `${this} is too far away to transfer materials with the target ship!`;
         }
 
@@ -940,6 +937,25 @@ export class Unit extends GameObject {
         if (this.energy < 0) {
             return `${this} is dead, and cannot do anything.`;
         }
+    }
+
+    /**
+     * returns the distance between the points
+     *
+     * @param x1: the start x coordinate.
+     * @param y1: the start y coordinate.
+     * @param x2: the end x coordinate.
+     * @param y2: the end y coordinate.
+     *
+     * @returns the distance between the points.
+     */
+    private distance(x1: number, y1: number, x2: number, y2: number): number {
+        // grab the differences.
+        const xDif = (x1 - x2);
+        const yDif = (y1 - y2);
+
+        // return the distance.
+        return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
 
     // Any additional protected or pirate methods can go here.
