@@ -258,7 +258,9 @@ export class Lobby {
                     throw new Error(`Cannot get room for game name '${gameName}' of id '${id}'.`);
                 }
 
-                rooms.push(room);
+                if (!room.isOver()) {
+                    rooms.push(room);
+                }
             }
         }
 
@@ -596,7 +598,6 @@ ${err}`);
 
             room.events.over.on(() => {
                 roomsPlayingThisGame.delete(room.id);
-                roomsForThisGame.delete(room.id);
 
                 if (this.isShuttingDown && this.roomsPlaying.size === 0) {
                     logger.info("Final game session exited. Shutdown complete.");
