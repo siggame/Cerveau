@@ -963,7 +963,7 @@ export class Unit extends GameObject {
         // make sure it isn't dashing through the sun zone
         const a = (y1 - y2);
         const b = (x2 - x1);
-        const c = (x2 * y1) - (x1 * y2);
+        const c = (x1 * y2) - (x2 * y1);
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
         if (dist <= minDist) {
