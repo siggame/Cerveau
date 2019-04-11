@@ -289,7 +289,7 @@ export class Unit extends GameObject {
                 target: enemy,
                 x: this.x,
                 y: this.y,
-                energy: this.game.jobs[0].damage * 2,
+                energy: this.game.jobs[0].damage * 1,
             });
 
             // adds the projectiles.
@@ -346,13 +346,7 @@ export class Unit extends GameObject {
         }
 
         // make sure it isn't dashing through the sun zone
-        const sun = this.game.bodies[2];
-        const a = (this.y - y);
-        const b = (x - this.x);
-        const c = (this.x * y) - (x * this.y);
-        // grab the distance between the line and the circle at it's closest.
-        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius + this.game.shipRadius) {
+        if (this.collide(x, y, this.x, this.y)) {
             return `${this} cannot dash to those coordinates due to magnetic interference from the sun.`;
         }
 
@@ -568,13 +562,7 @@ export class Unit extends GameObject {
         }
 
         // make sure it isn't dashing through the sun zone
-        const sun = this.game.bodies[2];
-        const a = (this.y - y);
-        const b = (x - this.x);
-        const c = (this.x * y) - (x * this.y);
-        // grab the distance between the line and the circle at it's closest.
-        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius + this.game.shipRadius) {
+        if (this.collide(x, y, this.x, this.y)) {
             return `${this} cannot move to those coordinates due to clipping the sun.`;
         }
 
@@ -673,17 +661,11 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: safe -->>
 
         // make sure it isn't dashing through the sun zone
-        const sun = this.game.bodies[2];
-        const a = (this.y - y);
-        const b = (x - this.x);
-        const c = (this.x * y) - (x * this.y);
-        // grab the distance between the line and the circle at it's closest.
-        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
-        if (dist <= sun.radius + this.game.shipRadius) {
+        if (this.collide(x, y, this.x, this.y)) {
             return false;
         }
 
-        // TODO: replace this with actual logic
+        // return that the move is safe.
         return true;
 
         // <<-- /Creer-Merge: safe -->>
@@ -776,11 +758,11 @@ export class Unit extends GameObject {
             missile.energy -= this.job.damage;
         }
         else {
-            missile.energy = 0;
+            missile.energy = -1;
         }
 
         // if the missile is dead, kill it. The only thing that dies at 0 energy.
-        if (missile.energy <= 0) {
+        if (missile.energy < 0) {
             missile.x = -101;
             missile.y = -101;
             missile.fuel = 0;
@@ -956,6 +938,56 @@ export class Unit extends GameObject {
 
         // return the distance.
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
+    }
+
+    /**
+     * detects if the given line intersects the sun.
+     *
+     * @param x1: the start x coordinate.
+     * @param y1: the start y coordinate.
+     * @param x2: the end x coordinate.
+     * @param y2: the end y coordinate.
+     *
+     * @returns True = collide, false = no collide.
+     */
+    private collide(x1: number, y1: number, x2: number, y2: number): boolean {
+        // grab the sun for reference.
+        const sun = this.game.bodies[2];
+
+        // grab line length
+        const length = this.distance(x1, y1, x2, y2);
+
+        // grab the length of the ship and sun.
+        const minDist = sun.radius + this.game.shipRadius;
+
+        // make sure it isn't dashing through the sun zone
+        const a = (y1 - y2);
+        const b = (x2 - x1);
+        const c = (x2 * y1) - (x1 * y2);
+        // grab the distance between the line and the circle at it's closest.
+        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        if (dist <= minDist) {
+            // if the sun is within collision distance, but further than the other end point.
+            if (this.distance(x1, y1, sun.x, sun.y) > length) {
+                // if it collides with the other end point.
+                if (this.distance(x2, y2, sun.x, sun.y) < minDist) {
+                    return true;
+                }
+            }
+            // if the sun is within collision distance, but further than the other end point.
+            else if (this.distance(x2, y2, sun.x, sun.y) > length) {
+                // if it collides with the other end point.
+                if (this.distance(x1, y1, sun.x, sun.y) < minDist) {
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+
+        // return that there is no collision
+        return false;
     }
 
     // Any additional protected or pirate methods can go here.
