@@ -112,7 +112,7 @@ export class GamelogScribe {
                 reason: player.won
                         ? player.reasonWon
                         : player.reasonLost,
-                disconnected: client.hasDisconnected && !client.hasTimedOut(),
+                disconnected: client.hasDisconnected() && !client.hasTimedOut(),
                               // then they lost because they disconnected
                 timedOut: client.hasTimedOut(),
                           // then they lost because the timed out

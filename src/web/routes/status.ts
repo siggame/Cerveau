@@ -2,6 +2,7 @@
 // Basically http responses that are not HTML, probably JSON
 
 import { Express } from "express";
+import { IClientInfo } from "~/core/clients/client-info";
 import { Config } from "~/core/config";
 import { Lobby } from "~/core/server/lobby";
 import { objectHasProperty } from "~/utils";
@@ -13,20 +14,7 @@ interface IRoomInfo {
     gameSession: string;
     requiredNumberOfPlayers: number;
     gamelogFilename?: string | null;
-
-    clients: Array<{
-        // required
-        name: string;
-        index: number | undefined;
-        spectating: boolean;
-
-        // when over
-        lost?: boolean;
-        won?: boolean;
-        reason?: string;
-        disconnected?: boolean;
-        timedOut?: boolean;
-    }>;
+    clients: IClientInfo[];
 }
 
 /**
@@ -80,13 +68,10 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
     }
 
     // if the game session was found there should be some clients...
-    for (const client of room.clients) {
-        info.clients.push({
-            name: client.name,
-            index: client.playerIndex,
-            spectating: client.isSpectating,
-        });
-    }
+    info.clients = room.clients.map((client) => ({
+        name: client.name,
+        spectating: client.isSpectating,
+    }));
 
     if (!room.isRunning() && !room.isOver()) {
         // it has clients, but it still open more more before it starts running
@@ -107,18 +92,9 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
         info.status = "over";
         info.gamelogFilename = room.gamelogFilename || null;
 
-        for (let i = 0; room.clients.length; i++) {
-            const client = room.clients[i];
-            const clientInfo = info.clients[i];
-
-            const { player } = client;
-            if (player) {
-                clientInfo.lost = player.lost;
-                clientInfo.won = player.won;
-                clientInfo.reason = player.reasonLost || player.reasonWon;
-                clientInfo.disconnected = client.hasDisconnected();
-                clientInfo.timedOut = client.hasTimedOut();
-            }
+        const clientInfos = room.getOverData();
+        if (clientInfos) {
+            info.clients = clientInfos;
         }
 
         return info;
@@ -211,7 +187,6 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false
      *          }
      *      ]
@@ -226,12 +201,10 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false
      *          },
      *          {
      *              name: "Chess Python Player",
-     *              index: 1,
      *              spectating: false
      *          }
      *      ]
@@ -276,7 +249,6 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false,
      *              won: true,
      *              lost: false,
@@ -284,7 +256,6 @@ export function registerRouteStatus(app: Express): void {
      *          },
      *          {
      *              name: "Chess Python Player",
-     *              index: 1,
      *              spectating: false,
      *              won: false,
      *              lost: true,

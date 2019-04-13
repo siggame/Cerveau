@@ -6,14 +6,15 @@ import { setupThread } from "../setup-thread";
 setupThread(); // we have to do this before doing aliased imports below
 
 // this also loads the command line arguments from process.env
+import { IGamelog } from "@cadre/ts-utils/cadre";
 import { isMaster } from "cluster";
 import { Socket } from "net";
 import * as Clients from "~/core/clients";
 import { Config } from "~/core/config";
 import { logger } from "~/core/logger";
-import { Session } from "~/core/server/session";
 import { Immutable, UnknownObject } from "~/utils";
 import { IGamesExport } from "./games-export";
+import { Session } from "./session";
 
 /**
  * An interface for the main thread to adhere to, so we can communicate
@@ -30,6 +31,18 @@ export type MessageFromMainThread = { type: "done" } | {
         metaDeltas: boolean;
     };
 };
+
+/** The message interface workers send from them as messages */
+export interface IWorkerOverMessage {
+    /** An error, if something bad happened */
+    error?: Error;
+
+    /** The gamelog, if everything went smoothly and it was generated */
+    gamelog?: Immutable<IGamelog>;
+
+    /** The client infos for the completed game. */
+    clientInfos?: Clients.IClientInfo[];
+}
 
 /** This interface we expect to be set via the process.env for us. */
 export interface IWorkerGameSessionData {
@@ -116,7 +129,7 @@ process.on("message", (
             const error = data instanceof Error
                 ? data
                 : undefined;
-            const gamelog = data instanceof Error
+            const success = data instanceof Error
                 ? undefined
                 : data;
 
@@ -128,7 +141,7 @@ process.on("message", (
                 throw new Error("Worker not on separate thread!");
             }
 
-            process.send({ gamelog, error }, () => {
+            process.send({ error, ...success }, () => {
                 process.exit(error ? 1 : 0);
             });
         });
