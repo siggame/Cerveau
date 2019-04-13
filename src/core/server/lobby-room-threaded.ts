@@ -64,10 +64,9 @@ export class ThreadedRoom extends Room {
                 // we are about to send it, so we don't want this client object
                 // listening to it, as we no longer care.
                 client.stopListeningToSocket();
+                const socket = client.popNetSocket();
 
-                const clientClass = Object.getPrototypeOf(client) as {
-                    constructor: { name: string };
-                };
+                const clientClass = Object.getPrototypeOf(client) as typeof client;
 
                 const messageFromMainThread: MessageFromMainThread = {
                     type: "client",
@@ -81,7 +80,7 @@ export class ThreadedRoom extends Room {
                     },
                 };
 
-                this.worker.send(messageFromMainThread, client.getNetSocket());
+                this.worker.send(messageFromMainThread, socket);
             }
 
             // Tell the worker thread we are done sending client + sockets to

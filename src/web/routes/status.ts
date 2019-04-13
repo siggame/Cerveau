@@ -17,7 +17,6 @@ interface IRoomInfo {
     clients: Array<{
         // required
         name: string;
-        index: number | undefined;
         spectating: boolean;
 
         // when over
@@ -80,13 +79,10 @@ function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomIn
     }
 
     // if the game session was found there should be some clients...
-    for (const client of room.clients) {
-        info.clients.push({
-            name: client.name,
-            index: client.playerIndex,
-            spectating: client.isSpectating,
-        });
-    }
+    info.clients = room.clients.map((client) => ({
+        name: client.name,
+        spectating: client.isSpectating,
+    }));
 
     if (!room.isRunning() && !room.isOver()) {
         // it has clients, but it still open more more before it starts running
@@ -211,7 +207,6 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false
      *          }
      *      ]
@@ -226,12 +221,10 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false
      *          },
      *          {
      *              name: "Chess Python Player",
-     *              index: 1,
      *              spectating: false
      *          }
      *      ]
@@ -247,7 +240,6 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false,
      *              won: true,
      *              lost: false,
@@ -255,7 +247,6 @@ export function registerRouteStatus(app: Express): void {
      *          },
      *          {
      *              name: "Chess Python Player",
-     *              index: 1,
      *              spectating: false,
      *              won: false,
      *              lost: true,
@@ -276,7 +267,6 @@ export function registerRouteStatus(app: Express): void {
      *      clients: [
      *          {
      *              name: "Chess Lua Player",
-     *              index: 0,
      *              spectating: false,
      *              won: true,
      *              lost: false,
@@ -284,7 +274,6 @@ export function registerRouteStatus(app: Express): void {
      *          },
      *          {
      *              name: "Chess Python Player",
-     *              index: 1,
      *              spectating: false,
      *              won: false,
      *              lost: true,
