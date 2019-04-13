@@ -38,14 +38,6 @@ export class Body extends GameObject {
      * 'rarium', 'legendarium', or 'mythicite'.
      */
     public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
-<<<<<<< HEAD
-
-    /**
-     * The Player that owns and can control this Unit.
-     */
-    public owner?: Player;
-=======
->>>>>>> Fixed synthax errors for ts and removed trailing spaces. Added comments
 
     /**
      * The Player that owns and can control this Body.

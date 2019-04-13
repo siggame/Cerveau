@@ -109,6 +109,7 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
         },
         */
 
+<<<<<<< HEAD
             // <<-- /Creer-Merge: schema -->>
 
             // Base settings
@@ -154,6 +155,52 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
 
         });
     }
+=======
+        // <<-- /Creer-Merge: schema -->>
+
+        // Base settings
+        playerStartingTime: {
+            // <<-- Creer-Merge: player-starting-time -->>
+            default: 12e10, // 1 min in ns
+            // <<-- /Creer-Merge: player-starting-time -->>
+            min: 0,
+            description: "The starting time (in ns) for each player.",
+        },
+
+        // Turn based settings
+        timeAddedPerTurn: {
+            // <<-- Creer-Merge: time-added-per-turn -->>
+            default: 2e9, // 2 sec in ns,
+            // <<-- /Creer-Merge: time-added-per-turn -->>
+            min: 0,
+            description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+        },
+        maxTurns: {
+            // <<-- Creer-Merge: max-turns -->>
+            default: 200,
+            // <<-- /Creer-Merge: max-turns -->>
+            min: 1,
+            description: "The maximum number of turns before the game is force ended and a winner is determined.",
+        },
+
+        // Tiled settings
+        mapWidth: {
+            // <<-- Creer-Merge: map-width -->>
+            default: 51,
+            // <<-- /Creer-Merge: map-width -->>
+            min: 2,
+            description: "The width (in Tiles) for the game map to be initialized to.",
+        },
+        mapHeight: {
+            // <<-- Creer-Merge: map-height -->>
+            default: 29,
+            // <<-- /Creer-Merge: map-height -->>
+            min: 2,
+            description: "The height (in Tiles) for the game map to be initialized to.",
+        },
+
+    });
+>>>>>>> 7b26f6d5ba18c908a7f163271fdfba06b675111e
 
     /**
      * The current values for the game's settings
