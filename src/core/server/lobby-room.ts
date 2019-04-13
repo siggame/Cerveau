@@ -4,7 +4,7 @@ import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
        } from "~/core/game";
 import { logger } from "~/core/logger";
 import { Immutable, removeElements, UnknownObject } from "~/utils";
-import { BaseClient } from "../clients/";
+import { BaseClient, IClientInfo } from "../clients/";
 import { Updater } from "../updater";
 
 /**
@@ -41,7 +41,10 @@ export abstract class Room {
     protected readonly gameSettingsManager: BaseGameSettingsManager;
 
     /** If the game this room is playing has been ran and it is over */
-    private over: boolean = false;
+    private over = false;
+
+    /** The infos about the client once the game is over. */
+    private clientInfos?: IClientInfo[];
 
     /**
      * Creates a room for a lobby to hold clients before they play the game.
@@ -151,12 +154,25 @@ export abstract class Room {
     }
 
     /**
+     * Gets the data about the game, if over
+     *
+     * @returns nothing if not over, otherwise info about the clients.
+     */
+    public getOverData(): undefined | IClientInfo[] {
+        return this.isOver()
+            ? this.clientInfos
+            : undefined;
+    }
+
+    /**
      * Invoked when a sub class knows its game session.
      *
+     * @param clientInfos - A list of information about clients state as the game ended.
      * @returns Once the over event is emitted.
      */
-    protected async handleOver(): Promise<void> {
+    protected async handleOver(clientInfos: Immutable<IClientInfo[]> | undefined): Promise<void> {
         this.clients.length = 0;
+        this.clientInfos = clientInfos as IClientInfo[];
 
         this.events.over.emit();
     }

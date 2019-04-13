@@ -28,14 +28,17 @@ export class SerialRoom extends Room {
             }
             else {
                 // we got the gamelog!
-                await this.cleanUp(data);
+                await this.cleanUp(data.gamelog);
             }
 
             for (const client of this.clients) {
                 events.offAll(client.events);
             }
 
-            this.handleOver();
+            this.handleOver(data instanceof Error
+                ? undefined
+                : data.clientInfos,
+            );
         });
     }
 

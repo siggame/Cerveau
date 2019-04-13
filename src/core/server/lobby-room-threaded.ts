@@ -5,7 +5,7 @@ import { events } from "ts-typed-events";
 import { Config } from "~/core";
 import { Immutable } from "~/utils";
 import { Room } from "./lobby-room";
-import { IWorkerGameSessionData, MessageFromMainThread } from "./worker";
+import { IWorkerGameSessionData, IWorkerOverMessage, MessageFromMainThread } from "./worker";
 
 cluster.setupMaster({
     exec: path.join(__dirname, "worker"),
@@ -94,13 +94,15 @@ export class ThreadedRoom extends Room {
             }
         });
 
+        let overData: IWorkerOverMessage = {};
         // this message should only happen once, when the game is over
-        this.worker.once("message", async (data: { gamelog?: IGamelog }) => {
+        this.worker.once("message", async (data: IWorkerOverMessage) => {
+            overData = data;
             this.cleanUp(data.gamelog);
         });
 
         this.worker.on("exit", () => {
-            this.handleOver();
+            this.handleOver(overData.clientInfos);
         });
     }
 
