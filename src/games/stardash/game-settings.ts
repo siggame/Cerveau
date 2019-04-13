@@ -34,13 +34,13 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         genariumValue: {
             description: "The value of every unit of genarium.",
             // <<-- Creer-Merge: genariumValue -->>
-            default: 1,
+            default: 2,
             // <<-- /Creer-Merge: genariumValue -->>
         },
         legendariumValue: {
             description: "The value of every unit of legendarium.",
             // <<-- Creer-Merge: legendariumValue -->>
-            default: 5,
+            default: 10,
             // <<-- /Creer-Merge: legendariumValue -->>
         },
         maxAsteroid: {
@@ -61,21 +61,21 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             description: "The rate at which miners grab minerals from "
                        + "asteroids.",
             // <<-- Creer-Merge: miningSpeed -->>
-            default: 5,
+            default: 10,
             // <<-- /Creer-Merge: miningSpeed -->>
         },
         mythiciteAmount: {
             description: "The amount of mythicite that spawns at the start of "
                        + "the game.",
             // <<-- Creer-Merge: mythiciteAmount -->>
-            default: 1000,
+            default: 2000,
             // <<-- /Creer-Merge: mythiciteAmount -->>
         },
         orbitsProtected: {
             description: "The number of orbit updates you cannot mine the "
                        + "mithicite asteroid.",
             // <<-- Creer-Merge: orbitsProtected -->>
-            default: 12,
+            default: 20,
             // <<-- /Creer-Merge: orbitsProtected -->>
         },
         oreRarityGenarium: {
@@ -102,13 +102,13 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         planetEnergyCap: {
             description: "The amount of energy a planet can hold at once.",
             // <<-- Creer-Merge: planetEnergyCap -->>
-            default: 20000,
+            default: 5000,
             // <<-- /Creer-Merge: planetEnergyCap -->>
         },
         planetRechargeRate: {
             description: "The amount of energy the planets restore each round.",
             // <<-- Creer-Merge: planetRechargeRate -->>
-            default: 100,
+            default: 50,
             // <<-- /Creer-Merge: planetRechargeRate -->>
         },
         projectileRadius: {
@@ -127,7 +127,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         rariumValue: {
             description: "The value of every unit of rarium.",
             // <<-- Creer-Merge: rariumValue -->>
-            default: 2,
+            default: 5,
             // <<-- /Creer-Merge: rariumValue -->>
         },
         regenerateRate: {
@@ -158,7 +158,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             description: "The number of turns it takes for a asteroid to orbit "
                        + "the sun. (Asteroids move after each players turn).",
             // <<-- Creer-Merge: turnsToOrbit -->>
-            default: 24,
+            default: 40,
             // <<-- /Creer-Merge: turnsToOrbit -->>
         },
         // <<-- Creer-Merge: schema -->>
@@ -193,7 +193,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
         },
         maxTurns: {
             // <<-- Creer-Merge: max-turns -->>
-            default: 204,
+            default: 260,
             // <<-- /Creer-Merge: max-turns -->>
             min: 1,
             description: "The maximum number of turns before the game is force ended and a winner is determined.",

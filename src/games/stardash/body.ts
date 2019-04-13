@@ -9,12 +9,13 @@ import { Player } from "./player";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of celestial body it is.
+ * The type of celestial body it is. Either 'planet', 'asteroid', or 'sun'.
  */
 export type BodyBodyType = "planet" | "asteroid" | "sun";
 
 /**
- * The type of material the celestial body has.
+ * The type of material the celestial body has. Either 'none', 'genarium',
+ * 'rarium', 'legendarium', or 'mythicite'.
  */
 export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
@@ -28,12 +29,13 @@ export class Body extends GameObject {
     public amount!: number;
 
     /**
-     * The type of celestial body it is.
+     * The type of celestial body it is. Either 'planet', 'asteroid', or 'sun'.
      */
     public readonly bodyType!: "planet" | "asteroid" | "sun";
 
     /**
-     * The type of material the celestial body has.
+     * The type of material the celestial body has. Either 'none', 'genarium',
+     * 'rarium', 'legendarium', or 'mythicite'.
      */
     public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 

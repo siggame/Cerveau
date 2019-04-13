@@ -164,7 +164,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         if (player0Value > player1Value) {
             // declare the winners!
             this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[0]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[1]);
+            this.declareLosers(`${reason}: You were worth less than your opponent.`, this.game.players[1]);
 
             // exit the secondary win condition handler.
             return;
@@ -172,7 +172,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         else if (player0Value < player1Value) {
             // declare the winners!
             this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[1]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[0]);
+            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[0]);
 
             // exit the secondary win condition handler.
             return;
@@ -180,7 +180,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         else if (player0Mat > player1Mat) {
             // declare the winners!
             this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[0]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[1]);
+            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[1]);
 
             // exit the secondary win condition handler.
             return;
@@ -188,7 +188,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         else if (player0Mat < player1Mat) {
             // declare the winners!
             this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[1]);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, this.game.players[0]);
+            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[0]);
 
             // exit the secondary win condition handler.
             return;
@@ -345,10 +345,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 }
                 // if it is a friendly ship, recharge it.
                 if (unit.owner === baseA.owner) {
-                    const dif = unit.job.energy - unit.energy + unit.job.shield - unit.shield;
+                    const dif = unit.job.energy - unit.energy;
                     if (dif < baseA.amount) {
                         unit.energy = unit.job.energy;
-                        unit.shield = unit.job.shield;
                         baseA.amount -= dif;
                     }
                 }
@@ -394,6 +393,12 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 continue;
             }
 
+            if (mis.target === null || mis.target === undefined || mis.target.x < 0 || mis.target.y < 0) {
+                mis.x = -100;
+                mis.y = -100;
+                continue;
+            }
+
             // grab the distance between the projectile and it's target
             const distance = Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2));
             // grab the x difference between the projectile and it's target.
@@ -402,9 +407,11 @@ export class StardashGameManager extends BaseClasses.GameManager {
             if (distance !== 0) {
                 // grab the angle difference between the target and the missile.
                 const angle = Math.acos(difX / distance);
+                // set the travel distance
+                const trav  = Math.min(this.game.projectileSpeed, distance);
                 // grab the change in x and y it can achieve.
-                const moveX = Math.abs(this.game.projectileSpeed * Math.cos(angle));
-                const moveY = Math.abs(this.game.projectileSpeed * Math.sin(angle));
+                const moveX = Math.abs(trav * Math.cos(angle));
+                const moveY = Math.abs(trav * Math.sin(angle));
                 // if the target is to the left, move left.
                 if (mis.x > mis.target.x) {
                     mis.x -= moveX;
@@ -435,16 +442,17 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 mis.target.x = -1;
                 mis.target.y = -1;
                 mis.target.energy = -1;
+                console.log("Kill.");
             }
         }
 
         // Properly remove all killed units and ones that collide with the sun.
         const deadUnits = this.game.units.filter((u) => u.x < 0 || u.y < 0 || u.energy < 0 ||
-                          Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius);
+                    Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius + this.game.shipRadius);
 
         // Properly remove all killed units and ones that collide with the sun.
-        const deadProj = this.game.projectiles.filter((u) => u.x < 0 || u.y < 0 || u.fuel < 0 ||
-                          Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius);
+        const deadProj = this.game.projectiles.filter((u) => u.x < 0 || u.y < 0 || u.fuel < 0 || u.target.x < 0 ||
+                    Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius + this.game.projectileRadius);
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {

@@ -49,7 +49,8 @@ export class Player extends GameObject implements IBaseStardashPlayer {
     public readonly opponent!: Player;
 
     /**
-     * Every Projectile owned by this Player.
+     * Every Projectile owned by this Player. The earlier in the list the older
+     * they are.
      */
     public projectiles!: Projectile[];
 
@@ -69,7 +70,8 @@ export class Player extends GameObject implements IBaseStardashPlayer {
     public timeRemaining!: number;
 
     /**
-     * Every Unit owned by this Player.
+     * Every Unit owned by this Player. The earlier in the list the older they
+     * are.
      */
     public units!: Unit[];
 
