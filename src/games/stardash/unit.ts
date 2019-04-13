@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitSafeArgs, IUnitShootDownArgs, IUnitTransferArgs,
+         IUnitProperties, IUnitSafeArgs, IUnitShootdownArgs, IUnitTransferArgs,
        } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
@@ -182,7 +182,7 @@ export class Unit extends GameObject {
         }
 
         // make sure the target is in range.
-        if ((this.job.range + this.game.shipRadius) <= this.distance(this.x, this.y, enemy.x, enemy.y)) {
+        if ((this.job.range + this.game.shipRadius) < this.distance(this.x, this.y, enemy.x, enemy.y)) {
             return `${this} is trying to attack a location which is too far away.`;
         }
 
@@ -334,7 +334,7 @@ export class Unit extends GameObject {
 
         // variables for ease of reference.
         const trav = this.distance(this.x, this.y, x, y);
-        const cost = (trav / this.game.dashDistance) * this.game.dashCost;
+        const cost = Math.ceil(trav / this.game.dashDistance) * this.game.dashCost;
         // make sure the unit can move to that locaiton.
         if (this.energy < cost) {
             return `${this} needs at least ${cost} energy to move ${trav} and it has ${this.energy}.`;
@@ -373,12 +373,16 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: dash -->>
 
+        // calculate  dash distance
+        const dist = Math.sqrt(((this.x - x) ** 2) + ((this.y - y) ** 2));
+
         // Add logic here for dash.
         this.dashX = x;
         this.dashY = y;
         this.isBusy = true;
+        this.acted = true;
         this.moves = 0;
-        this.energy -= this.game.dashCost;
+        this.energy -= this.game.dashCost * ((dist) / this.game.dashDistance);
 
         // return the action was successful.
         return true;
@@ -431,7 +435,7 @@ export class Unit extends GameObject {
         }
 
         // make sure the asteroid is in range.
-        if (this.job.range < this.distance(this.x, this.y, body.x, body.y)) {
+        if (this.job.range + body.radius < this.distance(this.x, this.y, body.x, body.y)) {
             return `${this} is too far away from ${body} to mine!`;
         }
 
@@ -672,7 +676,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Invalidation function for shootDown. Try to find a reason why the passed
+     * Invalidation function for shootdown. Try to find a reason why the passed
      * in parameters are invalid, and return a human readable string telling
      * them why it is invalid.
      *
@@ -682,12 +686,11 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateShootDown(
+    protected invalidateShootdown(
         player: Player,
         missile: Projectile,
-    ): void | string | IUnitShootDownArgs {
-        // <<-- Creer-Merge: invalidate-shootDown -->>
-
+    ): void | string | IUnitShootdownArgs {
+        // <<-- Creer-Merge: invalidate-shootdown -->>
         // check widely consistent things.
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
@@ -701,18 +704,13 @@ export class Unit extends GameObject {
         }
 
         // if the projectile is out of bounds of the map
-        if (missile.x < 0 || missile.x > 3200 || missile.y < 0 || missile.y > 1800) {
+        if (missile.x < 0 || missile.x > this.game.sizeX || missile.y < 0 || missile.y > this.game.sizeY) {
             return `${this} cannot shoot down ${missile} which is out of bounds. Let it go.`;
         }
 
         // if the projectile belongs to the player trying to shoot it down
         if (missile.owner === player) {
             return `${this} is trying to shoot down ${missile} which is an ally.`;
-        }
-
-        // if this unit does not have an owner
-        if (this.owner === undefined || this.owner !== player) {
-            return `${this} either does not belong to you or is undefined.`;
         }
 
         // if this unit has already acted, it may not act again
@@ -735,7 +733,7 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        // <<-- /Creer-Merge: invalidate-shootDown -->>
+        // <<-- /Creer-Merge: invalidate-shootdown -->>
     }
 
     /**
@@ -745,14 +743,13 @@ export class Unit extends GameObject {
      * @param missile - The projectile being shot down.
      * @returns True if successfully attacked, false otherwise.
      */
-    protected async shootDown(
+    protected async shootdown(
         player: Player,
         missile: Projectile,
     ): Promise<boolean> {
-        // <<-- Creer-Merge: shootDown -->>
+        // <<-- Creer-Merge: shootdown -->>
 
         // Add logic here for shootDown.
-
         // damage the missile.
         if (this.job.title === "corvette") {
             missile.energy -= this.job.damage;
@@ -774,7 +771,7 @@ export class Unit extends GameObject {
         // logic has been added
         return true;
 
-        // <<-- /Creer-Merge: shootDown -->>
+        // <<-- /Creer-Merge: shootdown -->>
     }
 
     /**
@@ -786,8 +783,8 @@ export class Unit extends GameObject {
      * @param unit - The unit you are grabbing the resources from.
      * @param amount - The amount of materials to you with to grab. Amounts <=
      * 0 will pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'resource1',
-     * 'resource2', or 'resource3'.
+     * @param material - The material the unit will pick up. 'genarium',
+     * 'rarium', 'legendarium', or 'mythicite'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -848,8 +845,8 @@ export class Unit extends GameObject {
      * @param unit - The unit you are grabbing the resources from.
      * @param amount - The amount of materials to you with to grab. Amounts <=
      * 0 will pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'resource1',
-     * 'resource2', or 'resource3'.
+     * @param material - The material the unit will pick up. 'genarium',
+     * 'rarium', 'legendarium', or 'mythicite'.
      * @returns True if successfully taken, false otherwise.
      */
     protected async transfer(
@@ -967,21 +964,25 @@ export class Unit extends GameObject {
         // grab the distance between the line and the circle at it's closest.
         const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
         if (dist <= minDist) {
+            // grab the two bool for possible infinite line catches
+            const check1 = this.distance(x1, y1, sun.x, sun.y) > length;
+            const check2 = this.distance(x2, y2, sun.x, sun.y) > length;
             // if the sun is within collision distance, but further than the other end point.
-            if (this.distance(x1, y1, sun.x, sun.y) > length) {
+            if (check1) {
                 // if it collides with the other end point.
                 if (this.distance(x2, y2, sun.x, sun.y) < minDist) {
                     return true;
                 }
             }
             // if the sun is within collision distance, but further than the other end point.
-            else if (this.distance(x2, y2, sun.x, sun.y) > length) {
+            if (check2) {
                 // if it collides with the other end point.
                 if (this.distance(x1, y1, sun.x, sun.y) < minDist) {
                     return true;
                 }
             }
-            else {
+            // if neither check is true, then it is a normal collision.
+            if (!check1 && !check2) {
                 return true;
             }
         }

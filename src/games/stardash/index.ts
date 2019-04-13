@@ -77,12 +77,13 @@ export interface IBodyProperties {
     amount?: number;
 
     /**
-     * The type of celestial body it is.
+     * The type of celestial body it is. Either 'planet', 'asteroid', or 'sun'.
      */
     bodyType?: "planet" | "asteroid" | "sun";
 
     /**
-     * The type of material the celestial body has.
+     * The type of material the celestial body has. Either 'none', 'genarium',
+     * 'rarium', 'legendarium', or 'mythicite'.
      */
     materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
@@ -235,7 +236,8 @@ export interface IPlayerProperties {
     opponent?: Player;
 
     /**
-     * Every Projectile owned by this Player.
+     * Every Projectile owned by this Player. The earlier in the list the older
+     * they are.
      */
     projectiles?: Projectile[];
 
@@ -255,7 +257,8 @@ export interface IPlayerProperties {
     timeRemaining?: number;
 
     /**
-     * Every Unit owned by this Player.
+     * Every Unit owned by this Player. The earlier in the list the older they
+     * are.
      */
     units?: Unit[];
 
@@ -467,11 +470,11 @@ export interface IUnitSafeArgs {
 }
 
 /**
- * Argument overrides for Unit's shootDown function. If you return an object of
+ * Argument overrides for Unit's shootdown function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitShootDownArgs {
+export interface IUnitShootdownArgs {
     /**
      * The projectile being shot down.
      */
@@ -494,8 +497,8 @@ export interface IUnitTransferArgs {
      */
     amount?: number;
     /**
-     * The material the unit will pick up. 'resource1', 'resource2', or
-     * 'resource3'.
+     * The material the unit will pick up. 'genarium', 'rarium', 'legendarium',
+     * or 'mythicite'.
      */
     material?: "genarium" | "rarium" | "legendarium" | "mythicite";
 }
@@ -1130,7 +1133,7 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
-                shootDown: {
+                shootdown: {
                     args: [
                         {
                             argName: "missile",
