@@ -408,7 +408,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 // grab the angle difference between the target and the missile.
                 const angle = Math.acos(difX / distance);
                 // set the travel distance
-                const trav  = Math.min(this.game.projectileSpeed, distance);
+                const trav = Math.min(this.game.projectileSpeed, distance);
                 // grab the change in x and y it can achieve.
                 const moveX = Math.abs(trav * Math.cos(angle));
                 const moveY = Math.abs(trav * Math.sin(angle));
@@ -442,7 +442,6 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 mis.target.x = -1;
                 mis.target.y = -1;
                 mis.target.energy = -1;
-                console.log("Kill.");
             }
         }
 
