@@ -293,9 +293,11 @@ export class Body extends GameObject {
         // Check if the player has the resources to spawn the ship
         // Slow solution; proposed: identify input job and check individual cost?
         // Unsure of how to implement above proposal
-        if ((player.money < 75 && (title === "miner" || title === "transport")) ||
-            (player.money < 100 && title === "corvette") || (player.money < 125 &&
-            title === "missileboat") || (player.money < 150 && title === "martyr")) {
+        if ((player.money < this.game.jobs[4].unitCost && title === "miner") || 
+            (player.money < this.game.jobs[3].unitCost && title === "transport")) ||
+            (player.money < this.game.jobs[0].unitCost && title === "corvette") ||
+            (player.money < this.game.jobs[1].unitCost && title === "missileboat") ||
+            (player.money < this.game.jobs[2].unitCost && title === "martyr")) {
             return `You do not have enough resources to spawn this ship.`;
         }
 
