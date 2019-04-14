@@ -629,9 +629,12 @@ export class Unit extends GameObject {
             return `${this} cannot move off the map.`;
         }
 
-        // make sure it isn't dashing through the sun zone
-        if (this.collide(x, y, this.x, this.y)) {
-            return `${this} cannot move to those coordinates due to clipping the sun.`;
+        // grab the sun
+        const sun = this.game.bodies[2];
+
+        // make sure it isn't moving into the sun zone
+        if (this.distance(x, y, sun.x, sun.y) < sun.radius + this.game.shipRadius) {
+            return `${this} cannot move to those coordinates due to landing in the sun.`;
         }
 
         // Check all the arguments for move here and try to
@@ -730,7 +733,7 @@ export class Unit extends GameObject {
         // grab the sun
         const sun = this.game.bodies[2];
 
-        // make sure it isn't dashing through the sun zone
+        // make sure it isn't moving into the sun zone
         if (this.distance(x, y, sun.x, sun.y) < sun.radius + this.game.shipRadius) {
             return false;
         }
