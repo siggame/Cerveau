@@ -149,7 +149,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[1]);
 
             // return that a win result was found.
-            return true;
+            return;
         }
         else if (this.game.players[1].victoryPoints > (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
             // declare the winner!
@@ -157,7 +157,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
 
             // return that a win result was found.
-            return true;
+            return;
         }
         let player0Value = 0;
         let player0Mat = 0;
