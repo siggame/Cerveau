@@ -277,8 +277,6 @@ export class Unit extends GameObject {
                 // set unit's location to out of bounds
                 enemy.x = -1;
                 enemy.y = -1;
-                // track lost mythicite using a secret variable.
-                this.game.lostMythicite += enemy.mythicite;
             }
         }
         else {

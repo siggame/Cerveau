@@ -469,6 +469,10 @@ export class StardashGameManager extends BaseClasses.GameManager {
         const deadProj = this.game.projectiles.filter((u) => u.x < 0 || u.y < 0 || u.fuel < 0 || u.target.x < 0 ||
                     Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius + this.game.projectileRadius);
 
+        // add up destroyed mythicite.
+        for (const unit of deadUnits) {
+            this.game.lostMythicite += unit.mythicite;
+        }
         // remove dead units from all player's units list
         for (const player of this.game.players) {
             removeElements(player.units, ...deadUnits);
