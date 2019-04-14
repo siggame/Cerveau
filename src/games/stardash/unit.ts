@@ -1,7 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitSafeArgs, IUnitShootdownArgs, IUnitTransferArgs,
-       } from "./";
+import { IUnitAttackArgs, IUnitDashArgs, IUnitIsDashableArgs, IUnitMineArgs,
+         IUnitMoveArgs, IUnitProperties, IUnitSafeArgs, IUnitShootdownArgs,
+         IUnitTransferArgs } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -391,6 +391,70 @@ export class Unit extends GameObject {
     }
 
     /**
+     * Invalidation function for isDashable. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateIsDashable(
+        player: Player,
+        x: number,
+        y: number,
+    ): void | string | IUnitIsDashableArgs {
+        // <<-- Creer-Merge: invalidate-isDashable -->>
+
+        // make sure the unit is in bounds.
+        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY) {
+            return `${this} cannot be off of the map.`;
+        }
+
+        // make sure the unit is in bounds.
+        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
+            return `${this} is dead, why do you bother checking?`;
+        }
+
+        // Check all the arguments for isDashable here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-isDashable -->>
+    }
+
+    /**
+     * tells you if your ship can dash to that location from where it is
+     * without clipping the sun.
+     *
+     * @param player - The player that called this.
+     * @param x - The x position of the location you wish to arrive.
+     * @param y - The y position of the location you wish to arrive.
+     * @returns True if pathable by this unit, false otherwise.
+     */
+    protected async isDashable(
+        player: Player,
+        x: number,
+        y: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: isDashable -->>
+
+        // make sure it isn't dashing through the sun zone
+        if (this.collide(x, y, this.x, this.y)) {
+            return false;
+        }
+
+        // return it is dashable
+        return true;
+
+        // <<-- /Creer-Merge: isDashable -->>
+    }
+
+    /**
      * Invalidation function for mine. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
      * why it is invalid.
@@ -648,8 +712,8 @@ export class Unit extends GameObject {
     }
 
     /**
-     * tells you if your ship can move to that location from were it is without
-     * clipping the sun.
+     * tells you if your ship can move to that location from were it is landing
+     * in the sun.
      *
      * @param player - The player that called this.
      * @param x - The x position of the location you wish to arrive.
@@ -663,8 +727,11 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: safe -->>
 
+        // grab the sun
+        const sun = this.game.bodies[2];
+
         // make sure it isn't dashing through the sun zone
-        if (this.collide(x, y, this.x, this.y)) {
+        if (this.distance(x, y, sun.x, sun.y) < sun.radius + this.game.shipRadius) {
             return false;
         }
 
