@@ -509,7 +509,7 @@ export class Unit extends GameObject {
         }
 
         // make sure mining of the mythicite is legal.
-        if (this.game.currentTurn < this.game.orbitsProtected) {
+        if (this.game.currentTurn < this.game.orbitsProtected && body.materialType === "mythicite") {
             return `${this} cannot mine the mythicite yet. It is protected for the first 12 turns.`;
         }
 
