@@ -143,7 +143,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
         // set up trackers for each players value.
-        if (this.game.players[0].victoryPoints > (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
+        if (this.game.players[0].victoryPoints > this.game.players[1].victoryPoints) {
             // declare the winner!
             this.declareWinner("You got the most mythicite!", this.game.players[0]);
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[1]);
@@ -151,7 +151,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // return that a win result was found.
             return;
         }
-        else if (this.game.players[1].victoryPoints > (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
+        else if (this.game.players[1].victoryPoints > this.game.players[0].victoryPoints) {
             // declare the winner!
             this.declareWinner("You got the most mythicite!", this.game.players[1]);
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
@@ -159,9 +159,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // return that a win result was found.
             return;
         }
-        let player0Value = 0;
+        let player0Value = this.game.players[0].money;
         let player0Mat = 0;
-        let player1Value = 0;
+        let player1Value = this.game.players[1].money;
         let player1Mat = 0;
         // add up the value of player 0.
         for (const unit of this.game.players[0].units) {
