@@ -185,8 +185,8 @@ export class Body extends GameObject {
 
         // gets the location of the asteroid at the angle and distance.
         if (this.distance && this.angle) {
-            return this.distance * Math.sin(((this.angle + (num * 360 / this.game.turnsToOrbit)) / 180) * Math.PI) +
-                   this.game.bodies[2].x;
+            return this.distance * Math.cos(((this.angle + 90 + (num * 360 / this.game.turnsToOrbit)) / 180) *
+            Math.PI) + this.game.bodies[2].x;
         }
         else {
             return this.x;
@@ -236,8 +236,8 @@ export class Body extends GameObject {
 
         // gets the location of the asteroid at the angle and distance.
         if (this.distance && this.angle) {
-            return this.distance * Math.cos(((this.angle + (num * 360 / this.game.turnsToOrbit)) / 180) * Math.PI) +
-            this.game.bodies[2].y;
+            return this.distance * Math.sin(((this.angle + 90 + (num * 360 / this.game.turnsToOrbit)) / 180) *
+            Math.PI) + this.game.bodies[2].y;
         }
         else {
             return this.y;
