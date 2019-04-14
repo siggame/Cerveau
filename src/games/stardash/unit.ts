@@ -605,8 +605,7 @@ export class Unit extends GameObject {
 
         // magic code that updates the units grid position.
 
-        // TODO: replace this with actual logic
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: move -->>
     }
