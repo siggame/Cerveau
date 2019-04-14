@@ -6,7 +6,7 @@ import { BaseClient } from "./base-client" ;
 export class WSClient extends BaseClient {
     /** The lark-websocket socket that semi-imitates net.Socket */
     // TODO: document lark-websocket
-    protected socket!: net.Socket & {
+    protected socket?: net.Socket & {
         /** The ACTUAL net.Socket */
         _socket: net.Socket;
 
@@ -41,8 +41,16 @@ export class WSClient extends BaseClient {
      *
      * @returns The net socket used for WS communications.
      */
-    public getNetSocket(): net.Socket {
-        return this.socket._socket;
+    public popNetSocket(): net.Socket | undefined {
+        // NOTE: do not call super, our actual socket is hack-y
+        if (!this.socket) {
+            return;
+        }
+
+        const socket = this.socket._socket;
+        this.socket = undefined;
+
+        return socket;
     }
 
     /**
@@ -51,6 +59,10 @@ export class WSClient extends BaseClient {
      * @returns A boolean indicating if it stopped listening.
      */
     public stopListeningToSocket(): boolean {
+        if (!this.socket) {
+            return false;
+        }
+
         const returned = super.stopListeningToSocket();
         this.socket.pause();
 
@@ -87,7 +99,7 @@ export class WSClient extends BaseClient {
      * @returns A promise that resolves after it sends the data.
      */
     protected async sendRaw(str: string): Promise<void> {
-        if (!this.socket.closed) {
+        if (this.socket && !this.socket.closed) {
             this.socket.send(str);
         }
     }
@@ -96,7 +108,9 @@ export class WSClient extends BaseClient {
      * Invoked when the other end of this socket disconnects
      */
     protected disconnected(): void {
-        this.socket.destroy();
+        if (this.socket) {
+            this.socket.destroy();
+        }
         super.disconnected();
     }
 }

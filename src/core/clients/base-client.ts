@@ -60,7 +60,7 @@ export class BaseClient {
     public isSpectating: boolean = false;
 
     /** The socket this communicates through. */
-    protected socket: net.Socket;
+    protected socket?: net.Socket;
 
     /** The timer we use to see if this client timed out. */
     private readonly timer: {
@@ -131,13 +131,20 @@ export class BaseClient {
     }
 
     /**
-     * Returns the raw net.Socket used by this client, probably for thread
-     * passing. Use with care.
+     * Removes and returns the raw net.Socket used by this client,
+     * probably for thread passing. Use with care.
      *
      * @returns The socket.
      */
-    public getNetSocket(): net.Socket {
-        return this.socket;
+    public popNetSocket(): net.Socket | undefined {
+        if (!this.socket) {
+            return;
+        }
+
+        const socket = this.socket;
+        this.socket = undefined;
+
+        return socket;
     }
 
     /**
@@ -217,7 +224,7 @@ export class BaseClient {
      * @returns A boolean representing if the detachment(s) were successful.
      */
     public stopListeningToSocket(): boolean {
-        if (this.listening) {
+        if (this.listening && this.socket) {
             for (const key of Object.keys(this.listeners)) {
                 this.socket.removeListener(key, this.listeners[key]);
             }
@@ -426,6 +433,10 @@ export class BaseClient {
      * should have data streaming from.
      */
     private listenToSocket(): void {
+        if (!this.socket) {
+            return;
+        }
+
         for (const key of Object.keys(this.listeners)) {
             this.socket.on(key, this.listeners[key]);
         }
