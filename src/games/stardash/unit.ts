@@ -382,7 +382,7 @@ export class Unit extends GameObject {
         this.isBusy = true;
         this.acted = true;
         this.moves = 0;
-        this.energy -= this.game.dashCost * ((dist) / this.game.dashDistance);
+        this.energy -= Math.ceil(this.game.dashCost * ((dist) / this.game.dashDistance));
 
         // return the action was successful.
         return true;

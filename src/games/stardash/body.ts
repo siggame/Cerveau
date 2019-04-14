@@ -343,7 +343,7 @@ export class Body extends GameObject {
 
         if (title === "corvette") {
             // Deduct ship cost from player's balance
-            player.money -= 100;
+            player.money -= this.game.jobs[0].unitCost;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
@@ -356,7 +356,7 @@ export class Body extends GameObject {
         }
         else if (title === "missileboat") {
             // Deduct ship cost from player's balance
-            player.money -= 125;
+            player.money -= this.game.jobs[1].unitCost;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
@@ -369,7 +369,7 @@ export class Body extends GameObject {
         }
         else if (title === "martyr") {
             // Deduct ship cost from player's balance
-            player.money -= 125;
+            player.money -= this.game.jobs[2].unitCost;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
@@ -383,7 +383,7 @@ export class Body extends GameObject {
         }
         else if (title === "transport") {
             // Deduct ship cost from player's balance
-            player.money -= 75;
+            player.money -= this.game.jobs[3].unitCost;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
@@ -396,7 +396,7 @@ export class Body extends GameObject {
         }
         else {
             // Deduct ship cost from player's balance
-            player.money -= 75;
+            player.money -= this.game.jobs[4].unitCost;
             // Adds desired unit to player's unit arsenal
             // Unsure if correct implementation
             unit = this.game.manager.create.unit({
