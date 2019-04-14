@@ -228,6 +228,8 @@ export class StardashGame extends BaseClasses.Game {
         this.createJobs();
 
         this.createMap();
+
+        this.lostMythicite = 0;
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
