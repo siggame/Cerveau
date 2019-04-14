@@ -67,7 +67,7 @@ export class TCPClient extends BaseClient {
         return new Promise((resolve, reject) => {
             super.sendRaw(str);
 
-            if (!this.hasDisconnected()) {
+            if (!this.hasDisconnected() && this.socket) {
                 this.socket.write(str + EOT_CHAR, resolve);
             }
             else {
@@ -80,7 +80,9 @@ export class TCPClient extends BaseClient {
      * Invoked when the other end of this socket disconnects
      */
     protected disconnected(): void {
-        this.socket.destroy();
+        if (this.socket) {
+            this.socket.destroy();
+        }
         super.disconnected();
     }
 }

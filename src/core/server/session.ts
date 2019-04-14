@@ -4,7 +4,7 @@ import { writeFile } from "fs-extra";
 import { join } from "path";
 import { Event, events, Signal } from "ts-typed-events";
 import { Profiler } from "v8-profiler"; // should be safe as it's from @types
-import { BaseClient, BasePlayingClient } from "~/core/clients";
+import { BaseClient, BasePlayingClient, IClientInfo } from "~/core/clients";
 import { Config } from "~/core/config";
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
 import { BaseGame } from "~/core/game/base/base-game";
@@ -17,6 +17,14 @@ import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
 import { filenameFor, getURL, getVisualizerURL } from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/logger";
 import { Immutable, isObjectEmpty, momentString } from "~/utils";
+
+/** Data about when a session ends */
+export interface ISessionEnded {
+    /** The clients as the game ended */
+    clientInfos: Immutable<IClientInfo[]>;
+    /** The gamelog resulting from the game */
+    gamelog: Immutable<IGamelog>;
+}
 
 const TIMEOUT_PADDING = 30 * 1000; // 30 sec padding for internal computations
 
@@ -51,7 +59,7 @@ export class Session {
         gameOver: new Signal(),
 
         /** Emitted once this session is over and we can be deleted. */
-        ended: new Event<Error | Immutable<IGamelog>>(),
+        ended: new Event<Error | ISessionEnded>(),
 
         // -- Events proxies through from AIs in our game -- \\
         aiOrdered: new Event<Immutable<IOrderDelta["data"]>>(),
@@ -258,8 +266,12 @@ ${fatal.message}`,
             logger.warn(`${message} But no gamelog!`);
         }
 
-        this.events.ended.emit(
-            this.fatal || gamelog || new Error("No gamelog!"),
+        this.events.ended.emit(this.fatal || (gamelog
+            ? {
+                gamelog,
+                clientInfos: this.getClientInfos(),
+            }
+            : new Error("No gamelog!")),
         );
     }
 
@@ -383,5 +395,29 @@ ${visualizerURL}
         }
 
         this.end(gamelog);
+    }
+
+    /**
+     * Gets the current client infos for all out clients.
+     *
+     * @returns A new array of client infos for soft client information.
+     */
+    private getClientInfos(): IClientInfo[] {
+        return this.clients.map((client, index) => ({
+            name: client.name,
+            spectating: client.isSpectating,
+
+            ...(client.player
+                ? {
+                    index,
+                    won: client.player.won,
+                    lost: client.player.lost,
+                    reason: client.player.reasonWon || client.player.reasonLost,
+                    disconnected: !client.player.won && client.hasDisconnected() || false,
+                    timedOut: !client.player.won && client.hasTimedOut() || false,
+                }
+                : null
+            ),
+        }));
     }
 }
