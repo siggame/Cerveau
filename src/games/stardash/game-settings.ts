@@ -197,7 +197,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
-                default: 260,
+                default: 220,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description: "The maximum number of turns before the game is force ended and a winner is determined.",
