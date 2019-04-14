@@ -813,6 +813,11 @@ export class Unit extends GameObject {
             return `${this} can't create minerals out of thin space! The target ship doesn't exist.`;
         }
 
+        // make sure you own the unit.
+        if (unit.owner !== player) {
+            return `${this} your opponent won't give you materials.`;
+        }
+
         // Check that target ship is in range
         if (this.distance(this.x, this.y, unit.x, unit.y) > this.job.range) {
             return `${this} is too far away to transfer materials with the target ship!`;
