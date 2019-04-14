@@ -96,7 +96,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // return that a win result was found.
             return true;
         }
-        else if (this.game.players[0].victoryPoints > (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
+        else if (this.game.players[0].victoryPoints > ((this.game.mythiciteAmount - this.game.lostMythicite) / 2)) {
             // declare the winner!
             this.declareWinner("You got the most mythicite!", this.game.players[0]);
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[1]);
@@ -104,7 +104,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // return that a win result was found.
             return true;
         }
-        else if (this.game.players[1].victoryPoints > (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
+        else if (this.game.players[1].victoryPoints > ((this.game.mythiciteAmount - this.game.lostMythicite) / 2)) {
             // declare the winner!
             this.declareWinner("You got the most mythicite!", this.game.players[1]);
             this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
@@ -471,7 +471,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
 
         // add up destroyed mythicite.
         for (const unit of deadUnits) {
-            this.game.lostMythicite += unit.mythicite;
+            this.game.lostMythicite += Math.abs(unit.mythicite);
         }
         // remove dead units from all player's units list
         for (const player of this.game.players) {
