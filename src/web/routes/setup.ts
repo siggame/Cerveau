@@ -79,10 +79,13 @@ export function registerRouteSetup(app: Express): void {
             numPlayers = gameNamespace.GameManager.requiredNumberOfPlayers;
         }
 
-        const session = String(body.session);
-        if (!session || session === "*" || session === "new") {
-            errors.push(`session '${session}' is not valid`);
+        if (typeof body.session !== "string") {
+            errors.push(`session id required`);
         }
+        else if (body.session === "*" || body.session === "new") {
+            errors.push(`session '${body.session}' is a reserved session name`);
+        }
+        const session = String(body.session);
 
         const gameSettings = body.gameSettings;
         if (!gameSettings || !isObject(gameSettings)) {
