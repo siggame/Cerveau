@@ -195,8 +195,9 @@ export class Lobby {
      */
     public setup(data: {
         gameAlias: string;
-        session: string;
         gameSettings: Immutable<UnknownObject>;
+        password?: string;
+        session: string;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -212,11 +213,14 @@ export class Lobby {
         }
 
         // Now get the room
-        // (it will never be an Error because we know the gameName is valid)
         const existingRoom = this.getRoom(
             namespace.gameName,
             data.session,
-        ) as Room | undefined;
+        );
+
+        if (existingRoom instanceof Error) {
+            return existingRoom.message;
+        }
 
         if (existingRoom) {
             return `session ${data.session} is already taken.`;
@@ -226,9 +230,13 @@ export class Lobby {
         const room = this.getOrCreateRoom(
             data.gameAlias,
             data.session,
-        ) as Room;
+        );
 
-        room.addGameSettings(settings);
+        if (typeof room === "string") {
+            // error string, this should not happen but did, pass it upstream
+            return room;
+        }
+
         const rooms = this.rooms.get(namespace.gameName);
 
         if (!rooms) {
@@ -238,6 +246,11 @@ export class Lobby {
         rooms.set(data.session, room);
 
         // if we got here the setup data looks valid, so let's setup the Room.
+
+        room.addGameSettings(settings);
+        if (data.password) {
+            room.password = data.password;
+        }
     }
 
     /**
@@ -544,6 +557,12 @@ ${err}`);
 
         if (typeof room === "string") {
             client.disconnect(room);
+
+            return;
+        }
+
+        if (room.password && room.password !== playData.password) {
+            client.disconnect(`Incorrect password for private room session`);
 
             return;
         }

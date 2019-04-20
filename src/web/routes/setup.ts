@@ -31,6 +31,9 @@ export function registerRouteSetup(app: Express): void {
      * conflict with any other sessions, and clients will need to connect to
      * this id when connecting to the game server after this succeeds.
      * when a game is over, and in status when a game is over.
+     * @apiParam {string} [password] An optional string to password protect
+     * the room setting up. When set all clients connecting must provide this
+     * same password to connect.
      * @apiParam {GameSettings} gameSettings A key/value object of valid game
      * settings for the game. The only **required** gameSettings are
      * `playerNames`.
@@ -63,8 +66,9 @@ export function registerRouteSetup(app: Express): void {
 
         const body = req.body as {
             gameName: unknown;
-            session: unknown;
             gameSettings: unknown;
+            password: unknown;
+            session: unknown;
         };
 
         const errors = [] as string[];
@@ -101,10 +105,21 @@ export function registerRouteSetup(app: Express): void {
             errors.push(`gameSettings.playerNames must be an array of length ${numPlayers}`);
         }
 
-        if (errors.length === 0) {
+        let password: string | undefined;
+        if (body.password) {
+            if (typeof body.password === "string") {
+                password = body.password;
+            }
+            else {
+                errors.push("password must be a string");
+            }
+        }
+
+        if (errors.length === 0 && isObject(gameSettings)) {
             const error = lobby.setup({
                 gameAlias,
-                gameSettings: gameSettings as {}, // if it was not an object an error would be added above
+                gameSettings,
+                password,
                 session,
             });
 
