@@ -13,7 +13,7 @@ import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
 import * as larkWebsocket from "lark-websocket";
-import { capitalize, difference, lowerFirst } from "lodash";
+import { capitalize, difference, lowerFirst, mapKeys } from "lodash";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
@@ -708,6 +708,11 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
                 return `Game settings incorrectly formatted.
 Must be one string in the url parameters format.${footer}`;
             }
+
+            // remove [] from keys for array setting names
+            settings = mapKeys(settings, (value, key) => key.endsWith("[]")
+                ? key.substr(0, key.length - 2)
+                : key);
 
             const validated = gameNamespace.gameSettingsManager.invalidateSettings(settings);
             if (validated instanceof Error) {
