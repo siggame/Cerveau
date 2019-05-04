@@ -256,7 +256,8 @@ table tr:nth-child(odd) {
 
 .toggle:checked + .toggle-label + .collapsible-content-wrapper {
 	opacity: 1;
-	max-height: 30em;
+	max-height: 20em; /* fallback value */
+	max-height: var(--collapsible-height);
 }
 
 /* --- Settings --- */
