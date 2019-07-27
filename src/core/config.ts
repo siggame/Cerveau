@@ -255,7 +255,6 @@ if (args.ARENA_MODE) {
     args.LOG_TO_FILES = true;
     args.GAME_SETTINGS_ENABLED = false;
     args.WEB_ENABLED = false;
-    args.LOAD_EXISTING_GAMELOGS = false;
     args.UPDATER_ENABLED = false;
     args.AUTO_UPDATE = false;
 }
