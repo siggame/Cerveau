@@ -1,6 +1,6 @@
 import { IGamelog } from "@cadre/ts-utils/cadre";
 import { basename } from "path";
-import * as sanitizeFilename from "sanitize-filename";
+import sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";
 import { Immutable, momentString } from "~/utils";
 

@@ -123,7 +123,7 @@ export function unSerialize<T = Serializable>(
 ): T {
     if (isObject(data) && game) {
         const result: UnknownObject = Array.isArray(data)
-            ? []
+            ? [] as {} // numbers are implicitly converted to strings which works, kinda hack-y
             : {};
 
         for (const [ key, value ] of Object.entries(data)) {
@@ -137,7 +137,7 @@ export function unSerialize<T = Serializable>(
             }
         }
 
-        return result as T;
+        return result as unknown as T;
     }
 
     if (dataTypeConverter) {

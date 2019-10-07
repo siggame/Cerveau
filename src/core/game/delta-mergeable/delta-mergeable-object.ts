@@ -17,10 +17,10 @@ export function createObject(args: Readonly<{
     parent?: DeltaMergeable;
     childTypes?: Immutable<TypedObject<ISanitizableType>>;
     childType?: Immutable<ISanitizableType>;
-    transform?: DeltaTransform<object>;
+    transform?: DeltaTransform<UnknownObject>;
 }>): DeltaMergeable<UnknownObject> {
     const deltaMergeables: TypedObject<DeltaMergeable> = {};
-    const container = new DeltaMergeable<object>({
+    const container = new DeltaMergeable<UnknownObject>({
         key: args.key,
         parent: args.parent,
         initialValue: args.initialValue || {},
@@ -42,7 +42,7 @@ export function createObject(args: Readonly<{
             }
 
             return currentValue!;
-        }),
+        }), // TODO: make ts happy about generic object
     });
 
     const proxyObject = new Proxy({}, {

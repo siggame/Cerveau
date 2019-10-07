@@ -51,7 +51,7 @@ export abstract class BaseTile extends BaseGameObject {
      */
     public getAdjacentDirection(
         adjacentTile: BaseTile | undefined,
-    ): string | undefined {
+    ): "North" | "South" | "East" | "West" | undefined {
         if (adjacentTile) {
             for (const direction of TILE_DIRECTIONS) {
                 if (this.getNeighbor(direction) === adjacentTile) {
