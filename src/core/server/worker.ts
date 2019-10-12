@@ -20,14 +20,25 @@ import { Session } from "./session";
  * An interface for the main thread to adhere to, so we can communicate
  * both safely, and robustly.
  */
-export type MessageFromMainThread = { type: "done" } | {
+export type MessageFromMainThread = {
+    /** Done indicating the main thread is done sending clients. */
+    type: "done";
+} | {
+    /** The type indicating a new client socket to inject. */
     type: "client";
+    /** The info about the client to re-construct their Client instance. */
     clientInfo: {
+        /** the name of the class instance in the Clients/ export */
         className: string;
+        /** Their player index, if they are a player. */
         index?: number;
+        /** Their player name */
         name: string;
+        /** The type of client */
         type: string;
+        /** Flag indicating if they are spectating or not. */
         spectating: boolean;
+        /** Flag indicating if they want meta deltas or normal deltas. */
         metaDeltas: boolean;
     };
 };
@@ -46,9 +57,13 @@ export interface IWorkerOverMessage {
 
 /** This interface we expect to be set via the process.env for us. */
 export interface IWorkerGameSessionData {
+    /** Optional debug port to bind to for debugger hooks. */
     mainDebugPort?: number;
+    /** The id of the session we are threading. */
     sessionID: string;
+    /** The game name (id) to create. */
     gameName: string;
+    /** The game settings for this specific game instance to be played. */
     gameSettings: UnknownObject;
 }
 

@@ -17,7 +17,7 @@ export function formatDate(date: Date | string | number | moment.Moment, format:
  * @param args - The arguments to be evaluated, spaces are auto inserted in between in arg
  * @returns whatever resolves from this sketch code.
  */
-export function exec(...args: Array<unknown>): unknown {
+export function exec(...args: unknown[]): unknown {
     args.pop(); // last element is Handlebars stuff we don't care about
 
     if (args.length === 0) {

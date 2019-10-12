@@ -61,7 +61,10 @@ type Serialized =
  */
 export function isGameObjectReference(
     obj: Immutable<UnknownObject>,
-): obj is { id: string } {
+): obj is {
+    /** The ID of this GameObject being referenced. */
+    id: string;
+} {
     return isEmptyExceptFor(obj, "id");
 }
 

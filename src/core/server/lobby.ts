@@ -29,6 +29,12 @@ const RoomClass = Config.SINGLE_THREADED
     ? SerialRoom
     : ThreadedRoom;
 
+/** Play data from a play event validated */
+type ValidatedPlayData = PlayEvent["data"] & {
+    /** The game settings for the play event validated and thus possibly changed. */
+    validGameSettings: UnknownObject;
+};
+
 /*
     Clients connect like this:
     Lobby -> Room -> [new thread] -> Session
@@ -194,9 +200,13 @@ export class Lobby {
      * undefined if no error and the Room was successfully created.
      */
     public setup(data: {
+        /** The game alias to setup, does not need to be the unique name */
         gameAlias: string;
+        /** Key/value pairs of the game settings for said game */
         gameSettings: Immutable<UnknownObject>;
+        /** Optional password to password protect the setup room */
         password?: string;
+        /** Session id string to reserve */
         session: string;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
@@ -351,7 +361,10 @@ export class Lobby {
 
         this.listenerServers.push(listener);
 
-        listener.on("error", (err: Error & { code: string }) => {
+        listener.on("error", (err: Error & {
+            /** Optional error code Node adds to some error events */
+            code?: string;
+        }) => {
             logger.error(err.code !== "EADDRINUSE" // Very common error for devs
                 ? String(err)
                 : `Lobby cannot listen on port ${port} for game connections.
@@ -664,7 +677,7 @@ ${err}`);
      */
     private validatePlayData(
         data?: Readonly<PlayEvent["data"]>,
-    ): string | (PlayEvent["data"] & { validGameSettings: UnknownObject }) {
+    ): string | ValidatedPlayData {
         if (!data) {
             return "Sent 'play' event with no data.";
         }

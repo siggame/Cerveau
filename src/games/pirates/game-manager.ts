@@ -10,8 +10,11 @@ import { Unit } from "./unit";
 
 /** A node on the merchant path-finding stack */
 interface IPath {
+    /** The Tile on this path. */
     tile: Tile;
+    /** Score heuristic */
     g: number;
+    /** Parent Tile node to reconstruct the path. */
     parent: IPath | undefined;
 }
 

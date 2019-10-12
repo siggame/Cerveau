@@ -62,12 +62,13 @@
     "node": ">=9.0.0"
   },
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "npm run js",
     "test": "npm run lint && npm run build:test",
     "build": "npm run build:assets && tsc",
     "build:assets": "copyfiles -u 1 \"src/**/*.hbs\" \"src/**/*.png\" \"src/**/*.css\" dist/",
     "build:test": "tsc --noEmit",
     "build:watch": "npm run build -- --watch",
+    "live": "ts-node -r tsconfig-paths/register src/index.ts",
     "js": "node dist/index.js",
     "clean": "shx rm -rf dist",
     "rebuild": "npm run clean && npm run build",

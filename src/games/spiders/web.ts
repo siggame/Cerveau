@@ -124,7 +124,12 @@ export class Web extends GameObject {
      *
      * @returns True if the web has been snapped (is dead), false otherwise
      */
-    public hasSnapped(): this is Web & { nestA: undefined; nestB: undefined } {
+    public hasSnapped(): this is Web & {
+        /** No nest in this case. */
+        nestA: undefined;
+        /** No nest in this case. */
+        nestB: undefined;
+    } {
         return this.strength === -1;
     }
 
@@ -133,7 +138,12 @@ export class Web extends GameObject {
      *
      * @returns False if the web has been snapped (is dead), True otherwise
      */
-    public hasNotSnapped(): this is Web & { nestA: Nest; nestB: Nest } {
+    public hasNotSnapped(): this is Web & {
+        /** The Nest it is connected to. */
+        nestA: Nest;
+        /** The Nest it is connected to. */
+        nestB: Nest;
+    } {
         return this.strength > -1;
     }
 

@@ -51,10 +51,15 @@ function sanitize(type: Immutable<ISanitizableType>): (
  * @returns A newly created DeltaMergeable instance of the given type.
  */
 export function createDeltaMergeable(args: {
+    /** The key of the DeltaMergeable to create. */
     key: string;
+    /** The type of the DeltaMergeable to create. */
     type: Immutable<ISanitizableType>;
+    /** The child types of this DeltaMergeable. */
     childTypes?: Immutable<TypedObject<ISanitizableType>>;
+    /** The parent DeltaMergable, if none then assumed to be root node. */
     parent?: DeltaMergeable;
+    /** The initial value of this DeltaMergable. */
     initialValue?: any;
 }): DeltaMergeable {
     switch (args.type.typeName) {

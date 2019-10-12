@@ -12,14 +12,24 @@ import { BasePlayer } from "./base-player";
 
 /** Represents an order sent to an AI. */
 interface IOrder {
+    /** The index of the order, used like a unique identifier. */
     // TODO: This should probably be an id in the future,
     // but clients currently only know the numbered index
     index: number;
+
+    /** The name of the function to execute for the order. */
     name: string;
-    args: Array<unknown>; // should be the serialized args
+
+    /** the arguments (in call order) for the function. */
+    args: unknown[]; // should be the serialized args
+
+    /** number of errors encountered for said order. */
     errors: number;
 
+    /** the resolver callback of the Promise for this order. */
     resolve(returned: unknown): void;
+
+    /** the rejector callback of the Promise for this order. */
     reject(err: unknown): void;
 }
 
@@ -90,7 +100,7 @@ export class BaseAIManager {
      */
     public executeOrder(
         name: string,
-        ...unsanitizedArgs: Array<unknown>
+        ...unsanitizedArgs: unknown[]
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const sanitizedArgs = this.gameSanitizer.sanitizeOrderArgs(

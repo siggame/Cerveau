@@ -12,11 +12,20 @@ import { DeltaMergeable, DeltaTransform } from "./delta-mergeable";
  * @returns A new DeltaMergeable wrapping an Object.
  */
 export function createObject(args: Readonly<{
+    /** The key of this DeltaMergeable in its parent */
     key: string;
+    /** The initial value of this object. Used to deep set. */
     initialValue?: any;
+    /** The parent node. If undefined assumed to be the root node. */
     parent?: DeltaMergeable;
+    /** The type of all child values in this object. */
     childTypes?: Immutable<TypedObject<ISanitizableType>>;
+    /** The singular type of all children in this object. */
     childType?: Immutable<ISanitizableType>;
+    /**
+     * The transform function to apply on all sets to this object
+     * so new objects are not created to maintain references
+     */
     transform?: DeltaTransform<UnknownObject>;
 }>): DeltaMergeable<UnknownObject> {
     const deltaMergeables: TypedObject<DeltaMergeable> = {};

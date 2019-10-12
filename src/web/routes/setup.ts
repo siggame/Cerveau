@@ -65,9 +65,13 @@ export function registerRouteSetup(app: Express): void {
         }
 
         const body = req.body as {
+            /** Name of the game to setup. Can technically be loose. */
             gameName: unknown;
+            /** The key/value pairs for the settings about the game. */
             gameSettings: unknown;
+            /** Password required to join this room being set up. */
             password: unknown;
+            /** The id of the session for this room. */
             session: unknown;
         };
 

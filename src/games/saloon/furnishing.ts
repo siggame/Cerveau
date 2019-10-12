@@ -54,6 +54,7 @@ export class Furnishing extends GameObject {
     constructor(
         args: Readonly<IFurnishingProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The Tile to spawn this Furnishing upon. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,

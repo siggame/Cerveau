@@ -12,15 +12,25 @@ import { BasePlayer, IBasePlayerData } from "./base-player";
 
 /** Arguments a game instance will need to initialize. */
 export interface IBaseGameRequiredData {
+    /** The session id this Game is in. */
     sessionID: string;
+    /** The array of clients that are playing this Game. */
     playingClients: Readonly<BasePlayingClient[]>; // clients will mutate
+    /** The root DeltaMergable that represents the entire game structure. */
     rootDeltaMergeable: DeltaMergeable;
+    /** The IDs of the players in this game. */
     playerIDs: Immutable<string[]>;
+    /** The Namespace object used to create new class instances in this Game. */
     namespace: Immutable<IBaseGameNamespace>;
+    /** The delta mergeable schema used to validate all inputs/outputs. */
     schema: Immutable<IBaseGameObjectSchema>;
+    /** The initialized game manager that already has control of the clients. */
     manager: BaseGameManager;
+    /** An event to invoke once this Game has been fully initialized. */
     gameCreated: Event<{
+        /** This game. */
         game: BaseGame;
+        /** The rootDeltaMergeable */
         gameObjectsDeltaMergeable: DeltaMergeable;
     }>;
 }

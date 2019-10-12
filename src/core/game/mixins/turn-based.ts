@@ -27,10 +27,15 @@ export function mixTurnBased<
     TBaseGameObject extends Base.BaseGameObjectConstructor,
     TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
+    /** The AI to extend. */
     AI: TBaseAI;
+    /** The Game to extend. */
     Game: TBaseGame;
+    /** The GameManager to extend. */
     GameManager: TBaseGameManager;
+    /** The GameObject to extend. */
     GameObject: TBaseGameObject;
+    /** The GameSettings to extend. */
     GameSettings: TBaseGameSettings;
 }) {
     /** An AI in the game that has turns to execute. */

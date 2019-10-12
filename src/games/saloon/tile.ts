@@ -137,11 +137,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     public getNeighbors(): Tile[] {
         // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this);
+        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
     }
-
-    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
-    public getNeighbor(direction: string): Tile | undefined;
 
     /**
      * Gets a neighbor in a particular direction
@@ -150,9 +147,9 @@ export class Tile extends GameObject implements BaseTile {
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: string): Tile | undefined {
+    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
         // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction);
+        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
     }
 
     /**

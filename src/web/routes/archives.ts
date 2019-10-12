@@ -19,8 +19,11 @@ export function registerRouteArchives(app: Express): void {
 
     app.get("/archives/:gameName?/:pageStart?/:pageCount?", async (req, res) => {
         const params = req.params as {
+            /** The name of the game. */
             gameName: unknown;
+            /** The start index to grab gamelogs starting at. */
             pageStart: unknown;
+            /** The number of entries to get for this page. */
             pageCount: unknown;
         };
 

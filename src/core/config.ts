@@ -96,7 +96,10 @@ export interface IArgs {
     WORKER_DATA?: Immutable<IWorkerGameSessionData>;
 }
 
-const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
+const parserArgs: Array<[string[], ArgumentOptions & {
+    /** destination key for argument, must be a valid key of the IArgs type */
+    dest: keyof IArgs;
+}]> = [
     [["--port-offset"], {action: "store", dest: "PORT_OFFSET", defaultValue: 0,
         type: "int", help: "port offset for the default port values"}],
 

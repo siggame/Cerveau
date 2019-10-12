@@ -3,6 +3,12 @@ import { Immutable, objectHasProperty, quoteIfString, UnknownObject } from "~/ut
 import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
+/** If failed validation this shape is expected. */
+export interface IInvalidated {
+    /** The human readable string why it is invalid. */
+    invalid: string;
+}
+
 /**
  * A collection of static functions to sanitize inputs from AI clients for the
  * Game.
@@ -26,8 +32,8 @@ export class BaseGameSanitizer {
      */
     public sanitizeOrderArgs(
         aiFunctionName: string,
-        args: Immutable<Array<unknown>>,
-    ): Error | Array<unknown> {
+        args: Immutable<unknown[]>,
+    ): Error | unknown[] {
         const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
         if (!schema) {
             return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
@@ -78,7 +84,7 @@ export class BaseGameSanitizer {
         gameObject: BaseGameObject,
         functionName: string,
         args: Readonly<UnknownObject>,
-    ): Error | Map<string, unknown> | { invalid: string } {
+    ): Error | Map<string, unknown> | IInvalidated {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;

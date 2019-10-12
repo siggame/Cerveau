@@ -1,16 +1,24 @@
 /** A ball to generate around. */
 export interface IBall {
+    /** The x position of the Ball. */
     x: number;
+    /** The y position of the Ball. */
     y: number;
+    /** The radius of the Ball. */
     r: number;
 }
 
 /** A generated ball. */
 export interface IBallGen {
+    /** List of balls being generated. */
     balls: IBall[];
+    /** The elasticity of the ball. */
     gooeyness: number;
+    /** Water threshold for generation. */
     threshold: number;
+    /** Grass threshold. */
     grassThreshold: number;
+    /** Sea threshold. */
     seaThreshold: number;
 }
 

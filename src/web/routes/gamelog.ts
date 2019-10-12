@@ -64,6 +64,7 @@ export function registerRouteGamelog(app: Express): void {
      */
     app.get("/gamelog/:filename", async (req, res) => {
         const params = req.params as {
+            /** The filename tp attempt to get. */
             filename: unknown;
         };
 

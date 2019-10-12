@@ -7,9 +7,13 @@ export type PossibleSettingValue = string | number | boolean | string[];
 
 /** An individual setting in a schema. */
 export interface ISettingsSchema<T extends PossibleSettingValue = PossibleSettingValue> {
+    /** The default value for this setting. */
     readonly default: T;
+    /** The human readable description about what this setting controls. */
     readonly description: string;
+    /** If a number type, this is the minimum value. */
     readonly min?: T extends number ? number : never;
+    /** If a number type, this is the maximum value. */
     readonly max?: T extends number ? number : never;
 }
 
