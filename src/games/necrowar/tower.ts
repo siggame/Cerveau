@@ -95,7 +95,18 @@ export class Tower extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
+        
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+        
+        // Check if tile exists
+        if (!tile) {
+            return `${this}, is trying to act on a tile that doesn't exist`;
+        }
+        
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
 
