@@ -96,11 +96,7 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
-        let range: number = 2.3; // Attack range
         
-        const reason = this.invalidate(player, true);
-        // If there is a reason, return it.
-        if (reason) {
             return reason;
         }
         
@@ -177,6 +173,10 @@ export class Tower extends GameObject {
         if (!found)
         {
             return `${this}, targets have zero health`;
+        }
+        
+        if (this.attcked) {
+            return `${this}, has already attacked this turn`;
         }
         
         // <<-- /Creer-Merge: invalidate-attack -->>
