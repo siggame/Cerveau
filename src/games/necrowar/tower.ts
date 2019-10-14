@@ -115,8 +115,7 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
-        const int range = 2;
-        const float rangeAdjustment = 0.3;
+        const float range = 2.3;
         
         const reason = this.invalidate(player, true);
         // If there is a reason, return it.
@@ -275,15 +274,15 @@ export class Tower extends GameObject {
         }
         
         /*
-         * Shape of the Tower range
-         * _ x x x_ 
-         * x x x x x
-         * x x T x x
-         * x x x x x
-         * _ x x x _
+         * Shape of the Tower range:
+         *         _ x x x _ 
+         *         x x x x x
+         *         x x T x x
+         *         x x x x x
+         *         _ x x x _
          */
         
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y) - rangeAdjustment) {
+        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
             return `${this}, cannot attack because target is out of range`;
         }
         
