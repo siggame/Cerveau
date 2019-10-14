@@ -74,6 +74,25 @@ export class Tower extends GameObject {
     
     // <<-- /Creer-Merge: public-functions -->>
     
+    /*
+     * Returns the distance between the points
+     *
+     * @param x1: the first x coordinate.
+     * @param y1: the first y coordinate.
+     * @param x2: the second x coordinate.
+     * @param y2: the second y coordinate.
+     *
+     * @returns the distance between the points.
+     */
+    private distance(x1: int, y1: int, x2: int, y2: int): number {
+        // grab the differences.
+        const xDif = (x1 - x2);
+        const yDif = (y1 - y2);
+
+        // return the distance.
+        return Math.sqrt((xDif ** 2) + (yDif ** 2));
+    }
+
     /**
      * Invalidation function for attack. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -178,6 +197,8 @@ export class Tower extends GameObject {
         if (this.attcked) {
             return `${this}, has already attacked this turn`;
         }
+        
+        if (range < this.distance(this., this. , tile. , tile.) - 0.1)
         
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
