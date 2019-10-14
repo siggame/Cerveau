@@ -179,6 +179,10 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
+        if (this.attcked) {
+            return `${this}, has already attacked this turn`;
+        }
+        
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
     
