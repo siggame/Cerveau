@@ -115,7 +115,8 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
-        let range: number = 2.3; // Attack range
+        const int range = 2;
+        const float rangeAdjustment = 0.3;
         
         const reason = this.invalidate(player, true);
         // If there is a reason, return it.
@@ -202,7 +203,9 @@ export class Tower extends GameObject {
             return `${this}, has already attacked this turn`;
         }
         
-        if (range < this.distance(this., this. , tile. , tile.) - 0.1)
+        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y) - rangeAdjustment) {
+            return `${this}, cannot attack because target is out of range`;
+        }
         
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
