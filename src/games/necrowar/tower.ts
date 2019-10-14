@@ -274,9 +274,20 @@ export class Tower extends GameObject {
             return `${this}, has already attacked this turn`;
         }
         
+        /*
+         * Shape of the Tower range
+         * _ x x x_ 
+         * x x x x x
+         * x x T x x
+         * x x x x x
+         * _ x x x _
+         */
+        
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y) - rangeAdjustment) {
             return `${this}, cannot attack because target is out of range`;
         }
+        
+        // Notes: 
         
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
