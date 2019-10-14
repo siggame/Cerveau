@@ -96,6 +96,8 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
+        const int range = 2;
+        
         const reason = this.invalidate(player, true);
         // if there is a reason, return it.
         if (reason) {
@@ -105,6 +107,10 @@ export class Tower extends GameObject {
         // Check if tile exists
         if (!tile) {
             return `${this}, is trying to act on a tile that doesn't exist`;
+        }
+        
+        if (this.attcked) {
+            return `${this}, has already attacked this turn`;
         }
         
         // <<-- /Creer-Merge: invalidate-attack -->>
