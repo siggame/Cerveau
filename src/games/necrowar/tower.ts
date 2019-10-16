@@ -195,6 +195,10 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
+        if (!tile.unit) {
+            return `${this}, cannot attack because the tile has no unit`;
+        }
+        
         if (this.attcked) {
             return `${this}, has already attacked this turn`;
         }
