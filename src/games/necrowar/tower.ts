@@ -128,6 +128,10 @@ export class Tower extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         
+        if (!tile.unit) {
+            return `${this}, cannot attack because the tile has no unit`;
+        }
+        
         if (this.attcked) {
             return `${this}, has already attacked this turn`;
         }
