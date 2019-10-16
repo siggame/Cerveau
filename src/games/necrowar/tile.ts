@@ -1,7 +1,8 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties } from "./";
+import { ITileProperties, ITileResArgs } from "./";
 import { GameObject } from "./game-object";
+import { Player } from "./player";
 import { Tower } from "./tower";
 import { Unit } from "./unit";
 
@@ -10,9 +11,10 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
+ * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
+ * 'pathSpawn', or 'workerSpawn').
  */
-export type TileType = "normal" | "path" | "river" | "spawn";
+export type TileType = "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
 
 /**
  * A Tile in the game that makes up the 2D map grid.
@@ -54,6 +56,21 @@ export class Tile extends GameObject implements BaseTile {
     public isWall!: boolean;
 
     /**
+     * The amount of Ghouls on this tile at the moment.
+     */
+    public numOfGhouls!: number;
+
+    /**
+     * The amount of Hell Hounds on this tile at the moment.
+     */
+    public numOfHounds!: number;
+
+    /**
+     * The amount of animated zombies on this tile at the moment.
+     */
+    public numOfZombies!: number;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -83,9 +100,10 @@ export class Tile extends GameObject implements BaseTile {
     public tower?: Tower;
 
     /**
-     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
+     * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
+     * 'pathSpawn', or 'workerSpawn').
      */
-    public readonly type!: "normal" | "path" | "river" | "spawn";
+    public readonly type!: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
 
     /**
      * The Unit on this Tile if present, otherwise undefined.
@@ -135,6 +153,51 @@ export class Tile extends GameObject implements BaseTile {
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for res. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param number - Number of zombies on the tile that are being
+     * resurrected.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateRes(
+        player: Player,
+        number: number,
+    ): void | string | ITileResArgs {
+        // <<-- Creer-Merge: invalidate-res -->>
+
+        // Check all the arguments for res here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-res -->>
+    }
+
+    /**
+     * Resurrect the corpses on this tile into zombies.
+     *
+     * @param player - The player that called this.
+     * @param number - Number of zombies on the tile that are being
+     * resurrected.
+     * @returns True if Unit was created successfully, false otherwise.
+     */
+    protected async res(player: Player, number: number): Promise<boolean> {
+        // <<-- Creer-Merge: res -->>
+
+        // Add logic here for res.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: res -->>
+    }
 
     /**
      * Gets the adjacent direction between this Tile and an adjacent Tile

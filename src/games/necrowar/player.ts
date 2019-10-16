@@ -1,7 +1,9 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseNecrowarPlayer } from "./";
+import { IBaseNecrowarPlayer, IPlayerSpawnUnitArgs, IPlayerSpawnWorkerArgs,
+       } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
+import { Player } from "./player";
 import { Tile } from "./tile";
 import { Tower } from "./tower";
 import { Unit } from "./unit";
@@ -29,12 +31,12 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
     public gold!: number;
 
     /**
-     * The amount of health remaining for this player's main unit.
+     * The amount of health remaining for this player's Castle.
      */
     public health!: number;
 
     /**
-     * The tile that the home base is located on.
+     * The tiles that the home base is located on.
      */
     public homeBase!: Tile[];
 
@@ -126,6 +128,100 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for spawnUnit. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param type - What type of Unit to create (ghoul, hound, abomination,
+     * wraith, or horseman).
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnUnit(
+        player: Player,
+        type: "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
+    ): void | string | IPlayerSpawnUnitArgs {
+        // <<-- Creer-Merge: invalidate-spawnUnit -->>
+
+        // Check all the arguments for spawnUnit here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-spawnUnit -->>
+    }
+
+    /**
+     * Spawn a fighting Unit on this player's path spawn tile.
+     *
+     * @param player - The player that called this.
+     * @param type - What type of Unit to create (ghoul, hound, abomination,
+     * wraith, or horseman).
+     * @returns True if Unit was created successfully, false otherwise.
+     */
+    protected async spawnUnit(
+        player: Player,
+        type: "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: spawnUnit -->>
+
+        // Add logic here for spawnUnit.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: spawnUnit -->>
+    }
+
+    /**
+     * Invalidation function for spawnWorker. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param type - What type of Unit to create (worker, zombie, ghoul).
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnWorker(
+        player: Player,
+        type: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
+    ): void | string | IPlayerSpawnWorkerArgs {
+        // <<-- Creer-Merge: invalidate-spawnWorker -->>
+
+        // Check all the arguments for spawnWorker here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-spawnWorker -->>
+    }
+
+    /**
+     * Spawn a worker Unit on this player's worker spawn tile.
+     *
+     * @param player - The player that called this.
+     * @param type - What type of Unit to create (worker, zombie, ghoul).
+     * @returns True if Unit was created successfully, false otherwise.
+     */
+    protected async spawnWorker(
+        player: Player,
+        type: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: spawnWorker -->>
+
+        // Add logic here for spawnWorker.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: spawnWorker -->>
+    }
 
     // <<-- Creer-Merge: protected-private-functions -->>
 

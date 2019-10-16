@@ -89,12 +89,12 @@ export interface IPlayerProperties {
     gold?: number;
 
     /**
-     * The amount of health remaining for this player's main unit.
+     * The amount of health remaining for this player's Castle.
      */
     health?: number;
 
     /**
-     * The tile that the home base is located on.
+     * The tiles that the home base is located on.
      */
     homeBase?: Tile[];
 
@@ -155,6 +155,31 @@ export interface IPlayerProperties {
 
 }
 
+/**
+ * Argument overrides for Player's spawnUnit function. If you return an object
+ * of this interface from the invalidate functions, the value(s) you set will
+ * be used in the actual function.
+ */
+export interface IPlayerSpawnUnitArgs {
+    /**
+     * What type of Unit to create (ghoul, hound, abomination, wraith, or
+     * horseman).
+     */
+    type?: "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
+}
+
+/**
+ * Argument overrides for Player's spawnWorker function. If you return an
+ * object of this interface from the invalidate functions, the value(s) you set
+ * will be used in the actual function.
+ */
+export interface IPlayerSpawnWorkerArgs {
+    /**
+     * What type of Unit to create (worker, zombie, ghoul).
+     */
+    type?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
+}
+
 /** All the possible properties for an Tile. */
 export interface ITileProperties {
     /**
@@ -193,6 +218,21 @@ export interface ITileProperties {
     isWall?: boolean;
 
     /**
+     * The amount of Ghouls on this tile at the moment.
+     */
+    numOfGhouls?: number;
+
+    /**
+     * The amount of Hell Hounds on this tile at the moment.
+     */
+    numOfHounds?: number;
+
+    /**
+     * The amount of animated zombies on this tile at the moment.
+     */
+    numOfZombies?: number;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -222,9 +262,10 @@ export interface ITileProperties {
     tower?: Tower;
 
     /**
-     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
+     * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
+     * 'pathSpawn', or 'workerSpawn').
      */
-    type?: "normal" | "path" | "river" | "spawn";
+    type?: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
 
     /**
      * The Unit on this Tile if present, otherwise undefined.
@@ -241,6 +282,18 @@ export interface ITileProperties {
      */
     y?: number;
 
+}
+
+/**
+ * Argument overrides for Tile's res function. If you return an object of this
+ * interface from the invalidate functions, the value(s) you set will be used
+ * in the actual function.
+ */
+export interface ITileResArgs {
+    /**
+     * Number of zombies on the tile that are being resurrected.
+     */
+    number?: number;
 }
 
 /** All the possible properties for an Tower. */
@@ -845,6 +898,34 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
+                spawnUnit: {
+                    args: [
+                        {
+                            argName: "type",
+                            typeName: "string",
+                            defaultValue: "ghoul",
+                            literals: ["ghoul", "hound", "abomination", "wraith", "horseman"],
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                spawnWorker: {
+                    args: [
+                        {
+                            argName: "type",
+                            typeName: "string",
+                            defaultValue: "worker",
+                            literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
             },
         },
         Tile: {
@@ -870,6 +951,15 @@ export const Namespace = makeNamespace({
                 },
                 isWall: {
                     typeName: "boolean",
+                },
+                numOfGhouls: {
+                    typeName: "int",
+                },
+                numOfHounds: {
+                    typeName: "int",
+                },
+                numOfZombies: {
+                    typeName: "int",
                 },
                 tileEast: {
                     typeName: "gameObject",
@@ -899,7 +989,7 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "normal",
-                    literals: ["normal", "path", "river", "spawn"],
+                    literals: ["normal", "path", "river", "mine", "castle", "pathSpawn", "workerSpawn"],
                 },
                 unit: {
                     typeName: "gameObject",
@@ -914,6 +1004,18 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
+                res: {
+                    args: [
+                        {
+                            argName: "number",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
             },
         },
         Tower: {
