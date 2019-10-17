@@ -145,6 +145,12 @@ export class NecrowarGame extends BaseClasses.Game {
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
+        
+        this.createUJobs();
+        
+        this.createTJobs();
+        
+        this.createMap();
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -171,6 +177,18 @@ export class NecrowarGame extends BaseClasses.Game {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
+    /** Creates all unit types in the game */
+    private createUJobs(): void {
+        
+    }
+    
+    private createTJobs(): void {
+        
+    }
 
+    private createMap(): void {
+        
+    }
+    
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
