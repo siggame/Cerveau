@@ -500,6 +500,11 @@ export interface ItJobProperties {
      */
     title?: "arrow" | "aoe" | "ballista" | "cleansing";
 
+    /**
+     * How many turns this tower type needs to take between attacks.
+     */
+    turnsBetweenAttacks?: number;
+
 }
 
 /** All the possible properties for an uJob. */
@@ -508,11 +513,6 @@ export interface IuJobProperties {
      * The amount of damage this type does per attack.
      */
     damage?: number;
-
-    /**
-     * Amount of damage this type does against towers on a given turn.
-     */
-    damageVsTowers?: number;
 
     /**
      * How much does this type cost in gold.
@@ -720,9 +720,6 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
                 islandIncomePerUnit: {
-                    typeName: "int",
-                },
-                islandUnitCap: {
                     typeName: "int",
                 },
                 manaIncomePerUnit: {
@@ -1202,6 +1199,9 @@ export const Namespace = makeNamespace({
                     defaultValue: "arrow",
                     literals: ["arrow", "aoe", "ballista", "cleansing"],
                 },
+                turnsBetweenAttacks: {
+                    typeName: "int",
+                },
             },
             functions: {
             },
@@ -1210,9 +1210,6 @@ export const Namespace = makeNamespace({
             parentClassName: "GameObject",
             attributes: {
                 damage: {
-                    typeName: "int",
-                },
-                damageVsTowers: {
                     typeName: "int",
                 },
                 goldCost: {
