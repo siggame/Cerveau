@@ -247,7 +247,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Enters a mine and is put to work gathering resources.
+     * Enters an empty mine tile and is put to work gathering resources.
      *
      * @param player - The player that called this.
      * @param tile - The tile the mine is located on.

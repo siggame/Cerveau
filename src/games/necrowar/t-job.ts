@@ -76,6 +76,11 @@ export class tJob extends GameObject {
      */
     public readonly title!: "arrow" | "aoe" | "ballista" | "cleansing";
 
+    /**
+     * How many turns this tower type needs to take between attacks.
+     */
+    public readonly turnsBetweenAttacks!: number;
+
     // <<-- Creer-Merge: attributes -->>
 
     // Any additional member attributes can go here
