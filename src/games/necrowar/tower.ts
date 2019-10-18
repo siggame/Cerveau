@@ -233,6 +233,10 @@ export class Tower extends GameObject {
      */
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
+
+        // Add logic here for attack.
+
+        // TODO: replace this with actual logic
         
         /*
          * Damage That Towers Do To Units
