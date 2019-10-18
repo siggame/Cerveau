@@ -167,6 +167,14 @@ export class Tower extends GameObject {
         // Add logic here for attack.
 
         // TODO: replace this with actual logic
+        
+        /*
+         * Damage That Towers Do To Units
+         * Castle | Arrow | Ballista | Cleansing | AOE
+         * -------+-------+----------+-----------+-----
+         *    5   |   5   |    20    |     5     |  3
+         */
+        
         return false;
 
         // <<-- /Creer-Merge: attack -->>
