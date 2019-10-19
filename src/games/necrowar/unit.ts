@@ -238,6 +238,38 @@ export class Unit extends GameObject {
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
 
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+
+        // make sure tile exists
+        if (!tile) {
+            return `Tile does not exist`;
+        }
+
+        // make sure tile is goldmine 
+        if (!tile.isGoldMine && !tile.isIslandGoldMine) {
+            return `${tile} must be a gold mine!`;
+        }
+
+        // make sure unit is a worker
+        if (this.uJob.title !== "worker") {
+            return `${this} must be a worker`;
+        }
+
+        // make sure unit is on gold mine
+        if (!(this.tile === tile)) {
+            return `${this} must be on a gold mine to mine!`;
+        }
+
+        // make sure unit has not acted
+        if (this.acted) {
+            return `${this} has already acted!`;
+        }
+
+
         // Check all the arguments for mine here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -257,10 +289,24 @@ export class Unit extends GameObject {
     protected async mine(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
 
-        // Add logic here for mine.
+        let goldGain = 0;
 
-        // TODO: replace this with actual logic
-        return false;
+        // Assign Gold gain based on mine type
+        if (this.tile.isIslandGoldMine) {
+            // Is island Gold Mine
+            goldGain = this.game.islandIncomePerUnit;
+        }
+        else {
+            // Is Normal Gold Mine
+            goldGain = this.game.goldIncomePerUnit;
+        }
+        // Give gold to player
+        this.owner.gold += goldGain;
+
+        // Unit has acted
+        this.acted = true;
+
+        return true;
 
         // <<-- /Creer-Merge: mine -->>
     }
