@@ -1,6 +1,6 @@
 {
   "name": "cerveau",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "The Node.js implementation of a multi-game server intended for games with AIs within the Cadre framework.",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@cadre/ts-utils": "1.0.5",
+    "@cadre/ts-utils": "1.1.0",
     "@types/argparse": "1.0.36",
     "@types/body-parser": "1.17.1",
     "@types/chess.js": "0.10.0",

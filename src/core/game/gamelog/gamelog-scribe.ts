@@ -37,6 +37,7 @@ export class GamelogScribe {
         private readonly deltaManager: DeltaManager,
     ) {
         this.gamelog = {
+            gamelogVersion: "2.1.0",
             gameName: game.name,
             gameSession: game.session,
             constants: SHARED_CONSTANTS,
