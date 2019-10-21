@@ -149,7 +149,7 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target is out of range`;
         }
         
-        var types: Array<string> = ['Castle', 'Arrow', 'Ballista', 'Cleansing', 'AOE'];
+        var types: Array<string> = ["castle", "arrow", "ballista", "cleansing", "aoe"];
         if (types.indexOf(this.type.title) < 0) {
             return `${this}, has an unknown type`;
         }
