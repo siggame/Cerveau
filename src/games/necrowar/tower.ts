@@ -128,7 +128,7 @@ export class Tower extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         
-        if (!tile.unit) {
+        if (tile.units.length < 1) {
             return `${this}, cannot attack because the tile has no unit`;
         }
         
@@ -159,7 +159,7 @@ export class Tower extends GameObject {
             return `${this}, has zero health`;
         }
         
-        if (this.tile.unit.health < 1)
+        if (this.tile.units.health < 1)
         {
             return `${this}, target has zero health`;
         }
@@ -188,7 +188,24 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
         
-        tile.unit.health = Math.max(0, tile.unit.health - this.type.damage);
+        if (this.type.title === "aoe")
+        {
+            for (int i = 0; i < tile.units.length)
+            {
+                tile.units[i].health = Math.max(0, tile.units.health - this.type.damage);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < tile.units.length)
+            {
+                if (0 < tile.units[i].health)
+                {
+                    tile.units[i].health = Math.max(0, tile.units.health - this.type.damage);
+                }
+                break;
+            }
+        }
         
         // Increment corpes
         // Remove the unit from the list
