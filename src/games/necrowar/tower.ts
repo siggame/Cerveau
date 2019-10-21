@@ -149,6 +149,11 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target is out of range`;
         }
         
+        var types: Array<string> = ['Castle', 'Arrow', 'Ballista', 'Cleansing', 'AOE'];
+        if(types.indexOf(this.type.title) < 0) {
+            return `${this}, has an unknown type`;
+        }
+        
         // Notes: 
         
         // <<-- /Creer-Merge: invalidate-attack -->>
@@ -182,7 +187,7 @@ export class Tower extends GameObject {
         damageMap.set("Cleansing", 5);
         damageMap.set("AOE", 3);
         
-        int damage = damageMap.get(this.type);
+        int damage = this.type.damage;
         
         tile.unit.health = Math.max(0, tile.unit.health - damage);
         
