@@ -175,7 +175,14 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
         
-        int damage = 0;
+        let damageMap = new Map<string, number>();
+        damageMap.set("Castle", 5);
+        damageMap.set("Arrow", 5);
+        damageMap.set("Ballista", 20);
+        damageMap.set("Cleansing", 5);
+        damageMap.set("AOE", 3);
+        
+        int damage = damageMap.get(this.type);
         
         tile.unit.health = Math.max(0, tile.unit.health - damage);
         
