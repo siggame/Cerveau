@@ -190,6 +190,9 @@ export class Tower extends GameObject {
         
         tile.unit.health = Math.max(0, tile.unit.health - this.type.damage);
         
+        // Increment corpes
+        // Remove the unit from the list
+        
         return true;
 
         // <<-- /Creer-Merge: attack -->>
