@@ -117,6 +117,9 @@ export class Tower extends GameObject {
         
         const float range = 2.3;
         
+        const reason = this.invalidate(player, true);
+        // If there is a reason, return it.
+        if (reason) {
             return reason;
         }
         
