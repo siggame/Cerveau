@@ -355,8 +355,18 @@ export class Tower extends GameObject {
         }
         
         var types: Array<string> = ['Castle', 'Arrow', 'Ballista', 'Cleansing', 'AOE'];
-        if(types.indexOf(this.type.title) < 0) {
+        if (types.indexOf(this.type.title) < 0) {
             return `${this}, has an unknown type`;
+        }
+        
+        if (this.health < 1)
+        {
+            return `${this}, has zero health`;
+        }
+        
+        if (this.tile.unit.health < 1)
+        {
+            return `${this}, target has zero health`;
         }
         
         // Notes: 
@@ -375,8 +385,6 @@ export class Tower extends GameObject {
         // <<-- Creer-Merge: attack -->>
 
         // Add logic here for attack.
-
-        // TODO: replace this with actual logic
         
         /*
          * Damage That Towers Do To Units
