@@ -333,7 +333,7 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
-        if (!tile.unit) {
+        if (tile.units.length < 1) {
             return `${this}, cannot attack because the tile has no unit`;
         }
         
@@ -364,7 +364,7 @@ export class Tower extends GameObject {
             return `${this}, has zero health`;
         }
         
-        if (this.tile.unit.health < 1)
+        if (this.tile.units.health < 1)
         {
             return `${this}, target has zero health`;
         }
