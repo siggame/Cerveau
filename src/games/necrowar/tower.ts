@@ -307,6 +307,9 @@ export class Tower extends GameObject {
             }
         }
         
+        // Increment corpes
+        // Remove the unit from the list
+        
         return true;
         
         // <<-- /Creer-Merge: attack -->>
