@@ -478,6 +478,7 @@ export class Tower extends GameObject {
         
         // Increment corpes
         // Remove the unit from the list
+        // Remove unit from game.untis, iterterate
         
         return true;
         
