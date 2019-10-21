@@ -118,7 +118,7 @@ export class Tower extends GameObject {
         const float range = 2.3;
         
         const reason = this.invalidate(player, true);
-        // if there is a reason, return it.
+        // If there is a reason, return it.
         if (reason) {
             return reason;
         }
@@ -175,7 +175,12 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
         
-        return false;
+        int damage = 0;
+        
+        tile.unit.health = Math.max(0, tile.unit.health - damage);
+        
+        
+        return true;
 
         // <<-- /Creer-Merge: attack -->>
     }
