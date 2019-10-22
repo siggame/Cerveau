@@ -268,6 +268,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: false,
+<<<<<<< HEAD
                 damage: 5,
             }),
 
@@ -294,6 +295,34 @@ export class NecrowarGame extends BaseClasses.Game {
             }),
 
             this.manager.create.tJob({
+=======
+                damage 5,
+            }),
+
+            this.manager.create.tJob({
+                title: "ballista",
+                goldCost: 75,
+                manaCost: 0,
+                health: 30,
+                range: 3,
+                turnsBetweenAttacks: 3,
+                allUnits: false,
+                damage 20,
+            }),
+
+            this.manager.create.tJob({
+                title: "cleansing",
+                goldCost: 30,
+                manaCost: 30,
+                health: 30,
+                range: 3,
+                turnsBetweenAttacks: 1,
+                allUnits: false,
+                damage 5,
+            }),
+
+            this.manager.create.tJob({
+>>>>>>> filled in functions that create tJobs and uJobs
                 title: "aoe",
                 goldCost: 40,
                 manaCost: 15,
@@ -301,7 +330,11 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: true,
+<<<<<<< HEAD
                 damage: 3,
+=======
+                damage 3,
+>>>>>>> filled in functions that create tJobs and uJobs
             }),
         );
     }
