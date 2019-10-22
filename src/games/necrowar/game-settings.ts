@@ -42,13 +42,6 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 default: 0,
                 // <<-- /Creer-Merge: manaIncomePerUnit -->>
             },
-            mineUnitCap: {
-                description: "The maximum number of workers that can occupy a "
-                           + "mine at a given time.",
-                // <<-- Creer-Merge: mineUnitCap -->>
-                default: 0,
-                // <<-- /Creer-Merge: mineUnitCap -->>
-            },
             riverPhase: {
                 description: "The amount of turns it takes between the river "
                            + "changing phases.",
