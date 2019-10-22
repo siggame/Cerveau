@@ -268,7 +268,7 @@ export interface ITileProperties {
     type?: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
 
     /**
-     * The Unit on this Tile if present, otherwise undefined.
+     * The list of Units on this Tile if present, otherwise undefined.
      */
     unit?: Unit;
 
@@ -444,36 +444,6 @@ export interface ItJobProperties {
      * a time (false).
      */
     allUnits?: boolean;
-
-    /**
-     * The amount of damage this type does per attack against abominations.
-     */
-    damageVsAbomination?: number;
-
-    /**
-     * The amount of damage this type does per attack against ghouls.
-     */
-    damageVsGhoul?: number;
-
-    /**
-     * The amount of damage this type does per attack against horseman.
-     */
-    damageVsHorseman?: number;
-
-    /**
-     * The amount of damage this type does per attack against hounds.
-     */
-    damageVsHound?: number;
-
-    /**
-     * The amount of damage this type does per attack against wraiths.
-     */
-    damageVsWraith?: number;
-
-    /**
-     * The amount of damage this type does per attack against zombies.
-     */
-    damageVsZombie?: number;
 
     /**
      * How much does this type cost in gold.
@@ -732,9 +702,6 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
                 maxTurns: {
-                    typeName: "int",
-                },
-                mineUnitCap: {
                     typeName: "int",
                 },
                 players: {
@@ -1163,24 +1130,6 @@ export const Namespace = makeNamespace({
             attributes: {
                 allUnits: {
                     typeName: "boolean",
-                },
-                damageVsAbomination: {
-                    typeName: "int",
-                },
-                damageVsGhoul: {
-                    typeName: "int",
-                },
-                damageVsHorseman: {
-                    typeName: "int",
-                },
-                damageVsHound: {
-                    typeName: "int",
-                },
-                damageVsWraith: {
-                    typeName: "int",
-                },
-                damageVsZombie: {
-                    typeName: "int",
                 },
                 goldCost: {
                     typeName: "int",

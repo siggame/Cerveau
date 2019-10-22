@@ -72,11 +72,6 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly maxTurns!: number;
 
     /**
-     * The maximum number of workers that can occupy a mine at a given time.
-     */
-    public readonly mineUnitCap!: number;
-
-    /**
      * List of all the players in the game.
      */
     public players!: Player[];
