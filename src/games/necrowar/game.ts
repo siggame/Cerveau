@@ -174,11 +174,109 @@ export class NecrowarGame extends BaseClasses.Game {
     // Any additional protected or pirate methods can go here.
     /** Creates all unit types in the game */
     private createUJobs(): void {
-        
+        // pushes all unit types
+        this.uJobs.push(
+            this.manager.create.uJob({
+                title: "worker",
+                goldCost: 10,
+                manaCost: 0,
+                damage: 0,
+                health: 1,
+                moves: 10,
+                range: 1,
+                perTile: 1,
+            }),
+
+            this.manager.create.uJob({
+                title: "zombie",
+                goldCost: 0,
+                manaCost: 2,
+                damage: 1,
+                health: 5,
+                moves: 10,
+                range: 1,
+                perTile: 10,
+            }),
+
+            this.manager.create.uJob({
+                title: "ghoul",
+                goldCost: 20,
+                manaCost: 5,
+                damage: 5,
+                health: 15,
+                moves: 10,
+                range: 1,
+                perTile: 2,
+            }),
+
+            this.manager.create.uJob({
+                title: "abomination",
+                goldCost: 25,
+                manaCost: 10,
+                damage: 10,
+                health: 60,
+                moves: 10,
+                range: 1,
+                perTile: 1,
+            }),
+
+            this.manager.create.uJob({
+                title: "hound",
+                goldCost: 15,
+                manaCost: 4,
+                damage: 10,
+                health: 5,
+                moves: 10,
+                range: 1,
+                perTile: 3,
+            }),
+
+            this.manager.create.uJob({
+                title: "wraith",
+                goldCost: 40,
+                manaCost: 20,
+                damage: 10,
+                health: 10,
+                moves: 10,
+                range: 1,
+                perTile: 1,
+            }),
+
+            this.manager.create.uJob({
+                title: "horseman",
+                goldCost: 150,
+                manaCost: 50,
+                damage: 10,
+                health: 75,
+                moves: 10,
+                range: 1,
+                perTile: 1,
+            }),
+
+        );
     }
     
     private createTJobs(): void {
-        
+        // pushes all tower types
+        this.tJobs.push(
+            this.manager.create.tJob({
+                title: ,
+                goldCost: ,
+                manaCost: ,
+                health: ,
+                range: ,
+                turnsBetweenAttacks: ,
+                allUnits: ,
+                damageVsZombie: ,
+                damageVsGhoul: ,
+                damageVsHound: ,
+                damageVsAbomination: ,
+                damageVsWraith: ,
+                damageVsHorseman: ,
+            }),
+
+
+        );
     }
 
     private createMap(): void {
