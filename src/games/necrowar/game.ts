@@ -10,6 +10,7 @@ import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { IPoint, Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -316,8 +317,89 @@ export class NecrowarGame extends BaseClasses.Game {
         );
     }
 
+    /**
+     * Generates the map
+     */
     private createMap(): void {
+        /**
+         * Utility function to get a mutable tile at a given (x, y).
+         *
+         * NOTE: This is a closure function. It is a function we create while
+         * running createMap(), and it wraps the current scope, so that `this`
+         * refers to the Game running `createMap()`, even though the game was
+         * not passed.
+         * @param x - The x coordinate. If off map throws an Error.
+         * @param y - The y coordinate. If off map throws an Error.
+         * @returns A Tile that is mutable JUST for this function scope.
+         */
+        const getMutableTile = (x: number, y: number): Mutable<Tile> => {
+            const tile = this.getTile(x, y);
+            if (!tile) {
+                throw new Error(`Cannot get a tile for map generation at (${x}, ${y})`);
+            }
+
+            return tile;
+        };
+
+        //Cover a whole side in grass tiles
+        for (let x = 0; x < (this.mapWidth / 2 - 3); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {        
+                getMutableTile(x, y).isGrass = true;
+            }
+        }
+
+        //Cover the middle stripe in river tiles
+        for (let x = (this.mapWidth / 2 - 2); x < (this.mapWidth / 2 + 2); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                getMutableTile(x, y).isRiver = true;
+            }
+        }
+
+        //Create the paths going around the map
+        for (let x = 0; x < (this.mapWidth / 2); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if (((y === (this.mapHeight - 5)) && (x > 5)) ||
+                ((y === 5) && (x > 10)) ||
+                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 5))) {
+                    getMutableTile(x, y).isPath = true;
+                }
+            }
+        }
         
+        //Create the extra paths surrounding the castle location
+        getMutableTile(7, 7).isPath = true;
+        getMutableTile(7, 6).isPath = true;
+        getMutableTile(7, 5).isPath = true;
+
+        //Place castle
+        getMutableTile(6, 6).isCastle = true;
+
+        //Place gold mine tiles
+
+
+        //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
+
+
+        //Generate Island
+        //Make a Square of river in the center of the map, the "lake"
+        for (let x = (this.mapWidth / 2 - 2); x <= (this.mapWidth / 2 + 2): x++) {
+            for (let y = (this.mapHeight / 2 - 2); y < (this.mapHeight / 2 + 2): y++) {
+                getMutableTile(x, y).isRiver = true;
+            }
+        }
+        //Make a smaller square of grass within the "lake"
+        for (let x = (this.mapWidth / 2 - 1); x <= (this.mapWidth / 2 + 1): x++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2): y++) {
+                getMutableTile(x, y).isGrass = true;
+            }
+        }
+        //Make island mine tiles on the middle three tiles
+        for (let x = (this.mapWidth / 2); x <= (this.mapWidth / 2): x++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2): y++) {
+                getMutableTile(x, y).isIslandGoldMine = true;
+            }
+        }
+
     }
     
     // <<-- /Creer-Merge: protected-private-functions -->>
