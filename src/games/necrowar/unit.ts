@@ -116,12 +116,19 @@ export class Unit extends GameObject {
      */
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
+        if (tile.unit === undefined) {
+            throw new Error("Unit on tile is undefined.");
+        }
+        tile.tower.health = tile.tower.health - this.uJob.damage;
+        // tile.unit.attacked = true;
+        if (tile.unit.health <= 0) {
+            tile.unit.health = 0; // set unit's health to zero.
+            tile.unit.tile = undefined; // unlink dead unit.
+            tile.unit = undefined; // Unlink tile.
+        }
+        this.acted = true; // unit has acted
 
-        // Add logic here for attack.
-
-        // TODO: replace this with actual logic
-        return false;
-
+        return true; // return true by default
         // <<-- /Creer-Merge: attack -->>
     }
 
