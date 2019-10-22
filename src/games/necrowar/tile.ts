@@ -106,7 +106,7 @@ export class Tile extends GameObject implements BaseTile {
     public readonly type!: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
 
     /**
-     * The Unit on this Tile if present, otherwise undefined.
+     * The list of Units on this Tile if present, otherwise undefined.
      */
     public unit?: Unit;
 
