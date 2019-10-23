@@ -150,6 +150,50 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
+        if (this.owner !== player) {
+            return `${this} isn't your worker.`;
+        }
+
+        if (player !== this.game.currentPlayer) {
+            return `It isn't your turn.`;
+        }
+
+        if (player.gold < this.game.towers.tJob.goldCost && player.mana < this.game.towers.tJob.manaCost) {
+            return `You don't have enough gold or mana to build this tower.`;
+        }
+
+        if (tile > this.game.uJob.worker.range) {
+            return `${this} wroker is not close enough to where you want to build the tower.`;
+        }
+
+        if (this.moves === 0) {
+            return `${this} worker has alread used all it's moves this turn.`;
+        }
+
+        if (tile.isGoldMine) {
+            return `You can not build on a gold mine.`;
+        }
+
+        if (tile.isIslandGoldMine) {
+            return `You can not build on the island.`;
+        }
+
+        if (tile.isPath) {
+            return `You can not build on the path.`;
+        }
+
+        if (tile.isRiver) {
+            return `You can not build on the river.`;
+        }
+
+        if (tile.isTower) {
+            return `You can not build ontop another tower.`;
+        }
+
+        if (tile.isWall) {
+            return `You can not build on a wall.`;
+        }
+
         // <<-- /Creer-Merge: invalidate-build -->>
     }
 
@@ -171,9 +215,16 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: build -->>
 
         // Add logic here for build.
+        if (!tile.tower) {
+            tile.tower = this.game.manager.create.tower({tile:tile,});
+        }
+
+        tile.tower = this.game.towers.tJob;
+        player.gold -= this.game.towers.tJob.goldCost;
+        player.mana -= this.game.towers.tJob.manaCost;
 
         // TODO: replace this with actual logic
-        return false;
+        return true;
 
         // <<-- /Creer-Merge: build -->>
     }
