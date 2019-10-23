@@ -118,6 +118,10 @@ export class Unit extends GameObject {
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
+        // check if the unit is attacking a wall (not needed but we try to be funny).
+        if (tile.isWall === true) {
+            return `${this} hurt its hand attacking a wall on tile ${tile}.`;
+        }
         // make sure the the unit is attacking a unit.
         if (tile.unit === undefined) {
             return `${this} is attacking ${tile} that doesn't have a unit.`;
@@ -135,7 +139,7 @@ export class Unit extends GameObject {
             return `${this} doesn't have a job. That shouldn't be possible.`;
         }
         // make sure the unit hasn't moved.
-        if (tile.unit.acted!) {
+        if (this.moves < this.job.moves) {
             // Have to ask Jake about this
             return `${this} has already moved this turn and cannot attack`;
         }
