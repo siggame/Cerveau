@@ -102,7 +102,47 @@ export class Unit extends GameObject {
         // Check all the arguments for attack here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        // changing its value in this scope is enough.// check widespread reasons.
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+
+        // Handle possible tile invalidations here:
+        if (!tile) {
+            return `${this} is trying to attack a tile that doesn't exist`;
+        }
+        // make sure the tile is in range.
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+            return `${this} is trying to attack ${tile} which is too far away.`;
+        }
+        // check if the unit is attacking a wall (not needed but we try to be funny).
+        if (tile.isWall === true) {
+            return `${this} hurt its hand attacking a wall on tile ${tile}.`;
+        }
+        // make sure the the unit is attacking a unit.
+        if (tile.unit === undefined) {
+            return `${this} is attacking ${tile} that doesn't have a unit.`;
+        }
+        // make sure you aren't attacking a friend.
+        if (tile.unit.owner === player) {
+            return `${this} is trying to attack the ally: ${tile.unit} on tile ${tile}`;
+        }
+        // Handle possible unit invalidations here:
+        if (this.owner === undefined) {
+            return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
+        }
+        // make sure the unit has a job.
+        if (this.job === undefined) {
+            return `${this} doesn't have a job. That shouldn't be possible.`;
+        }
+        // make sure the unit hasn't moved.
+        if (this.moves < this.job.moves) {
+            // Have to ask Jake about this
+            return `${this} has already moved this turn and cannot attack`;
+        }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
