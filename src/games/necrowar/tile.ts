@@ -172,10 +172,32 @@ export class Tile extends GameObject implements BaseTile {
     ): void | string | ITileResArgs {
         // <<-- Creer-Merge: invalidate-res -->>
 
-        // Check all the arguments for res here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        // Player invalidation
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        // Ensure tile exists
+        if (!this) {
+            return `This tile does not exist!`;
+        }
+
+        // Ensure number isn't too large
+        if (this.corpses < number) {
+            return `${this} doesn't have ${number} corpses, it only has ${this.corpses}!`;
+        }
+
+        // Ensure number is positive
+        if (number <= 0) {
+            return `Why are you trying to ressurrect ${number} corpses?!`;
+        }
+
+        // Ensure the player has enough mana
+        let cost = number * this.game.
+        if (this.game.currentPlayer.mana < )
+
+        // Ensure there isn't another unit currently on this tile
+
 
         // <<-- /Creer-Merge: invalidate-res -->>
     }
@@ -191,10 +213,9 @@ export class Tile extends GameObject implements BaseTile {
     protected async res(player: Player, number: number): Promise<boolean> {
         // <<-- Creer-Merge: res -->>
 
-        // Add logic here for res.
-
-        // TODO: replace this with actual logic
-        return false;
+        // Reduce player mana
+        // Create stack of zombies
+        // Remove corpses from tile
 
         // <<-- /Creer-Merge: res -->>
     }
