@@ -139,7 +139,7 @@ export class Unit extends GameObject {
             return `${this} doesn't have a job. That shouldn't be possible.`;
         }
         // make sure the unit hasn't moved.
-        if (this.moves < this.job.moves) {
+        if (tile.unit.acted!) {
             // Have to ask Jake about this
             return `${this} has already moved this turn and cannot attack`;
         }
