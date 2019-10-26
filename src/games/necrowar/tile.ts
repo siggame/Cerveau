@@ -189,15 +189,25 @@ export class Tile extends GameObject implements BaseTile {
 
         // Ensure number is positive
         if (number <= 0) {
-            return `Why are you trying to ressurrect ${number} corpses?!`;
+            return `Why are you trying to resurrect ${number} corpses?!`;
         }
 
         // Ensure the player has enough mana
-        let cost = number * this.game.
-        if (this.game.currentPlayer.mana < )
+        const cost = number * this.game.uJobs[1].manaCost;
+        if (this.game.currentPlayer.mana < cost) {
+            return `You do not have enough mana to resurrect ${number} corpses!`;
+        }
 
         // Ensure there isn't another unit currently on this tile
+        const unitCount = Math.max(this.numOfGhouls, this.numOfHounds)
+        if (unitCount > 0 || this.unit !== undefined) {
+            return `This tile is already occupied by another unit!`;
+        }
 
+        // Ensure there wouldn't be too many zombies
+        if (this.numOfZombies + number > 1) {
+            return `The tile cannot fit an additional ${number} zombies!`;
+        }
 
         // <<-- /Creer-Merge: invalidate-res -->>
     }
@@ -214,8 +224,24 @@ export class Tile extends GameObject implements BaseTile {
         // <<-- Creer-Merge: res -->>
 
         // Reduce player mana
+        this.game.currentPlayer.mana -= (number * this.game.uJobs[1].manaCost);
+
         // Create stack of zombies
+        // assign stack?
+        this.manager.create.unit({
+            acted: false,
+            health: this.game.uJobs[1].health,
+            owner: this.game.currentPlayer,
+            tile: this,
+            uJob: this.game.uJobs[1],
+        });
+
+        this.numOfZombies = number;
+
         // Remove corpses from tile
+        this.corpses -= number;
+
+        return true;
 
         // <<-- /Creer-Merge: res -->>
     }
