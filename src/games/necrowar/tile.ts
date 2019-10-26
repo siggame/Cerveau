@@ -205,7 +205,7 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure there wouldn't be too many zombies
-        if (this.numOfZombies + number > 1) {
+        if (this.numOfZombies + number > this.game.uJobs[1].perTile) {
             return `The tile cannot fit an additional ${number} zombies!`;
         }
 
@@ -227,16 +227,18 @@ export class Tile extends GameObject implements BaseTile {
         this.game.currentPlayer.mana -= (number * this.game.uJobs[1].manaCost);
 
         // Create stack of zombies
-        // assign stack?
-        this.manager.create.unit({
-            acted: false,
-            health: this.game.uJobs[1].health,
-            owner: this.game.currentPlayer,
-            tile: this,
-            uJob: this.game.uJobs[1],
-        });
+        for (let i = 0; i < number; i++) {
+            this.manager.create.unit({
+                acted: false,
+                health: this.game.uJobs[1].health,
+                owner: this.game.currentPlayer,
+                tile: this,
+                uJob: this.game.uJobs[1],
+            });
+        }
 
-        this.numOfZombies = number;
+        // Add zombies to this tile
+        this.numOfZombies += number;
 
         // Remove corpses from tile
         this.corpses -= number;
