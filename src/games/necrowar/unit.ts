@@ -119,6 +119,7 @@ export class Unit extends GameObject {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
+             // **** Check with Jake if needed ****
         if (tile.isWall === true) {
             return `${this} hurt its hand attacking a wall on tile ${tile}.`;
         }
