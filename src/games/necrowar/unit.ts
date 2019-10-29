@@ -118,11 +118,6 @@ export class Unit extends GameObject {
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
-        // check if the unit is attacking a wall (not needed but we try to be funny).
-             // **** Check with Jake if needed ****
-        if (tile.isWall === true) {
-            return `${this} hurt its hand attacking a wall on tile ${tile}.`;
-        }
         // make sure the the unit is attacking a unit.
         if (tile.unit === undefined) {
             return `${this} is attacking ${tile} that doesn't have a unit.`;
