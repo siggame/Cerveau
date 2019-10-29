@@ -146,7 +146,18 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         type: "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
     ): void | string | IPlayerSpawnUnitArgs {
         // <<-- Creer-Merge: invalidate-spawnUnit -->>
-
+        if (this.gold<this.unitCost){
+            this.cantafford('You can not afford to spawn this unit.')
+        }
+        else if  (!this.Player.tile){
+            this.cantfit('This unit can not fit on this tile.')
+        }
+        else if (this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0){
+            this.gameOver('The game is over you can not spawn that unit.')
+        }
+        else if (unit.capacity>=unitMaxCapacity){
+            this.cantfit('You have too many units.')
+        }
         // Check all the arguments for spawnUnit here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
@@ -170,7 +181,11 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         // <<-- Creer-Merge: spawnUnit -->>
 
         // Add logic here for spawnUnit.
-
+        if (this.invalidateSpawnUnit(player,type)==true){
+            this.tile = type
+            this.gold-=unitCost
+            return true;
+        }
         // TODO: replace this with actual logic
         return false;
 
@@ -198,6 +213,22 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        if (this.gold<this.workerCost){
+            this.cantafford('You can not afford to spawn this worker.')
+        }
+        else if  (!this.Player.tile){
+            this.cantfit('This worker can not fit on this tile.')
+        }
+        else if (this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0){
+            this.gameOver('The game is over you can not spawn workers.')
+        }
+        else if (worker.capacity>=workerMaxCapacity){
+            this.cantfit('You have too many workers.')
+        }
+
+        
+
+        
 
         // <<-- /Creer-Merge: invalidate-spawnWorker -->>
     }
@@ -216,6 +247,20 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         // <<-- Creer-Merge: spawnWorker -->>
 
         // Add logic here for spawnWorker.
+        if (this.Player.spawnWorker===true ){
+            return true;
+        }
+        else if (this.spawnWorker===Player.side){
+            return true;
+        }
+        else if (Worker.capacity<workerMaxCapacity){
+            return true;
+        }
+        else if (this.invalidateSpawnWorker(player,type)==true){
+            this.tile = type
+            this.gold-=workerCost
+            return true;
+        }
 
         // TODO: replace this with actual logic
         return false;
