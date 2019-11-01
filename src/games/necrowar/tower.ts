@@ -73,7 +73,7 @@ export class Tower extends GameObject {
     // in the creer file.
     
     // <<-- /Creer-Merge: public-functions -->>
-
+    
     /**
      * Invalidation function for attack. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -369,6 +369,7 @@ export class Tower extends GameObject {
             if (0 < this.tile.units[0].health)
             {
                 found = true;
+                break;
             }
         }
         if (!found)
@@ -486,7 +487,7 @@ export class Tower extends GameObject {
                 tile.units.splice(i, 1); // Remove unit from array
             }
         }
-
+        
         // Remove units on tile with zero health
         for (let i: number = 0; i < game.units.length; i++) {
             if (tile.units[i].health <= 0)
@@ -522,10 +523,8 @@ export class Tower extends GameObject {
         // grab the differences.
         const xDif: number = (x1 - x2);
         const yDif: number = (y1 - y2);
-
-        // return the distance.
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
-
+    
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
