@@ -321,7 +321,7 @@ export class Tower extends GameObject {
         // Check if tower has zero health
         if (this.health <= 0)
         {
-            return `${this}, has zero health`;
+            return `${this}, cannot attack because it has zero health`;
         }
         
         /*
@@ -339,7 +339,7 @@ export class Tower extends GameObject {
         }
         
         // Check if any unit belongs to the player
-        for (let i: number  = 0; i < tile.units.length; i++)
+        for (let i: number = 0; i < tile.units.length; i++)
         {
             if (tile.units[i].owner === player)
             {
