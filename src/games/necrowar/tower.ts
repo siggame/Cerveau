@@ -106,7 +106,7 @@ export class Tower extends GameObject {
         
         // Check if tower already attacked
         if (this.attacked) {
-            return `${this}, has already attacked this turn`;
+            return `${this}, cannot attack becuase has already attacked this turn`;
         }
         
         /// Check if tile exists
@@ -122,7 +122,7 @@ export class Tower extends GameObject {
         // Check if tower has zero health
         if (this.health <= 0)
         {
-            return `${this}, has zero health`;
+            return `${this}, cannot attack because it has zero health`;
         }
         
         /*
@@ -140,7 +140,7 @@ export class Tower extends GameObject {
         }
         
         // Check if any unit belongs to the player
-        for (let i: number  = 0; i < tile.units.length; i++)
+        for (let i: number = 0; i < tile.units.length; i++)
         {
             if (tile.units[i].owner === player)
             {
@@ -202,7 +202,9 @@ export class Tower extends GameObject {
             // Attack logic for AOE tower
             for (let i: number = 0; i < tile.units.length; i++)
             {
-                tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                if (0 < tile.units[i].health) {
+                    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                }
             }
         }
         else
@@ -210,7 +212,9 @@ export class Tower extends GameObject {
             // Attack logic for other towers
             for (let i: number  = 0; i < tile.units.length; i++)
             {
-                tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                if (0 < tile.units[i].health) {
+                    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                }
                 break;
             }
         }
