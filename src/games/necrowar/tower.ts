@@ -190,14 +190,14 @@ export class Tower extends GameObject {
         
         if (this.type.title === "aoe")
         {
-            for (int i = 0; i < tile.units.length)
+            for (let i: number = 0; i < tile.units.length; i++)
             {
                 tile.units[i].health = Math.max(0, tile.units.health - this.type.damage);
             }
         }
         else
         {
-            for (int i = 0; i < tile.units.length)
+            for (let i: number = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health)
                 {
