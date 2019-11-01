@@ -305,7 +305,14 @@ export class Tower extends GameObject {
             return `${this}, has zero health`;
         }
         
-        if (this.tile.units[0].health < 1)
+        let found: boolean = false;
+        for (let i: number  = 0; i < tile.units.length; i++) {
+            if (0 < this.tile.units[0].health)
+            {
+                found = true;
+            }
+        }
+        if (!found)
         {
             return `${this}, target has zero health`;
         }
