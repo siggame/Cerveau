@@ -199,7 +199,7 @@ export class Tower extends GameObject {
         }
         
         if (tile.units.length < 1) {
-            return `${this}, cannot attack because the tile has no unit`;
+            return `${this}, cannot attack because the tile has no units`;
         }
         
         if (this.attacked) {
@@ -245,8 +245,6 @@ export class Tower extends GameObject {
         {
             return `${this}, target has zero health`;
         }
-        
-        // Notes: 
         
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
@@ -318,10 +316,20 @@ export class Tower extends GameObject {
                 game.units.splice(i, 1); // Remove unit from array
             }
         }
-        
-        // Increment corpes
-        // Remove the unit from the list
-        // Remove unit from game.untis, iterterate
+
+        for (let i: number  = 0; i < tile.units.length; i++) {
+            if (tile.units[i].health < 1)
+            {
+                tile.corpses++;
+                tile.units.splice(i, 1);
+            }
+        }
+        for (let i: number  = 0; i < game.units.length; i++) {
+            if (tile.units[i].health < 1)
+            {
+                game.units.splice(i, 1);
+            }
+        }
         
         return true;
         
