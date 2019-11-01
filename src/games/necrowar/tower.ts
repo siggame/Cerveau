@@ -104,13 +104,9 @@ export class Tower extends GameObject {
             return reason;
         }
         
-        // Check if any unit belongs to the player
-        for (let i: number  = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
+        // Check if tower already attacked
+        if (this.attacked) {
+            return `${this}, has already attacked this turn`;
         }
         
         /// Check if tile exists
@@ -123,9 +119,10 @@ export class Tower extends GameObject {
             return `${this}, cannot attack a tile with no units`;
         }
         
-        // Check if tower already attacked
-        if (this.attacked) {
-            return `${this}, has already attacked this turn`;
+        // Check if tower has zero health
+        if (this.health <= 0)
+        {
+            return `${this}, has zero health`;
         }
         
         /*
@@ -142,6 +139,15 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target tile is out of range`;
         }
         
+        // Check if any unit belongs to the player
+        for (let i: number  = 0; i < tile.units.length; i++)
+        {
+            if (tile.units[i].owner === player)
+            {
+                return `${this}, cannot attack units on their own side`;
+            }
+        }
+        
         // Check if type is valid
         if (!this.type) {
             return `${this}, has an unknown type`;
@@ -156,12 +162,6 @@ export class Tower extends GameObject {
         // Check if damage is valid
         if (!this.damage) {
             return `${this}, has unknown damage`;
-        }
-        
-        // Check if tower has zero health
-        if (this.health <= 0)
-        {
-            return `${this}, has zero health`;
         }
         
         // Check if any unit on tile has health
