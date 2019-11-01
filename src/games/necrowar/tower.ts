@@ -106,7 +106,8 @@ export class Tower extends GameObject {
         
         // Check if tower already attacked
         if (this.attacked) {
-            return `${this}, cannot attack becuase has already attacked this turn`;
+            return
+                `${this}, cannot attack becuase has already attacked this turn`;
         }
         
         /// Check if tile exists
@@ -203,7 +204,8 @@ export class Tower extends GameObject {
             for (let i: number = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health) {
-                    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                    tile.units[i].health = Math.max(0, tile.units[i].health -
+                                                    this.damage);
                 }
             }
         }
@@ -213,7 +215,8 @@ export class Tower extends GameObject {
             for (let i: number  = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health) {
-                    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                    tile.units[i].health = Math.max(0, tile.units[i].health -
+                                                    this.damage);
                 }
                 break;
             }
