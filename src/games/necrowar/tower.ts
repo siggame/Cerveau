@@ -192,16 +192,16 @@ export class Tower extends GameObject {
         {
             for (let i: number = 0; i < tile.units.length; i++)
             {
-                tile.units[i].health = Math.max(0, tile.units.health - this.type.damage);
+                tile.units[i].health = Math.max(0, tile.units[i].health - this.type.damage);
             }
         }
         else
         {
-            for (let i: number = 0; i < tile.units.length; i++)
+            for (let i: number  = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health)
                 {
-                    tile.units[i].health = Math.max(0, tile.units.health - this.type.damage);
+                    tile.units[i].health = Math.max(0, tile.units[i].health - this.type.damage);
                 }
                 break;
             }
