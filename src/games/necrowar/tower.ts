@@ -84,10 +84,10 @@ export class Tower extends GameObject {
      *
      * @returns the distance between the points.
      */
-    private distance(x1: int, y1: int, x2: int, y2: int): number {
+    private distance(x1: number, y1: number, x2: number, y2: number): number {
         // grab the differences.
-        const xDif = (x1 - x2);
-        const yDif = (y1 - y2);
+        const xDif: number = (x1 - x2);
+        const yDif: number = (y1 - y2);
 
         // return the distance.
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
@@ -115,7 +115,7 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
-        const float range = 2.3;
+        let range: number = 2.3;
         
         const reason = this.invalidate(player, true);
         // If there is a reason, return it.
@@ -202,7 +202,7 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because the tile has no unit`;
         }
         
-        if (this.attcked) {
+        if (this.attacked) {
             return `${this}, has already attacked this turn`;
         }
         
@@ -219,9 +219,14 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target is out of range`;
         }
         
-        var types: Array<string> = ["castle", "arrow", "ballista", "cleansing", "aoe"];
-        if (types.indexOf(this.type.title) < 0) {
+        if (!this.type) {
             return `${this}, has an unknown type`;
+        }
+        else
+        {
+            if (!this.type.title) {
+                return `${this}, has an unknown type`;
+            }
         }
         
         if (this.health < 1)
@@ -229,7 +234,7 @@ export class Tower extends GameObject {
             return `${this}, has zero health`;
         }
         
-        if (this.tile.units.health < 1)
+        if (this.tile.units[0].health < 1)
         {
             return `${this}, target has zero health`;
         }
