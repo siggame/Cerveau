@@ -73,25 +73,6 @@ export class Tower extends GameObject {
     // in the creer file.
     
     // <<-- /Creer-Merge: public-functions -->>
-    
-    /*
-     * Returns the distance between the points
-     *
-     * @param x1: the first x coordinate.
-     * @param y1: the first y coordinate.
-     * @param x2: the second x coordinate.
-     * @param y2: the second y coordinate.
-     *
-     * @returns the distance between the points.
-     */
-    private distance(x1: number, y1: number, x2: number, y2: number): number {
-        // grab the differences.
-        const xDif: number = (x1 - x2);
-        const yDif: number = (y1 - y2);
-
-        // return the distance.
-        return Math.sqrt((xDif ** 2) + (yDif ** 2));
-    }
 
     /**
      * Invalidation function for attack. Try to find a reason why the passed in
@@ -115,7 +96,7 @@ export class Tower extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
         
-        let range: number = 2.3;
+        let range: number = 2.3; // Attack range
         
         const reason = this.invalidate(player, true);
         // If there is a reason, return it.
@@ -334,9 +315,10 @@ export class Tower extends GameObject {
         }
         
         if (tile.units.length < 1) {
-            return `${this}, cannot attack because the tile has no units`;
+            return `${this}, cannot attack a tile with no units`;
         }
         
+        // Check if tower already attacked
         if (this.attacked) {
             return `${this}, has already attacked this turn`;
         }
@@ -350,27 +332,36 @@ export class Tower extends GameObject {
          *         _ x x x _
          */
         
+        // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
-            return `${this}, cannot attack because target is out of range`;
+            return `${this}, cannot attack because target tile is out of range`;
         }
         
+        // Check if type is valid
         if (!this.type) {
             return `${this}, has an unknown type`;
         }
         else
         {
             if (!this.type.title) {
-                return `${this}, has an unknown type`;
+                return `${this}, has an unknown type name`;
             }
         }
         
-        if (this.health < 1)
+        // Check if damage is valid
+        if (!this.damage) {
+            return `${this}, has unknown damage`;
+        }
+        
+        // Check if tower has zero health
+        if (this.health <= 0)
         {
             return `${this}, has zero health`;
         }
         
+        // Check if any unit on tile has health
         let found: boolean = false;
-        for (let i: number  = 0; i < tile.units.length; i++) {
+        for (let i: number = 0; i < tile.units.length; i++) {
             if (0 < this.tile.units[0].health)
             {
                 found = true;
@@ -378,7 +369,7 @@ export class Tower extends GameObject {
         }
         if (!found)
         {
-            return `${this}, target has zero health`;
+            return `${this}, targets have zero health`;
         }
         
         // <<-- /Creer-Merge: invalidate-attack -->>
@@ -393,8 +384,6 @@ export class Tower extends GameObject {
      */
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
-
-        // Add logic here for attack.
         
         /*
          * Damage That Towers Do To Units
@@ -489,14 +478,16 @@ export class Tower extends GameObject {
         for (let i: number  = 0; i < tile.units.length; i++) {
             if (tile.units[i].health < 1)
             {
-                tile.corpses++;
-                tile.units.splice(i, 1);
+                tile.corpses++; // Add corpse to tile
+                tile.units.splice(i, 1); // Remove unit from array
             }
         }
-        for (let i: number  = 0; i < game.units.length; i++) {
-            if (tile.units[i].health < 1)
+
+        // Remove units on tile with zero health
+        for (let i: number = 0; i < game.units.length; i++) {
+            if (tile.units[i].health <= 0)
             {
-                game.units.splice(i, 1);
+                game.units.splice(i, 1); // Remove unit from array
             }
         }
         
@@ -527,8 +518,10 @@ export class Tower extends GameObject {
         // grab the differences.
         const xDif: number = (x1 - x2);
         const yDif: number = (y1 - y2);
+
+        // return the distance.
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
-    
+
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
