@@ -73,7 +73,7 @@ export class Tower extends GameObject {
     // in the creer file.
     
     // <<-- /Creer-Merge: public-functions -->>
-
+    
     /**
      * Invalidation function for attack. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -242,6 +242,7 @@ export class Tower extends GameObject {
             if (0 < this.tile.units[0].health)
             {
                 found = true;
+                break;
             }
         }
         if (!found)
@@ -326,7 +327,7 @@ export class Tower extends GameObject {
                 tile.units.splice(i, 1); // Remove unit from array
             }
         }
-
+        
         // Remove units on tile with zero health
         for (let i: number = 0; i < game.units.length; i++) {
             if (tile.units[i].health <= 0)
