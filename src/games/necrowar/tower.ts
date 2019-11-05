@@ -115,8 +115,8 @@ export class Tower extends GameObject {
             return `${this}, cannot attack a tile that doesn't exist`;
         }
         
-        // Chick if tile has no units
-        if (tile.units.length < 1) {
+        // Check if tile has no units
+        if (tile.units.length <= 0) {
             return `${this}, cannot attack a tile with no units`;
         }
         
@@ -219,7 +219,7 @@ export class Tower extends GameObject {
                     tile.units[i].health = Math.max(0, tile.units[i].health -
                                                     this.damage);
                 }
-                break;
+                break; // Exit for-loop
             }
         }
         
