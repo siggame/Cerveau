@@ -205,6 +205,10 @@ export class Tower extends GameObject {
             for (let i: number = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health) {
+                    /*
+                     * The Math.max function with 0 as an argument will ensure
+                     * the health of a unit is always equal or greater than 0
+                     */
                     tile.units[i].health = Math.max(0, tile.units[i].health -
                                                     this.damage);
                 }
@@ -216,6 +220,10 @@ export class Tower extends GameObject {
             for (let i: number  = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health) {
+                    /*
+                     * The Math.max function with 0 as an argument will ensure
+                     * the health of a unit is always equal or greater than 0
+                     */
                     tile.units[i].health = Math.max(0, tile.units[i].health -
                                                     this.damage);
                 }
