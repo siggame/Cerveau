@@ -303,10 +303,10 @@ export class Tower extends GameObject {
         // Check if any unit on tile has health
         let found: boolean = false;
         for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < this.tile.units[0].health)
+            if (0 < tile.units[0].health)
             {
                 found = true;
-                break;
+                break; // Exit for-loop
             }
         }
         if (!found)
