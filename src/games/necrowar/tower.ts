@@ -411,7 +411,7 @@ export class Tower extends GameObject {
         
         // Remove units on tile with zero health
         for (let i: number = 0; i < game.units.length; i++) {
-            if (tile.units[i].health <= 0)
+            if (game.units[i].health <= 0)
             {
                 game.units.splice(i, 1); // Remove unit from array
             }
