@@ -279,7 +279,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: false,
-                damage 5,
+                damage: 5,
             }),
 
             this.manager.create.tJob({
@@ -290,7 +290,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 3,
                 allUnits: false,
-                damage 20,
+                damage: 20,
             }),
 
             this.manager.create.tJob({
@@ -301,7 +301,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: false,
-                damage 5,
+                damage: 5,
             }),
 
             this.manager.create.tJob({
@@ -312,7 +312,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: true,
-                damage 3,
+                damage: 3,
             }),
         );
     }
@@ -349,7 +349,7 @@ export class NecrowarGame extends BaseClasses.Game {
         }
 
         //Cover the middle stripe in river tiles
-        for (let x = (this.mapWidth / 2 - 2); x < (this.mapWidth / 2 + 2); x++) {
+        for (let x = (this.mapWidth / 2 - 1); x < (this.mapWidth / 2 + 1); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isRiver = true;
             }
@@ -358,9 +358,17 @@ export class NecrowarGame extends BaseClasses.Game {
         //Create the paths going around the map
         for (let x = 0; x < (this.mapWidth / 2); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                if (((y === (this.mapHeight - 5)) && (x > 5)) ||
+                if (
+                //Top Part
+                ((y === (this.mapHeight - 5)) && (x > 5)) ||
+                ((y === (this.mapHeight - 6)) && (x > 5)) ||
+                //Bottom Part
                 ((y === 5) && (x > 10)) ||
-                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 5))) {
+                ((y === 6) && (x > 10)) ||
+                //Left Side Part
+                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 5)) ||
+                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 6))
+                ){
                     getMutableTile(x, y).isPath = true;
                 }
             }
@@ -375,10 +383,46 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(6, 6).isCastle = true;
 
         //Place gold mine tiles
+        for (let x = 10; x <= 11; x++) {
+            for (let y = (this.mapHeight - 10); y <= (this.mapHeight - 11); y++) {
+                getMutableTile(x, y).isGoldMine = true;
+            }
+        }
 
+        //Set Worker Spawn
+        getMutableTile(8, 9).isWorkerSpawn = true;
+        //Set Unit Spawn
+        getMutableTile(11, 6).isUnitSpawn = true;
 
         //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
-
+        for(let x = 0; x < this.mapWidth / 2; x++) {
+            for(let y = 0; y < this.mapHeight; y++) {
+                //Grass
+                if(getMutableTile(x, y).isGrass = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGrass = true
+                }
+                //Paths
+                if(getMutableTile(x, y).isPath = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isPath = true
+                }
+                //Gold Mines
+                if(getMutableTile(x, y).isGoldMine = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGoldMine = true
+                }
+                //Castle
+                if(getMutableTile(x, y).isCastle = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isCastle = true
+                }
+                //Worker Spawn
+                if(getMutableTile(x, y).isWorkerSpawn = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isWorkerSpawn = true
+                }
+                //Unit Spawn
+                if(getMutableTile(x, y).isUnitSpawn = true) {
+                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isUnitSpawn = true
+                }
+            }
+        }
 
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
