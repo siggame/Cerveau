@@ -108,6 +108,7 @@ export class Tower extends GameObject {
         if (this.attacked) {
             return
                 `${this}, cannot attack becuase has already attacked this turn`;
+<<<<<<< HEAD
         // Check if any unit belongs to the player
         for (let i: number  = 0; i < tile.units.length; i++)
         {
@@ -115,6 +116,8 @@ export class Tower extends GameObject {
             {
                 return `${this}, cannot attack units on their own side`;
             }
+=======
+>>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
         }
         
         /// Check if tile exists
@@ -186,6 +189,7 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
+<<<<<<< HEAD
         // Chick if tile has no units
         if (tile.units.length < 1) {
             return `${this}, cannot attack a tile with no units`;
@@ -250,6 +254,8 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
+=======
+>>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
     
@@ -319,6 +325,7 @@ export class Tower extends GameObject {
             }
         }
         
+<<<<<<< HEAD
         // Remove units on tile with zero health and add corpses
         for (let i: number = 0; i < tile.units.length; i++) {
             if (tile.units[i].health <= 0)
@@ -336,6 +343,8 @@ export class Tower extends GameObject {
             }
         }
         
+=======
+>>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
         return true;
         
         // <<-- /Creer-Merge: attack -->>
@@ -360,11 +369,14 @@ export class Tower extends GameObject {
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
     
+<<<<<<< HEAD
         // grab the differences.
         const xDif: number = (x1 - x2);
         const yDif: number = (y1 - y2);
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
     
+=======
+>>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
