@@ -453,6 +453,7 @@ export class Tower extends GameObject {
             {
                 tile.corpses++; // Add corpse to tile
                 tile.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
         
@@ -461,6 +462,7 @@ export class Tower extends GameObject {
             if (game.units[i].health <= 0)
             {
                 game.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
         
