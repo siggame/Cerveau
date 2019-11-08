@@ -503,7 +503,7 @@ export class Tower extends GameObject {
             }
         }
 
-        for (let i: number  = 0; i < tile.units.length; i++) {
+        for (let i: number = 0; i < tile.units.length; i++) {
             if (tile.units[i].health < 1)
             {
                 tile.corpses++; // Add corpse to tile
