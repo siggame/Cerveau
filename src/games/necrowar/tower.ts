@@ -113,7 +113,7 @@ export class Tower extends GameObject {
 <<<<<<< HEAD
 >>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
         // Check if any unit belongs to the player
-        for (let i: number  = 0; i < tile.units.length; i++)
+        for (let i: number = 0; i < tile.units.length; i++)
         {
             if (tile.units[i].owner === player)
             {
@@ -433,7 +433,7 @@ export class Tower extends GameObject {
         else
         {
             // Attack logic for other towers
-            for (let i: number  = 0; i < tile.units.length; i++)
+            for (let i: number = 0; i < tile.units.length; i++)
             {
                 if (0 < tile.units[i].health) {
                     /*
@@ -474,6 +474,7 @@ export class Tower extends GameObject {
             {
                 tile.corpses++; // Add corpse to tile
                 tile.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
         
@@ -482,6 +483,7 @@ export class Tower extends GameObject {
             if (game.units[i].health <= 0)
             {
                 game.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
         
@@ -492,6 +494,7 @@ export class Tower extends GameObject {
             {
                 tile.corpses++; // Add corpse to tile
                 tile.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
         
@@ -500,6 +503,7 @@ export class Tower extends GameObject {
             if (game.units[i].health <= 0)
             {
                 game.units.splice(i, 1); // Remove unit from array
+                i--;
             }
         }
 
