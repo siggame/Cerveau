@@ -173,137 +173,6 @@ export class Tile extends GameObject implements BaseTile {
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
 
-    // <<-- /Creer-Merge: public-functions -->>
-
-    /**
-     * Invalidation function for res. Try to find a reason why the passed in
-     * parameters are invalid, and return a human readable string telling them
-     * why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @param num - Number of zombies to resurrect.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateRes(
-        player: Player,
-        num: number,
-    ): void | string | ITileResArgs {
-        // <<-- Creer-Merge: invalidate-res -->>
-
-        // Check all the arguments for res here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-res -->>
-    }
-
-    /**
-     * Resurrect the corpses on this tile into Zombies.
-     *
-     * @param player - The player that called this.
-     * @param num - Number of zombies to resurrect.
-     * @returns True if successful res, false otherwise.
-     */
-    protected async res(player: Player, num: number): Promise<boolean> {
-        // <<-- Creer-Merge: res -->>
-
-        // Add logic here for res.
-
-        // TODO: replace this with actual logic
-        return false;
-
-        // <<-- /Creer-Merge: res -->>
-    }
-
-    /**
-     * Invalidation function for spawnUnit. Try to find a reason why the passed
-     * in parameters are invalid, and return a human readable string telling
-     * them why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @param title - The title of the desired unit type.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateSpawnUnit(
-        player: Player,
-        title: string,
-    ): void | string | ITileSpawnUnitArgs {
-        // <<-- Creer-Merge: invalidate-spawnUnit -->>
-
-        // Check all the arguments for spawnUnit here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-spawnUnit -->>
-    }
-
-    /**
-     * Spawns a fighting unit on the correct tile.
-     *
-     * @param player - The player that called this.
-     * @param title - The title of the desired unit type.
-     * @returns True if successfully spawned, false otherwise.
-     */
-    protected async spawnUnit(
-        player: Player,
-        title: string,
-    ): Promise<boolean> {
-        // <<-- Creer-Merge: spawnUnit -->>
-
-        // Add logic here for spawnUnit.
-
-        // TODO: replace this with actual logic
-        return false;
-
-        // <<-- /Creer-Merge: spawnUnit -->>
-    }
-
-    /**
-     * Invalidation function for spawnWorker. Try to find a reason why the
-     * passed in parameters are invalid, and return a human readable string
-     * telling them why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateSpawnWorker(
-        player: Player,
-    ): void | string | ITileSpawnWorkerArgs {
-        // <<-- Creer-Merge: invalidate-spawnWorker -->>
-
-        // Check all the arguments for spawnWorker here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-spawnWorker -->>
-    }
-
-    /**
-     * Spawns a worker on the correct tile.
-     *
-     * @param player - The player that called this.
-     * @returns True if successfully spawned, false otherwise.
-     */
-    protected async spawnWorker(player: Player): Promise<boolean> {
-        // <<-- Creer-Merge: spawnWorker -->>
-
-        // Add logic here for spawnWorker.
-
-        // TODO: replace this with actual logic
-        return false;
-
-        // <<-- /Creer-Merge: spawnWorker -->>
-    }
-
     /**
      * Gets the adjacent direction between this Tile and an adjacent Tile
      * (if one exists).
@@ -363,6 +232,314 @@ export class Tile extends GameObject implements BaseTile {
     public toString(): string {
         // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
+    }
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for res. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param num - Number of zombies to resurrect.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateRes(
+        player: Player,
+        num: number,
+    ): void | string | ITileResArgs {
+        // <<-- Creer-Merge: invalidate-res -->>
+
+        // Player invalidation
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        // Ensure tile exists
+        if (!this) {
+            return `This tile does not exist!`;
+        }
+
+        // Ensure number isn't too large
+        if (this.corpses < num) {
+            return `${this} doesn't have ${num} corpses, it only has ${this.corpses}!`;
+        }
+
+        // Ensure num is positive
+        if (num <= 0) {
+            return `Why are you trying to resurrect ${num} corpses?!`;
+        }
+
+        // Ensure the player has enough mana
+        const cost = num * this.game.uJobs[1].manaCost;
+        if (this.game.currentPlayer.mana < cost) {
+            return `You do not have enough mana to resurrect ${num} corpses!`;
+        }
+
+        // Ensure there isn't another unit currently on this tile
+        const unitCount = Math.max(this.numGhouls, this.numHounds)
+        if (unitCount > 0 || this.unit !== undefined) {
+            return `This tile is already occupied by another unit!`;
+        }
+
+        // Ensure there wouldn't be too many zombies
+        if (this.numZombies + num > this.game.uJobs[1].perTile) {
+            return `The tile cannot fit an additional ${num} zombies!`;
+        }
+
+        // <<-- /Creer-Merge: invalidate-res -->>
+    }
+
+    /**
+     * Resurrect the corpses on this tile into Zombies.
+     *
+     * @param player - The player that called this.
+     * @param num - Number of zombies to resurrect.
+     * @returns True if successful res, false otherwise.
+     */
+    protected async res(player: Player, num: number): Promise<boolean> {
+        // <<-- Creer-Merge: res -->>
+
+        // Reduce player mana
+        this.game.currentPlayer.mana -= (num * this.game.uJobs[1].manaCost);
+
+        // Create stack of zombies
+        for (let i = 0; i < num; i++) {
+            this.manager.create.unit({
+                acted: false,
+                health: this.game.uJobs[1].health,
+                owner: this.game.currentPlayer,
+                tile: this,
+                uJob: this.game.uJobs[1],
+            });
+        }
+
+        // Add zombies to this tile
+        this.numZombies += num;
+
+        // Remove corpses from tile
+        this.corpses -= num;
+
+        return true;
+
+        // <<-- /Creer-Merge: res -->>
+    }
+
+    /**
+     * Invalidation function for spawnUnit. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param title - The title of the desired unit type.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnUnit(
+        player: Player,
+        title: string,
+    ): void | string | ITileSpawnUnitArgs {
+        // <<-- Creer-Merge: invalidate-spawnUnit -->>
+
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        let unitIndex = -1;
+
+        if (title === "ghoul") {
+            unitIndex = 2;
+        }
+        else if (title === "abomination") {
+            unitIndex = 3;
+        }
+        else if (title === "hound") {
+            unitIndex = 4;
+        }
+        else if (title === "wraith") {
+            unitIndex = 5;
+        }
+        else if (title === "horseman") {
+            unitIndex = 6;
+        }
+
+        if (unitIndex === -1) {
+            return `Invalid unit type!`;
+        }
+
+        if (player.gold < this.game.uJobs[unitIndex].goldCost
+            || player.mana < this.game.uJobs[unitIndex].manaCost) {
+            return `You cannot afford to spawn this unit.`;
+        }
+
+        if (!this) {
+            return `This tile does not exist!`;
+        }
+
+        if (!this.isUnitSpawn) {
+            return `This tile cannot spawn units!`;
+        }
+
+        if (this.unit) {
+            if (this.unit.uJob.title === "zombie"
+                || this.unit.uJob.title === "horseman"
+                || this.unit.uJob.title === "abomination"
+                || this.unit.uJob.title === "wraith"
+                || this.unit.uJob.title !== title) {
+                return `You cannot fit another unit on this tile!`;
+            }
+
+            if (this.unit.uJob.title === "ghoul" && this.numGhouls >= this.game.uJobs[2].perTile) {
+                return `The maximum number of ghouls are already on this tile!`;
+            }
+
+            if (this.unit.uJob.title === "hound" && this.numHounds >= this.game.uJobs[2].perTile) {
+                return `The maximum number of hounds are already on this tile!`;
+            }
+        }
+
+        // <<-- /Creer-Merge: invalidate-spawnUnit -->>
+    }
+
+    /**
+     * Spawns a fighting unit on the correct tile.
+     *
+     * @param player - The player that called this.
+     * @param title - The title of the desired unit type.
+     * @returns True if successfully spawned, false otherwise.
+     */
+    protected async spawnUnit(
+        player: Player,
+        title: string,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: spawnUnit -->>
+
+        let unitIndex = -1;
+
+        if (title === "ghoul") {
+            unitIndex = 2;
+        }
+        else if (title === "abomination") {
+            unitIndex = 3;
+        }
+        else if (title === "hound") {
+            unitIndex = 4;
+        }
+        else if (title === "wraith") {
+            unitIndex = 5;
+        }
+        else if (title === "horseman") {
+            unitIndex = 6;
+        }
+
+        const goldCost = this.game.uJobs[unitIndex].goldCost;
+        const manaCost = this.game.uJobs[unitIndex].manaCost;
+
+        player.gold -= goldCost;
+        player.mana -= manaCost;
+
+        const unit = this.game.manager.create.unit({
+            acted: false,
+            health: this.game.uJobs[unitIndex].health,
+            owner: player,
+            tile: this,
+            uJob: this.game.uJobs[unitIndex],
+            title,
+        });
+
+        if (this.unit) {
+            if (this.numGhouls !== 0) {
+                this.numGhouls += 1;
+            }
+            else {
+                this.numHounds += 1;
+            }
+        }
+        else {
+            this.unit = unit;
+            if (title === "hound") {
+                this.numHounds = 1;
+            }
+            else if (title === "ghoul") {
+                this.numGhouls = 1;
+            }
+        }
+
+        return true;
+
+        // <<-- /Creer-Merge: spawnUnit -->>
+    }
+
+    /**
+     * Invalidation function for spawnWorker. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnWorker(
+        player: Player,
+    ): void | string | ITileSpawnWorkerArgs {
+        // <<-- Creer-Merge: invalidate-spawnWorker -->>
+
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if (player.gold < this.game.uJobs[0].goldCost
+            || player.mana < this.game.uJobs[0].manaCost) {
+            return `You cannot afford to spawn a worker.`;
+        }
+
+        if (!this) {
+            return `This tile does not exist!`;
+        }
+
+        if (!this.isWorkerSpawn) {
+            return `This tile cannot spawn workers!`;
+        }
+
+        if (this.unit) {
+            return `You cannot fit another worker on this tile!`;
+        }
+
+        // <<-- /Creer-Merge: invalidate-spawnWorker -->>
+    }
+
+    /**
+     * Spawns a worker on the correct tile.
+     *
+     * @param player - The player that called this.
+     * @returns True if successfully spawned, false otherwise.
+     */
+    protected async spawnWorker(player: Player): Promise<boolean> {
+        // <<-- Creer-Merge: spawnWorker -->>
+
+        const goldCost = this.game.uJobs[0].goldCost;
+        const manaCost = this.game.uJobs[0].manaCost;
+
+        player.gold -= goldCost;
+        player.mana -= manaCost;
+
+        this.unit = this.game.manager.create.unit({
+            acted: false,
+            health: this.game.uJobs[0].health,
+            owner: player,
+            tile: this,
+            uJob: this.game.uJobs[0],
+            title: "worker",
+        });
+
+        return true;
+
+        // <<-- /Creer-Merge: spawnWorker -->>
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>

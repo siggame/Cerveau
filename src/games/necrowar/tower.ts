@@ -2,6 +2,7 @@ import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ITowerAttackArgs, ITowerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
+import { tJob } from "./t-job";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
@@ -98,11 +99,6 @@ export class Tower extends GameObject {
         
         let range: number = 2.3; // Attack range
         
-        const reason = this.invalidate(player, true);
-        // If there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
         
         // Check if tower already attacked
         if (this.attacked) {
@@ -110,12 +106,9 @@ export class Tower extends GameObject {
         }
         
         // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
+        if ((tile.unit) && (tile.unit.owner === player))
         {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
+             return `${this}, cannot attack units on their own side`;
         }
         
         // Check if tile exists
@@ -124,7 +117,7 @@ export class Tower extends GameObject {
         }
         
         // Check if tile has no units
-        if (tile.units.length <= 0) {
+        if (!tile.unit) {
             return `${this}, cannot attack a tile with no units`;
         }
         
@@ -148,15 +141,6 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target tile is out of range`;
         }
         
-        // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
-        }
-        
         // Check if type is valid
         if (!this.type) {
             return `${this}, has an unknown type`;
@@ -168,20 +152,15 @@ export class Tower extends GameObject {
             }
         }
         
-        // Check if damage is valid
-        if (!this.damage) {
-            return `${this}, has unknown damage`;
-        }
-        
         // Check if any unit on tile has health
         let found: boolean = false;
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < tile.units[0].health)
-            {
-                found = true;
-                break; // Exit for-loop
-            }
+        //for (let i: number = 0; i < tile.units.length; i++) {
+        if (0 < tile.unit.health)
+        {
+            found = true;
+            //break; // Exit for-loop
         }
+        //}
         if (!found)
         {
             return `${this}, targets have zero health`;
@@ -207,56 +186,54 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
         
-        if (this.type.title === "aoe")
-        {
+        //if (this.type.title === "aoe")
+        //{
             // Attack logic for AOE tower
-            for (let i: number = 0; i < tile.units.length; i++)
-            {
-                if (0 < tile.units[i].health) {
+            //for (let i: number = 0; i < tile.units.length; i++)
+            //{
+                //if (0 < tile.units[i].health) {
                     /*
                      * The Math.max function with 0 as an argument will ensure
                      * the health of a unit is always equal or greater than 0
                      */
-                    tile.units[i].health = Math.max(0, tile.units[i].health -
-                                                    this.damage);
-                }
-            }
-        }
-        else
-        {
+                //    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+                //}
+            //}
+        //}
+        //else
+        //{
             // Attack logic for other towers
-            for (let i: number = 0; i < tile.units.length; i++)
-            {
-                if (0 < tile.units[i].health) {
+        //   for (let i: number = 0; i < tile.units.length; i++)
+        //    {
+        //        if (0 < tile.units[i].health) {
                     /*
                      * The Math.max function with 0 as an argument will ensure
                      * the health of a unit is always equal or greater than 0
                      */
-                    tile.units[i].health = Math.max(0, tile.units[i].health -
-                                                    this.damage);
-                }
-                break; // Exit for-loop
-            }
-        }
+        //            tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
+        //        }
+        //        break; // Exit for-loop
+        //    }
+        //}
         
         // Remove units on tile with zero health and add corpses
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (tile.units[i].health <= 0)
-            {
-                tile.corpses++; // Add corpse to tile
-                tile.units.splice(i, 1); // Remove unit from array
-                i = Math.max(0, i - 1);
-            }
-        }
+        //for (let i: number = 0; i < tile.units.length; i++) {
+        //    if (tile.units[i].health <= 0)
+        //    {
+        //        tile.corpses++; // Add corpse to tile
+        //        tile.units.splice(i, 1); // Remove unit from array
+        //        i = Math.max(0, i - 1);
+        //    }
+        //}
         
         // Remove units in game with zero health
-        for (let i: number = 0; i < game.units.length; i++) {
-            if (game.units[i].health <= 0)
-            {
-                game.units.splice(i, 1); // Remove unit from array
-                i = Math.max(0, i - 1);
-            }
-        }
+        //for (let i: number = 0; i < game.units.length; i++) {
+        //    if (game.units[i].health <= 0)
+        //    {
+        //        game.units.splice(i, 1); // Remove unit from array
+        //        i = Math.max(0, i - 1);
+        //    }
+        //}
         
         return true;
         

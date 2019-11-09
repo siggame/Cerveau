@@ -4,13 +4,15 @@ import { NecrowarGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { NecrowarGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
+import { tJob } from "./t-job"
 import { Tile } from "./tile";
 import { Tower } from "./tower";
+import { uJob } from "./u-job"
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
-import { IPoint, Mutable } from "~/utils";
+import { Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -434,6 +436,6 @@ export class NecrowarGame extends BaseClasses.Game {
         }
 
     }
-    
+
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
