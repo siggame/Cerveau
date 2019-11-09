@@ -241,17 +241,13 @@ export class Unit extends GameObject {
         if (!tile) {
             return `${this} is trying to build on a tile that doesn't exist`;
         }
-
-        if (player.gold < this.game.towers.tJob.goldCost && player.mana < this.game.towers.tJob.manaCost) {
+        // continue from here after creer
+        if (player.gold < this.game.towers.tJobs.goldCost && player.mana < this.game.towers.tJob.manaCost) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
-        if (tile > this.game.uJob.worker.range) {
-            return `${this} wroker is not close enough to where you want to build the tower.`;
-        }
-
-        if (this.moves === 0) {
-            return `${this} worker has alread used all it's moves this turn.`;
+        if (tile !== this.tile) {
+            return `${this} must be on the target tile to build!`;
         }
 
         if (tile.isGoldMine) {
@@ -297,8 +293,7 @@ export class Unit extends GameObject {
         tJob: tJob,
     ): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
-
-        // Add logic here for build.
+        // fix after creer run
         if (!tile.tower) {
             tile.tower = this.game.manager.create.tower({tile:tile,});
         }
@@ -307,7 +302,6 @@ export class Unit extends GameObject {
         player.gold -= this.game.towers.tJob.goldCost;
         player.mana -= this.game.towers.tJob.manaCost;
 
-        // TODO: replace this with actual logic
         return true;
 
         // <<-- /Creer-Merge: build -->>
@@ -329,13 +323,6 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitFishArgs {
         // <<-- Creer-Merge: invalidate-fish -->>
-
-        // Check all the arguments for fish here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        
-
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
         }
@@ -344,16 +331,27 @@ export class Unit extends GameObject {
             return `${this} isn't owned by you.`;
         }
 
-        if (this.acted === false) {
+        if (this.acted) {
             return `${this} has already acted this turn.`;
         }
 
-        if (tile.isRiver !== true){
+        if (!this.tile) {
+            return `${this} is not on a tile! Could they be behind you..?`;
+        }
+
+        if (!((this.tile.tileEast && this.tile.tileEast.isRiver)
+            || (this.tile.tileWest && this.tile.tileWest.isRiver)
+            || (this.tile.tileNorth && this.tile.tileNorth.isRiver)
+            || (this.tile.tileSouth && this.tile.tileSouth.isRiver))) {
+            return `${this} is not near any river tiles!`;
+        }
+
+        if (!tile.isRiver) {
             return `${this} unit is trying to fish on land.`;
         }
 
-        if (!tile){
-            return `Tile doesn't exist.`;
+        if (!tile) {
+            return `Target tile does not exist.`;
         }
 
         if (this.uJob.title !== "worker") {
@@ -372,38 +370,11 @@ export class Unit extends GameObject {
      */
     protected async fish(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: fish -->>
+        this.acted = true;
 
-        // Add logic here for fish.
-        
-        if (!this.tile) {
-            return false;
-        }
+        player.mana += this.game.manaIncomePerUnit;
 
-        if (this.tile.tileEast) {
-            if (this.tile.tileEast.isRiver){
-                player.mana += this.game.manaIncomePerUnit
-                return true;
-            }
-        } else if (this.tile.tileNorth) {
-            if (this.tile.tileNorth.isRiver) {
-                player.mana += this.game.manaIncomePerUnit
-                return true;
-            }
-        } else if (this.tile.tileWest) {
-            if (this.tile.tileWest.isRiver) {
-                player.mana += this.game.manaIncomePerUnit
-                return true;
-            }
-        } else if (this.tile.tileSouth) {
-            if (this.tile.tileSouth.isRiver) {
-                player.mana += this.game.manaIncomePerUnit
-                return true;
-            }
-        }
-
-        // TODO: replace this with actual logic
-        return false;
-
+        return true;
         // <<-- /Creer-Merge: fish -->>
     }
 
@@ -423,38 +394,34 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-
-        // make sure tile exists
-        if (!tile) {
-            return `Tile does not exist`;
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
         }
 
-        // make sure tile is goldmine 
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if (this.acted) {
+            return `${this} has already acted this turn.`;
+        }
+
+        if (!this.tile) {
+            return `${this} is not on a tile! Could they be behind you..?`;
+        }
+
+        if (tile !== this.tile) {
+            return `${this} must be standing in the gold mine!`;
+        }
+
         if (!tile.isGoldMine && !tile.isIslandGoldMine) {
             return `${tile} must be a gold mine!`;
         }
 
-        // make sure unit is a worker
+        // Make sure unit is a worker
         if (this.uJob.title !== "worker") {
-            return `${this} must be a worker`;
+            return `${this} must be a worker to mine!`;
         }
-
-        // make sure unit is on gold mine
-        if (!(this.tile === tile)) {
-            return `${this} must be on a gold mine to mine!`;
-        }
-
-        // make sure unit has not acted
-        if (this.acted) {
-            return `${this} has already acted!`;
-        }
-
-
-        // Check all the arguments for mine here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
 
@@ -480,10 +447,9 @@ export class Unit extends GameObject {
             // Is Normal Gold Mine
             goldGain = this.game.goldIncomePerUnit;
         }
+
         // Give gold to player
-        if (this.owner) {
-            this.owner.gold += goldGain;
-        }
+        player.gold += goldGain;
 
         // Unit has acted
         this.acted = true;
@@ -509,54 +475,65 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
-
-        // Check all the arguments for move here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        //return the reason if tehr eis owner
-
-        //make sure the tile is on the map
-        if (!tile){
-          return '${this}, unit cannot plane shift, tile does not exist in this plane.';
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
         }
 
-        //make sure there are moves left
-        if (this.moves<= 0){
-          return '${this} has no more moves and might fall apart!';
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
         }
 
-        //make sure tile is part of the path
-        if (!tile.isPath){
-          return '${this}, going off the path is dangerous.';
+        if (this.acted) {
+            return `${this} has already acted this turn.`;
         }
 
-        //make sure tile is not a river tile
-        if (tile.isRiver){
-          return '${this} cannot swim.';
+        if (!this.tile) {
+            return `${this} is not on a tile! Could they be behind you..?`;
         }
 
-        //make sure tile isnt occu[ied by a different unit type
-        if ((tile.unit) && (tile.unit.uJob != this.uJob)){
-          return '${this} cannot cut in line.';
+        // Make sure the tile is on the map
+        if (!tile) {
+            return `${this}, unit cannot plane shift, tile does not exist in this plane.`;
         }
 
-        //make sure tile isnt a tower
-        if (tile.isTower){
-          return '${this} cannot hide in the tower.';
+        // Make sure there are moves left
+        if (this.moves <= 0) {
+            return `${this} has no more moves and might fall apart!`;
         }
 
-        //make sure tile isnt a wall
-        if (tile.isWall){
-          return '${this} cannot move through, under, over or around walls..we are sorry.'
+        // Make sure tile is part of the path
+        if (!tile.isPath) {
+            return `${this}, going off the path is dangerous.`;
         }
 
-        /*Still need check for unit count on tile, possibly for goldmine tiles
-         not sure how to differentiate jobs just yet, i'm sure i missed something
-         else super game breaking */
+        // Make sure tile is not a river tile
+        if (tile.isRiver) {
+            return `${this} cannot swim.`;
+        }
 
-        return;
+        // Make sure tile isnt occupied by a different unit type
+        if (tile.unit) {
+            if (tile.unit.uJob !== this.uJob) {
+                return `${this} is not allowed to walk on ${tile.unit}!`;
+            }
+            else {
+                if (this.uJob.title === "zombie" && tile.numZombies >= this.game.uJobs[1].perTile
+                    || this.uJob.title === "hound" && tile.numHounds >= this.game.uJobs[4].perTile
+                    || this.uJob.title === "ghoul" && tile.numGhouls >= this.game.uJobs[2].perTile) {
+                    return `${this} cannot walk on an occupied tile!`;
+                }
+            }
+        }
+
+        // Make sure tile isnt a tower
+        if (tile.isTower) {
+            return `${this} cannot hide in the tower.`;
+        }
+
+        // Make sure tile isnt a wall
+        if (tile.isWall) {
+            return `${this} cannot move through, under, over or around walls..we are sorry.`;
+        }
         // <<-- /Creer-Merge: invalidate-move -->>
     }
 
@@ -573,17 +550,15 @@ export class Unit extends GameObject {
         // Add logic here for move.
 
         if (!this.tile) {
-            throw new Error(`${this} has no Tile to move from!`);
+            return false;
         }
+
         this.tile.unit = undefined;
         this.tile = tile;
         tile.unit = this;
         this.moves -= 1;
 
         return true;
-        /*This is the code from Newtonian, I think it might still work,
-        could use help on how to add to unit count if unit moves to tile already
-        occupied */
         // <<-- /Creer-Merge: move -->>
     }
 
