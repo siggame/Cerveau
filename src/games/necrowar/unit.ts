@@ -3,9 +3,9 @@ import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
          IUnitMoveArgs, IUnitProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
+import { tJob } from "./t-Job";
 import { Tile } from "./tile";
 import { uJob } from "./u-Job";
-import { tJob } from "./t-Job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -101,42 +101,62 @@ export class Unit extends GameObject {
     ): void | string | IUnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
-        // Check all the arguments for attack here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.// check widespread reasons.
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
 
-        // if there is a reason, return it.
+        if (!this) {
+            return `This unit does not exist!`;
+        }
 
-        // Handle possible tile invalidations here:
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+
+        // Make sure the unit hasn't acted.
+        if (this.acted) {
+            return `${this} has already acted this turn.`;
+        }
+
+        // Make sure the unit is alive.
+        if (this.health <= 0) {
+            return `${this} is dead, for now.`;
+        }
+
+        // Make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
+        // Make sure the tile exists.
         if (!tile) {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
-        // make sure the tile is in range.
+
+        // Make sure the tile is in range.
         if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
             this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} is trying to attack ${tile} which is too far away.`;
+            return `${this} is trying to attack ${tile}, which is too far away.`;
         }
-        // make sure the the unit is attacking a unit.
-        if (tile.unit === undefined) {
-            return `${this} is attacking ${tile} that doesn't have a unit.`;
+
+        // Make sure the the unit is attacking a tower.
+        if (!tile.tower) {
+            return `${this} is attacking ${tile}, which doesn't have a unit.`;
         }
-        // make sure you aren't attacking a friend.
-        if (tile.unit.owner === player) {
-            return `${this} is trying to attack the ally: ${tile.unit} on tile ${tile}`;
+
+        // Make sure you aren't attacking a friend.
+        if (tile.tower.owner === player) {
+            return `${this} is trying to attack the allied tower: ${tile.tower} on tile ${tile}`;
         }
+
         // Handle possible unit invalidations here:
         if (this.owner === undefined) {
             return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
         }
-        // make sure the unit has a job.
+
+        //  Make sure the unit has a job.
         if (this.uJob === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
-        }
-        // make sure the unit hasn't moved.
-        if (tile.unit.acted!) {
-            // Have to ask Jake about this
-            return `${this} has already moved this turn and cannot attack`;
         }
 
         // <<-- /Creer-Merge: invalidate-attack -->>
@@ -151,19 +171,23 @@ export class Unit extends GameObject {
      */
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
-        if (tile.unit === undefined) {
-            throw new Error("Unit on tile is undefined.");
+        // TS thinks this could be undefined despite the invalidate for some reason, so we check it again.
+        if (!tile.tower) {
+            return false;
         }
-        tile.tower.health = tile.tower.health - this.uJob.damage;
-        // tile.unit.attacked = true;
-        if (tile.unit.health <= 0) {
-            tile.unit.health = 0; // set unit's health to zero.
-            tile.unit.tile = undefined; // unlink dead unit.
-            tile.unit = undefined; // Unlink tile.
-        }
-        this.acted = true; // unit has acted
 
-        return true; // return true by default
+        tile.tower.health -= this.uJob.damage;
+
+        if (tile.tower.health <= 0) {
+            tile.tower.health = 0;
+            tile.tower = undefined;
+            tile.isTower = false;
+            tile.isGrass = true;
+        }
+
+        this.acted = true;
+
+        return true;
         // <<-- /Creer-Merge: attack -->>
     }
 
@@ -186,18 +210,36 @@ export class Unit extends GameObject {
         tJob: tJob,
     ): void | string | IUnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
-
-        // Check all the arguments for build here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        if (this.owner !== player) {
-            return `${this} isn't your worker.`;
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
         }
 
-        if (player !== this.game.currentPlayer) {
-            return `It isn't your turn.`;
+        if (!this) {
+            return `This unit does not exist!`;
+        }
+
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+
+        // Make sure the unit hasn't acted.
+        if (this.acted) {
+            return `${this} has already acted this turn.`;
+        }
+
+        // Make sure the unit is alive.
+        if (this.health <= 0) {
+            return `${this} is dead, for now.`;
+        }
+
+        // Make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
+        // Make sure the tile exists.
+        if (!tile) {
+            return `${this} is trying to build on a tile that doesn't exist`;
         }
 
         if (player.gold < this.game.towers.tJob.goldCost && player.mana < this.game.towers.tJob.manaCost) {
@@ -439,8 +481,9 @@ export class Unit extends GameObject {
             goldGain = this.game.goldIncomePerUnit;
         }
         // Give gold to player
-        if (this.owner)
+        if (this.owner) {
             this.owner.gold += goldGain;
+        }
 
         // Unit has acted
         this.acted = true;
