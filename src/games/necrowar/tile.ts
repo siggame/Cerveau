@@ -78,6 +78,21 @@ export class Tile extends GameObject implements BaseTile {
     public isWorkerSpawn!: boolean;
 
     /**
+     * The amount of Ghouls on this tile.
+     */
+    public numGhouls!: number;
+
+    /**
+     * The amount of Hounds on this tile.
+     */
+    public numHounds!: number;
+
+    /**
+     * The amount of Zombies on this tile.
+     */
+    public numZombies!: number;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -166,14 +181,14 @@ export class Tile extends GameObject implements BaseTile {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param number - Number of zombies to resurrect.
+     * @param num - Number of zombies to resurrect.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
     protected invalidateRes(
         player: Player,
-        number: number,
+        num: number,
     ): void | string | ITileResArgs {
         // <<-- Creer-Merge: invalidate-res -->>
 
@@ -189,10 +204,10 @@ export class Tile extends GameObject implements BaseTile {
      * Resurrect the corpses on this tile into Zombies.
      *
      * @param player - The player that called this.
-     * @param number - Number of zombies to resurrect.
+     * @param num - Number of zombies to resurrect.
      * @returns True if successful res, false otherwise.
      */
-    protected async res(player: Player, number: number): Promise<boolean> {
+    protected async res(player: Player, num: number): Promise<boolean> {
         // <<-- Creer-Merge: res -->>
 
         // Add logic here for res.
