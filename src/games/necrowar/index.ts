@@ -407,14 +407,9 @@ export interface IUnitAttackArgs {
  */
 export interface IUnitBuildArgs {
     /**
-     * The tile the unit is on/builds on.
+     * The tower type to build, as a string.
      */
-    tile?: Tile;
-    /**
-     * The type of tower that is being built. 'arrow', 'aoe', 'ballista', or
-     * 'cleansing'.
-     */
-    tJob?: tJob;
+    title?: string;
 }
 
 /**
@@ -1091,14 +1086,8 @@ export const Namespace = makeNamespace({
                 build: {
                     args: [
                         {
-                            argName: "tile",
-                            typeName: "gameObject",
-                            gameObjectClass: Tile,
-                            nullable: false,
-                        },
-                        {
-                            argName: "tJob",
-                            typeName: "tJob",
+                            argName: "title",
+                            typeName: "string",
                         },
                     ],
                     invalidValue: false,

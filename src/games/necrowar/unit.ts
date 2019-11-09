@@ -174,17 +174,14 @@ export class Unit extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The tile the unit is on/builds on.
-     * @param tJob - The type of tower that is being built. 'arrow', 'aoe',
-     * 'ballista', or 'cleansing'.
+     * @param title - The tower type to build, as a string.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
     protected invalidateBuild(
         player: Player,
-        tile: Tile,
-        tJob: tJob,
+        title: string,
     ): void | string | IUnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
 
@@ -245,16 +242,10 @@ export class Unit extends GameObject {
      * workers can do this.
      *
      * @param player - The player that called this.
-     * @param tile - The tile the unit is on/builds on.
-     * @param tJob - The type of tower that is being built. 'arrow', 'aoe',
-     * 'ballista', or 'cleansing'.
+     * @param title - The tower type to build, as a string.
      * @returns True if successfully built, false otherwise.
      */
-    protected async build(
-        player: Player,
-        tile: Tile,
-        tJob: tJob,
-    ): Promise<boolean> {
+    protected async build(player: Player, title: string): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
 
         // Add logic here for build.
