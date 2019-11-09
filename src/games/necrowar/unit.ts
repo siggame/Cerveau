@@ -4,6 +4,8 @@ import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
+import { uJob } from "./u-Job";
+import { tJob } from "./t-Job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -103,11 +105,8 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.// check widespread reasons.
-        const reason = this.invalidate(player, true);
+
         // if there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
 
         // Handle possible tile invalidations here:
         if (!tile) {
@@ -131,7 +130,7 @@ export class Unit extends GameObject {
             return `${this} is attacking a unit that has no owner. Report this to the game Devs. This is 100% a bug`;
         }
         // make sure the unit has a job.
-        if (this.job === undefined) {
+        if (this.uJob === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
         }
         // make sure the unit hasn't moved.
@@ -333,12 +332,32 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: fish -->>
 
         // Add logic here for fish.
-        let manaGain = 0;
-
-        if (this.tile.isRiver){
-            manaGain = this.game.manaIncomePerUnit
-        }
         
+        if (!this.tile) {
+            return false;
+        }
+
+        if (this.tile.tileEast) {
+            if (this.tile.tileEast.isRiver){
+                player.mana += this.game.manaIncomePerUnit
+                return true;
+            }
+        } else if (this.tile.tileNorth) {
+            if (this.tile.tileNorth.isRiver) {
+                player.mana += this.game.manaIncomePerUnit
+                return true;
+            }
+        } else if (this.tile.tileWest) {
+            if (this.tile.tileWest.isRiver) {
+                player.mana += this.game.manaIncomePerUnit
+                return true;
+            }
+        } else if (this.tile.tileSouth) {
+            if (this.tile.tileSouth.isRiver) {
+                player.mana += this.game.manaIncomePerUnit
+                return true;
+            }
+        }
 
         // TODO: replace this with actual logic
         return false;
@@ -362,12 +381,6 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-
-        const reason = this.invalidate(player, true);
-        // if there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
 
         // make sure tile exists
         if (!tile) {
@@ -417,7 +430,7 @@ export class Unit extends GameObject {
         let goldGain = 0;
 
         // Assign Gold gain based on mine type
-        if (this.tile.isIslandGoldMine) {
+        if ((this.tile) && (this.tile.isIslandGoldMine)) {
             // Is island Gold Mine
             goldGain = this.game.islandIncomePerUnit;
         }
@@ -426,7 +439,8 @@ export class Unit extends GameObject {
             goldGain = this.game.goldIncomePerUnit;
         }
         // Give gold to player
-        this.owner.gold += goldGain;
+        if (this.owner)
+            this.owner.gold += goldGain;
 
         // Unit has acted
         this.acted = true;
@@ -458,13 +472,7 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        //check all the reasons
-        const reason = this.invalidate(player, true);
-
         //return the reason if tehr eis owner
-        if (reason){
-          return reason;
-        }
 
         //make sure the tile is on the map
         if (!tile){
@@ -487,7 +495,7 @@ export class Unit extends GameObject {
         }
 
         //make sure tile isnt occu[ied by a different unit type
-        if (tile.unit != this.unit){
+        if ((tile.unit) && (tile.unit.uJob != this.uJob)){
           return '${this} cannot cut in line.';
         }
 
