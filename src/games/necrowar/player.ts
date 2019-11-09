@@ -3,7 +3,6 @@ import { IBaseNecrowarPlayer, IPlayerSpawnUnitArgs, IPlayerSpawnWorkerArgs,
        } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
-import { Player } from "./player";
 import { Tile } from "./tile";
 import { Tower } from "./tower";
 import { Unit } from "./unit";
@@ -146,16 +145,37 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         type: "ghoul" | "hound" | "abomination" | "wraith" | "horseman",
     ): void | string | IPlayerSpawnUnitArgs {
         // <<-- Creer-Merge: invalidate-spawnUnit -->>
-        if (this.gold<this.unitCost){
-            this.cantafford('You can not afford to spawn this unit.')
+        let unitIndex = -1;
+
+        if (type === "ghoul") {
+            unitIndex = 2;
         }
-        else if  (!this.Player.tile){
+        else if (type === "abomination") {
+            unitIndex = 3;
+        }
+        else if (type === "hound") {
+            unitIndex = 4;
+        }
+        else if (type === "wraith") {
+            unitIndex = 5;
+        }
+        else if (type === "horseman") {
+            unitIndex = 6;
+        }
+
+        if (unitIndex === -1) {
+            return `Invalid unit type!`;
+        }
+
+        if (this.gold < this.game.uJobs[unitIndex].goldCost) {
+            return `You cannot afford to spawn this unit.`;
+        }
+
+        if  (!this.Player.tile){
             this.cantfit('This unit can not fit on this tile.')
         }
-        else if ((this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0)){
-            this.gameOver('The game is over you can not spawn that unit.')
-        }
-        else if (unit.capacity>=unit.MaxCapacity){
+        
+        if (unit.capacity>=unit.MaxCapacity){
             this.cantfit('You have too many units.')
         }
         // Check all the arguments for spawnUnit here and try to
