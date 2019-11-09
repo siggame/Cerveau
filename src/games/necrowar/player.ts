@@ -152,10 +152,10 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         else if  (!this.Player.tile){
             this.cantfit('This unit can not fit on this tile.')
         }
-        else if (this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0){
+        else if ((this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0)){
             this.gameOver('The game is over you can not spawn that unit.')
         }
-        else if (unit.capacity>=unitMaxCapacity){
+        else if (unit.capacity>=unit.MaxCapacity){
             this.cantfit('You have too many units.')
         }
         // Check all the arguments for spawnUnit here and try to
@@ -219,7 +219,7 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
         else if  (!this.Player.tile){
             this.cantfit('This worker can not fit on this tile.')
         }
-        else if (this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0){
+        else if ((this.opponent.health<0) || (this.Player.health<0) || (this.timeRemaining<0)){
             this.gameOver('The game is over you can not spawn workers.')
         }
         else if (worker.capacity>=workerMaxCapacity){

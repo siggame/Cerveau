@@ -470,7 +470,7 @@ export class Unit extends GameObject {
         //return the reason if tehr eis owner
         if (reason){
           return reason;
-        })
+        }
 
         //make sure the tile is on the map
         if (!tile){
@@ -507,10 +507,6 @@ export class Unit extends GameObject {
           return '${this} cannot move through, under, over or around walls..we are sorry.'
         }
 
-        //make sure tile has room
-        if ( tile.unit == this.unit ){
-          if( tile.)
-        }
         /*Still need check for unit count on tile, possibly for goldmine tiles
          not sure how to differentiate jobs just yet, i'm sure i missed something
          else super game breaking */

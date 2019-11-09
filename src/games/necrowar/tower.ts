@@ -106,12 +106,9 @@ export class Tower extends GameObject {
         
         // Check if tower already attacked
         if (this.attacked) {
-            return
-                `${this}, cannot attack becuase has already attacked this turn`;
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
+            return `${this}, cannot attack becuase has already attacked this turn`;
+        }
+        
         // Check if any unit belongs to the player
         for (let i: number = 0; i < tile.units.length; i++)
         {
@@ -119,11 +116,6 @@ export class Tower extends GameObject {
             {
                 return `${this}, cannot attack units on their own side`;
             }
-<<<<<<< HEAD
-=======
-=======
->>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
         }
         
         /// Check if tile exists
@@ -195,10 +187,70 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
+        // Chick if tile has no units
+        if (tile.units.length < 1) {
+            return `${this}, cannot attack a tile with no units`;
+        }
+        
+        // Check if tower has zero health
+        if (this.health <= 0)
+        {
+            return `${this}, cannot attack because it has zero health`;
+        }
+        
+        /*
+         * Shape of the Tower range:
+         *         _ x x x _ 
+         *         x x x x x
+         *         x x T x x
+         *         x x x x x
+         *         _ x x x _
+         */
+        
+        // Check if tile is in range
+        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
+            return `${this}, cannot attack because target tile is out of range`;
+        }
+        
+        // Check if any unit belongs to the player
+        for (let i: number = 0; i < tile.units.length; i++)
+        {
+            if (tile.units[i].owner === player)
+            {
+                return `${this}, cannot attack units on their own side`;
+            }
+        }
+        
+        // Check if type is valid
+        if (!this.type) {
+            return `${this}, has an unknown type`;
+        }
+        else
+        {
+            if (!this.type.title) {
+                return `${this}, has an unknown type name`;
+            }
+        }
+        
+        // Check if damage is valid
+        if (!this.damage) {
+            return `${this}, has unknown damage`;
+        }
+        
+        // Check if any unit on tile has health
+        let found: boolean = false;
+        for (let i: number = 0; i < tile.units.length; i++) {
+            if (0 < tile.units[0].health)
+            {
+                found = true;
+                break; // Exit for-loop
+            }
+        }
+        if (!found)
+        {
+            return `${this}, targets have zero health`;
+        }
+
         // Chick if tile has no units
         if (tile.units.length < 1) {
             return `${this}, cannot attack a tile with no units`;
@@ -263,8 +315,6 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
-<<<<<<< HEAD
-        // Chick if tile has no units
         if (tile.units.length < 1) {
             return `${this}, cannot attack a tile with no units`;
         }
@@ -328,73 +378,6 @@ export class Tower extends GameObject {
             return `${this}, targets have zero health`;
         }
         
-        if (tile.units.length < 1) {
-            return `${this}, cannot attack a tile with no units`;
-        }
-        
-        // Check if tower has zero health
-        if (this.health <= 0)
-        {
-            return `${this}, cannot attack because it has zero health`;
-        }
-        
-        /*
-         * Shape of the Tower range:
-         *         _ x x x _ 
-         *         x x x x x
-         *         x x T x x
-         *         x x x x x
-         *         _ x x x _
-         */
-        
-        // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
-            return `${this}, cannot attack because target tile is out of range`;
-        }
-        
-        // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
-        }
-        
-        // Check if type is valid
-        if (!this.type) {
-            return `${this}, has an unknown type`;
-        }
-        else
-        {
-            if (!this.type.title) {
-                return `${this}, has an unknown type name`;
-            }
-        }
-        
-        // Check if damage is valid
-        if (!this.damage) {
-            return `${this}, has unknown damage`;
-        }
-        
-        // Check if any unit on tile has health
-        let found: boolean = false;
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < tile.units[0].health)
-            {
-                found = true;
-                break; // Exit for-loop
-            }
-        }
-        if (!found)
-        {
-            return `${this}, targets have zero health`;
-        }
-        
-=======
-=======
->>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
     
@@ -466,10 +449,6 @@ export class Tower extends GameObject {
             }
         }
         
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
         // Remove units on tile with zero health and add corpses
         for (let i: number = 0; i < tile.units.length; i++) {
             if (tile.units[i].health <= 0)
@@ -489,7 +468,6 @@ export class Tower extends GameObject {
             }
         }
         
-<<<<<<< HEAD
         // Remove units on tile with zero health and add corpses
         for (let i: number = 0; i < tile.units.length; i++) {
             if (tile.units[i].health <= 0)
@@ -527,10 +505,6 @@ export class Tower extends GameObject {
             }
         }
         
-=======
-=======
->>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
         return true;
         
         // <<-- /Creer-Merge: attack -->>
@@ -555,20 +529,5 @@ export class Tower extends GameObject {
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
     
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
-        // grab the differences.
-        const xDif: number = (x1 - x2);
-        const yDif: number = (y1 - y2);
-        return Math.sqrt((xDif ** 2) + (yDif ** 2));
-    }
-    
-<<<<<<< HEAD
-=======
-=======
->>>>>>> f24bc7e72bf08ddc6799e7cba7ae215f60106dec
->>>>>>> 0da5d0e43908ba97d5c5a8ee74272e392b79af58
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
