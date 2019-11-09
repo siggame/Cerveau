@@ -118,7 +118,7 @@ export class Tower extends GameObject {
             }
         }
         
-        /// Check if tile exists
+        // Check if tile exists
         if (!tile) {
             return `${this}, cannot attack a tile that doesn't exist`;
         }
