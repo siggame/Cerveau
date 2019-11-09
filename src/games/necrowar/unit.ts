@@ -450,6 +450,7 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
+    
     protected invalidateMove(
         player: Player,
         tile: Tile,
@@ -462,6 +463,60 @@ export class Unit extends GameObject {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-move -->>
+
+        //check all the reasons
+        const reason = this.invalidate(player, true);
+
+        //return the reason if tehr eis owner
+        if (reason){
+          return reason;
+        })
+
+        //make sure the tile is on the map
+        if (!tile){
+          return '${this}, unit cannot plane shift, tile does not exist in this plane.';
+        }
+
+        //make sure there are moves left
+        if (this.moves<= 0){
+          return '${this} has no more moves and might fall apart!';
+        }
+
+        //make sure tile is part of the path
+        if (!tile.isPath){
+          return '${this}, going off the path is dangerous.';
+        }
+
+        //make sure tile is not a river tile
+        if (tile.isRiver){
+          return '${this} cannot swim.';
+        }
+
+        //make sure tile isnt occu[ied by a different unit type
+        if (tile.unit != this.unit){
+          return '${this} cannot cut in line.';
+        }
+
+        //make sure tile isnt a tower
+        if (tile.isTower){
+          return '${this} cannot hide in the tower.';
+        }
+
+        //make sure tile isnt a wall
+        if (tile.isWall){
+          return '${this} cannot move through, under, over or around walls..we are sorry.'
+        }
+
+        //make sure tile has room
+        if ( tile.unit == this.unit ){
+          if( tile.)
+        }
+        /*Still need check for unit count on tile, possibly for goldmine tiles
+         not sure how to differentiate jobs just yet, i'm sure i missed something
+         else super game breaking */
+
+      return;
+
     }
 
     /**
@@ -476,9 +531,18 @@ export class Unit extends GameObject {
 
         // Add logic here for move.
 
-        // TODO: replace this with actual logic
-        return false;
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to move from!`);
+        }
+        this.tile.unit = undefined;
+        this.tile = tile;
+        tile.unit = this;
+        this.moves -= 1;
 
+        return true;
+        /*This is the code from Newtonian, I think it might still work,
+        could use help on how to add to unit count if unit moves to tile already
+        occupied */
         // <<-- /Creer-Merge: move -->>
     }
 
