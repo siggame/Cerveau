@@ -293,6 +293,34 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        
+
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+
+        if (this.acted === false) {
+            return `${this} has already acted this turn.`;
+        }
+
+        if (tile.isRiver !== true){
+            return `${this} unit is trying to fish on land.`;
+        }
+
+        if (!tile){
+            return `Tile doesn't exist.`;
+        }
+
+        if (this.uJob.title !== "worker") {
+            return `${this} must be a worker.`;
+        }
+
+        
+
 
         // <<-- /Creer-Merge: invalidate-fish -->>
     }
@@ -308,6 +336,12 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: fish -->>
 
         // Add logic here for fish.
+        let manaGain = 0;
+
+        if (this.tile.isRiver){
+            manaGain = this.game.manaIncomePerUnit
+        }
+        
 
         // TODO: replace this with actual logic
         return false;
