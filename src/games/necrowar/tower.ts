@@ -118,204 +118,13 @@ export class Tower extends GameObject {
             }
         }
         
-        /// Check if tile exists
+        // Check if tile exists
         if (!tile) {
             return `${this}, cannot attack a tile that doesn't exist`;
         }
         
         // Check if tile has no units
         if (tile.units.length <= 0) {
-            return `${this}, cannot attack a tile with no units`;
-        }
-        
-        // Check if tower has zero health
-        if (this.health <= 0)
-        {
-            return `${this}, cannot attack because it has zero health`;
-        }
-        
-        /*
-         * Shape of the Tower range:
-         *         _ x x x _ 
-         *         x x x x x
-         *         x x T x x
-         *         x x x x x
-         *         _ x x x _
-         */
-        
-        // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
-            return `${this}, cannot attack because target tile is out of range`;
-        }
-        
-        // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
-        }
-        
-        // Check if type is valid
-        if (!this.type) {
-            return `${this}, has an unknown type`;
-        }
-        else
-        {
-            if (!this.type.title) {
-                return `${this}, has an unknown type name`;
-            }
-        }
-        
-        // Check if damage is valid
-        if (!this.damage) {
-            return `${this}, has unknown damage`;
-        }
-        
-        // Check if any unit on tile has health
-        let found: boolean = false;
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < tile.units[0].health)
-            {
-                found = true;
-                break; // Exit for-loop
-            }
-        }
-        if (!found)
-        {
-            return `${this}, targets have zero health`;
-        }
-        
-        // Chick if tile has no units
-        if (tile.units.length < 1) {
-            return `${this}, cannot attack a tile with no units`;
-        }
-        
-        // Check if tower has zero health
-        if (this.health <= 0)
-        {
-            return `${this}, cannot attack because it has zero health`;
-        }
-        
-        /*
-         * Shape of the Tower range:
-         *         _ x x x _ 
-         *         x x x x x
-         *         x x T x x
-         *         x x x x x
-         *         _ x x x _
-         */
-        
-        // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
-            return `${this}, cannot attack because target tile is out of range`;
-        }
-        
-        // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
-        }
-        
-        // Check if type is valid
-        if (!this.type) {
-            return `${this}, has an unknown type`;
-        }
-        else
-        {
-            if (!this.type.title) {
-                return `${this}, has an unknown type name`;
-            }
-        }
-        
-        // Check if damage is valid
-        if (!this.damage) {
-            return `${this}, has unknown damage`;
-        }
-        
-        // Check if any unit on tile has health
-        let found: boolean = false;
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < tile.units[0].health)
-            {
-                found = true;
-                break; // Exit for-loop
-            }
-        }
-        if (!found)
-        {
-            return `${this}, targets have zero health`;
-        }
-
-        // Chick if tile has no units
-        if (tile.units.length < 1) {
-            return `${this}, cannot attack a tile with no units`;
-        }
-        
-        // Check if tower has zero health
-        if (this.health <= 0)
-        {
-            return `${this}, cannot attack because it has zero health`;
-        }
-        
-        /*
-         * Shape of the Tower range:
-         *         _ x x x _ 
-         *         x x x x x
-         *         x x T x x
-         *         x x x x x
-         *         _ x x x _
-         */
-        
-        // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
-            return `${this}, cannot attack because target tile is out of range`;
-        }
-        
-        // Check if any unit belongs to the player
-        for (let i: number = 0; i < tile.units.length; i++)
-        {
-            if (tile.units[i].owner === player)
-            {
-                return `${this}, cannot attack units on their own side`;
-            }
-        }
-        
-        // Check if type is valid
-        if (!this.type) {
-            return `${this}, has an unknown type`;
-        }
-        else
-        {
-            if (!this.type.title) {
-                return `${this}, has an unknown type name`;
-            }
-        }
-        
-        // Check if damage is valid
-        if (!this.damage) {
-            return `${this}, has unknown damage`;
-        }
-        
-        // Check if any unit on tile has health
-        let found: boolean = false;
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (0 < tile.units[0].health)
-            {
-                found = true;
-                break; // Exit for-loop
-            }
-        }
-        if (!found)
-        {
-            return `${this}, targets have zero health`;
-        }
-        
-        if (tile.units.length < 1) {
             return `${this}, cannot attack a tile with no units`;
         }
         
@@ -436,7 +245,7 @@ export class Tower extends GameObject {
             {
                 tile.corpses++; // Add corpse to tile
                 tile.units.splice(i, 1); // Remove unit from array
-                i--;
+                i = Math.max(0, i - 1);
             }
         }
         
@@ -445,63 +254,7 @@ export class Tower extends GameObject {
             if (game.units[i].health <= 0)
             {
                 game.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-        
-        // Remove units on tile with zero health and add corpses
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (tile.units[i].health <= 0)
-            {
-                tile.corpses++; // Add corpse to tile
-                tile.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-        
-        // Remove units in game with zero health
-        for (let i: number = 0; i < game.units.length; i++) {
-            if (game.units[i].health <= 0)
-            {
-                game.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-        
-        // Remove units on tile with zero health and add corpses
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (tile.units[i].health <= 0)
-            {
-                tile.corpses++; // Add corpse to tile
-                tile.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-        
-        // Remove units in game with zero health
-        for (let i: number = 0; i < game.units.length; i++) {
-            if (game.units[i].health <= 0)
-            {
-                game.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-
-        for (let i: number = 0; i < tile.units.length; i++) {
-            if (tile.units[i].health < 1)
-            {
-                tile.corpses++; // Add corpse to tile
-                tile.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
-        }
-        
-        // Remove units in game with zero health
-        for (let i: number = 0; i < game.units.length; i++) {
-            if (game.units[i].health <= 0)
-            {
-                game.units.splice(i, 1); // Remove unit from array
-                i--;
+                i = Math.max(0, i - 1);
             }
         }
         
