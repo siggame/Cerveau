@@ -89,12 +89,12 @@ export interface IPlayerProperties {
     gold?: number;
 
     /**
-     * The amount of health remaining for this player's Castle.
+     * The amount of health remaining for this player's main unit.
      */
     health?: number;
 
     /**
-     * The tiles that the home base is located on.
+     * The tile that the home base is located on.
      */
     homeBase?: Tile[];
 
@@ -155,31 +155,6 @@ export interface IPlayerProperties {
 
 }
 
-/**
- * Argument overrides for Player's spawnUnit function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
- */
-export interface IPlayerSpawnUnitArgs {
-    /**
-     * What type of Unit to create (ghoul, hound, abomination, wraith, or
-     * horseman).
-     */
-    type?: "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
-}
-
-/**
- * Argument overrides for Player's spawnWorker function. If you return an
- * object of this interface from the invalidate functions, the value(s) you set
- * will be used in the actual function.
- */
-export interface IPlayerSpawnWorkerArgs {
-    /**
-     * What type of Unit to create (worker, zombie, ghoul).
-     */
-    type?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
-}
-
 /** All the possible properties for an Tile. */
 export interface ITileProperties {
     /**
@@ -188,9 +163,20 @@ export interface ITileProperties {
     corpses?: number;
 
     /**
+     * Whether or not the tile is a castle tile.
+     */
+    isCastle?: boolean;
+
+    /**
      * Whether or not the tile is considered to be a gold mine or not.
      */
     isGoldMine?: boolean;
+
+    /**
+     * Whether or not the tile is considered grass or not (Workers can walk on
+     * grass).
+     */
+    isGrass?: boolean;
 
     /**
      * Whether or not the tile is considered to be the island gold mine or not.
@@ -198,7 +184,8 @@ export interface ITileProperties {
     isIslandGoldMine?: boolean;
 
     /**
-     * Whether or not the tile is considered a path or not.
+     * Whether or not the tile is considered a path or not (Units can walk on
+     * paths).
      */
     isPath?: boolean;
 
@@ -213,24 +200,19 @@ export interface ITileProperties {
     isTower?: boolean;
 
     /**
+     * Whether or not the tile is the unit spawn.
+     */
+    isUnitSpawn?: boolean;
+
+    /**
      * Whether or not the tile can be moved on by workers.
      */
     isWall?: boolean;
 
     /**
-     * The amount of Ghouls on this tile at the moment.
+     * Whether or not the tile is the worker spawn.
      */
-    numOfGhouls?: number;
-
-    /**
-     * The amount of Hell Hounds on this tile at the moment.
-     */
-    numOfHounds?: number;
-
-    /**
-     * The amount of animated zombies on this tile at the moment.
-     */
-    numOfZombies?: number;
+    isWorkerSpawn?: boolean;
 
     /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
@@ -262,13 +244,12 @@ export interface ITileProperties {
     tower?: Tower;
 
     /**
-     * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
-     * 'pathSpawn', or 'workerSpawn').
+     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
      */
-    type?: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
+    type?: "normal" | "path" | "river" | "spawn";
 
     /**
-     * The list of Units on this Tile if present, otherwise undefined.
+     * The Unit on this Tile if present, otherwise undefined.
      */
     unit?: Unit;
 
@@ -291,9 +272,29 @@ export interface ITileProperties {
  */
 export interface ITileResArgs {
     /**
-     * Number of zombies on the tile that are being resurrected.
+     * Number of zombies to resurrect.
      */
     number?: number;
+}
+
+/**
+ * Argument overrides for Tile's spawnUnit function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface ITileSpawnUnitArgs {
+    /**
+     * The title of the desired unit type.
+     */
+    title?: string;
+}
+
+/**
+ * Argument overrides for Tile's spawnWorker function. If you return an object
+ * of this interface from the invalidate functions, the value(s) you set will
+ * be used in the actual function.
+ */
+export interface ITileSpawnWorkerArgs {
 }
 
 /** All the possible properties for an Tower. */
@@ -446,6 +447,11 @@ export interface ItJobProperties {
     allUnits?: boolean;
 
     /**
+     * The amount of damage this type does per attack.
+     */
+    damage?: number;
+
+    /**
      * How much does this type cost in gold.
      */
     goldCost?: number;
@@ -471,7 +477,7 @@ export interface ItJobProperties {
     title?: "arrow" | "aoe" | "ballista" | "cleansing";
 
     /**
-     * How many turns this tower type needs to take between attacks.
+     * How many turns have to take place between this type's attacks.
      */
     turnsBetweenAttacks?: number;
 
@@ -692,6 +698,9 @@ export const Namespace = makeNamespace({
                 islandIncomePerUnit: {
                     typeName: "int",
                 },
+                islandUnitCap: {
+                    typeName: "int",
+                },
                 manaIncomePerUnit: {
                     typeName: "int",
                 },
@@ -702,6 +711,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
                 maxTurns: {
+                    typeName: "int",
+                },
+                mineUnitCap: {
                     typeName: "int",
                 },
                 players: {
@@ -862,34 +874,6 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
-                spawnUnit: {
-                    args: [
-                        {
-                            argName: "type",
-                            typeName: "string",
-                            defaultValue: "ghoul",
-                            literals: ["ghoul", "hound", "abomination", "wraith", "horseman"],
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-                spawnWorker: {
-                    args: [
-                        {
-                            argName: "type",
-                            typeName: "string",
-                            defaultValue: "worker",
-                            literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
             },
         },
         Tile: {
@@ -898,7 +882,13 @@ export const Namespace = makeNamespace({
                 corpses: {
                     typeName: "int",
                 },
+                isCastle: {
+                    typeName: "boolean",
+                },
                 isGoldMine: {
+                    typeName: "boolean",
+                },
+                isGrass: {
                     typeName: "boolean",
                 },
                 isIslandGoldMine: {
@@ -913,17 +903,14 @@ export const Namespace = makeNamespace({
                 isTower: {
                     typeName: "boolean",
                 },
+                isUnitSpawn: {
+                    typeName: "boolean",
+                },
                 isWall: {
                     typeName: "boolean",
                 },
-                numOfGhouls: {
-                    typeName: "int",
-                },
-                numOfHounds: {
-                    typeName: "int",
-                },
-                numOfZombies: {
-                    typeName: "int",
+                isWorkerSpawn: {
+                    typeName: "boolean",
                 },
                 tileEast: {
                     typeName: "gameObject",
@@ -953,7 +940,7 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "normal",
-                    literals: ["normal", "path", "river", "mine", "castle", "pathSpawn", "workerSpawn"],
+                    literals: ["normal", "path", "river", "spawn"],
                 },
                 unit: {
                     typeName: "gameObject",
@@ -974,6 +961,26 @@ export const Namespace = makeNamespace({
                             argName: "number",
                             typeName: "int",
                         },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                spawnUnit: {
+                    args: [
+                        {
+                            argName: "title",
+                            typeName: "string",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                spawnWorker: {
+                    args: [
                     ],
                     invalidValue: false,
                     returns: {
@@ -1130,6 +1137,9 @@ export const Namespace = makeNamespace({
             attributes: {
                 allUnits: {
                     typeName: "boolean",
+                },
+                damage: {
+                    typeName: "int",
                 },
                 goldCost: {
                     typeName: "int",

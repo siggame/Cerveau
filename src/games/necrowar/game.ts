@@ -53,6 +53,12 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly islandIncomePerUnit!: number;
 
     /**
+     * The maximum number of workers that can occupy the mine on the island at
+     * a given time.
+     */
+    public readonly islandUnitCap!: number;
+
+    /**
      * The Amount of gold income per turn per unit fishing on the river side.
      */
     public readonly manaIncomePerUnit!: number;
@@ -71,6 +77,11 @@ export class NecrowarGame extends BaseClasses.Game {
      * The maximum number of turns before the game will automatically end.
      */
     public readonly maxTurns!: number;
+
+    /**
+     * The maximum number of workers that can occupy a mine at a given time.
+     */
+    public readonly mineUnitCap!: number;
 
     /**
      * List of all the players in the game.

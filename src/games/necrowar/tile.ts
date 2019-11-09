@@ -1,6 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties, ITileResArgs } from "./";
+import { ITileProperties, ITileResArgs, ITileSpawnUnitArgs,
+         ITileSpawnWorkerArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tower } from "./tower";
@@ -11,10 +12,9 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
- * 'pathSpawn', or 'workerSpawn').
+ * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
  */
-export type TileType = "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
+export type TileType = "normal" | "path" | "river" | "spawn";
 
 /**
  * A Tile in the game that makes up the 2D map grid.
@@ -26,9 +26,20 @@ export class Tile extends GameObject implements BaseTile {
     public corpses!: number;
 
     /**
+     * Whether or not the tile is a castle tile.
+     */
+    public isCastle!: boolean;
+
+    /**
      * Whether or not the tile is considered to be a gold mine or not.
      */
     public isGoldMine!: boolean;
+
+    /**
+     * Whether or not the tile is considered grass or not (Workers can walk on
+     * grass).
+     */
+    public isGrass!: boolean;
 
     /**
      * Whether or not the tile is considered to be the island gold mine or not.
@@ -36,7 +47,8 @@ export class Tile extends GameObject implements BaseTile {
     public isIslandGoldMine!: boolean;
 
     /**
-     * Whether or not the tile is considered a path or not.
+     * Whether or not the tile is considered a path or not (Units can walk on
+     * paths).
      */
     public isPath!: boolean;
 
@@ -51,24 +63,19 @@ export class Tile extends GameObject implements BaseTile {
     public isTower!: boolean;
 
     /**
+     * Whether or not the tile is the unit spawn.
+     */
+    public isUnitSpawn!: boolean;
+
+    /**
      * Whether or not the tile can be moved on by workers.
      */
     public isWall!: boolean;
 
     /**
-     * The amount of Ghouls on this tile at the moment.
+     * Whether or not the tile is the worker spawn.
      */
-    public numOfGhouls!: number;
-
-    /**
-     * The amount of Hell Hounds on this tile at the moment.
-     */
-    public numOfHounds!: number;
-
-    /**
-     * The amount of animated zombies on this tile at the moment.
-     */
-    public numOfZombies!: number;
+    public isWorkerSpawn!: boolean;
 
     /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
@@ -100,13 +107,12 @@ export class Tile extends GameObject implements BaseTile {
     public tower?: Tower;
 
     /**
-     * The type of Tile this is ('normal', 'path', 'river', 'mine', 'castle',
-     * 'pathSpawn', or 'workerSpawn').
+     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
      */
-    public readonly type!: "normal" | "path" | "river" | "mine" | "castle" | "pathSpawn" | "workerSpawn";
+    public readonly type!: "normal" | "path" | "river" | "spawn";
 
     /**
-     * The list of Units on this Tile if present, otherwise undefined.
+     * The Unit on this Tile if present, otherwise undefined.
      */
     public unit?: Unit;
 
@@ -160,8 +166,7 @@ export class Tile extends GameObject implements BaseTile {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param number - Number of zombies on the tile that are being
-     * resurrected.
+     * @param number - Number of zombies to resurrect.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -172,80 +177,116 @@ export class Tile extends GameObject implements BaseTile {
     ): void | string | ITileResArgs {
         // <<-- Creer-Merge: invalidate-res -->>
 
-        // Player invalidation
-        if (!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
-        }
-
-        // Ensure tile exists
-        if (!this) {
-            return `This tile does not exist!`;
-        }
-
-        // Ensure number isn't too large
-        if (this.corpses < number) {
-            return `${this} doesn't have ${number} corpses, it only has ${this.corpses}!`;
-        }
-
-        // Ensure number is positive
-        if (number <= 0) {
-            return `Why are you trying to resurrect ${number} corpses?!`;
-        }
-
-        // Ensure the player has enough mana
-        const cost = number * this.game.uJobs[1].manaCost;
-        if (this.game.currentPlayer.mana < cost) {
-            return `You do not have enough mana to resurrect ${number} corpses!`;
-        }
-
-        // Ensure there isn't another unit currently on this tile
-        const unitCount = Math.max(this.numOfGhouls, this.numOfHounds)
-        if (unitCount > 0 || this.unit !== undefined) {
-            return `This tile is already occupied by another unit!`;
-        }
-
-        // Ensure there wouldn't be too many zombies
-        if (this.numOfZombies + number > this.game.uJobs[1].perTile) {
-            return `The tile cannot fit an additional ${number} zombies!`;
-        }
+        // Check all the arguments for res here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-res -->>
     }
 
     /**
-     * Resurrect the corpses on this tile into zombies.
+     * Resurrect the corpses on this tile into Zombies.
      *
      * @param player - The player that called this.
-     * @param number - Number of zombies on the tile that are being
-     * resurrected.
-     * @returns True if Unit was created successfully, false otherwise.
+     * @param number - Number of zombies to resurrect.
+     * @returns True if successful res, false otherwise.
      */
     protected async res(player: Player, number: number): Promise<boolean> {
         // <<-- Creer-Merge: res -->>
 
-        // Reduce player mana
-        this.game.currentPlayer.mana -= (number * this.game.uJobs[1].manaCost);
+        // Add logic here for res.
 
-        // Create stack of zombies
-        for (let i = 0; i < number; i++) {
-            this.manager.create.unit({
-                acted: false,
-                health: this.game.uJobs[1].health,
-                owner: this.game.currentPlayer,
-                tile: this,
-                uJob: this.game.uJobs[1],
-            });
-        }
-
-        // Add zombies to this tile
-        this.numOfZombies += number;
-
-        // Remove corpses from tile
-        this.corpses -= number;
-
-        return true;
+        // TODO: replace this with actual logic
+        return false;
 
         // <<-- /Creer-Merge: res -->>
+    }
+
+    /**
+     * Invalidation function for spawnUnit. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param title - The title of the desired unit type.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnUnit(
+        player: Player,
+        title: string,
+    ): void | string | ITileSpawnUnitArgs {
+        // <<-- Creer-Merge: invalidate-spawnUnit -->>
+
+        // Check all the arguments for spawnUnit here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-spawnUnit -->>
+    }
+
+    /**
+     * Spawns a fighting unit on the correct tile.
+     *
+     * @param player - The player that called this.
+     * @param title - The title of the desired unit type.
+     * @returns True if successfully spawned, false otherwise.
+     */
+    protected async spawnUnit(
+        player: Player,
+        title: string,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: spawnUnit -->>
+
+        // Add logic here for spawnUnit.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: spawnUnit -->>
+    }
+
+    /**
+     * Invalidation function for spawnWorker. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnWorker(
+        player: Player,
+    ): void | string | ITileSpawnWorkerArgs {
+        // <<-- Creer-Merge: invalidate-spawnWorker -->>
+
+        // Check all the arguments for spawnWorker here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-spawnWorker -->>
+    }
+
+    /**
+     * Spawns a worker on the correct tile.
+     *
+     * @param player - The player that called this.
+     * @returns True if successfully spawned, false otherwise.
+     */
+    protected async spawnWorker(player: Player): Promise<boolean> {
+        // <<-- Creer-Merge: spawnWorker -->>
+
+        // Add logic here for spawnWorker.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: spawnWorker -->>
     }
 
     /**

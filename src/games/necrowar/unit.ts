@@ -319,9 +319,6 @@ export class Unit extends GameObject {
             return `${this} must be a worker.`;
         }
 
-        
-
-
         // <<-- /Creer-Merge: invalidate-fish -->>
     }
 
@@ -407,7 +404,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Enters an empty mine tile and is put to work gathering resources.
+     * Enters a mine and is put to work gathering resources.
      *
      * @param player - The player that called this.
      * @param tile - The tile the mine is located on.
@@ -450,7 +447,6 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    
     protected invalidateMove(
         player: Player,
         tile: Tile,
@@ -461,8 +457,6 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-move -->>
 
         //check all the reasons
         const reason = this.invalidate(player, true);
@@ -511,8 +505,8 @@ export class Unit extends GameObject {
          not sure how to differentiate jobs just yet, i'm sure i missed something
          else super game breaking */
 
-      return;
-
+        return;
+        // <<-- /Creer-Merge: invalidate-move -->>
     }
 
     /**

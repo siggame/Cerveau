@@ -16,27 +16,27 @@ export class Tower extends GameObject {
      * Whether this tower has attacked this turn or not.
      */
     public attacked!: boolean;
-    
+
     /**
      * How much remaining health this tower has.
      */
     public health!: number;
-    
+
     /**
      * The player that built / owns this tower.
      */
     public owner?: Player;
-    
+
     /**
      * The Tile this Tower is on.
      */
     public readonly tile: Tile;
-    
+
     /**
      * What type of tower this is (it's job).
      */
     public readonly type!: tJob;
-    
+
     // <<-- Creer-Merge: attributes -->>
     
     // Any additional member attributes can go here
@@ -44,7 +44,7 @@ export class Tower extends GameObject {
     // in the creer file.
     
     // <<-- /Creer-Merge: attributes -->>
-    
+
     /**
      * Called when a Tower is created.
      *
@@ -60,12 +60,12 @@ export class Tower extends GameObject {
         required: Readonly<IBaseGameObjectRequiredData>,
     ) {
         super(args, required);
-        
+
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
-    
+
     // <<-- Creer-Merge: public-functions -->>
     
     // Any public functions can go here for other things in the game to use.
@@ -73,7 +73,7 @@ export class Tower extends GameObject {
     // in the creer file.
     
     // <<-- /Creer-Merge: public-functions -->>
-    
+
     /**
      * Invalidation function for attack. Try to find a reason why the passed in
      * parameters are invalid, and return a human readable string telling them
@@ -380,7 +380,7 @@ export class Tower extends GameObject {
         
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
-    
+
     /**
      * Attacks an enemy unit on an tile within it's range.
      *
@@ -509,7 +509,7 @@ export class Tower extends GameObject {
         
         // <<-- /Creer-Merge: attack -->>
     }
-    
+
     // <<-- Creer-Merge: protected-private-functions -->>
     
     /*
