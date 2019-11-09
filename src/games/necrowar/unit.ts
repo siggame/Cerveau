@@ -319,9 +319,6 @@ export class Unit extends GameObject {
             return `${this} must be a worker.`;
         }
 
-        
-
-
         // <<-- /Creer-Merge: invalidate-fish -->>
     }
 
@@ -462,8 +459,6 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
-        // <<-- /Creer-Merge: invalidate-move -->>
-
         //check all the reasons
         const reason = this.invalidate(player, true);
 
@@ -511,7 +506,8 @@ export class Unit extends GameObject {
          not sure how to differentiate jobs just yet, i'm sure i missed something
          else super game breaking */
 
-      return;
+        return;
+        // <<-- /Creer-Merge: invalidate-move -->>
 
     }
 

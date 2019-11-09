@@ -7,6 +7,8 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 import { Tower } from "./tower";
 import { Unit } from "./unit";
+import { tJob } from "./t-Job";
+import { uJob } from "./u-Job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
