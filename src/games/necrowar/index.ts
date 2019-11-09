@@ -215,6 +215,21 @@ export interface ITileProperties {
     isWorkerSpawn?: boolean;
 
     /**
+     * The amount of Ghouls on this tile.
+     */
+    numGhouls?: number;
+
+    /**
+     * The amount of Hounds on this tile.
+     */
+    numHounds?: number;
+
+    /**
+     * The amount of Zombies on this tile.
+     */
+    numZombies?: number;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -274,7 +289,7 @@ export interface ITileResArgs {
     /**
      * Number of zombies to resurrect.
      */
-    number?: number;
+    num?: number;
 }
 
 /**
@@ -698,9 +713,6 @@ export const Namespace = makeNamespace({
                 islandIncomePerUnit: {
                     typeName: "int",
                 },
-                islandUnitCap: {
-                    typeName: "int",
-                },
                 manaIncomePerUnit: {
                     typeName: "int",
                 },
@@ -711,9 +723,6 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
                 maxTurns: {
-                    typeName: "int",
-                },
-                mineUnitCap: {
                     typeName: "int",
                 },
                 players: {
@@ -912,6 +921,15 @@ export const Namespace = makeNamespace({
                 isWorkerSpawn: {
                     typeName: "boolean",
                 },
+                numGhouls: {
+                    typeName: "int",
+                },
+                numHounds: {
+                    typeName: "int",
+                },
+                numZombies: {
+                    typeName: "int",
+                },
                 tileEast: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
@@ -958,7 +976,7 @@ export const Namespace = makeNamespace({
                 res: {
                     args: [
                         {
-                            argName: "number",
+                            argName: "num",
                             typeName: "int",
                         },
                     ],

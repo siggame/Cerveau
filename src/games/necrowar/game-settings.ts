@@ -35,26 +35,12 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 default: 0,
                 // <<-- /Creer-Merge: islandIncomePerUnit -->>
             },
-            islandUnitCap: {
-                description: "The maximum number of workers that can occupy "
-                           + "the mine on the island at a given time.",
-                // <<-- Creer-Merge: islandUnitCap -->>
-                default: 0,
-                // <<-- /Creer-Merge: islandUnitCap -->>
-            },
             manaIncomePerUnit: {
                 description: "The Amount of gold income per turn per unit "
                            + "fishing on the river side.",
                 // <<-- Creer-Merge: manaIncomePerUnit -->>
                 default: 0,
                 // <<-- /Creer-Merge: manaIncomePerUnit -->>
-            },
-            mineUnitCap: {
-                description: "The maximum number of workers that can occupy a "
-                           + "mine at a given time.",
-                // <<-- Creer-Merge: mineUnitCap -->>
-                default: 0,
-                // <<-- /Creer-Merge: mineUnitCap -->>
             },
             riverPhase: {
                 description: "The amount of turns it takes between the river "
