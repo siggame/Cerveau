@@ -7,8 +7,6 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 import { Tower } from "./tower";
 import { Unit } from "./unit";
-import { tJob } from "./t-Job";
-import { uJob } from "./u-Job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -55,6 +53,12 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly islandIncomePerUnit!: number;
 
     /**
+     * The maximum number of workers that can occupy the mine on the island at
+     * a given time.
+     */
+    public readonly islandUnitCap!: number;
+
+    /**
      * The Amount of gold income per turn per unit fishing on the river side.
      */
     public readonly manaIncomePerUnit!: number;
@@ -73,6 +77,11 @@ export class NecrowarGame extends BaseClasses.Game {
      * The maximum number of turns before the game will automatically end.
      */
     public readonly maxTurns!: number;
+
+    /**
+     * The maximum number of workers that can occupy a mine at a given time.
+     */
+    public readonly mineUnitCap!: number;
 
     /**
      * List of all the players in the game.

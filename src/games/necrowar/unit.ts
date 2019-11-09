@@ -404,7 +404,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Enters an empty mine tile and is put to work gathering resources.
+     * Enters a mine and is put to work gathering resources.
      *
      * @param player - The player that called this.
      * @param tile - The tile the mine is located on.
@@ -447,7 +447,6 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    
     protected invalidateMove(
         player: Player,
         tile: Tile,
@@ -508,7 +507,6 @@ export class Unit extends GameObject {
 
         return;
         // <<-- /Creer-Merge: invalidate-move -->>
-
     }
 
     /**

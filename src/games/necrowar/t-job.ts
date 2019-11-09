@@ -22,6 +22,11 @@ export class tJob extends GameObject {
     public allUnits!: boolean;
 
     /**
+     * The amount of damage this type does per attack.
+     */
+    public readonly damage!: number;
+
+    /**
      * How much does this type cost in gold.
      */
     public readonly goldCost!: number;
@@ -47,7 +52,7 @@ export class tJob extends GameObject {
     public readonly title!: "arrow" | "aoe" | "ballista" | "cleansing";
 
     /**
-     * How many turns this tower type needs to take between attacks.
+     * How many turns have to take place between this type's attacks.
      */
     public readonly turnsBetweenAttacks!: number;
 
