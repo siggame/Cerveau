@@ -91,81 +91,59 @@ export class Tower extends GameObject {
         tile: Tile,
     ): void | string | ITowerAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
+        const range = 2.3; // Attack range
 
-        // Check all the arguments for attack here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        
-        let range: number = 2.3; // Attack range
-        
-        
         // Check if tower already attacked
         if (this.attacked) {
             return `${this}, cannot attack becuase has already attacked this turn`;
         }
-        
+
         // Check if any unit belongs to the player
         if ((tile.unit) && (tile.unit.owner === player))
         {
-             return `${this}, cannot attack units on their own side`;
+            return `${this}, cannot attack allied units!`;
         }
-        
+
         // Check if tile exists
         if (!tile) {
-            return `${this}, cannot attack a tile that doesn't exist`;
+            return `${this}, cannot attack a tile that doesn't exist!`;
         }
-        
+
         // Check if tile has no units
         if (!tile.unit) {
-            return `${this}, cannot attack a tile with no units`;
+            return `${this}, cannot attack a tile with no units!`;
         }
-        
+
         // Check if tower has zero health
         if (this.health <= 0)
         {
-            return `${this}, cannot attack because it has zero health`;
+            return `${this}, cannot attack because it has been destroyed!`;
         }
-        
+
         /*
          * Shape of the Tower range:
-         *         _ x x x _ 
+         *         _ x x x _
          *         x x x x x
          *         x x T x x
          *         x x x x x
          *         _ x x x _
          */
-        
+
         // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
             return `${this}, cannot attack because target tile is out of range`;
         }
-        
+
         // Check if job is valid
         if (!this.job) {
             return `${this}, has an unknown job`;
         }
-        else
-        {
+        else {
             if (!this.job.title) {
                 return `${this}, has an unknown job name`;
             }
         }
-        
-        // Check if any unit on tile has health
-        let found: boolean = false;
-        //for (let i: number = 0; i < tile.units.length; i++) {
-        if (0 < tile.unit.health)
-        {
-            found = true;
-            //break; // Exit for-loop
-        }
-        //}
-        if (!found)
-        {
-            return `${this}, targets have zero health`;
-        }
-        
+
         // <<-- /Creer-Merge: invalidate-attack -->>
     }
 
@@ -178,70 +156,63 @@ export class Tower extends GameObject {
      */
     protected async attack(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: attack -->>
-        
+
         /*
          * Damage That Towers Do To Units
          * Castle | Arrow | Ballista | Cleansing | AOE
          * -------+-------+----------+-----------+-----
          *    5   |   5   |    20    |     5     |  3
          */
-        
-        //if (this.job.title === "aoe")
-        //{
-            // Attack logic for AOE tower
-            //for (let i: number = 0; i < tile.units.length; i++)
-            //{
-                //if (0 < tile.units[i].health) {
-                    /*
-                     * The Math.max function with 0 as an argument will ensure
-                     * the health of a unit is always equal or greater than 0
-                     */
-                //    tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
-                //}
-            //}
-        //}
-        //else
-        //{
-            // Attack logic for other towers
-        //   for (let i: number = 0; i < tile.units.length; i++)
-        //    {
-        //        if (0 < tile.units[i].health) {
-                    /*
-                     * The Math.max function with 0 as an argument will ensure
-                     * the health of a unit is always equal or greater than 0
-                     */
-        //            tile.units[i].health = Math.max(0, tile.units[i].health - this.damage);
-        //        }
-        //        break; // Exit for-loop
-        //    }
-        //}
-        
-        // Remove units on tile with zero health and add corpses
-        //for (let i: number = 0; i < tile.units.length; i++) {
-        //    if (tile.units[i].health <= 0)
-        //    {
-        //        tile.corpses++; // Add corpse to tile
-        //        tile.units.splice(i, 1); // Remove unit from array
-        //        i = Math.max(0, i - 1);
-        //    }
-        //}
-        
+
+        // Get all units on target tile
+        let tileUnits = [];
+        for (let unit of this.game.units) {
+            if (unit.tile === tile) {
+                tileUnits.push(unit);
+            }
+        }
+
+        if (!tile.unit) {
+            return false;
+        }
+
+        if (this.job.title === "aoe") {
+            for (let unit of tileUnits) {
+                unit.health = Math.max(0, unit.health - this.job.damage);
+            }
+        }
+        else {
+            tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
+        }
+
+        // Handle killed units
+        for (let unit of tileUnits) {
+            if (unit.health === 0) {
+                if (unit.job.title !== "zombie") {
+                    tile.corpses += 1;
+                }
+                unit.tile = undefined;
+
+                if (tile.unit && tile.unit.health === 0) {
+                    tile.unit = undefined;
+                }
+            }
+        }
+
         // Remove units in game with zero health
-        //for (let i: number = 0; i < game.units.length; i++) {
-        //    if (game.units[i].health <= 0)
-        //    {
-        //        game.units.splice(i, 1); // Remove unit from array
-        //        i = Math.max(0, i - 1);
-        //    }
-        //}
-        
+        for (let i: number = 0; i < this.game.units.length; i++) {
+            if (this.game.units[i].health <= 0) {
+                this.game.units.splice(i, 1); // Remove unit from array
+                i = Math.max(0, i - 1);
+            }
+        }
+
         return true;
-        
         // <<-- /Creer-Merge: attack -->>
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
-    
+
     /*
      * Returns the distance between the points
      *
@@ -256,8 +227,9 @@ export class Tower extends GameObject {
         // Calculate differences
         const xDif: number = (x1 - x2);
         const yDif: number = (y1 - y2);
+
         return Math.sqrt((xDif ** 2) + (yDif ** 2));
     }
-    
+
     // <<-- /Creer-Merge: protected-private-functions -->>
 }

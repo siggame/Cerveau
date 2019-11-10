@@ -323,6 +323,8 @@ export class Unit extends GameObject {
             title,
         });
 
+        this.tile.isTower = true;
+
         player.towers.push(this.tile.tower);
         player.gold -= this.game.TowerJobs[towerIndex].goldCost;
         player.mana -= this.game.TowerJobs[towerIndex].manaCost;
