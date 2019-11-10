@@ -26,7 +26,7 @@ export class Tower extends GameObject {
     /**
      * What type of tower this is (it's job).
      */
-    public readonly job: TowerJob;
+    public readonly job!: TowerJob;
 
     /**
      * The player that built / owns this tower.
@@ -141,14 +141,14 @@ export class Tower extends GameObject {
             return `${this}, cannot attack because target tile is out of range`;
         }
         
-        // Check if type is valid
-        if (!this.type) {
-            return `${this}, has an unknown type`;
+        // Check if job is valid
+        if (!this.job) {
+            return `${this}, has an unknown job`;
         }
         else
         {
-            if (!this.type.title) {
-                return `${this}, has an unknown type name`;
+            if (!this.job.title) {
+                return `${this}, has an unknown job name`;
             }
         }
         
@@ -186,7 +186,7 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
         
-        //if (this.type.title === "aoe")
+        //if (this.job.title === "aoe")
         //{
             // Attack logic for AOE tower
             //for (let i: number = 0; i < tile.units.length; i++)

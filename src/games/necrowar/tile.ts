@@ -274,7 +274,7 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure the player has enough mana
-        const cost = num * this.game.uJobs[1].manaCost;
+        const cost = num * this.game.UnitJobs[1].manaCost;
         if (this.game.currentPlayer.mana < cost) {
             return `You do not have enough mana to resurrect ${num} corpses!`;
         }
@@ -286,7 +286,7 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure there wouldn't be too many zombies
-        if (this.numZombies + num > this.game.uJobs[1].perTile) {
+        if (this.numZombies + num > this.game.UnitJobs[1].perTile) {
             return `The tile cannot fit an additional ${num} zombies!`;
         }
 
@@ -304,16 +304,16 @@ export class Tile extends GameObject implements BaseTile {
         // <<-- Creer-Merge: res -->>
 
         // Reduce player mana
-        this.game.currentPlayer.mana -= (num * this.game.uJobs[1].manaCost);
+        this.game.currentPlayer.mana -= (num * this.game.UnitJobs[1].manaCost);
 
         // Create stack of zombies
         for (let i = 0; i < num; i++) {
             this.manager.create.unit({
                 acted: false,
-                health: this.game.uJobs[1].health,
+                health: this.game.UnitJobs[1].health,
                 owner: this.game.currentPlayer,
                 tile: this,
-                uJob: this.game.uJobs[1],
+                job: this.game.UnitJobs[1],
             });
         }
 
@@ -371,8 +371,8 @@ export class Tile extends GameObject implements BaseTile {
             return `Invalid unit type!`;
         }
 
-        if (player.gold < this.game.uJobs[unitIndex].goldCost
-            || player.mana < this.game.uJobs[unitIndex].manaCost) {
+        if (player.gold < this.game.UnitJobs[unitIndex].goldCost
+            || player.mana < this.game.UnitJobs[unitIndex].manaCost) {
             return `You cannot afford to spawn this unit.`;
         }
 
@@ -385,19 +385,19 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         if (this.unit) {
-            if (this.unit.uJob.title === "zombie"
-                || this.unit.uJob.title === "horseman"
-                || this.unit.uJob.title === "abomination"
-                || this.unit.uJob.title === "wraith"
-                || this.unit.uJob.title !== title) {
+            if (this.unit.job.title === "zombie"
+                || this.unit.job.title === "horseman"
+                || this.unit.job.title === "abomination"
+                || this.unit.job.title === "wraith"
+                || this.unit.job.title !== title) {
                 return `You cannot fit another unit on this tile!`;
             }
 
-            if (this.unit.uJob.title === "ghoul" && this.numGhouls >= this.game.uJobs[2].perTile) {
+            if (this.unit.job.title === "ghoul" && this.numGhouls >= this.game.UnitJobs[2].perTile) {
                 return `The maximum number of ghouls are already on this tile!`;
             }
 
-            if (this.unit.uJob.title === "hound" && this.numHounds >= this.game.uJobs[2].perTile) {
+            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[2].perTile) {
                 return `The maximum number of hounds are already on this tile!`;
             }
         }
@@ -436,18 +436,18 @@ export class Tile extends GameObject implements BaseTile {
             unitIndex = 6;
         }
 
-        const goldCost = this.game.uJobs[unitIndex].goldCost;
-        const manaCost = this.game.uJobs[unitIndex].manaCost;
+        const goldCost = this.game.UnitJobs[unitIndex].goldCost;
+        const manaCost = this.game.UnitJobs[unitIndex].manaCost;
 
         player.gold -= goldCost;
         player.mana -= manaCost;
 
         const unit = this.game.manager.create.unit({
             acted: false,
-            health: this.game.uJobs[unitIndex].health,
+            health: this.game.UnitJobs[unitIndex].health,
             owner: player,
             tile: this,
-            uJob: this.game.uJobs[unitIndex],
+            job: this.game.UnitJobs[unitIndex],
             title,
         });
 
@@ -493,8 +493,8 @@ export class Tile extends GameObject implements BaseTile {
             return `It isn't your turn, ${player}.`;
         }
 
-        if (player.gold < this.game.uJobs[0].goldCost
-            || player.mana < this.game.uJobs[0].manaCost) {
+        if (player.gold < this.game.UnitJobs[0].goldCost
+            || player.mana < this.game.UnitJobs[0].manaCost) {
             return `You cannot afford to spawn a worker.`;
         }
 
@@ -522,85 +522,24 @@ export class Tile extends GameObject implements BaseTile {
     protected async spawnWorker(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: spawnWorker -->>
 
-        const goldCost = this.game.uJobs[0].goldCost;
-        const manaCost = this.game.uJobs[0].manaCost;
+        const goldCost = this.game.UnitJobs[0].goldCost;
+        const manaCost = this.game.UnitJobs[0].manaCost;
 
         player.gold -= goldCost;
         player.mana -= manaCost;
 
         this.unit = this.game.manager.create.unit({
             acted: false,
-            health: this.game.uJobs[0].health,
+            health: this.game.UnitJobs[0].health,
             owner: player,
             tile: this,
-            uJob: this.game.uJobs[0],
+            job: this.game.UnitJobs[0],
             title: "worker",
         });
 
         return true;
 
         // <<-- /Creer-Merge: spawnWorker -->>
-    }
-
-    /**
-     * Gets the adjacent direction between this Tile and an adjacent Tile
-     * (if one exists).
-     *
-     * @param adjacentTile - A tile that should be adjacent to this Tile.
-     * @returns "North", "East", "South", or "West" if the tile is adjacent to
-     * this Tile in that direction. Otherwise undefined.
-     */
-    public getAdjacentDirection(
-        adjacentTile: Tile | undefined,
-    ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
-    }
-
-    /**
-     * Gets a list of all the neighbors of this Tile.
-     *
-     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
-     */
-    public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this);
-    }
-
-    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
-    public getNeighbor(direction: string): Tile | undefined;
-
-    /**
-     * Gets a neighbor in a particular direction
-     *
-     * @param direction - The direction you want, must be
-     * "North", "East", "South", or "West".
-     * @returns The Tile in that direction, or undefined if there is none.
-     */
-    public getNeighbor(direction: string): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction);
-    }
-
-    /**
-     * Checks if a Tile has another Tile as its neighbor.
-     *
-     * @param tile - The Tile to check.
-     * @returns True if neighbor, false otherwise.
-     */
-    public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.hasNeighbor.call(this, tile);
-    }
-
-    /**
-     * toString override.
-     *
-     * @returns A string representation of the Tile.
-     */
-    public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.toString.call(this);
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
