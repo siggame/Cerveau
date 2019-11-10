@@ -389,28 +389,28 @@ export class NecrowarGame extends BaseClasses.Game {
         for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
                 //Grass
-                if(getMutableTile(x, y).isGrass = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGrass = true
+                if(getMutableTile(x, y).isGrass) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true
                 }
                 //Paths
-                if(getMutableTile(x, y).isPath = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isPath = true
+                if(getMutableTile(x, y).isPath) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isPath = true
                 }
                 //Gold Mines
-                if(getMutableTile(x, y).isGoldMine = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGoldMine = true
+                if(getMutableTile(x, y).isGoldMine) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGoldMine = true
                 }
                 //Castle
-                if(getMutableTile(x, y).isCastle = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isCastle = true
+                if(getMutableTile(x, y).isCastle) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isCastle = true
                 }
                 //Worker Spawn
-                if(getMutableTile(x, y).isWorkerSpawn = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isWorkerSpawn = true
+                if(getMutableTile(x, y).isWorkerSpawn) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isWorkerSpawn = true
                 }
                 //Unit Spawn
-                if(getMutableTile(x, y).isUnitSpawn = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isUnitSpawn = true
+                if(getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isUnitSpawn = true
                 }
             }
         }
