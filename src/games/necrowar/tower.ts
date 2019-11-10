@@ -121,7 +121,7 @@ export class Tower extends GameObject {
         }
 
         /*
-         * Shape of the Tower range:
+         * Shape of the tower range:
          *         _ x x x _
          *         x x x x x
          *         x x T x x
