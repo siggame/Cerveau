@@ -90,7 +90,7 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
             // Tiled settings
             mapWidth: {
                 // <<-- Creer-Merge: map-width -->>
-                default: 63,
+                default: 64,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
                 description: "The width (in Tiles) for the game map to be initialized to.",
