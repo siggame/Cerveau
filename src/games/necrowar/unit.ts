@@ -3,9 +3,8 @@ import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
          IUnitMoveArgs, IUnitProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { tJob } from "./t-Job";
 import { Tile } from "./tile";
-import { uJob } from "./u-Job";
+import { UnitJob } from "./unit-job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -28,6 +27,11 @@ export class Unit extends GameObject {
     public health!: number;
 
     /**
+     * The type of unit this is.
+     */
+    public readonly job: UnitJob;
+
+    /**
      * The number of moves this unit has left this turn.
      */
     public moves!: number;
@@ -41,11 +45,6 @@ export class Unit extends GameObject {
      * The Tile this Unit is on.
      */
     public tile?: Tile;
-
-    /**
-     * The type of unit this is.
-     */
-    public readonly uJob!: uJob;
 
     // <<-- Creer-Merge: attributes -->>
 

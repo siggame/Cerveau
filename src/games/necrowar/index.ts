@@ -325,6 +325,11 @@ export interface ITowerProperties {
     health?: number;
 
     /**
+     * What type of tower this is (it's job).
+     */
+    job?: TowerJob;
+
+    /**
      * The player that built / owns this tower.
      */
     owner?: Player;
@@ -333,11 +338,6 @@ export interface ITowerProperties {
      * The Tile this Tower is on.
      */
     tile?: Tile;
-
-    /**
-     * What type of tower this is (it's job).
-     */
-    type?: tJob;
 
 }
 
@@ -351,6 +351,51 @@ export interface ITowerAttackArgs {
      * The Tile to attack.
      */
     tile?: Tile;
+}
+
+/** All the possible properties for an TowerJob. */
+export interface ITowerJobProperties {
+    /**
+     * Whether this tower type hits all of the units on a tile (true) or one at
+     * a time (false).
+     */
+    allUnits?: boolean;
+
+    /**
+     * The amount of damage this type does per attack.
+     */
+    damage?: number;
+
+    /**
+     * How much does this type cost in gold.
+     */
+    goldCost?: number;
+
+    /**
+     * The amount of starting health this type has.
+     */
+    health?: number;
+
+    /**
+     * How much does this type cost in mana.
+     */
+    manaCost?: number;
+
+    /**
+     * The number of tiles this type can attack from.
+     */
+    range?: number;
+
+    /**
+     * The type title. 'arrow', 'aoe', 'ballista', or 'cleansing'.
+     */
+    title?: "arrow" | "aoe" | "ballista" | "cleansing";
+
+    /**
+     * How many turns have to take place between this type's attacks.
+     */
+    turnsBetweenAttacks?: number;
+
 }
 
 /** All the possible properties for an Unit. */
@@ -367,6 +412,11 @@ export interface IUnitProperties {
     health?: number;
 
     /**
+     * The type of unit this is.
+     */
+    job?: UnitJob;
+
+    /**
      * The number of moves this unit has left this turn.
      */
     moves?: number;
@@ -380,11 +430,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
-    /**
-     * The type of unit this is.
-     */
-    uJob?: uJob;
 
 }
 
@@ -448,53 +493,8 @@ export interface IUnitMoveArgs {
     tile?: Tile;
 }
 
-/** All the possible properties for an tJob. */
-export interface ItJobProperties {
-    /**
-     * Whether this tower type hits all of the units on a tile (true) or one at
-     * a time (false).
-     */
-    allUnits?: boolean;
-
-    /**
-     * The amount of damage this type does per attack.
-     */
-    damage?: number;
-
-    /**
-     * How much does this type cost in gold.
-     */
-    goldCost?: number;
-
-    /**
-     * The amount of starting health this type has.
-     */
-    health?: number;
-
-    /**
-     * How much does this type cost in mana.
-     */
-    manaCost?: number;
-
-    /**
-     * The number of tiles this type can attack from.
-     */
-    range?: number;
-
-    /**
-     * The type title. 'arrow', 'aoe', 'ballista', or 'cleansing'.
-     */
-    title?: "arrow" | "aoe" | "ballista" | "cleansing";
-
-    /**
-     * How many turns have to take place between this type's attacks.
-     */
-    turnsBetweenAttacks?: number;
-
-}
-
-/** All the possible properties for an uJob. */
-export interface IuJobProperties {
+/** All the possible properties for an UnitJob. */
+export interface IUnitJobProperties {
     /**
      * The amount of damage this type does per attack.
      */
@@ -542,9 +542,9 @@ export * from "./game-object";
 export * from "./player";
 export * from "./tile";
 export * from "./tower";
+export * from "./tower-job";
 export * from "./unit";
-export * from "./t-job";
-export * from "./u-job";
+export * from "./unit-job";
 export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
@@ -553,9 +553,9 @@ import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 import { Tower } from "./tower";
+import { TowerJob } from "./tower-job";
 import { Unit } from "./unit";
-import { tJob } from "./t-job";
-import { uJob } from "./u-job";
+import { UnitJob } from "./unit-job";
 
 import { AI } from "./ai";
 import { NecrowarGame } from "./game";
@@ -568,14 +568,14 @@ export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 /** The arguments used to construct a Tower */
 export type TowerArgs = FirstArgumentFromConstructor<typeof Tower>;
 
+/** The arguments used to construct a TowerJob */
+export type TowerJobArgs = FirstArgumentFromConstructor<typeof TowerJob>;
+
 /** The arguments used to construct a Unit */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
-/** The arguments used to construct a tJob */
-export type tJobArgs = FirstArgumentFromConstructor<typeof tJob>;
-
-/** The arguments used to construct a uJob */
-export type uJobArgs = FirstArgumentFromConstructor<typeof uJob>;
+/** The arguments used to construct a UnitJob */
+export type UnitJobArgs = FirstArgumentFromConstructor<typeof UnitJob>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -609,6 +609,19 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     }
 
     /**
+     * Creates a new TowerJob in the Game and tracks it for all players.
+     *
+     * @param args - Data about the TowerJob to set. Any keys matching a
+     * property in the game object's class will be automatically set for you.
+     * @returns A new TowerJob hooked up in the game and ready for you to use.
+     */
+    public towerJob<T extends TowerJobArgs>(
+        args: Readonly<T>,
+    ): TowerJob & T {
+        return this.createGameObject("TowerJob", TowerJob, args);
+    }
+
+    /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
      * @param args - Data about the Unit to set. Any keys matching a property
@@ -622,29 +635,16 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     }
 
     /**
-     * Creates a new tJob in the Game and tracks it for all players.
+     * Creates a new UnitJob in the Game and tracks it for all players.
      *
-     * @param args - Data about the tJob to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
-     * @returns A new tJob hooked up in the game and ready for you to use.
+     * @param args - Data about the UnitJob to set. Any keys matching a
+     * property in the game object's class will be automatically set for you.
+     * @returns A new UnitJob hooked up in the game and ready for you to use.
      */
-    public tJob<T extends tJobArgs>(
+    public unitJob<T extends UnitJobArgs>(
         args: Readonly<T>,
-    ): tJob & T {
-        return this.createGameObject("tJob", tJob, args);
-    }
-
-    /**
-     * Creates a new uJob in the Game and tracks it for all players.
-     *
-     * @param args - Data about the uJob to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
-     * @returns A new uJob hooked up in the game and ready for you to use.
-     */
-    public uJob<T extends uJobArgs>(
-        args: Readonly<T>,
-    ): uJob & T {
-        return this.createGameObject("uJob", uJob, args);
+    ): UnitJob & T {
+        return this.createGameObject("UnitJob", UnitJob, args);
     }
 
 }
@@ -683,6 +683,22 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
+                TowerJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: TowerJob,
+                        nullable: false,
+                    },
+                },
+                UnitJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: UnitJob,
+                        nullable: false,
+                    },
+                },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -734,12 +750,6 @@ export const Namespace = makeNamespace({
                 session: {
                     typeName: "string",
                 },
-                tJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "tJob",
-                    },
-                },
                 tiles: {
                     typeName: "list",
                     valueType: {
@@ -757,12 +767,6 @@ export const Namespace = makeNamespace({
                         typeName: "gameObject",
                         gameObjectClass: Tower,
                         nullable: false,
-                    },
-                },
-                uJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "uJob",
                     },
                 },
                 units: {
@@ -1011,6 +1015,11 @@ export const Namespace = makeNamespace({
                 health: {
                     typeName: "int",
                 },
+                job: {
+                    typeName: "gameObject",
+                    gameObjectClass: TowerJob,
+                    nullable: false,
+                },
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -1020,9 +1029,6 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Tile,
                     nullable: false,
-                },
-                type: {
-                    typeName: "tJob",
                 },
             },
             functions: {
@@ -1042,6 +1048,39 @@ export const Namespace = makeNamespace({
                 },
             },
         },
+        TowerJob: {
+            parentClassName: "GameObject",
+            attributes: {
+                allUnits: {
+                    typeName: "boolean",
+                },
+                damage: {
+                    typeName: "int",
+                },
+                goldCost: {
+                    typeName: "int",
+                },
+                health: {
+                    typeName: "int",
+                },
+                manaCost: {
+                    typeName: "int",
+                },
+                range: {
+                    typeName: "int",
+                },
+                title: {
+                    typeName: "string",
+                    defaultValue: "arrow",
+                    literals: ["arrow", "aoe", "ballista", "cleansing"],
+                },
+                turnsBetweenAttacks: {
+                    typeName: "int",
+                },
+            },
+            functions: {
+            },
+        },
         Unit: {
             parentClassName: "GameObject",
             attributes: {
@@ -1050,6 +1089,11 @@ export const Namespace = makeNamespace({
                 },
                 health: {
                     typeName: "int",
+                },
+                job: {
+                    typeName: "gameObject",
+                    gameObjectClass: UnitJob,
+                    nullable: false,
                 },
                 moves: {
                     typeName: "int",
@@ -1063,9 +1107,6 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Tile,
                     nullable: true,
-                },
-                uJob: {
-                    typeName: "uJob",
                 },
             },
             functions: {
@@ -1139,40 +1180,7 @@ export const Namespace = makeNamespace({
                 },
             },
         },
-        tJob: {
-            parentClassName: "GameObject",
-            attributes: {
-                allUnits: {
-                    typeName: "boolean",
-                },
-                damage: {
-                    typeName: "int",
-                },
-                goldCost: {
-                    typeName: "int",
-                },
-                health: {
-                    typeName: "int",
-                },
-                manaCost: {
-                    typeName: "int",
-                },
-                range: {
-                    typeName: "int",
-                },
-                title: {
-                    typeName: "string",
-                    defaultValue: "arrow",
-                    literals: ["arrow", "aoe", "ballista", "cleansing"],
-                },
-                turnsBetweenAttacks: {
-                    typeName: "int",
-                },
-            },
-            functions: {
-            },
-        },
-        uJob: {
+        UnitJob: {
             parentClassName: "GameObject",
             attributes: {
                 damage: {

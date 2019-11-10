@@ -4,11 +4,11 @@ import { NecrowarGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { NecrowarGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
-import { tJob } from "./t-job"
 import { Tile } from "./tile";
 import { Tower } from "./tower";
-import { uJob } from "./u-job"
+import { TowerJob } from "./tower-job";
 import { Unit } from "./unit";
+import { UnitJob } from "./unit-job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -25,6 +25,16 @@ export class NecrowarGame extends BaseClasses.Game {
 
     /** The settings used to initialize the game, as set by players */
     public readonly settings = Object.freeze(this.settingsManager.values);
+
+    /**
+     * A list of every tower type / job.
+     */
+    public TowerJobs!: TowerJob[];
+
+    /**
+     * A list of every unit type / job.
+     */
+    public UnitJobs!: UnitJob[];
 
     /**
      * The player whose turn it is currently. That player can send commands.
@@ -90,11 +100,6 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly session!: string;
 
     /**
-     * A list of every tower type / job.
-     */
-    public tJobs!: tJob[];
-
-    /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
      * mapWidth` to access the correct index.
      */
@@ -110,11 +115,6 @@ export class NecrowarGame extends BaseClasses.Game {
      * Every Tower in the game.
      */
     public towers!: Tower[];
-
-    /**
-     * A list of every unit type / job.
-     */
-    public uJobs!: uJob[];
 
     /**
      * Every Unit in the game.

@@ -2,8 +2,8 @@ import { IBaseGameObjectRequiredData } from "~/core/game";
 import { ITowerAttackArgs, ITowerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { tJob } from "./t-job";
 import { Tile } from "./tile";
+import { TowerJob } from "./tower-job";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -24,6 +24,11 @@ export class Tower extends GameObject {
     public health!: number;
 
     /**
+     * What type of tower this is (it's job).
+     */
+    public readonly job: TowerJob;
+
+    /**
      * The player that built / owns this tower.
      */
     public owner?: Player;
@@ -32,11 +37,6 @@ export class Tower extends GameObject {
      * The Tile this Tower is on.
      */
     public readonly tile: Tile;
-
-    /**
-     * What type of tower this is (it's job).
-     */
-    public readonly type!: tJob;
 
     // <<-- Creer-Merge: attributes -->>
     
