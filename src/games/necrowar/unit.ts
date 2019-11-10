@@ -206,6 +206,25 @@ export class Unit extends GameObject {
         title: string,
     ): void | string | IUnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
+        let towerIndex = -1;
+
+        if (title === "arrow") {
+            towerIndex = 0;
+        }
+        else if (title === "ballista") {
+            towerIndex = 1;
+        }
+        else if (title === "cleansing") {
+            towerIndex = 2;
+        }
+        else if (title === "aoe") {
+            towerIndex = 3;
+        }
+
+        if (towerIndex === -1) {
+            return `Invalid tower type!`;
+        }
+
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
         }
@@ -233,40 +252,36 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        // Make sure the tile exists.
-        if (!tile) {
-            return `${this} is trying to build on a tile that doesn't exist`;
-        }
-        // continue from here after creer
-        if (player.gold < this.game.towers.tJobs.goldCost && player.mana < this.game.towers.tJob.manaCost) {
+        if (player.gold < this.game.tJobs[towerIndex].goldCost
+            || player.mana < this.game.tJobs[towerIndex].manaCost) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
-        if (tile !== this.tile) {
+        if (this.tile !== this.tile) {
             return `${this} must be on the target tile to build!`;
         }
 
-        if (tile.isGoldMine) {
+        if (this.tile.isGoldMine) {
             return `You can not build on a gold mine.`;
         }
 
-        if (tile.isIslandGoldMine) {
+        if (this.tile.isIslandGoldMine) {
             return `You can not build on the island.`;
         }
 
-        if (tile.isPath) {
+        if (this.tile.isPath) {
             return `You can not build on the path.`;
         }
 
-        if (tile.isRiver) {
+        if (this.tile.isRiver) {
             return `You can not build on the river.`;
         }
 
-        if (tile.isTower) {
+        if (this.tile.isTower) {
             return `You can not build ontop another tower.`;
         }
 
-        if (tile.isWall) {
+        if (this.tile.isWall) {
             return `You can not build on a wall.`;
         }
 
@@ -283,14 +298,34 @@ export class Unit extends GameObject {
      */
     protected async build(player: Player, title: string): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
-        // fix after creer run
-        if (!tile.tower) {
-            tile.tower = this.game.manager.create.tower({tile:tile,});
+        if (!this.tile) {
+            return false;
         }
 
-        tile.tower = this.game.towers.tJob;
-        player.gold -= this.game.towers.tJob.goldCost;
-        player.mana -= this.game.towers.tJob.manaCost;
+        let towerIndex = -1;
+
+        if (title === "arrow") {
+            towerIndex = 0;
+        }
+        else if (title === "ballista") {
+            towerIndex = 1;
+        }
+        else if (title === "cleansing") {
+            towerIndex = 2;
+        }
+        else if (title === "aoe") {
+            towerIndex = 3;
+        }
+
+        this.tile.tower = this.game.manager.create.tower({
+            owner: player,
+            tile: this.tile,
+            title,
+        });
+
+        player.towers.push(this.tile.tower);
+        player.gold -= this.game.tJobs[towerIndex].goldCost;
+        player.mana -= this.game.tJobs[towerIndex].manaCost;
 
         return true;
 
