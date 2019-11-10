@@ -3,7 +3,6 @@ import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
          IUnitMoveArgs, IUnitProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
-import { tJob } from "./t-Job";
 import { Tile } from "./tile";
 import { uJob } from "./u-Job";
 
