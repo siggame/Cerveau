@@ -424,13 +424,13 @@ export class NecrowarGame extends BaseClasses.Game {
         }
         //Make a smaller square of grass within the "lake"
         for (let x = (this.mapWidth / 2 - 1); x <= (this.mapWidth / 2 + 1); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2); y++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isGrass = true;
             }
         }
         //Make island mine tiles on the middle three tiles
         for (let x = (this.mapWidth / 2); x <= (this.mapWidth / 2); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2); y++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isIslandGoldMine = true;
             }
         }
