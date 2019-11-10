@@ -31,7 +31,7 @@ export class Tower extends GameObject {
     /**
      * The Tile this Tower is on.
      */
-    public readonly tile: Tile;
+    public readonly tile!: Tile;
 
     /**
      * What type of tower this is (it's job).
