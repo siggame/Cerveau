@@ -203,7 +203,7 @@ export class Tower extends GameObject {
         for (let i: number = 0; i < this.game.units.length; i++) {
             if (this.game.units[i].health <= 0) {
                 this.game.units.splice(i, 1); // Remove unit from array
-                i = i - 1;
+                i--;
             }
         }
 
