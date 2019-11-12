@@ -307,16 +307,19 @@ export class Tile extends GameObject implements BaseTile {
         this.game.currentPlayer.mana -= (num * this.game.UnitJobs[1].manaCost);
 
         // Create stack of zombies
+        let unit;
         for (let i = 0; i < num; i++) {
-            this.manager.create.unit({
+            unit = this.manager.create.unit({
                 acted: false,
                 health: this.game.UnitJobs[1].health,
                 owner: this.game.currentPlayer,
                 tile: this,
                 job: this.game.UnitJobs[1],
             });
+            this.game.units.push(unit);
+            player.units.push(unit);
         }
-
+        
         // Add zombies to this tile
         this.numZombies += num;
 
@@ -450,6 +453,8 @@ export class Tile extends GameObject implements BaseTile {
             job: this.game.UnitJobs[unitIndex],
             title,
         });
+        this.game.units.push(unit);
+        player.units.push(unit);
 
         if (this.unit) {
             if (this.numGhouls !== 0) {
