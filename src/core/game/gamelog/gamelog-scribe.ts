@@ -26,20 +26,23 @@ export class GamelogScribe {
      * Creates a new game logger for a specific game.
      *
      * @param game - The game we are logging.
+     * @param gameVersion - The version of the game we are logging.
      * @param session - The session the game is in.
      * @param clients - The clients in the game session.
      * @param deltaManager - The delta manager that builds deltas for us.
      */
     constructor(
         game: BaseGame,
+        gameVersion: string,
         session: Session,
         clients: Immutable<BaseClient[]>,
         private readonly deltaManager: DeltaManager,
     ) {
         this.gamelog = {
-            gamelogVersion: "2.1.0",
+            gamelogVersion: "2.2.0",
             gameName: game.name,
             gameSession: game.session,
+            gameVersion,
             constants: SHARED_CONSTANTS,
             deltas: [],
             epoch: 0,

@@ -1152,4 +1152,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "ede84ab86376b00287c09558f05e8f2a61b92109d93aad9ebd3379ff4215fb53",
 });
