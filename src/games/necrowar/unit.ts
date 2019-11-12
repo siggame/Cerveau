@@ -323,6 +323,10 @@ export class Unit extends GameObject {
             title,
         });
 
+        this.game.towers.push(this.tile.tower);
+        
+        player.towers.push(this.tile.tower);
+
         this.tile.isTower = true;
 
         player.towers.push(this.tile.tower);
