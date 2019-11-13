@@ -149,6 +149,9 @@ export class NecrowarGame extends BaseClasses.Game {
         this.createTowerJobs();
 
         this.createMap();
+
+        this.giveInitialStuff();
+
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -175,6 +178,14 @@ export class NecrowarGame extends BaseClasses.Game {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
+
+    private giveInitialStuff(): void {
+        this.players[0].gold = 100;
+        this.players[0].mana = 100;
+        this.players[1].gold = 100;
+        this.players[1].mana = 100;
+    }
+
     /** Creates all unit types in the game */
     private createUnitJobs(): void {
         // pushes all unit types
@@ -262,6 +273,17 @@ export class NecrowarGame extends BaseClasses.Game {
     private createTowerJobs(): void {
         // pushes all tower types
         this.TowerJobs.push(
+            this.manager.create.towerJob({
+                title: "castle",
+                goldCost: 9999,
+                manaCost: 9999,
+                health: 50,
+                range: 3,
+                turnsBetweenAttacks: 1,
+                allUnits: true,
+                damage: 3,
+            }),
+            
             this.manager.create.towerJob({
                 title: "arrow",
                 goldCost: 50,
