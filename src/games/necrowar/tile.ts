@@ -89,7 +89,7 @@ export class Tile extends GameObject implements BaseTile {
 
     /**
      * Which player owns this tile, only applies to grass tiles for workers,
-     * NULL otherwise.
+     * undefined otherwise.
      */
     public owner?: Player;
 
@@ -315,7 +315,7 @@ export class Tile extends GameObject implements BaseTile {
             this.game.units.push(unit);
             player.units.push(unit);
         }
-        
+
         // Add zombies to this tile
         this.numZombies += num;
 
