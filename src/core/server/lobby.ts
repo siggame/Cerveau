@@ -609,10 +609,12 @@ ${err}`);
             room.addGameSettings(playData.validGameSettings);
         }
 
+        const gameNamespace = this.getGameNamespace(playData.gameName);
         client.send({
             event: "lobbied",
             data: {
                 gameName: data.gameName,
+                gameVersion: gameNamespace && gameNamespace.gameVersion || "",
                 gameSession: room.id,
                 constants: SHARED_CONSTANTS,
             },

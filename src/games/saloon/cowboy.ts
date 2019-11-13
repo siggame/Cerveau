@@ -14,7 +14,7 @@ import { TileDirection } from "~/core/game/mixins/tiled";
  * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
  * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
  */
-export type CowboyDrunkDirection = "North" | "East" | "South" | "West" | "";
+export type CowboyDrunkDirection = "" | "North" | "East" | "South" | "West";
 
 /**
  * The job that this Cowboy does, and dictates how they fight and interact
@@ -36,7 +36,7 @@ export class Cowboy extends GameObject {
      * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
      * drunk.
      */
-    public drunkDirection!: "North" | "East" | "South" | "West" | "";
+    public drunkDirection!: "" | "North" | "East" | "South" | "West";
 
     /**
      * How much focus this Cowboy has. Different Jobs do different things with

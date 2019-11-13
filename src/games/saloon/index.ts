@@ -110,7 +110,7 @@ export interface ICowboyProperties {
      * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
      * drunk.
      */
-    drunkDirection?: "North" | "East" | "South" | "West" | "";
+    drunkDirection?: "" | "North" | "East" | "South" | "West";
 
     /**
      * How much focus this Cowboy has. Different Jobs do different things with
@@ -706,8 +706,8 @@ export const Namespace = makeNamespace({
                 },
                 drunkDirection: {
                     typeName: "string",
-                    defaultValue: "North",
-                    literals: ["North", "East", "South", "West", ""],
+                    defaultValue: "",
+                    literals: ["", "North", "East", "South", "West"],
                 },
                 focus: {
                     typeName: "int",
@@ -1006,4 +1006,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
 });

@@ -66,12 +66,6 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
-     * The percent of max HP regained when a unit end their turn on a tile
-     * owned by their player.
-     */
-    public readonly RegenerateRate!: number;
-
-    /**
      * The player whose turn it is currently. That player can send commands.
      * Other players cannot.
      */
@@ -145,6 +139,12 @@ export class NewtonianGame extends BaseClasses.Game {
      * generator.
      */
     public readonly refinedValue!: number;
+
+    /**
+     * The percent of max HP regained when a unit end their turn on a tile
+     * owned by their player.
+     */
+    public readonly regenerateRate!: number;
 
     /**
      * A unique identifier for the game instance that is being played.

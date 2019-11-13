@@ -200,6 +200,7 @@ export class Session {
 
         this.gamelogScribe = new GamelogScribe(
             this.game,
+            args.gameNamespace.gameVersion,
             this,
             playingClients,
             this.deltaManager,

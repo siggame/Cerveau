@@ -49,7 +49,6 @@ export interface IBaseGameNamespace {
     GameSettingsManager: typeof BaseGameSettingsManager;
     /** The class of the Player instances in this game. */
     Player: Constructor<BasePlayer>;
-
     /** The unique identifying string for this Game. */
     gameName: string;
     /** The schema about what GameObjects are valid in game settings for this Game. */
@@ -63,6 +62,8 @@ export interface IBaseGameNamespace {
     };
     /** A static settings manager for the Lobby to check initial settings sent. */
     gameSettingsManager: BaseGameSettingsManager;
+    /** The hashed game temlate used to represent the version of this game */
+    gameVersion: string;
 }
 
 /**
