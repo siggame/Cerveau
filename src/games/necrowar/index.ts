@@ -230,6 +230,12 @@ export interface ITileProperties {
     numZombies?: number;
 
     /**
+     * Which player owns this tile, only applies to grass tiles for workers,
+     * NULL otherwise.
+     */
+    owner?: Player;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -257,11 +263,6 @@ export interface ITileProperties {
      * The Tower on this Tile if present, otherwise undefined.
      */
     tower?: Tower;
-
-    /**
-     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
-     */
-    type?: "normal" | "path" | "river" | "spawn";
 
     /**
      * The Unit on this Tile if present, otherwise undefined.
@@ -387,9 +388,9 @@ export interface ITowerJobProperties {
     range?: number;
 
     /**
-     * The type title. 'arrow', 'aoe', 'ballista', or 'cleansing'.
+     * The type title. 'arrow', 'aoe', 'ballista', 'cleansing', or 'castle'.
      */
-    title?: "arrow" | "aoe" | "ballista" | "cleansing";
+    title?: "arrow" | "aoe" | "ballista" | "cleansing" | "castle";
 
     /**
      * How many turns have to take place between this type's attacks.
@@ -929,6 +930,11 @@ export const Namespace = makeNamespace({
                 numZombies: {
                     typeName: "int",
                 },
+                owner: {
+                    typeName: "gameObject",
+                    gameObjectClass: Player,
+                    nullable: true,
+                },
                 tileEast: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
@@ -953,11 +959,6 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Tower,
                     nullable: true,
-                },
-                type: {
-                    typeName: "string",
-                    defaultValue: "normal",
-                    literals: ["normal", "path", "river", "spawn"],
                 },
                 unit: {
                     typeName: "gameObject",
@@ -1072,7 +1073,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "arrow",
-                    literals: ["arrow", "aoe", "ballista", "cleansing"],
+                    literals: ["arrow", "aoe", "ballista", "cleansing", "castle"],
                 },
                 turnsBetweenAttacks: {
                     typeName: "int",

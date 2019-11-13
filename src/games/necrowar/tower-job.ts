@@ -7,9 +7,9 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type title. 'arrow', 'aoe', 'ballista', or 'cleansing'.
+ * The type title. 'arrow', 'aoe', 'ballista', 'cleansing', or 'castle'.
  */
-export type TowerJobTitle = "arrow" | "aoe" | "ballista" | "cleansing";
+export type TowerJobTitle = "arrow" | "aoe" | "ballista" | "cleansing" | "castle";
 
 /**
  * Information about a tower's job/type.
@@ -47,9 +47,9 @@ export class TowerJob extends GameObject {
     public readonly range!: number;
 
     /**
-     * The type title. 'arrow', 'aoe', 'ballista', or 'cleansing'.
+     * The type title. 'arrow', 'aoe', 'ballista', 'cleansing', or 'castle'.
      */
-    public readonly title!: "arrow" | "aoe" | "ballista" | "cleansing";
+    public readonly title!: "arrow" | "aoe" | "ballista" | "cleansing" | "castle";
 
     /**
      * How many turns have to take place between this type's attacks.

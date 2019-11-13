@@ -12,11 +12,6 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
- */
-export type TileType = "normal" | "path" | "river" | "spawn";
-
-/**
  * A Tile in the game that makes up the 2D map grid.
  */
 export class Tile extends GameObject implements BaseTile {
@@ -93,6 +88,12 @@ export class Tile extends GameObject implements BaseTile {
     public numZombies!: number;
 
     /**
+     * Which player owns this tile, only applies to grass tiles for workers,
+     * NULL otherwise.
+     */
+    public owner?: Player;
+
+    /**
      * The Tile to the 'East' of this one (x+1, y). Undefined if out of bounds
      * of the map.
      */
@@ -120,11 +121,6 @@ export class Tile extends GameObject implements BaseTile {
      * The Tower on this Tile if present, otherwise undefined.
      */
     public tower?: Tower;
-
-    /**
-     * The type of Tile this is ('normal', 'path', 'river', or 'spawn').
-     */
-    public readonly type!: "normal" | "path" | "river" | "spawn";
 
     /**
      * The Unit on this Tile if present, otherwise undefined.
