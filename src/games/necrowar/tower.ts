@@ -36,7 +36,7 @@ export class Tower extends GameObject {
     /**
      * The Tile this Tower is on.
      */
-    public readonly tile!: Tile;
+    public readonly tile?: Tile;
 
     // <<-- Creer-Merge: attributes -->>
     
@@ -121,13 +121,17 @@ export class Tower extends GameObject {
         }
 
         /*
-         * Shape of the Tower range:
+         * Shape of the tower range:
          *         _ x x x _
          *         x x x x x
          *         x x T x x
          *         x x x x x
          *         _ x x x _
          */
+
+        if (this.tile === undefined) {
+            return `${this} is not on a tile!`;
+        }
 
         // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
@@ -203,7 +207,7 @@ export class Tower extends GameObject {
         for (let i: number = 0; i < this.game.units.length; i++) {
             if (this.game.units[i].health <= 0) {
                 this.game.units.splice(i, 1); // Remove unit from array
-                i = Math.max(0, i - 1);
+                i--;
             }
         }
 
