@@ -29,7 +29,7 @@ export class Unit extends GameObject {
     /**
      * The type of unit this is.
      */
-    public readonly job: UnitJob;
+    public readonly job!: UnitJob;
 
     /**
      * The number of moves this unit has left this turn.
@@ -154,7 +154,7 @@ export class Unit extends GameObject {
         }
 
         //  Make sure the unit has a job.
-        if (this.uJob === undefined) {
+        if (this.job === undefined) {
             return `${this} doesn't have a job. That shouldn't be possible.`;
         }
 
@@ -175,7 +175,7 @@ export class Unit extends GameObject {
             return false;
         }
 
-        tile.tower.health -= this.uJob.damage;
+        tile.tower.health -= this.job.damage;
 
         if (tile.tower.health <= 0) {
             tile.tower.health = 0;
@@ -252,8 +252,8 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if (player.gold < this.game.tJobs[towerIndex].goldCost
-            || player.mana < this.game.tJobs[towerIndex].manaCost) {
+        if (player.gold < this.game.TowerJobs[towerIndex].goldCost
+            || player.mana < this.game.TowerJobs[towerIndex].manaCost) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
@@ -323,9 +323,15 @@ export class Unit extends GameObject {
             title,
         });
 
+        this.game.towers.push(this.tile.tower);
+        
         player.towers.push(this.tile.tower);
-        player.gold -= this.game.tJobs[towerIndex].goldCost;
-        player.mana -= this.game.tJobs[towerIndex].manaCost;
+
+        this.tile.isTower = true;
+
+        player.towers.push(this.tile.tower);
+        player.gold -= this.game.TowerJobs[towerIndex].goldCost;
+        player.mana -= this.game.TowerJobs[towerIndex].manaCost;
 
         return true;
 
@@ -379,7 +385,7 @@ export class Unit extends GameObject {
             return `Target tile does not exist.`;
         }
 
-        if (this.uJob.title !== "worker") {
+        if (this.job.title !== "worker") {
             return `${this} must be a worker.`;
         }
 
@@ -444,7 +450,7 @@ export class Unit extends GameObject {
         }
 
         // Make sure unit is a worker
-        if (this.uJob.title !== "worker") {
+        if (this.job.title !== "worker") {
             return `${this} must be a worker to mine!`;
         }
         // <<-- /Creer-Merge: invalidate-mine -->>
@@ -538,13 +544,13 @@ export class Unit extends GameObject {
 
         // Make sure tile isnt occupied by a different unit type
         if (tile.unit) {
-            if (tile.unit.uJob !== this.uJob) {
+            if (tile.unit.job !== this.job) {
                 return `${this} is not allowed to walk on ${tile.unit}!`;
             }
             else {
-                if (this.uJob.title === "zombie" && tile.numZombies >= this.game.uJobs[1].perTile
-                    || this.uJob.title === "hound" && tile.numHounds >= this.game.uJobs[4].perTile
-                    || this.uJob.title === "ghoul" && tile.numGhouls >= this.game.uJobs[2].perTile) {
+                if (this.job.title === "zombie" && tile.numZombies >= this.game.UnitJobs[1].perTile
+                    || this.job.title === "hound" && tile.numHounds >= this.game.UnitJobs[4].perTile
+                    || this.job.title === "ghoul" && tile.numGhouls >= this.game.UnitJobs[2].perTile) {
                     return `${this} cannot walk on an occupied tile!`;
                 }
             }

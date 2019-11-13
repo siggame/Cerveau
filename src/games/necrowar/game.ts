@@ -143,11 +143,11 @@ export class NecrowarGame extends BaseClasses.Game {
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
-        
-        this.createUJobs();
-        
-        this.createTJobs();
-        
+
+        this.createUnitJobs();
+
+        this.createTowerJobs();
+
         this.createMap();
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -176,10 +176,10 @@ export class NecrowarGame extends BaseClasses.Game {
 
     // Any additional protected or pirate methods can go here.
     /** Creates all unit types in the game */
-    private createUJobs(): void {
+    private createUnitJobs(): void {
         // pushes all unit types
-        this.uJobs.push(
-            this.manager.create.uJob({
+        this.UnitJobs.push(
+            this.manager.create.unitJob({
                 title: "worker",
                 goldCost: 10,
                 manaCost: 0,
@@ -190,7 +190,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 1,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "zombie",
                 goldCost: 0,
                 manaCost: 2,
@@ -201,7 +201,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 10,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "ghoul",
                 goldCost: 20,
                 manaCost: 5,
@@ -212,7 +212,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 2,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "abomination",
                 goldCost: 25,
                 manaCost: 10,
@@ -223,7 +223,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 1,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "hound",
                 goldCost: 15,
                 manaCost: 4,
@@ -234,7 +234,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 3,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "wraith",
                 goldCost: 40,
                 manaCost: 20,
@@ -245,7 +245,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 perTile: 1,
             }),
 
-            this.manager.create.uJob({
+            this.manager.create.unitJob({
                 title: "horseman",
                 goldCost: 150,
                 manaCost: 50,
@@ -259,10 +259,10 @@ export class NecrowarGame extends BaseClasses.Game {
         );
     }
     
-    private createTJobs(): void {
+    private createTowerJobs(): void {
         // pushes all tower types
-        this.tJobs.push(
-            this.manager.create.tJob({
+        this.TowerJobs.push(
+            this.manager.create.towerJob({
                 title: "arrow",
                 goldCost: 50,
                 manaCost: 0,
@@ -273,7 +273,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 damage: 5,
             }),
 
-            this.manager.create.tJob({
+            this.manager.create.towerJob({
                 title: "ballista",
                 goldCost: 75,
                 manaCost: 0,
@@ -284,7 +284,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 damage: 20,
             }),
 
-            this.manager.create.tJob({
+            this.manager.create.towerJob({
                 title: "cleansing",
                 goldCost: 30,
                 manaCost: 30,
@@ -295,7 +295,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 damage: 5,
             }),
 
-            this.manager.create.tJob({
+            this.manager.create.towerJob({
                 title: "aoe",
                 goldCost: 40,
                 manaCost: 15,
@@ -334,7 +334,7 @@ export class NecrowarGame extends BaseClasses.Game {
 
         //Cover a whole side in grass tiles
         for (let x = 0; x < (this.mapWidth / 2 - 3); x++) {
-            for (let y = 0; y < this.mapHeight; y++) {        
+            for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isGrass = true;
             }
         }
@@ -389,28 +389,28 @@ export class NecrowarGame extends BaseClasses.Game {
         for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
                 //Grass
-                if(getMutableTile(x, y).isGrass = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGrass = true
+                if(getMutableTile(x, y).isGrass) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true
                 }
                 //Paths
-                if(getMutableTile(x, y).isPath = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isPath = true
+                if(getMutableTile(x, y).isPath) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isPath = true
                 }
                 //Gold Mines
-                if(getMutableTile(x, y).isGoldMine = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isGoldMine = true
+                if(getMutableTile(x, y).isGoldMine) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGoldMine = true
                 }
                 //Castle
-                if(getMutableTile(x, y).isCastle = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isCastle = true
+                if(getMutableTile(x, y).isCastle) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isCastle = true
                 }
                 //Worker Spawn
-                if(getMutableTile(x, y).isWorkerSpawn = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isWorkerSpawn = true
+                if(getMutableTile(x, y).isWorkerSpawn) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isWorkerSpawn = true
                 }
                 //Unit Spawn
-                if(getMutableTile(x, y).isUnitSpawn = true) {
-                    getMutableTile((this.mapWidth - x), (this.mapHeight - y)).isUnitSpawn = true
+                if(getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isUnitSpawn = true
                 }
             }
         }
@@ -424,13 +424,13 @@ export class NecrowarGame extends BaseClasses.Game {
         }
         //Make a smaller square of grass within the "lake"
         for (let x = (this.mapWidth / 2 - 1); x <= (this.mapWidth / 2 + 1); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2); y++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isGrass = true;
             }
         }
         //Make island mine tiles on the middle three tiles
         for (let x = (this.mapWidth / 2); x <= (this.mapWidth / 2); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 1 + 2); y++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isIslandGoldMine = true;
             }
         }

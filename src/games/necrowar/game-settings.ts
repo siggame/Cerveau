@@ -25,28 +25,28 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of gold income per turn per unit in a "
                            + "mine.",
                 // <<-- Creer-Merge: goldIncomePerUnit -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: goldIncomePerUnit -->>
             },
             islandIncomePerUnit: {
                 description: "The amount of gold income per turn per unit in "
                            + "the island mine.",
                 // <<-- Creer-Merge: islandIncomePerUnit -->>
-                default: 0,
+                default: 10,
                 // <<-- /Creer-Merge: islandIncomePerUnit -->>
             },
             manaIncomePerUnit: {
                 description: "The Amount of gold income per turn per unit "
                            + "fishing on the river side.",
                 // <<-- Creer-Merge: manaIncomePerUnit -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: manaIncomePerUnit -->>
             },
             riverPhase: {
                 description: "The amount of turns it takes between the river "
                            + "changing phases.",
                 // <<-- Creer-Merge: riverPhase -->>
-                default: 0,
+                default: 25,
                 // <<-- /Creer-Merge: riverPhase -->>
             },
             // <<-- Creer-Merge: schema -->>
@@ -90,14 +90,14 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
             // Tiled settings
             mapWidth: {
                 // <<-- Creer-Merge: map-width -->>
-                default: 32,
+                default: 64,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
                 description: "The width (in Tiles) for the game map to be initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
-                default: 16,
+                default: 32,
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
                 description: "The height (in Tiles) for the game map to be initialized to.",
