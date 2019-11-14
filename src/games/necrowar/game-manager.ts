@@ -1,6 +1,8 @@
 // This file is where you should put logic to control the game and everything
 // around it.
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
+import { normalizeUnits } from 'moment';
+import { Unit, Tile } from '../catastrophe';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -73,6 +75,23 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
         // Add logic here checking for the primary win condition(s)
+        let castleStandingOne = false;
+        let castleStandingTwo = false;
+
+        for(let x = 0; x < this.game.towers.length; x++) {
+            if (this.game.players[0].towers[x].job.title === "castle") {
+                castleStandingOne = true;
+            } else if (this.game.players[1].towers[x].job.title === "castle") {
+                castleStandingTwo = true;
+            }
+        }
+
+        if(castleStandingOne) {
+            return true;
+        } else if (castleStandingTwo) {
+            return true;
+        }
+        
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -87,6 +106,24 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
+
+        /*let castleOne = null;
+        let castleTwo = null;
+
+        for(let x = 0; x < this.game.towers.length; x++) {
+            if (this.game.players[0].towers[x].job.title === "castle") {
+                castleOne = this.game.players[0].towers[x];
+            } else if (this.game.players[1].towers[x].job.title === "castle") {
+                castleTwo = this.game.players[1].towers[x];
+            }
+        }
+
+        if(castleOne.health > castleTwo.health) {
+
+        } else if (castleTwo.health > castleOne.health) {
+
+        }
+        */
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         // This will end the game.
