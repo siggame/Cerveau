@@ -61,7 +61,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 }
             }
         }
-        
+
         // <<-- /Creer-Merge: before-turn -->>
     }
 
@@ -152,7 +152,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
 
-        /*let castleOne = null;
+        let castleOne = null;
         let castleTwo = null;
 
         for(let x = 0; x < this.game.towers.length; x++) {
@@ -164,11 +164,13 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
 
         if(castleOne.health > castleTwo.health) {
-
+            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0])
+            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1])
         } else if (castleTwo.health > castleOne.health) {
-
+            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1])
+            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0])
         }
-        */
+        
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         // This will end the game.
