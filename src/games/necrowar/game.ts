@@ -355,7 +355,7 @@ export class NecrowarGame extends BaseClasses.Game {
         };
 
         //Cover a whole side in grass tiles
-        for (let x = 0; x < (this.mapWidth / 2 - 3); x++) {
+        for (let x = 0; x < (this.mapWidth / 2 - 1); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isGrass = true;
                 getMutableTile(x, y).owner = this.players[0];
@@ -363,7 +363,7 @@ export class NecrowarGame extends BaseClasses.Game {
         }
 
         //Cover the middle stripe in river tiles
-        for (let x = (this.mapWidth / 2 - 1); x < (this.mapWidth / 2 + 1); x++) {
+        for (let x = (this.mapWidth / 2 - 1.5); x < (this.mapWidth / 2 + 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isRiver = true;
             }
@@ -373,15 +373,15 @@ export class NecrowarGame extends BaseClasses.Game {
         for (let x = 0; x < (this.mapWidth / 2); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 if (
-                //Top Part
-                ((y === (this.mapHeight - 5)) && (x > 5)) ||
+                //bottom Part
                 ((y === (this.mapHeight - 6)) && (x > 5)) ||
-                //Bottom Part
-                ((y === 5) && (x > 10)) ||
-                ((y === 6) && (x > 10)) ||
+                ((y === (this.mapHeight - 7)) && (x > 5)) ||
+                //top Part
+                ((y === 6) && (x > 15)) ||
+                ((y === 5) && (x > 15)) ||
                 //Left Side Part
-                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 5)) ||
-                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 6))
+                ((y > 4) && (y < (this.mapHeight - 5)) && (x === 5)) ||
+                ((y > 4) && (y < (this.mapHeight - 5)) && (x === 6))
                 ){
                     getMutableTile(x, y).isPath = true;
                 }
@@ -398,8 +398,8 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(6, 6).owner = this.players[0];
 
         //Place gold mine tiles
-        for (let x = 10; x <= 11; x++) {
-            for (let y = (this.mapHeight - 10); y <= (this.mapHeight - 11); y++) {
+        for (let x = 15; x <= 16; x++) {
+            for (let y = (this.mapHeight - 15); y <= (this.mapHeight - 16); y++) {
                 getMutableTile(x, y).isGoldMine = true;
             }
         }
@@ -447,19 +447,19 @@ export class NecrowarGame extends BaseClasses.Game {
 
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
-        for (let x = (this.mapWidth / 2 - 2); x <= (this.mapWidth / 2 + 2); x++) {
+        for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 2.5); x++) {
             for (let y = (this.mapHeight / 2 - 2); y < (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isRiver = true;
             }
         }
         //Make a smaller square of grass within the "lake"
-        for (let x = (this.mapWidth / 2 - 1); x <= (this.mapWidth / 2 + 1); x++) {
+        for (let x = (this.mapWidth / 2 - 1.5); x <= (this.mapWidth / 2 + 1.5); x++) {
             for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isGrass = true;
             }
         }
         //Make island mine tiles on the middle three tiles
-        for (let x = (this.mapWidth / 2); x <= (this.mapWidth / 2); x++) {
+        for (let x = (this.mapWidth / 2 + 0.5); x <= (this.mapWidth / 2 + 0.5); x++) {
             for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isIslandGoldMine = true;
             }
