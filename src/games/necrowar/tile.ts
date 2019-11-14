@@ -529,7 +529,7 @@ export class Tile extends GameObject implements BaseTile {
         player.gold -= goldCost;
         player.mana -= manaCost;
 
-        this.unit = this.game.manager.create.unit({
+        let unit = this.game.manager.create.unit({
             acted: false,
             health: this.game.UnitJobs[0].health,
             owner: player,
@@ -537,6 +537,10 @@ export class Tile extends GameObject implements BaseTile {
             job: this.game.UnitJobs[0],
             title: "worker",
         });
+
+        this.unit = unit;
+        this.game.units.push(unit);
+        player.units.push(unit);
 
         return true;
 
