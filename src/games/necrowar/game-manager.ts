@@ -1,5 +1,6 @@
 // This file is where you should put logic to control the game and everything
 // around it.
+import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
@@ -57,6 +58,35 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
+        // Properly remove all killed units
+        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+
+        // remove dead units from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.units, ...deadUnits);
+        }
+        // and remove them from the game
+        removeElements(this.game.units, ...deadUnits);
+         // mark them dead
+        for (const unit of deadUnits) {
+            if (unit.tile) {
+                unit.tile.unit = undefined;
+                unit.tile = undefined;
+            }
+        }
+
+        for (const unit of this.game.units) {
+            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+            }
+
+            if (unit.tile && unit.tile.owner === unit.owner) {
+                if (unit.health > unit.job.health) {
+                    unit.health = unit.job.health;
+                }
+            }
+        }
         // <<-- /Creer-Merge: after-turn -->>
     }
 
