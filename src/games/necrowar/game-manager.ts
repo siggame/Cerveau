@@ -47,6 +47,21 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
+
+        //Code for the river phases, clearing out workers in the island gold mine
+        //Every 25 turns
+        if(this.game.currentTurn % 25 === 0) {
+            for(let x = 0; x <= Unit.length; x++) {
+                if(this.game.units[x].tile) {
+                    if(this.game.units[x].tile.isIslandGoldMine) {
+                        this.game.units[x].tile = undefined;
+                        this.game.tiles[x].unit = undefined;
+                        this.game.units.splice(x, 1);
+                    }
+                }
+            }
+        }
+        
         // <<-- /Creer-Merge: before-turn -->>
     }
 
