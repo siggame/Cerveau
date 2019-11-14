@@ -533,9 +533,18 @@ export class Unit extends GameObject {
             return `${this} has no more moves and might fall apart!`;
         }
 
+        if (this.owner !== tile.owner) {
+            return `${this} cannot walk on the enemies side!`;
+        }
+
         // Make sure tile is part of the path
         if (!tile.isPath && this.job.title !== "worker") {
-            return `${this}, going off the path is dangerous.`;
+            return `${this}, going off the path is dangerous!`;
+        }
+
+        // Or, make sure it isn't for workers
+        if (tile.isPath && this.job.title === "worker") {
+            return `${this}, workers are not allowed on the path!`;
         }
 
         // Make sure tile is not a river tile
