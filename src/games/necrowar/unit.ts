@@ -140,7 +140,7 @@ export class Unit extends GameObject {
 
         // Make sure the the unit is attacking a tower.
         if (!tile.tower) {
-            return `${this} is attacking ${tile}, which doesn't have a unit.`;
+            return `${this} is attacking ${tile}, which doesn't have a tower.`;
         }
 
         // Make sure you aren't attacking a friend.
