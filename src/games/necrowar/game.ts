@@ -468,10 +468,10 @@ export class NecrowarGame extends BaseClasses.Game {
             }
         }
         //Paths leading to island
-        getMutableTile(this.mapWidth / 2 - 3.5, this.mapHeight / 2).isGrass = true;
-        getMutableTile(this.mapWidth / 2 - 3.5, this.mapHeight / 2).isRiver = false;
-        getMutableTile(this.mapWidth / 2 + 2.5, this.mapHeight / 2).isGrass = true;
-        getMutableTile(this.mapWidth / 2 + 2.5, this.mapHeight / 2).isRiver = false;
+        getMutableTile(this.mapWidth / 2 - 2.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 - 2.5, this.mapHeight / 2).isRiver = false;
+        getMutableTile(this.mapWidth / 2 + 1.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 + 1.5, this.mapHeight / 2).isRiver = false;
 
         //Make island mine tiles on the middle three tiles
         for (let x = (this.mapWidth / 2 - 0.5); x <= (this.mapWidth / 2 - 0.5); x++) {
