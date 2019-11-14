@@ -533,7 +533,7 @@ export class Unit extends GameObject {
         }
 
         // Make sure tile is part of the path
-        if (!tile.isPath) {
+        if (!tile.isPath && this.job.title !== "worker") {
             return `${this}, going off the path is dangerous.`;
         }
 
