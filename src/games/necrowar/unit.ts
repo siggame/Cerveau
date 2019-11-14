@@ -305,31 +305,32 @@ export class Unit extends GameObject {
         let towerIndex = -1;
 
         if (title === "arrow") {
-            towerIndex = 0;
-        }
-        else if (title === "ballista") {
             towerIndex = 1;
         }
-        else if (title === "cleansing") {
+        else if (title === "ballista") {
             towerIndex = 2;
         }
-        else if (title === "aoe") {
+        else if (title === "cleansing") {
             towerIndex = 3;
+        }
+        else if (title === "aoe") {
+            towerIndex = 4;
         }
 
         this.tile.tower = this.game.manager.create.tower({
             owner: player,
+            attacked: false,
+            health: this.game.TowerJobs[towerIndex].health,
+            job: this.game.TowerJobs[towerIndex],
             tile: this.tile,
-            title,
         });
 
         this.game.towers.push(this.tile.tower);
-        
+
         player.towers.push(this.tile.tower);
 
         this.tile.isTower = true;
 
-        player.towers.push(this.tile.tower);
         player.gold -= this.game.TowerJobs[towerIndex].goldCost;
         player.mana -= this.game.TowerJobs[towerIndex].manaCost;
 
