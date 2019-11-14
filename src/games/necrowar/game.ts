@@ -399,7 +399,7 @@ export class NecrowarGame extends BaseClasses.Game {
 
         //Place gold mine tiles
         for (let x = 15; x <= 16; x++) {
-            for (let y = (this.mapHeight - 15); y <= (this.mapHeight - 16); y++) {
+            for (let y = (this.mapHeight - 16); y <= (this.mapHeight - 15); y++) {
                 getMutableTile(x, y).isGoldMine = true;
             }
         }
@@ -408,7 +408,7 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(8, 9).isWorkerSpawn = true;
         getMutableTile(8, 9).owner = this.players[0];
         //Set Unit Spawn
-        getMutableTile(11, 6).isUnitSpawn = true;
+        getMutableTile(15, 6).isUnitSpawn = true;
         getMutableTile(11, 6).owner = this.players[0];
 
         //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
@@ -447,20 +447,20 @@ export class NecrowarGame extends BaseClasses.Game {
 
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
-        for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 2.5); x++) {
-            for (let y = (this.mapHeight / 2 - 2); y < (this.mapHeight / 2 + 2); y++) {
+        for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 1.5); x++) {
+            for (let y = (this.mapHeight / 2 - 2); y <= (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isRiver = true;
             }
         }
         //Make a smaller square of grass within the "lake"
-        for (let x = (this.mapWidth / 2 - 1.5); x <= (this.mapWidth / 2 + 1.5); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
+        for (let x = (this.mapWidth / 2 - 1.5); x <= (this.mapWidth / 2 + 0.5); x++) {
+            for (let y = (this.mapHeight / 2 - 1); y <= (this.mapHeight / 2 + 1); y++) {
                 getMutableTile(x, y).isGrass = true;
             }
         }
         //Make island mine tiles on the middle three tiles
-        for (let x = (this.mapWidth / 2 + 0.5); x <= (this.mapWidth / 2 + 0.5); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
+        for (let x = (this.mapWidth / 2 - 0.5); x <= (this.mapWidth / 2 - 0.5); x++) {
+            for (let y = (this.mapHeight / 2 - 1); y <= (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isIslandGoldMine = true;
             }
         }
