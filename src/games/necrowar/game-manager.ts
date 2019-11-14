@@ -2,7 +2,6 @@
 // around it.
 import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
-import { Unit, } from './unit';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -183,23 +182,13 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
 
-        let castleOne = null;
-        let castleTwo = null;
-
-        for(let x = 0; x < this.game.towers.length; x++) {
-            if (this.game.players[0].towers[x].job.title === "castle") {
-                castleOne = this.game.players[0].towers[x];
-            } else if (this.game.players[1].towers[x].job.title === "castle") {
-                castleTwo = this.game.players[1].towers[x];
-            }
-        }
-
-        if(castleOne.health > castleTwo.health) {
+        if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0])
             this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1])
-        } else if (castleTwo.health > castleOne.health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1])
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0])
+        }
+        else if (this.game.players[1].towers[0].health > this.game.players[2].towers[0].health) {
+            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1]);
+            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0]);
         }
         
         // <<-- /Creer-Merge: secondary-win-conditions -->>
