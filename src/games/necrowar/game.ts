@@ -366,6 +366,7 @@ export class NecrowarGame extends BaseClasses.Game {
         for (let x = (this.mapWidth / 2 - 1.5); x < (this.mapWidth / 2 + 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isRiver = true;
+                getMutableTile(x, y).isGrass = false;
             }
         }
 
@@ -384,6 +385,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 ((y > 4) && (y < (this.mapHeight - 5)) && (x === 6))
                 ){
                     getMutableTile(x, y).isPath = true;
+                    getMutableTile(x, y).isGrass = false;
                 }
             }
         }
@@ -392,9 +394,13 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(7, 7).isPath = true;
         getMutableTile(7, 6).isPath = true;
         getMutableTile(7, 5).isPath = true;
+        getMutableTile(7, 7).isGrass = false;
+        getMutableTile(7, 6).isGrass = false;
+        getMutableTile(7, 5).isGrass = false;
 
         //Place castle
         getMutableTile(6, 6).isCastle = true;
+        getMutableTile(6, 6).isPath = false;
         getMutableTile(6, 6).owner = this.players[0];
 
         //Place gold mine tiles
@@ -409,6 +415,7 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(8, 9).owner = this.players[0];
         //Set Unit Spawn
         getMutableTile(15, 6).isUnitSpawn = true;
+        getMutableTile(15, 6).isGrass = false;
         getMutableTile(11, 6).owner = this.players[0];
 
         //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
@@ -450,17 +457,21 @@ export class NecrowarGame extends BaseClasses.Game {
         for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 1.5); x++) {
             for (let y = (this.mapHeight / 2 - 2); y <= (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isRiver = true;
+                getMutableTile(x, y).isGrass = false;
             }
         }
         //Make a smaller square of grass within the "lake"
         for (let x = (this.mapWidth / 2 - 1.5); x <= (this.mapWidth / 2 + 0.5); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y <= (this.mapHeight / 2 + 1); y++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isGrass = true;
+                getMutableTile(x, y).isRiver = false;
             }
         }
         //Paths leading to island
         getMutableTile(this.mapWidth / 2 - 3.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 - 3.5, this.mapHeight / 2).isRiver = false;
         getMutableTile(this.mapWidth / 2 + 2.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 + 2.5, this.mapHeight / 2).isRiver = false;
 
         //Make island mine tiles on the middle three tiles
         for (let x = (this.mapWidth / 2 - 0.5); x <= (this.mapWidth / 2 - 0.5); x++) {
