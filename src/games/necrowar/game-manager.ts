@@ -2,7 +2,6 @@
 // around it.
 import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
-import { normalizeUnits } from 'moment';
 import { Unit, } from './unit';
 
 // <<-- Creer-Merge: imports -->>
@@ -48,17 +47,47 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
 
-        //Code for the river phases, clearing out workers in the island gold mine
-        //Every 25 turns
-        if(this.game.currentTurn % 25 === 0) {
-            for(let x = 0; x <= Unit.length; x++) {
-                if(this.game.units[x].tile) {
-                    if(this.game.units[x].tile.isIslandGoldMine) {
-                        this.game.units[x].tile = undefined;
-                        this.game.tiles[x].unit = undefined;
-                        this.game.units.splice(x, 1);
+        for (const unit of this.game.units) {
+            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+            }
+
+            if (unit.tile && unit.tile.owner === unit.owner) {
+                if (unit.health > unit.job.health) {
+                    unit.health = unit.job.health;
+                }
+            }
+        }
+
+        // Code for the river phases, clearing out workers in the island gold mine
+        // Every 25 turns
+        if (this.game.currentTurn % 25 === 0) {
+            for (const unit of this.game.units) {
+                if (unit.tile) {
+                    if (unit.tile.isIslandGoldMine) {
+                        unit.tile.unit = undefined;
+                        unit.tile = undefined;
+                        unit.health = 0;
                     }
                 }
+            }
+        }
+
+        // Properly remove all killed units
+        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+
+        // remove dead units from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.units, ...deadUnits);
+        }
+        // and remove them from the game
+        removeElements(this.game.units, ...deadUnits);
+         // mark them dead
+        for (const unit of deadUnits) {
+            if (unit.tile) {
+                unit.tile.unit = undefined;
+                unit.tile = undefined;
             }
         }
 
@@ -123,20 +152,22 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         let castleStandingOne = false;
         let castleStandingTwo = false;
 
-        for(let x = 0; x < this.game.towers.length; x++) {
+        for (let x = 0; x < this.game.towers.length; x++) {
             if (this.game.players[0].towers[x].job.title === "castle") {
                 castleStandingOne = true;
-            } else if (this.game.players[1].towers[x].job.title === "castle") {
+            }
+            else if (this.game.players[1].towers[x].job.title === "castle") {
                 castleStandingTwo = true;
             }
         }
 
-        if(castleStandingOne) {
-            return true;
-        } else if (castleStandingTwo) {
+        if (castleStandingOne) {
             return true;
         }
-        
+        else if (castleStandingTwo) {
+            return true;
+        }
+
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
