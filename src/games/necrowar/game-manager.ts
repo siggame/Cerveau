@@ -3,7 +3,7 @@
 import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
 import { normalizeUnits } from 'moment';
-import { Unit, Tile } from '../catastrophe';
+import { Unit, } from './unit';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs

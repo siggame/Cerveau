@@ -480,7 +480,35 @@ export class NecrowarGame extends BaseClasses.Game {
             }
         }
 
+        //Creates the castles on either side
+        for (let x = 0; x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if (getMutableTile(x, y).isCastle) {
+                    //if its player 0's castle
+                    if (getMutableTile(x, y).owner === this.players[0]) {
+                        getMutableTile(x, y).tile.tower = this.manager.create.tower({
+                            owner: this.players[0],
+                            tile: getMutableTile(x, y),
+                            title: "castle",
+                        }) ;
+                        this.towers.push(getMutableTile(x, y).tower);
+                        this.players[0].towers.push(getMutableTile(x, y).tower);
 
+                    //if its player 1's castle
+                    } else if (getMutableTile(x, y).owner === this.players[1]) {
+                        if (getMutableTile(x, y).owner === this.players[1]) {
+                            getMutableTile(x, y).tile.tower = this.manager.create.tower({
+                                owner: this.players[1],
+                                tile: getMutableTile(x, y),
+                                title: "castle",
+                            }) ;
+                            this.towers.push(getMutableTile(x, y).tower);
+                            this.players[0].towers.push(getMutableTile(x, y).tower);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
