@@ -355,10 +355,9 @@ export class NecrowarGame extends BaseClasses.Game {
         };
 
         //Cover a whole side in grass tiles
-        for (let x = 0; x < (this.mapWidth / 2 - 1); x++) {
+        for (let x = 0; x < (this.mapWidth / 2 - 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isGrass = true;
-                getMutableTile(x, y).owner = this.players[0];
             }
         }
 
@@ -424,7 +423,6 @@ export class NecrowarGame extends BaseClasses.Game {
                 //Grass
                 if(getMutableTile(x, y).isGrass) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true;
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).owner = this.players[1];
                 }
                 //Paths
                 if(getMutableTile(x, y).isPath) {
@@ -437,20 +435,37 @@ export class NecrowarGame extends BaseClasses.Game {
                 //Castle
                 if(getMutableTile(x, y).isCastle) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isCastle = true;
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).owner = this.players[1];
                 }
                 //Worker Spawn
                 if(getMutableTile(x, y).isWorkerSpawn) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isWorkerSpawn = true;
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).owner = this.players[1];
                 }
                 //Unit Spawn
                 if(getMutableTile(x, y).isUnitSpawn) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isUnitSpawn = true;
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).owner = this.players[1];
                 }
             }
         }
+
+        //assign ownership to sides
+        for (let x = 0; x < (this.mapWidth / 2 - 0.5); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle || 
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[0];
+                }
+            }
+        }
+        for (let x = (this.mapWidth / 2 + 0.5); x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle ||
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[1];
+                }
+            }
+        }
+
+
 
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
