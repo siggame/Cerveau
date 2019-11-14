@@ -489,7 +489,7 @@ export class NecrowarGame extends BaseClasses.Game {
                         getMutableTile(x, y).tower = this.manager.create.tower({
                             owner: this.players[0],
                             tile: this.getTile(x, y),
-                            title: "castle",
+                            job: this.TowerJobs[0],
                         });
                         const tile = this.getTile(x, y);
                         if (tile && tile.tower) {
@@ -503,7 +503,7 @@ export class NecrowarGame extends BaseClasses.Game {
                             getMutableTile(x, y).tower = this.manager.create.tower({
                                 owner: this.players[1],
                                 tile: this.getTile(x, y),
-                                title: "castle",
+                                job: this.TowerJobs[0],
                             }) ;
                             const tile = this.getTile(x, y);
                             if (tile && tile.tower) {
