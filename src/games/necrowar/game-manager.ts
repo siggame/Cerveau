@@ -45,7 +45,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
-        console.log("Before Turn Start");
         for (const unit of this.game.units) {
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
@@ -58,7 +57,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 }
             }
         }
-        console.log("Before Turn Middle");
+
         // Code for the river phases, clearing out workers in the island gold mine
         // Every 25 turns
         if (this.game.currentTurn % 25 === 0) {
@@ -72,7 +71,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 }
             }
         }
-        console.log("Before Turn Middle 2");
+
         // Properly remove all killed units
         const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
 
@@ -89,7 +88,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 unit.tile = undefined;
             }
         }
-        console.log("Before Turn End");
         // <<-- /Creer-Merge: before-turn -->>
     }
 
@@ -100,7 +98,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     protected async afterTurn(): Promise<void> {
         await super.afterTurn();
-        console.log("After Turn Start");
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
         // Properly remove all killed units
@@ -119,7 +116,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 unit.tile = undefined;
             }
         }
-        console.log("After Turn Middle");
 
         for (const unit of this.game.units) {
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
@@ -133,7 +129,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 }
             }
         }
-        console.log("After Turn End");
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -201,7 +196,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
-        console.log("Secondary Win Start");
 
         if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0])
@@ -211,8 +205,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1]);
             this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0]);
         }
-        console.log("Secondary Win End");
-        
+
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         // This will end the game.
