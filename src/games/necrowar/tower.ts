@@ -91,7 +91,7 @@ export class Tower extends GameObject {
         tile: Tile,
     ): void | string | ITowerAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
-        const range = 2.3; // Attack range
+        const range = 2.2; // Attack range
 
         // Check if tower already attacked
         if (this.attacked) {
