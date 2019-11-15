@@ -269,7 +269,7 @@ export class NecrowarGame extends BaseClasses.Game {
 
         );
     }
-    
+
     private createTowerJobs(): void {
         // pushes all tower types
         this.TowerJobs.push(
