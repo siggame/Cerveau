@@ -202,16 +202,16 @@ export class Unit extends GameObject {
         let towerIndex = -1;
 
         if (title === "arrow") {
-            towerIndex = 0;
-        }
-        else if (title === "ballista") {
             towerIndex = 1;
         }
-        else if (title === "cleansing") {
+        else if (title === "ballista") {
             towerIndex = 2;
         }
-        else if (title === "aoe") {
+        else if (title === "cleansing") {
             towerIndex = 3;
+        }
+        else if (title === "aoe") {
+            towerIndex = 4;
         }
 
         if (towerIndex === -1) {
