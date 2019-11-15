@@ -358,6 +358,7 @@ export class NecrowarGame extends BaseClasses.Game {
         for (let x = 0; x < (this.mapWidth / 2 - 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isGrass = true;
+                this.players[0].side.push(this.getTile(x, y)!);
             }
         }
 
@@ -420,6 +421,7 @@ export class NecrowarGame extends BaseClasses.Game {
         //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
         for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
+                this.players[1].side.push(this.getTile(x, y)!);
                 //Grass
                 if(getMutableTile(x, y).isGrass) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true;
