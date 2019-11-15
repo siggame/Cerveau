@@ -485,11 +485,14 @@ export class NecrowarGame extends BaseClasses.Game {
                             owner: this.players[0],
                             tile: this.getTile(x, y),
                             job: this.TowerJobs[0],
+                            health: this.TowerJobs[0].health,
                         });
                         const tile = this.getTile(x, y);
                         if (tile && tile.tower) {
                             this.towers.push(tile.tower);
                             this.players[0].towers.push(tile.tower);
+                            getMutableTile(x, y).isTower = true;
+                            getMutableTile(x, y).isCastle = true;
                         }
                     }
                     else if (getMutableTile(x, y).owner === this.players[1]) {
@@ -499,11 +502,14 @@ export class NecrowarGame extends BaseClasses.Game {
                                 owner: this.players[1],
                                 tile: this.getTile(x, y),
                                 job: this.TowerJobs[0],
+                                health: this.TowerJobs[0].health,
                             }) ;
                             const tile = this.getTile(x, y);
                             if (tile && tile.tower) {
                                 this.towers.push(tile.tower);
                                 this.players[1].towers.push(tile.tower);
+                                getMutableTile(x, y).isTower = true;
+                                getMutableTile(x, y).isCastle = true;
                             }
                         }
                     }
