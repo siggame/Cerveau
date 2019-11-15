@@ -336,6 +336,9 @@ export class Tile extends GameObject implements BaseTile {
                 job: this.game.UnitJobs[1],
                 moves: this.game.UnitJobs[1].moves,
             });
+            if (!spawnTile.unit) {
+                spawnTile.unit = unit;
+            }
             this.game.units.push(unit);
             player.units.push(unit);
         }
