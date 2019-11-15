@@ -447,26 +447,6 @@ export class NecrowarGame extends BaseClasses.Game {
             }
         }
 
-        //assign ownership to sides
-        for (let x = 0; x < (this.mapWidth / 2 - 0.5); x++) {
-            for (let y = 0; y < this.mapHeight; y++) {
-                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle || 
-                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
-                    getMutableTile(x, y).owner = this.players[0];
-                }
-            }
-        }
-        for (let x = (this.mapWidth / 2 + 0.5); x < this.mapWidth; x++) {
-            for (let y = 0; y < this.mapHeight; y++) {
-                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle ||
-                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
-                    getMutableTile(x, y).owner = this.players[1];
-                }
-            }
-        }
-
-
-
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
         for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 1.5); x++) {
@@ -527,6 +507,24 @@ export class NecrowarGame extends BaseClasses.Game {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        //assign ownership to sides
+        for (let x = 0; x < (this.mapWidth / 2 - 0.5); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle || 
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[0];
+                }
+            }
+        }
+        for (let x = (this.mapWidth / 2 + 0.5); x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle ||
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[1];
                 }
             }
         }
