@@ -72,22 +72,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
             }
         }
 
-        // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
-
-        // remove dead units from all player's units list
-        for (const player of this.game.players) {
-            removeElements(player.units, ...deadUnits);
-        }
-        // and remove them from the game
-        removeElements(this.game.units, ...deadUnits);
-         // mark them dead
-        for (const unit of deadUnits) {
-            if (unit.tile) {
-                unit.tile.unit = undefined;
-                unit.tile = undefined;
-            }
-        }
+        this.updateUnits();
         // <<-- /Creer-Merge: before-turn -->>
     }
 
@@ -100,23 +85,8 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         await super.afterTurn();
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn starts
-        // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
-
-        // remove dead units from all player's units list
-        for (const player of this.game.players) {
-            removeElements(player.units, ...deadUnits);
-        }
-        // and remove them from the game
-        removeElements(this.game.units, ...deadUnits);
-         // mark them dead
-        for (const unit of deadUnits) {
-            if (unit.tile) {
-                unit.tile.unit = undefined;
-                unit.tile = undefined;
-            }
-        }
-
+        this.updateUnits();
+        this.updateTowers();
         for (const unit of this.game.units) {
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
@@ -216,6 +186,41 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
+    private updateUnits(): void {
+        // Properly remove all killed units
+        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
 
+        // remove dead units from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.units, ...deadUnits);
+        }
+        // and remove them from the game
+        removeElements(this.game.units, ...deadUnits);
+         // mark them dead
+        for (const unit of deadUnits) {
+            if (unit.tile) {
+                unit.tile.unit = undefined;
+                unit.tile = undefined;
+            }
+        }
+    }
+
+    private updateTowers(): void {
+        // Properly remove all killed towers
+        const deadTowers = this.game.towers.filter((t) => !t.tile || t.health <= 0);
+
+        // remove dead towers from all player's towers list
+        for (const player of this.game.players) {
+            removeElements(player.towers, ...deadTowers);
+        }
+        // and remove them from the game
+        removeElements(this.game.towers, ...deadTowers);
+         // mark them dead
+        for (const tower of deadTowers) {
+            if (tower.tile) {
+                tower.tile.tower = undefined;
+            }
+        }
+    }
     // <<-- /Creer-Merge: protected-private-methods -->>
 }

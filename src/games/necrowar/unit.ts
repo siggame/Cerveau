@@ -143,7 +143,7 @@ export class Unit extends GameObject {
             return `${this} is attacking ${tile}, which doesn't have a tower.`;
         }
 
-        // Make sure you aren't attacking a friend.
+        // Make sure you aren't attacking a friendly tower.
         if (tile.tower.owner === player) {
             return `${this} is trying to attack the allied tower: ${tile.tower} on tile ${tile}`;
         }
@@ -176,13 +176,6 @@ export class Unit extends GameObject {
         }
 
         tile.tower.health -= this.job.damage;
-
-        if (tile.tower.health <= 0) {
-            tile.tower.health = 0;
-            tile.tower = undefined;
-            tile.isTower = false;
-            tile.isGrass = true;
-        }
 
         this.acted = true;
 
@@ -561,6 +554,10 @@ export class Unit extends GameObject {
                 if (this.job.title === "zombie" && tile.numZombies >= this.game.UnitJobs[1].perTile
                     || this.job.title === "hound" && tile.numHounds >= this.game.UnitJobs[4].perTile
                     || this.job.title === "ghoul" && tile.numGhouls >= this.game.UnitJobs[2].perTile) {
+                    return `${this} cannot walk on a fully occupied tile!`;
+                }
+                if (this.job.title === "worker" || this.job.title === "abomination"
+                    || this.job.title === "horseman" || this.job.title === "wraith") {
                     return `${this} cannot walk on an occupied tile!`;
                 }
             }

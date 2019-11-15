@@ -277,7 +277,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 title: "castle",
                 goldCost: 9999,
                 manaCost: 9999,
-                health: 50,
+                health: 100,
                 range: 3,
                 turnsBetweenAttacks: 1,
                 allUnits: true,
