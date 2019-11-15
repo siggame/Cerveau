@@ -420,7 +420,7 @@ export class Tile extends GameObject implements BaseTile {
                 return `The maximum number of ghouls are already on this tile!`;
             }
 
-            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[2].perTile) {
+            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[4].perTile) {
                 return `The maximum number of hounds are already on this tile!`;
             }
         }
