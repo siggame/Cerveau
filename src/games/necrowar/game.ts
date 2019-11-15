@@ -519,8 +519,8 @@ export class NecrowarGame extends BaseClasses.Game {
                             getMutableTile(x, y).tower = this.manager.create.tower({
                                 owner: this.players[1],
                                 tile: this.getTile(x, y),
-                                job: this.TowerJobs[1],
-                                health: this.TowerJobs[1].health,
+                                job: this.TowerJobs[0],
+                                health: this.TowerJobs[0].health,
                             }) ;
                             const tile = this.getTile(x, y);
                             if (tile && tile.tower) {
