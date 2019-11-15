@@ -166,7 +166,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
             }
             else {
                 this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
-                this.declareLosers("Your opponents achieved fusion.", this.game.players[0].opponent);
+                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0].opponent);
 
                 return true;
             }
@@ -174,7 +174,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         else {
             if (!castleStandingTwo) {
                 this.declareWinner("You defeated the enemy Necromancer!", this.game.players[1]);
-                this.declareLosers("Your opponents achieved fusion.", this.game.players[1].opponent);
+                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[1].opponent);
 
                 return true;
             }
