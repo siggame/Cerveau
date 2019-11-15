@@ -596,6 +596,19 @@ export class Unit extends GameObject {
         tile.unit = this;
         this.moves -= 1;
 
+        if ( this.job.title == "ghoul" )
+        {
+          tile.numGhouls++;
+        }
+        if else ( this.job.title == "hound" )
+        {
+          title.numHounds++;
+        }
+        else ( this.job.title == "zombie")
+        {
+          title.numZombies++;
+        }
+
         return true;
         // <<-- /Creer-Merge: move -->>
     }
