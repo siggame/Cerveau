@@ -313,6 +313,18 @@ export class Tile extends GameObject implements BaseTile {
         // Reduce player mana
         this.game.currentPlayer.mana -= (num * this.game.UnitJobs[1].manaCost);
 
+        // Find spawn tile
+        let spawnTile;
+        for (const tile of this.game.tiles) {
+            if (tile.owner === player && tile.isUnitSpawn) {
+                spawnTile = tile;
+            }
+        }
+
+        if (!spawnTile) {
+            throw new Error(`${player} has no spawn unit tile!`);
+        }
+
         // Create stack of zombies
         let unit;
         for (let i = 0; i < num; i++) {
@@ -320,15 +332,16 @@ export class Tile extends GameObject implements BaseTile {
                 acted: false,
                 health: this.game.UnitJobs[1].health,
                 owner: this.game.currentPlayer,
-                tile: this,
+                tile: spawnTile,
                 job: this.game.UnitJobs[1],
+                moves: this.game.UnitJobs[1].moves,
             });
             this.game.units.push(unit);
             player.units.push(unit);
         }
 
-        // Add zombies to this tile
-        this.numZombies += num;
+        // Add zombies to the spawn tile
+        spawnTile.numZombies += num;
 
         // Remove corpses from tile
         this.corpses -= num;
