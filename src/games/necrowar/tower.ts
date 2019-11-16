@@ -4,7 +4,6 @@ import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 import { TowerJob } from "./tower-job";
-import { Unit } from '../catastrophe';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -45,11 +44,11 @@ export class Tower extends GameObject {
     public readonly tile?: Tile;
 
     // <<-- Creer-Merge: attributes -->>
-    
+
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
-    
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -74,11 +73,11 @@ export class Tower extends GameObject {
     }
 
     // <<-- Creer-Merge: public-functions -->>
-    
+
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
-    
+
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
@@ -105,8 +104,7 @@ export class Tower extends GameObject {
         }
 
         // Check if any unit belongs to the player
-        if ((tile.unit) && (tile.unit.owner === player))
-        {
+        if ((tile.unit) && (tile.unit.owner === player)) {
             return `${this}, cannot attack allied units!`;
         }
 
@@ -138,8 +136,7 @@ export class Tower extends GameObject {
         }
 
         // Check if tower has zero health
-        if (this.health <= 0)
-        {
+        if (this.health <= 0) {
             return `${this}, cannot attack because it has been destroyed!`;
         }
 
@@ -194,8 +191,8 @@ export class Tower extends GameObject {
         this.cooldown = this.job.turnsBetweenAttacks;
 
         // Get all units on target tile
-        let tileUnits = [];
-        for (let unit of this.game.units) {
+        const tileUnits = [];
+        for (const unit of this.game.units) {
             if (unit.tile === tile) {
                 tileUnits.push(unit);
             }
@@ -206,7 +203,7 @@ export class Tower extends GameObject {
         }
 
         if (this.job.title === "aoe") {
-            for (let unit of tileUnits) {
+            for (const unit of tileUnits) {
                 unit.health = Math.max(0, unit.health - this.job.damage);
             }
         }
@@ -220,7 +217,7 @@ export class Tower extends GameObject {
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
-    /*
+    /**
      * Returns the distance between the points
      *
      * @param x1: the first x coordinate.

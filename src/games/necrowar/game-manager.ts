@@ -188,6 +188,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
+    /**
+     * Updates units.
+     */
     private updateUnits(): void {
         // Properly remove all killed units
         const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
@@ -210,6 +213,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
     }
 
+    /**
+     * Updates towers.
+     */
     private updateTowers(): void {
         // Properly remove all killed towers
         const deadTowers = this.game.towers.filter((t) => !t.tile || t.health <= 0);

@@ -190,8 +190,8 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this);
+        // tslint:disable-next-line:no-unsafe-any no-any
+        return BaseTile.prototype.getNeighbors.call(this) as any;
     }
 
     public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
@@ -205,8 +205,8 @@ export class Tile extends GameObject implements BaseTile {
      * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: string): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction);
+        // tslint:disable-next-line:no-unsafe-any no-any
+        return BaseTile.prototype.getNeighbor.call(this, direction as any) as any;
     }
 
     /**
@@ -557,7 +557,7 @@ export class Tile extends GameObject implements BaseTile {
         player.gold -= goldCost;
         player.mana -= manaCost;
 
-        let unit = this.game.manager.create.unit({
+        const unit = this.game.manager.create.unit({
             acted: false,
             health: this.game.UnitJobs[0].health,
             owner: player,

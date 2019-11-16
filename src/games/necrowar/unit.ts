@@ -464,6 +464,7 @@ export class Unit extends GameObject {
         let goldGain = 0;
 
         // Assign Gold gain based on mine type
+        // tslint:disable-next-line:prefer-conditional-expression
         if ((this.tile) && (this.tile.isIslandGoldMine)) {
             // Is island Gold Mine
             goldGain = this.game.islandIncomePerUnit;
