@@ -93,8 +93,11 @@ export class Building extends GameObject {
     constructor(
         args: Readonly<IBuildingProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The owner of this building. */
             owner: Player;
+            /** The x location of this building. */
             x: number;
+            /** The y location of this building. */
             y: number;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,

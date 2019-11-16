@@ -21,13 +21,6 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
             ...(super.schema || (this as any).schema),
 
             // Newtonian game specific settings
-            RegenerateRate: {
-                description: "The percent of max HP regained when a unit end "
-                           + "their turn on a tile owned by their player.",
-                // <<-- Creer-Merge: RegenerateRate -->>
-                default: 0.5,
-                // <<-- /Creer-Merge: RegenerateRate -->>
-            },
             internCap: {
                 description: "The maximum number of interns a player can have.",
                 // <<-- Creer-Merge: internCap -->>
@@ -66,6 +59,13 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 default: 5,
                 min: 1,
                 // <<-- /Creer-Merge: refinedValue -->>
+            },
+            regenerateRate: {
+                description: "The percent of max HP regained when a unit end "
+                           + "their turn on a tile owned by their player.",
+                // <<-- Creer-Merge: regenerateRate -->>
+                default: 0.5,
+                // <<-- /Creer-Merge: regenerateRate -->>
             },
             spawnTime: {
                 description: "The amount of turns it takes a unit to spawn.",

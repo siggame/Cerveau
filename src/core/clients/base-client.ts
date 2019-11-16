@@ -266,9 +266,16 @@ export class BaseClient {
      * @param info - The name, language, and index of the client
      */
     public setInfo(info: {
+        /** Name of the clinet */
         name?: string;
+
+        /** Type of client (ws/tcp) */
         type?: string;
+
+        /** Connection index of the client */
         index?: number;
+
+        /** Flag for if meta deltas should be sent instead of normal deltas */
         metaDeltas?: boolean;
     }): void {
         this.ourName = info.name || DEFAULT_STR;

@@ -49,9 +49,13 @@ export class DeltaMergeable<T = any> {
      * @param data - Initialization data about the parent and value of this DM.
      */
     constructor(data: {
+        /** The key of this delta mergable in its parent. */
         key: string;
+        /** The parent DeltaMergeable, if null assumed to be root node. */
         parent?: DeltaMergeable;
+        /** The initial value of this node. */
         initialValue?: T;
+        /** An optional transform function to ensure any set values are the correct type. */
         transform?: DeltaTransform<T>;
     }) {
         this.key = data.key;

@@ -426,22 +426,6 @@ export interface IUnitDashArgs {
 }
 
 /**
- * Argument overrides for Unit's isDashable function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
- */
-export interface IUnitIsDashableArgs {
-    /**
-     * The x position of the location you wish to arrive.
-     */
-    x?: number;
-    /**
-     * The y position of the location you wish to arrive.
-     */
-    y?: number;
-}
-
-/**
  * Argument overrides for Unit's mine function. If you return an object of this
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
@@ -1103,22 +1087,6 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
-                isDashable: {
-                    args: [
-                        {
-                            argName: "x",
-                            typeName: "float",
-                        },
-                        {
-                            argName: "y",
-                            typeName: "float",
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
                 mine: {
                     args: [
                         {
@@ -1206,4 +1174,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "0fa378e83ac567ebdf3e9805d3f130023f936e2740acda173d238b37f2b5d541",
 });

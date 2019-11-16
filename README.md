@@ -73,7 +73,7 @@ Node v9 is the supported version. It may run on older/newer versions,
 ``` bash
 npm install
 npm run build
-npm run js
+npm start
 ```
 
 That's it, your server is running! Now start up two Cadre clients such as the
@@ -86,7 +86,7 @@ port + 80, so 3080 by default. Websocket clients on port 3088.
 
 ### Faster development
 
-By default, using `npm start` has a long startup time as each file has to be
+By default, using `npm run live` has a long startup time as each file has to be
 transpiled by TypeScript before being ran. If you are actively developing a
 game your best workflow will be to open two terminals (split view in VSC):
 
@@ -102,7 +102,7 @@ npm run build:watch
 #### Second Terminal = Run Transpiled Code
 
 ```bash
-npm run js
+npm start
 ```
 
 With these two terminals up are you good to go! Because by default games are

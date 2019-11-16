@@ -96,7 +96,10 @@ export interface IArgs {
     WORKER_DATA?: Immutable<IWorkerGameSessionData>;
 }
 
-const parserArgs: Array<[string[], ArgumentOptions & { dest: string }]> = [
+const parserArgs: Array<[string[], ArgumentOptions & {
+    /** destination key for argument, must be a valid key of the IArgs type */
+    dest: keyof IArgs;
+}]> = [
     [["--port-offset"], {action: "store", dest: "PORT_OFFSET", defaultValue: 0,
         type: "int", help: "port offset for the default port values"}],
 
@@ -255,7 +258,6 @@ if (args.ARENA_MODE) {
     args.LOG_TO_FILES = true;
     args.GAME_SETTINGS_ENABLED = false;
     args.WEB_ENABLED = false;
-    args.LOAD_EXISTING_GAMELOGS = false;
     args.UPDATER_ENABLED = false;
     args.AUTO_UPDATE = false;
 }

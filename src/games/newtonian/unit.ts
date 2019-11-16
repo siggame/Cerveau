@@ -111,8 +111,8 @@ export class Unit extends GameObject {
     constructor(
         args: Readonly<IUnitProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The Job this Unit will have. */
             job: Job;
-            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<IBaseGameObjectRequiredData>,

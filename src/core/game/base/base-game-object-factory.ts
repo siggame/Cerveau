@@ -11,12 +11,19 @@ import { BaseGameObject, IBaseGameObjectData } from "./base-game-object";
  * @returns The newly created game object.
  */
 export function createGameObject<T extends BaseGameObject>(args: Readonly<{
+    /** The ID of the game object creating */
     id: string;
+    /** The game instance of the game object it will be part of. */
     game: BaseGame;
+    /** The Class constructor of this GameObject's class */
     GameObjectClass: typeof BaseGameObject;
+    /** The name of the game object's class */
     gameObjectName: string;
+    /** The DeltaMergeable to track this game object's state. */
     gameObjectsDeltaMergeable: DeltaMergeable;
+    /** The namespace this game object and its game came from. */
     gameNamespace: Immutable<IBaseGameNamespace>;
+    /** The initialization ata used as constructor args */
     data: Readonly<IBaseGameObjectData>;
 }>): T {
     const schema = args.gameNamespace.gameObjectsSchema[args.gameObjectName];
@@ -53,7 +60,9 @@ export class BaseGameObjectFactory {
         private readonly namespace: Immutable<IBaseGameNamespace>,
         private readonly generateID: () => string,
         gameCreated: Event<Readonly<{
+            /** The game that was created. */
             game: BaseGame;
+            /** The root delta mereable of the game that was created. */
             gameObjectsDeltaMergeable: DeltaMergeable;
         }>>,
     ) {

@@ -59,8 +59,8 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
 
         // Code for the river phases, clearing out workers in the island gold mine
-        // Every 25 turns
-        if (this.game.currentTurn % 25 === 0) {
+        // Every 15 turns
+        if (this.game.currentTurn % 15 === 0) {
             for (const unit of this.game.units) {
                 if (unit.tile) {
                     if (unit.tile.isIslandGoldMine) {

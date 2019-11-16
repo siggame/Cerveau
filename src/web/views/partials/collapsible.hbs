@@ -1,7 +1,12 @@
 <div class="collapsible">
 	<input id="{{title}}" class="toggle" type="checkbox">
 	<label for="{{title}}" class="toggle-label">{{title}}</label>
-	<div class="collapsible-content-wrapper">
+	<div
+		class="collapsible-content-wrapper"
+	{{#if height}}
+		style="--collapsible-height: {{exec "4 +" height "* 3"}}em"
+	{{/if}}
+	>
 		<div class="collapsible-content">
 			{{> @partial-block }}
 		</div>

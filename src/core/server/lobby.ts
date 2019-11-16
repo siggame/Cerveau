@@ -13,7 +13,7 @@ import { ThreadedRoom } from "./lobby-room-threaded";
 
 // external imports
 import * as larkWebsocket from "lark-websocket";
-import { capitalize, difference, lowerFirst } from "lodash";
+import { capitalize, difference, lowerFirst, mapKeys } from "lodash";
 import * as net from "net";
 import { join } from "path";
 import * as querystring from "querystring";
@@ -28,6 +28,12 @@ const GAMES_DIR = join(__dirname, "../../games/");
 const RoomClass = Config.SINGLE_THREADED
     ? SerialRoom
     : ThreadedRoom;
+
+/** Play data from a play event validated */
+type ValidatedPlayData = PlayEvent["data"] & {
+    /** The game settings for the play event validated and thus possibly changed. */
+    validGameSettings: UnknownObject;
+};
 
 /*
     Clients connect like this:
@@ -194,9 +200,14 @@ export class Lobby {
      * undefined if no error and the Room was successfully created.
      */
     public setup(data: {
+        /** The game alias to setup, does not need to be the unique name */
         gameAlias: string;
-        session: string;
+        /** Key/value pairs of the game settings for said game */
         gameSettings: Immutable<UnknownObject>;
+        /** Optional password to password protect the setup room */
+        password?: string;
+        /** Session id string to reserve */
+        session: string;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
         if (!namespace) {
@@ -212,11 +223,14 @@ export class Lobby {
         }
 
         // Now get the room
-        // (it will never be an Error because we know the gameName is valid)
         const existingRoom = this.getRoom(
             namespace.gameName,
             data.session,
-        ) as Room | undefined;
+        );
+
+        if (existingRoom instanceof Error) {
+            return existingRoom.message;
+        }
 
         if (existingRoom) {
             return `session ${data.session} is already taken.`;
@@ -226,9 +240,13 @@ export class Lobby {
         const room = this.getOrCreateRoom(
             data.gameAlias,
             data.session,
-        ) as Room;
+        );
 
-        room.addGameSettings(settings);
+        if (typeof room === "string") {
+            // error string, this should not happen but did, pass it upstream
+            return room;
+        }
+
         const rooms = this.rooms.get(namespace.gameName);
 
         if (!rooms) {
@@ -238,6 +256,11 @@ export class Lobby {
         rooms.set(data.session, room);
 
         // if we got here the setup data looks valid, so let's setup the Room.
+
+        room.addGameSettings(settings);
+        if (data.password) {
+            room.password = data.password;
+        }
     }
 
     /**
@@ -338,7 +361,10 @@ export class Lobby {
 
         this.listenerServers.push(listener);
 
-        listener.on("error", (err: Error & { code: string }) => {
+        listener.on("error", (err: Error & {
+            /** Optional error code Node adds to some error events */
+            code?: string;
+        }) => {
             logger.error(err.code !== "EADDRINUSE" // Very common error for devs
                 ? String(err)
                 : `Lobby cannot listen on port ${port} for game connections.
@@ -548,6 +574,12 @@ ${err}`);
             return;
         }
 
+        if (room.password && room.password !== playData.password) {
+            client.disconnect(`Incorrect password for private room session`);
+
+            return;
+        }
+
         // We need to check to make sure they did not request an already
         // requested player index.
         if (!isNil(playData.playerIndex)) {
@@ -577,10 +609,12 @@ ${err}`);
             room.addGameSettings(playData.validGameSettings);
         }
 
+        const gameNamespace = this.getGameNamespace(playData.gameName);
         client.send({
             event: "lobbied",
             data: {
                 gameName: data.gameName,
+                gameVersion: gameNamespace && gameNamespace.gameVersion || "",
                 gameSession: room.id,
                 constants: SHARED_CONSTANTS,
             },
@@ -645,7 +679,7 @@ ${err}`);
      */
     private validatePlayData(
         data?: Readonly<PlayEvent["data"]>,
-    ): string | (PlayEvent["data"] & { validGameSettings: UnknownObject }) {
+    ): string | ValidatedPlayData {
         if (!data) {
             return "Sent 'play' event with no data.";
         }
@@ -708,6 +742,11 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
                 return `Game settings incorrectly formatted.
 Must be one string in the url parameters format.${footer}`;
             }
+
+            // remove [] from keys for array setting names
+            settings = mapKeys(settings, (value, key) => key.endsWith("[]")
+                ? key.substr(0, key.length - 2)
+                : key);
 
             const validated = gameNamespace.gameSettingsManager.invalidateSettings(settings);
             if (validated instanceof Error) {

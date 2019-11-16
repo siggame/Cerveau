@@ -11,6 +11,12 @@ import { TileDirection } from "~/core/game/mixins/tiled";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
+ * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+ */
+export type CowboyDrunkDirection = "" | "North" | "East" | "South" | "West";
+
+/**
  * The job that this Cowboy does, and dictates how they fight and interact
  * within the Saloon.
  */
@@ -30,7 +36,7 @@ export class Cowboy extends GameObject {
      * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
      * drunk.
      */
-    public drunkDirection!: string;
+    public drunkDirection!: "" | "North" | "East" | "South" | "West";
 
     /**
      * How much focus this Cowboy has. Different Jobs do different things with
@@ -98,7 +104,10 @@ export class Cowboy extends GameObject {
     constructor(
         args: Readonly<ICowboyProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The owner of this Cowboy. */
             owner: Player;
+
+            /** The Tile to spawn this cowboy on. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -160,7 +169,7 @@ export class Cowboy extends GameObject {
      *
      * @param drunkDirection The valid string direction to set this.drunkDirection
      */
-    public getDrunk(drunkDirection: string): void {
+    public getDrunk(drunkDirection: CowboyDrunkDirection): void {
         this.owner.addRowdiness(1);
 
         this.canMove = false;
@@ -457,7 +466,7 @@ export class Cowboy extends GameObject {
      */
     private actSharpshooter(player: Player, tile: Tile): true {
 
-        let shot = tile;
+        let shot: Tile | undefined = tile;
         let distance = this.focus;
         while (shot && distance > 0) { // shoot things
             distance--; // yes we could do this above but it reads stupid
@@ -535,7 +544,7 @@ export class Cowboy extends GameObject {
      * bottle to go.
      * @returns True because it worked.
      */
-    private actBartender(player: Player, tile: Tile, drunkDirection: string): true {
+    private actBartender(player: Player, tile: Tile, drunkDirection: CowboyDrunkDirection): true {
         // check to make sure the tile the bottle spawns on would not cause it to instantly break
         // because if so, don't create it, just instantly get the cowboy there drunk
         if (!tile.isPathableToBottles() || tile.bottle) { // don't spawn a bottle, just splash the beer at them
@@ -560,7 +569,7 @@ export class Cowboy extends GameObject {
 
             this.manager.create.bottle({
                 tile,
-                drunkDirection,
+                drunkDirection: drunkDirection || undefined,
                 direction,
             });
         }

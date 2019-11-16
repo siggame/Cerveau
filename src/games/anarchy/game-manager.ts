@@ -106,7 +106,9 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         const playersBurnedDownBuildings = new Map<Player, number>();
         const fireSpreads: Array<{
+            /** The building to spread to. */
             building: Building;
+            /** The fire they will accumulate. */
             fire: number;
         }> = [];
 

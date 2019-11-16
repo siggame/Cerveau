@@ -27,7 +27,7 @@ export function setupWebServer(): void {
                 partialsDir: join(__dirname, "views/partials"),
                 layoutsDir: join(__dirname, "views/layouts"),
                 helpers,
-            }));
+            }) as any); // tslint:disable-line:no-any - express-hbs definitions are borked
 
             app.set("view engine", "hbs");
             app.set("views", join(__dirname, "views"));

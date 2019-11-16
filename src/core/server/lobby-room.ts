@@ -34,6 +34,9 @@ export abstract class Room {
     /** Once the game is over, this will exist and be the list of losers */
     public losers?: IGamelogWinnerLoser[];
 
+    /** The password to entry this room. If undefined open to anyone. */
+    public password?: string;
+
     /** The time this room was created */
     public readonly timeCreated = new Date();
 

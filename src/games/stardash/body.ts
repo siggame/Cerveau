@@ -86,7 +86,9 @@ export class Body extends GameObject {
     constructor(
         args: Readonly<IBodyProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The angle */
             angle: number;
+            /** The distance */
             distance: number;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>

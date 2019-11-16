@@ -43,7 +43,10 @@ export class ThreadedRoom extends Room {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
         const workerSessionData: IWorkerGameSessionData = {
-            mainDebugPort: (process as NodeJS.Process & { _debugPort?: number}
+            mainDebugPort: (process as NodeJS.Process & {
+                /** special flag for Node to know what port the debugger can bind to. */
+                _debugPort?: number;
+            }
             )._debugPort,
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,

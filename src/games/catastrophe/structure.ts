@@ -63,7 +63,9 @@ export class Structure extends GameObject {
     constructor(
         args: Readonly<IStructureProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The Tile this Structure will be placed on. */
             tile: Tile;
+            /** The type of structure it is. */
             type: StructureType;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,

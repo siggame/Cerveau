@@ -28,7 +28,7 @@ export class BaseAI {
      */
     protected executeOrder(
         name: string,
-        ...args: Array<unknown>
+        ...args: unknown[]
     ): Promise<any> /* tslint:disable-line:no-any - this is dynamic */ {
         return this.manager.executeOrder(name, ...args);
     }

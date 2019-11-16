@@ -15,10 +15,15 @@ export interface IBaseGameObjectData {
 
 /** Values required by all game objects to be initialized correctly. */
 export interface IBaseGameObjectRequiredData {
+    /** The id of the game object. */
     id: string;
+    /** The name of the class this GameObject is */
     gameObjectName: string;
+    /** The delta mergeable used to track this game object's state. */
     gameObjectsDeltaMergeable: DeltaMergeable;
+    /** The game this game object is in. */
     game: BaseGame;
+    /** The schema used to validate everything inside the game object. */
     schema: Immutable<IBaseGameObjectSchema>;
 }
 
@@ -101,7 +106,10 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
     protected invalidateLog(
         player: BasePlayer,
         message: string,
-    ): undefined | string | { message?: string } {
+    ): undefined | string | {
+        /** The new value of the validated message to use */
+        message?: string;
+    } {
         if (message.length > MAX_LOG_LENGTH) {
             return `Message is too long! Max ${MAX_LOG_LENGTH} per message.`;
         }

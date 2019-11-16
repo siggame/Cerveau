@@ -31,6 +31,9 @@ export function registerRouteSetup(app: Express): void {
      * conflict with any other sessions, and clients will need to connect to
      * this id when connecting to the game server after this succeeds.
      * when a game is over, and in status when a game is over.
+     * @apiParam {string} [password] An optional string to password protect
+     * the room setting up. When set all clients connecting must provide this
+     * same password to connect.
      * @apiParam {GameSettings} gameSettings A key/value object of valid game
      * settings for the game. The only **required** gameSettings are
      * `playerNames`.
@@ -62,9 +65,14 @@ export function registerRouteSetup(app: Express): void {
         }
 
         const body = req.body as {
+            /** Name of the game to setup. Can technically be loose. */
             gameName: unknown;
-            session: unknown;
+            /** The key/value pairs for the settings about the game. */
             gameSettings: unknown;
+            /** Password required to join this room being set up. */
+            password: unknown;
+            /** The id of the session for this room. */
+            session: unknown;
         };
 
         const errors = [] as string[];
@@ -79,10 +87,13 @@ export function registerRouteSetup(app: Express): void {
             numPlayers = gameNamespace.GameManager.requiredNumberOfPlayers;
         }
 
-        const session = String(body.session);
-        if (!session || session === "*" || session === "new") {
-            errors.push(`session '${session}' is not valid`);
+        if (typeof body.session !== "string") {
+            errors.push(`session id required`);
         }
+        else if (body.session === "*" || body.session === "new") {
+            errors.push(`session '${body.session}' is a reserved session name`);
+        }
+        const session = String(body.session);
 
         const gameSettings = body.gameSettings;
         if (!gameSettings || !isObject(gameSettings)) {
@@ -98,10 +109,21 @@ export function registerRouteSetup(app: Express): void {
             errors.push(`gameSettings.playerNames must be an array of length ${numPlayers}`);
         }
 
-        if (errors.length === 0) {
+        let password: string | undefined;
+        if (body.password) {
+            if (typeof body.password === "string") {
+                password = body.password;
+            }
+            else {
+                errors.push("password must be a string");
+            }
+        }
+
+        if (errors.length === 0 && isObject(gameSettings)) {
             const error = lobby.setup({
                 gameAlias,
-                gameSettings: gameSettings as {}, // if it was not an object an error would be added above
+                gameSettings,
+                password,
                 session,
             });
 

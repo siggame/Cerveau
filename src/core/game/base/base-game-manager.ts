@@ -100,7 +100,10 @@ export class BaseGameManager {
         }
 
         const gameCreated = new Event<{
+            /** The game that was created. */
             game: BaseGame;
+
+            /** The base delta mergeable to the game objects for serialization */
             gameObjectsDeltaMergeable: DeltaMergeable;
         }>();
 

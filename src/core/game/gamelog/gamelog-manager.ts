@@ -59,7 +59,7 @@ export class GamelogManager {
         /** The directory where this will save gamelog files to */
         public readonly gamelogDirectory: string = DEFAULT_LOGS_DIR,
     ) {
-        if (!Config.ARENA_MODE) {
+        if (Config.LOAD_EXISTING_GAMELOGS) {
             this.initializeGamelogInfos();
         }
     }
@@ -75,17 +75,15 @@ export class GamelogManager {
         const serialized = JSON.stringify(gamelog);
         const filename = filenameFor(gamelog);
 
-        if (!Config.ARENA_MODE) {
-            // cache gamelog info
-            this.gamelogInfos.push({
-                epoch: gamelog.epoch,
-                filename,
-                gameName: gamelog.gameName,
-                session: gamelog.gameSession,
-                uri: getURL(filename),
-                visualizerUrl: getVisualizerURL(filename),
-            });
-        }
+        // cache gamelog info
+        this.gamelogInfos.push({
+            epoch: gamelog.epoch,
+            filename,
+            gameName: gamelog.gameName,
+            session: gamelog.gameSession,
+            uri: getURL(filename),
+            visualizerUrl: getVisualizerURL(filename),
+        });
 
         const writeSteam = fs.createWriteStream(
             this.gamelogDirectory + filename + GAMELOG_EXTENSION,

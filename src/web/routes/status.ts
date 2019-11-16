@@ -9,12 +9,24 @@ import { objectHasProperty } from "~/utils";
 
 /** Information about the room to be returned via the status API. */
 interface IRoomInfo {
+    /** The room's current status. */
     status: "empty" | "open" | "running" | "over";
+    /** The unique name of the game being played. */
     gameName: string;
+    /** The id of the game session */
     gameSession: string;
+    /** Number of players required to start this room's game */
     requiredNumberOfPlayers: number;
+    /** filename of the gamelog. When undefined not finished, when null still writing to filesystem. */
     gamelogFilename?: string | null;
+    /** The array of client info in the room. */
     clients: IClientInfo[];
+}
+
+/** Information about an error getting room info. */
+interface IErrorInfo {
+    /** Human readable error message */
+    error: string;
 }
 
 /**
@@ -24,7 +36,7 @@ interface IRoomInfo {
  * @param id - id of the session of that gameName
  * @returns information about the session for the api
  */
-function getRoomInfo(gameAlias: string, id: string): { error: string } | IRoomInfo {
+function getRoomInfo(gameAlias: string, id: string): IErrorInfo | IRoomInfo {
     const lobby = Lobby.getInstance();
     const room = lobby.getRoom(gameAlias, id);
 
@@ -280,22 +292,19 @@ export function registerRouteStatus(app: Express): void {
      */
     app.get("/status/:gameName/:gameSession", async (req, res) => {
         const params = req.params as {
+            /** The game name being requested */
             gameName: unknown;
+
+            /** the game session being requested */
             gameSession: unknown;
         };
 
         const gameName = String(params.gameName);
         const gameSession = String(params.gameSession);
 
-        let info: { error: string } | IRoomInfo;
-        if (!gameName || !gameSession) {
-            info = { error: "gameName and gameSession are required" };
-
-            return;
-        }
-        else {
-            info = getRoomInfo(gameName, gameSession);
-        }
+        const info = (!gameName || !gameSession)
+            ? { error: "gameName and gameSession are required" }
+            : getRoomInfo(gameName, gameSession);
 
         if (objectHasProperty(info, "error")) {
             res.status(400);

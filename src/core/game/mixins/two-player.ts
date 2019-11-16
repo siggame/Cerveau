@@ -8,6 +8,7 @@ import * as Base from "./base";
 
 /** A player in a two player game, that has a guaranteed opponent. */
 export interface ITwoPlayerPlayer extends BasePlayer {
+    /** The opponenet (other player) of this Player. For handy lookup. */
     opponent: ITwoPlayerPlayer;
 }
 
@@ -27,10 +28,15 @@ export function mixTwoPlayer<
     TBaseGameObject extends Base.BaseGameObjectConstructor,
     TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
+    /** The AI to extend. */
     AI: TBaseAI;
+    /** The Game to extend. */
     Game: TBaseGame;
+    /** The GameManager to extend. */
     GameManager: TBaseGameManager;
+    /** The GameObject to extend. */
     GameObject: TBaseGameObject;
+    /** The GameSettings to extend. */
     GameSettings: TBaseGameSettings;
 }) {
     /** A game with only two players in it. (a very common game type) */
