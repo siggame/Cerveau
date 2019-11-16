@@ -114,6 +114,10 @@ export class Tower extends GameObject {
             return `${this}, cannot attack a tile that doesn't exist!`;
         }
 
+        if (this.cooldown > 0) {
+            return `${this} is not ready to attack yet!`;
+        }
+
         // Check if tile has no units
         if (!tile.unit) {
             return `${this}, cannot attack a tile with no units!`;
@@ -137,10 +141,7 @@ export class Tower extends GameObject {
         if (this.tile === undefined) {
             return `${this} is not on a tile!`;
         }
-        // Checks if the tower is cooled down.
-        if (this.cooldown != 0) {
-            return `${this} is not cooled down. Slow down there!`;
-        }
+
         // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
             return `${this}, cannot attack because target tile is out of range`;
@@ -176,8 +177,9 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
 
-        // Get all units on target tile
         this.cooldown = this.job.turnsBetweenAttacks;
+
+        // Get all units on target tile
         let tileUnits = [];
         for (let unit of this.game.units) {
             if (unit.tile === tile) {
@@ -196,14 +198,6 @@ export class Tower extends GameObject {
         }
         else {
             tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
-        }
-
-        // Remove units in game with zero health
-        for (let i: number = 0; i < this.game.units.length; i++) {
-            if (this.game.units[i].health <= 0) {
-                this.game.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
         }
 
         return true;
