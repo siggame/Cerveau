@@ -84,19 +84,21 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     protected async afterTurn(): Promise<void> {
         await super.afterTurn();
         // <<-- Creer-Merge: after-turn -->>
-        // add logic here after the current player's turn starts
+        // add logic here after the current player's turn ends
         this.updateUnits();
         this.updateTowers();
-        for (const unit of this.game.units) {
-            if (!unit.owner || unit.owner === this.game.currentPlayer) {
-                unit.acted = false;
-                unit.moves = unit.job.moves;
-            }
+        for (const unit of this.game.currentPlayer.units) {
+            unit.acted = false;
+            unit.moves = unit.job.moves;
 
-            if (unit.tile && unit.tile.owner === unit.owner) {
-                if (unit.health > unit.job.health) {
-                    unit.health = unit.job.health;
-                }
+            if (unit.health > unit.job.health) {
+                unit.health = unit.job.health;
+            }
+        }
+
+        for (const tower of this.game.currentPlayer.towers) {
+            if (tower.cooldown > 0) {
+                tower.cooldown--;
             }
         }
         // <<-- /Creer-Merge: after-turn -->>
@@ -168,8 +170,8 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // Add logic here for the secondary win conditions
 
         if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0])
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1])
+            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0]);
+            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1]);
         }
         else if (this.game.players[1].towers[0].health > this.game.players[0].towers[0].health) {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1]);
@@ -199,6 +201,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
          // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
+                unit.tile.corpses++;
                 unit.tile.unit = undefined;
                 unit.tile = undefined;
             }

@@ -19,6 +19,11 @@ export class Tower extends GameObject {
     public attacked!: boolean;
 
     /**
+     * How many turns are left before it can fire again.
+     */
+    public cooldown!: number;
+
+    /**
      * How much remaining health this tower has.
      */
     public health!: number;
@@ -109,6 +114,10 @@ export class Tower extends GameObject {
             return `${this}, cannot attack a tile that doesn't exist!`;
         }
 
+        if (this.cooldown > 0) {
+            return `${this} is not ready to attack yet!`;
+        }
+
         // Check if tile has no units
         if (!tile.unit) {
             return `${this}, cannot attack a tile with no units!`;
@@ -168,6 +177,8 @@ export class Tower extends GameObject {
          *    5   |   5   |    20    |     5     |  3
          */
 
+        this.cooldown = this.job.turnsBetweenAttacks;
+
         // Get all units on target tile
         let tileUnits = [];
         for (let unit of this.game.units) {
@@ -187,28 +198,6 @@ export class Tower extends GameObject {
         }
         else {
             tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
-        }
-
-        // Handle killed units
-        for (let unit of tileUnits) {
-            if (unit.health === 0) {
-                if (unit.job.title !== "zombie") {
-                    tile.corpses += 1;
-                }
-                unit.tile = undefined;
-
-                if (tile.unit && tile.unit.health === 0) {
-                    tile.unit = undefined;
-                }
-            }
-        }
-
-        // Remove units in game with zero health
-        for (let i: number = 0; i < this.game.units.length; i++) {
-            if (this.game.units[i].health <= 0) {
-                this.game.units.splice(i, 1); // Remove unit from array
-                i--;
-            }
         }
 
         return true;

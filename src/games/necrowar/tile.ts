@@ -275,15 +275,26 @@ export class Tile extends GameObject implements BaseTile {
             return `You do not have enough mana to resurrect ${num} corpses!`;
         }
 
+        let spawnTile;
+        for (const tile of this.game.tiles) {
+            if (tile.owner === player && tile.isUnitSpawn) {
+                spawnTile = tile;
+            }
+        }
+
+        if (!spawnTile) {
+            return `You do not have a unit spawn tile. This is probably a bug.`;
+        }
+
         // Ensure there isn't another unit currently on this tile
-        const unitCount = Math.max(this.numGhouls, this.numHounds)
-        if (unitCount > 0 || this.unit !== undefined) {
-            return `This tile is already occupied by another unit!`;
+        const unitCount = Math.max(this.numGhouls, this.numHounds);
+        if (unitCount > 0 || (this.unit !== undefined && this.unit.job.title !== "zombie")) {
+            return `Your unit spawn tile is already occupied by another unit!`;
         }
 
         // Ensure there wouldn't be too many zombies
-        if (this.numZombies + num > this.game.UnitJobs[1].perTile) {
-            return `The tile cannot fit an additional ${num} zombies!`;
+        if (spawnTile.numZombies + num > this.game.UnitJobs[1].perTile) {
+            return `Your spawn tile cannot fit an additional ${num} zombies!`;
         }
 
         // <<-- /Creer-Merge: invalidate-res -->>
@@ -302,6 +313,18 @@ export class Tile extends GameObject implements BaseTile {
         // Reduce player mana
         this.game.currentPlayer.mana -= (num * this.game.UnitJobs[1].manaCost);
 
+        // Find spawn tile
+        let spawnTile;
+        for (const tile of this.game.tiles) {
+            if (tile.owner === player && tile.isUnitSpawn) {
+                spawnTile = tile;
+            }
+        }
+
+        if (!spawnTile) {
+            throw new Error(`${player} has no spawn unit tile!`);
+        }
+
         // Create stack of zombies
         let unit;
         for (let i = 0; i < num; i++) {
@@ -309,15 +332,19 @@ export class Tile extends GameObject implements BaseTile {
                 acted: false,
                 health: this.game.UnitJobs[1].health,
                 owner: this.game.currentPlayer,
-                tile: this,
+                tile: spawnTile,
                 job: this.game.UnitJobs[1],
+                moves: this.game.UnitJobs[1].moves,
             });
+            if (!spawnTile.unit) {
+                spawnTile.unit = unit;
+            }
             this.game.units.push(unit);
             player.units.push(unit);
         }
 
-        // Add zombies to this tile
-        this.numZombies += num;
+        // Add zombies to the spawn tile
+        spawnTile.numZombies += num;
 
         // Remove corpses from tile
         this.corpses -= num;
@@ -396,7 +423,7 @@ export class Tile extends GameObject implements BaseTile {
                 return `The maximum number of ghouls are already on this tile!`;
             }
 
-            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[2].perTile) {
+            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[4].perTile) {
                 return `The maximum number of hounds are already on this tile!`;
             }
         }
@@ -448,6 +475,7 @@ export class Tile extends GameObject implements BaseTile {
             tile: this,
             job: this.game.UnitJobs[unitIndex],
             title,
+            moves: this.game.UnitJobs[unitIndex].moves,
         });
         this.game.units.push(unit);
         player.units.push(unit);
@@ -536,6 +564,7 @@ export class Tile extends GameObject implements BaseTile {
             tile: this,
             job: this.game.UnitJobs[0],
             title: "worker",
+            moves: this.game.UnitJobs[0].moves,
         });
 
         this.unit = unit;

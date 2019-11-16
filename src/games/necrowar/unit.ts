@@ -271,7 +271,7 @@ export class Unit extends GameObject {
         }
 
         if (this.tile.isTower) {
-            return `You can not build ontop another tower.`;
+            return `You can not build on top another tower.`;
         }
 
         if (this.tile.isWall) {
@@ -596,17 +596,14 @@ export class Unit extends GameObject {
         tile.unit = this;
         this.moves -= 1;
 
-        if ( this.job.title == "ghoul" )
-        {
-          tile.numGhouls++;
+        if (this.job.title === "ghoul") {
+            tile.numGhouls++;
         }
-        if else ( this.job.title == "hound" )
-        {
-          title.numHounds++;
+        else if (this.job.title === "hound") {
+            tile.numHounds++;
         }
-        else ( this.job.title == "zombie")
-        {
-          title.numZombies++;
+        else if (this.job.title === "zombie") {
+            tile.numZombies++;
         }
 
         return true;
