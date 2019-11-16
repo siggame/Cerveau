@@ -513,7 +513,7 @@ export class Unit extends GameObject {
             return `It isn't your turn, ${player}.`;
         }
 
-        if (this.owner !== player || this.owner === undefined) {
+        if ((this.job.title === "worker") && (this.owner !== player || this.owner === undefined)) {
             return `${this} isn't owned by you.`;
         }
 
@@ -535,7 +535,8 @@ export class Unit extends GameObject {
             return `${this} has no more moves and might fall apart!`;
         }
 
-        if (!tile.isPath && this.owner !== this.owner.opponent) {
+        // Make both players don't own the tile
+        if (this.owner === this.owner.opponent) {
             return `${this} cannot walk on the enemies side!`;
         }
 
