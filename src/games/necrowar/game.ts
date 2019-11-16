@@ -395,6 +395,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 ) {
                     getMutableTile(x, y).isPath = true;
                     getMutableTile(x, y).isGrass = false;
+                    getMutableTile(x, y).isRiver = false;
                 }
             }
         }
