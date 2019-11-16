@@ -321,6 +321,11 @@ export interface ITowerProperties {
     attacked?: boolean;
 
     /**
+     * How many turns are left before it can fire again.
+     */
+    cooldown?: number;
+
+    /**
      * How much remaining health this tower has.
      */
     health?: number;
@@ -1012,6 +1017,9 @@ export const Namespace = makeNamespace({
             attributes: {
                 attacked: {
                     typeName: "boolean",
+                },
+                cooldown: {
+                    typeName: "int",
                 },
                 health: {
                     typeName: "int",

@@ -19,6 +19,11 @@ export class Tower extends GameObject {
     public attacked!: boolean;
 
     /**
+     * How many turns are left before it can fire again.
+     */
+    public cooldown!: number;
+
+    /**
      * How much remaining health this tower has.
      */
     public health!: number;
@@ -26,7 +31,7 @@ export class Tower extends GameObject {
     /**
      * What type of tower this is (it's job).
      */
-    public readonly job!: TowerJob;
+    public readonly job: TowerJob;
 
     /**
      * The player that built / owns this tower.

@@ -29,7 +29,7 @@ export class Unit extends GameObject {
     /**
      * The type of unit this is.
      */
-    public readonly job!: UnitJob;
+    public readonly job: UnitJob;
 
     /**
      * The number of moves this unit has left this turn.
