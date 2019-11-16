@@ -201,7 +201,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
          // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
-                unit.tile.corpses++;
+                if (unit.job.title !== "zombie") {
+                    unit.tile.corpses++;
+                }
                 unit.tile.unit = undefined;
                 unit.tile = undefined;
             }

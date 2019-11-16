@@ -4,6 +4,7 @@ import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 import { TowerJob } from "./tower-job";
+import { Unit } from '../catastrophe';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -123,6 +124,19 @@ export class Tower extends GameObject {
             return `${this}, cannot attack a tile with no units!`;
         }
 
+        if (tile.unit.job.title === "worker") {
+            return `Towers may not attack workers!`;
+        }
+
+        if (this.job.title === "cleansing") {
+            if (tile.unit.job.title !== "wraith" && tile.unit.job.title !== "abomination") {
+                return `Cleansing towers can only attack wraiths and abominations!`;
+            }
+        }
+        else if (tile.unit.job.title === "wraith") {
+            return `${this} cannot attack wraiths! They are incorporeal!`;
+        }
+
         // Check if tower has zero health
         if (this.health <= 0)
         {
@@ -131,11 +145,11 @@ export class Tower extends GameObject {
 
         /*
          * Shape of the tower range:
-         *         _ x x x _
-         *         x x x x x
+         *         _   x   _
+         *           x x x
          *         x x T x x
-         *         x x x x x
-         *         _ x x x _
+         *           x x x
+         *         _   x   _
          */
 
         if (this.tile === undefined) {
