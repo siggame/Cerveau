@@ -525,10 +525,10 @@ export class Unit extends GameObject {
             return `${this} is not on a tile! Could they be behind you..?`;
         }
 
-        if (tile !== tile.tileEast
-            && tile !== tile.tileWest
-            && tile !== tile.tileNorth
-            && tile !== tile.tileSouth) {
+        if (tile !== this.tile.tileEast
+            && tile !== this.tile.tileWest
+            && tile !== this.tile.tileNorth
+            && tile !== this.tile.tileSouth) {
             return `${this} cannot move to a non-adjacent tile!`;
         }
 
