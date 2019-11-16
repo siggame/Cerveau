@@ -271,7 +271,7 @@ export class Unit extends GameObject {
         }
 
         if (this.tile.isTower) {
-            return `You can not build ontop another tower.`;
+            return `You can not build on top another tower.`;
         }
 
         if (this.tile.isWall) {
