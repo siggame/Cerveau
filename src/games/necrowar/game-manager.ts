@@ -207,6 +207,15 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 if (unit.job.title !== "zombie") {
                     unit.tile.corpses++;
                 }
+                if (unit.job.title === "zombie") {
+                    unit.tile.numZombies--;
+                }
+                if (unit.job.title === "ghoul") {
+                    unit.tile.numGhouls--;
+                }
+                if (unit.job.title === "hound") {
+                    unit.tile.numHounds--;
+                }
                 unit.tile.unit = undefined;
                 unit.tile = undefined;
             }

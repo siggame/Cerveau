@@ -443,6 +443,14 @@ export class Unit extends GameObject {
             return `${tile} must be a gold mine!`;
         }
 
+        if (!tile.unit) {
+            return `You are not on the target tile!`;
+        }
+
+        if (tile.unit.owner !== player) {
+            return `You are trying to mine where another player's unit is!`;
+        }
+
         // Make sure unit is a worker
         if (this.job.title !== "worker") {
             return `${this} must be a worker to mine!`;
@@ -592,20 +600,30 @@ export class Unit extends GameObject {
             return false;
         }
 
-        this.tile.unit = undefined;
-        this.tile = tile;
-        tile.unit = this;
-        this.moves -= 1;
-
         if (this.job.title === "ghoul") {
             tile.numGhouls++;
+            this.tile.numGhouls--;
         }
         else if (this.job.title === "hound") {
             tile.numHounds++;
+            this.tile.numHounds--;
         }
         else if (this.job.title === "zombie") {
             tile.numZombies++;
+            this.tile.numZombies--;
         }
+
+        let replacementUnit = undefined;
+        for (const unit of player.units) {
+            if (unit !== this && unit.tile === this.tile) {
+                replacementUnit = unit;
+            }
+        }
+
+        this.tile.unit = replacementUnit;
+        this.tile = tile;
+        tile.unit = this;
+        this.moves -= 1;
 
         return true;
         // <<-- /Creer-Merge: move -->>

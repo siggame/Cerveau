@@ -202,7 +202,7 @@ export class Tower extends GameObject {
             return false;
         }
 
-        if (this.job.title === "aoe") {
+        if (this.job.title === "aoe" || this.job.title === "castle") {
             for (const unit of tileUnits) {
                 unit.health = Math.max(0, unit.health - this.job.damage);
             }
