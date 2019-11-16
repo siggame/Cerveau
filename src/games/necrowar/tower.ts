@@ -137,7 +137,10 @@ export class Tower extends GameObject {
         if (this.tile === undefined) {
             return `${this} is not on a tile!`;
         }
-
+        // Checks if the tower is cooled down.
+        if (this.cooldown != 0) {
+            return `${this} is not cooled down. Slow down there!`;
+        }
         // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
             return `${this}, cannot attack because target tile is out of range`;
@@ -174,6 +177,7 @@ export class Tower extends GameObject {
          */
 
         // Get all units on target tile
+        this.cooldown = this.job.turnsBetweenAttacks;
         let tileUnits = [];
         for (let unit of this.game.units) {
             if (unit.tile === tile) {
