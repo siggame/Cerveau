@@ -513,7 +513,7 @@ export class Unit extends GameObject {
             return `It isn't your turn, ${player}.`;
         }
 
-        if ((this.job.title === "worker") && (this.owner !== player || this.owner === undefined)) {
+        if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
         }
 
@@ -523,6 +523,13 @@ export class Unit extends GameObject {
 
         if (!this.tile) {
             return `${this} is not on a tile! Could they be behind you..?`;
+        }
+
+        if (tile !== tile.tileEast
+            && tile !== tile.tileWest
+            && tile !== tile.tileNorth
+            && tile !== tile.tileSouth) {
+            return `${this} cannot move to a non-adjacent tile!`;
         }
 
         // Make sure the tile is on the map
@@ -536,7 +543,7 @@ export class Unit extends GameObject {
         }
 
         // Make both players don't own the tile
-        if (this.owner === this.owner.opponent) {
+        if (this.job.title === "worker" && tile.owner === this.owner.opponent) {
             return `${this} cannot walk on the enemies side!`;
         }
 
