@@ -513,7 +513,7 @@ export class Unit extends GameObject {
             return `It isn't your turn, ${player}.`;
         }
 
-        if ((this.job.title === "worker") && (this.owner !== player || this.owner === undefined)) {
+        if ((this.job.title === "worker") && (this.owner !== player)) {
             return `${this} isn't owned by you.`;
         }
 
