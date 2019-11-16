@@ -1,8 +1,12 @@
 import { IGamelog } from "@cadre/ts-utils/cadre";
 import { basename } from "path";
-import * as sanitizeFilename from "sanitize-filename";
 import { Config } from "~/core/config";
 import { Immutable, momentString } from "~/utils";
+
+// Typings bug. No default export exist for this library, yet TS thinks there should be.
+// This side steps the bug by reverting to old school requires.
+// tslint:disable-next-line:no-var-requires no-require-imports
+const sanitizeFilename = require("sanitize-filename") as typeof import("sanitize-filename");
 
 /** The extension for gamelog files */
 export const GAMELOG_EXTENSION = ".json.gz";
@@ -84,8 +88,11 @@ export function getVisualizerURL(
  * @returns the string filename (just name, no path), expected for the data.
  */
 export function filenameFor(gamelogData: {
+    /** The name of the game to format the filename for. */
     gameName: string;
+    /** The game session id. */
     gameSession: string;
+    /** Optional epoch. */
     epoch?: number;
 }): string {
     return sanitizeFilename(filenameFormat(

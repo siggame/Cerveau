@@ -46,8 +46,11 @@ class DeltaArray<T> extends Array<T> {
  * @returns A new DeltaMergeable wrapping an Array.
  */
 export function createArray<T = any>(args: {
+    /** The key of this array in its parent delta mergable. */
     key: string;
+    /** The type of all children in this Array. */
     childType: Immutable<ISanitizableType>;
+    /** The parent of this node. */
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
     let oldLength = 0;

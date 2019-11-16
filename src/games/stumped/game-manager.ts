@@ -266,7 +266,9 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      */
     private updateResources(): void {
         const newResources = new Map<Tile, {
+            /** The number of branches that will exist on this Tile key. */
             branches: number;
+            /** The number of food that will exist on this Tile key */
             food: number;
         }>();
 

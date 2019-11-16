@@ -53,8 +53,11 @@ export class Forecast extends GameObject {
     constructor(
         args: Readonly<IForecastProperties & {
             // <<-- Creer-Merge: constructor-args -->>
-            direction: "North" | "East" | "South" | "West";
+            /** The direction this Forecast will be. */
+            direction: ForecastDirection;
+            /** The intensity value of this Forecast. */
             intensity: number;
+            /** The player whose turn it will be on the turn this Forecast can be manipulated. */
             controllingPlayer: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,

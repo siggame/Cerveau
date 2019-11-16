@@ -15,12 +15,36 @@ import { IPoint, Mutable } from "~/utils";
 /** interface used to create rooms.s */
 interface IRoom {
     // room locations to be stored.
-    x1: number; y1: number;
-    x2: number; y2: number;
-    x3: number; y3: number;
+    /** x1 position */
+    x1: number;
+    /** y1 position */
+    y1: number;
+    /** x2 position */
+    x2: number;
+    /** y2 position */
+    y2: number;
+    /** x3 position */
+    x3: number;
+    /** y3 position */
+    y3: number;
+
     // tracks doors and walls.
-    WNorth: boolean; WEast: boolean; WSouth: boolean; WWest: boolean;
-    DNorth: boolean; DEast: boolean; DSouth: boolean; DWest: boolean;
+    /** Flag for this direction? */
+    WNorth: boolean;
+    /** Flag for this direction? */
+    WEast: boolean;
+    /** Flag for this direction? */
+    WSouth: boolean;
+    /** Flag for this direction? */
+    WWest: boolean;
+    /** Flag for this direction? */
+    DNorth: boolean;
+    /** Flag for this direction? */
+    DEast: boolean;
+    /** Flag for this direction? */
+    DSouth: boolean;
+    /** Flag for this direction? */
+    DWest: boolean;
 }
 
 /*interface IConveyor {
@@ -40,12 +64,6 @@ export class NewtonianGame extends BaseClasses.Game {
 
     /** The settings used to initialize the game, as set by players */
     public readonly settings = Object.freeze(this.settingsManager.values);
-
-    /**
-     * The percent of max HP regained when a unit end their turn on a tile
-     * owned by their player.
-     */
-    public readonly RegenerateRate!: number;
 
     /**
      * The player whose turn it is currently. That player can send commands.
@@ -121,6 +139,12 @@ export class NewtonianGame extends BaseClasses.Game {
      * generator.
      */
     public readonly refinedValue!: number;
+
+    /**
+     * The percent of max HP regained when a unit end their turn on a tile
+     * owned by their player.
+     */
+    public readonly regenerateRate!: number;
 
     /**
      * A unique identifier for the game instance that is being played.
@@ -322,8 +346,11 @@ export class NewtonianGame extends BaseClasses.Game {
 
         // --- Set resource spawn --- \\
         const conveyors: Array<{
+            /** x position for the conveyor */
             x: number;
+            /** y position for the conveyor */
             y: number;
+            /** The direction of the conveyor */
             direction: Tile["direction"];
         }> = [];
         for (let x = 1; x < startEnd - 1; x++) {

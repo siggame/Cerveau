@@ -9,6 +9,18 @@ import { Cowboy } from "./cowboy";
 // <<-- /Creer-Merge: imports -->>
 
 /**
+ * The Direction this Bottle is flying and will move to between turns, can be
+ * 'North', 'East', 'South', or 'West'.
+ */
+export type BottleDirection = "North" | "East" | "South" | "West";
+
+/**
+ * The direction any Cowboys hit by this will move, can be 'North', 'East',
+ * 'South', or 'West'.
+ */
+export type BottleDrunkDirection = "North" | "East" | "South" | "West";
+
+/**
  * A bottle thrown by a bartender at a Tile.
  */
 export class Bottle extends GameObject {
@@ -16,13 +28,13 @@ export class Bottle extends GameObject {
      * The Direction this Bottle is flying and will move to between turns, can
      * be 'North', 'East', 'South', or 'West'.
      */
-    public readonly direction!: string;
+    public readonly direction!: "North" | "East" | "South" | "West";
 
     /**
      * The direction any Cowboys hit by this will move, can be 'North', 'East',
      * 'South', or 'West'.
      */
-    public readonly drunkDirection!: string;
+    public readonly drunkDirection!: "North" | "East" | "South" | "West";
 
     /**
      * True if this Bottle has impacted and has been destroyed (removed from
@@ -52,6 +64,7 @@ export class Bottle extends GameObject {
     constructor(
         args: Readonly<IBottleProperties & {
             // <<-- Creer-Merge: constructor-args -->>
+            /** The Tile to spawn this Bottle upon. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,

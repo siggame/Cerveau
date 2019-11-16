@@ -600,9 +600,6 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
-                RegenerateRate: {
-                    typeName: "float",
-                },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -669,6 +666,9 @@ export const Namespace = makeNamespace({
                 },
                 refinedValue: {
                     typeName: "int",
+                },
+                regenerateRate: {
+                    typeName: "float",
                 },
                 session: {
                     typeName: "string",
@@ -1078,4 +1078,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "7c19f909ee5faa0ac3faf4e989032b5a37ba94aeb5d6ae7654a15a2bb1401bbe",
 });

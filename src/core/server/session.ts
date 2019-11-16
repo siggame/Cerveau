@@ -105,9 +105,13 @@ export class Session {
      * @param args - The initialization args required to hookup a game.
      */
     constructor(args: {
+        /** The id of this session. Passed around as session: string often */
         id: string;
+        /** The namespace of this game to create new instances from */
         gameNamespace: Immutable<IBaseGameNamespace>;
+        /** The already active game manager that holds AIs. */
         gameSettingsManager: BaseGameSettingsManager;
+        /** The clients connected to this session. Includes spectators and players. */
         clients: ReadonlyArray<BaseClient>;
     }) {
         this.id = args.id;
@@ -196,6 +200,7 @@ export class Session {
 
         this.gamelogScribe = new GamelogScribe(
             this.game,
+            args.gameNamespace.gameVersion,
             this,
             playingClients,
             this.deltaManager,

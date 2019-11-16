@@ -262,4 +262,5 @@ ${shared['cerveau']['schema_type'](returns['type'], 6)}
         },
 % endfor
     },
+    gameVersion: "${game_version}",
 });

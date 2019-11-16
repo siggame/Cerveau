@@ -198,7 +198,14 @@ export class StumpedGame extends BaseClasses.Game {
         const lake = Math.floor(this.mapWidth / 2);
 
         // Generate random metaballs where the lake will be
-        const balls: Array<{ x: number; y: number; r: number }> = [];
+        const balls: Array<{
+            /** X position of the ball */
+            x: number;
+            /** Y position of the ball */
+            y: number;
+            /** Radius of the ball */
+            r: number;
+        }> = [];
         const minRadius = 0.5;
         const maxRadius = 5.0;
         const maxOffset = 2.0;
@@ -254,7 +261,12 @@ export class StumpedGame extends BaseClasses.Game {
             // console.log(`Generating river at ${theta * 180 / Math.PI} degrees`);
 
             // Define the line segments
-            const points: Array<{ x: number; y: number }> = [];
+            const points: Array<{
+                /** X position */
+                x: number;
+                /** Y positoion */
+                y: number;
+            }> = [];
 
             // Starting point - The center of lake, at (0, 0)
             points.push({

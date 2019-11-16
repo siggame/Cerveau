@@ -1,12 +1,5 @@
 language: node_js
 
-before_script:
-  - npm install
-
-script:
-  # run linter and check to make sure TypeScript can build the source code
-  - npm test
-
 before_deploy:
   # build the docs for the API
   - npm run docs

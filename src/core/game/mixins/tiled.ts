@@ -51,7 +51,7 @@ export abstract class BaseTile extends BaseGameObject {
      */
     public getAdjacentDirection(
         adjacentTile: BaseTile | undefined,
-    ): string | undefined {
+    ): "North" | "South" | "East" | "West" | undefined {
         if (adjacentTile) {
             for (const direction of TILE_DIRECTIONS) {
                 if (this.getNeighbor(direction) === adjacentTile) {
@@ -141,10 +141,15 @@ export function mixTiled<
     TBaseGameObject extends Base.BaseGameObjectConstructor,
     TBaseGameSettings extends Base.BaseGameSettingsManagerConstructor
 >(base: {
+    /** The AI to extend. */
     AI: TBaseAI;
+    /** The Game to extend. */
     Game: TBaseGame;
+    /** The GameManager to extend. */
     GameManager: TBaseGameManager;
+    /** The GameObject to extend. */
     GameObject: TBaseGameObject;
+    /** The GameSettings to extend. */
     GameSettings: TBaseGameSettings;
 }) {
     /** The settings for a Tiled game */
@@ -202,8 +207,18 @@ export function mixTiled<
                 for (let y = 0; y < this.mapHeight; y++) {
                     const i = x + y * this.mapWidth;
                     this.tiles[i] = (this.manager.create as (BaseGameObjectFactory & {
-                        // All Tiled games should have this method
-                        tile(args: { x: number; y: number }): BaseTile;
+                        // All Tiled games should have this method, can't reference in this mixin.
+                        /**
+                         * Creates a Tile at the given { x, y }
+                         * @param args - Must contain normal BaseGameObject data and an { x, y }
+                         * @Returns A tile of that instance from that GameObjectFactory
+                         */
+                        tile(args: {
+                            /** The X position of the Tile. */
+                            x: number;
+                            /** The Y position of the Tile. */
+                            y: number;
+                        }): BaseTile;
                     })).tile({x, y});
                 }
             }

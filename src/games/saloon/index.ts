@@ -77,13 +77,13 @@ export interface IBottleProperties {
      * The Direction this Bottle is flying and will move to between turns, can
      * be 'North', 'East', 'South', or 'West'.
      */
-    direction?: string;
+    direction?: "North" | "East" | "South" | "West";
 
     /**
      * The direction any Cowboys hit by this will move, can be 'North', 'East',
      * 'South', or 'West'.
      */
-    drunkDirection?: string;
+    drunkDirection?: "North" | "East" | "South" | "West";
 
     /**
      * True if this Bottle has impacted and has been destroyed (removed from
@@ -110,7 +110,7 @@ export interface ICowboyProperties {
      * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
      * drunk.
      */
-    drunkDirection?: string;
+    drunkDirection?: "" | "North" | "East" | "South" | "West";
 
     /**
      * How much focus this Cowboy has. Different Jobs do different things with
@@ -678,9 +678,13 @@ export const Namespace = makeNamespace({
             attributes: {
                 direction: {
                     typeName: "string",
+                    defaultValue: "North",
+                    literals: ["North", "East", "South", "West"],
                 },
                 drunkDirection: {
                     typeName: "string",
+                    defaultValue: "North",
+                    literals: ["North", "East", "South", "West"],
                 },
                 isDestroyed: {
                     typeName: "boolean",
@@ -702,6 +706,8 @@ export const Namespace = makeNamespace({
                 },
                 drunkDirection: {
                     typeName: "string",
+                    defaultValue: "",
+                    literals: ["", "North", "East", "South", "West"],
                 },
                 focus: {
                     typeName: "int",
@@ -1000,4 +1006,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
 });

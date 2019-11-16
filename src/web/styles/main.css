@@ -256,7 +256,8 @@ table tr:nth-child(odd) {
 
 .toggle:checked + .toggle-label + .collapsible-content-wrapper {
 	opacity: 1;
-	max-height: 30em;
+	max-height: 20em; /* fallback value */
+	max-height: var(--collapsible-height);
 }
 
 /* --- Settings --- */
@@ -280,8 +281,9 @@ h4.game-settings {
 }
 
 .game-setting-default:before {
-	content: " = ";
+	content: "=";
 	color: var(--color-off-black);
+	padding-right: 0.125em;
 }
 
 .game-setting-min:empty,
@@ -294,7 +296,7 @@ h4.game-settings {
 .game-setting-max {
 	color: var(--color-gray);
 	font-style: italic;
-	margin-left: 0.5em;
+	margin: 0 0.125em;
 }
 
 .game-setting-min:before {
@@ -310,6 +312,14 @@ h4.game-settings {
 	content: ")"
 }
 
+.game-setting-description {
+	display: block;
+	margin-top: 0.25em;
+}
+
+.game-list ul > li:not(:last-child) {
+	padding-bottom: 0.375em;
+}
 
 
 /* --- Docs --- */

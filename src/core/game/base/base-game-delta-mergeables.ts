@@ -18,9 +18,15 @@ export class BaseGameDeltaMergeables {
      * @param args - The data needed to hookup our DeltaMergeable.
      */
     constructor(args: {
+        /** The key representing this node. */
         key: string;
+        /** The parent delta mergable, if null then this is the root. */
         parent?: DeltaMergeable; // will mutate as it gets a new child
+
+        /** Schema about the attributes to follow for this entry */
         attributesSchema: Immutable<TypedObject<ISanitizableType>>;
+
+        /** Initial value(s) to set to upon creation. */
         initialValues: Immutable<{[key: string]: unknown}>;
     }) {
         this.deltaMergeable = createDeltaMergeable({

@@ -14,14 +14,18 @@ export * from "./status";
 
 /** Setting for the view to expect. */
 type Setting = ISettingsSchema & {
+    /** The name of the setting */
     name: string;
 };
 
 const MAX_GAMELOGS_ON_INDEX = 10;
 
 const games: Array<{
+    /** The unique name of the game, used as an ID. */
     name: string;
+    /** The human readable description of the game. Should be brief. */
     description: string;
+    /** A list of settings available in this game. */
     settings: Setting[];
 }> = [];
 
