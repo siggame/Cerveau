@@ -31,7 +31,7 @@ export class Tower extends GameObject {
     /**
      * What type of tower this is (it's job).
      */
-    public readonly job: TowerJob;
+    public readonly job!: TowerJob;
 
     /**
      * The player that built / owns this tower.
@@ -192,20 +192,6 @@ export class Tower extends GameObject {
         }
         else {
             tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
-        }
-
-        // Handle killed units
-        for (let unit of tileUnits) {
-            if (unit.health === 0) {
-                if (unit.job.title !== "zombie") {
-                    tile.corpses += 1;
-                }
-                unit.tile = undefined;
-
-                if (tile.unit && tile.unit.health === 0) {
-                    tile.unit = undefined;
-                }
-            }
         }
 
         // Remove units in game with zero health
