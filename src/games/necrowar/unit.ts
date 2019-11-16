@@ -535,7 +535,7 @@ export class Unit extends GameObject {
             return `${this} has no more moves and might fall apart!`;
         }
 
-        if (this.owner === this.owner.opponent) {
+        if (!tile.isPath && this.owner !== this.owner.opponent) {
             return `${this} cannot walk on the enemies side!`;
         }
 
