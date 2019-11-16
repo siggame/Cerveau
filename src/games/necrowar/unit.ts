@@ -316,6 +316,7 @@ export class Unit extends GameObject {
             health: this.game.towerJobs[towerIndex].health,
             job: this.game.towerJobs[towerIndex],
             tile: this.tile,
+            cooldown: 0,
         });
 
         this.game.towers.push(this.tile.tower);

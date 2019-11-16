@@ -442,6 +442,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 // Paths
                 if (getMutableTile(x, y).isPath) {
                     getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isPath = true;
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isRiver = false;
                 }
                 // Gold Mines
                 if (getMutableTile(x, y).isGoldMine) {
