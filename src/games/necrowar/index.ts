@@ -689,22 +689,6 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
-                TowerJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: TowerJob,
-                        nullable: false,
-                    },
-                },
-                UnitJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: UnitJob,
-                        nullable: false,
-                    },
-                },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -767,11 +751,27 @@ export const Namespace = makeNamespace({
                 timeAddedPerTurn: {
                     typeName: "int",
                 },
+                towerJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: TowerJob,
+                        nullable: false,
+                    },
+                },
                 towers: {
                     typeName: "list",
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Tower,
+                        nullable: false,
+                    },
+                },
+                unitJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: UnitJob,
                         nullable: false,
                     },
                 },
@@ -1223,4 +1223,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
+    gameVersion: "935f0e64ba290cdce31688a40bd90d1eb5375f36aeebd67482238fc0da25ef86",
 });

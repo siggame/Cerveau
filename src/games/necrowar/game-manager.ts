@@ -1,10 +1,10 @@
 // This file is where you should put logic to control the game and everything
 // around it.
-import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -83,6 +83,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     protected async afterTurn(): Promise<void> {
         await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn ends
         this.updateUnits();
@@ -114,6 +115,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     protected primaryWinConditionsCheck(): boolean {
         super.primaryWinConditionsCheck();
+
         // <<-- Creer-Merge: primary-win-conditions -->>
         // Add logic here checking for the primary win condition(s)
         let castleStandingOne = false;

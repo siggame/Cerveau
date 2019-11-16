@@ -27,16 +27,6 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
-     * A list of every tower type / job.
-     */
-    public TowerJobs!: TowerJob[];
-
-    /**
-     * A list of every unit type / job.
-     */
-    public UnitJobs!: UnitJob[];
-
-    /**
      * The player whose turn it is currently. That player can send commands.
      * Other players cannot.
      */
@@ -112,9 +102,19 @@ export class NecrowarGame extends BaseClasses.Game {
     public readonly timeAddedPerTurn!: number;
 
     /**
+     * A list of every tower type / job.
+     */
+    public towerJobs!: TowerJob[];
+
+    /**
      * Every Tower in the game.
      */
     public towers!: Tower[];
+
+    /**
+     * A list of every unit type / job.
+     */
+    public unitJobs!: UnitJob[];
 
     /**
      * Every Unit in the game.
@@ -144,9 +144,9 @@ export class NecrowarGame extends BaseClasses.Game {
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
 
-        this.createUnitJobs();
+        this.createunitJobs();
 
-        this.createTowerJobs();
+        this.createtowerJobs();
 
         this.createMap();
 
@@ -190,9 +190,9 @@ export class NecrowarGame extends BaseClasses.Game {
     }
 
     /** Creates all unit types in the game */
-    private createUnitJobs(): void {
+    private createunitJobs(): void {
         // pushes all unit types
-        this.UnitJobs.push(
+        this.unitJobs.push(
             this.manager.create.unitJob({
                 title: "worker",
                 goldCost: 10,
@@ -276,9 +276,9 @@ export class NecrowarGame extends BaseClasses.Game {
     /**
      * Creates all tower types.
      */
-    private createTowerJobs(): void {
+    private createtowerJobs(): void {
         // pushes all tower types
-        this.TowerJobs.push(
+        this.towerJobs.push(
             this.manager.create.towerJob({
                 title: "castle",
                 goldCost: 9999,
@@ -516,8 +516,8 @@ export class NecrowarGame extends BaseClasses.Game {
                         getMutableTile(x, y).tower = this.manager.create.tower({
                             owner: this.players[0],
                             tile: this.getTile(x, y),
-                            job: this.TowerJobs[0],
-                            health: this.TowerJobs[0].health,
+                            job: this.towerJobs[0],
+                            health: this.towerJobs[0].health,
                         });
                         const tile = this.getTile(x, y);
                         if (tile && tile.tower) {
@@ -533,8 +533,8 @@ export class NecrowarGame extends BaseClasses.Game {
                             getMutableTile(x, y).tower = this.manager.create.tower({
                                 owner: this.players[1],
                                 tile: this.getTile(x, y),
-                                job: this.TowerJobs[0],
-                                health: this.TowerJobs[0].health,
+                                job: this.towerJobs[0],
+                                health: this.towerJobs[0].health,
                             }) ;
                             const tile = this.getTile(x, y);
                             if (tile && tile.tower) {

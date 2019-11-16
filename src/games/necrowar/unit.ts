@@ -245,8 +245,8 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if (player.gold < this.game.TowerJobs[towerIndex].goldCost
-            || player.mana < this.game.TowerJobs[towerIndex].manaCost) {
+        if (player.gold < this.game.towerJobs[towerIndex].goldCost
+            || player.mana < this.game.towerJobs[towerIndex].manaCost) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
@@ -313,8 +313,8 @@ export class Unit extends GameObject {
         this.tile.tower = this.game.manager.create.tower({
             owner: player,
             attacked: false,
-            health: this.game.TowerJobs[towerIndex].health,
-            job: this.game.TowerJobs[towerIndex],
+            health: this.game.towerJobs[towerIndex].health,
+            job: this.game.towerJobs[towerIndex],
             tile: this.tile,
         });
 
@@ -324,8 +324,8 @@ export class Unit extends GameObject {
 
         this.tile.isTower = true;
 
-        player.gold -= this.game.TowerJobs[towerIndex].goldCost;
-        player.mana -= this.game.TowerJobs[towerIndex].manaCost;
+        player.gold -= this.game.towerJobs[towerIndex].goldCost;
+        player.mana -= this.game.towerJobs[towerIndex].manaCost;
 
         return true;
 
@@ -560,9 +560,9 @@ export class Unit extends GameObject {
                 return `${this} is not allowed to walk on ${tile.unit}!`;
             }
             else {
-                if (this.job.title === "zombie" && tile.numZombies >= this.game.UnitJobs[1].perTile
-                    || this.job.title === "hound" && tile.numHounds >= this.game.UnitJobs[4].perTile
-                    || this.job.title === "ghoul" && tile.numGhouls >= this.game.UnitJobs[2].perTile) {
+                if (this.job.title === "zombie" && tile.numZombies >= this.game.unitJobs[1].perTile
+                    || this.job.title === "hound" && tile.numHounds >= this.game.unitJobs[4].perTile
+                    || this.job.title === "ghoul" && tile.numGhouls >= this.game.unitJobs[2].perTile) {
                     return `${this} cannot walk on a fully occupied tile!`;
                 }
                 if (this.job.title === "worker" || this.job.title === "abomination"
