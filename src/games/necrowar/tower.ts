@@ -41,7 +41,7 @@ export class Tower extends GameObject {
     /**
      * The Tile this Tower is on.
      */
-    public readonly tile: Tile;
+    public readonly tile?: Tile;
 
     // <<-- Creer-Merge: attributes -->>
     
@@ -96,7 +96,7 @@ export class Tower extends GameObject {
         tile: Tile,
     ): void | string | ITowerAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
-        const range = 2.3; // Attack range
+        const range = 2.2; // Attack range
 
         // Check if tower already attacked
         if (this.attacked) {
@@ -133,6 +133,10 @@ export class Tower extends GameObject {
          *         x x x x x
          *         _ x x x _
          */
+
+        if (this.tile === undefined) {
+            return `${this} is not on a tile!`;
+        }
 
         // Check if tile is in range
         if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {

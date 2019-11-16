@@ -140,10 +140,10 @@ export class Unit extends GameObject {
 
         // Make sure the the unit is attacking a tower.
         if (!tile.tower) {
-            return `${this} is attacking ${tile}, which doesn't have a unit.`;
+            return `${this} is attacking ${tile}, which doesn't have a tower.`;
         }
 
-        // Make sure you aren't attacking a friend.
+        // Make sure you aren't attacking a friendly tower.
         if (tile.tower.owner === player) {
             return `${this} is trying to attack the allied tower: ${tile.tower} on tile ${tile}`;
         }
@@ -177,13 +177,6 @@ export class Unit extends GameObject {
 
         tile.tower.health -= this.job.damage;
 
-        if (tile.tower.health <= 0) {
-            tile.tower.health = 0;
-            tile.tower = undefined;
-            tile.isTower = false;
-            tile.isGrass = true;
-        }
-
         this.acted = true;
 
         return true;
@@ -209,16 +202,16 @@ export class Unit extends GameObject {
         let towerIndex = -1;
 
         if (title === "arrow") {
-            towerIndex = 0;
-        }
-        else if (title === "ballista") {
             towerIndex = 1;
         }
-        else if (title === "cleansing") {
+        else if (title === "ballista") {
             towerIndex = 2;
         }
-        else if (title === "aoe") {
+        else if (title === "cleansing") {
             towerIndex = 3;
+        }
+        else if (title === "aoe") {
+            towerIndex = 4;
         }
 
         if (towerIndex === -1) {
@@ -305,31 +298,32 @@ export class Unit extends GameObject {
         let towerIndex = -1;
 
         if (title === "arrow") {
-            towerIndex = 0;
-        }
-        else if (title === "ballista") {
             towerIndex = 1;
         }
-        else if (title === "cleansing") {
+        else if (title === "ballista") {
             towerIndex = 2;
         }
-        else if (title === "aoe") {
+        else if (title === "cleansing") {
             towerIndex = 3;
+        }
+        else if (title === "aoe") {
+            towerIndex = 4;
         }
 
         this.tile.tower = this.game.manager.create.tower({
             owner: player,
+            attacked: false,
+            health: this.game.TowerJobs[towerIndex].health,
+            job: this.game.TowerJobs[towerIndex],
             tile: this.tile,
-            title,
         });
 
         this.game.towers.push(this.tile.tower);
-        
+
         player.towers.push(this.tile.tower);
 
         this.tile.isTower = true;
 
-        player.towers.push(this.tile.tower);
         player.gold -= this.game.TowerJobs[towerIndex].goldCost;
         player.mana -= this.game.TowerJobs[towerIndex].manaCost;
 
@@ -532,9 +526,18 @@ export class Unit extends GameObject {
             return `${this} has no more moves and might fall apart!`;
         }
 
+        if (this.owner === this.owner.opponent) {
+            return `${this} cannot walk on the enemies side!`;
+        }
+
         // Make sure tile is part of the path
-        if (!tile.isPath) {
-            return `${this}, going off the path is dangerous.`;
+        if (!tile.isPath && this.job.title !== "worker") {
+            return `${this}, going off the path is dangerous!`;
+        }
+
+        // Or, make sure it isn't for workers
+        if (tile.isPath && this.job.title === "worker") {
+            return `${this}, workers are not allowed on the path!`;
         }
 
         // Make sure tile is not a river tile
@@ -551,6 +554,10 @@ export class Unit extends GameObject {
                 if (this.job.title === "zombie" && tile.numZombies >= this.game.UnitJobs[1].perTile
                     || this.job.title === "hound" && tile.numHounds >= this.game.UnitJobs[4].perTile
                     || this.job.title === "ghoul" && tile.numGhouls >= this.game.UnitJobs[2].perTile) {
+                    return `${this} cannot walk on a fully occupied tile!`;
+                }
+                if (this.job.title === "worker" || this.job.title === "abomination"
+                    || this.job.title === "horseman" || this.job.title === "wraith") {
                     return `${this} cannot walk on an occupied tile!`;
                 }
             }
@@ -588,6 +595,16 @@ export class Unit extends GameObject {
         this.tile = tile;
         tile.unit = this;
         this.moves -= 1;
+
+        if (this.job.title === "ghoul") {
+            tile.numGhouls++;
+        }
+        else if (this.job.title === "hound") {
+            tile.numHounds++;
+        }
+        else if (this.job.title === "zombie") {
+            tile.numZombies++;
+        }
 
         return true;
         // <<-- /Creer-Merge: move -->>

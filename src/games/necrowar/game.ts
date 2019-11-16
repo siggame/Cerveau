@@ -149,6 +149,9 @@ export class NecrowarGame extends BaseClasses.Game {
         this.createTowerJobs();
 
         this.createMap();
+
+        this.giveInitialStuff();
+
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -175,6 +178,14 @@ export class NecrowarGame extends BaseClasses.Game {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
+
+    private giveInitialStuff(): void {
+        this.players[0].gold = 100;
+        this.players[0].mana = 100;
+        this.players[1].gold = 100;
+        this.players[1].mana = 100;
+    }
+
     /** Creates all unit types in the game */
     private createUnitJobs(): void {
         // pushes all unit types
@@ -196,7 +207,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 2,
                 damage: 1,
                 health: 5,
-                moves: 10,
+                moves: 3,
                 range: 1,
                 perTile: 10,
             }),
@@ -207,7 +218,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 5,
                 damage: 5,
                 health: 15,
-                moves: 10,
+                moves: 3,
                 range: 1,
                 perTile: 2,
             }),
@@ -218,7 +229,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 10,
                 damage: 10,
                 health: 60,
-                moves: 10,
+                moves: 1,
                 range: 1,
                 perTile: 1,
             }),
@@ -229,7 +240,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 4,
                 damage: 5,
                 health: 5,
-                moves: 10,
+                moves: 5,
                 range: 1,
                 perTile: 3,
             }),
@@ -240,7 +251,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 20,
                 damage: 10,
                 health: 10,
-                moves: 10,
+                moves: 6,
                 range: 1,
                 perTile: 1,
             }),
@@ -251,17 +262,28 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 50,
                 damage: 15,
                 health: 75,
-                moves: 10,
+                moves: 5,
                 range: 1,
                 perTile: 1,
             }),
 
         );
     }
-    
+
     private createTowerJobs(): void {
         // pushes all tower types
         this.TowerJobs.push(
+            this.manager.create.towerJob({
+                title: "castle",
+                goldCost: 9999,
+                manaCost: 9999,
+                health: 100,
+                range: 3,
+                turnsBetweenAttacks: 1,
+                allUnits: true,
+                damage: 3,
+            }),
+            
             this.manager.create.towerJob({
                 title: "arrow",
                 goldCost: 50,
@@ -333,16 +355,18 @@ export class NecrowarGame extends BaseClasses.Game {
         };
 
         //Cover a whole side in grass tiles
-        for (let x = 0; x < (this.mapWidth / 2 - 3); x++) {
+        for (let x = 0; x < (this.mapWidth / 2 - 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isGrass = true;
+                this.players[0].side.push(this.getTile(x, y)!);
             }
         }
 
         //Cover the middle stripe in river tiles
-        for (let x = (this.mapWidth / 2 - 1); x < (this.mapWidth / 2 + 1); x++) {
+        for (let x = (this.mapWidth / 2 - 1.5); x < (this.mapWidth / 2 + 1.5); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 getMutableTile(x, y).isRiver = true;
+                getMutableTile(x, y).isGrass = false;
             }
         }
 
@@ -350,17 +374,18 @@ export class NecrowarGame extends BaseClasses.Game {
         for (let x = 0; x < (this.mapWidth / 2); x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 if (
-                //Top Part
-                ((y === (this.mapHeight - 5)) && (x > 5)) ||
+                //bottom Part
                 ((y === (this.mapHeight - 6)) && (x > 5)) ||
-                //Bottom Part
-                ((y === 5) && (x > 10)) ||
-                ((y === 6) && (x > 10)) ||
+                ((y === (this.mapHeight - 7)) && (x > 5)) ||
+                //top Part
+                ((y === 6) && (x > 15)) ||
+                ((y === 5) && (x > 15)) ||
                 //Left Side Part
-                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 5)) ||
-                ((y > 5) && (y < (this.mapHeight - 5)) && (x === 6))
+                ((y > 4) && (y < (this.mapHeight - 5)) && (x === 5)) ||
+                ((y > 4) && (y < (this.mapHeight - 5)) && (x === 6))
                 ){
                     getMutableTile(x, y).isPath = true;
+                    getMutableTile(x, y).isGrass = false;
                 }
             }
         }
@@ -369,72 +394,148 @@ export class NecrowarGame extends BaseClasses.Game {
         getMutableTile(7, 7).isPath = true;
         getMutableTile(7, 6).isPath = true;
         getMutableTile(7, 5).isPath = true;
+        getMutableTile(7, 7).isGrass = false;
+        getMutableTile(7, 6).isGrass = false;
+        getMutableTile(7, 5).isGrass = false;
 
         //Place castle
         getMutableTile(6, 6).isCastle = true;
+        getMutableTile(6, 6).isPath = false;
+        getMutableTile(6, 6).owner = this.players[0];
 
         //Place gold mine tiles
-        for (let x = 10; x <= 11; x++) {
-            for (let y = (this.mapHeight - 10); y <= (this.mapHeight - 11); y++) {
+        for (let x = 15; x <= 16; x++) {
+            for (let y = (this.mapHeight - 16); y <= (this.mapHeight - 15); y++) {
                 getMutableTile(x, y).isGoldMine = true;
             }
         }
 
         //Set Worker Spawn
         getMutableTile(8, 9).isWorkerSpawn = true;
+        getMutableTile(8, 9).owner = this.players[0];
         //Set Unit Spawn
-        getMutableTile(11, 6).isUnitSpawn = true;
+        getMutableTile(15, 6).isUnitSpawn = true;
+        getMutableTile(15, 6).isGrass = false;
+        getMutableTile(11, 6).owner = this.players[0];
 
         //Mirror the generated map for the other side, both mirroring x and y so it flips diagnolly
         for(let x = 0; x < this.mapWidth / 2; x++) {
             for(let y = 0; y < this.mapHeight; y++) {
+                this.players[1].side.push(this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1)!);
                 //Grass
                 if(getMutableTile(x, y).isGrass) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGrass = true;
                 }
                 //Paths
                 if(getMutableTile(x, y).isPath) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isPath = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isPath = true;
                 }
                 //Gold Mines
                 if(getMutableTile(x, y).isGoldMine) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGoldMine = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isGoldMine = true;
                 }
                 //Castle
                 if(getMutableTile(x, y).isCastle) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isCastle = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isCastle = true;
                 }
                 //Worker Spawn
                 if(getMutableTile(x, y).isWorkerSpawn) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isWorkerSpawn = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isWorkerSpawn = true;
                 }
                 //Unit Spawn
                 if(getMutableTile(x, y).isUnitSpawn) {
-                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isUnitSpawn = true
+                    getMutableTile((this.mapWidth - x - 1), (this.mapHeight - y - 1)).isUnitSpawn = true;
                 }
             }
         }
 
         //Generate Island
         //Make a Square of river in the center of the map, the "lake"
-        for (let x = (this.mapWidth / 2 - 2); x <= (this.mapWidth / 2 + 2); x++) {
-            for (let y = (this.mapHeight / 2 - 2); y < (this.mapHeight / 2 + 2); y++) {
+        for (let x = (this.mapWidth / 2 - 2.5); x <= (this.mapWidth / 2 + 1.5); x++) {
+            for (let y = (this.mapHeight / 2 - 2); y <= (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isRiver = true;
+                getMutableTile(x, y).isGrass = false;
             }
         }
         //Make a smaller square of grass within the "lake"
-        for (let x = (this.mapWidth / 2 - 1); x <= (this.mapWidth / 2 + 1); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
+        for (let x = (this.mapWidth / 2 - 1.5); x <= (this.mapWidth / 2 + 0.5); x++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isGrass = true;
+                getMutableTile(x, y).isRiver = false;
             }
         }
+        //Paths leading to island
+        getMutableTile(this.mapWidth / 2 - 2.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 - 2.5, this.mapHeight / 2).isRiver = false;
+        getMutableTile(this.mapWidth / 2 + 1.5, this.mapHeight / 2).isGrass = true;
+        getMutableTile(this.mapWidth / 2 + 1.5, this.mapHeight / 2).isRiver = false;
+
         //Make island mine tiles on the middle three tiles
-        for (let x = (this.mapWidth / 2); x <= (this.mapWidth / 2); x++) {
-            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 1); y++) {
+        for (let x = (this.mapWidth / 2 - 0.5); x <= (this.mapWidth / 2 - 0.5); x++) {
+            for (let y = (this.mapHeight / 2 - 1); y < (this.mapHeight / 2 + 2); y++) {
                 getMutableTile(x, y).isIslandGoldMine = true;
             }
         }
 
+        //Assign ownership to sides
+        for (let x = 0; x < (this.mapWidth / 2 - 0.5); x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle || 
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[0];
+                }
+            }
+        }
+        for (let x = (this.mapWidth / 2 + 0.5); x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if(getMutableTile(x, y).isGrass || getMutableTile(x, y).isGoldMine || getMutableTile(x, y).isCastle ||
+                getMutableTile(x, y).isWorkerSpawn || getMutableTile(x, y).isUnitSpawn) {
+                    getMutableTile(x, y).owner = this.players[1];
+                }
+            }
+        }
+
+        // Creates the castles on either side
+        for (let x = 0; x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                if (getMutableTile(x, y).isCastle) {
+                    // if it's player 0's castle
+                    if (getMutableTile(x, y).owner === this.players[0]) {
+                        getMutableTile(x, y).tower = this.manager.create.tower({
+                            owner: this.players[0],
+                            tile: this.getTile(x, y),
+                            job: this.TowerJobs[0],
+                            health: this.TowerJobs[0].health,
+                        });
+                        const tile = this.getTile(x, y);
+                        if (tile && tile.tower) {
+                            this.towers.push(tile.tower);
+                            this.players[0].towers.push(tile.tower);
+                            getMutableTile(x, y).isTower = true;
+                            getMutableTile(x, y).isCastle = true;
+                        }
+                    }
+                    else if (getMutableTile(x, y).owner === this.players[1]) {
+                        // if it's player 1's castle
+                        if (getMutableTile(x, y).owner === this.players[1]) {
+                            getMutableTile(x, y).tower = this.manager.create.tower({
+                                owner: this.players[1],
+                                tile: this.getTile(x, y),
+                                job: this.TowerJobs[0],
+                                health: this.TowerJobs[0].health,
+                            }) ;
+                            const tile = this.getTile(x, y);
+                            if (tile && tile.tower) {
+                                this.towers.push(tile.tower);
+                                this.players[1].towers.push(tile.tower);
+                                getMutableTile(x, y).isTower = true;
+                                getMutableTile(x, y).isCastle = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
