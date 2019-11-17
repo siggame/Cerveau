@@ -46,7 +46,7 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of turns it takes between the river "
                            + "changing phases.",
                 // <<-- Creer-Merge: riverPhase -->>
-                default: 25,
+                default: 15,
                 // <<-- /Creer-Merge: riverPhase -->>
             },
             // <<-- Creer-Merge: schema -->>

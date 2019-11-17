@@ -46,11 +46,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
         for (const unit of this.game.units) {
-            if (!unit.owner || unit.owner === this.game.currentPlayer) {
-                unit.acted = false;
-                unit.moves = unit.job.moves;
-            }
-
             if (unit.tile && unit.tile.owner === unit.owner) {
                 if (unit.health > unit.job.health) {
                     unit.health = unit.job.health;
@@ -60,7 +55,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // Code for the river phases, clearing out workers in the island gold mine
         // Every 15 turns
-        if (this.game.currentTurn % 15 === 0) {
+        if (this.game.currentTurn % this.game.riverPhase === 0) {
             for (const unit of this.game.units) {
                 if (unit.tile) {
                     if (unit.tile.isIslandGoldMine) {
@@ -89,9 +84,10 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         this.updateUnits();
         this.updateTowers();
         for (const unit of this.game.currentPlayer.units) {
-            unit.acted = false;
-            unit.moves = unit.job.moves;
-
+            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+            }
             if (unit.health > unit.job.health) {
                 unit.health = unit.job.health;
             }
