@@ -176,6 +176,9 @@ export class Unit extends GameObject {
         }
 
         tile.tower.health -= this.job.damage;
+        if (tile.tower.health <= 0) {
+            player.towerKills++;
+        }
 
         this.acted = true;
 

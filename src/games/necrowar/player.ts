@@ -99,6 +99,11 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
+    /**
+     * How many tower kills this player has for secondary win condition.
+     */
+    public towerKills!: number;
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**

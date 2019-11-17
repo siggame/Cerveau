@@ -166,7 +166,15 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
 
-        if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
+        if (this.game.players[0].towerKills > this.game.players[1].towerKills) {
+            this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[0]);
+            this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[1]);
+        } 
+        else if (this.game.players[1].towerKills > this.game.players[0].towerKills) {
+            this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[1]);
+            this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[0]);
+        } 
+        else if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0]);
             this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1]);
         }
