@@ -83,8 +83,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // add logic here after the current player's turn ends
         this.updateUnits();
         this.updateTowers();
-        for (const unit of this.game.currentPlayer.units) {
-            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+        const player = this.game.currentPlayer.opponent;
+        for (const unit of player.units) {
+            if (!unit.owner || unit.owner === player) {
                 unit.acted = false;
                 unit.moves = unit.job.moves;
             }
@@ -93,7 +94,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
             }
         }
 
-        for (const tower of this.game.currentPlayer.towers) {
+        for (const tower of player.towers) {
             if (tower.cooldown > 0) {
                 tower.cooldown--;
             }
