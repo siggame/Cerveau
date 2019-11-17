@@ -243,6 +243,8 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
          // mark them dead
         for (const tower of deadTowers) {
             if (tower.tile) {
+                tower.tile.isGrass = true;
+                tower.tile.isTower = false;
                 tower.tile.tower = undefined;
             }
         }
