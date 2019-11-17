@@ -226,8 +226,8 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure there isn't another unit currently on this tile
-        const unitCount = Math.max(this.numGhouls, this.numHounds);
-        if (unitCount > 0 || (this.unit !== undefined && this.unit.job.title !== "zombie")) {
+        const unitCount = Math.max(spawnTile.numGhouls, spawnTile.numHounds);
+        if (unitCount > 0 || (spawnTile.unit !== undefined && spawnTile.unit.job.title !== "zombie")) {
             return `Your unit spawn tile is already occupied by another unit!`;
         }
 
