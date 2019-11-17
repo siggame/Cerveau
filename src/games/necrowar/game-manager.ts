@@ -139,17 +139,15 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
                 this.secondaryWinConditions("Both castles fell at the same time.");
             }
             else {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0].opponent);
-
+                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[1]);
+                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[1].opponent);
                 return true;
             }
         }
         else {
             if (!castleStandingTwo) {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[1]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[1].opponent);
-
+                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
+                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0]);
                 return true;
             }
             else {
