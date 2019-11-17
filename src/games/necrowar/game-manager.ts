@@ -147,7 +147,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         else {
             if (!castleStandingTwo) {
                 this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0]);
+                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0].opponent);
                 return true;
             }
             else {
