@@ -131,7 +131,7 @@ export class Tower extends GameObject {
                 return `Cleansing towers can only attack wraiths and abominations!`;
             }
         }
-        else if (!tile.isCastle && tile.unit.job.title === "wraith") {
+        else if (this.job.title !== "castle" && tile.unit.job.title === "wraith") {
             return `${this} cannot attack wraiths! They are incorporeal!`;
         }
 
