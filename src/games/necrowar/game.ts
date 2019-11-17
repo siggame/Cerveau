@@ -307,7 +307,7 @@ export class NecrowarGame extends BaseClasses.Game {
                 manaCost: 0,
                 health: 20,
                 range: 3,
-                turnsBetweenAttacks: 3,
+                turnsBetweenAttacks: 2,
                 allUnits: false,
                 damage: 20,
             }),
