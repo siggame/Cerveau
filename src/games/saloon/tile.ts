@@ -126,7 +126,6 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
@@ -136,7 +135,6 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this) as Tile[];
     }
 
@@ -148,7 +146,6 @@ export class Tile extends GameObject implements BaseTile {
      * @returns The Tile in that direction, or undefined if there is none.
      */
     public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
     }
 
@@ -159,7 +156,6 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
@@ -169,7 +165,6 @@ export class Tile extends GameObject implements BaseTile {
      * @returns A string representation of the Tile.
      */
     public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
 

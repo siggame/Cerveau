@@ -176,6 +176,75 @@ ${merge('    // ', 'public-functions', """
     // in the creer file.
 
 """, optional=True, help=False)}
+% if 'TiledGame' in game['serverParentClasses']:
+%   if obj_key == 'Game':
+
+    /**
+     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map.
+     *
+     * @param x - The x position of the desired tile.
+     * @param y - The y position of the desired tile.
+     * @returns The Tile at (x, y) if valid, undefined otherwise.
+     */
+    public getTile(x: number, y: number): Tile | undefined {
+        return super.getTile(x, y) as Tile | undefined;
+    }
+%   elif obj_key == 'Tile':
+
+    /**
+     * Gets the adjacent direction between this Tile and an adjacent Tile
+     * (if one exists).
+     *
+     * @param adjacentTile - A tile that should be adjacent to this Tile.
+     * @returns "North", "East", "South", or "West" if the tile is adjacent to
+     * this Tile in that direction. Otherwise undefined.
+     */
+    public getAdjacentDirection(
+        adjacentTile: Tile | undefined,
+    ): "North" | "South" | "East" | "West" | undefined {
+        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+    }
+
+    /**
+     * Gets a list of all the neighbors of this Tile.
+     *
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
+     */
+    public getNeighbors(): Tile[] {
+        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
+    }
+
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction - The direction you want, must be
+     * "North", "East", "South", or "West".
+     * @returns The Tile in that direction, or undefined if there is none.
+     */
+    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    }
+
+    /**
+     * Checks if a Tile has another Tile as its neighbor.
+     *
+     * @param tile - The Tile to check.
+     * @returns True if neighbor, false otherwise.
+     */
+    public hasNeighbor(tile: Tile | undefined): boolean {
+        return BaseTile.prototype.hasNeighbor.call(this, tile);
+    }
+
+    /**
+     * toString override.
+     *
+     * @returns A string representation of the Tile.
+     */
+    public toString(): string {
+        return BaseTile.prototype.toString.call(this);
+    }
+%   endif
+% endif
 % for function_name in obj['function_names']:
 <%
     if obj_key == 'GameObject' and function_name == 'log':
@@ -239,81 +308,6 @@ ${merge('        // ', function_name, """
     }
 % endfor
 
-% if 'TiledGame' in game['serverParentClasses']:
-%   if obj_key == 'Game':
-    /**
-     * Gets the tile at (x, y), or undefined if the co-ordinates are off-map.
-     *
-     * @param x - The x position of the desired tile.
-     * @param y - The y position of the desired tile.
-     * @returns The Tile at (x, y) if valid, undefined otherwise.
-     */
-    public getTile(x: number, y: number): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return super.getTile(x, y) as Tile | undefined;
-    }
-
-%   elif obj_key == 'Tile':
-    /**
-     * Gets the adjacent direction between this Tile and an adjacent Tile
-     * (if one exists).
-     *
-     * @param adjacentTile - A tile that should be adjacent to this Tile.
-     * @returns "North", "East", "South", or "West" if the tile is adjacent to
-     * this Tile in that direction. Otherwise undefined.
-     */
-    public getAdjacentDirection(
-        adjacentTile: Tile | undefined,
-    ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
-    }
-
-    /**
-     * Gets a list of all the neighbors of this Tile.
-     *
-     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
-     */
-    public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
-    }
-
-    /**
-     * Gets a neighbor in a particular direction
-     *
-     * @param direction - The direction you want, must be
-     * "North", "East", "South", or "West".
-     * @returns The Tile in that direction, or undefined if there is none.
-     */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
-    }
-
-    /**
-     * Checks if a Tile has another Tile as its neighbor.
-     *
-     * @param tile - The Tile to check.
-     * @returns True if neighbor, false otherwise.
-     */
-    public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.hasNeighbor.call(this, tile);
-    }
-
-    /**
-     * toString override.
-     *
-     * @returns A string representation of the Tile.
-     */
-    public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.toString.call(this);
-    }
-
-%   endif
-% endif
 ${merge('    // ', 'protected-private-functions', """
     // Any additional protected or pirate methods can go here.
 
