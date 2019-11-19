@@ -29,7 +29,7 @@ export class Unit extends GameObject {
     /**
      * The type of unit this is.
      */
-    public readonly job!: UnitJob;
+    public readonly job: UnitJob;
 
     /**
      * The number of moves this unit has left this turn.
@@ -63,7 +63,8 @@ export class Unit extends GameObject {
     constructor(
         args: Readonly<IUnitProperties & {
             // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
+            /** The job to assign this new Unit to */
+            job: UnitJob;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<IBaseGameObjectRequiredData>,
@@ -71,7 +72,7 @@ export class Unit extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+        this.job = args.job;
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -625,14 +626,7 @@ export class Unit extends GameObject {
             this.tile.numZombies--;
         }
 
-        let replacementUnit = undefined;
-        for (const unit of player.units) {
-            if (unit !== this && unit.tile === this.tile) {
-                replacementUnit = unit;
-            }
-        }
-
-        this.tile.unit = replacementUnit;
+        this.tile.unit = player.units.find((unit) => unit !== this && unit.tile === this.tile);
         this.tile = tile;
         tile.unit = this;
         this.moves -= 1;

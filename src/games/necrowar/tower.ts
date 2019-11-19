@@ -31,7 +31,7 @@ export class Tower extends GameObject {
     /**
      * What type of tower this is (it's job).
      */
-    public readonly job!: TowerJob;
+    public readonly job: TowerJob;
 
     /**
      * The player that built / owns this tower.
@@ -41,7 +41,7 @@ export class Tower extends GameObject {
     /**
      * The Tile this Tower is on.
      */
-    public readonly tile?: Tile;
+    public readonly tile: Tile;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -60,7 +60,10 @@ export class Tower extends GameObject {
     constructor(
         args: Readonly<ITowerProperties & {
             // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
+            /** The TowerJob to assign this tower to */
+            job: TowerJob;
+            /** The starting tile */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<IBaseGameObjectRequiredData>,
@@ -68,7 +71,8 @@ export class Tower extends GameObject {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+        this.job = args.job;
+        this.tile = args.tile;
         // <<-- /Creer-Merge: constructor -->>
     }
 

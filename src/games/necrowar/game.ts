@@ -509,44 +509,22 @@ export class NecrowarGame extends BaseClasses.Game {
         }
 
         // Creates the castles on either side
-        for (let x = 0; x < this.mapWidth; x++) {
-            for (let y = 0; y < this.mapHeight; y++) {
-                if (getMutableTile(x, y).isCastle) {
-                    // if it's player 0's castle
-                    if (getMutableTile(x, y).owner === this.players[0]) {
-                        getMutableTile(x, y).tower = this.manager.create.tower({
-                            owner: this.players[0],
-                            tile: this.getTile(x, y),
-                            job: this.towerJobs[0],
-                            health: this.towerJobs[0].health,
-                        });
-                        const tile = this.getTile(x, y);
-                        if (tile && tile.tower) {
-                            this.towers.push(tile.tower);
-                            this.players[0].towers.push(tile.tower);
-                            getMutableTile(x, y).isTower = true;
-                            getMutableTile(x, y).isCastle = true;
-                        }
-                    }
-                    else if (getMutableTile(x, y).owner === this.players[1]) {
-                        // if it's player 1's castle
-                        if (getMutableTile(x, y).owner === this.players[1]) {
-                            getMutableTile(x, y).tower = this.manager.create.tower({
-                                owner: this.players[1],
-                                tile: this.getTile(x, y),
-                                job: this.towerJobs[0],
-                                health: this.towerJobs[0].health,
-                            }) ;
-                            const tile = this.getTile(x, y);
-                            if (tile && tile.tower) {
-                                this.towers.push(tile.tower);
-                                this.players[1].towers.push(tile.tower);
-                                getMutableTile(x, y).isTower = true;
-                                getMutableTile(x, y).isCastle = true;
-                            }
-                        }
-                    }
-                }
+        for (const tile of this.tiles) {
+            if (tile.isCastle) {
+                // if it's player 0's castle
+                const owner = tile.owner as Player;
+                const tower = this.manager.create.tower({
+                    owner,
+                    tile,
+                    job: this.towerJobs[0],
+                    health: this.towerJobs[0].health,
+                });
+
+                tile.tower = tower;
+                this.towers.push(tower);
+                owner.towers.push(tower);
+                tile.isTower = true;
+                tile.isCastle = true;
             }
         }
     }

@@ -114,43 +114,23 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        // Add logic here checking for the primary win condition(s)
-        let castleStandingOne = false;
-        let castleStandingTwo = false;
+        const playersWithCastlesStanding = this.game.players.filter(
+            (player) => player.towers.length > 0 && player.towers[0].job.title === "castle",
+        );
 
-        for (const player of this.game.players) {
-            if (player.towers.length > 0) {
-                if (player.towers[0].job.title === "castle") {
-                    if (player === this.game.players[0]) {
-                        castleStandingOne = true;
-                    }
-                    else if (player === this.game.players[1]) {
-                        castleStandingTwo = true;
-                    }
-                }
-            }
+        if (playersWithCastlesStanding.length === 0) {
+            this.secondaryWinConditions("Both castles fell at the same time.");
+
+            return true;
         }
 
-        if (!castleStandingOne) {
-            if (!castleStandingTwo) {
-                this.secondaryWinConditions("Both castles fell at the same time.");
-            }
-            else {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[1]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[1].opponent);
-                return true;
-            }
+        if (playersWithCastlesStanding.length === 1) {
+            this.declareWinner("You defeated the enemy Necromancer!", playersWithCastlesStanding[0]);
+            this.declareLosers("The enemy Necromancer has bested you!", playersWithCastlesStanding[0].opponent);
+
+            return true;
         }
-        else {
-            if (!castleStandingTwo) {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0].opponent);
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
+
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -169,11 +149,11 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         if (this.game.players[0].towerKills > this.game.players[1].towerKills) {
             this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[0]);
             this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[1]);
-        } 
+        }
         else if (this.game.players[1].towerKills > this.game.players[0].towerKills) {
             this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[1]);
             this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[0]);
-        } 
+        }
         else if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
             this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0]);
             this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1]);
