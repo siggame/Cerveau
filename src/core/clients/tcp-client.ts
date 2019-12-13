@@ -64,17 +64,15 @@ export class TCPClient extends BaseClient {
      * @returns a promise to resolve after data is sent
      */
     protected sendRaw(str: string): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             super.sendRaw(str);
 
             if (!this.hasDisconnected() && this.socket) {
                 this.socket.write(str + EOT_CHAR, (err) => {
-                    if (err) {
-                        reject(err);
+                    if (err && !this.hasDisconnected()) { // then it has actually disconnected while/before sending data
+                        this.disconnected();
                     }
-                    else {
-                        resolve();
-                    }
+                    resolve();
                 });
             }
             else {
