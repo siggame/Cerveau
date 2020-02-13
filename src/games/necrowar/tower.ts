@@ -4,7 +4,6 @@ import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
 import { TowerJob } from "./tower-job";
-import { Unit } from '../catastrophe';
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
