@@ -41,7 +41,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of victory points required to win.",
                 // <<-- Creer-Merge: victoryAmount -->>
                 default: 10000,
-                min: 1,
+                min: 10,
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
             // <<-- Creer-Merge: schema -->>

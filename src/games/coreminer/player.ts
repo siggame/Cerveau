@@ -1,5 +1,5 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseCoreminerPlayer, IPlayerSpawnMinerArgs } from "./";
+import { IBaseCoreminerPlayer } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -110,46 +110,6 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
-
-    /**
-     * Invalidation function for spawnMiner. Try to find a reason why the
-     * passed in parameters are invalid, and return a human readable string
-     * telling them why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateSpawnMiner(
-        player: Player,
-    ): void | string | IPlayerSpawnMinerArgs {
-        // <<-- Creer-Merge: invalidate-spawnMiner -->>
-
-        // Check all the arguments for spawnMiner here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-spawnMiner -->>
-    }
-
-    /**
-     * Spawns a Miner Unit on this Player's Base Tile.
-     *
-     * @param player - The player that called this.
-     * @returns True if successfully spawned, false otherwise.
-     */
-    protected async spawnMiner(player: Player): Promise<boolean> {
-        // <<-- Creer-Merge: spawnMiner -->>
-
-        // Add logic here for spawnMiner.
-
-        // TODO: replace this with actual logic
-        return false;
-
-        // <<-- /Creer-Merge: spawnMiner -->>
-    }
 
     // <<-- Creer-Merge: protected-private-functions -->>
 

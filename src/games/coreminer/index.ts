@@ -189,14 +189,6 @@ export interface IPlayerProperties {
 
 }
 
-/**
- * Argument overrides for Player's spawnMiner function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
- */
-export interface IPlayerSpawnMinerArgs {
-}
-
 /** All the possible properties for an Tile. */
 export interface ITileProperties {
     /**
@@ -270,6 +262,11 @@ export interface ITileProperties {
     tileWest?: Tile;
 
     /**
+     * An array of the Units on this Tile.
+     */
+    units?: Unit[];
+
+    /**
      * The x (horizontal) position of this Tile.
      */
     x?: number;
@@ -279,6 +276,14 @@ export interface ITileProperties {
      */
     y?: number;
 
+}
+
+/**
+ * Argument overrides for Tile's spawnMiner function. If you return an object
+ * of this interface from the invalidate functions, the value(s) you set will
+ * be used in the actual function.
+ */
+export interface ITileSpawnMinerArgs {
 }
 
 /** All the possible properties for an Unit. */
@@ -725,14 +730,6 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
-                spawnMiner: {
-                    args: [
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
             },
         },
         Tile: {
@@ -787,6 +784,14 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Tile,
                     nullable: true,
                 },
+                units: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Unit,
+                        nullable: false,
+                    },
+                },
                 x: {
                     typeName: "int",
                 },
@@ -795,6 +800,14 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
+                spawnMiner: {
+                    args: [
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
             },
         },
         Unit: {
@@ -931,5 +944,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "ebf8479aecc1663fdbdbd350b23ed190fc0b97b892200e752100f5509cb0d1a2",
+    gameVersion: "7c106e1dbcbba7626801ee73d719a2234967d6da0919b290713def4c6954cb84",
 });
