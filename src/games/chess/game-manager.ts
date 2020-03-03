@@ -3,7 +3,7 @@
 import { BaseClasses, ChessGame, ChessGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
-import { ChessInstance, Move } from "chess.js";
+import { Move } from "chess.js";
 
 /**
  * Checks if the move a capture, promotion, or pawn movement
@@ -14,6 +14,8 @@ import { ChessInstance, Move } from "chess.js";
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
 }
+
+const toUCI = (move: Move) => move.from + move.to + (move.promotion || "");
 
 const gameOver50TurnMessage = "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
 // <<-- /Creer-Merge: imports -->>
@@ -68,15 +70,15 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
         const move = await player.ai.makeMove();
 
-        const cleanedMove = this.cleanMove(move, this.game.chess);
+        const cleanedMove = this.cleanMove(move);
 
-        const valid = this.game.chess.move(cleanedMove, { sloppy: true });
+        const validMove = this.game.chess.move(cleanedMove, { sloppy: true });
 
-        if (!valid) {
+        if (!validMove) {
             this.declareLoser(`Made an invalid move ('${move}').
-Valid moves: ${this.game.chess.moves()      // Take all valid moves,
-    .map((validMove) => `'${validMove}'`)   // Wrap them in '' quotes,
-    .join(", ")                             // Then finally add commas between each for readability
+Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid moves,
+    .map((m) => `'${toUCI(m)}'`)                            // Wrap them in '' quotes,
+    .join(", ")                                             // Then finally add commas between each for readability
 }`, player);
             this.declareWinner(
                 "Opponent made an invalid move.",
@@ -88,11 +90,11 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         }
         // else their move was accepted, update our state proxies
         this.game.fen = this.game.chess.fen();
-        this.game.history.push(valid.san);
+        this.game.history.push(toUCI(validMove));
 
         if (this.game.settings.enableSTFR) {
             // if
-            this.halfMoveCountSTFR = checkMoveForSTFR(valid)
+            this.halfMoveCountSTFR = checkMoveForSTFR(validMove)
                 ? 0 // reset turns, pawn was moved or piece captured
                 : this.halfMoveCountSTFR + 1; // else increase by 1
         }
@@ -219,11 +221,11 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
      * Cleans a move so chess.js can accept a wider range of moves.
      *
      * @param uncleanedMoved - The SAN move to clean
-     * @param chess - The chess.js instance to use for move hints
      * @returns A new SAN move that more easily works with chess.js
      */
-    private cleanMove(uncleanedMoved: string, chess: ChessInstance): string {
-        const move = uncleanedMoved.replace(/\s/g, ""); // remove all whitespace from move
+    private cleanMove(uncleanedMoved: string): string {
+        // remove all whitespace from move
+        const move = uncleanedMoved.replace(/\s/g, "");
 
         // First check for 0 vs O casteling
         if (move === "0-0" || move === "0-0-0") {
@@ -236,7 +238,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         const promotion = move[4]; // fifth char _might_ be the promotion char
 
         // \-> now check all moves to see if the from, to, and promotion match. If so use the SAN for it
-        const moves = chess.moves({ verbose: true });
+        const moves = this.game.chess.moves({ verbose: true });
         const ourMove = moves.find((valid) => valid.from === from
                                            && valid.to === to
                                            && valid.promotion === promotion,
