@@ -1015,5 +1015,9 @@ export const Namespace = makeNamespace({
             },
         },
     },
+<<<<<<< HEAD
     gameVersion: "8d537ee0d9bd5cd575dca2f2f08f184157cd9dce66a015e5598b3ee0e70e7ef6",
+=======
+    gameVersion: "4d15edfc10c5fd1f260c1dd405d853c00f3622e802551d1375a983ee73ec6f0c",
+>>>>>>> move bomb to dump instead of build
 });
