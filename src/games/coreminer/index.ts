@@ -355,9 +355,9 @@ export interface IUnitBuildArgs {
      */
     tile?: Tile;
     /**
-     * The structure to build (support, ladder, shield, or bomb).
+     * The structure to build (support, ladder, or shield).
      */
-    type?: "support" | "bomb" | "ladder" | "shield";
+    type?: "support" | "ladder" | "shield";
 }
 
 /**
@@ -371,9 +371,9 @@ export interface IUnitDumpArgs {
      */
     tile?: Tile;
     /**
-     * The material the Unit will drop. 'dirt' or 'ore'.
+     * The material the Unit will drop. 'dirt', 'ore', or 'bomb'.
      */
-    material?: "dirt" | "ore";
+    material?: "dirt" | "ore" | "bomb";
     /**
      * The number of materials to drop. Amounts <= 0 will drop all the
      * materials.
@@ -863,7 +863,7 @@ export const Namespace = makeNamespace({
                             argName: "type",
                             typeName: "string",
                             defaultValue: "support",
-                            literals: ["support", "bomb", "ladder", "shield"],
+                            literals: ["support", "ladder", "shield"],
                         },
                     ],
                     invalidValue: false,
@@ -883,7 +883,7 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "dirt",
-                            literals: ["dirt", "ore"],
+                            literals: ["dirt", "ore", "bomb"],
                         },
                         {
                             argName: "amount",
@@ -944,5 +944,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "7c106e1dbcbba7626801ee73d719a2234967d6da0919b290713def4c6954cb84",
+    gameVersion: "4d15edfc10c5fd1f260c1dd405d853c00f3622e802551d1375a983ee73ec6f0c",
 });
