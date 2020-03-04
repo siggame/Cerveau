@@ -113,7 +113,7 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to build on.
-     * @param type - The structure to build (support, ladder, shield, or bomb).
+     * @param type - The structure to build (support, ladder, or shield).
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -121,7 +121,7 @@ export class Unit extends GameObject {
     protected invalidateBuild(
         player: Player,
         tile: Tile,
-        type: "support" | "bomb" | "ladder" | "shield",
+        type: "support" | "ladder" | "shield",
     ): void | string | IUnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
 
@@ -134,18 +134,17 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Builds a support, shield, ladder, or bomb on Unit's tile, or an adjacent
-     * Tile.
+     * Builds a support, shield, or ladder on Unit's tile, or an adjacent Tile.
      *
      * @param player - The player that called this.
      * @param tile - The Tile to build on.
-     * @param type - The structure to build (support, ladder, shield, or bomb).
+     * @param type - The structure to build (support, ladder, or shield).
      * @returns True if successfully built, False otherwise.
      */
     protected async build(
         player: Player,
         tile: Tile,
-        type: "support" | "bomb" | "ladder" | "shield",
+        type: "support" | "ladder" | "shield",
     ): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
 
@@ -164,7 +163,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt' or 'ore'.
+     * @param material - The material the Unit will drop. 'dirt', 'ore', or
+     * 'bomb'.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns If the arguments are invalid, return a string explaining to
@@ -174,7 +174,7 @@ export class Unit extends GameObject {
     protected invalidateDump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore",
+        material: "dirt" | "ore" | "bomb",
         amount: number,
     ): void | string | IUnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
@@ -192,7 +192,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt' or 'ore'.
+     * @param material - The material the Unit will drop. 'dirt', 'ore', or
+     * 'bomb'.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns True if successfully dumped materials, false otherwise.
@@ -200,7 +201,7 @@ export class Unit extends GameObject {
     protected async dump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore",
+        material: "dirt" | "ore" | "bomb",
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>

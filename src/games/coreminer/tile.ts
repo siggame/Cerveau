@@ -126,53 +126,6 @@ export class Tile extends GameObject implements BaseTile {
 
     // <<-- Creer-Merge: public-functions -->>
 
-    // Any public functions can go here for other things in the game to use.
-    // NOTE: Client AIs cannot call these functions, those must be defined
-    // in the creer file.
-
-    // <<-- /Creer-Merge: public-functions -->>
-
-    /**
-     * Invalidation function for spawnMiner. Try to find a reason why the
-     * passed in parameters are invalid, and return a human readable string
-     * telling them why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateSpawnMiner(
-        player: Player,
-    ): void | string | ITileSpawnMinerArgs {
-        // <<-- Creer-Merge: invalidate-spawnMiner -->>
-
-        // Check all the arguments for spawnMiner here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
-        // <<-- /Creer-Merge: invalidate-spawnMiner -->>
-    }
-
-    /**
-     * Spawns a Miner Unit on this Tile - Must be on the surface on their side
-     * of the map.
-     *
-     * @param player - The player that called this.
-     * @returns True if successfully spawned, false otherwise.
-     */
-    protected async spawnMiner(player: Player): Promise<boolean> {
-        // <<-- Creer-Merge: spawnMiner -->>
-
-        // Add logic here for spawnMiner.
-
-        // TODO: replace this with actual logic
-        return false;
-
-        // <<-- /Creer-Merge: spawnMiner -->>
-    }
-
     /**
      * Gets the adjacent direction between this Tile and an adjacent Tile
      * (if one exists).
@@ -229,6 +182,49 @@ export class Tile extends GameObject implements BaseTile {
     public toString(): string {
         // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
+    }
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for spawnMiner. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateSpawnMiner(
+        player: Player,
+    ): void | string | ITileSpawnMinerArgs {
+        // <<-- Creer-Merge: invalidate-spawnMiner -->>
+
+        // Check all the arguments for spawnMiner here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-spawnMiner -->>
+    }
+
+    /**
+     * Spawns a Miner Unit on this Tile - Must be on the surface on their side
+     * of the map.
+     *
+     * @param player - The player that called this.
+     * @returns True if successfully spawned, false otherwise.
+     */
+    protected async spawnMiner(player: Player): Promise<boolean> {
+        // <<-- Creer-Merge: spawnMiner -->>
+
+        // Add logic here for spawnMiner.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: spawnMiner -->>
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
