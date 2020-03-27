@@ -43,6 +43,26 @@ export class Unit extends GameObject {
     public readonly job: Job;
 
     /**
+     * The maximum amount of cargo this Unit can carry.
+     */
+    public maxCargoCapacity!: number;
+
+    /**
+     * The maximum health of this Unit.
+     */
+    public maxHealth!: number;
+
+    /**
+     * The maximum mining power of this Unit.
+     */
+    public maxMiningPower!: number;
+
+    /**
+     * The maximum moves this Unit can have.
+     */
+    public maxMoves!: number;
+
+    /**
      * The remaining mining power this Unit has this turn.
      */
     public miningPower!: number;

@@ -51,6 +51,11 @@ export class CoreminerGame extends BaseClasses.Game {
     public jobs!: Job[];
 
     /**
+     * The amount of building material required to build a ladder.
+     */
+    public readonly ladderCost!: number;
+
+    /**
      * The number of Tiles in the map along the y (vertical) axis.
      */
     public readonly mapHeight!: number;
@@ -79,6 +84,16 @@ export class CoreminerGame extends BaseClasses.Game {
      * A unique identifier for the game instance that is being played.
      */
     public readonly session!: string;
+
+    /**
+     * The amount of building material required to shield a Tile.
+     */
+    public readonly shieldCost!: number;
+
+    /**
+     * The amount of building material required to build a support.
+     */
+    public readonly supportCost!: number;
 
     /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
@@ -156,26 +171,16 @@ export class CoreminerGame extends BaseClasses.Game {
         this.jobs.push(
             this.manager.create.job({
                 title: "miner",
-                health: 25,
-                maxHealth: 400,
-                moves: 2,
-                maxMoves: 4,
-                miningPower: 50,
-                maxMiningPower: 800,
-                cargoCapacity: 250,
-                maxCargoCapacity: 4000,
+                health: [25, 50, 75, 100],
+                moves: [2, 3, 4, 5],
+                miningPower: [50, 100, 150, 200],
+                cargoCapacity: [250, 500, 750, 1000],
+                cost: 200,
             }),
 
             this.manager.create.job({
                 title: "bomb",
-                health: 9999,
-                maxHealth: 9999,
-                moves: 0,
-                maxMoves: 0,
-                miningPower: 0,
-                maxMiningPower: 0,
-                cargoCapacity: 0,
-                maxCargoCapacity: 0,
+                cost: 0,
             }),
         );
     }

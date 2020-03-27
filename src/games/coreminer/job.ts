@@ -16,44 +16,29 @@ export type JobTitle = "miner" | "bomb";
  */
 export class Job extends GameObject {
     /**
-     * The amount of cargo capacity this Unit starts with.
+     * The amount of cargo capacity this Unit starts with per level.
      */
-    public readonly cargoCapacity!: number;
+    public readonly cargoCapacity!: number[];
 
     /**
-     * The amount of starting health this Job has.
+     * The cost of spawning a Unit with this Job.
      */
-    public readonly health!: number;
+    public readonly cost!: number;
 
     /**
-     * The maximum amount of cargo capacity this Unit can have.
+     * The amount of starting health this Job has per level.
      */
-    public readonly maxCargoCapacity!: number;
+    public readonly health!: number[];
 
     /**
-     * The maximum amount of health this Job can have.
+     * The amount of mining power this Unit has per turn per level.
      */
-    public readonly maxHealth!: number;
+    public readonly miningPower!: number[];
 
     /**
-     * The maximum amount of mining power this Unit can have.
+     * The number of moves this Job can make per turn per level.
      */
-    public readonly maxMiningPower!: number;
-
-    /**
-     * The maximum number of moves this Job can have.
-     */
-    public readonly maxMoves!: number;
-
-    /**
-     * The amount of mining power this Unit has per turn.
-     */
-    public readonly miningPower!: number;
-
-    /**
-     * The number of moves this Job can make per turn.
-     */
-    public readonly moves!: number;
+    public readonly moves!: number[];
 
     /**
      * The Job title. 'miner' or 'bomb'.
