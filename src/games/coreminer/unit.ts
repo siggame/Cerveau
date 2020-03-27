@@ -288,6 +288,50 @@ export class Unit extends GameObject {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-move -->>
+
+        const reason = this.invalidate(player, true);
+        // if there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+        // make sure the unit is on the planet.... wait...
+        if (!tile) {
+            return `${this}, sorry but the dev's forgot to make that area. Target tile doesn't exist.`;
+        }
+
+        // Make sure there isn'ta dirt block
+        if (tile.dirt > 0) {
+            return `${this} you're supposed to mine the dirt first, ${tile} is occupied by dirt.`;
+        }
+
+        //Make sure the there isnt a hopper
+        if (tile.isHopper) {
+            return `${this}, putting bots into the hopper is violation of company code H-78, bots cannot enter hoppers.`;
+        }
+
+        //Make sure bots are not trying to enter the base
+        if(tile.isBase){
+            return `${this}, bots are not allowed to enter the base.`;
+        }
+
+        // Make sure the unit still has moves
+        if (this.moves <= 0) {
+            return `${this} cannot move anymore this turn, your robot is tired`;
+        }
+        
+        // make sure the tile is next to the unit.
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+            return `${this} can only travel to an adjacent tile, this time. Tile ${tile} too far away.`;
+        }
+
+        //make sure if they are going up they are on a ladder
+        if (this.tile == tile.tileNorth){
+            if(!tile.isLadder){
+                return `${this}, bot does not posses rocket boosters, ladder neeed to move up.`;
+            }
+        }
+        return;
     }
 
     /**
@@ -299,9 +343,24 @@ export class Unit extends GameObject {
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
-
-        // Add logic here for move.
-
+        var block_fall = 0;
+        var below = tile.tileSouth;
+        // Moves robot
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to move from!`);
+        }
+        this.tile.unit = undefined;
+        this.tile = tile;
+        tile.unit = this;
+        this.moves -= 1;
+        //Checks the amount fallen
+        while (below.dirt == 0 || below.ore == 0 || !below )
+        {
+            block_fall++;
+        }
+        //Calculates the damages
+        
+                
         // TODO: replace this with actual logic
         return false;
 
