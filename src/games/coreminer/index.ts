@@ -78,44 +78,29 @@ export interface IGameObjectProperties {
 /** All the possible properties for an Job. */
 export interface IJobProperties {
     /**
-     * The amount of cargo capacity this Unit starts with.
+     * The amount of cargo capacity this Unit starts with per level.
      */
-    cargoCapacity?: number;
+    cargoCapacity?: number[];
 
     /**
-     * The amount of starting health this Job has.
+     * The cost of spawning a Unit with this Job.
      */
-    health?: number;
+    cost?: number;
 
     /**
-     * The maximum amount of cargo capacity this Unit can have.
+     * The amount of starting health this Job has per level.
      */
-    maxCargoCapacity?: number;
+    health?: number[];
 
     /**
-     * The maximum amount of health this Job can have.
+     * The amount of mining power this Unit has per turn per level.
      */
-    maxHealth?: number;
+    miningPower?: number[];
 
     /**
-     * The maximum amount of mining power this Unit can have.
+     * The number of moves this Job can make per turn per level.
      */
-    maxMiningPower?: number;
-
-    /**
-     * The maximum number of moves this Job can have.
-     */
-    maxMoves?: number;
-
-    /**
-     * The amount of mining power this Unit has per turn.
-     */
-    miningPower?: number;
-
-    /**
-     * The number of moves this Job can make per turn.
-     */
-    moves?: number;
+    moves?: number[];
 
     /**
      * The Job title. 'miner' or 'bomb'.
@@ -132,6 +117,11 @@ export interface IPlayerProperties {
     baseTile?: Tile;
 
     /**
+     * The bombs stored in the Player's supply.
+     */
+    bombs?: number;
+
+    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
@@ -146,6 +136,11 @@ export interface IPlayerProperties {
      * If the player lost the game or not.
      */
     lost?: boolean;
+
+    /**
+     * The amount of money this Player currently has.
+     */
+    money?: number;
 
     /**
      * The name of the player.
@@ -166,6 +161,16 @@ export interface IPlayerProperties {
      * The reason why the player won the game.
      */
     reasonWon?: string;
+
+    /**
+     * The Tiles on this Player's side of the map.
+     */
+    side?: Tile[];
+
+    /**
+     * The Tiles this Player may spawn Units on.
+     */
+    spawnTiles?: Tile[];
 
     /**
      * The amount of time (in ns) remaining for this AI to send commands.
@@ -207,7 +212,7 @@ export interface ITileProperties {
     isFalling?: boolean;
 
     /**
-     * Whether or not a hopper is placed on this Tile.
+     * Whether or not a hopper is on this Tile.
      */
     isHopper?: boolean;
 
@@ -315,6 +320,26 @@ export interface IUnitProperties {
      * The Job this Unit has.
      */
     job?: Job;
+
+    /**
+     * The maximum amount of cargo this Unit can carry.
+     */
+    maxCargoCapacity?: number;
+
+    /**
+     * The maximum health of this Unit.
+     */
+    maxHealth?: number;
+
+    /**
+     * The maximum mining power of this Unit.
+     */
+    maxMiningPower?: number;
+
+    /**
+     * The maximum moves this Unit can have.
+     */
+    maxMoves?: number;
 
     /**
      * The remaining mining power this Unit has this turn.
@@ -561,6 +586,9 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
+                ladderCost: {
+                    typeName: "int",
+                },
                 mapHeight: {
                     typeName: "int",
                 },
@@ -583,6 +611,12 @@ export const Namespace = makeNamespace({
                 },
                 session: {
                     typeName: "string",
+                },
+                shieldCost: {
+                    typeName: "int",
+                },
+                supportCost: {
+                    typeName: "int",
                 },
                 tiles: {
                     typeName: "list",
@@ -643,28 +677,31 @@ export const Namespace = makeNamespace({
             parentClassName: "GameObject",
             attributes: {
                 cargoCapacity: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "int",
+                    },
+                },
+                cost: {
                     typeName: "int",
                 },
                 health: {
-                    typeName: "int",
-                },
-                maxCargoCapacity: {
-                    typeName: "int",
-                },
-                maxHealth: {
-                    typeName: "int",
-                },
-                maxMiningPower: {
-                    typeName: "int",
-                },
-                maxMoves: {
-                    typeName: "int",
+                    typeName: "list",
+                    valueType: {
+                        typeName: "int",
+                    },
                 },
                 miningPower: {
-                    typeName: "int",
+                    typeName: "list",
+                    valueType: {
+                        typeName: "int",
+                    },
                 },
                 moves: {
-                    typeName: "int",
+                    typeName: "list",
+                    valueType: {
+                        typeName: "int",
+                    },
                 },
                 title: {
                     typeName: "string",
@@ -683,6 +720,9 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Tile,
                     nullable: false,
                 },
+                bombs: {
+                    typeName: "int",
+                },
                 clientType: {
                     typeName: "string",
                 },
@@ -697,6 +737,9 @@ export const Namespace = makeNamespace({
                 lost: {
                     typeName: "boolean",
                 },
+                money: {
+                    typeName: "int",
+                },
                 name: {
                     typeName: "string",
                 },
@@ -710,6 +753,22 @@ export const Namespace = makeNamespace({
                 },
                 reasonWon: {
                     typeName: "string",
+                },
+                side: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Tile,
+                        nullable: false,
+                    },
+                },
+                spawnTiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Tile,
+                        nullable: false,
+                    },
                 },
                 timeRemaining: {
                     typeName: "float",
@@ -830,6 +889,18 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Job,
                     nullable: false,
                 },
+                maxCargoCapacity: {
+                    typeName: "int",
+                },
+                maxHealth: {
+                    typeName: "int",
+                },
+                maxMiningPower: {
+                    typeName: "int",
+                },
+                maxMoves: {
+                    typeName: "int",
+                },
                 miningPower: {
                     typeName: "int",
                 },
@@ -944,5 +1015,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "4d15edfc10c5fd1f260c1dd405d853c00f3622e802551d1375a983ee73ec6f0c",
+    gameVersion: "8d537ee0d9bd5cd575dca2f2f08f184157cd9dce66a015e5598b3ee0e70e7ef6",
 });
