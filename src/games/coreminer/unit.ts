@@ -130,6 +130,50 @@ export class Unit extends GameObject {
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
 
+        if (!this) {
+            return 'This unit does not exist!';
+        }
+        if (this.health === 0) {
+            return 'You can\'t build with a dead unit.';
+        }
+        if (tile.isBase) {
+            return 'You cannot build on a base.';
+        }
+        if (tile.isSupport) {
+            return 'You cannot build on a support.';
+        }
+        if (tile.isBase) {
+            return 'You cannot build on a ladder.';
+        }
+        if (tile.isFalling) {
+            return 'You cannot build on a falling tile.';
+        }
+        if (tile !== this.tile?.tileEast && tile !== this.tile?.tileNorth &&
+            tile !== this.tile?.tileWest && tile !== this.tile?.tileSouth && tile !== this.tile) {
+            return 'That tile is too far away to be built on.';
+        }
+        switch (type) {
+            case "support":
+                if (tile.dirt > 0 || tile.ore > 0)
+                    return 'You can only build a support on an empty tile.'
+                //TODO check building materials
+                break;
+            case "ladder":
+                if (tile.dirt > 0 || tile.ore > 0)
+                    return 'You can only build a ladder on an empty tile.'
+                //TODO check building materials
+                break;
+            case "shield":
+                if (tile.dirt === 0 && tile.ore === 0)
+                    return 'You can\'t build a shield on an empty tile.';
+                else if (tile.shielding === 2)
+                    return 'This tile already has full shield.'
+                break;
+            default:
+                return 'Invalid build type.';
+                break;
+        }
+
         // <<-- /Creer-Merge: invalidate-build -->>
     }
 
@@ -149,10 +193,20 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: build -->>
 
         // Add logic here for build.
-
-        // TODO: replace this with actual logic
-        return false;
-
+ 
+        switch (type) {
+            case "support":
+                tile.isSupport = true;
+                break;
+            case "ladder":
+                tile.isLadder = true;
+                break;
+            case "shield":
+                tile.shielding = 2;
+                break;
+            //TODO decrement building materials
+        }
+        return true;
         // <<-- /Creer-Merge: build -->>
     }
 
