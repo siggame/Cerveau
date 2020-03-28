@@ -29,6 +29,13 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 10,
                 // <<-- /Creer-Merge: freeBombInterval -->>
             },
+            ladderCost: {
+                description: "The amount of building material required to "
+                           + "build a ladder.",
+                // <<-- Creer-Merge: ladderCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: ladderCost -->>
+            },
             oreValue: {
                 description: "The amount of victory points awarded when ore is "
                            + "deposited in the base.",
@@ -36,6 +43,20 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1,
                 min: 1,
                 // <<-- /Creer-Merge: oreValue -->>
+            },
+            shieldCost: {
+                description: "The amount of building material required to "
+                           + "shield a Tile.",
+                // <<-- Creer-Merge: shieldCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: shieldCost -->>
+            },
+            supportCost: {
+                description: "The amount of building material required to "
+                           + "build a support.",
+                // <<-- Creer-Merge: supportCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: supportCost -->>
             },
             victoryAmount: {
                 description: "The amount of victory points required to win.",

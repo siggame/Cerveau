@@ -22,6 +22,11 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     public baseTile!: Tile;
 
     /**
+     * The bombs stored in the Player's supply.
+     */
+    public bombs!: number;
+
+    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
@@ -36,6 +41,11 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
      * If the player lost the game or not.
      */
     public lost!: boolean;
+
+    /**
+     * The amount of money this Player currently has.
+     */
+    public money!: number;
 
     /**
      * The name of the player.
@@ -56,6 +66,16 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
      * The reason why the player won the game.
      */
     public reasonWon!: string;
+
+    /**
+     * The Tiles on this Player's side of the map.
+     */
+    public side!: Tile[];
+
+    /**
+     * The Tiles this Player may spawn Units on.
+     */
+    public spawnTiles!: Tile[];
 
     /**
      * The amount of time (in ns) remaining for this AI to send commands.

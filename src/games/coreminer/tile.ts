@@ -29,7 +29,7 @@ export class Tile extends GameObject implements BaseTile {
     public isFalling!: boolean;
 
     /**
-     * Whether or not a hopper is placed on this Tile.
+     * Whether or not a hopper is on this Tile.
      */
     public isHopper!: boolean;
 
