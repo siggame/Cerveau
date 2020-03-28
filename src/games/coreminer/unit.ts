@@ -168,6 +168,8 @@ export class Unit extends GameObject {
         if (tile.isFalling) {
             return 'You cannot build on a falling tile.';
         }
+
+        //tile must be adjacent to or the same as the tile the unit is on
         if (tile !== this.tile?.tileEast && tile !== this.tile?.tileNorth &&
             tile !== this.tile?.tileWest && tile !== this.tile?.tileSouth && tile !== this.tile) {
             return 'That tile is too far away to be built on.';
@@ -175,23 +177,26 @@ export class Unit extends GameObject {
         switch (type) {
             case "support":
                 if (tile.dirt > 0 || tile.ore > 0)
-                    return 'You can only build a support on an empty tile.'
-                //TODO check building materials
+                    return 'You can only build a support on an empty tile.';
+                else if (this.buildingMaterials < this.game.supportCost)
+                    return 'You don\'t have enough building materials to build a support';
                 break;
             case "ladder":
                 if (tile.dirt > 0 || tile.ore > 0)
-                    return 'You can only build a ladder on an empty tile.'
-                //TODO check building materials
+                    return 'You can only build a ladder on an empty tile.';
+                else if (this.buildingMaterials < this.game.ladderCost)
+                    return 'You don\'t have enough building materials to build a ladder';
                 break;
             case "shield":
                 if (tile.dirt === 0 && tile.ore === 0)
                     return 'You can\'t build a shield on an empty tile.';
                 else if (tile.shielding === 2)
-                    return 'This tile already has full shield.'
+                    return 'This tile already has full shield.';
+                else if (this.buildingMaterials < this.game.shieldCost)
+                    return 'You don\'t have enough building materials to build a shield';
                 break;
             default:
                 return 'Invalid build type.';
-                break;
         }
 
         // <<-- /Creer-Merge: invalidate-build -->>
@@ -217,14 +222,16 @@ export class Unit extends GameObject {
         switch (type) {
             case "support":
                 tile.isSupport = true;
+                this.buildingMaterials -= this.game.supportCost;    //decrement building materials used
                 break;
             case "ladder":
                 tile.isLadder = true;
+                this.buildingMaterials -= this.game.ladderCost;
                 break;
             case "shield":
                 tile.shielding = 2;
+                this.buildingMaterials -= this.game.shieldCost;
                 break;
-            //TODO decrement building materials
         }
         return true;
         // <<-- /Creer-Merge: build -->>
