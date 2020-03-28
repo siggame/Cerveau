@@ -335,6 +335,7 @@ export class Unit extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
+     * @param tier - The tier of the upgrade.
      * @param attribute - The attribute of the Unit to be upgraded.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -342,15 +343,75 @@ export class Unit extends GameObject {
      */
     protected invalidateUpgrade(
         player: Player,
+        tier: number,
         attribute: "health" | "miningPower" | "moves" | "capacity",
     ): void | string | IUnitUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
+        if (!player || player !== this.game.currentPlayer) {
+            return `It's not your turn to dig deeper, ${player}.`;
+        }
 
-        // Check all the arguments for upgrade here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        if (!this) {
+            return `This unit does not exist and can't dig deeper.`;
+        }
 
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't under your control to dig deeper`;
+        }
+
+        if (this.health <= 0) {
+            return `${this} is dead, it can't dig any deeper :(`;
+        }
+
+        if (!this.tile) {
+            return `${this} is not on a tile. I think you might have dug too deep.`;
+        }
+
+        if (tier === 1) {
+            if (player.money < 1) {
+                return `You don't have enough money for this upgrade to dig deeper.`;
+            }
+        } 
+
+        if (tier === 2) {
+            if (player.money < 2) {
+                return `You don't have enough money for this upgrade to dig deeper.`;
+            }
+        } 
+
+        if (tier === 3) {
+            if (player.money < 3) {
+                return `You don't have enough money for this upgrade to dig deeper.`;
+            }
+        } 
+
+        if (this.tile !== this.tile) {
+            return `${this} must be on the same tile to upgrade so you can dig deeper.`;
+        }
+
+        if (attribute === "health") {
+            if (this.health === this.maxHealth) {
+                return `${this} is already at its max health to dig deeper with.`;
+            }
+        }
+        if (attribute === "miningPower") {
+            if (this.maxMiningPower === this.maxMiningPower) {
+                return `${this} is already at its max mining power to dig deeper with.`;
+            }
+        }
+
+        if (attribute === "moves") {
+            if (this.moves === this.maxMoves) {
+                return `${this} is already at its max moves to dig deeper with.`;
+            }
+        }
+
+        if (attribute === "capacity") {
+            //capacity does not exist 
+            if (this.capacity === this.maxCargoCapacity) {
+                return `${this} is already at its max capacity to dig deeper with.`;
+            }
+        }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
 
@@ -359,20 +420,68 @@ export class Unit extends GameObject {
      * "capacity".
      *
      * @param player - The player that called this.
+     * @param tier - The tier of the upgrade.
      * @param attribute - The attribute of the Unit to be upgraded.
      * @returns True if successfully upgraded, False otherwise.
      */
     protected async upgrade(
         player: Player,
+        tier: number,
         attribute: "health" | "miningPower" | "moves" | "capacity",
     ): Promise<boolean> {
         // <<-- Creer-Merge: upgrade -->>
+        if (!this.tile) {
+            return false;
+        }
 
-        // Add logic here for upgrade.
+        if (tier === 1) {
+            //10 is a place holder since i dont know what the values are supposed to be
+            if (attribute === "health") {
+                this.health = 10;
+            }
+            else if (attribute === "miningPower") {
+                this.miningPower = 10;
+            }
+            else if (attribute === "moves") {
+                this.moves = 10;
+            }
+            else if (attribute === "capacity") {
+                this.capacity = 10;
+            }
+        }
+        else if (tier === 2) {
+            //20 is a place holder since i dont know what the values are supposed to be
+            if (attribute === "health") {
+                this.health = 20;
+            }
+            else if (attribute === "miningPower") {
+                this.miningPower = 20;
+            }
+            else if (attribute === "moves") {
+                this.moves = 20;
+            }
+            else if (attribute === "capacity") {
+                this.capacity = 20;
+            }
+        }
+        else if (tier === 3) {
+            //20 is a place holder since i dont know what the values are supposed to be
+            if (attribute === "health") {
+                this.health = 30;
+            }
+            else if (attribute === "miningPower") {
+                this.miningPower = 30;
+            }
+            else if (attribute === "moves") {
+                this.moves = 30;
+            }
+            else if (attribute === "capacity") {
+                this.capacity = 30;
+            }
+        }
 
-        // TODO: replace this with actual logic
-        return false;
-
+        return true;
+        
         // <<-- /Creer-Merge: upgrade -->>
     }
 
