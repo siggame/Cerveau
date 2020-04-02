@@ -238,9 +238,41 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+             
+        const reason = this.invalidate(player, true);
+        // If there is a reason, return it.
+        if (reason) {
+            return reason;
+        }
+        
+        if (!this) {
+            return `Unit doesn't exist`;
+        }
+        
+        if (!tile) {
+            return `Tile doesn't exist`;
+        }
+        
+        if (Player !== this.Player) {
+            return `You do not own this unit`;
+        }
         
         if (this.job.title !== "miner") {
             return `${this} must be a miner to mine.`;
+        }
+        
+        if (this.moves < 1) {
+            return `${this} does not have enough moves`;
+        }
+        
+        const currentLoad = this.bombs + this.buildingMaterials +
+            this.dirt + this.ore;
+        if (this.job.cargoCapacity <= current load) {
+            return `${this} cannot hold any more materials!`;
+        }
+        
+        if (tile.dirt + tile.ore < 0) {
+            return `No dirt or ore to mine`;
         }
         
         // <<-- /Creer-Merge: invalidate-mine -->>
@@ -261,8 +293,7 @@ export class Unit extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
-
-        // Add logic here for mine
+        
         const currentLoad = this.bombs + this.buildingMaterials +
             this.dirt + this.ore;
         if (0 < tile.dirt) {
