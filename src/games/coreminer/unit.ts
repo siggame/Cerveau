@@ -268,16 +268,16 @@ export class Unit extends GameObject {
         if (0 < tile.dirt) {
             const actualAmount = Math.min(tile.dirt, this.miningPower,
                 this.job.cargoCapacity - currentLoad);
-            tile.dirt = tile.dirt - actualAmount;
-            this.dirt = this.dirt + actualAmount;
+            tile.dirt -= actualAmount;
+            this.dirt += actualAmount;
         }
         else {
             const actualAmount = Math.min(tile.ore, this.miningPower,
                 this.job.cargoCapacity - currentLoad);
-            tile.dirt = tile.ore - actualAmount;
-            this.dirt = this.ore + actualAmount;
+            tile.ore -= actualAmount;
+            this.ore +- actualAmount;
         }
-        
+        this.moves = Math.min(0, this.moves - 1);
         return false;
 
         // <<-- /Creer-Merge: mine -->>
