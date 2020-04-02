@@ -238,7 +238,11 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
+        
+        if (this.job.title !== "miner") {
+            return `${this} must be a miner to mine.`;
+        }
+        
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
 
@@ -259,8 +263,10 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: mine -->>
 
         // Add logic here for mine.
-
-        // TODO: replace this with actual logic
+        
+        let actualAmount = Math.min(tile.dirt, this.game.miningSpeed);
+        
+        
         return false;
 
         // <<-- /Creer-Merge: mine -->>
