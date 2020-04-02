@@ -262,10 +262,21 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
 
-        // Add logic here for mine.
-        
-        let actualAmount = Math.min(tile.dirt, this.game.miningSpeed);
-        
+        // Add logic here for mine
+        const currentLoad = this.bombs + this.buildingMaterials +
+            this.dirt + this.ore;
+        if (0 < tile.dirt) {
+            const actualAmount = Math.min(tile.dirt, this.miningPower,
+                this.job.cargoCapacity - currentLoad);
+            tile.dirt = tile.dirt - actualAmount;
+            this.dirt = this.dirt + actualAmount;
+        }
+        else {
+            const actualAmount = Math.min(tile.ore, this.miningPower,
+                this.job.cargoCapacity - currentLoad);
+            tile.dirt = tile.ore - actualAmount;
+            this.dirt = this.ore + actualAmount;
+        }
         
         return false;
 
