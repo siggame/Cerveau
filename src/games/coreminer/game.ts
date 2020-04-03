@@ -294,10 +294,10 @@ export class CoreminerGame extends BaseClasses.Game {
 
         /**
          * Utility function to get a biased random integer.
-         * Used to randomly populate the map with ore.
+         * Used to help randomly populate the map with ore.
          * Bias is used to make more ore spawn towards the middle of the map.
          *
-         * @param influence - The amount of influence given to the bias.
+         * @param influence - The amount of influence given to the bias (0-1).
          * @param min - The minimum value for the RNG.
          * @param max - The maximum (excluded) value for the RNG.
          * @returns An integer number that is biased in some way towards the map center.
@@ -309,7 +309,7 @@ export class CoreminerGame extends BaseClasses.Game {
             const mix = this.manager.random.float(1, 0) * influence;
             const value = rnd * (1 - mix) + (bias * mix);
 
-            return Math.round(value);
+            return Math.floor(value);
         };
 
         // Define number of ore deposits per layer (on one side)
@@ -326,13 +326,22 @@ export class CoreminerGame extends BaseClasses.Game {
         const layerInfluences = [0.1, 0.2, 0.4, 0.8];
 
         // Populate each layer with ore.
-        // Adds ore in case of repeated random Tile positions
         layerRows.forEach((layer, i) => {
             for (let c = layerOreCounts[i]; c > 0; c--) {
                 const randomY = this.manager.random.int(layer.length, 0);
-                const randomX = getBiasedInt(layerInfluences[i]);
+                const randomX = getBiasedInt(layerInfluences[i], 0, layerRows[i][randomY].length);
 
-                layerRows[i][randomY][randomX].ore += layerOreDensities[i];
+                const chosenTile = layerRows[i][randomY][randomX];
+                const oreAmount = layerOreDensities[i];
+
+                chosenTile.ore = oreAmount;
+                chosenTile.dirt -= oreAmount;
+
+                layerRows[i][randomY].splice(randomX, 1);
+
+                if (layerRows[i][randomY].length === 0) {
+                    layerRows[i].splice(randomY, 1);
+                }
             }
         });
 
@@ -340,37 +349,40 @@ export class CoreminerGame extends BaseClasses.Game {
         const cacheLayer = layerRows[layerRows.length - 1];
         const cacheOreCount = 7;
         const cacheOreDensity = 500;
-        const cacheMinX = Math.floor(side * 0.8);
+        const cacheMinX = Math.floor(side * 0.5);
         const cacheXBias = 1;
         const cacheYBias = 0.8;
 
         for (let c = cacheOreCount; c > 0; c--) {
             const randomY = getBiasedInt(cacheYBias, 0, cacheLayer.length);
-            const randomX = getBiasedInt(cacheXBias, cacheMinX);
 
-            cacheLayer[randomY][randomX].ore += cacheOreDensity;
-        }
+            const randomX = getBiasedInt(cacheXBias, cacheMinX, cacheLayer[randomY].length);
 
-        // Mirror the surface of the map
-        for (let x = 0; x < this.mapWidth; x++) {
-            const tile = getMutableTile(x, 0);
-            const oppositeTile = getMutableTile(this.mapWidth - x - 1, 0);
+            cacheLayer[randomY][randomX].ore = cacheOreDensity;
+            cacheLayer[randomY][randomX].dirt = 0;
 
-            if (tile.owner !== undefined) {
-                oppositeTile.owner = tile.owner.opponent;
-                oppositeTile.isBase = tile.isBase;
+            cacheLayer[randomY].splice(randomX, 1);
+
+            if (cacheLayer[randomY].length === 0) {
+                cacheLayer.splice(randomY, 1);
             }
         }
 
-        // Mirror the rest of the map
-        rows.forEach((row, y) => {
-            row.forEach((tile: Tile, x: number) => {
-                const oppositeTile = getMutableTile(this.mapWidth - x - 1, y + 1);
+        // Mirror the map
+        for (let x = 0; x < this.mapWidth; x++) {
+            for (let y = 0; y < this.mapHeight; y++) {
+                const tile = getMutableTile(x, y);
+                const oppositeTile = getMutableTile(this.mapWidth - x - 1, y);
+
+                if (tile.owner !== undefined) {
+                    oppositeTile.owner = tile.owner.opponent;
+                    oppositeTile.isBase = tile.isBase;
+                }
 
                 oppositeTile.dirt = tile.dirt;
                 oppositeTile.ore = tile.ore;
-            });
-        });
+            }
+        }
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
