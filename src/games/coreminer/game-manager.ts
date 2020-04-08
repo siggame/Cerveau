@@ -4,6 +4,7 @@ import { BaseClasses, CoreminerGame, CoreminerGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -17,7 +18,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-Coreminer",
+            "MegaMinerAI-25-Coreminer",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -56,7 +57,10 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         await super.afterTurn();
 
         // <<-- Creer-Merge: after-turn -->>
-        // add logic here after the current player's turn starts
+        // clean up dead units
+        this.updateArrays();
+        // update units
+        this.updateUnits();
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -72,7 +76,20 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        // Add logic here checking for the primary win condition(s)
+        const winners = this.game.players.filter(player => player.value >= this.game.victoryAmount);
+
+        if (winners.length === this.game.players.length) {
+            this.secondaryWinConditions("Both players qualified for a promotion!");
+
+            return true;
+        }
+
+        if (winners.length === 1) {
+            this.declareWinner("Your performance has earned you a promotion!", winners[0]);
+            this.declareLoser("Your opponent has earned a promotion.", winners[0].opponent);
+
+            return true;
+        }
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -86,7 +103,14 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
-        // Add logic here for the secondary win conditions
+        const winners = this.game.players.sort((a, b) => b.value - a.value);
+
+        if (winners[0].value !== winners[1].value) {
+            this.declareWinner(`${reason}: You were more valuable to the company.`, winners[0]);
+            this.declareLoser(`${reason}: Your opponent was more valuable to the company.`, winners[1]);
+
+            return;
+        }
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 
         // This will end the game.
@@ -97,6 +121,40 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
+
+    /** Updates all arrays in the game with new/dead game objects */
+    private updateArrays(): void {
+        // Properly remove all killed units
+        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+
+        // remove dead units from all player's units list
+        for (const player of this.game.players) {
+            removeElements(player.units, ...deadUnits);
+        }
+        // and remove them from the game
+        removeElements(this.game.units, ...deadUnits);
+         // mark them dead
+        for (const unit of deadUnits) {
+            if (unit.tile) {
+                removeElements(unit.tile.units, unit);
+                unit.tile = undefined;
+            }
+        }
+    }
+
+    /** Updates all units */
+    private updateUnits(): void {
+        for (const unit of this.game.units) {
+            if (!unit.owner || unit.owner === this.game.currentPlayer) {
+                unit.miningPower = unit.maxMiningPower;
+                unit.moves = unit.maxMoves;
+            }
+
+            if (unit.tile && unit.tile.owner === unit.owner) {
+                unit.health = unit.maxHealth;
+            }
+        }
+    }
 
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
