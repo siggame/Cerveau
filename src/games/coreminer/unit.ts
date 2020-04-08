@@ -328,7 +328,11 @@ export class Unit extends GameObject {
 
         // <<-- /Creer-Merge: mine -->>
     }
-    
+    /*
+     * Checks if tile is supported
+     *
+     * @param tile - The Tile the materials will be mined from.
+     */
     private checkForSupport(tile: Tile): boolean {
         // Get tile by coordinates: this.game.tiles[x + (y * this.game.mapWidth)]
         for (i = tile.x - 1; tile.x + 1 <= i; i++) {
