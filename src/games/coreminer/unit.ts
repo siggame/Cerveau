@@ -323,6 +323,14 @@ export class Unit extends GameObject {
         if (!this.checkForSupport(tile)) {
             tile.isFalling = true;
         }
+        for (i = tile.x - 1; tile.x + 1 <= i; i++) {
+            for (j = tile.y; tile.y + 3 <= j; j++) {
+                if (!this.checkForSupport(
+                    this.game.tiles[i+(j*this.game.mapWidth)])) {
+                    this.game.tiles[i+(j*this.game.mapWidth)].isFalling = true;
+                }
+            }
+        }
         
         return false;
 
