@@ -319,6 +319,17 @@ export class Unit extends GameObject {
             this.ore +- actualAmount;
         }
         this.moves = Math.min(0, this.moves - 1);
+        
+        // this.game.tiles[x + (y * this.game.mapWidth)]
+        let support = 0;
+        for (i = tile.x - 1; i >= tile.x + 1; i++) {
+            for (j = tile.y - 1; j >= tile.y - 4; j--) {
+                if (this.game.tiles[i + (j * this.game.mapWidth).isSupport) {
+                    support += 1;
+                }
+            }
+        }
+        
         return false;
 
         // <<-- /Creer-Merge: mine -->>
