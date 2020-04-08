@@ -337,11 +337,11 @@ export class Unit extends GameObject {
             }
         }
         for (j = tile.y - 1; j <= tile.y - 4; j--) {
-            if (this.game.tiles[tiles.x + (j * this.game.mapWidth)].dirt + 
-                this.game.tiles[tiles.x + (j * this.game.mapWidth)].ore < 1) {
+            if (this.game.tiles[tile.x + (j * this.game.mapWidth)].dirt + 
+                this.game.tiles[tile.x + (j * this.game.mapWidth)].ore < 1) {
                 break;
             }
-            if (this.game.tiles[tiles.x + (j * this.game.mapWidth)].isSupport) {
+            if (this.game.tiles[tile.x + (j * this.game.mapWidth)].isSupport) {
                 return true;
             }
         }
