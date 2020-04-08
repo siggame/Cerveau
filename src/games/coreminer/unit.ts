@@ -330,17 +330,11 @@ export class Unit extends GameObject {
     }
     
     private checkForSupport(tile: Tile): boolean {
-        // this.game.tiles[x + (y * this.game.mapWidth)]
-        let support = 0;
+        // Get tile by coordinates: this.game.tiles[x + (y * this.game.mapWidth)]
         for (i = tile.x - 1; i >= tile.x + 1; i++) {
-            for (j = tile.y - 1; j >= tile.y - 4; j--) {
-                if (this.game.tiles[i + (j * this.game.mapWidth)].isSupport) {
-                    support += 1;
-                }
+            if (this.game.tiles[i + ((tile.y - 1) * this.game.mapWidth)].isSupport) {
+                return true;
             }
-        }
-        if (0 < support) {
-            return true;
         }
         return false;
     }
