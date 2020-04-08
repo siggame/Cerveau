@@ -325,6 +325,29 @@ export class CoreminerGame extends BaseClasses.Game {
         // Must be between 0 and 1 (weak to strong)
         const layerInfluences = [0.1, 0.2, 0.4, 0.8];
 
+        // Generate cache of ore in the center of the map
+        const cacheLayer = layerRows[layerRows.length - 1];
+        const cacheOreCount = 10;
+        const cacheOreDensity = 500;
+        const cacheWidth = 0.9; // Only spawns where x >= 100*cacheWidth% of the side
+        const cacheXBias = 1;
+        const cacheYBias = 0.8;
+
+        for (let c = cacheOreCount; c > 0; c--) {
+            const randomY = getBiasedInt(cacheYBias, 0, cacheLayer.length);
+            const cacheMinX = Math.floor(cacheLayer[randomY].length * cacheWidth);
+            const randomX = getBiasedInt(cacheXBias, cacheMinX, cacheLayer[randomY].length);
+
+            cacheLayer[randomY][randomX].ore = cacheOreDensity;
+            cacheLayer[randomY][randomX].dirt = 0;
+
+            cacheLayer[randomY].splice(randomX, 1);
+
+            if (cacheLayer[randomY].length === 0) {
+                cacheLayer.splice(randomY, 1);
+            }
+        }
+
         // Populate each layer with ore.
         layerRows.forEach((layer, i) => {
             for (let c = layerOreCounts[i]; c > 0; c--) {
@@ -344,29 +367,6 @@ export class CoreminerGame extends BaseClasses.Game {
                 }
             }
         });
-
-        // Generate cache of ore in the center of the map
-        const cacheLayer = layerRows[layerRows.length - 1];
-        const cacheOreCount = 7;
-        const cacheOreDensity = 500;
-        const cacheMinX = Math.floor(side * 0.5);
-        const cacheXBias = 1;
-        const cacheYBias = 0.8;
-
-        for (let c = cacheOreCount; c > 0; c--) {
-            const randomY = getBiasedInt(cacheYBias, 0, cacheLayer.length);
-
-            const randomX = getBiasedInt(cacheXBias, cacheMinX, cacheLayer[randomY].length);
-
-            cacheLayer[randomY][randomX].ore = cacheOreDensity;
-            cacheLayer[randomY][randomX].dirt = 0;
-
-            cacheLayer[randomY].splice(randomX, 1);
-
-            if (cacheLayer[randomY].length === 0) {
-                cacheLayer.splice(randomY, 1);
-            }
-        }
 
         // Mirror the map
         for (let x = 0; x < this.mapWidth; x++) {
