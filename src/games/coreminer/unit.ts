@@ -264,6 +264,60 @@ export class Unit extends GameObject {
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        if (this.owner !== player || this.owner === undefined) {
+            return `${this} isn't owned by you.`;
+        }
+
+        // Make sure the unit is alive.
+        if (this.health <= 0) {
+            return `${this} is dead.`;
+        }
+
+        // Make sure the unit is on a tile.
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
+
+        //Checks if the tile is a ladder
+        if (this.tile.isLadder && (material === `dirt` || material === `ore`)){
+            return `You cannot dump dirt or ore onto a ladder tile.`;
+        }
+
+        //Checks if the tile is a support
+        if (this.tile.isSupport && (material === `dirt` || material === `ore`)){
+            return `You cannot dump dirt or ore onto a support tile.`;
+        }
+
+        //Checks if tile is falling.
+        if (this.tile.isFalling && (material === `dirt` || material === `ore`)){
+            return `This tile is falling, you have bigger things to worry about than dumping dirt or ore.`;
+        }
+
+        //Checks if you have negative dirt.
+        if (material === `dirt` && this.dirt < 0){
+            return 'You have negative dirt. This should not happen. Contact devs.';
+        }
+
+        //Checks if you have dirt to dump
+        if (material === `dirt` && this.dirt === 0){
+            return 'You have no dirt to dump.';
+        }
+
+        if (material === `bomb` && this.bombs === 0){
+            return `You have no bombs to dump.`;
+        }
+
+        if (material === `bomb` && this.bombs < 0){
+            return `You have negative bombs. This should not happen. Contact devs.`;
+        }
+
+        if (material === `ore` && this.ore === 0){
+            return `You have no ore to dump.`;
+        }
+
+        if material === `ore` && this.ore < 0){
+            return `You have negative ore. This should not happen. Contact devs.`;
+        }
 
         // <<-- /Creer-Merge: invalidate-dump -->>
     }
@@ -290,7 +344,41 @@ export class Unit extends GameObject {
         // Add logic here for dump.
 
         // TODO: replace this with actual logic
-        return false;
+        if ((this.tile.isHopper || this.tile.isBase) && material === `ore`){
+            player.money += amount * this.game.oreValue;
+            player.value += amount * this.game.oreValue;
+            this.ore -= amount;
+        }
+
+        else if ((this.tile.isHopper || this.tile.isBase) && material === `dirt`){
+            player.money += amount;
+            player.value += amount;
+            this.dirt -= amount;
+        }
+        
+        else if ((this.tile.isHopper || this.tile.isBase) && material === `bomb`){
+            player.bombs += amount;
+            this.bombs -= amount;
+        }
+
+        else{
+            if (material === `dirt`){
+                this.tile.dirt += amount;
+                this.dirt -= amount;
+            }
+
+            if (material === `ore`){
+                this.tile.ore += amount;
+                this.ore -= amount;
+            }
+
+            if (material === `bomb`){
+                tile.units.push(this.game.manager.create.unit({title: this.game.jobs[1].title, cost: this.game.jobs[1].cost});
+                this.bombs -= amount;
+            }
+        }
+
+
 
         // <<-- /Creer-Merge: dump -->>
     }
