@@ -294,6 +294,16 @@ export class Unit extends GameObject {
     ): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
         
+        // --- 80 Columns ---------------------------------------------------- #
+        // A unit may mine ore and dirt from a tile. If a tile contains both, we
+        // can make them mine ore first, then dirt, or vice versa, or alternate
+        // between the two. Balancing will decide, just clearly pick one.
+        // Update isFalling variables
+        // Supports give support to 3 in a horizontal line sbove them (T shape
+        // kinda)
+        // Support’s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
+        // block support is on
+        
         const currentLoad = this.bombs + this.buildingMaterials +
             this.dirt + this.ore;
         if (0 < tile.dirt) {
