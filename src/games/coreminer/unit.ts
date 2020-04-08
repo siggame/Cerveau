@@ -320,7 +320,7 @@ export class Unit extends GameObject {
         }
         this.moves = Math.min(0, this.moves - 1);
         
-        if (!checkForSupport(tile)) {
+        if (!this.checkForSupport(tile)) {
             tile.isFalling = true;
         }
         
