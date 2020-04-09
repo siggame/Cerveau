@@ -23,6 +23,16 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
+     * The price of buying a bomb.
+     */
+    public readonly bombCost!: number;
+
+    /**
+     * The price of buying building materials.
+     */
+    public readonly buildingMaterialCost!: number;
+
+    /**
      * The player whose turn it is currently. That player can send commands.
      * Other players cannot.
      */

@@ -470,7 +470,7 @@ export class Unit extends GameObject {
         // Update isFalling variables
         // Supports give support to 3 in a horizontal line sbove them (T shape
         // kinda)
-        // Supportâ€™s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
+        // SupportÃ¢â‚¬â„¢s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
         // block support is on
         
         const currentLoad = this.bombs + this.buildingMaterials +

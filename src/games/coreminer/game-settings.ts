@@ -21,6 +21,18 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             ...(super.schema || (this as any).schema),
 
             // Coreminer game specific settings
+            bombCost: {
+                description: "The price of buying a bomb.",
+                // <<-- Creer-Merge: bombCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: bombCost -->>
+            },
+            buildingMaterialCost: {
+                description: "The price of buying building materials.",
+                // <<-- Creer-Merge: buildingMaterialCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: buildingMaterialCost -->>
+            },
             freeBombInterval: {
                 description: "The amount of turns it takes to gain a free "
                            + "Bomb.",
