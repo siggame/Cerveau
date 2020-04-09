@@ -605,6 +605,9 @@ export const Namespace = makeNamespace({
                 bombCost: {
                     typeName: "int",
                 },
+                bombSize: {
+                    typeName: "int",
+                },
                 buildingMaterialCost: {
                     typeName: "int",
                 },
@@ -1115,5 +1118,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "397e64cb9b2f8d76a04e0f32823456fad3d0dd8902b39c6f4d3bc3d636ec2bfd",
+    gameVersion: "6414fff3d6e5957603f07cc0e7e14897d16437e4af5bbc05940fdc81df44c032",
 });

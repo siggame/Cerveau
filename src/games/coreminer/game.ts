@@ -28,6 +28,11 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly bombCost!: number;
 
     /**
+     * The amount of cargo space taken up by a bomb.
+     */
+    public readonly bombSize!: number;
+
+    /**
      * The price of buying building materials.
      */
     public readonly buildingMaterialCost!: number;

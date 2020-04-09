@@ -27,6 +27,12 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 default: 0,
                 // <<-- /Creer-Merge: bombCost -->>
             },
+            bombSize: {
+                description: "The amount of cargo space taken up by a bomb.",
+                // <<-- Creer-Merge: bombSize -->>
+                default: 0,
+                // <<-- /Creer-Merge: bombSize -->>
+            },
             buildingMaterialCost: {
                 description: "The price of buying building materials.",
                 // <<-- Creer-Merge: buildingMaterialCost -->>
