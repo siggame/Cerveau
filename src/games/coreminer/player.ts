@@ -1,7 +1,8 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseCoreminerPlayer } from "./";
+import { IBaseCoreminerPlayer, IPlayerBuyArgs, IPlayerTransferArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
+import { Player } from "./player";
 import { Tile } from "./tile";
 import { Unit } from "./unit";
 
@@ -27,10 +28,20 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     public bombs!: number;
 
     /**
+     * The building material stored in the Player's supply.
+     */
+    public buildingMaterials!: number;
+
+    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
     public readonly clientType!: string;
+
+    /**
+     * The dirt stored in the Player's supply.
+     */
+    public dirt!: number;
 
     /**
      * The Tiles this Player's hoppers are on.
@@ -130,6 +141,110 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
+
+    /**
+     * Invalidation function for buy. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param resource - The type of resource to buy.
+     * @param amount - The amount of resource to buy.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateBuy(
+        player: Player,
+        resource: "dirt" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): void | string | IPlayerBuyArgs {
+        // <<-- Creer-Merge: invalidate-buy -->>
+
+        // Check all the arguments for buy here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-buy -->>
+    }
+
+    /**
+     * Purchases a resource and adds it to the Player's supply.
+     *
+     * @param player - The player that called this.
+     * @param resource - The type of resource to buy.
+     * @param amount - The amount of resource to buy.
+     * @returns True if successfully purchased, false otherwise.
+     */
+    protected async buy(
+        player: Player,
+        resource: "dirt" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: buy -->>
+
+        // Add logic here for buy.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: buy -->>
+    }
+
+    /**
+     * Invalidation function for transfer. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param unit - The Unit to transfer materials to.
+     * @param resource - The type of resource to transfer.
+     * @param amount - The amount of resource to transfer.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateTransfer(
+        player: Player,
+        unit: Unit,
+        resource: "dirt" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): void | string | IPlayerTransferArgs {
+        // <<-- Creer-Merge: invalidate-transfer -->>
+
+        // Check all the arguments for transfer here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-transfer -->>
+    }
+
+    /**
+     * Transfers a resource from the Player's supply to a Unit.
+     *
+     * @param player - The player that called this.
+     * @param unit - The Unit to transfer materials to.
+     * @param resource - The type of resource to transfer.
+     * @param amount - The amount of resource to transfer.
+     * @returns True if successfully transfered, false otherwise.
+     */
+    protected async transfer(
+        player: Player,
+        unit: Unit,
+        resource: "dirt" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: transfer -->>
+
+        // Add logic here for transfer.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: transfer -->>
+    }
 
     // <<-- Creer-Merge: protected-private-functions -->>
 

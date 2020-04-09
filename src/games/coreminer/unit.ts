@@ -470,7 +470,7 @@ export class Unit extends GameObject {
         // Update isFalling variables
         // Supports give support to 3 in a horizontal line sbove them (T shape
         // kinda)
-        // Support’s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
+        // Supportâ€™s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
         // block support is on
         
         const currentLoad = this.bombs + this.buildingMaterials +
@@ -505,29 +505,6 @@ export class Unit extends GameObject {
 
         // <<-- /Creer-Merge: mine -->>
     }
-    /*
-     * Checks if tile is supported
-     *
-     * @param tile - The Tile the materials will be mined from.
-     */
-    private checkForSupport(tile: Tile): boolean {
-        // Get tile by coordinates: this.game.tiles[x + (y * this.game.mapWidth)]
-        for (i = tile.x - 1; tile.x + 1 <= i; i++) {
-            if (this.game.tiles[i + ((tile.y - 1) * this.game.mapWidth)].isSupport) {
-                return true;
-            }
-        }
-        for (j = tile.y - 1; j <= tile.y - 4; j--) {
-            if (this.game.tiles[tile.x + (j * this.game.mapWidth)].dirt + 
-                this.game.tiles[tile.x + (j * this.game.mapWidth)].ore < 1) {
-                break;
-            }
-            if (this.game.tiles[tile.x + (j * this.game.mapWidth)].isSupport) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Invalidation function for move. Try to find a reason why the passed in
@@ -552,50 +529,6 @@ export class Unit extends GameObject {
         // changing its value in this scope is enough.
 
         // <<-- /Creer-Merge: invalidate-move -->>
-
-        const reason = this.invalidate(player, true);
-        // if there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
-        // make sure the unit is on the planet.... wait...
-        if (!tile) {
-            return `${this}, sorry but the dev's forgot to make that area. Target tile doesn't exist.`;
-        }
-
-        // Make sure there isn'ta dirt block
-        if (tile.dirt > 0) {
-            return `${this} you're supposed to mine the dirt first, ${tile} is occupied by dirt.`;
-        }
-
-        //Make sure the there isnt a hopper
-        if (tile.isHopper) {
-            return `${this}, putting bots into the hopper is violation of company code H-78, bots cannot enter hoppers.`;
-        }
-
-        //Make sure bots are not trying to enter the base
-        if(tile.isBase){
-            return `${this}, bots are not allowed to enter the base.`;
-        }
-
-        // Make sure the unit still has moves
-        if (this.moves <= 0) {
-            return `${this} cannot move anymore this turn, your robot is tired`;
-        }
-        
-        // make sure the tile is next to the unit.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
-            return `${this} can only travel to an adjacent tile, this time. Tile ${tile} too far away.`;
-        }
-
-        //make sure if they are going up they are on a ladder
-        if (this.tile == tile.tileNorth){
-            if(!tile.isLadder){
-                return `${this}, bot does not posses rocket boosters, ladder neeed to move up.`;
-            }
-        }
-        return;
     }
 
     /**
@@ -637,7 +570,6 @@ export class Unit extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tier - The tier of the upgrade.
      * @param attribute - The attribute of the Unit to be upgraded.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -645,7 +577,6 @@ export class Unit extends GameObject {
      */
     protected invalidateUpgrade(
         player: Player,
-        tier: number,
         attribute: "health" | "miningPower" | "moves" | "capacity",
     ): void | string | IUnitUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
@@ -722,13 +653,11 @@ export class Unit extends GameObject {
      * "capacity".
      *
      * @param player - The player that called this.
-     * @param tier - The tier of the upgrade.
      * @param attribute - The attribute of the Unit to be upgraded.
      * @returns True if successfully upgraded, False otherwise.
      */
     protected async upgrade(
         player: Player,
-        tier: number,
         attribute: "health" | "miningPower" | "moves" | "capacity",
     ): Promise<boolean> {
         // <<-- Creer-Merge: upgrade -->>

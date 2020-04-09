@@ -122,10 +122,20 @@ export interface IPlayerProperties {
     bombs?: number;
 
     /**
+     * The building material stored in the Player's supply.
+     */
+    buildingMaterials?: number;
+
+    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
     clientType?: string;
+
+    /**
+     * The dirt stored in the Player's supply.
+     */
+    dirt?: number;
 
     /**
      * The Tiles this Player's hoppers are on.
@@ -192,6 +202,42 @@ export interface IPlayerProperties {
      */
     won?: boolean;
 
+}
+
+/**
+ * Argument overrides for Player's buy function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface IPlayerBuyArgs {
+    /**
+     * The type of resource to buy.
+     */
+    resource?: "dirt" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to buy.
+     */
+    amount?: number;
+}
+
+/**
+ * Argument overrides for Player's transfer function. If you return an object
+ * of this interface from the invalidate functions, the value(s) you set will
+ * be used in the actual function.
+ */
+export interface IPlayerTransferArgs {
+    /**
+     * The Unit to transfer materials to.
+     */
+    unit?: Unit;
+    /**
+     * The type of resource to transfer.
+     */
+    resource?: "dirt" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to transfer.
+     */
+    amount?: number;
 }
 
 /** All the possible properties for an Tile. */
@@ -723,8 +769,14 @@ export const Namespace = makeNamespace({
                 bombs: {
                     typeName: "int",
                 },
+                buildingMaterials: {
+                    typeName: "int",
+                },
                 clientType: {
                     typeName: "string",
+                },
+                dirt: {
+                    typeName: "int",
                 },
                 hopperTiles: {
                     typeName: "list",
@@ -789,6 +841,48 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
+                buy: {
+                    args: [
+                        {
+                            argName: "resource",
+                            typeName: "string",
+                            defaultValue: "dirt",
+                            literals: ["dirt", "bomb", "buildingMaterials"],
+                        },
+                        {
+                            argName: "amount",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                transfer: {
+                    args: [
+                        {
+                            argName: "unit",
+                            typeName: "gameObject",
+                            gameObjectClass: Unit,
+                            nullable: false,
+                        },
+                        {
+                            argName: "resource",
+                            typeName: "string",
+                            defaultValue: "dirt",
+                            literals: ["dirt", "bomb", "buildingMaterials"],
+                        },
+                        {
+                            argName: "amount",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
             },
         },
         Tile: {
@@ -1015,5 +1109,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "8d537ee0d9bd5cd575dca2f2f08f184157cd9dce66a015e5598b3ee0e70e7ef6",
+    gameVersion: "7c7df3c25ba9e82d546825d64e398fc8c07b58e868e7501736a1637ce00e0681",
 });
