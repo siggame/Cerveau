@@ -572,7 +572,7 @@ export class Unit extends GameObject {
         }
 
         if (this.owner !== player || this.owner === undefined) {
-            return `${this} isn't under your control to dig deeper`;
+            return `${this} isn't under your control to dig deeper.`;
         }
 
         if (this.health <= 0) {
@@ -583,50 +583,42 @@ export class Unit extends GameObject {
             return `${this} is not on a tile. I think you might have dug too deep.`;
         }
 
-        if (tier === 1) {
-            if (player.money < 1) {
-                return `You don't have enough money for this upgrade to dig deeper.`;
-            }
-        } 
-
-        if (tier === 2) {
-            if (player.money < 2) {
-                return `You don't have enough money for this upgrade to dig deeper.`;
-            }
-        } 
-
-        if (tier === 3) {
-            if (player.money < 3) {
-                return `You don't have enough money for this upgrade to dig deeper.`;
-            }
-        } 
-
-        if (this.tile !== this.tile) {
-            return `${this} must be on the same tile to upgrade so you can dig deeper.`;
+        if (this.tile.owner !== player || !(this.tile.isBase || this.tile.isHopper)) {
+            return `${this} must be on your base or hopper to upgrade!`;
         }
 
-        if (attribute === "health") {
-            if (this.health === this.maxHealth) {
-                return `${this} is already at its max health to dig deeper with.`;
-            }
-        }
-        if (attribute === "miningPower") {
-            if (this.maxMiningPower === this.maxMiningPower) {
-                return `${this} is already at its max mining power to dig deeper with.`;
-            }
-        }
+        let cost;
+        switch (attribute) {
+            case "capacity":
+                cost = this.game.upgradeCapacityCost;
+                if (this.job.cargoCapacity.indexOf(this.maxCargoCapacity) === this.job.cargoCapacity.length - 1) {
+                    return `${this} already has max capacity upgrades!`;
+                }
+                break;
 
-        if (attribute === "moves") {
-            if (this.moves === this.maxMoves) {
-                return `${this} is already at its max moves to dig deeper with.`;
-            }
-        }
+            case "health":
+                cost = this.game.upgradeHealthCost;
+                if (this.job.health.indexOf(this.maxHealth) === this.job.health.length - 1) {
+                    return `${this} already has max health upgrades!`;
+                }
+                break;
 
-        if (attribute === "capacity") {
-            //capacity does not exist 
-            if (this.capacity === this.maxCargoCapacity) {
-                return `${this} is already at its max capacity to dig deeper with.`;
-            }
+            case "miningPower":
+                cost = this.game.upgradeMiningPowerCost;
+                if (this.job.miningPower.indexOf(this.maxMiningPower) === this.job.miningPower.length - 1) {
+                    return `${this} already has max mining power upgrades!`;
+                }
+                break;
+
+            case "moves":
+                cost = this.game.upgradeMovesCost;
+                if (this.job.moves.indexOf(this.maxMoves) === this.job.moves.length - 1) {
+                    return `${this} already has max move upgrades!`;
+                }
+                break;
+
+            default:
+                return `Units cannot upgrade ${attribute}!`;
         }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
