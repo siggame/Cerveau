@@ -270,10 +270,10 @@ export class CoreminerGame extends BaseClasses.Game {
                     // Surface layer
                     tile.dirt = 0;
                     tile.ore = 0;
+                    tile.owner = this.players[0];
 
                     if (x === 0) {
                         tile.isBase = true;
-                        tile.owner = this.players[0];
                     }
                 }
                 else {
@@ -389,11 +389,14 @@ export class CoreminerGame extends BaseClasses.Game {
                 const tile = getMutableTile(x, y);
                 const oppositeTile = getMutableTile(this.mapWidth - x - 1, y);
 
+                this.players[0].side.push(tile as Tile);
+                this.players[1].side.push(oppositeTile as Tile);
+
                 if (tile.owner !== undefined) {
                     oppositeTile.owner = tile.owner.opponent;
-                    oppositeTile.isBase = tile.isBase;
                 }
 
+                oppositeTile.isBase = tile.isBase;
                 oppositeTile.dirt = tile.dirt;
                 oppositeTile.ore = tile.ore;
             }

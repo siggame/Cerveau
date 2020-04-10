@@ -144,61 +144,69 @@ export class Unit extends GameObject {
         type: "support" | "ladder" | "shield",
     ): void | string | IUnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
-
-        // Check all the arguments for build here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-
         if (!this) {
-            return 'This unit does not exist!';
-        }
-        if (this.health === 0) {
-            return 'You can\'t build with a dead unit.';
-        }
-        if (tile.isBase) {
-            return 'You cannot build on a base.';
-        }
-        if (tile.isSupport) {
-            return 'You cannot build on a support.';
-        }
-        if (tile.isBase) {
-            return 'You cannot build on a ladder.';
-        }
-        if (tile.isFalling) {
-            return 'You cannot build on a falling tile.';
+            return "This unit does not exist!";
         }
 
-        //tile must be adjacent to or the same as the tile the unit is on
+        if (this.health === 0) {
+            return "You can't build with a dead unit.";
+        }
+
+        if (tile.isBase) {
+            return "You cannot build on a base.";
+        }
+
+        if (tile.isSupport) {
+            return "You cannot build on a support.";
+        }
+
+        if (tile.isBase) {
+            return "You cannot build on a ladder.";
+        }
+
+        if (tile.isFalling) {
+            return "You cannot build on a falling tile.";
+        }
+
+        // Tile must be adjacent to or the same as the tile the unit is on
         if (tile !== this.tile?.tileEast && tile !== this.tile?.tileNorth &&
             tile !== this.tile?.tileWest && tile !== this.tile?.tileSouth && tile !== this.tile) {
-            return 'That tile is too far away to be built on.';
+            return "That tile is too far away to be built on.";
         }
         switch (type) {
             case "support":
-                if (tile.dirt > 0 || tile.ore > 0)
-                    return 'You can only build a support on an empty tile.';
-                else if (this.buildingMaterials < this.game.supportCost)
-                    return 'You don\'t have enough building materials to build a support';
+                if (tile.dirt > 0 || tile.ore > 0) {
+                    return "You can only build a support on an empty tile.";
+                }
+                else if (this.buildingMaterials < this.game.supportCost) {
+                    return "You don't have enough building materials to build a support";
+                }
                 break;
-            case "ladder":
-                if (tile.dirt > 0 || tile.ore > 0)
-                    return 'You can only build a ladder on an empty tile.';
-                else if (this.buildingMaterials < this.game.ladderCost)
-                    return 'You don\'t have enough building materials to build a ladder';
-                break;
-            case "shield":
-                if (tile.dirt === 0 && tile.ore === 0)
-                    return 'You can\'t build a shield on an empty tile.';
-                else if (tile.shielding === 2)
-                    return 'This tile already has full shield.';
-                else if (this.buildingMaterials < this.game.shieldCost)
-                    return 'You don\'t have enough building materials to build a shield';
-                break;
-            default:
-                return 'Invalid build type.';
-        }
 
+            case "ladder":
+                if (tile.dirt > 0 || tile.ore > 0) {
+                    return "You can only build a ladder on an empty tile.";
+                }
+                else if (this.buildingMaterials < this.game.ladderCost) {
+                    return "You don't have enough building materials to build a ladder";
+                }
+                break;
+
+            case "shield":
+                if (tile.dirt === 0 && tile.ore === 0) {
+                    return "You can't build a shield on an empty tile.";
+                }
+                else if (tile.shielding === 2) {
+                    return "This tile already has full shield.";
+                }
+                else if (this.buildingMaterials < this.game.shieldCost) {
+                    return "You don't have enough building materials to build a shield";
+                }
+                break;
+
+            default:
+                return "Invalid build type.";
+        }
         // <<-- /Creer-Merge: invalidate-build -->>
     }
 
@@ -216,23 +224,22 @@ export class Unit extends GameObject {
         type: "support" | "ladder" | "shield",
     ): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
-
-        // Add logic here for build.
- 
         switch (type) {
             case "support":
                 tile.isSupport = true;
-                this.buildingMaterials -= this.game.supportCost;    //decrement building materials used
+                this.buildingMaterials -= this.game.supportCost; // decrement building materials used
                 break;
+
             case "ladder":
                 tile.isLadder = true;
                 this.buildingMaterials -= this.game.ladderCost;
                 break;
+
             case "shield":
                 tile.shielding = 2;
                 this.buildingMaterials -= this.game.shieldCost;
-                break;
         }
+
         return true;
         // <<-- /Creer-Merge: build -->>
     }
@@ -259,11 +266,6 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | IUnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
-
-        // Check all the arguments for dump here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
         }
@@ -278,47 +280,46 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        //Checks if the tile is a ladder
-        if (this.tile.isLadder && (material === `dirt` || material === `ore`)){
+        // Checks if the tile is a ladder
+        if (this.tile.isLadder && (material === `dirt` || material === `ore`)) {
             return `You cannot dump dirt or ore onto a ladder tile.`;
         }
 
-        //Checks if the tile is a support
-        if (this.tile.isSupport && (material === `dirt` || material === `ore`)){
+        // Checks if the tile is a support
+        if (this.tile.isSupport && (material === `dirt` || material === `ore`)) {
             return `You cannot dump dirt or ore onto a support tile.`;
         }
 
-        //Checks if tile is falling.
-        if (this.tile.isFalling && (material === `dirt` || material === `ore`)){
+        // Checks if tile is falling.
+        if (this.tile.isFalling && (material === `dirt` || material === `ore`)) {
             return `This tile is falling, you have bigger things to worry about than dumping dirt or ore.`;
         }
 
-        //Checks if you have negative dirt.
-        if (material === `dirt` && this.dirt < 0){
-            return 'You have negative dirt. This should not happen. Contact devs.';
+        // Checks if you have negative dirt.
+        if (material === `dirt` && this.dirt < 0) {
+            return "You have negative dirt. This should not happen. Contact devs.";
         }
 
-        //Checks if you have dirt to dump
-        if (material === `dirt` && this.dirt === 0){
-            return 'You have no dirt to dump.';
+        // Checks if you have dirt to dump
+        if (material === `dirt` && this.dirt === 0) {
+            return "You have no dirt to dump.";
         }
 
-        if (material === `bomb` && this.bombs === 0){
+        if (material === `bomb` && this.bombs === 0) {
             return `You have no bombs to dump.`;
         }
 
-        if (material === `bomb` && this.bombs < 0){
+        if (material === `bomb` && this.bombs < 0) {
             return `You have negative bombs. This should not happen. Contact devs.`;
         }
 
-        if (material === `ore` && this.ore === 0){
+        if (material === `ore` && this.ore === 0) {
             return `You have no ore to dump.`;
         }
 
-        if material === `ore` && this.ore < 0){
+        if (material === `ore` && this.ore < 0) {
             return `You have negative ore. This should not happen. Contact devs.`;
         }
-
         // <<-- /Creer-Merge: invalidate-dump -->>
     }
 
@@ -340,46 +341,45 @@ export class Unit extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>
-
-        // Add logic here for dump.
-
-        // TODO: replace this with actual logic
-        if ((this.tile.isHopper || this.tile.isBase) && material === `ore`){
+        if ((tile.isHopper || tile.isBase) && material === `ore`) {
             player.money += amount * this.game.oreValue;
             player.value += amount * this.game.oreValue;
             this.ore -= amount;
         }
 
-        else if ((this.tile.isHopper || this.tile.isBase) && material === `dirt`){
+        else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
             player.money += amount;
-            player.value += amount;
+            // Dirt grants no value
             this.dirt -= amount;
         }
-        
-        else if ((this.tile.isHopper || this.tile.isBase) && material === `bomb`){
+
+        else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
             player.bombs += amount;
             this.bombs -= amount;
         }
 
         else{
-            if (material === `dirt`){
-                this.tile.dirt += amount;
+            if (material === `dirt`) {
+                tile.dirt += amount;
                 this.dirt -= amount;
             }
 
-            if (material === `ore`){
-                this.tile.ore += amount;
+            if (material === `ore`) {
+                tile.ore += amount;
                 this.ore -= amount;
             }
 
-            if (material === `bomb`){
-                tile.units.push(this.game.manager.create.unit({title: this.game.jobs[1].title, cost: this.game.jobs[1].cost});
+            if (material === `bomb`) {
+                const bomb = this.game.manager.create.unit({
+                    job: this.game.jobs[1],
+                    tile,
+                });
+                tile.units.push(bomb);
                 this.bombs -= amount;
             }
         }
 
-
-
+        return true;
         // <<-- /Creer-Merge: dump -->>
     }
 
@@ -402,48 +402,31 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | IUnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-
-        // Check all the arguments for mine here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-             
-        const reason = this.invalidate(player, true);
-        // If there is a reason, return it.
-        if (reason) {
-            return reason;
-        }
-        
         if (!this) {
             return `Unit doesn't exist`;
         }
-        
+
         if (!tile) {
             return `Tile doesn't exist`;
         }
-        
-        if (Player !== this.Player) {
+
+        if (player !== this.owner) {
             return `You do not own this unit`;
         }
-        
-        if (this.job.title !== "miner") {
+
+        if (this.job.title !== this.game.jobs[0].title) {
             return `${this} must be a miner to mine.`;
         }
-        
-        if (this.moves < 1) {
-            return `${this} does not have enough moves`;
+
+        const newLoad = (this.bombs * this.game.bombSize)
+        + this.buildingMaterials + this.dirt + this.ore + amount;
+        if (this.maxCargoCapacity <= newLoad) {
+            return `${this} cannot hold ${amount} more materials!`;
         }
-        
-        const currentLoad = this.bombs + this.buildingMaterials +
-            this.dirt + this.ore;
-        if (this.job.cargoCapacity <= current load) {
-            return `${this} cannot hold any more materials!`;
+
+        if (tile.dirt + tile.ore <= 0) {
+            return `No dirt or ore to mine!`;
         }
-        
-        if (tile.dirt + tile.ore < 0) {
-            return `No dirt or ore to mine`;
-        }
-        
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
 
@@ -462,7 +445,7 @@ export class Unit extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
-        
+
         // --- 80 Columns ---------------------------------------------------- #
         // A unit may mine ore and dirt from a tile. If a tile contains both, we
         // can make them mine ore first, then dirt, or vice versa, or alternate
@@ -470,7 +453,7 @@ export class Unit extends GameObject {
         // Update isFalling variables
         // Supports give support to 3 in a horizontal line sbove them (T shape
         // kinda)
-        // SupportÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s 3 above (add ore + dirt) - 3 * material (ore and dirt) of
+        // Supports 3 above (add ore + dirt) - 3 * material (ore and dirt) of
         // block support is on
         
         const currentLoad = this.bombs + this.buildingMaterials +
