@@ -274,6 +274,7 @@ export class CoreminerGame extends BaseClasses.Game {
 
                     if (x === 0) {
                         tile.isBase = true;
+                        this.players[0].baseTile = tile as Tile;
                     }
                 }
                 else {
@@ -396,7 +397,10 @@ export class CoreminerGame extends BaseClasses.Game {
                     oppositeTile.owner = tile.owner.opponent;
                 }
 
-                oppositeTile.isBase = tile.isBase;
+                if (tile.isBase) {
+                    oppositeTile.isBase = tile.isBase;
+                    this.players[1].baseTile = oppositeTile as Tile;
+                }
                 oppositeTile.dirt = tile.dirt;
                 oppositeTile.ore = tile.ore;
             }
