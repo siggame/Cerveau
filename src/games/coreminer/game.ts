@@ -374,7 +374,7 @@ export class CoreminerGame extends BaseClasses.Game {
                 const oreAmount = layerOreDensities[i];
 
                 chosenTile.ore = oreAmount;
-                chosenTile.dirt -= oreAmount;
+                chosenTile.dirt = 0;
 
                 layerRows[i][randomY].splice(randomX, 1);
 
