@@ -83,7 +83,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        const winners = this.game.players.filter(player => player.value >= this.game.victoryAmount);
+        const winners = this.game.players.filter((player) => player.value >= this.game.victoryAmount);
 
         if (winners.length === this.game.players.length) {
             this.secondaryWinConditions("Both players qualified for a promotion!");
@@ -166,7 +166,31 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     /** Updates all falling tiles */
     private updateGravity(): void {
         for (const tile of this.game.fallingTiles) {
-            // perform update
+            if (tile.tileSouth) {
+                let support = 0;
+                if (tile.tileSouth.isSupport) {
+                    if (tile.tileSouth.tileSouth) {
+                        support += tile.tileSouth.tileSouth.dirt;
+                        support += tile.tileSouth.tileSouth.ore;
+                    }
+                    if (tile.tileSouth.tileEast) {
+                        support += tile.tileSouth.tileEast.dirt;
+                        support += tile.tileSouth.tileEast.ore;
+                    }
+                    if (tile.tileSouth.tileWest) {
+                        support += tile.tileSouth.tileWest.dirt;
+                        support += tile.tileSouth.tileWest.ore;
+                    }
+                }
+
+                if (support < tile.ore + tile.dirt) {
+                    // fall
+                    tile.tileSouth.dirt += tile.dirt;
+                    tile.tileSouth.ore += tile.ore;
+                    tile.dirt = 0;
+                    tile.ore = 0;
+                }
+            }
         }
     }
 

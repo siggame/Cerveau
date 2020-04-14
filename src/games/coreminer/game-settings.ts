@@ -79,25 +79,25 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             upgradeCargoCapacityCost: {
                 description: "The cost to upgrade a Unit's cargo capacity.",
                 // <<-- Creer-Merge: upgradeCargoCapacityCost -->>
-                default: 0,
+                default: 500,
                 // <<-- /Creer-Merge: upgradeCargoCapacityCost -->>
             },
             upgradeHealthCost: {
                 description: "The cost to upgrade a Unit's health.",
                 // <<-- Creer-Merge: upgradeHealthCost -->>
-                default: 0,
+                default: 500,
                 // <<-- /Creer-Merge: upgradeHealthCost -->>
             },
             upgradeMiningPowerCost: {
                 description: "The cost to upgrade a Unit's mining power.",
                 // <<-- Creer-Merge: upgradeMiningPowerCost -->>
-                default: 0,
+                default: 500,
                 // <<-- /Creer-Merge: upgradeMiningPowerCost -->>
             },
             upgradeMovesCost: {
                 description: "The cost to upgrade a Unit's movement speed.",
                 // <<-- Creer-Merge: upgradeMovesCost -->>
-                default: 0,
+                default: 500,
                 // <<-- /Creer-Merge: upgradeMovesCost -->>
             },
             victoryAmount: {
@@ -108,26 +108,13 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
             // <<-- Creer-Merge: schema -->>
-            upgradeHealthCost: {
-                description: "The cost to upgrade a Unit's health.",
-                default: 500,
+            /*
+            someVariableLikeUnitHealth: {
+                description: "Describe what this setting does for the players.",
+                default: 1337,
                 min: 1,
             },
-            upgradeMovesCost: {
-                description: "The cost to upgrade a Unit's movespeed.",
-                default: 500,
-                min: 1,
-            },
-            upgradeMiningPowerCost: {
-                description: "The cost to upgrade a Unit's mining power.",
-                default: 500,
-                min: 1,
-            },
-            upgradeCapacityCost: {
-                description: "The cost to upgrade a Unit's cargo capacity.",
-                default: 500,
-                min: 1,
-            },
+            */
 
             // <<-- /Creer-Merge: schema -->>
 

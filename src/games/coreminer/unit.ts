@@ -148,6 +148,10 @@ export class Unit extends GameObject {
             return "This unit does not exist!";
         }
 
+        if (!this.tile) {
+            return `${this} is lost in the mines! Their tile is undefined!`;
+        }
+
         if (this.health === 0) {
             return "You can't build with a dead unit.";
         }
@@ -169,8 +173,8 @@ export class Unit extends GameObject {
         }
 
         // Tile must be adjacent to or the same as the tile the unit is on
-        if (tile !== this.tile?.tileEast && tile !== this.tile?.tileNorth &&
-            tile !== this.tile?.tileWest && tile !== this.tile?.tileSouth && tile !== this.tile) {
+        if (tile !== this.tile.tileEast && tile !== this.tile.tileNorth &&
+            tile !== this.tile.tileWest && tile !== this.tile.tileSouth && tile !== this.tile) {
             return "That tile is too far away to be built on.";
         }
         switch (type) {
@@ -632,7 +636,7 @@ export class Unit extends GameObject {
         let cost;
         switch (attribute) {
             case "capacity":
-                cost = this.game.upgradeCapacityCost;
+                cost = this.game.upgradeCargoCapacityCost;
                 if (this.job.cargoCapacity.indexOf(this.maxCargoCapacity) === this.job.cargoCapacity.length - 1) {
                     return `${this} already has max capacity upgrades!`;
                 }
@@ -662,6 +666,10 @@ export class Unit extends GameObject {
             default:
                 return `Units cannot upgrade ${attribute}!`;
         }
+
+        if (cost > player.money) {
+            return `You cannot afford that upgrade! It costs $${cost}!`;
+        }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
 
@@ -678,58 +686,33 @@ export class Unit extends GameObject {
         attribute: "health" | "miningPower" | "moves" | "capacity",
     ): Promise<boolean> {
         // <<-- Creer-Merge: upgrade -->>
-        if (!this.tile) {
-            return false;
-        }
+        let nextLevelIndex;
+        switch (attribute) {
+            case "capacity":
+                player.money -= this.game.upgradeCargoCapacityCost;
+                nextLevelIndex = this.job.cargoCapacity.indexOf(this.maxCargoCapacity) + 1;
+                this.maxCargoCapacity = this.job.cargoCapacity[nextLevelIndex];
+                break;
 
-        if (tier === 1) {
-            //10 is a place holder since i dont know what the values are supposed to be
-            if (attribute === "health") {
-                this.health = 10;
-            }
-            else if (attribute === "miningPower") {
-                this.miningPower = 10;
-            }
-            else if (attribute === "moves") {
-                this.moves = 10;
-            }
-            else if (attribute === "capacity") {
-                this.capacity = 10;
-            }
-        }
-        else if (tier === 2) {
-            //20 is a place holder since i dont know what the values are supposed to be
-            if (attribute === "health") {
-                this.health = 20;
-            }
-            else if (attribute === "miningPower") {
-                this.miningPower = 20;
-            }
-            else if (attribute === "moves") {
-                this.moves = 20;
-            }
-            else if (attribute === "capacity") {
-                this.capacity = 20;
-            }
-        }
-        else if (tier === 3) {
-            //20 is a place holder since i dont know what the values are supposed to be
-            if (attribute === "health") {
-                this.health = 30;
-            }
-            else if (attribute === "miningPower") {
-                this.miningPower = 30;
-            }
-            else if (attribute === "moves") {
-                this.moves = 30;
-            }
-            else if (attribute === "capacity") {
-                this.capacity = 30;
-            }
+            case "health":
+                player.money -= this.game.upgradeHealthCost;
+                nextLevelIndex = this.job.health.indexOf(this.maxHealth) + 1;
+                this.maxHealth = this.job.health[nextLevelIndex];
+                break;
+
+            case "miningPower":
+                player.money -= this.game.upgradeMiningPowerCost;
+                nextLevelIndex = this.job.miningPower.indexOf(this.maxMiningPower) + 1;
+                this.maxMiningPower = this.job.miningPower[nextLevelIndex];
+                break;
+
+            case "moves":
+                player.money -= this.game.upgradeMovesCost;
+                nextLevelIndex = this.job.moves.indexOf(this.maxMoves) + 1;
+                this.maxMoves = this.job.moves[nextLevelIndex];
         }
 
         return true;
-        
         // <<-- /Creer-Merge: upgrade -->>
     }
 
