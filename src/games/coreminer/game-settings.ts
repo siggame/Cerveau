@@ -108,15 +108,26 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
             // <<-- Creer-Merge: schema -->>
-
-            // you can add more settings here, e.g.:
-            /*
-            someVariableLikeUnitHealth: {
-                description: "Describe what this setting does for the players.",
-                default: 1337,
+            upgradeHealthCost: {
+                description: "The cost to upgrade a Unit's health.",
+                default: 500,
                 min: 1,
             },
-            */
+            upgradeMovesCost: {
+                description: "The cost to upgrade a Unit's movespeed.",
+                default: 500,
+                min: 1,
+            },
+            upgradeMiningPowerCost: {
+                description: "The cost to upgrade a Unit's mining power.",
+                default: 500,
+                min: 1,
+            },
+            upgradeCapacityCost: {
+                description: "The cost to upgrade a Unit's cargo capacity.",
+                default: 500,
+                min: 1,
+            },
 
             // <<-- /Creer-Merge: schema -->>
 

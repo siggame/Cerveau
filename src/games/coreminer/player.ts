@@ -161,10 +161,35 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     ): void | string | IPlayerBuyArgs {
         // <<-- Creer-Merge: invalidate-buy -->>
 
-        // Check all the arguments for buy here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if (amount <= 0) {
+            return `Sorry ${player}, you cannot buy negative resources.`;
+        }
+
+        let cost = amount;
+        switch (resource) {
+            case "dirt":
+                cost *= 1;
+                break;
+
+            case "bomb":
+                cost *= this.game.bombCost;
+                break;
+
+            case "buildingMaterials":
+                cost *= this.game.buildingMaterialCost;
+                break;
+
+            default:
+                return `${resource} is not a valid resource.`;
+        }
+
+        if (cost > player.money) {
+            return `Sorry ${player}, you cannot afford to buy that.`;
+        }
 
         // <<-- /Creer-Merge: invalidate-buy -->>
     }
@@ -183,12 +208,26 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: buy -->>
+        let cost = amount;
+        switch (resource) {
+            case "dirt":
+                cost *= 1;
+                player.dirt += amount;
+                break;
 
-        // Add logic here for buy.
+            case "bomb":
+                cost *= this.game.bombCost;
+                player.bombs += amount;
+                break;
 
-        // TODO: replace this with actual logic
-        return false;
+            case "buildingMaterials":
+                cost *= this.game.buildingMaterialCost;
+                player.buildingMaterials += amount;
+        }
 
+        player.money -= cost;
+
+        return true;
         // <<-- /Creer-Merge: buy -->>
     }
 
@@ -212,12 +251,58 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
         amount: number,
     ): void | string | IPlayerTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
 
-        // Check all the arguments for transfer here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        if (amount <= 0) {
+            return `Sorry ${player}, you cannot transfer negative resources.`;
+        }
 
+        if (!unit) {
+            return `The unit specified, ${unit}, does not exist.`;
+        }
+
+        if (!unit.tile) {
+            return `That unit, ${unit}, is currently lost in space.`;
+        }
+
+        if (unit.owner !== player) {
+            return `${unit} will not accept transfers from a stranger!`;
+        }
+
+        if (unit.tile.owner !== player && !(unit.tile.isBase || unit.tile.isHopper)) {
+            return `${unit} is not on your base or hopper tiles!`;
+        }
+
+        switch (resource) {
+            case "dirt":
+                if (player.dirt < amount) {
+                    return `You do not have enough dirt to transfer ${amount} dirt!`;
+                }
+                break;
+
+            case "bomb":
+                if (player.bombs < amount) {
+                    return `You do not have enough bombs to transfer ${amount} bombs!`;
+                }
+                break;
+
+            case "buildingMaterials":
+                if (player.buildingMaterials < amount) {
+                    return `You do not have enough building materials to transfer ${amount} building materials!`;
+                }
+                break;
+
+            default:
+                return `${resource} is not a valid resource.`;
+        }
+
+        const currCargo = (unit.bombs * this.game.bombSize) + unit.buildingMaterials + unit.dirt + unit.ore;
+        const addedCargo = amount * (resource === "bomb" ? this.game.bombSize : 1);
+        if (currCargo + addedCargo > unit.maxCargoCapacity) {
+            return `${unit} cannot hold that much additional cargo!`;
+        }
         // <<-- /Creer-Merge: invalidate-transfer -->>
     }
 
@@ -237,12 +322,23 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
+        switch (resource) {
+            case "dirt":
+                unit.dirt += amount;
+                player.dirt -= amount;
+                break;
 
-        // Add logic here for transfer.
+            case "bomb":
+                unit.bombs += amount;
+                player.bombs -= amount;
+                break;
 
-        // TODO: replace this with actual logic
-        return false;
+            case "buildingMaterials":
+                unit.buildingMaterials += amount;
+                player.buildingMaterials -= amount;
+        }
 
+        return true;
         // <<-- /Creer-Merge: transfer -->>
     }
 

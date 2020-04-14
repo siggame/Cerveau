@@ -201,10 +201,21 @@ export class Tile extends GameObject implements BaseTile {
     ): void | string | ITileSpawnMinerArgs {
         // <<-- Creer-Merge: invalidate-spawnMiner -->>
 
-        // Check all the arguments for spawnMiner here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        if (!this) {
+            return `The chosen tile does not exist!`;
+        }
+
+        if (!player || player !== this.game.currentPlayer) {
+            return `It isn't your turn, ${player}.`;
+        }
+
+        if (this.owner !== player) {
+            return `This tile isn't owned by you!`;
+        }
+
+        if (player.money < this.game.jobs[0].cost) {
+            return `You cannot afford a miner!`;
+        }
 
         // <<-- /Creer-Merge: invalidate-spawnMiner -->>
     }
@@ -218,71 +229,26 @@ export class Tile extends GameObject implements BaseTile {
      */
     protected async spawnMiner(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: spawnMiner -->>
+        const newUnit = this.game.manager.create.unit({
+            job: this.game.jobs[0],
+            tile: this,
+            health: this.game.jobs[0].health[0],
+            maxHealth: this.game.jobs[0].health[0],
+            maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
+            miningPower: this.game.jobs[0].miningPower[0],
+            maxMiningPower: this.game.jobs[0].miningPower[0],
+            moves: this.game.jobs[0].moves[0],
+            maxMoves: this.game.jobs[0].moves[0],
+        });
 
-        // Add logic here for spawnMiner.
+        player.money -= this.game.jobs[0].cost;
 
-        // TODO: replace this with actual logic
-        return false;
+        player.units.push(newUnit);
+        this.units.push(newUnit);
+
+        return true;
 
         // <<-- /Creer-Merge: spawnMiner -->>
-    }
-
-    /**
-     * Gets the adjacent direction between this Tile and an adjacent Tile
-     * (if one exists).
-     *
-     * @param adjacentTile - A tile that should be adjacent to this Tile.
-     * @returns "North", "East", "South", or "West" if the tile is adjacent to
-     * this Tile in that direction. Otherwise undefined.
-     */
-    public getAdjacentDirection(
-        adjacentTile: Tile | undefined,
-    ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
-    }
-
-    /**
-     * Gets a list of all the neighbors of this Tile.
-     *
-     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
-     */
-    public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
-    }
-
-    /**
-     * Gets a neighbor in a particular direction
-     *
-     * @param direction - The direction you want, must be
-     * "North", "East", "South", or "West".
-     * @returns The Tile in that direction, or undefined if there is none.
-     */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
-    }
-
-    /**
-     * Checks if a Tile has another Tile as its neighbor.
-     *
-     * @param tile - The Tile to check.
-     * @returns True if neighbor, false otherwise.
-     */
-    public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.hasNeighbor.call(this, tile);
-    }
-
-    /**
-     * toString override.
-     *
-     * @returns A string representation of the Tile.
-     */
-    public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.toString.call(this);
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
