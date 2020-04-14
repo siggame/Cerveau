@@ -358,7 +358,7 @@ export class Unit extends GameObject {
             this.bombs -= amount;
         }
 
-        else{
+        else {
             if (material === `dirt`) {
                 tile.dirt += amount;
                 this.dirt -= amount;
@@ -455,37 +455,48 @@ export class Unit extends GameObject {
         // kinda)
         // Supports 3 above (add ore + dirt) - 3 * material (ore and dirt) of
         // block support is on
-        
-        const currentLoad = this.bombs + this.buildingMaterials +
-            this.dirt + this.ore;
-        if (0 < tile.dirt) {
-            const actualAmount = Math.min(tile.dirt, this.miningPower,
-                this.job.cargoCapacity - currentLoad);
-            tile.dirt -= actualAmount;
-            this.dirt += actualAmount;
+
+        let amountLeft = amount;
+        const currentLoad = (this.bombs * this.game.bombSize)
+        + this.buildingMaterials + this.dirt + this.ore;
+
+        if (tile.dirt > 0) {
+            const actualDirtAmount = Math.min(
+            tile.dirt, this.miningPower, this.maxCargoCapacity - currentLoad);
+
+            tile.dirt -= actualDirtAmount;
+            this.dirt += actualDirtAmount;
+            amountLeft -= actualDirtAmount;
         }
-        else {
-            const actualAmount = Math.min(tile.ore, this.miningPower,
-                this.job.cargoCapacity - currentLoad);
-            tile.ore -= actualAmount;
-            this.ore +- actualAmount;
+
+        if (tile.ore > 0 && amountLeft > 0) {
+            const actualOreAmount = Math.min(
+            tile.ore, this.miningPower, this.maxCargoCapacity - currentLoad);
+            tile.ore -= actualOreAmount;
+            this.ore += actualOreAmount;
         }
-        this.moves = Math.min(0, this.moves - 1);
-        
-        if (!this.checkForSupport(tile)) {
-            tile.isFalling = true;
-        }
-        for (i = tile.x - 1; tile.x + 1 <= i; i++) {
-            for (j = tile.y; tile.y + 3 <= j; j++) {
-                if (!this.checkForSupport(
-                    this.game.tiles[i+(j*this.game.mapWidth)])) {
-                    this.game.tiles[i+(j*this.game.mapWidth)].isFalling = true;
+
+        // Check if mined tile is still filled
+        if (tile.ore + tile.dirt <= 0) {
+            // Check if any tiles are going to fall
+            if (tile.tileNorth !== undefined) {
+                this.game.fallingTiles.push(tile.tileNorth);
+            }
+
+            // Check if unit is going to fall
+            if (this.tile) {
+                if (this.tile.tileSouth && this.tile.tileSouth === tile) {
+                    // Fall logic
+                    while (this.tile.tileSouth !== undefined && this.tile.ore + this.tile.dirt <= 0) {
+                        this.tile.units.splice(this.tile.units.indexOf(this), 1);
+                        this.tile = this.tile.tileSouth;
+                        this.tile.units.push(this);
+                    }
                 }
             }
         }
-        
-        return false;
 
+        return false;
         // <<-- /Creer-Merge: mine -->>
     }
 
@@ -505,12 +516,34 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | IUnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
+        if (!tile) {
+            return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
+        }
 
-        // Check all the arguments for move here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
+        if (!this.tile) {
+            return `${this} is in an uncharted part of the mine!`;
+        }
 
+        if (this.moves <= 0) {
+            return `${this} is out of fuel, and must fabricate more! It cannot move any more this turn!`;
+        }
+
+        if (this.tile !== tile.tileEast && this.tile !== tile.tileWest &&
+            this.tile !== tile.tileSouth && this.tile !== tile.tileNorth) {
+            return `${this} cannot teleport yet! This unit can only move to adjacent tiles.`;
+        }
+
+        if (this.tile.dirt + this.tile.ore > 0) {
+            return `${this} is buried! This unit is stuck, and must dig itself out.`;
+        }
+
+        if (tile.dirt + tile.ore > 0) {
+            return `${this} cannot phase through dirt and ore!`;
+        }
+
+        if (tile === this.tile.tileNorth && !this.tile.isLadder) {
+            return `${this} cannot fly! This unit needs a ladder!`;
+        }
         // <<-- /Creer-Merge: invalidate-move -->>
     }
 
@@ -523,26 +556,35 @@ export class Unit extends GameObject {
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
-        var block_fall = 0;
-        var below = tile.tileSouth;
-        // Moves robot
         if (!this.tile) {
             throw new Error(`${this} has no Tile to move from!`);
         }
-        this.tile.unit = undefined;
+
+        this.tile.units.splice(this.tile.units.indexOf(this), 1);
         this.tile = tile;
-        tile.unit = this;
+        tile.units.push(this);
         this.moves -= 1;
-        //Checks the amount fallen
-        while (below.dirt == 0 || below.ore == 0 || !below )
-        {
-            block_fall++;
+
+        // Fall logic
+        let distance = 0;
+        while (this.tile.tileSouth !== undefined && this.tile.ore + this.tile.dirt <= 0) {
+            this.tile.units.splice(this.tile.units.indexOf(this), 1);
+            this.tile = this.tile.tileSouth;
+            this.tile.units.push(this);
+            distance++;
         }
-        //Calculates the damages
-        
-                
-        // TODO: replace this with actual logic
-        return false;
+
+        // Calculate damage
+        const healthLevel = this.job.health.indexOf(this.maxHealth);
+        if (distance > 0) {
+            const damage = distance - (healthLevel + 1);
+
+            if (damage > 0) {
+                this.health = Math.max(this.health - (damage * this.maxHealth), 0);
+            }
+        }
+
+        return true;
 
         // <<-- /Creer-Merge: move -->>
     }

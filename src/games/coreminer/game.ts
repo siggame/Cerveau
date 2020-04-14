@@ -138,6 +138,11 @@ export class CoreminerGame extends BaseClasses.Game {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
+    /**
+     * Every Tile about to fall in the game.
+     */
+    public fallingTiles!: Tile[];
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**

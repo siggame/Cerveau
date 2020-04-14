@@ -59,8 +59,15 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         // clean up dead units
         this.updateArrays();
+
         // update units
         this.updateUnits();
+
+        // gravity
+        this.updateGravity();
+
+        // hoppers
+        this.updateHoppers();
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -152,6 +159,44 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
             if (unit.tile && unit.tile.owner === unit.owner) {
                 unit.health = unit.maxHealth;
+            }
+        }
+    }
+
+    /** Updates all falling tiles */
+    private updateGravity(): void {
+        for (const tile of this.game.fallingTiles) {
+            // perform update
+        }
+    }
+
+    /** Updates all hopper extensions */
+    private updateHoppers(): void {
+        const currPlayer = this.game.currentPlayer;
+        if (currPlayer.hopperTiles.length === 0) {
+            // no hoppers, check from base tile
+            const nextHopperPos = this.game.currentPlayer.baseTile.tileSouth;
+            if (nextHopperPos === undefined) {
+                // there is no space for hoppers in this map
+                return;
+            }
+            if (nextHopperPos.dirt === 0 && nextHopperPos.ore === 0) {
+                nextHopperPos.isHopper = true;
+                currPlayer.hopperTiles.push(nextHopperPos);
+            }
+        }
+
+        if (currPlayer.hopperTiles.length > 0) {
+            // try to extend hoppers
+            let nextHopperPos = currPlayer.hopperTiles[currPlayer.hopperTiles.length - 1].tileSouth;
+            while (nextHopperPos !== undefined) {
+                if (nextHopperPos.ore === 0 && nextHopperPos.dirt === 0) {
+                    nextHopperPos.isHopper = true;
+                    nextHopperPos = nextHopperPos.tileSouth;
+                }
+                else {
+                    return;
+                }
             }
         }
     }
