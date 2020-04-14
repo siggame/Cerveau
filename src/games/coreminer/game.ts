@@ -128,6 +128,26 @@ export class CoreminerGame extends BaseClasses.Game {
     public units!: Unit[];
 
     /**
+     * The cost to upgrade a Unit's cargo capacity.
+     */
+    public readonly upgradeCargoCapacityCost!: number;
+
+    /**
+     * The cost to upgrade a Unit's health.
+     */
+    public readonly upgradeHealthCost!: number;
+
+    /**
+     * The cost to upgrade a Unit's mining power.
+     */
+    public readonly upgradeMiningPowerCost!: number;
+
+    /**
+     * The cost to upgrade a Unit's movement speed.
+     */
+    public readonly upgradeMovesCost!: number;
+
+    /**
      * The amount of victory points required to win.
      */
     public readonly victoryAmount!: number;

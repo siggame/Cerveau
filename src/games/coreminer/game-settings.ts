@@ -76,6 +76,30 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 default: 0,
                 // <<-- /Creer-Merge: supportCost -->>
             },
+            upgradeCargoCapacityCost: {
+                description: "The cost to upgrade a Unit's cargo capacity.",
+                // <<-- Creer-Merge: upgradeCargoCapacityCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: upgradeCargoCapacityCost -->>
+            },
+            upgradeHealthCost: {
+                description: "The cost to upgrade a Unit's health.",
+                // <<-- Creer-Merge: upgradeHealthCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: upgradeHealthCost -->>
+            },
+            upgradeMiningPowerCost: {
+                description: "The cost to upgrade a Unit's mining power.",
+                // <<-- Creer-Merge: upgradeMiningPowerCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: upgradeMiningPowerCost -->>
+            },
+            upgradeMovesCost: {
+                description: "The cost to upgrade a Unit's movement speed.",
+                // <<-- Creer-Merge: upgradeMovesCost -->>
+                default: 0,
+                // <<-- /Creer-Merge: upgradeMovesCost -->>
+            },
             victoryAmount: {
                 description: "The amount of victory points required to win.",
                 // <<-- Creer-Merge: victoryAmount -->>
