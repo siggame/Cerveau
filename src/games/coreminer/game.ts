@@ -181,6 +181,10 @@ export class CoreminerGame extends BaseClasses.Game {
         this.createJobs();
 
         this.createMap();
+
+        for (const player of this.players) {
+            player.money = this.jobs[0].cost * 2;
+        }
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -410,7 +414,7 @@ export class CoreminerGame extends BaseClasses.Game {
         });
 
         // Mirror the map
-        for (let x = 0; x < this.mapWidth; x++) {
+        for (let x = 0; x < side; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const tile = getMutableTile(x, y);
                 const oppositeTile = getMutableTile(this.mapWidth - x - 1, y);
@@ -423,7 +427,7 @@ export class CoreminerGame extends BaseClasses.Game {
                 }
 
                 if (tile.isBase) {
-                    oppositeTile.isBase = tile.isBase;
+                    oppositeTile.isBase = true;
                     this.players[1].baseTile = oppositeTile as Tile;
                 }
                 oppositeTile.dirt = tile.dirt;

@@ -239,6 +239,7 @@ export class Tile extends GameObject implements BaseTile {
             maxMiningPower: this.game.jobs[0].miningPower[0],
             moves: this.game.jobs[0].moves[0],
             maxMoves: this.game.jobs[0].moves[0],
+            owner: player,
         });
 
         player.money -= this.game.jobs[0].cost;

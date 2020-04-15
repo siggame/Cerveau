@@ -165,7 +165,8 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     /** Updates all falling tiles */
     private updateGravity(): void {
-        for (const tile of this.game.fallingTiles) {
+        while (this.game.fallingTiles) {
+            const tile = this.game.fallingTiles[this.game.fallingTiles.length - 1];
             if (tile.tileSouth) {
                 let support = 0;
                 if (tile.tileSouth.isSupport) {
@@ -189,6 +190,8 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                     tile.tileSouth.ore += tile.ore;
                     tile.dirt = 0;
                     tile.ore = 0;
+                    this.game.fallingTiles.pop();
+                    this.game.fallingTiles.push(tile.tileSouth);
                 }
             }
         }
