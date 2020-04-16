@@ -165,35 +165,36 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     /** Updates all falling tiles */
     private updateGravity(): void {
-        while (this.game.fallingTiles) {
+        while (this.game.fallingTiles.length > 0) {
             const tile = this.game.fallingTiles[this.game.fallingTiles.length - 1];
             if (tile.tileSouth) {
-                let support = 0;
+                let willFall = true;
+                // Supports prevent falling
                 if (tile.tileSouth.isSupport) {
-                    if (tile.tileSouth.tileSouth) {
-                        support += tile.tileSouth.tileSouth.dirt;
-                        support += tile.tileSouth.tileSouth.ore;
-                    }
-                    if (tile.tileSouth.tileEast) {
-                        support += tile.tileSouth.tileEast.dirt;
-                        support += tile.tileSouth.tileEast.ore;
-                    }
-                    if (tile.tileSouth.tileWest) {
-                        support += tile.tileSouth.tileWest.dirt;
-                        support += tile.tileSouth.tileWest.ore;
-                    }
+                    willFall = false;
+                }
+                else if (tile.tileSouth.tileEast && tile.tileSouth.tileEast.isSupport) {
+                    willFall = false;
+                }
+                else if (tile.tileSouth.tileWest && tile.tileSouth.tileWest.isSupport) {
+                    willFall = false;
                 }
 
-                if (support < tile.ore + tile.dirt) {
-                    // fall
-                    tile.tileSouth.dirt += tile.dirt;
-                    tile.tileSouth.ore += tile.ore;
-                    tile.dirt = 0;
-                    tile.ore = 0;
-                    this.game.fallingTiles.pop();
-                    this.game.fallingTiles.push(tile.tileSouth);
+                if (willFall) {
+                    // Fall logic
+                    let curTile = tile;
+                    while (curTile.tileSouth && !curTile.tileSouth.isSupport &&
+                        curTile.tileSouth.dirt + curTile.tileSouth.ore <= 0) {
+                        curTile.tileSouth.ore = curTile.ore;
+                        curTile.tileSouth.dirt = curTile.dirt;
+                        curTile.ore = 0;
+                        curTile.dirt = 0;
+                        curTile.isFalling = false;
+                        curTile = curTile.tileSouth;
+                    }
                 }
             }
+            this.game.fallingTiles.pop();
         }
     }
 

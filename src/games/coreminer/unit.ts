@@ -168,8 +168,8 @@ export class Unit extends GameObject {
             return "You cannot build on a ladder.";
         }
 
-        if (tile.isFalling) {
-            return "You cannot build on a falling tile.";
+        if (tile.dirt + tile.ore > 0 && type !== "shield") {
+            return "You can only build shields on a filled tile.";
         }
 
         // Tile must be adjacent to or the same as the tile the unit is on
@@ -182,7 +182,10 @@ export class Unit extends GameObject {
                 if (tile.dirt > 0 || tile.ore > 0) {
                     return "You can only build a support on an empty tile.";
                 }
-                else if (this.buildingMaterials < this.game.supportCost) {
+                if (tile.isSupport) {
+                    return "This tile already has a support!";
+                }
+                if (this.buildingMaterials < this.game.supportCost) {
                     return "You don't have enough building materials to build a support";
                 }
                 break;
@@ -191,7 +194,10 @@ export class Unit extends GameObject {
                 if (tile.dirt > 0 || tile.ore > 0) {
                     return "You can only build a ladder on an empty tile.";
                 }
-                else if (this.buildingMaterials < this.game.ladderCost) {
+                if (tile.isLadder) {
+                    return "This tile already has a ladder!";
+                }
+                if (this.buildingMaterials < this.game.ladderCost) {
                     return "You don't have enough building materials to build a ladder";
                 }
                 break;
@@ -345,41 +351,55 @@ export class Unit extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>
+        let trueAmount = amount;
         if ((tile.isHopper || tile.isBase) && material === `ore`) {
-            player.money += amount * this.game.oreValue;
-            player.value += amount * this.game.oreValue;
-            this.ore -= amount;
+            if (amount <= 0) {
+                trueAmount = this.ore;
+            }
+            player.money += trueAmount * this.game.oreValue;
+            player.value += trueAmount * this.game.oreValue;
+            this.ore -= trueAmount;
         }
 
         else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
-            player.money += amount;
+            if (amount <= 0) {
+                trueAmount = this.dirt;
+            }
+            player.money += trueAmount;
             // Dirt grants no value
-            this.dirt -= amount;
+            this.dirt -= trueAmount;
         }
 
         else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
-            player.bombs += amount;
-            this.bombs -= amount;
+            player.bombs += trueAmount;
+            this.bombs -= trueAmount;
         }
 
         else {
             if (material === `dirt`) {
-                tile.dirt += amount;
-                this.dirt -= amount;
+                tile.dirt += trueAmount;
+                this.dirt -= trueAmount;
             }
 
             if (material === `ore`) {
-                tile.ore += amount;
-                this.ore -= amount;
+                tile.ore += trueAmount;
+                this.ore -= trueAmount;
             }
 
             if (material === `bomb`) {
-                const bomb = this.game.manager.create.unit({
-                    job: this.game.jobs[1],
-                    tile,
-                });
-                tile.units.push(bomb);
-                this.bombs -= amount;
+                if (amount <= 0) {
+                    trueAmount = this.bombs;
+                }
+                for (let i = 0; i < trueAmount; i++) {
+                    const bomb = this.game.manager.create.unit({
+                        job: this.game.jobs[1],
+                        tile,
+                    });
+                    this.game.units.push(bomb);
+                    player.units.push(bomb);
+                    tile.units.push(bomb);
+                }
+                this.bombs -= trueAmount;
             }
         }
 
@@ -461,37 +481,44 @@ export class Unit extends GameObject {
         // block support is on
 
         let amountLeft = amount;
-        const currentLoad = (this.bombs * this.game.bombSize)
+        if (amountLeft <= 0) {
+            amountLeft = tile.ore + tile.dirt;
+        }
+        let currentLoad = (this.bombs * this.game.bombSize)
         + this.buildingMaterials + this.dirt + this.ore;
 
-        if (tile.dirt > 0) {
-            const actualDirtAmount = Math.min(
-            tile.dirt, this.miningPower, this.maxCargoCapacity - currentLoad);
-
-            tile.dirt -= actualDirtAmount;
-            this.dirt += actualDirtAmount;
-            amountLeft -= actualDirtAmount;
-        }
-
-        if (tile.ore > 0 && amountLeft > 0) {
+        if (tile.ore > 0) {
             const actualOreAmount = Math.min(
             tile.ore, this.miningPower, this.maxCargoCapacity - currentLoad);
             tile.ore -= actualOreAmount;
             this.ore += actualOreAmount;
         }
 
+        if (tile.dirt > 0 && amountLeft > 0) {
+            const actualDirtAmount = Math.min(
+                tile.dirt, this.miningPower, this.maxCargoCapacity - currentLoad);
+
+            tile.dirt -= actualDirtAmount;
+            this.dirt += actualDirtAmount;
+            amountLeft -= actualDirtAmount;
+            currentLoad += actualDirtAmount;
+        }
+
         // Check if mined tile is still filled
         if (tile.ore + tile.dirt <= 0) {
-            // Check if any tiles are going to fall
-            if (tile.tileNorth !== undefined) {
+            // Check if any tiles are potentially going to fall
+            if (tile.tileNorth !== undefined && tile.tileNorth.ore + tile.tileNorth.dirt > 0) {
                 this.game.fallingTiles.push(tile.tileNorth);
+                tile.isFalling = true;
             }
 
             // Check if unit is going to fall
             if (this.tile) {
                 if (this.tile.tileSouth && this.tile.tileSouth === tile) {
                     // Fall logic
-                    while (this.tile.tileSouth !== undefined && this.tile.ore + this.tile.dirt <= 0) {
+                    while (this.tile.tileSouth !== undefined &&
+                        this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
+                        !this.tile.tileSouth.isLadder) {
                         this.tile.units.splice(this.tile.units.indexOf(this), 1);
                         this.tile = this.tile.tileSouth;
                         this.tile.units.push(this);
@@ -533,12 +560,12 @@ export class Unit extends GameObject {
         }
 
         if (this.tile !== tile.tileEast && this.tile !== tile.tileWest &&
-            this.tile !== tile.tileSouth && this.tile !== tile.tileNorth) {
+            this.tile !== tile.tileSouth && this.tile !== tile.tileNorth && this.tile !== tile) {
             return `${this} cannot teleport yet! This unit can only move to adjacent tiles.`;
         }
 
         if (this.tile.dirt + this.tile.ore > 0) {
-            return `${this} is buried! This unit is stuck, and must dig itself out.`;
+            return `${this} is buried in ${this.tile}! This unit is stuck, and must dig itself out.`;
         }
 
         if (tile.dirt + tile.ore > 0) {
@@ -564,6 +591,11 @@ export class Unit extends GameObject {
             throw new Error(`${this} has no Tile to move from!`);
         }
 
+        // Moving in place (could happen after falling)
+        if (this.tile === tile) {
+            return true;
+        }
+
         this.tile.units.splice(this.tile.units.indexOf(this), 1);
         this.tile = tile;
         tile.units.push(this);
@@ -571,7 +603,8 @@ export class Unit extends GameObject {
 
         // Fall logic
         let distance = 0;
-        while (this.tile.tileSouth !== undefined && this.tile.ore + this.tile.dirt <= 0) {
+        while (this.tile.tileSouth !== undefined && this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
+            !this.tile.tileSouth.isLadder) {
             this.tile.units.splice(this.tile.units.indexOf(this), 1);
             this.tile = this.tile.tileSouth;
             this.tile.units.push(this);

@@ -24,19 +24,22 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             bombCost: {
                 description: "The price of buying a bomb.",
                 // <<-- Creer-Merge: bombCost -->>
-                default: 0,
+                default: 50,
+                min: 1,
                 // <<-- /Creer-Merge: bombCost -->>
             },
             bombSize: {
                 description: "The amount of cargo space taken up by a bomb.",
                 // <<-- Creer-Merge: bombSize -->>
-                default: 0,
+                default: 10,
+                min: 1,
                 // <<-- /Creer-Merge: bombSize -->>
             },
             buildingMaterialCost: {
                 description: "The price of buying building materials.",
                 // <<-- Creer-Merge: buildingMaterialCost -->>
-                default: 0,
+                default: 1,
+                min: 1,
                 // <<-- /Creer-Merge: buildingMaterialCost -->>
             },
             freeBombInterval: {
@@ -51,7 +54,8 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of building material required to "
                            + "build a ladder.",
                 // <<-- Creer-Merge: ladderCost -->>
-                default: 0,
+                default: 5,
+                min: 1,
                 // <<-- /Creer-Merge: ladderCost -->>
             },
             oreValue: {
@@ -66,38 +70,44 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of building material required to "
                            + "shield a Tile.",
                 // <<-- Creer-Merge: shieldCost -->>
-                default: 0,
+                default: 5,
+                min: 1,
                 // <<-- /Creer-Merge: shieldCost -->>
             },
             supportCost: {
                 description: "The amount of building material required to "
                            + "build a support.",
                 // <<-- Creer-Merge: supportCost -->>
-                default: 0,
+                default: 5,
+                min: 1,
                 // <<-- /Creer-Merge: supportCost -->>
             },
             upgradeCargoCapacityCost: {
                 description: "The cost to upgrade a Unit's cargo capacity.",
                 // <<-- Creer-Merge: upgradeCargoCapacityCost -->>
                 default: 500,
+                min: 1,
                 // <<-- /Creer-Merge: upgradeCargoCapacityCost -->>
             },
             upgradeHealthCost: {
                 description: "The cost to upgrade a Unit's health.",
                 // <<-- Creer-Merge: upgradeHealthCost -->>
                 default: 500,
+                min: 1,
                 // <<-- /Creer-Merge: upgradeHealthCost -->>
             },
             upgradeMiningPowerCost: {
                 description: "The cost to upgrade a Unit's mining power.",
                 // <<-- Creer-Merge: upgradeMiningPowerCost -->>
                 default: 500,
+                min: 1,
                 // <<-- /Creer-Merge: upgradeMiningPowerCost -->>
             },
             upgradeMovesCost: {
                 description: "The cost to upgrade a Unit's movement speed.",
                 // <<-- Creer-Merge: upgradeMovesCost -->>
                 default: 500,
+                min: 1,
                 // <<-- /Creer-Merge: upgradeMovesCost -->>
             },
             victoryAmount: {
@@ -137,7 +147,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
-                default: 200,
+                default: 500,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description: "The maximum number of turns before the game is force ended and a winner is determined.",

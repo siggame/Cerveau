@@ -183,8 +183,11 @@ export class CoreminerGame extends BaseClasses.Game {
         this.createMap();
 
         for (const player of this.players) {
-            player.money = this.jobs[0].cost * 2;
+            player.money = this.jobs[0].cost * 4;
         }
+
+        // Strangely, this starts undefined
+        this.fallingTiles = [];
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -287,7 +290,11 @@ export class CoreminerGame extends BaseClasses.Game {
         }
 
         // Define amount of dirt per Tile in each layer
-        const layerDirtDensities = [25, 75, 225, 500];
+        const layerDirtDensities = [25, 50, 100, 200];
+
+        // Define amount of ore per ore Tile per layer
+        // Should be less than dirt density in respective layer
+        const layerOreDensities = [10, 25, 50, 125];
 
         // Generate layer map for one side
         // Also set one Player's base
@@ -363,9 +370,6 @@ export class CoreminerGame extends BaseClasses.Game {
         const layerOreCounts: number[] = [0.07, 0.10, 0.15, 0.20]
         .map((c, i) => Math.round(c * layerRows[i].length * side));
 
-        // Define amount of ore per ore Tile per layer
-        const layerOreDensities = [50, 100, 200, 300];
-
         // Define influence values for biases per layer
         // Must be between 0 and 1 (weak to strong)
         const layerInfluences = [0.1, 0.2, 0.4, 0.8];
@@ -373,7 +377,7 @@ export class CoreminerGame extends BaseClasses.Game {
         // Generate cache of ore in the center of the map
         const cacheLayer = layerRows[layerRows.length - 1];
         const cacheOreCount = 10;
-        const cacheOreDensity = 500;
+        const cacheOreDensity = 250;
         const cacheWidth = 0.9; // Only spawns where x >= 100*cacheWidth% of the side
         const cacheXBias = 1;
         const cacheYBias = 0.8;
@@ -403,7 +407,7 @@ export class CoreminerGame extends BaseClasses.Game {
                 const oreAmount = layerOreDensities[i];
 
                 chosenTile.ore = oreAmount;
-                chosenTile.dirt = 0;
+                chosenTile.dirt -= oreAmount;
 
                 layerRows[i][randomY].splice(randomX, 1);
 

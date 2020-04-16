@@ -244,6 +244,7 @@ export class Tile extends GameObject implements BaseTile {
 
         player.money -= this.game.jobs[0].cost;
 
+        this.game.units.push(newUnit);
         player.units.push(newUnit);
         this.units.push(newUnit);
 
