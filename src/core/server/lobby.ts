@@ -459,7 +459,8 @@ ${err}`);
         const rooms = this.rooms.get(gameName);
 
         if (!rooms) {
-            return `Game name ${gameName} is not known to us.`;
+            return `Game name '${gameName}' is not a valid game name.
+Cannot put you in a room for a game we don't host.`;
         }
 
         let room: Room | undefined;
@@ -493,7 +494,7 @@ ${err}`);
         if (room) {
             if (room.isRunning()) {
                 // We can't put them in this game, so they get a new room.
-                return `Room ${id} for game ${gameName} is full! Sorry.`;
+                return `Room '${id}' for game '${gameName}' is full! Sorry.`;
             }
             else if (room.isOver()) {
                 // We need to clear out this Room as it's over and available
