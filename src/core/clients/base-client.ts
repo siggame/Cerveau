@@ -277,17 +277,23 @@ export class BaseClient {
 
         /** Flag for if meta deltas should be sent instead of normal deltas */
         metaDeltas?: boolean;
+
+        /** Flag to indicate if the client is a spectator */
+        spectating?: boolean;
     }): void {
         this.ourName = info.name || DEFAULT_STR;
         this.ourProgrammingLanguageType = info.type || DEFAULT_STR;
         this.ourPlayerIndex = info.index;
         this.sendMetaDeltas = Boolean(info.metaDeltas);
+        if (info.spectating !== undefined) {
+            this.isSpectating = info.spectating;
+        }
 
         if (this.ourName.length > 80) {
             // We don't want players to be able to use stupidly long names.
             // so here's a limit of 80 characters.
 
-            this.ourName = `${this.ourProgrammingLanguageType} Player`;
+            this.ourName = "Name Too Long Player";
             // If people start cheesing this too and sending a "fake"
             // programming language, then we might want to hard code a list of
             // known languages and make sure it is valid here too.

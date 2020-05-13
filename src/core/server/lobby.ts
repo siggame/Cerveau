@@ -601,6 +601,7 @@ Cannot put you in a room for a game we don't host.`;
                 ? undefined
                 : playData.playerIndex,
             metaDeltas: playData.metaDeltas || false,
+            spectating: playData.spectating || false,
         });
 
         room.addClient(client);
