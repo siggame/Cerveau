@@ -1,7 +1,7 @@
 import { ServerEvent } from "@cadre/ts-utils/cadre";
 import * as ClientEvents from "@cadre/ts-utils/cadre/events/client";
 import * as net from "net";
-import { Event, events, Signal } from "ts-typed-events";
+import { Event, events } from "ts-typed-events";
 import { Config } from "~/core/config";
 import { BaseAIManager, BasePlayer } from "~/core/game/";
 import { logger } from "~/core/logger";
@@ -18,8 +18,8 @@ const DEFAULT_STR = "Unknown";
 export class BaseClient {
     /** All events this client can do. */
     public readonly events = events({
-        disconnected: new Signal(),
-        timedOut: new Signal(),
+        disconnected: new Event(),
+        timedOut: new Event(),
     });
 
     /** The events clients emit (send). */
@@ -379,7 +379,7 @@ export class BaseClient {
             return;
         }
 
-        const event = this.sent[jsonData.event];
+        const event = (this.sent as {[eventName: string]: undefined | Event<unknown>})[jsonData.event];
         if (!event) {
             this.disconnect(`Sent unknown event '${jsonData.event}'.`);
 

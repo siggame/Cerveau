@@ -1,5 +1,5 @@
 import { IGamelog, IGamelogWinnerLoser } from "@cadre/ts-utils/cadre";
-import { events, Signal } from "ts-typed-events";
+import { Event, events } from "ts-typed-events";
 import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
        } from "~/core/game";
 import { logger } from "~/core/logger";
@@ -14,7 +14,7 @@ import { Updater } from "../updater";
 export abstract class Room {
     /** The events emitted from this room. */
     public readonly events = events({
-        over: new Signal(),
+        over: new Event(),
     });
 
     /**

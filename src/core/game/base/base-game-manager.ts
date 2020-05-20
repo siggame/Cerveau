@@ -1,4 +1,4 @@
-import { Event, Signal } from "ts-typed-events";
+import { Event } from "ts-typed-events";
 import { BasePlayingClient } from "~/core/clients/";
 import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
@@ -72,7 +72,7 @@ export class BaseGameManager {
         playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,
         sessionID: string,
-        gameStarted: Signal,
+        gameStarted: Event,
         private readonly gameOverCallback: () => void,
     ) {
         const settings = settingsManager.values;

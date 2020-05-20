@@ -2,7 +2,7 @@ import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "@cadre/
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
-import { Event, events, Signal } from "ts-typed-events";
+import { Event, events } from "ts-typed-events";
 import { Profiler } from "v8-profiler"; // should be safe as it's from @types
 import { BaseClient, BasePlayingClient, IClientInfo } from "~/core/clients";
 import { Config } from "~/core/config";
@@ -50,13 +50,13 @@ export class Session {
     /** The events this Session emits. */
     public readonly events = events({
         /** Emitted once everything is setup and the game should start */
-        start: new Signal(),
+        start: new Event(),
 
         /**
          * Emitted once the game is over, however not before the session is
          * over and the gamelog is ready.
          */
-        gameOver: new Signal(),
+        gameOver: new Event(),
 
         /** Emitted once this session is over and we can be deleted. */
         ended: new Event<Error | ISessionEnded>(),
@@ -185,7 +185,7 @@ export class Session {
             this.startTimeout(args.gameSettingsManager);
         }
 
-        const started = new Signal();
+        const started = new Event();
 
         this.gameManager = new args.gameNamespace.GameManager(
             args.gameNamespace,

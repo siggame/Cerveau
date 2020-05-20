@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { events, Signal } from "ts-typed-events";
+import { Event, events } from "ts-typed-events";
 import { httpRequest, isObject, safelyParseJSON } from "~/utils";
 import { logger } from "./logger";
 
@@ -12,7 +12,7 @@ const GITHUB_URL = "https://api.github.com/repos/siggame/cerveau/commits";
 export class Updater {
     /** The events that this Updater emits */
     public readonly events = events({
-        updateFound: new Signal(),
+        updateFound: new Event(),
     });
 
     /** Our current sha hash of the git repo we are running inside of. */
