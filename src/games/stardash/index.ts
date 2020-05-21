@@ -8,13 +8,24 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,11 +34,10 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Stardash game
  * must implement from mixed in game logic.
  */
-export interface IBaseStardashPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface IBaseStardashPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -85,7 +95,12 @@ export interface IBodyProperties {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+    materialType?:
+        | "none"
+        | "genarium"
+        | "rarium"
+        | "legendarium"
+        | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -106,7 +121,6 @@ export interface IBodyProperties {
      * The y value this celestial body is on.
      */
     y?: number;
-
 }
 
 /**
@@ -154,8 +168,7 @@ export interface IBodySpawnArgs {
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Job. */
 export interface IJobProperties {
@@ -199,7 +212,6 @@ export interface IJobProperties {
      * How much money it costs to spawn a unit.
      */
     unitCost?: number;
-
 }
 
 /** All the possible properties for an Player. */
@@ -271,7 +283,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Projectile. */
@@ -305,7 +316,6 @@ export interface IProjectileProperties {
      * The y value this projectile is on.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an Unit. */
@@ -394,7 +404,6 @@ export interface IUnitProperties {
      * The y value this unit is on.
      */
     y?: number;
-
 }
 
 /**
@@ -549,9 +558,7 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Body hooked up in the game and ready for you to use.
      */
-    public body<T extends BodyArgs>(
-        args: Readonly<T>,
-    ): Body & T {
+    public body<T extends BodyArgs>(args: Readonly<T>): Body & T {
         return this.createGameObject("Body", Body, args);
     }
 
@@ -562,9 +569,7 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -589,12 +594,9 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -617,12 +619,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new StardashGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -766,8 +766,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Body: {
             parentClassName: "GameObject",
@@ -783,7 +782,13 @@ export const Namespace = makeNamespace({
                 materialType: {
                     typeName: "string",
                     defaultValue: "none",
-                    literals: ["none", "genarium", "rarium", "legendarium", "mythicite"],
+                    literals: [
+                        "none",
+                        "genarium",
+                        "rarium",
+                        "legendarium",
+                        "mythicite",
+                    ],
                 },
                 owner: {
                     typeName: "gameObject",
@@ -900,14 +905,19 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "corvette",
-                    literals: ["corvette", "missileboat", "martyr", "transport", "miner"],
+                    literals: [
+                        "corvette",
+                        "missileboat",
+                        "martyr",
+                        "transport",
+                        "miner",
+                    ],
                 },
                 unitCost: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -966,8 +976,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Projectile: {
             parentClassName: "GameObject",
@@ -995,8 +1004,7 @@ export const Namespace = makeNamespace({
                     typeName: "float",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1163,7 +1171,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "genarium",
-                            literals: ["genarium", "rarium", "legendarium", "mythicite"],
+                            literals: [
+                                "genarium",
+                                "rarium",
+                                "legendarium",
+                                "mythicite",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1174,5 +1187,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "0fa378e83ac567ebdf3e9805d3f130023f936e2740acda173d238b37f2b5d541",
+    gameVersion:
+        "0fa378e83ac567ebdf3e9805d3f130023f936e2740acda173d238b37f2b5d541",
 });

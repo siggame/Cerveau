@@ -5,7 +5,7 @@ import { SHARED_CONSTANTS } from "~/core/constants";
 import { logger } from "~/core/logger";
 import { getDirs, Immutable, isNil, UnknownObject } from "~/utils";
 import { BaseClient, TCPClient, WSClient } from "../clients";
-import { GamelogManager, IBaseGameNamespace } from "../game";
+import { GamelogManager, BaseGameNamespace } from "../game";
 import { Updater } from "../updater";
 import { Room } from "./lobby-room";
 import { SerialRoom } from "./lobby-room-serial";
@@ -19,17 +19,15 @@ import { join } from "path";
 import * as querystring from "querystring";
 import * as readline from "readline";
 import { sanitizeNumber } from "~/core/sanitize";
-import { IGamesExport } from "~/core/server/games-export";
+import { GamesExport } from "~/core/server/games-export";
 
 const ws = larkWebsocket as typeof net;
 
 const GAMES_DIR = join(__dirname, "../../games/");
 
-const RoomClass = Config.SINGLE_THREADED
-    ? SerialRoom
-    : ThreadedRoom;
+const RoomClass = Config.SINGLE_THREADED ? SerialRoom : ThreadedRoom;
 
-/** Play data from a play event validated */
+/** Play data from a play event validated. */
 type ValidatedPlayData = PlayEvent["data"] & {
     /** The game settings for the play event validated and thus possibly changed. */
     validGameSettings: UnknownObject;
@@ -52,7 +50,7 @@ export class Lobby {
      *
      * @returns The Lobby singleton.
      */
-    public static getInstance(): Lobby { // tslint:disable-line:function-name
+    public static getInstance(): Lobby {
         if (!Lobby.instance) {
             Lobby.instance = new Lobby();
         }
@@ -67,7 +65,10 @@ export class Lobby {
     public readonly gamesInitializedPromise: Promise<void>;
 
     /** All the namespaces for games we can play, indexed by gameName. */
-    public readonly gameNamespaces = new Map<string, Immutable<IBaseGameNamespace>>();
+    public readonly gameNamespaces = new Map<
+        string,
+        Immutable<BaseGameNamespace>
+    >();
 
     /** The logger instance that manages game logs. */
     public readonly gamelogManager = new GamelogManager();
@@ -104,11 +105,12 @@ export class Lobby {
      * There should only be 1 Lobby per program running at a time.
      */
     private constructor() {
-        this.gamesInitializedPromise = new Promise<void>(async (resolve) => {
+        this.gamesInitializedPromise = (async () => {
             // Purposely wait for games to initialize before listeners
             await this.initializeGames();
 
-            await Promise.all([ // so they can initialize asynchronously
+            await Promise.all([
+                // so they can initialize asynchronously
                 this.initializeListener(
                     Config.TCP_PORT,
                     net.createServer,
@@ -122,9 +124,7 @@ export class Lobby {
             ]);
 
             logger.info("🎉 Everything is ready! 🎉");
-
-            resolve();
-        }).catch((err) => {
+        })().catch((err) => {
             logger.error("Fatal exception initializing games!");
             logger.error(String(err));
             process.exit(1); // kills the entire game server
@@ -150,11 +150,11 @@ export class Lobby {
     }
 
     /**
-     * Gets the session for gameAlias and session id, if it exists
+     * Gets the session for gameAlias and session id, if it exists.
      *
-     * @param gameAlias - The name alias of the game for this session
-     * @param id - the session id of the gameName
-     * @returns the session, if found
+     * @param gameAlias - The name alias of the game for this session.
+     * @param id - The session id of the gameName.
+     * @returns The session, if found.
      */
     public getRoom(gameAlias: string, id: string): Room | Error | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
@@ -163,29 +163,32 @@ export class Lobby {
             if (rooms) {
                 return rooms.get(id);
             }
-        }
-        else {
-            return new Error(`Game name '${gameAlias}' is not a valid game alias.`);
+        } else {
+            return new Error(
+                `Game name '${gameAlias}' is not a valid game alias.`,
+            );
         }
     }
 
     /**
-     * Gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers"
+     * Gets the actual name of an alias for a game, e.g. "checkers" -> "Checkers".
      *
-     * @param gameAlias - an alias for the game, not case sensitive
-     * @returns the actual game name of the aliased game, or undefined if not valid
+     * @param gameAlias - An alias for the game, not case sensitive.
+     * @returns The actual game name of the aliased game, or undefined if not valid.
      */
     public getGameNameForAlias(gameAlias: string): string | undefined {
         return this.gameAliasToName.get(gameAlias.toLowerCase());
     }
 
     /**
-     * Gets the game class (constructor) for a given game alias
+     * Gets the game class (constructor) for a given game alias.
      *
-     * @param gameAlias - an alias for the game you want
-     * @returns the game class constructor, if found
+     * @param gameAlias - An alias for the game you want.
+     * @returns The game class constructor, if found.
      */
-    public getGameNamespace(gameAlias: string): Immutable<IBaseGameNamespace> | undefined {
+    public getGameNamespace(
+        gameAlias: string,
+    ): Immutable<BaseGameNamespace> | undefined {
         const gameName = this.getGameNameForAlias(gameAlias);
         if (gameName) {
             return this.gameNamespaces.get(gameName);
@@ -196,17 +199,21 @@ export class Lobby {
      * Tries to set up a Room for private arena play with clients.
      *
      * @param data - Data about the Room to setup with.
+     * @param data.gameAlias - An alias of the game name to setup.
+     * @param data.gameSettings - The key value settings for the game.
+     * @param data.password - The password to get into the Room.
+     * @param data.session - Session id string to reserve.
      * @returns An error string if it could not be validated, otherwise
      * undefined if no error and the Room was successfully created.
      */
     public setup(data: {
-        /** The game alias to setup, does not need to be the unique name */
+        /** The game alias to setup, does not need to be the unique name. */
         gameAlias: string;
-        /** Key/value pairs of the game settings for said game */
+        /** Key/value pairs of the game settings for said game. */
         gameSettings: Immutable<UnknownObject>;
-        /** Optional password to password protect the setup room */
+        /** Optional password to password protect the setup room. */
         password?: string;
-        /** Session id string to reserve */
+        /** Session id string to reserve. */
         session: string;
     }): string | undefined {
         const namespace = this.getGameNamespace(data.gameAlias);
@@ -223,10 +230,7 @@ export class Lobby {
         }
 
         // Now get the room
-        const existingRoom = this.getRoom(
-            namespace.gameName,
-            data.session,
-        );
+        const existingRoom = this.getRoom(namespace.gameName, data.session);
 
         if (existingRoom instanceof Error) {
             return existingRoom.message;
@@ -237,10 +241,7 @@ export class Lobby {
         }
 
         // We now know the Room can be created safely.
-        const room = this.getOrCreateRoom(
-            data.gameAlias,
-            data.session,
-        );
+        const room = this.getOrCreateRoom(data.gameAlias, data.session);
 
         if (typeof room === "string") {
             // error string, this should not happen but did, pass it upstream
@@ -273,12 +274,16 @@ export class Lobby {
         for (const gameName of Array.from(this.rooms.keys()).sort()) {
             const roomForGameName = this.rooms.get(gameName);
             if (!roomForGameName) {
-                throw new Error(`Cannot get rooms for game name '${gameName}'.`);
+                throw new Error(
+                    `Cannot get rooms for game name '${gameName}'.`,
+                );
             }
             for (const id of Array.from(roomForGameName.keys()).sort()) {
                 const room = roomForGameName.get(id);
                 if (!room) {
-                    throw new Error(`Cannot get room for game name '${gameName}' of id '${id}'.`);
+                    throw new Error(
+                        `Cannot get room for game name '${gameName}' of id '${id}'.`,
+                    );
                 }
 
                 if (!room.isOver()) {
@@ -291,13 +296,16 @@ export class Lobby {
     }
 
     /**
-     * Invoked when a client disconnects from the lobby
+     * Invoked when a client disconnects from the lobby.
      *
-     * @param client - the client that disconnected
-     * @param reason the reason the client disconnected, if we know why
-     *               (e.g. timed out)
+     * @param client - The client that disconnected.
+     * @param _reason - The reason the client disconnected, if we know why (e.g. Timed out).
      */
-    private clientDisconnected(client: BaseClient, reason?: string): void {
+    private clientDisconnected(
+        client: BaseClient,
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        _reason?: string,
+    ): void {
         this.clients.delete(client);
 
         const room = this.clientsRoom.get(client);
@@ -324,18 +332,26 @@ export class Lobby {
     }
 
     /**
-     * Adds a socket of some client class as a proper Client type
-     * @param socket the socket to bind the Client around
-     * @param clientClass the class constructor of the Client class
+     * Adds a socket of some client class as a proper Client type.
+     *
+     * @param socket - The socket to bind the Client around.
+     * @param clientClass - The class constructor of the Client class.
      */
-    private addSocket(socket: net.Socket, clientClass: typeof BaseClient): void {
+    private addSocket(
+        socket: net.Socket,
+        clientClass: typeof BaseClient,
+    ): void {
         const client = new clientClass(socket);
         this.clients.add(client);
 
         client.sent.alias.on((data) => this.clientSentAlias(client, data));
         client.sent.play.on((data) => this.clientSentPlay(client, data));
-        client.events.disconnected.on(() => this.clientDisconnected(client, "Disconnected unexpectedly"));
-        client.events.timedOut.on(() => this.clientDisconnected(client, "Timed out"));
+        client.events.disconnected.on(() =>
+            this.clientDisconnected(client, "Disconnected unexpectedly"),
+        );
+        client.events.timedOut.on(() =>
+            this.clientDisconnected(client, "Timed out"),
+        );
     }
 
     /**
@@ -361,23 +377,32 @@ export class Lobby {
 
         this.listenerServers.push(listener);
 
-        listener.on("error", (err: Error & {
-            /** Optional error code Node adds to some error events */
-            code?: string;
-        }) => {
-            logger.error(err.code !== "EADDRINUSE" // Very common error for devs
-                ? String(err)
-                : `Lobby cannot listen on port ${port} for game connections.
+        listener.on(
+            "error",
+            (
+                err: Error & {
+                    /** Optional error code Node adds to some error events. */
+                    code?: string;
+                },
+            ) => {
+                logger.error(
+                    err.code !== "EADDRINUSE" // Very common error for devs
+                        ? String(err)
+                        : `Lobby cannot listen on port ${port} for game connections.
 Address is already in use.
 
-There's probably another Cerveau server running on this same computer.`);
+There's probably another Cerveau server running on this same computer.`,
+                );
 
-            process.exit(1);
-        });
+                process.exit(1);
+            },
+        );
 
         return new Promise((resolve) => {
             listener.listen(port, "0.0.0.0", () => {
-                logger.info(`📞 Listening on port ${port} for ${clientName}s 📞`);
+                logger.info(
+                    `📞 Listening on port ${port} for ${clientName}s 📞`,
+                );
 
                 resolve();
             });
@@ -399,9 +424,11 @@ There's probably another Cerveau server running on this same computer.`);
 
             const unknownGameNames = difference(gameDirs, dirs);
             if (unknownGameNames.length > 0) {
-                throw new Error(`Cannot find directories to load for the selected games: ${
-                    unknownGameNames.map((name) => `"${capitalize(name)}"`).join(", ")
-                }`);
+                throw new Error(
+                    `Cannot find directories to load for the selected games: ${unknownGameNames
+                        .map((name) => `"${capitalize(name)}"`)
+                        .join(", ")}`,
+                );
             }
 
             // The selected game directories look fine! load them instead.
@@ -409,12 +436,11 @@ There's probably another Cerveau server running on this same computer.`);
         }
 
         for (const dir of dirs) {
-            let gameNamespace: Immutable<IBaseGameNamespace> | undefined;
+            let gameNamespace: Immutable<BaseGameNamespace> | undefined;
             try {
-                const data = await import(GAMES_DIR + dir) as IGamesExport;
+                const data = (await import(GAMES_DIR + dir)) as GamesExport;
                 gameNamespace = data.Namespace;
-            }
-            catch (err) {
+            } catch (err) {
                 const errorGameName = capitalize(dir);
                 throw new Error(`⚠️ Could not load game ${errorGameName} ⚠️
 ---
@@ -444,18 +470,18 @@ ${err}`);
      * want to play.
      *
      * @param gameName - The key identifying the name of the game you want.
-     * Should exist in games/
+     * Should exist in games/.
      * @param requestedId - Basically a room id. Specifying an id can be used
      * to join other players on purpose. "*" will join you to any open session
      * or a new one, and "new" will always give you a brand new room even if
      * there are open ones.
      * @returns The Room of gameName and id. If one does not exists a new
-     * instance will be created
+     * instance will be created.
      */
     private getOrCreateRoom(
         gameName: string,
-        requestedId: string = "*",
-    ): Room |string {
+        requestedId = "*",
+    ): Room | string {
         const rooms = this.rooms.get(gameName);
 
         if (!rooms) {
@@ -483,8 +509,7 @@ Cannot put you in a room for a game we don't host.`;
                     // so they get a new room.
                     id = "new";
                 }
-            }
-            else {
+            } else {
                 // They requested to join a specific room.
                 // An Error cannot be returned as gameName is checked above
                 room = this.getRoom(gameName, id) as Room | undefined;
@@ -495,8 +520,7 @@ Cannot put you in a room for a game we don't host.`;
             if (room.isRunning()) {
                 // We can't put them in this game, so they get a new room.
                 return `Room '${id}' for game '${gameName}' is full! Sorry.`;
-            }
-            else if (room.isOver()) {
+            } else if (room.isOver()) {
                 // We need to clear out this Room as it's over and available
                 // to re-use.
                 this.rooms.delete(id);
@@ -533,7 +557,7 @@ Cannot put you in a room for a game we don't host.`;
      * When a client sends the 'play' event, which tells the server what it
      * wants to play and as who.
      *
-     * @param client - The client that send the 'play' event
+     * @param client - The client that send the 'play' event.
      * @param data - The information about what this client wants to play.
      */
     private async clientSentPlay(
@@ -556,18 +580,22 @@ Cannot put you in a room for a game we don't host.`;
                 playData.playerName || "",
                 playData.password || "",
             );
-        }
-        catch (error) {
+        } catch (error) {
             authenticationError = (error as Error).message;
         }
 
         if (authenticationError) {
-            client.disconnect(`Authentication Error: '${authenticationError}'`);
+            client.disconnect(
+                `Authentication Error: '${authenticationError}'`,
+            );
 
             return;
         }
 
-        const room = this.getOrCreateRoom(data.gameName, data.requestedSession || undefined);
+        const room = this.getOrCreateRoom(
+            data.gameName,
+            data.requestedSession || undefined,
+        );
 
         if (typeof room === "string") {
             client.disconnect(room);
@@ -584,11 +612,17 @@ Cannot put you in a room for a game we don't host.`;
         // We need to check to make sure they did not request an already
         // requested player index.
         if (!isNil(playData.playerIndex)) {
-            if (room.clients.find((c) => c.playerIndex === playData.playerIndex)) {
+            if (
+                room.clients.find(
+                    (c) => c.playerIndex === playData.playerIndex,
+                )
+            ) {
                 // Then there is already a client in this room that requested
                 // this player index so the existing client gets the index,
                 // and this client gets rejected
-                client.disconnect(`Player index ${playData.playerIndex} is already taken`);
+                client.disconnect(
+                    `Player index ${playData.playerIndex} is already taken`,
+                );
 
                 return;
             }
@@ -616,7 +650,8 @@ Cannot put you in a room for a game we don't host.`;
             event: "lobbied",
             data: {
                 gameName: data.gameName,
-                gameVersion: gameNamespace && gameNamespace.gameVersion || "",
+                gameVersion:
+                    (gameNamespace && gameNamespace.gameVersion) || "",
                 gameSession: room.id,
                 constants: SHARED_CONSTANTS,
             },
@@ -625,10 +660,14 @@ Cannot put you in a room for a game we don't host.`;
         if (room.canStart()) {
             this.unTrackClients(...room.clients);
 
-            const roomsPlayingThisGame = this.roomsPlaying.get(playData.gameName);
+            const roomsPlayingThisGame = this.roomsPlaying.get(
+                playData.gameName,
+            );
             const roomsForThisGame = this.rooms.get(playData.gameName);
             if (!roomsPlayingThisGame || !roomsForThisGame) {
-                throw new Error(`Could not find rooms for ${data.gameName} to start`);
+                throw new Error(
+                    `Could not find rooms for ${data.gameName} to start`,
+                );
             }
             roomsPlayingThisGame.set(room.id, room);
 
@@ -636,7 +675,9 @@ Cannot put you in a room for a game we don't host.`;
                 roomsPlayingThisGame.delete(room.id);
 
                 if (this.isShuttingDown && this.roomsPlaying.size === 0) {
-                    logger.info("Final game session exited. Shutdown complete.");
+                    logger.info(
+                        "Final game session exited. Shutdown complete.",
+                    );
                     process.exit(0);
                 }
             });
@@ -653,8 +694,9 @@ Cannot put you in a room for a game we don't host.`;
      * @param playerName - The name of the player wanting to play.
      * @param password - The password they are trying to use. Not encrypted or
      * anything fancy like that. Plaintext.
-     * @returns A promise that resolves to either error text is they
+     * @returns A promise that resolves to either error text is they.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     private async authenticate(
         gameName: string,
         playerName: string,
@@ -664,7 +706,6 @@ Cannot put you in a room for a game we don't host.`;
             return undefined; // we do not need to authenticate them
         }
 
-        // tslint:disable-next-line:possible-timing-attack - passwords are in no way crypto-safe in Cerveau
         if (Config.AUTH_PASSWORD !== password) {
             return `Could not authenticate.
 '${password} is not a valid password to play on this server'`;
@@ -703,17 +744,18 @@ Cannot put you in a room for a game we don't host.`;
         const gameNamespace = this.getGameNamespace(gameAlias);
         if (!gameNamespace) {
             return `Game alias '${data.gameName}' is not a known game.`;
-        }
-        else {
+        } else {
             validatedData.gameName = gameNamespace.gameName;
         }
 
         // Special case for backwards compatibility.
         // -1 is treated as if they didn't care about their playerIndex
-        if (validatedData.playerIndex === -1 || isNil(validatedData.playerIndex)) {
+        if (
+            validatedData.playerIndex === -1 ||
+            isNil(validatedData.playerIndex)
+        ) {
             validatedData.playerIndex = undefined;
-        }
-        else {
+        } else {
             const asNumber = sanitizeNumber(validatedData.playerIndex, true);
             if (asNumber instanceof Error) {
                 return `playerIndex is not valid: ${asNumber.message}`;
@@ -722,8 +764,9 @@ Cannot put you in a room for a game we don't host.`;
         }
 
         const n = gameNamespace.GameManager.requiredNumberOfPlayers;
-        if (validatedData.playerIndex !== undefined
-            && (validatedData.playerIndex < 0 || validatedData.playerIndex >= n)
+        if (
+            validatedData.playerIndex !== undefined &&
+            (validatedData.playerIndex < 0 || validatedData.playerIndex >= n)
         ) {
             return `playerIndex '${validatedData.playerIndex}' is out of range (max ${n} players).
 Please use zero-based indexing, where '0' is the first player.`;
@@ -739,18 +782,19 @@ ${gameNamespace.gameSettingsManager.getHelp()}`;
             let settings: UnknownObject = {};
             try {
                 settings = querystring.parse(data.gameSettings);
-            }
-            catch (err) {
+            } catch (err) {
                 return `Game settings incorrectly formatted.
 Must be one string in the url parameters format.${footer}`;
             }
 
             // remove [] from keys for array setting names
-            settings = mapKeys(settings, (value, key) => key.endsWith("[]")
-                ? key.substr(0, key.length - 2)
-                : key);
+            settings = mapKeys(settings, (value, key) =>
+                key.endsWith("[]") ? key.substr(0, key.length - 2) : key,
+            );
 
-            const validated = gameNamespace.gameSettingsManager.invalidateSettings(settings);
+            const validated = gameNamespace.gameSettingsManager.invalidateSettings(
+                settings,
+            );
             if (validated instanceof Error) {
                 return validated.message + footer;
             }
@@ -767,17 +811,14 @@ Must be one string in the url parameters format.${footer}`;
      *
      * @param client - The client that send the 'play'.
      * @param alias - The alias they want named.
-     * @returns A promise that is resolved once we've sent the client their
-     * 'named' gameName.
      */
-    private async clientSentAlias(
-        client: BaseClient,
-        alias: string,
-    ): Promise<void> {
+    private clientSentAlias(client: BaseClient, alias: string): void {
         const gameName = this.getGameNameForAlias(alias);
 
         if (!gameName) {
-            client.disconnect(`${alias} is not a known game alias for any game.`);
+            client.disconnect(
+                `${alias} is not a known game alias for any game.`,
+            );
 
             return;
         }
@@ -786,9 +827,9 @@ Must be one string in the url parameters format.${footer}`;
     }
 
     /**
-     * Stops tracking clients
+     * Stops tracking clients.
      *
-     * @param clients the clients to stop tracking events for
+     * @param clients - The clients to stop tracking events for.
      */
     private unTrackClients(...clients: BaseClient[]): void {
         for (const client of clients) {
@@ -814,9 +855,10 @@ Must be one string in the url parameters format.${footer}`;
             this.isShuttingDown = true;
             logger.info("🔚 Shutting down gracefully 🔚");
 
-            const n = Array
-                .from(this.roomsPlaying)
-                .reduce((sum, [, rooms]) => sum + rooms.size, 0);
+            const n = Array.from(this.roomsPlaying).reduce(
+                (sum, [, rooms]) => sum + rooms.size,
+                0,
+            );
 
             logger.info(`   ${n} game${n !== 1 ? "s" : ""} currently running`);
             if (n === 0) {
@@ -827,23 +869,28 @@ Must be one string in the url parameters format.${footer}`;
                 // Tell all clients we are shutting down, and asynchronously
                 // wait for the socket to confirm the data was sent before
                 // proceeding.
-                await Promise.all([...this.clients].map((client) => (
-                    client.disconnect("Sorry, the server is shutting down.")
-                )));
-            }
-            catch (rejection) {
+                await Promise.all(
+                    [...this.clients].map((client) =>
+                        client.disconnect(
+                            "Sorry, the server is shutting down.",
+                        ),
+                    ),
+                );
+            } catch (rejection) {
                 // We don't care.
             }
 
             if (n > 0) {
-                logger.info("     Waiting for them to exit before shutting down.");
-                logger.info("     ^C again to force shutdown, which force disconnects clients.");
-            }
-            else {
+                logger.info(
+                    "     Waiting for them to exit before shutting down.",
+                );
+                logger.info(
+                    "     ^C again to force shutdown, which force disconnects clients.",
+                );
+            } else {
                 process.exit(0);
             }
-        }
-        else {
+        } else {
             logger.info("╘ Force shutting down.");
             process.exit(0);
         }

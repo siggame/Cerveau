@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BuildingArgs, IWarehouseIgniteArgs, IWarehouseProperties } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
@@ -41,12 +41,15 @@ export class Warehouse extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<BuildingArgs & IWarehouseProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            BuildingArgs &
+                IWarehouseProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -116,7 +119,11 @@ export class Warehouse extends Building {
     ): Promise<number> {
         // <<-- Creer-Merge: ignite -->>
 
-        building.fire = clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
+        building.fire = clamp(
+            building.fire + this.fireAdded,
+            0,
+            this.game.maxFire,
+        );
         const exposure = manhattanDistance(this, building);
         this.exposure += exposure; // Do we want a cap on this?
 

@@ -21,7 +21,7 @@ import { sanitizeString } from "./sanitize-string";
 export function sanitizeType(
     type: Immutable<ISanitizableType>,
     obj: unknown,
-    allowError: boolean = true,
+    allowError = true,
 ): unknown {
     let value: unknown;
 
@@ -44,7 +44,7 @@ export function sanitizeType(
         case "string":
             value = sanitizeString(obj, allowError);
             break;
-        case "dictionary":
+        case "dictionary": {
             const asObj = sanitizeObject(obj, allowError);
             if (asObj instanceof Error) {
                 return asObj;
@@ -59,14 +59,15 @@ export function sanitizeType(
             }
             value = asObj;
             break;
-        case "list":
+        }
+        case "list": {
             const asArray = sanitizeArray(obj, allowError);
             if (asArray instanceof Error) {
                 return asArray;
             }
 
             // Re-use the array because it may be one of our Proxy wrapped
-            // arrays, otherwise map() would be prefered
+            // arrays, otherwise map() would be preferred
             for (let i = 0; i < asArray.length; i++) {
                 asArray[i] = sanitizeType(
                     type.valueType,
@@ -75,6 +76,7 @@ export function sanitizeType(
                 );
             }
             break;
+        }
         case "gameObject": // assume game object
             value = sanitizeGameObject(obj, type.gameObjectClass, allowError);
             break;
@@ -82,23 +84,25 @@ export function sanitizeType(
             throw new Error(`Sanitizing unknown type ${type}.`);
     }
 
-    if ((
-        type.typeName === "string" ||
-        type.typeName === "float" ||
-        type.typeName === "int" ||
-        type.typeName === "boolean"
-    ) && type.literals) {
+    if (
+        (type.typeName === "string" ||
+            type.typeName === "float" ||
+            type.typeName === "int" ||
+            type.typeName === "boolean") &&
+        type.literals
+    ) {
         const literals = type.literals;
-        let found = literals.includes(value as (boolean | number | string));
+        let found = literals.includes(value as boolean | number | string);
 
         if (!found && type.typeName === "string") {
             // Try to see if the string is found via a case-insensitive
             // search.
             const lowered = (value as string).toLowerCase();
-            const matchingLiteral = literals.find((literal) =>
-                (literal as string).toLowerCase() === lowered,
+            const matchingLiteral = literals.find(
+                (literal) => (literal as string).toLowerCase() === lowered,
             );
-            if (matchingLiteral !== undefined) { // we found it!
+            if (matchingLiteral !== undefined) {
+                // we found it!
                 found = true;
                 value = matchingLiteral;
             }
@@ -107,10 +111,12 @@ export function sanitizeType(
         if (!found) {
             if (allowError) {
                 // the value they sent was not one of the literals
-                return new Error(`${value} is not an expected value from literals [${literals.join(", ")}]`,
+                return new Error(
+                    `${value} is not an expected value from literals [${literals.join(
+                        ", ",
+                    )}]`,
                 );
-            }
-            else {
+            } else {
                 // Couldn't be found at all, default to first literal value.
                 return literals[0];
             }

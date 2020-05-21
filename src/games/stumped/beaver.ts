@@ -1,7 +1,13 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBeaverAttackArgs, IBeaverBuildLodgeArgs, IBeaverDropArgs,
-         IBeaverHarvestArgs, IBeaverMoveArgs, IBeaverPickupArgs,
-         IBeaverProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IBeaverAttackArgs,
+    IBeaverBuildLodgeArgs,
+    IBeaverDropArgs,
+    IBeaverHarvestArgs,
+    IBeaverMoveArgs,
+    IBeaverPickupArgs,
+    IBeaverProperties,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -82,17 +88,19 @@ export class Beaver extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IBeaverProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Job of this Beaver. */
-            job: Job;
-            /** The controlling Player of this Beaver. */
-            owner: Player;
-            /** The Tile to spawn this Beaver upon. */
-            tile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IBeaverProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The Job of this Beaver. */
+                job: Job;
+                /** The controlling Player of this Beaver. */
+                owner: Player;
+                /** The Tile to spawn this Beaver upon. */
+                tile: Tile;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -179,7 +187,8 @@ export class Beaver extends GameObject {
 
         // If the beaver is already distracted, keep that value, otherwise they
         // get distracted by this attack
-        beaver.turnsDistracted = beaver.turnsDistracted || this.job.distractionPower;
+        beaver.turnsDistracted =
+            beaver.turnsDistracted || this.job.distractionPower;
         this.actions--;
 
         // Check if the enemy beaver died.
@@ -229,7 +238,7 @@ export class Beaver extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if ((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
+        if (this.branches + this.tile.branches < player.branchesToBuildLodge) {
             return `${this} does not have enough branches to build the lodge.`;
         }
 
@@ -254,7 +263,9 @@ export class Beaver extends GameObject {
         // <<-- Creer-Merge: buildLodge -->>
 
         if (!this.tile) {
-            throw new Error(`${this} is not on a tile but is trying to build a lodge!`);
+            throw new Error(
+                `${this} is not on a tile but is trying to build a lodge!`,
+            );
         }
 
         // Overcharge tile's branches
@@ -312,9 +323,7 @@ export class Beaver extends GameObject {
         }
 
         // transform the amount if they passed in a number =< 0
-        const actualAmount = amount <= 0
-            ? this[resource]
-            : amount;
+        const actualAmount = amount <= 0 ? this[resource] : amount;
 
         if (actualAmount <= 0) {
             return `${this} cannot drop ${actualAmount} of ${resource}`;
@@ -435,20 +444,15 @@ export class Beaver extends GameObject {
 
         const load = this.food + this.branches;
         const spaceAvailable = this.job.carryLimit - load;
-        const skillScalar = spawner.type === "branches"
-            ? this.job.chopping
-            : this.job.munching;
+        const skillScalar =
+            spawner.type === "branches"
+                ? this.job.chopping
+                : this.job.munching;
 
-        const maxCanHarvest = (
-            this.game.spawnerHarvestConstant *
-            spawner.health *
-            skillScalar
-        );
+        const maxCanHarvest =
+            this.game.spawnerHarvestConstant * spawner.health * skillScalar;
 
-        this[spawner.type] += Math.min(
-            spaceAvailable,
-            maxCanHarvest,
-        );
+        this[spawner.type] += Math.min(spaceAvailable, maxCanHarvest);
         this.actions--;
 
         // damage the spawner because we harvested from it
@@ -612,9 +616,8 @@ export class Beaver extends GameObject {
         const spaceAvailable = this.job.carryLimit - this.branches - this.food;
 
         // Transform the amount if they passed in a number =< 0
-        const actualAmount = amount <= 0
-            ? Math.min(tile[resource], spaceAvailable)
-            : amount;
+        const actualAmount =
+            amount <= 0 ? Math.min(tile[resource], spaceAvailable) : amount;
 
         if (actualAmount <= 0) {
             return `${this} cannot pick up ${actualAmount} of ${resource}`;
@@ -626,8 +629,8 @@ export class Beaver extends GameObject {
 
         if (actualAmount > spaceAvailable) {
             return (
-                `${this} cannot carry ${actualAmount} of ${resource} because it `
-                + `only can carry ${spaceAvailable} more resources`
+                `${this} cannot carry ${actualAmount} of ${resource} because it ` +
+                `only can carry ${spaceAvailable} more resources`
             );
         }
 

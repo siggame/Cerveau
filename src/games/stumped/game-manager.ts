@@ -47,8 +47,8 @@ export class StumpedGameManager extends BaseClasses.GameManager {
         // and empty out the `this.newBeavers` array as they are no longer new and have been added above
         this.game.newBeavers.length = 0;
 
-         // Clone of array so we can remove them from the actual array and not
-         // fuck up loop iteration
+        // Clone of array so we can remove them from the actual array and not
+        // fuck up loop iteration
         const allBeavers = this.game.beavers.slice();
         // remove all beavers from the game that died
         for (const beaver of allBeavers) {
@@ -56,8 +56,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 // poor beaver died, remove it from arrays
                 removeElements(beaver.owner.beavers, beaver);
                 removeElements(this.game.beavers, beaver);
-            }
-            else if (beaver.tile) {
+            } else if (beaver.tile) {
                 beaver.tile.beaver = beaver;
             }
         }
@@ -125,7 +124,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
 
         const players = this.game.players.slice();
         const extinctPlayers = players.filter(
-            (p) => (p.beavers.length === 0 && p.lodges.length === 0),
+            (p) => p.beavers.length === 0 && p.lodges.length === 0,
         );
 
         if (extinctPlayers.length > 0) {
@@ -135,12 +134,17 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 this.secondaryWinConditions(
                     "Both Players exterminated on the same turn",
                 );
-            }
-            else {
+            } else {
                 // all exterminated players lost
                 const loser = extinctPlayers[0];
-                this.declareWinner("Drove opponent to extinction", loser.opponent);
-                this.declareLoser("Extinct - All Beavers and lodges destroyed", loser);
+                this.declareWinner(
+                    "Drove opponent to extinction",
+                    loser.opponent,
+                );
+                this.declareLoser(
+                    "Extinct - All Beavers and lodges destroyed",
+                    loser,
+                );
                 this.endGame();
             }
 
@@ -159,13 +163,18 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                     this.secondaryWinConditions(
                         "Lodges complete on the same round",
                     );
-                }
-                else {
+                } else {
                     // someone won
                     const winner = players[0];
                     const loser = players[1];
-                    this.declareWinner(`Reached ${winner.lodges.length}/${this.game.lodgesToWin} lodges!`, winner);
-                    this.declareLoser("Less lodges than winner who reached completed all lodges", loser);
+                    this.declareWinner(
+                        `Reached ${winner.lodges.length}/${this.game.lodgesToWin} lodges!`,
+                        winner,
+                    );
+                    this.declareLoser(
+                        "Less lodges than winner who reached completed all lodges",
+                        loser,
+                    );
                     this.endGame();
                 }
 
@@ -187,15 +196,18 @@ export class StumpedGameManager extends BaseClasses.GameManager {
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
 
-        const players = this.game.players.slice().sort(
-            (p1, p2) => p2.lodges.length - p1.lodges.length,
-        );
+        const players = this.game.players
+            .slice()
+            .sort((p1, p2) => p2.lodges.length - p1.lodges.length);
 
         // check if someone won by having more lodges
         if (players[0].lodges.length !== players[1].lodges.length) {
             const winner = players[0];
             const loser = players[1];
-            this.declareWinner(`${reason} - Has the most lodges (${winner.lodges.length})`, winner);
+            this.declareWinner(
+                `${reason} - Has the most lodges (${winner.lodges.length})`,
+                winner,
+            );
             this.declareLoser(`${reason} - Less lodges than opponent`, loser);
 
             this.endGame();
@@ -211,10 +223,10 @@ export class StumpedGameManager extends BaseClasses.GameManager {
              * @param p - player to count for
              * @returns the count f resource
              */
-            const count = (p: Player) => (p.lodges
-                .map((m) => m[resource as "branches" | "food"])
-                .reduce((acc, val) => acc + val, 0)
-            );
+            const count = (p: Player) =>
+                p.lodges
+                    .map((m) => m[resource as "branches" | "food"])
+                    .reduce((acc, val) => acc + val, 0);
 
             const player0Count = count(players[0]);
             const player1Count = count(players[1]);
@@ -223,7 +235,10 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                 const winner = players[player0Count > player1Count ? 0 : 1];
                 const winnerCount = Math.max(player0Count, player1Count);
                 const looserCount = Math.min(player0Count, player1Count);
-                this.declareWinner(`${reason} - Has more ${resource} than opponent (${winnerCount})`, winner);
+                this.declareWinner(
+                    `${reason} - Has more ${resource} than opponent (${winnerCount})`,
+                    winner,
+                );
                 this.declareLoser(
                     `${reason} - Less ${resource} than winner (${looserCount})`,
                     winner.opponent,
@@ -265,12 +280,15 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      * Updates the resources by moving them down water and such
      */
     private updateResources(): void {
-        const newResources = new Map<Tile, {
-            /** The number of branches that will exist on this Tile key. */
-            branches: number;
-            /** The number of food that will exist on this Tile key */
-            food: number;
-        }>();
+        const newResources = new Map<
+            Tile,
+            {
+                /** The number of branches that will exist on this Tile key. */
+                branches: number;
+                /** The number of food that will exist on this Tile key */
+                food: number;
+            }
+        >();
 
         for (const tile of this.game.tiles) {
             // Keep resources here
@@ -283,7 +301,11 @@ export class StumpedGameManager extends BaseClasses.GameManager {
 
             let resources = newResources.get(tile);
 
-            if (!tile.lodgeOwner && tile.type === "water" && tile.flowDirection) {
+            if (
+                !tile.lodgeOwner &&
+                tile.type === "water" &&
+                tile.flowDirection
+            ) {
                 const nextTile = tile.getNeighbor(tile.flowDirection);
 
                 if (!nextTile) {
@@ -315,8 +337,9 @@ export class StumpedGameManager extends BaseClasses.GameManager {
                     if (tile.spawner.harvestCooldown === 0) {
                         tile.spawner.hasBeenHarvested = false;
                     }
-                }
-                else if (tile.spawner.health < this.game.settings.maxSpawnerHealth) {
+                } else if (
+                    tile.spawner.health < this.game.settings.maxSpawnerHealth
+                ) {
                     tile.spawner.health++;
                 }
             }

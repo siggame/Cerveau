@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IYoungGunCallInArgs, IYoungGunProperties } from "./";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
@@ -49,17 +49,19 @@ export class YoungGun extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IYoungGunProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The controlling Player of this YoungGun. */
-            owner: Player;
-            /** The Tile to spawn this YoungGun upon. */
-            tile: Tile;
-            /** The previous Tile he would have moved from, used to figure out movement direction. */
-            previousTile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IYoungGunProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The controlling Player of this YoungGun. */
+                owner: Player;
+                /** The Tile to spawn this YoungGun upon. */
+                tile: Tile;
+                /** The previous Tile he would have moved from, used to figure out movement direction. */
+                previousTile: Tile;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -83,14 +85,16 @@ export class YoungGun extends GameObject {
         // find the adjacent tile that they were not on last turn,
         //   this way all YoungGuns continue walking clockwise
         const tiles = this.tile.getNeighbors();
-        const moveTo = tiles.find((tile) => tile.isBalcony && this.previousTile !== tile);
+        const moveTo = tiles.find(
+            (tile) => tile.isBalcony && this.previousTile !== tile,
+        );
 
         if (!moveTo) {
             throw new Error(`${this} cannot move to a new Tile!`);
         }
 
         // do a quick BFS to find the callInTile
-        const searchTiles = [ moveTo ];
+        const searchTiles = [moveTo];
         const searched = new Set();
         while (searchTiles.length > 0) {
             const searchTile = searchTiles.shift() as Tile; // will exist because above check
@@ -98,10 +102,10 @@ export class YoungGun extends GameObject {
             if (!searched.has(searchTile)) {
                 searched.add(searchTile);
 
-                if (searchTile.isBalcony) { // add its neighbors to be searched
+                if (searchTile.isBalcony) {
+                    // add its neighbors to be searched
                     searchTiles.push(...searchTile.getNeighbors());
-                }
-                else {
+                } else {
                     this.callInTile = searchTile;
                     break; // we found it
                 }
@@ -138,7 +142,9 @@ export class YoungGun extends GameObject {
         }
 
         // make sure they are not trying to go above the limit
-        const count = this.owner.cowboys.filter((c) => c.job === job && !c.isDead).length;
+        const count = this.owner.cowboys.filter(
+            (c) => c.job === job && !c.isDead,
+        ).length;
         if (count >= this.game.maxCowboysPerJob) {
             return `You cannot call in any more '${job}' Cowboys (max of ${this.game.maxCowboysPerJob})`;
         }

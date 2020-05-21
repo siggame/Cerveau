@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IBottleProperties } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -62,13 +62,15 @@ export class Bottle extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IBottleProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Tile to spawn this Bottle upon. */
-            tile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IBottleProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The Tile to spawn this Bottle upon. */
+                tile: Tile;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

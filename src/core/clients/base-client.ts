@@ -54,10 +54,10 @@ export class BaseClient {
     public aiManager?: BaseAIManager;
 
     /** If this client wants to be sent meta deltas instead of normal deltas. */
-    public sendMetaDeltas: boolean = false;
+    public sendMetaDeltas = false;
 
     /** If this client is a spectator. */
-    public isSpectating: boolean = false;
+    public isSpectating = false;
 
     /** The socket this communicates through. */
     protected socket?: net.Socket;
@@ -71,18 +71,18 @@ export class BaseClient {
     } = {};
 
     /** If we are listening to our socket. */
-    private listening: boolean = false;
+    private listening = false;
 
     /** The listener callbacks for socket events. */
     private readonly listeners: {
         [key: string]: (data: unknown) => void | undefined;
     } = {};
 
-    /** True once we have disconnected from the socket */
-    private hasDisconnectedFromSocket: boolean = false;
+    /** True once we have disconnected from the socket. */
+    private hasDisconnectedFromSocket = false;
 
     /** Set to try if this client times out. */
-    private timedOut: boolean = false;
+    private timedOut = false;
 
     /** Our player in the game. */
     private ourPlayer?: BasePlayer;
@@ -97,10 +97,9 @@ export class BaseClient {
     private ourPlayerIndex?: number;
 
     /**
-     * Creates a client connected to a server
+     * Creates a client connected to a server.
      *
      * @param socket - The socket this client communicates through.
-     * @param server - The server this client is connected to.
      */
     constructor(socket: net.Socket) {
         this.socket = socket;
@@ -110,10 +109,10 @@ export class BaseClient {
         this.listeners[this.onDataEventName] = (data: unknown) => {
             this.onSocketData(data);
         };
-        this.listeners[this.onCloseEventName] = (data) => {
+        this.listeners[this.onCloseEventName] = () => {
             this.onSocketClose();
         };
-        this.listeners[this.onErrorEventName] = (data) => {
+        this.listeners[this.onErrorEventName] = () => {
             this.onSocketError();
         };
 
@@ -154,7 +153,7 @@ export class BaseClient {
      * @returns True if ticking, false otherwise.
      */
     public isTicking(): boolean {
-        return (this.timer.timeout !== undefined);
+        return this.timer.timeout !== undefined;
     }
 
     /**
@@ -212,7 +211,7 @@ export class BaseClient {
             this.timer.startTime = undefined;
 
             // high resolution time to only ns
-            const timeTaken = (timeDiff[0] * 1e9 + timeDiff[1]);
+            const timeTaken = timeDiff[0] * 1e9 + timeDiff[1];
             this.player.timeRemaining -= timeTaken;
         }
     }
@@ -263,22 +262,23 @@ export class BaseClient {
     /**
      * Sets the optional information about.
      *
-     * @param info - The name, language, and index of the client
+     * @param info - The name, language, and index of the client.
+     * @param info.name - Name of the clinet.
+     * @param info.type - Type of client (ws/tcp).
+     * @param info.index - Connection index of the client.
+     * @param info.metaDeltas - Flag for if meta deltas should be sent instead of normal deltas.
+     * @param info.spectating - Flag to indicate if the client is a spectator.
      */
     public setInfo(info: {
-        /** Name of the clinet */
+        /** Name of the clinet. */
         name?: string;
-
-        /** Type of client (ws/tcp) */
+        /** Type of client (ws/tcp). */
         type?: string;
-
-        /** Connection index of the client */
+        /** Connection index of the client. */
         index?: number;
-
-        /** Flag for if meta deltas should be sent instead of normal deltas */
+        /** Flag for if meta deltas should be sent instead of normal deltas. */
         metaDeltas?: boolean;
-
-        /** Flag to indicate if the client is a spectator */
+        /** Flag to indicate if the client is a spectator. */
         spectating?: boolean;
     }): void {
         this.ourName = info.name || DEFAULT_STR;
@@ -351,7 +351,7 @@ export class BaseClient {
     }
 
     /**
-     * Called when the client sends some data. the specific super class should
+     * Called when the client sends some data. The specific super class should
      * inherit and do stuff to this.
      *
      * @param data - What the client send via the socket event listener.
@@ -370,16 +370,19 @@ export class BaseClient {
      * @param jsonData - The data, as an already parsed json object.
      */
     protected handleSent(jsonData: unknown): void {
-        if (!isObject(jsonData)
-         || !objectHasProperty(jsonData, "event")
-         || typeof jsonData.event !== "string"
+        if (
+            !isObject(jsonData) ||
+            !objectHasProperty(jsonData, "event") ||
+            typeof jsonData.event !== "string"
         ) {
             this.disconnect("Sent malformed json event");
 
             return;
         }
 
-        const event = (this.sent as {[eventName: string]: undefined | Event<unknown>})[jsonData.event];
+        const event = (this.sent as {
+            [eventName: string]: undefined | Event<unknown>;
+        })[jsonData.event];
         if (!event) {
             this.disconnect(`Sent unknown event '${jsonData.event}'.`);
 
@@ -416,12 +419,10 @@ export class BaseClient {
 
         if (typeof json !== "string") {
             invalid = `Sent ${json}, which cannot be parsed.`;
-        }
-        else {
+        } else {
             try {
                 return JSON.parse(json) as Json;
-            }
-            catch (err) {
+            } catch (err) {
                 invalid = `Sent malformed JSON: '${String(err)}'`;
             }
         }
@@ -465,6 +466,8 @@ export class BaseClient {
         this.timedOut = true;
         this.pauseTicking();
         this.events.timedOut.emit();
-        this.disconnect("Your client has run out of time, and has been timed out.");
+        this.disconnect(
+            "Your client has run out of time, and has been timed out.",
+        );
     }
 }

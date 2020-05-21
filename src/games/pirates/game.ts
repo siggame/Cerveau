@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { PiratesGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -85,7 +85,7 @@ export class PiratesGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * How much health a Unit recovers when they rest.
@@ -202,7 +202,7 @@ export class PiratesGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: PiratesGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -211,8 +211,12 @@ export class PiratesGame extends BaseClasses.Game {
         this.generateMap();
 
         // Give players their starting gold
-        const startingGoldFromSettings = Math.max(this.settings.startingGold, 0);
-        const startingGold = startingGoldFromSettings || (this.crewCost + this.shipCost * 3);
+        const startingGoldFromSettings = Math.max(
+            this.settings.startingGold,
+            0,
+        );
+        const startingGold =
+            startingGoldFromSettings || this.crewCost + this.shipCost * 3;
         for (const player of this.players) {
             player.gold = startingGold;
         }
@@ -263,11 +267,15 @@ export class PiratesGame extends BaseClasses.Game {
 
             // Pick a meta-ball generator
             if (!arrayHasElements(ballGens)) {
-                throw new Error("Error loading ballGens for Piracy, appears to be empty.");
+                throw new Error(
+                    "Error loading ballGens for Piracy, appears to be empty.",
+                );
             }
 
             const ballGen = this.manager.random.element(ballGens);
-            const ballInfo = ballGen(this.mapWidth, this.mapHeight, () => this.manager.random.float());
+            const ballInfo = ballGen(this.mapWidth, this.mapHeight, () =>
+                this.manager.random.float(),
+            );
 
             // Generate the islands from the meta-balls
             for (let x = 0; x < this.mapWidth / 2; x++) {
@@ -276,8 +284,13 @@ export class PiratesGame extends BaseClasses.Game {
                     let energy = 0;
                     for (const ball of ballInfo.balls) {
                         const r = ball.r;
-                        const dist = Math.sqrt(Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2));
-                        const d = Math.max(0.0001, Math.pow(dist, ballInfo.gooeyness)); // Can't be 0
+                        const dist = Math.sqrt(
+                            Math.pow(ball.x - x, 2) + Math.pow(ball.y - y, 2),
+                        );
+                        const d = Math.max(
+                            0.0001,
+                            Math.pow(dist, ballInfo.gooeyness),
+                        ); // Can't be 0
                         energy += r / d;
                     }
 
@@ -286,8 +299,7 @@ export class PiratesGame extends BaseClasses.Game {
                         if (energy >= ballInfo.grassThreshold) {
                             tile.decoration = true;
                         }
-                    }
-                    else {
+                    } else {
                         tile.type = "water";
                         if (energy <= ballInfo.seaThreshold) {
                             tile.decoration = true;
@@ -316,38 +328,46 @@ export class PiratesGame extends BaseClasses.Game {
                 let water = 0;
                 if (t.tileNorth && t.tileNorth.type === "land") {
                     land = true;
-                }
-                else if (t.tileNorth) {
+                } else if (t.tileNorth) {
                     water += 1;
-                    if (t.tileNorth.tileEast && t.tileNorth.tileEast.type === "water") {
+                    if (
+                        t.tileNorth.tileEast &&
+                        t.tileNorth.tileEast.type === "water"
+                    ) {
                         water += 1;
                     }
-                    if (t.tileNorth.tileWest && t.tileNorth.tileWest.type === "water") {
+                    if (
+                        t.tileNorth.tileWest &&
+                        t.tileNorth.tileWest.type === "water"
+                    ) {
                         water += 1;
                     }
                 }
                 if (t.tileEast && t.tileEast.type === "land") {
                     land = true;
-                }
-                else if (t.tileEast) {
+                } else if (t.tileEast) {
                     water += 1;
                 }
                 if (t.tileSouth && t.tileSouth.type === "land") {
                     land = true;
-                }
-                else if (t.tileSouth) {
+                } else if (t.tileSouth) {
                     water += 1;
-                    if (t.tileSouth.tileEast && t.tileSouth.tileEast.type === "water") {
+                    if (
+                        t.tileSouth.tileEast &&
+                        t.tileSouth.tileEast.type === "water"
+                    ) {
                         water += 1;
                     }
-                    if (t.tileSouth.tileWest && t.tileSouth.tileWest.type === "water") {
+                    if (
+                        t.tileSouth.tileWest &&
+                        t.tileSouth.tileWest.type === "water"
+                    ) {
                         water += 1;
                     }
                 }
                 if (t.tileWest && t.tileWest.type === "land") {
                     land = true;
-                }
-                else if (t.tileWest) {
+                } else if (t.tileWest) {
                     water += 1;
                 }
 
@@ -377,7 +397,10 @@ export class PiratesGame extends BaseClasses.Game {
 
             // Find merchant port locations
             const merchantTiles = portTiles.filter(
-                (t) => Math.pow(t.x - port.tile.x, 2) + Math.pow(t.y - port.tile.y, 2) > 9,
+                (t) =>
+                    Math.pow(t.x - port.tile.x, 2) +
+                        Math.pow(t.y - port.tile.y, 2) >
+                    9,
             );
             if (!arrayHasElements(merchantTiles)) {
                 failed = true;
@@ -399,7 +422,10 @@ export class PiratesGame extends BaseClasses.Game {
         for (let x = 0; x < this.mapWidth / 2; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const orig = this.getTile(x, y);
-                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+                const target = this.getTile(
+                    this.mapWidth - x - 1,
+                    this.mapHeight - y - 1,
+                );
 
                 if (!orig || !target) {
                     throw new Error("Could not mirror the map!");
@@ -421,8 +447,7 @@ export class PiratesGame extends BaseClasses.Game {
 
                     if (port.owner) {
                         (port.owner as MutablePlayer).port = port;
-                    }
-                    else {
+                    } else {
                         // Stagger merchant ship spawning
                         port.gold += this.merchantGoldRate;
                     }
@@ -452,7 +477,7 @@ export class PiratesGame extends BaseClasses.Game {
 
             // Use BFS(ish) to find all the connected water
             const body: Tile[] = [];
-            const open: Tile[] = [ tile ];
+            const open: Tile[] = [tile];
             while (open.length > 0) {
                 const cur = open.shift() as Tile;
 

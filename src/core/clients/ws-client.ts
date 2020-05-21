@@ -1,38 +1,37 @@
 import * as ws from "lark-websocket";
 import * as net from "net";
-import { BaseClient } from "./base-client" ;
+import { BaseClient } from "./base-client";
 
 /** A client to the game server via a WS connection. */
 export class WSClient extends BaseClient {
-    /** The lark-websocket socket that semi-imitates net.Socket */
+    /** The lark-websocket socket that semi-imitates net.Socket. */
     // TODO: document lark-websocket
     protected socket?: net.Socket & {
-        /** The ACTUAL net.Socket */
+        /** The ACTUAL net.Socket. */
         _socket: net.Socket;
 
-        /** indicates if the connection is closed */
+        /** Indicates if the connection is closed. */
         readonly closed: boolean;
 
-        /** remove from net.Socket */
+        /** Remove from net.Socket. */
         write: never;
 
-        /** sends a string, use instead of write */
+        /** Sends a string, use instead of write. */
         send(str: string): void;
-
     };
 
     /**
      * Creates a client connected to a server.
      *
-     * @param socket The socket this client communicates through.
+     * @param socket - The socket this client communicates through.
      */
     constructor(socket: net.Socket) {
-        super(socket instanceof net.Socket
-            // hackish, we need to re - set socket before super is called,
-            // but the super method wants to be called first
-            // tslint:disable-next-line:no-unsafe-any
-            ? ws.createClient(socket) // then we need to create a websocket interface wrapped around this net.Socket
-            : socket, // normal socket fail through
+        super(
+            socket instanceof net.Socket
+                ? // hackish, we need to re - set socket before super is called,
+                  // but the super method wants to be called first
+                  ws.createClient(socket) // then we need to create a websocket interface wrapped around this net.Socket
+                : socket, // normal socket fail through
         );
     }
 
@@ -77,7 +76,7 @@ export class WSClient extends BaseClient {
     /**
      * Invoked when the tcp socket gets data.
      *
-     * @param data What the client send via the socket event listener.
+     * @param data - What the client send via the socket event listener.
      */
     protected onSocketData(data: unknown): void {
         super.onSocketData(data);
@@ -105,7 +104,7 @@ export class WSClient extends BaseClient {
     }
 
     /**
-     * Invoked when the other end of this socket disconnects
+     * Invoked when the other end of this socket disconnects.
      */
     protected disconnected(): void {
         if (this.socket) {

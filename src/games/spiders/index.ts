@@ -8,13 +8,24 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,11 +34,10 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Spiders game
  * must implement from mixed in game logic.
  */
-export interface IBaseSpidersPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface IBaseSpidersPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -81,7 +91,6 @@ export interface IBroodMotherProperties {
      * and her owner loses.
      */
     health?: number;
-
 }
 
 /**
@@ -116,7 +125,6 @@ export interface ICutterProperties {
      * The Web that this Cutter is trying to cut. Undefined if not cutting.
      */
     cuttingWeb?: Web;
-
 }
 
 /**
@@ -133,8 +141,7 @@ export interface ICutterCutArgs {
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Nest. */
 export interface INestProperties {
@@ -163,7 +170,6 @@ export interface INestProperties {
      * The Y coordinate of the Nest. Used for distance calculations.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an Player. */
@@ -228,7 +234,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Spider. */
@@ -248,7 +253,6 @@ export interface ISpiderProperties {
      * The Player that owns this Spider, and can command it.
      */
     owner?: Player;
-
 }
 
 /** All the possible properties for an Spiderling. */
@@ -257,7 +261,14 @@ export interface ISpiderlingProperties {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    busy?: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+    busy?:
+        | ""
+        | "Moving"
+        | "Attacking"
+        | "Strengthening"
+        | "Weakening"
+        | "Cutting"
+        | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -280,7 +291,6 @@ export interface ISpiderlingProperties {
      * See docs for the Work forumla.
      */
     workRemaining?: number;
-
 }
 
 /**
@@ -314,7 +324,6 @@ export interface ISpitterProperties {
      * them. Undefined if not spitting.
      */
     spittingWebToNest?: Nest;
-
 }
 
 /**
@@ -342,7 +351,6 @@ export interface IWeaverProperties {
      * The Web that this Weaver is weakening. Undefined if not weakening.
      */
     weakeningWeb?: Web;
-
 }
 
 /**
@@ -404,7 +412,6 @@ export interface IWebProperties {
      * and all the Spiders on it.
      */
     strength?: number;
-
 }
 
 export * from "./brood-mother";
@@ -487,9 +494,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cutter hooked up in the game and ready for you to use.
      */
-    public cutter<T extends CutterArgs>(
-        args: Readonly<T>,
-    ): Cutter & T {
+    public cutter<T extends CutterArgs>(args: Readonly<T>): Cutter & T {
         return this.createGameObject("Cutter", Cutter, args);
     }
 
@@ -500,9 +505,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
-    public nest<T extends NestArgs>(
-        args: Readonly<T>,
-    ): Nest & T {
+    public nest<T extends NestArgs>(args: Readonly<T>): Nest & T {
         return this.createGameObject("Nest", Nest, args);
     }
 
@@ -513,9 +516,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Spider hooked up in the game and ready for you to use.
      */
-    public spider<T extends SpiderArgs>(
-        args: Readonly<T>,
-    ): Spider & T {
+    public spider<T extends SpiderArgs>(args: Readonly<T>): Spider & T {
         return this.createGameObject("Spider", Spider, args);
     }
 
@@ -540,9 +541,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
-    public spitter<T extends SpitterArgs>(
-        args: Readonly<T>,
-    ): Spitter & T {
+    public spitter<T extends SpitterArgs>(args: Readonly<T>): Spitter & T {
         return this.createGameObject("Spitter", Spitter, args);
     }
 
@@ -553,9 +552,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Weaver hooked up in the game and ready for you to use.
      */
-    public weaver<T extends WeaverArgs>(
-        args: Readonly<T>,
-    ): Weaver & T {
+    public weaver<T extends WeaverArgs>(args: Readonly<T>): Weaver & T {
         return this.createGameObject("Weaver", Weaver, args);
     }
 
@@ -566,12 +563,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Web hooked up in the game and ready for you to use.
      */
-    public web<T extends WebArgs>(
-        args: Readonly<T>,
-    ): Web & T {
+    public web<T extends WebArgs>(args: Readonly<T>): Web & T {
         return this.createGameObject("Web", Web, args);
     }
-
 }
 
 /**
@@ -594,12 +588,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new SpidersGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -685,8 +677,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         BroodMother: {
             parentClassName: "Spider",
@@ -817,8 +808,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -869,8 +859,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spider: {
             parentClassName: "GameObject",
@@ -889,8 +878,7 @@ export const Namespace = makeNamespace({
                     nullable: false,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spiderling: {
             parentClassName: "Spider",
@@ -898,7 +886,15 @@ export const Namespace = makeNamespace({
                 busy: {
                     typeName: "string",
                     defaultValue: "",
-                    literals: ["", "Moving", "Attacking", "Strengthening", "Weakening", "Cutting", "Spitting"],
+                    literals: [
+                        "",
+                        "Moving",
+                        "Attacking",
+                        "Strengthening",
+                        "Weakening",
+                        "Cutting",
+                        "Spitting",
+                    ],
                 },
                 movingOnWeb: {
                     typeName: "gameObject",
@@ -1050,9 +1046,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "a8df6038306b6855bb35959d7698f8dcbf98f48e7e148de59fef940ccb241bdf",
+    gameVersion:
+        "a8df6038306b6855bb35959d7698f8dcbf98f48e7e148de59fef940ccb241bdf",
 });

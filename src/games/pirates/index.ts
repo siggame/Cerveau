@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Pirates game
  * must implement from mixed in game logic.
  */
-export interface IBasePiratesPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBasePiratesPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -72,8 +84,7 @@ export const BaseClasses = {
 // so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -137,7 +148,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Port. */
@@ -164,7 +174,6 @@ export interface IPortProperties {
      * The Tile this Port is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -240,7 +249,6 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an Unit. */
@@ -305,7 +313,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -381,8 +388,7 @@ export interface IUnitMoveArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitRestArgs {
-}
+export interface IUnitRestArgs {}
 
 /**
  * Argument overrides for Unit's split function. If you return an object of
@@ -459,9 +465,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public port<T extends PortArgs>(
-        args: Readonly<T>,
-    ): Port & T {
+    public port<T extends PortArgs>(args: Readonly<T>): Port & T {
         return this.createGameObject("Port", Port, args);
     }
 
@@ -472,9 +476,7 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -485,12 +487,9 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -513,12 +512,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new PiratesGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -642,8 +639,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -723,8 +719,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Port: {
             parentClassName: "GameObject",
@@ -814,8 +809,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -939,8 +933,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 rest: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -986,5 +979,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "d51fca49d06cb7164f9dbf9c3515ab0f9b5a17113a5946bddcc75aaba125967f",
+    gameVersion:
+        "d51fca49d06cb7164f9dbf9c3515ab0f9b5a17113a5946bddcc75aaba125967f",
 });

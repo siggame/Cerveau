@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IStructureProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -12,7 +12,12 @@ import { Tile } from "./tile";
  * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
  * 'neutral').
  */
-export type StructureType = "neutral" | "shelter" | "monument" | "wall" | "road";
+export type StructureType =
+    | "neutral"
+    | "shelter"
+    | "monument"
+    | "wall"
+    | "road";
 
 /**
  * A structure on a Tile.
@@ -44,7 +49,12 @@ export class Structure extends GameObject {
      * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
      * 'neutral').
      */
-    public readonly type!: "neutral" | "shelter" | "monument" | "wall" | "road";
+    public readonly type!:
+        | "neutral"
+        | "shelter"
+        | "monument"
+        | "wall"
+        | "road";
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -61,15 +71,17 @@ export class Structure extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IStructureProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Tile this Structure will be placed on. */
-            tile: Tile;
-            /** The type of structure it is. */
-            type: StructureType;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IStructureProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The Tile this Structure will be placed on. */
+                tile: Tile;
+                /** The type of structure it is. */
+                type: StructureType;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

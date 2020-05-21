@@ -1,4 +1,4 @@
-import { BasePlayer, IBaseGameObjectSchema } from "~/core/game";
+import { BasePlayer, BaseGameObjectSchema } from "~/core/game";
 import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { Immutable } from "~/utils";
 import { BaseGame } from "./base-game";
@@ -9,27 +9,28 @@ import { BaseGameManager } from "./base-game-manager";
 const MAX_LOG_LENGTH = 16 * 1024;
 
 /** The base game object data (empty). */
-export interface IBaseGameObjectData {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface BaseGameObjectData {
     // pass
 }
 
 /** Values required by all game objects to be initialized correctly. */
-export interface IBaseGameObjectRequiredData {
+export interface BaseGameObjectRequiredData {
     /** The id of the game object. */
     id: string;
-    /** The name of the class this GameObject is */
+    /** The name of the class this GameObject is. */
     gameObjectName: string;
     /** The delta mergeable used to track this game object's state. */
     gameObjectsDeltaMergeable: DeltaMergeable;
     /** The game this game object is in. */
     game: BaseGame;
     /** The schema used to validate everything inside the game object. */
-    schema: Immutable<IBaseGameObjectSchema>;
+    schema: Immutable<BaseGameObjectSchema>;
 }
 
 /**
  * The base object for any object in the game that will need to be tracked via
- * an ID, e.g. players, units, etc.
+ * an ID, e.g. Players, units, etc.
  */
 export class BaseGameObject extends BaseGameDeltaMergeables {
     /** The ID of the game object. */
@@ -41,7 +42,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
 
     /**
      * The game this game object is in.
-     * Inheriting classes should specify the sub game type
+     * Inheriting classes should specify the sub game type.
      */
     protected readonly game: BaseGame;
 
@@ -58,8 +59,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * the game, and set default values for the sub class.
      */
     constructor(
-        data: Immutable<IBaseGameObjectData>,
-        requiredData: Readonly<IBaseGameObjectRequiredData>,
+        data: Immutable<BaseGameObjectData>,
+        requiredData: Readonly<BaseGameObjectRequiredData>,
     ) {
         super({
             key: requiredData.id,
@@ -81,21 +82,23 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * String coercion override, handles players by default as every game has
      * them.
      *
-     * @returns formatted string for this name
+     * @returns Formatted string for this name.
      */
     public toString(): string {
         if (this.gameObjectName === "Player") {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
-            // tslint:disable-next-line:no-any
-            return `Player "${(this as any as BasePlayer).name}" #${this.id}`;
+            return `Player "${((this as unknown) as BasePlayer).name}" #${
+                this.id
+            }`;
         }
 
         return `${this.gameObjectName} #${this.id}`;
     }
 
     /**
-     * Logs a string to this BaseGameObject's log array, for debugging purposes.
+     * Logs a string to this BaseGameObject's log array, for debugging
+     * purposes.
      * This is called from a 'run' event.
      *
      * @param player - The player requesting to log the string to this game
@@ -106,10 +109,13 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
     protected invalidateLog(
         player: BasePlayer,
         message: string,
-    ): undefined | string | {
-        /** The new value of the validated message to use */
-        message?: string;
-    } {
+    ):
+        | undefined
+        | string
+        | {
+              /** The new value of the validated message to use. */
+              message?: string;
+          } {
         if (message.length > MAX_LOG_LENGTH) {
             return `Message is too long! Max ${MAX_LOG_LENGTH} per message.`;
         }

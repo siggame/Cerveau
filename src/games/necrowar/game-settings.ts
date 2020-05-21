@@ -14,7 +14,8 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -22,29 +23,33 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
 
             // Necrowar game specific settings
             goldIncomePerUnit: {
-                description: "The amount of gold income per turn per unit in a "
-                           + "mine.",
+                description:
+                    "The amount of gold income per turn per unit in a " +
+                    "mine.",
                 // <<-- Creer-Merge: goldIncomePerUnit -->>
                 default: 5,
                 // <<-- /Creer-Merge: goldIncomePerUnit -->>
             },
             islandIncomePerUnit: {
-                description: "The amount of gold income per turn per unit in "
-                           + "the island mine.",
+                description:
+                    "The amount of gold income per turn per unit in " +
+                    "the island mine.",
                 // <<-- Creer-Merge: islandIncomePerUnit -->>
                 default: 10,
                 // <<-- /Creer-Merge: islandIncomePerUnit -->>
             },
             manaIncomePerUnit: {
-                description: "The Amount of gold income per turn per unit "
-                           + "fishing on the river side.",
+                description:
+                    "The Amount of gold income per turn per unit " +
+                    "fishing on the river side.",
                 // <<-- Creer-Merge: manaIncomePerUnit -->>
                 default: 5,
                 // <<-- /Creer-Merge: manaIncomePerUnit -->>
             },
             riverPhase: {
-                description: "The amount of turns it takes between the river "
-                           + "changing phases.",
+                description:
+                    "The amount of turns it takes between the river " +
+                    "changing phases.",
                 // <<-- Creer-Merge: riverPhase -->>
                 default: 15,
                 // <<-- /Creer-Merge: riverPhase -->>
@@ -77,14 +82,16 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 250,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game is force ended and a winner is determined.",
             },
 
             // Tiled settings
@@ -93,16 +100,17 @@ export class NecrowarGameSettingsManager extends BaseClasses.GameSettings {
                 default: 63,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
-                description: "The width (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The width (in Tiles) for the game map to be initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
                 default: 32,
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
-                description: "The height (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The height (in Tiles) for the game map to be initialized to.",
             },
-
         });
     }
 

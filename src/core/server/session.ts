@@ -1,28 +1,38 @@
-import { Delta, IFinishedDelta, IGamelog, IOrderDelta, IRanDelta } from "@cadre/ts-utils/cadre";
+import {
+    Delta,
+    IFinishedDelta,
+    IGamelog,
+    IOrderDelta,
+    IRanDelta,
+} from "@cadre/ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
 import { join } from "path";
 import { Event, events } from "ts-typed-events";
 import { Profiler } from "v8-profiler"; // should be safe as it's from @types
-import { BaseClient, BasePlayingClient, IClientInfo } from "~/core/clients";
+import { BaseClient, BasePlayingClient, ClientInfo } from "~/core/clients";
 import { Config } from "~/core/config";
 import { BaseAIManager } from "~/core/game/base/base-ai-manager";
 import { BaseGame } from "~/core/game/base/base-game";
 import { BaseGameManager } from "~/core/game/base/base-game-manager";
-import { IBaseGameNamespace } from "~/core/game/base/base-game-namespace";
+import { BaseGameNamespace } from "~/core/game/base/base-game-namespace";
 import { BaseGameSanitizer } from "~/core/game/base/base-game-sanitizer";
 import { BaseGameSettingsManager } from "~/core/game/base/base-game-settings";
 import { DeltaManager } from "~/core/game/delta-manager";
 import { GamelogScribe } from "~/core/game/gamelog/gamelog-scribe";
-import { filenameFor, getURL, getVisualizerURL } from "~/core/game/gamelog/gamelog-utils";
+import {
+    filenameFor,
+    getURL,
+    getVisualizerURL,
+} from "~/core/game/gamelog/gamelog-utils";
 import { logger } from "~/core/logger";
 import { Immutable, isObjectEmpty, momentString } from "~/utils";
 
-/** Data about when a session ends */
-export interface ISessionEnded {
-    /** The clients as the game ended */
-    clientInfos: Immutable<IClientInfo[]>;
-    /** The gamelog resulting from the game */
+/** Data about when a session ends. */
+export interface SessionEnded {
+    /** The clients as the game ended. */
+    clientInfos: Immutable<ClientInfo[]>;
+    /** The gamelog resulting from the game. */
     gamelog: Immutable<IGamelog>;
 }
 
@@ -49,7 +59,7 @@ import("v8-profiler")
 export class Session {
     /** The events this Session emits. */
     public readonly events = events({
-        /** Emitted once everything is setup and the game should start */
+        /** Emitted once everything is setup and the game should start. */
         start: new Event(),
 
         /**
@@ -59,7 +69,7 @@ export class Session {
         gameOver: new Event(),
 
         /** Emitted once this session is over and we can be deleted. */
-        ended: new Event<Error | ISessionEnded>(),
+        ended: new Event<Error | SessionEnded>(),
 
         // -- Events proxies through from AIs in our game -- \\
         aiOrdered: new Event<Immutable<IOrderDelta["data"]>>(),
@@ -88,7 +98,7 @@ export class Session {
     private readonly gameManager: BaseGameManager;
 
     /** The namespace of the game we are running. */
-    private readonly gameNamespace: Immutable<IBaseGameNamespace>;
+    private readonly gameNamespace: Immutable<BaseGameNamespace>;
 
     /** The game we are running. The GameManager actually creates it. */
     private readonly game: BaseGame;
@@ -103,12 +113,16 @@ export class Session {
      * Initializes a new session with data to create and run the game.
      *
      * @param args - The initialization args required to hookup a game.
+     * @param args.id - The id of the session (room name).
+     * @param args.gameNamespace - The namespace of the game we are playing.
+     * @param args.gameSettingsManager - The settings for this game.
+     * @param args.clients - The clients in this game.
      */
     constructor(args: {
-        /** The id of this session. Passed around as session: string often */
+        /** The id of this session. Passed around as session: string often. */
         id: string;
-        /** The namespace of this game to create new instances from */
-        gameNamespace: Immutable<IBaseGameNamespace>;
+        /** The namespace of this game to create new instances from. */
+        gameNamespace: Immutable<BaseGameNamespace>;
         /** The already active game manager that holds AIs. */
         gameSettingsManager: BaseGameSettingsManager;
         /** The clients connected to this session. Includes spectators and players. */
@@ -127,8 +141,9 @@ export class Session {
         // NOTE: the game only knows about clients playing, this session will
         // care about spectators sending them deltas a such.
         // Therefore, the game never needs to know of their existence.
-        const nonSpectators = this.clients.
-            filter((c) => !c.isSpectating) as BasePlayingClient[];
+        const nonSpectators = this.clients.filter(
+            (c) => !c.isSpectating,
+        ) as BasePlayingClient[];
 
         const playingClients = new Array<BasePlayingClient>(n);
         const noIndexClients = [] as typeof nonSpectators;
@@ -136,8 +151,7 @@ export class Session {
             const index = client.playerIndex;
             if (index === undefined) {
                 noIndexClients.push(client);
-            }
-            else {
+            } else {
                 playingClients[index] = client;
             }
         }
@@ -224,31 +238,32 @@ export class Session {
      * When a fatal (unhandled) error occurs we need to exit and kill all
      * clients, and then end this session.
      *
-     * @param err - the unhandled error
-     * @returns once all the cleanup is done
+     * @param err - The unhandled error.
+     * @returns Once all the cleanup is done.
      */
     public async kill(err: Error | string): Promise<void> {
         logger.error(String(err));
-        const fatal = typeof err === "string"
-            ? new Error(err)
-            : err;
+        const fatal = typeof err === "string" ? new Error(err) : err;
 
         this.fatal = fatal;
 
-        await Promise.all([...this.clients].map((client) => {
-            return client.disconnect(
-`An unhandled fatal error occurred on the server:
+        await Promise.all(
+            [...this.clients].map((client) => {
+                return client.disconnect(
+                    `An unhandled fatal error occurred on the server:
 
 ${fatal.message}`,
-            );
-        }));
+                );
+            }),
+        );
 
         await this.end();
     }
 
     /**
-     * Called when the game ends, so that this thread "ends"
-     * @param gamelog The gamelog we made to send back to the master thread.
+     * Called when the game ends, so that this thread "ends".
+     *
+     * @param gamelog - The gamelog we made to send back to the master thread.
      */
     private async end(gamelog?: Readonly<IGamelog>): Promise<void> {
         if (this.timeout) {
@@ -266,17 +281,18 @@ ${fatal.message}`,
         const message = `${this.gameName} - ${this.id} is over.`;
         if (gamelog) {
             logger.info(message);
-        }
-        else {
+        } else {
             logger.warn(`${message} But no gamelog!`);
         }
 
-        this.events.ended.emit(this.fatal || (gamelog
-            ? {
-                gamelog,
-                clientInfos: this.getClientInfos(),
-            }
-            : new Error("No gamelog!")),
+        this.events.ended.emit(
+            this.fatal ||
+                (gamelog
+                    ? {
+                          gamelog,
+                          clientInfos: this.getClientInfos(),
+                      }
+                    : new Error("No gamelog!")),
         );
     }
 
@@ -287,7 +303,7 @@ ${fatal.message}`,
      * or immediately if no profiler is running.
      */
     private stopProfiler(): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (!Config.RUN_PROFILER || !profiler) {
                 resolve();
 
@@ -295,7 +311,12 @@ ${fatal.message}`,
             }
 
             const profile = profiler.stopProfiling();
-            profile.export((error, result) => {
+            profile.export((err, result) => {
+                if (err) {
+                    resolve();
+                    return;
+                }
+
                 const dateTime = momentString();
                 writeFile(
                     join(
@@ -304,7 +325,7 @@ ${fatal.message}`,
                         `${this.gameName}-${this.id}-${dateTime}.cpuprofile`,
                     ),
                     result,
-                    (err) => {
+                    () => {
                         profile.delete();
                         resolve();
                     },
@@ -320,7 +341,7 @@ ${fatal.message}`,
      * goes on too long. Useful for game servers hosted over long periods of
      * time so they clean up zombie sessions.
      *
-     * @param gameSettingsManager The game settings for this session
+     * @param gameSettingsManager - The game settings for this session.
      */
     private startTimeout(gameSettingsManager: BaseGameSettingsManager): void {
         const maxTimePerPlayer = gameSettingsManager.getMaxPlayerTime();
@@ -331,7 +352,7 @@ ${fatal.message}`,
         // can use accumulatively. However we need to account for server-side
         // processing time, so do a rough approximation and double it.
         // some padding for internal computations
-        let timeoutTime = (maxTime * 2) * 1e-6 + TIMEOUT_PADDING; // convert ns to ms
+        let timeoutTime = maxTime * 2 * 1e-6 + TIMEOUT_PADDING; // convert ns to ms
 
         if (timeoutTime <= 0) {
             // It is invalid, so they probably set a custom timeout time of 0,
@@ -352,16 +373,17 @@ ${fatal.message}`,
     /**
      * When the game state changes the clients need to know, and we need to
      * check if that game ended when its state changed.
-     * @param type - the type of delta that ocurred
-     * @param [data] - any additional data about what caused the delta
+     *
+     * @param delta - The Delta to send to all clients.
      */
     private readonly sendDeltas = (delta: Immutable<Delta>) => {
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
-                client.send(client.sendMetaDeltas
-                    ? { event: "meta-delta", data: delta }
-                    : { event: "delta", data: delta.game },
+                client.send(
+                    client.sendMetaDeltas
+                        ? { event: "meta-delta", data: delta }
+                        : { event: "delta", data: delta.game },
                 );
             }
         }
@@ -371,7 +393,7 @@ ${fatal.message}`,
             // the last delta was just sent above.
             this.gamelogScribe.events.logged.off(this.sendDeltas);
         }
-    }
+    };
 
     /**
      * Called when the game has ended (is over) and the clients need to know,
@@ -386,8 +408,9 @@ ${fatal.message}`,
         const gamelogURL = getURL(gamelogFilename);
 
         const visualizerURL = getVisualizerURL(gamelogFilename);
-        const message = visualizerURL &&
-`---
+        const message =
+            visualizerURL &&
+            `---
 Your gamelog is viewable at:
 ${visualizerURL}
 ---`;
@@ -407,22 +430,26 @@ ${visualizerURL}
      *
      * @returns A new array of client infos for soft client information.
      */
-    private getClientInfos(): IClientInfo[] {
+    private getClientInfos(): ClientInfo[] {
         return this.clients.map((client, index) => ({
             name: client.name,
             spectating: client.isSpectating,
 
             ...(client.player
                 ? {
-                    index,
-                    won: client.player.won,
-                    lost: client.player.lost,
-                    reason: client.player.reasonWon || client.player.reasonLost,
-                    disconnected: !client.player.won && client.hasDisconnected() || false,
-                    timedOut: !client.player.won && client.hasTimedOut() || false,
-                }
-                : null
-            ),
+                      index,
+                      won: client.player.won,
+                      lost: client.player.lost,
+                      reason:
+                          client.player.reasonWon || client.player.reasonLost,
+                      disconnected:
+                          (!client.player.won && client.hasDisconnected()) ||
+                          false,
+                      timedOut:
+                          (!client.player.won && client.hasTimedOut()) ||
+                          false,
+                  }
+                : null),
         }));
     }
 }

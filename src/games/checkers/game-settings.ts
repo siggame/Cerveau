@@ -14,7 +14,8 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -23,7 +24,7 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
             // Checkers game specific settings
             // <<-- Creer-Merge: schema -->>
 
-        /** The width of the board (in tiles). */
+            /** The width of the board (in tiles). */
             boardWidth: {
                 default: 8,
                 min: 2,
@@ -54,16 +55,17 @@ export class CheckersGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 200,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game is force ended and a winner is determined.",
             },
-
         });
     }
 

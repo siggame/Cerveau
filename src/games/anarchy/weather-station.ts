@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IWeatherStationIntensifyArgs, IWeatherStationProperties,
-         IWeatherStationRotateArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    BuildingArgs,
+    IWeatherStationIntensifyArgs,
+    IWeatherStationProperties,
+    IWeatherStationRotateArgs,
+} from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -27,12 +31,15 @@ export class WeatherStation extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<BuildingArgs & IWeatherStationProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            BuildingArgs &
+                IWeatherStationProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -77,9 +84,14 @@ export class WeatherStation extends Building {
         }
 
         // checks if the intensity is at maximum and trying to increase
-        if (!negative && this.game.nextForecast.intensity >= this.game.maxForecastIntensity) {
-            return `${this} cannot intensify the next Forecast `
-                + `${this.game.nextForecast} above ${this.game.maxForecastIntensity}.`;
+        if (
+            !negative &&
+            this.game.nextForecast.intensity >= this.game.maxForecastIntensity
+        ) {
+            return (
+                `${this} cannot intensify the next Forecast ` +
+                `${this.game.nextForecast} above ${this.game.maxForecastIntensity}.`
+            );
         }
 
         // checks if the intensity is at minimum and trying to decrease
@@ -105,10 +117,12 @@ export class WeatherStation extends Building {
         // <<-- Creer-Merge: intensify -->>
 
         if (!this.game.nextForecast) {
-            throw new Error("Intensify called when there is no next forecast!");
+            throw new Error(
+                "Intensify called when there is no next forecast!",
+            );
         }
 
-        this.game.nextForecast.intensity += (negative ? -1 : 1);
+        this.game.nextForecast.intensity += negative ? -1 : 1;
 
         this.bribed = true;
         player.bribesRemaining--;
@@ -166,16 +180,23 @@ export class WeatherStation extends Building {
         // <<-- Creer-Merge: rotate -->>
 
         if (!this.game.nextForecast) {
-            throw new Error("Intensify called when there is no next forecast!");
+            throw new Error(
+                "Intensify called when there is no next forecast!",
+            );
         }
 
         const wrapAround = counterclockwise
             ? getPreviousWrapAround
             : getNextWrapAround;
 
-        const direction = wrapAround(this.game.directions, this.game.nextForecast.direction);
+        const direction = wrapAround(
+            this.game.directions,
+            this.game.nextForecast.direction,
+        );
         if (!direction) {
-            throw new Error("No direction should never happen but TS is dumb at times");
+            throw new Error(
+                "No direction should never happen but TS is dumb at times",
+            );
         }
 
         this.game.nextForecast.direction = direction;

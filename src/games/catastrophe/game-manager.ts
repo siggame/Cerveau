@@ -1,7 +1,10 @@
 // This file is where you should put logic to control the game and everything
 // around it.
-import { BaseClasses, CatastropheGame, CatastropheGameObjectFactory,
-       } from "./";
+import {
+    BaseClasses,
+    CatastropheGame,
+    CatastropheGameObjectFactory,
+} from "./";
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
@@ -85,11 +88,12 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         // 1. enemy cats defeated
         players.sort((a, b) => b.cat.energy - a.cat.energy);
         if (players[0].cat.energy <= 0) {
-            this.secondaryWinConditions("Both players' cats defeated at the same time.");
+            this.secondaryWinConditions(
+                "Both players' cats defeated at the same time.",
+            );
 
             return true;
-        }
-        else if (players[1].cat.energy <= 0) {
+        } else if (players[1].cat.energy <= 0) {
             const winner = players.shift() as Player;
             this.declareWinner("Defeated opponent's cat!", winner);
             this.declareLosers("Cat died", ...players);
@@ -103,8 +107,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
             this.secondaryWinConditions("All units died for both players.");
 
             return true;
-        }
-        else if (players[1].units.length === 1) {
+        } else if (players[1].units.length === 1) {
             const winner = players.shift() as Player;
             this.declareWinner("Defeated all enemy humans!", winner);
             this.declareLosers("Humans died", ...players);
@@ -153,7 +156,10 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         if (players[0].structures.length > players[1].structures.length) {
             const winner = players.shift() as Player;
             this.declareWinner(`${reason}: Had the most structures`, winner);
-            this.declareLosers(`${reason}: Had the least structures`, ...players);
+            this.declareLosers(
+                `${reason}: Had the least structures`,
+                ...players,
+            );
 
             return;
         }
@@ -169,7 +175,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
 
     /** Updates all arrays in the game with new/dead game objects */
     private updateArrays(): void {
-         // Add new structures
+        // Add new structures
         for (const structure of this.game.newStructures) {
             this.game.structures.push(structure);
             if (structure.owner) {
@@ -240,8 +246,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
             if (unit.owner) {
                 // Add this unit's upkeep to the player's total upkeep
                 unit.owner.upkeep += unit.job.upkeep;
-            }
-            else {
+            } else {
                 // Neutral fresh humans
                 if (unit.turnsToDie > 0) {
                     unit.turnsToDie--;
@@ -250,7 +255,10 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
                 const target = unit.movementTarget;
                 if (target && unit.tile) {
                     // Move neutral fresh humans on the road
-                    const nextTile = this.game.getTile(unit.tile.x + Math.sign(target.x - unit.tile.x), unit.tile.y);
+                    const nextTile = this.game.getTile(
+                        unit.tile.x + Math.sign(target.x - unit.tile.x),
+                        unit.tile.y,
+                    );
                     if (nextTile && !nextTile.unit) {
                         unit.tile.unit = undefined;
                         nextTile.unit = unit;
@@ -285,12 +293,17 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
                     owner: undefined,
                     tile,
                     turnsToDie: this.game.mapWidth - tile.x,
-                    movementTarget: this.game.getTile(this.game.mapWidth - 1, this.game.mapHeight / 2 - 1),
+                    movementTarget: this.game.getTile(
+                        this.game.mapWidth - 1,
+                        this.game.mapHeight / 2 - 1,
+                    ),
                 });
                 unit.tile.unit = unit;
             }
-        }
-        else if (this.game.currentTurn % this.game.turnsToCreateHuman === 1) {
+        } else if (
+            this.game.currentTurn % this.game.turnsToCreateHuman ===
+            1
+        ) {
             let tile;
 
             // Search for a valid spawning tile
@@ -313,7 +326,10 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
                     owner: undefined,
                     tile,
                     turnsToDie: tile.x + 1,
-                    movementTarget: this.game.getTile(0, this.game.mapHeight / 2),
+                    movementTarget: this.game.getTile(
+                        0,
+                        this.game.mapHeight / 2,
+                    ),
                 });
                 unit.tile.unit = unit;
             }
@@ -322,8 +338,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         // Check if units are starving and update food
         if (this.game.currentPlayer.food >= this.game.currentPlayer.upkeep) {
             this.game.currentPlayer.food -= this.game.currentPlayer.upkeep;
-        }
-        else {
+        } else {
             for (const unit of this.game.currentPlayer.units) {
                 unit.starving = true;
             }
@@ -332,7 +347,8 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
 
     /** Updates the resources in between turns */
     private updateResources(): void {
-        const lowerHarvests = this.game.currentTurn % this.game.turnsToLowerHarvest === 0;
+        const lowerHarvests =
+            this.game.currentTurn % this.game.turnsToLowerHarvest === 0;
 
         // Iterate through every tile
         for (const tile of this.game.tiles) {

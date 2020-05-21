@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { ISpitterProperties, ISpitterSpitArgs, SpiderlingArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
@@ -34,12 +34,15 @@ export class Spitter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderlingArgs & ISpitterProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            SpiderlingArgs &
+                ISpitterProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -82,9 +85,12 @@ export class Spitter extends Spiderling {
 
         // cancel spitters on the current nest to the destination
         for (const spider of newWeb.getSideSpiders()) {
-            if (spider !== this && spider instanceof Spitter && (
-                spider.spittingWebToNest === this.spittingWebToNest || spider.spittingWebToNest === this.nest
-            )) {
+            if (
+                spider !== this &&
+                spider instanceof Spitter &&
+                (spider.spittingWebToNest === this.spittingWebToNest ||
+                    spider.spittingWebToNest === this.nest)
+            ) {
                 spider.finish(true);
             }
         }
@@ -149,7 +155,9 @@ export class Spitter extends Spiderling {
         // <<-- Creer-Merge: spit -->>
 
         if (!this.nest) {
-            throw new Error(`${this} is trying to spit without being on a Nest!`);
+            throw new Error(
+                `${this} is trying to spit without being on a Nest!`,
+            );
         }
 
         this.busy = "Spitting";
@@ -158,11 +166,11 @@ export class Spitter extends Spiderling {
         // find coworkers
         const sideSpiders = this.nest.spiders.concat(nest.spiders);
         for (const spider of sideSpiders) {
-            if (spider !== this
-                && spider instanceof Spitter
-                && (spider.spittingWebToNest === nest
-                    || spider.spittingWebToNest === this.nest
-                )
+            if (
+                spider !== this &&
+                spider instanceof Spitter &&
+                (spider.spittingWebToNest === nest ||
+                    spider.spittingWebToNest === this.nest)
             ) {
                 this.coworkers.add(spider);
                 this.numberOfCoworkers = this.coworkers.size;
@@ -171,7 +179,8 @@ export class Spitter extends Spiderling {
             }
         }
 
-        this.workRemaining = euclideanDistance(this.nest, nest) / this.game.spitSpeed;
+        this.workRemaining =
+            euclideanDistance(this.nest, nest) / this.game.spitSpeed;
 
         return true;
 

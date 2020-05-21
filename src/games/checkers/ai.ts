@@ -10,11 +10,10 @@ import { Checker } from "./checker";
  * the AI orders to execute.
  */
 export class AI extends BaseClasses.AI {
-
-// <<-- Creer-Merge: attributes -->>
-// If the AI needs additional attributes add them here.
-// NOTE: these are not set in client AIs.
-// <<-- /Creer-Merge: attributes -->>
+    // <<-- Creer-Merge: attributes -->>
+    // If the AI needs additional attributes add them here.
+    // NOTE: these are not set in client AIs.
+    // <<-- /Creer-Merge: attributes -->>
     /**
      * This is called whenever your checker gets captured (during an opponent's
      * turn).
@@ -22,14 +21,11 @@ export class AI extends BaseClasses.AI {
      * @param checker - The checker that was captured.
      */
     public async gotCaptured(checker: Checker): Promise<void> {
-        this.executeOrder("gotCaptured",
-            checker,
-        );
+        this.executeOrder("gotCaptured", checker);
     }
 
-// <<-- Creer-Merge: functions -->>
-// If the AI needs additional attributes add them here.
-/// NOTE: these will not be callable in client AIs.
-// <<-- /Creer-Merge: functions -->>
-
+    // <<-- Creer-Merge: functions -->>
+    // If the AI needs additional attributes add them here.
+    /// NOTE: these will not be callable in client AIs.
+    // <<-- /Creer-Merge: functions -->>
 }

@@ -1,7 +1,7 @@
 import * as random from "seedrandom";
 import { Immutable, NonEmptyArray, shuffle } from "~/utils";
 
-/** A simple class wrapper for generating random numbers */
+/** A simple class wrapper for generating random numbers. */
 export class RandomNumberGenerator {
     /** The random library interface we are wrapping around. */
     private readonly random: random.prng;
@@ -9,6 +9,7 @@ export class RandomNumberGenerator {
     /**
      * Creates a random number generator that can be seeded with useful
      * methods for games to leverage.
+     *
      * @param seed - The optional rng seed to use.
      */
     constructor(seed?: string) {
@@ -23,7 +24,7 @@ export class RandomNumberGenerator {
      * @param lower - The lower range, defaults to 0.
      * @returns A random integer within the range lower to upper.
      */
-    public int(upper: number = 1, lower: number = 0): number {
+    public int(upper = 1, lower = 0): number {
         const max = Math.round(Math.max(upper, lower));
         const min = Math.round(Math.min(upper, lower));
 
@@ -39,7 +40,7 @@ export class RandomNumberGenerator {
      * @param lower - The lower range, defaults to 0.
      * @returns A random integer within the range lower to upper.
      */
-    public float(upper: number = 1, lower: number = 0): number {
+    public float(upper = 1, lower = 0): number {
         const max = Math.max(upper, lower);
         const min = Math.min(upper, lower);
 
@@ -50,7 +51,6 @@ export class RandomNumberGenerator {
      * Shuffles an array IN PLACE using the PRNG.
      *
      * @param array - The array to shuffle in place.
-     * @returns The same array, now shuffled.
      */
     public shuffle<T>(array: T[]): void {
         shuffle(array, () => this.float());
@@ -84,7 +84,7 @@ export class RandomNumberGenerator {
 
     /**
      * Selects a random element from an array using the PRNG, and pops it
-     * (removes it from the array and returns it)
+     * (removes it from the array and returns it).
      *
      * @param array - The array to select from.
      * @returns An element from the array.
@@ -95,7 +95,7 @@ export class RandomNumberGenerator {
 
     /**
      * Selects a random element from an array using the PRNG, and pops it
-     * (removes it from the array and returns it)
+     * (removes it from the array and returns it).
      *
      * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.
@@ -106,7 +106,7 @@ export class RandomNumberGenerator {
 
     /**
      * Selects a random element from an array using the PRNG, and pops it
-     * (removes it from the array and returns it)
+     * (removes it from the array and returns it).
      *
      * @param array - The array to select from.
      * @returns An element from the array, or undefined if the array was empty.

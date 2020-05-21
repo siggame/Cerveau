@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IBaseCatastrophePlayer } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
@@ -103,7 +103,7 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
     constructor(
         // never directly created by game developers
         args: Readonly<IBaseCatastrophePlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -120,7 +120,9 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
      * @returns All of this player's structures
      */
     public getAllStructures(): Structure[] {
-        return this.structures.concat(this.game.newStructures.filter((s) => s.owner === this));
+        return this.structures.concat(
+            this.game.newStructures.filter((s) => s.owner === this),
+        );
     }
 
     /**
@@ -141,7 +143,8 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
                 const cur = tile.unit;
 
                 // If the tile grabbed is null/undefined, there's no valid unit there, or we already checked this tile
-                if (!cur ||
+                if (
+                    !cur ||
                     cur.owner !== this ||
                     (unit.squad.length > 0 && cur.job.title !== "soldier") ||
                     closed.has(tile)

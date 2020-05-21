@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { ITileProperties } from "./";
 import { GameObject } from "./game-object";
@@ -135,7 +135,7 @@ export class Tile extends GameObject implements BaseTile {
     constructor(
         // never directly created by game developers
         args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -163,7 +163,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -182,8 +185,12 @@ export class Tile extends GameObject implements BaseTile {
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**

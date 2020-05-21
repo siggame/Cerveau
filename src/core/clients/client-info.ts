@@ -1,19 +1,19 @@
-/** Lightweight information about a client */
-export interface IClientInfo {
+/** Lightweight information about a client. */
+export interface ClientInfo {
     // required
-    /** The name of the client */
+    /** The name of the client. */
     name: string;
-    /** If they are spectating the game (true), or playing (false) */
+    /** If they are spectating the game (true), or playing (false). */
     spectating: boolean;
 
-    // when over
+    // -- when over -- \\
     /** Their index in the game, undefined when not playing. */
     index?: number;
     /** If they lost the game or not, undefined when not playing. */
     lost?: boolean;
     /** If they won the game or not, undefined when not playing. */
     won?: boolean;
-    /** the reason why they won or lost, undefined when not playing. */
+    /** The reason why they won or lost, undefined when not playing. */
     reason?: string;
     /** If they disconnected during gameplay. */
     disconnected?: boolean;

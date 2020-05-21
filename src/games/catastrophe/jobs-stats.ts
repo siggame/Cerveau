@@ -21,20 +21,20 @@ export const jobStats: { [jobName: string]: IJobProperties } = {
         regenRate: 10,
         upkeep: 0,
     },
-    "soldier": {
+    soldier: {
         actionCost: 25,
         moves: 3,
         regenRate: 25,
         upkeep: 3,
     },
-    "gatherer": {
+    gatherer: {
         carryLimit: 100,
         upkeep: 1,
     },
-    "builder": {
+    builder: {
         carryLimit: 75,
     },
-    "missionary": {},
+    missionary: {},
 };
 
 // Inject the default values into each job's stats.

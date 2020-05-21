@@ -8,21 +8,25 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
+import { TwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
 
 /**
  * The interface the Player for the Chess game
  * must implement from mixed in game logic.
  */
-export interface IBaseChessPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer {
-}
+export interface IBaseChessPlayer extends BasePlayer, TwoPlayerPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -64,8 +68,7 @@ export const BaseClasses = {
 // so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -115,7 +118,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 export * from "./game-object";
@@ -136,8 +138,7 @@ import { ChessGameSettingsManager } from "./game-settings";
  * The factory that **must** be used to create any game objects in
  * the Chess game.
  */
-export class ChessGameObjectFactory extends BaseGameObjectFactory {
-}
+export class ChessGameObjectFactory extends BaseGameObjectFactory {}
 
 /**
  * The shared namespace for Chess that is used to
@@ -159,12 +160,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new ChessGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 makeMove: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "string",
                     },
@@ -205,8 +204,7 @@ export const Namespace = makeNamespace({
                     typeName: "string",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -272,9 +270,9 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "cfa5f5c1685087ce2899229c04c26e39f231e897ecc8fe036b44bc22103ef801",
+    gameVersion:
+        "cfa5f5c1685087ce2899229c04c26e39f231e897ecc8fe036b44bc22103ef801",
 });

@@ -1,9 +1,9 @@
-// tslint:disable:no-any no-unsafe-any no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
 import { Event, events } from "ts-typed-events";
 
-/** An optional transform function for delta mergeables */
+/** An optional transform function for delta mergeables. */
 export type DeltaTransform<T> = (
     value: any,
     currentValue: T | undefined,
@@ -12,12 +12,12 @@ export type DeltaTransform<T> = (
 
 /**
  * Wraps a property in the game to observe for changes (deltas).
- * Each DeltaMergeable can have child values, such as an array with child index
- * DeltaMergeables. This builds up a tree representing the game, used to build
- * delta states.
+ * Each DeltaMergeable can have child values, such as an array with child
+ * index DeltaMergeables. This builds up a tree representing the game, used to
+ * build delta states.
  */
 export class DeltaMergeable<T = any> {
-    /** The key parent this is */
+    /** The key parent this is. */
     public readonly key: string;
 
     /**
@@ -25,7 +25,7 @@ export class DeltaMergeable<T = any> {
      */
     public wrapper?: object;
 
-    /** The events this delta mergeable emits when it mutates */
+    /** The events this delta mergeable emits when it mutates. */
     public readonly events = events({
         changed: new Event<DeltaMergeable>(),
         deleted: new Event<DeltaMergeable>(),
@@ -44,9 +44,14 @@ export class DeltaMergeable<T = any> {
     private value: T | undefined;
 
     /**
-     * Creates a new delta mergeable. it's creation will trigger a change in
+     * Creates a new delta mergeable. It's creation will trigger a change in
      * parent(s).
+     *
      * @param data - Initialization data about the parent and value of this DM.
+     * @param data.key - The key of this delta mergable in its parent.
+     * @param data.parent - The parent DeltaMergeable, if null assumed to be root node.
+     * @param data.initialValue - The initial value of this node.
+     * @param data.transform - An optional transform function to ensure any set values are the correct type.
      */
     constructor(data: {
         /** The key of this delta mergable in its parent. */
@@ -73,6 +78,7 @@ export class DeltaMergeable<T = any> {
 
     /**
      * Gets our parent, if we have one.
+     *
      * @returns Our parent, if we have one.
      */
     public getParent(): DeltaMergeable<T> | undefined {
@@ -81,6 +87,7 @@ export class DeltaMergeable<T = any> {
 
     /**
      * Gets our current value.
+     *
      * @returns Our current value.
      */
     public get(): T | undefined {
@@ -95,7 +102,7 @@ export class DeltaMergeable<T = any> {
      * @param forceSet - Force the set to occur, even if the current value is
      * the same.
      */
-    public set(newValue: any, forceSet: boolean = false): void {
+    public set(newValue: any, forceSet = false): void {
         const value = this.transform
             ? this.transform(newValue, this.get(), forceSet)
             : newValue;
@@ -121,7 +128,7 @@ export class DeltaMergeable<T = any> {
      *
      * **NOTE**: You cannot adopt nodes that already have a parent.
      *
-     * @param child - The child node to adopt
+     * @param child - The child node to adopt.
      */
     public adopt(child: DeltaMergeable): void {
         if (child.parent === this) {
@@ -154,6 +161,7 @@ export class DeltaMergeable<T = any> {
 
     /**
      * Gets our child with the given key, if we have it.
+     *
      * @param key - They key of the child to check for.
      * @returns The child, if it exists, otherwise undefined.
      */

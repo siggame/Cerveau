@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IProjectileProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -57,14 +57,16 @@ export class Projectile extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IProjectileProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The target */
-            target: Unit;
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IProjectileProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The target */
+                target: Unit;
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

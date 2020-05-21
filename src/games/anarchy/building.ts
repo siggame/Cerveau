@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IBuildingProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -91,17 +91,19 @@ export class Building extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IBuildingProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The owner of this building. */
-            owner: Player;
-            /** The x location of this building. */
-            x: number;
-            /** The y location of this building. */
-            y: number;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IBuildingProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The owner of this building. */
+                owner: Player;
+                /** The x location of this building. */
+                x: number;
+                /** The y location of this building. */
+                y: number;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

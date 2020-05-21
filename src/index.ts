@@ -1,7 +1,8 @@
-/** This file is the entry-point to start Cerveau */
+/** This file is the entry-point to start Cerveau. */
 
 // first code to execute, like a mini sanity test
-console.log("~~~ Cerveau is starting ~~~"); // tslint:disable-line:no-console
+// eslint-disable-next-line no-console
+console.log("~~~ Cerveau is starting ~~~");
 
 process.title = "Cerveau Game Server";
 

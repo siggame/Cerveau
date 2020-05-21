@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Necrowar game
  * must implement from mixed in game logic.
  */
-export interface IBaseNecrowarPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBaseNecrowarPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -72,8 +84,7 @@ export const BaseClasses = {
 // so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -152,7 +163,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Tile. */
@@ -278,7 +288,6 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 /**
@@ -310,8 +319,7 @@ export interface ITileSpawnUnitArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface ITileSpawnWorkerArgs {
-}
+export interface ITileSpawnWorkerArgs {}
 
 /** All the possible properties for an Tower. */
 export interface ITowerProperties {
@@ -344,7 +352,6 @@ export interface ITowerProperties {
      * The Tile this Tower is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -401,7 +408,6 @@ export interface ITowerJobProperties {
      * How many turns have to take place between this type's attacks.
      */
     turnsBetweenAttacks?: number;
-
 }
 
 /** All the possible properties for an Unit. */
@@ -436,7 +442,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -540,8 +545,14 @@ export interface IUnitJobProperties {
      * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
      * 'wraith' or 'horseman'.
      */
-    title?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
-
+    title?:
+        | "worker"
+        | "zombie"
+        | "ghoul"
+        | "hound"
+        | "abomination"
+        | "wraith"
+        | "horseman";
 }
 
 export * from "./game-object";
@@ -595,9 +606,7 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -608,9 +617,7 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tower hooked up in the game and ready for you to use.
      */
-    public tower<T extends TowerArgs>(
-        args: Readonly<T>,
-    ): Tower & T {
+    public tower<T extends TowerArgs>(args: Readonly<T>): Tower & T {
         return this.createGameObject("Tower", Tower, args);
     }
 
@@ -621,9 +628,7 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new TowerJob hooked up in the game and ready for you to use.
      */
-    public towerJob<T extends TowerJobArgs>(
-        args: Readonly<T>,
-    ): TowerJob & T {
+    public towerJob<T extends TowerJobArgs>(args: Readonly<T>): TowerJob & T {
         return this.createGameObject("TowerJob", TowerJob, args);
     }
 
@@ -634,9 +639,7 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
 
@@ -647,12 +650,9 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new UnitJob hooked up in the game and ready for you to use.
      */
-    public unitJob<T extends UnitJobArgs>(
-        args: Readonly<T>,
-    ): UnitJob & T {
+    public unitJob<T extends UnitJobArgs>(args: Readonly<T>): UnitJob & T {
         return this.createGameObject("UnitJob", UnitJob, args);
     }
-
 }
 
 /**
@@ -675,12 +675,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new NecrowarGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -784,8 +782,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -887,8 +884,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -1003,8 +999,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 spawnWorker: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1081,14 +1076,19 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "arrow",
-                    literals: ["arrow", "aoe", "ballista", "cleansing", "castle"],
+                    literals: [
+                        "arrow",
+                        "aoe",
+                        "ballista",
+                        "cleansing",
+                        "castle",
+                    ],
                 },
                 turnsBetweenAttacks: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1216,12 +1216,20 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "worker",
-                    literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
+                    literals: [
+                        "worker",
+                        "zombie",
+                        "ghoul",
+                        "hound",
+                        "abomination",
+                        "wraith",
+                        "horseman",
+                    ],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "935f0e64ba290cdce31688a40bd90d1eb5375f36aeebd67482238fc0da25ef86",
+    gameVersion:
+        "935f0e64ba290cdce31688a40bd90d1eb5375f36aeebd67482238fc0da25ef86",
 });

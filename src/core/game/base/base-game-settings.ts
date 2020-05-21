@@ -1,12 +1,18 @@
 import { sanitizeBoolean } from "~/core";
-import { Immutable, objectHasProperty, quoteIfString, UnknownObject,
-       } from "~/utils";
+import {
+    Immutable,
+    objectHasProperty,
+    quoteIfString,
+    UnknownObject,
+} from "~/utils";
 
 /** The only allowed value types settings can be of. */
 export type PossibleSettingValue = string | number | boolean | string[];
 
 /** An individual setting in a schema. */
-export interface ISettingsSchema<T extends PossibleSettingValue = PossibleSettingValue> {
+export interface SettingsSchema<
+    T extends PossibleSettingValue = PossibleSettingValue
+> {
     /** The default value for this setting. */
     readonly default: T;
     /** The human readable description about what this setting controls. */
@@ -18,18 +24,17 @@ export interface ISettingsSchema<T extends PossibleSettingValue = PossibleSettin
 }
 
 /** The base settings schemas all implement. */
-export interface ISettingsSchemas {
-    [key: string]: ISettingsSchema;
+export interface SettingsSchemas {
+    [key: string]: SettingsSchema;
 }
 
 /** Given settings schema the type object we'd expect for that schema. */
-export type SettingsFromSchema<T extends ISettingsSchemas> = {
-    [K in keyof T] : T[K] extends ISettingsSchema<infer W>
-        ? (W extends never[]
+export type SettingsFromSchema<T extends SettingsSchemas> = {
+    [K in keyof T]: T[K] extends SettingsSchema<infer W>
+        ? W extends never[]
             ? string[]
             : W
-        )
-        : never
+        : never;
 };
 
 /**
@@ -40,7 +45,7 @@ export class BaseGameSettingsManager {
     /**
      * The schema used to build and validate settings' values.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
         return this.makeSchema({
             playerStartingTime: {
                 default: 6e10,
@@ -49,7 +54,8 @@ export class BaseGameSettingsManager {
             },
             playerNames: {
                 default: [],
-                description: "The names of the players (overrides strings they send).",
+                description:
+                    "The names of the players (overrides strings they send).",
             },
             randomSeed: {
                 default: "",
@@ -59,13 +65,14 @@ export class BaseGameSettingsManager {
     }
 
     /**
-     * The current settings' values
+     * The current settings' values.
      */
     public values = this.initialValues(this.schema, true);
 
     /**
-     * Creates a game settings manager with optional initial values
-     * @param values Optional initial values for the settings
+     * Creates a game settings manager with optional initial values.
+     *
+     * @param values - Optional initial values for the settings.
      */
     public constructor(values?: UnknownObject) {
         if (values) {
@@ -76,18 +83,19 @@ export class BaseGameSettingsManager {
     /**
      * Attempts to validates settings for this instance, or returns an Error.
      *
-     * @param invalidatedSettings key values pairs to attempt to validate, and
-     * then if valid to be added to our settings
+     * @param invalidatedSettings - Key values pairs to attempt to validate, and
+     * then if valid to be added to our settings.
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
-    public addSettings(invalidatedSettings: Immutable<UnknownObject>): void | Error {
+    public addSettings(
+        invalidatedSettings: Immutable<UnknownObject>,
+    ): void | Error {
         const validated = this.invalidateSettings(invalidatedSettings);
 
         if (validated instanceof Error) {
             return validated;
-        }
-        else {
+        } else {
             Object.assign(this.values, validated);
         }
     }
@@ -95,8 +103,8 @@ export class BaseGameSettingsManager {
     /**
      * Attempts to validates settings for this instance, or returns an Error.
      *
-     * @param invalidatedSettings key values pairs to attempt to validate, and
-     * then if valid to be added to our settings
+     * @param invalidatedSettings - Key values pairs to attempt to validate, and
+     * then if valid to be added to our settings.
      * @returns An error if the settings were invalid, otherwise the validated
      * game settings as an object.
      */
@@ -112,25 +120,36 @@ export class BaseGameSettingsManager {
 
             const str = quoteIfString(value);
 
-            const schema = (this.schema as ISettingsSchemas)[key];
+            const schema = (this.schema as SettingsSchemas)[key];
             let sanitizedValue: PossibleSettingValue = "";
             switch (typeof schema.default) {
                 case "number":
                     sanitizedValue = Number(value) || 0;
-                    if (schema.min !== undefined && sanitizedValue < schema.min) {
-                        return new Error(`${key} setting is invalid (${str}). Must be >= ${schema.min}`);
+                    if (
+                        schema.min !== undefined &&
+                        sanitizedValue < schema.min
+                    ) {
+                        return new Error(
+                            `${key} setting is invalid (${str}). Must be >= ${schema.min}`,
+                        );
                     }
-                    if (schema.max !== undefined && sanitizedValue > schema.max) {
-                        return new Error(`${key} setting is invalid (${str}). Must be <= ${schema.max}`);
+                    if (
+                        schema.max !== undefined &&
+                        sanitizedValue > schema.max
+                    ) {
+                        return new Error(
+                            `${key} setting is invalid (${str}). Must be <= ${schema.max}`,
+                        );
                     }
                     break;
                 case "string":
                     sanitizedValue = String(value);
                     break;
                 case "boolean":
-                    sanitizedValue = value === "" // special case from url parm, means key was present with no value
-                        ? true
-                        : sanitizeBoolean(value, false);
+                    sanitizedValue =
+                        value === "" // special case from url parm, means key was present with no value
+                            ? true
+                            : sanitizeBoolean(value, false);
                     break;
                 case "object": // string array is this case
                     sanitizedValue = Array.isArray(value)
@@ -147,8 +166,9 @@ export class BaseGameSettingsManager {
 
     /**
      * Gets the help string to send to clients that do not know what valid
-     * settings are
-     * @returns a string formatted in a human readable fashion
+     * settings are.
+     *
+     * @returns A string formatted in a human readable fashion.
      */
     public getHelp(): string {
         const lines: string[] = [];
@@ -158,8 +178,9 @@ export class BaseGameSettingsManager {
                 ? "string[]"
                 : typeof schema.default;
 
-            if (schema.default !== "" &&
-               (!Array.isArray(schema.default) || schema.default.length > 0)
+            if (
+                schema.default !== "" &&
+                (!Array.isArray(schema.default) || schema.default.length > 0)
             ) {
                 type += ` = ${schema.default}`;
             }
@@ -189,9 +210,9 @@ export class BaseGameSettingsManager {
      * Makes a schema object from an interface.
      *
      * @param schema - The schema to make it from.
-     * @returns the schema, now frozen
+     * @returns The schema, now frozen.
      */
-    protected makeSchema<T extends ISettingsSchemas>(schema: T): Readonly<T> {
+    protected makeSchema<T extends SettingsSchemas>(schema: T): Readonly<T> {
         return Object.freeze(schema);
     }
 
@@ -199,23 +220,22 @@ export class BaseGameSettingsManager {
      * Generates initial values from defaults in a settings schema.
      *
      * @param schema - The schema to build defaults from.
-     * @param pure - If this should be pure and not consider current values
+     * @param pure - If this should be pure and not consider current values.
      * @returns The defaults from that schema.
      */
-    protected initialValues<T extends ISettingsSchemas>(
+    protected initialValues<T extends SettingsSchemas>(
         schema: T,
         pure?: boolean,
     ): SettingsFromSchema<T> {
         const values: UnknownObject = {};
         for (const [key, value] of Object.entries(schema)) {
-            values[key] = (pure || !objectHasProperty(this.values, key))
-                ? value.default
-                : this.values[key];
+            values[key] =
+                pure || !objectHasProperty(this.values, key)
+                    ? value.default
+                    : this.values[key];
         }
 
-        // lol, try accurately casting to that monstrosity of a type
-        // tslint:disable-next-line:no-any
-        return values as any;
+        return values as SettingsFromSchema<T>;
     }
 
     /**
@@ -223,7 +243,7 @@ export class BaseGameSettingsManager {
      *
      * @param someSettings - A subset of the valid settings to attempt to
      * validate.
-     * @returns an Error if invalid, otherwise the validated settings.
+     * @returns An Error if invalid, otherwise the validated settings.
      */
     protected invalidate(
         someSettings: Immutable<UnknownObject>,
@@ -233,7 +253,9 @@ export class BaseGameSettingsManager {
         const settings = { ...this.values, ...someSettings };
 
         if (settings.playerStartingTime <= 0) {
-            return new Error(`player starting time is invalid: ${settings.playerStartingTime}. Must be > 0.`);
+            return new Error(
+                `player starting time is invalid: ${settings.playerStartingTime}. Must be > 0.`,
+            );
         }
 
         return settings;

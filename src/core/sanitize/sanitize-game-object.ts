@@ -4,9 +4,9 @@ import { BaseGameObject } from "~/core/game/base/base-game-object";
  * Takes a variable and ensures it is a game object, If the passed in value is
  * not a game object of the class specified, returns an Error.
  *
- * @param obj Any variable, if it is a game object passes it back, otherwise
+ * @param obj - Any variable, if it is a game object passes it back, otherwise
  * returns undefined or an Error.
- * @param gameObjectClass An optional game object class to enforce on the game
+ * @param gameObjectClass - An optional game object class to enforce on the game
  * object.
  * @param allowError - If errors should be allowed to be returned if they
  * cannot be reasonable sanitized.
@@ -22,9 +22,9 @@ export function sanitizeGameObject(
  * Takes a variable and ensures it is a game object.
  * If it is not returns undefined.
  *
- * @param obj Any variable, if it is a game object passes it back, otherwise
+ * @param obj - Any variable, if it is a game object passes it back, otherwise
  * returns undefined or an Error.
- * @param gameObjectClass An optional game object class to enforce on the game
+ * @param gameObjectClass - An optional game object class to enforce on the game
  * object.
  * @param allowError - If errors should be allowed to be returned if they
  * cannot be reasonable sanitized.
@@ -40,9 +40,9 @@ export function sanitizeGameObject(
  * Takes a variable and ensures it is a game object, If the passed in value is
  * not a game object of the class specified, returns an Error.
  *
- * @param obj Any variable, if it is a game object passes it back, otherwise
+ * @param obj - Any variable, if it is a game object passes it back, otherwise
  * returns undefined or an Error.
- * @param gameObjectClass An optional game object class to enforce on the game
+ * @param gameObjectClass - An optional game object class to enforce on the game
  * object.
  * @param allowError - If errors should be allowed to be returned if they
  * cannot be reasonable sanitized.
@@ -51,12 +51,13 @@ export function sanitizeGameObject(
 export function sanitizeGameObject(
     obj: unknown,
     gameObjectClass: typeof BaseGameObject,
-    allowError: boolean = true,
+    allowError = true,
 ): BaseGameObject | undefined | Error {
     return obj instanceof gameObjectClass
         ? obj
-        : (allowError
-            ? new Error(`${obj} is not of the expected GameObject class \`${gameObjectClass.name}\``)
-            : undefined
-        );
+        : allowError
+        ? new Error(
+              `${obj} is not of the expected GameObject class \`${gameObjectClass.name}\``,
+          )
+        : undefined;
 }

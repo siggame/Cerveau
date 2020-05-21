@@ -4,7 +4,7 @@ import { BaseGameSettingsManager, DeltaMergeable } from "~/core/game";
 import { RandomNumberGenerator } from "~/core/game/random-number-generator";
 import { Immutable, Mutable, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
-import { IBaseGameNamespace } from "./base-game-namespace";
+import { BaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { BasePlayer } from "./base-player";
@@ -15,7 +15,7 @@ import { BasePlayer } from "./base-player";
 type MutableGame = Mutable<BaseGame>;
 
 /**
- * the base game plugin new games should inherit from.
+ * The base game plugin new games should inherit from.
  */
 export class BaseGameManager {
     /** A list of aliases (case insensitive) that map to this game name. */
@@ -34,7 +34,7 @@ export class BaseGameManager {
     public readonly create: BaseGameObjectFactory;
 
     /**
-     * The game this GameManager is managing
+     * The game this GameManager is managing.
      */
     public readonly game: BaseGame;
 
@@ -67,7 +67,7 @@ export class BaseGameManager {
      * @param gameOverCallback - A callback to invoke once the game is over.
      */
     constructor(
-        private readonly namespace: Immutable<IBaseGameNamespace>,
+        private readonly namespace: Immutable<BaseGameNamespace>,
         settingsManager: BaseGameSettingsManager,
         playingClients: BasePlayingClient[],
         rootDeltaMergeable: DeltaMergeable,
@@ -78,9 +78,9 @@ export class BaseGameManager {
         const settings = settingsManager.values;
 
         if (!settings.randomSeed) {
-            // This is the only place we use old random
-            // tslint:disable-next-line:no-math-random insecure-random
-            (settings as UnknownObject).randomSeed = Math.random().toString(36).substring(2);
+            (settings as UnknownObject).randomSeed = Math.random()
+                .toString(36)
+                .substring(2);
         }
         this.random = new RandomNumberGenerator(settings.randomSeed);
 
@@ -103,7 +103,7 @@ export class BaseGameManager {
             /** The game that was created. */
             game: BaseGame;
 
-            /** The base delta mergeable to the game objects for serialization */
+            /** The base delta mergeable to the game objects for serialization. */
             gameObjectsDeltaMergeable: DeltaMergeable;
         }>();
 
@@ -123,7 +123,9 @@ export class BaseGameManager {
             playingClients,
             rootDeltaMergeable,
             manager: this,
-            playerIDs: playingClients.map(() => this.generateNextGameObjectID()),
+            playerIDs: playingClients.map(() =>
+                this.generateNextGameObjectID(),
+            ),
             schema: this.namespace.gameObjectsSchema.Game,
             gameCreated,
             sessionID,
@@ -153,10 +155,7 @@ export class BaseGameManager {
      * @param reason - The reason they lost.
      * @param loser - The player that lost the game.
      */
-    public declareLoser(
-        reason: string,
-        loser: BasePlayer,
-    ): void {
+    public declareLoser(reason: string, loser: BasePlayer): void {
         this.declareLosers(reason, loser);
     }
 
@@ -167,10 +166,7 @@ export class BaseGameManager {
      * @param reason - The reason they lost.
      * @param losers - The player(s) that lost the game.
      */
-    public declareLosers(
-        reason: string,
-        ...losers: BasePlayer[]
-    ): void {
+    public declareLosers(reason: string, ...losers: BasePlayer[]): void {
         for (const player of losers) {
             this.setPlayerLost(player, reason);
         }
@@ -183,10 +179,7 @@ export class BaseGameManager {
      * @param reason - The reason they won.
      * @param winner - The player that won the game.
      */
-    public declareWinner(
-        reason: string,
-        winner: BasePlayer,
-    ): void {
+    public declareWinner(reason: string, winner: BasePlayer): void {
         this.declareWinners(reason, winner);
     }
 
@@ -197,10 +190,7 @@ export class BaseGameManager {
      * @param reason - The reason they won.
      * @param winners - The player(s) that won the game.
      */
-    public declareWinners(
-        reason: string,
-        ...winners: BasePlayer[]
-    ): void {
+    public declareWinners(reason: string, ...winners: BasePlayer[]): void {
         for (const player of winners) {
             player.lost = false;
             player.reasonLost = "";
@@ -216,7 +206,7 @@ export class BaseGameManager {
      *
      * @param reason - An optional reason why win via coin flip is happening.
      */
-    public makePlayerWinViaCoinFlip(reason: string = "Draw"): void {
+    public makePlayerWinViaCoinFlip(reason = "Draw"): void {
         // Win via coin flip - if we got here no player won via game rules.
         // They probably played identically to each other.
         const players = this.game.players.filter((p) => !p.won && !p.lost);
@@ -240,14 +230,16 @@ export class BaseGameManager {
 
     /**
      * You **MUST** call this to let everything know the game is over and
-     * all the clients should be notified
+     * all the clients should be notified.
      *
      * @param reason - The reason the game is over to set for any players that
      * have not already won or lost the game.
      */
-    public endGame(reason: string = "Draw"): void {
+    public endGame(reason = "Draw"): void {
         if (!this.isOver) {
-            const playingPlayers = this.game.players.filter((p) => !p.won && !p.lost);
+            const playingPlayers = this.game.players.filter(
+                (p) => !p.won && !p.lost,
+            );
             if (playingPlayers.length > 0) {
                 this.declareLosers(reason, ...playingPlayers);
             }
@@ -268,7 +260,7 @@ export class BaseGameManager {
 
     /**
      * Invoked when the game starts and we should send orders.
-     * The Game and this GameManager will have already been constructed
+     * The Game and this GameManager will have already been constructed.
      */
     protected start(): void {
         // pass, intended to be overridden
@@ -277,28 +269,32 @@ export class BaseGameManager {
     /**
      * Generates a new id string for a new game object.
      *
-     * @returns A string for the new id. **Must be unique**
+     * @returns A string for the new id. **Must be unique**.
      */
     protected generateNextGameObjectID = () => {
         // returns this.nextGameObjectID then increments by 1
         return String(this.nextGameObjectID++);
-    }
+    };
 
     /**
      * Invoked any time an AI wants to run some game object function.
      * If a string is returned that is the reason why it is invalid.
      *
-     * @param player - The player invoking the function.
-     * @param gameObject - The game object being invoked on.
-     * @param functionName - The string name of the function.
-     * @param args - The key/value pair args to the function.
+     * @param _player - The player invoking the function.
+     * @param _gameObject - The game object being invoked on.
+     * @param _functionName - The string name of the function.
+     * @param _args - The key/value pair args to the function.
      * @returns A string if the run is invalid, nothing if valid.
      */
     protected invalidateRun(
-        player: BasePlayer,
-        gameObject: BaseGameObject,
-        functionName: string,
-        args: Map<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _player: BasePlayer,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _gameObject: BaseGameObject,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _functionName: string,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _args: Map<string, unknown>,
     ): string | undefined {
         // all runs are valid by default
         return undefined;
@@ -325,17 +321,14 @@ export class BaseGameManager {
                     throw new Error("No winner found when one should exist!");
                 }
 
-                const allLosersDisconnected = losers
-                    .filter(
-                        (p) => this.unsafeGetClient(p).hasDisconnected(),
-                    )
-                    .length === losers.length;
+                const allLosersDisconnected =
+                    losers.filter((p) =>
+                        this.unsafeGetClient(p).hasDisconnected(),
+                    ).length === losers.length;
 
-                const allLosersTimedOut = losers
-                    .filter(
-                        (p) => this.unsafeGetClient(p).hasTimedOut(),
-                    )
-                    .length === losers.length;
+                const allLosersTimedOut =
+                    losers.filter((p) => this.unsafeGetClient(p).hasTimedOut())
+                        .length === losers.length;
 
                 let reasonWon = "All other players lost.";
                 if (allLosersDisconnected) {
@@ -352,9 +345,10 @@ export class BaseGameManager {
     }
 
     /**
-     * The player that lost the game
-     * @param loser the loser
-     * @param reason the reason they lost
+     * The player that lost the game.
+     *
+     * @param loser - The loser.
+     * @param reason - The reason they lost.
      */
     private setPlayerLost(loser: BasePlayer, reason: string): void {
         loser.lost = true;
@@ -381,6 +375,7 @@ export class BaseGameManager {
 
     /**
      * Gets a client for a given player, or throws an Error if non exists.
+     *
      * @param player - The player to get the client for.
      * @returns A client, always.
      */

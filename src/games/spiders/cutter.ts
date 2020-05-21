@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { ICutterCutArgs, ICutterProperties, SpiderlingArgs } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
@@ -32,12 +32,15 @@ export class Cutter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderlingArgs & ICutterProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            SpiderlingArgs &
+                ICutterProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -140,7 +143,9 @@ export class Cutter extends Spiderling {
         }
 
         // workRemaining =  5 * strength^2 / (cutterSpeed * sqrt(distance))
-        this.workRemaining = (web.strength ** 2) * 5 / (this.game.cutSpeed * Math.sqrt(web.length));
+        this.workRemaining =
+            (web.strength ** 2 * 5) /
+            (this.game.cutSpeed * Math.sqrt(web.length));
 
         return true;
 

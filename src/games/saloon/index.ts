@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Saloon game
  * must implement from mixed in game logic.
  */
-export interface IBaseSaloonPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBaseSaloonPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -95,7 +107,6 @@ export interface IBottleProperties {
      * The Tile this bottle is currently flying over.
      */
     tile?: Tile;
-
 }
 
 /** All the possible properties for an Cowboy. */
@@ -160,7 +171,6 @@ export interface ICowboyProperties {
      * can `act()` or `play()` again.
      */
     turnsBusy?: number;
-
 }
 
 /**
@@ -231,12 +241,10 @@ export interface IFurnishingProperties {
      * The Tile that this Furnishing is located on.
      */
     tile?: Tile;
-
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -312,7 +320,6 @@ export interface IPlayerProperties {
      * The YoungGun this Player uses to call in new Cowboys.
      */
     youngGun?: YoungGun;
-
 }
 
 /** All the possible properties for an Tile. */
@@ -382,7 +389,6 @@ export interface ITileProperties {
      * The YoungGun on this tile, undefined otherwise.
      */
     youngGun?: YoungGun;
-
 }
 
 /** All the possible properties for an YoungGun. */
@@ -407,7 +413,6 @@ export interface IYoungGunProperties {
      * The Tile this YoungGun is currently on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -473,9 +478,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public bottle<T extends BottleArgs>(
-        args: Readonly<T>,
-    ): Bottle & T {
+    public bottle<T extends BottleArgs>(args: Readonly<T>): Bottle & T {
         return this.createGameObject("Bottle", Bottle, args);
     }
 
@@ -486,9 +489,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public cowboy<T extends CowboyArgs>(
-        args: Readonly<T>,
-    ): Cowboy & T {
+    public cowboy<T extends CowboyArgs>(args: Readonly<T>): Cowboy & T {
         return this.createGameObject("Cowboy", Cowboy, args);
     }
 
@@ -513,9 +514,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -526,12 +525,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public youngGun<T extends YoungGunArgs>(
-        args: Readonly<T>,
-    ): YoungGun & T {
+    public youngGun<T extends YoungGunArgs>(args: Readonly<T>): YoungGun & T {
         return this.createGameObject("YoungGun", YoungGun, args);
     }
-
 }
 
 /**
@@ -554,12 +550,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new SaloonGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -670,8 +664,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Bottle: {
             parentClassName: "GameObject",
@@ -695,8 +688,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Cowboy: {
             parentClassName: "GameObject",
@@ -815,8 +807,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -902,8 +893,7 @@ export const Namespace = makeNamespace({
                     nullable: false,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -961,8 +951,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         YoungGun: {
             parentClassName: "GameObject",
@@ -1006,5 +995,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
+    gameVersion:
+        "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
 });

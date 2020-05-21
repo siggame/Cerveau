@@ -88,42 +88,80 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: primary-win-conditions -->>
 
         // Add logic here checking for the primary win condition(s)
-        if (this.game.players[0].victoryPoints === (this.game.mythiciteAmount - this.game.lostMythicite) / 2 &&
-            this.game.players[1].victoryPoints === (this.game.mythiciteAmount - this.game.lostMythicite) / 2) {
+        if (
+            this.game.players[0].victoryPoints ===
+                (this.game.mythiciteAmount - this.game.lostMythicite) / 2 &&
+            this.game.players[1].victoryPoints ===
+                (this.game.mythiciteAmount - this.game.lostMythicite) / 2
+        ) {
             // check secondary conditions.
-            this.secondaryWinConditions("Both players have half of the mythicite.");
+            this.secondaryWinConditions(
+                "Both players have half of the mythicite.",
+            );
 
             // return that a win result was found.
             return true;
-        }
-        else if (this.game.players[0].victoryPoints > ((this.game.mythiciteAmount - this.game.lostMythicite) / 2)) {
+        } else if (
+            this.game.players[0].victoryPoints >
+            (this.game.mythiciteAmount - this.game.lostMythicite) / 2
+        ) {
             // declare the winner!
-            this.declareWinner("You got the most mythicite!", this.game.players[0]);
-            this.declareLosers("Your opponent got the most mythicite.", this.game.players[1]);
+            this.declareWinner(
+                "You got the most mythicite!",
+                this.game.players[0],
+            );
+            this.declareLosers(
+                "Your opponent got the most mythicite.",
+                this.game.players[1],
+            );
 
             // return that a win result was found.
             return true;
-        }
-        else if (this.game.players[1].victoryPoints > ((this.game.mythiciteAmount - this.game.lostMythicite) / 2)) {
+        } else if (
+            this.game.players[1].victoryPoints >
+            (this.game.mythiciteAmount - this.game.lostMythicite) / 2
+        ) {
             // declare the winner!
-            this.declareWinner("You got the most mythicite!", this.game.players[1]);
-            this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
+            this.declareWinner(
+                "You got the most mythicite!",
+                this.game.players[1],
+            );
+            this.declareLosers(
+                "Your opponent got the most mythicite.",
+                this.game.players[0],
+            );
 
             // return that a win result was found.
             return true;
-        }
-        else if (this.game.players[0].money < 75 && this.game.players[0].units.length === 0) {
+        } else if (
+            this.game.players[0].money < 75 &&
+            this.game.players[0].units.length === 0
+        ) {
             // declare the winner!
-            this.declareWinner("You bankrupted your opponent.", this.game.players[1]);
-            this.declareLosers("You have no cash and no assets.", this.game.players[0]);
+            this.declareWinner(
+                "You bankrupted your opponent.",
+                this.game.players[1],
+            );
+            this.declareLosers(
+                "You have no cash and no assets.",
+                this.game.players[0],
+            );
 
             // return that a win result was found.
             return true;
-        }
-        else if (this.game.players[1].money < 75 && this.game.players[1].units.length === 0) {
+        } else if (
+            this.game.players[1].money < 75 &&
+            this.game.players[1].units.length === 0
+        ) {
             // declare the winner!
-            this.declareWinner("You bankrupted your opponent.", this.game.players[0]);
-            this.declareLosers("You have no cash and no assets.", this.game.players[1]);
+            this.declareWinner(
+                "You bankrupted your opponent.",
+                this.game.players[0],
+            );
+            this.declareLosers(
+                "You have no cash and no assets.",
+                this.game.players[1],
+            );
 
             // return that a win result was found.
             return true;
@@ -143,18 +181,35 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
         // set up trackers for each players value.
-        if (this.game.players[0].victoryPoints > this.game.players[1].victoryPoints) {
+        if (
+            this.game.players[0].victoryPoints >
+            this.game.players[1].victoryPoints
+        ) {
             // declare the winner!
-            this.declareWinner("You got the most mythicite!", this.game.players[0]);
-            this.declareLosers("Your opponent got the most mythicite.", this.game.players[1]);
+            this.declareWinner(
+                "You got the most mythicite!",
+                this.game.players[0],
+            );
+            this.declareLosers(
+                "Your opponent got the most mythicite.",
+                this.game.players[1],
+            );
 
             // return that a win result was found.
             return;
-        }
-        else if (this.game.players[1].victoryPoints > this.game.players[0].victoryPoints) {
+        } else if (
+            this.game.players[1].victoryPoints >
+            this.game.players[0].victoryPoints
+        ) {
             // declare the winner!
-            this.declareWinner("You got the most mythicite!", this.game.players[1]);
-            this.declareLosers("Your opponent got the most mythicite.", this.game.players[0]);
+            this.declareWinner(
+                "You got the most mythicite!",
+                this.game.players[1],
+            );
+            this.declareLosers(
+                "Your opponent got the most mythicite.",
+                this.game.players[0],
+            );
 
             // return that a win result was found.
             return;
@@ -166,45 +221,68 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // add up the value of player 0.
         for (const unit of this.game.players[0].units) {
             player0Value += unit.job.unitCost;
-            player0Mat += unit.genarium * this.game.genariumValue +
-                          unit.rarium * this.game.rariumValue +
-                          unit.legendarium * this.game.legendariumValue;
+            player0Mat +=
+                unit.genarium * this.game.genariumValue +
+                unit.rarium * this.game.rariumValue +
+                unit.legendarium * this.game.legendariumValue;
         }
         // add up the value of player 1.
         for (const unit of this.game.players[1].units) {
             player1Value += unit.job.unitCost;
-            player1Mat += unit.genarium * this.game.genariumValue +
-                          unit.rarium * this.game.rariumValue +
-                          unit.legendarium * this.game.legendariumValue;
+            player1Mat +=
+                unit.genarium * this.game.genariumValue +
+                unit.rarium * this.game.rariumValue +
+                unit.legendarium * this.game.legendariumValue;
         }
         if (player0Value > player1Value) {
             // declare the winners!
-            this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[0]);
-            this.declareLosers(`${reason}: You were worth less than your opponent.`, this.game.players[1]);
+            this.declareWinner(
+                `${reason}: You were worth more than your opponent. `,
+                this.game.players[0],
+            );
+            this.declareLosers(
+                `${reason}: You were worth less than your opponent.`,
+                this.game.players[1],
+            );
 
             // exit the secondary win condition handler.
             return;
-        }
-        else if (player0Value < player1Value) {
+        } else if (player0Value < player1Value) {
             // declare the winners!
-            this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[1]);
-            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[0]);
+            this.declareWinner(
+                `${reason}: You were worth more than your opponent. `,
+                this.game.players[1],
+            );
+            this.declareLosers(
+                `${reason}: You were worth less than your opponent`,
+                this.game.players[0],
+            );
 
             // exit the secondary win condition handler.
             return;
-        }
-        else if (player0Mat > player1Mat) {
+        } else if (player0Mat > player1Mat) {
             // declare the winners!
-            this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[0]);
-            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[1]);
+            this.declareWinner(
+                `${reason}: You were worth more than your opponent. `,
+                this.game.players[0],
+            );
+            this.declareLosers(
+                `${reason}: You were worth less than your opponent`,
+                this.game.players[1],
+            );
 
             // exit the secondary win condition handler.
             return;
-        }
-        else if (player0Mat < player1Mat) {
+        } else if (player0Mat < player1Mat) {
             // declare the winners!
-            this.declareWinner(`${reason}: You were worth more than your opponent. `, this.game.players[1]);
-            this.declareLosers(`${reason}: You were worth less than your opponent`, this.game.players[0]);
+            this.declareWinner(
+                `${reason}: You were worth more than your opponent. `,
+                this.game.players[1],
+            );
+            this.declareLosers(
+                `${reason}: You were worth less than your opponent`,
+                this.game.players[0],
+            );
 
             // exit the secondary win condition handler.
             return;
@@ -248,8 +326,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 // resets the units moves.
                 unit.moves = unit.job.moves;
             }
-        }
-        else {
+        } else {
             // iterate over each unit to check the dashing status.
             for (const unit of this.game.players[1].units) {
                 // set the protector to undefined as units have moved.
@@ -300,11 +377,13 @@ export class StardashGameManager extends BaseClasses.GameManager {
      */
     private updateMartyr(player: number): void {
         // all martyr ships owned by the player that can protect.
-        const martyrs = this.game.players[player].units.filter((u) =>
-                      u.job.title === "martyr");
+        const martyrs = this.game.players[player].units.filter(
+            (u) => u.job.title === "martyr",
+        );
         // all units owned by the player that need to be guarded.
-        const units = this.game.players[player].units.filter((u) =>
-                      u.protector === undefined && u.shield <= 0);
+        const units = this.game.players[player].units.filter(
+            (u) => u.protector === undefined && u.shield <= 0,
+        );
         // iterate over martyr that can protect.
         for (const martyr of martyrs) {
             // regen martyr shields.
@@ -316,8 +395,11 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // iterate over every unprotected unit.
             for (const unit of units) {
                 // if the unit isn't protected and is in range.
-                if (Math.sqrt(((unit.x - martyr.x) ** 2) +
-                    ((unit.y - martyr.y) ** 2)) < martyr.job.range) {
+                if (
+                    Math.sqrt(
+                        (unit.x - martyr.x) ** 2 + (unit.y - martyr.y) ** 2,
+                    ) < martyr.job.range
+                ) {
                     // protected.
                     unit.protector = martyr;
                 }
@@ -326,7 +408,6 @@ export class StardashGameManager extends BaseClasses.GameManager {
             // make the martyr protect it's self
             martyr.protector = martyr;
         }
-
     }
 
     /**
@@ -342,10 +423,14 @@ export class StardashGameManager extends BaseClasses.GameManager {
         // iterate over every unit.
         for (const unit of this.game.units) {
             // if they are in the range of the player0 planet.
-            if (Math.sqrt(((unit.x - baseA.x) ** 2) + ((unit.y - baseA.y) ** 2)) <= baseA.radius) {
+            if (
+                Math.sqrt((unit.x - baseA.x) ** 2 + (unit.y - baseA.y) ** 2) <=
+                baseA.radius
+            ) {
                 // grab all valued materials and convert them to cash. Not Josh.
-                this.game.players[0].money += unit.genarium * this.game.genariumValue
-                    + unit.rarium * this.game.rariumValue +
+                this.game.players[0].money +=
+                    unit.genarium * this.game.genariumValue +
+                    unit.rarium * this.game.rariumValue +
                     unit.legendarium * this.game.legendariumValue;
                 // grab all vp materials.
                 this.game.players[0].victoryPoints += unit.mythicite;
@@ -369,10 +454,14 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 }
             }
             // if they are in the range of the player1 planet.
-            if (Math.sqrt(((unit.x - baseB.x) ** 2) + ((unit.y - baseB.y) ** 2)) <= baseB.radius) {
+            if (
+                Math.sqrt((unit.x - baseB.x) ** 2 + (unit.y - baseB.y) ** 2) <=
+                baseB.radius
+            ) {
                 // grab all valued materials and convert them to cash. Not Josh.
-                this.game.players[1].money += unit.genarium * this.game.genariumValue
-                    + unit.rarium * this.game.rariumValue +
+                this.game.players[1].money +=
+                    unit.genarium * this.game.genariumValue +
+                    unit.rarium * this.game.rariumValue +
                     unit.legendarium * this.game.legendariumValue;
                 // grab all vp materials.
                 this.game.players[1].victoryPoints += unit.mythicite;
@@ -383,7 +472,11 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 unit.mythicite = 0;
                 // if it is a friendly ship, recharge it.
                 if (unit.owner === baseB.owner) {
-                    const dif = unit.job.energy - unit.energy + unit.job.shield - unit.shield;
+                    const dif =
+                        unit.job.energy -
+                        unit.energy +
+                        unit.job.shield -
+                        unit.shield;
                     if (dif < baseB.amount) {
                         unit.energy = unit.job.energy;
                         unit.shield = unit.job.shield;
@@ -409,14 +502,21 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 continue;
             }
 
-            if (mis.target === null || mis.target === undefined || mis.target.x < 0 || mis.target.y < 0) {
+            if (
+                mis.target === null ||
+                mis.target === undefined ||
+                mis.target.x < 0 ||
+                mis.target.y < 0
+            ) {
                 mis.x = -100;
                 mis.y = -100;
                 continue;
             }
 
             // grab the distance between the projectile and it's target
-            const distance = Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2));
+            const distance = Math.sqrt(
+                (mis.x - mis.target.x) ** 2 + (mis.y - mis.target.y) ** 2,
+            );
             // grab the x difference between the projectile and it's target.
             const difX = Math.abs(mis.x - mis.target.x);
             // as long as the projectile isn't ontop of the target.
@@ -445,12 +545,16 @@ export class StardashGameManager extends BaseClasses.GameManager {
                     mis.y += moveY;
                 }
                 // decrease the missiles fuel appropriately.
-                mis.fuel -= Math.sqrt(((moveX) ** 2) + ((moveY) ** 2));
+                mis.fuel -= Math.sqrt(moveX ** 2 + moveY ** 2);
             }
 
             // if it is colliding with the target.
-            if (Math.sqrt(((mis.x - mis.target.x) ** 2) + ((mis.y - mis.target.y) ** 2)) <
-                            (this.game.projectileRadius + this.game.shipRadius)) {
+            if (
+                Math.sqrt(
+                    (mis.x - mis.target.x) ** 2 + (mis.y - mis.target.y) ** 2,
+                ) <
+                this.game.projectileRadius + this.game.shipRadius
+            ) {
                 // kill the missile and the target.
                 mis.x = -1;
                 mis.y = -1;
@@ -462,12 +566,25 @@ export class StardashGameManager extends BaseClasses.GameManager {
         }
 
         // Properly remove all killed units and ones that collide with the sun.
-        const deadUnits = this.game.units.filter((u) => u.x < 0 || u.y < 0 || u.energy < 0 ||
-                    Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius + this.game.shipRadius);
+        const deadUnits = this.game.units.filter(
+            (u) =>
+                u.x < 0 ||
+                u.y < 0 ||
+                u.energy < 0 ||
+                Math.sqrt((sun.x - u.x) ** 2 + (sun.y - u.y) ** 2) <
+                    sun.radius + this.game.shipRadius,
+        );
 
         // Properly remove all killed units and ones that collide with the sun.
-        const deadProj = this.game.projectiles.filter((u) => u.x < 0 || u.y < 0 || u.fuel < 0 || u.target.x < 0 ||
-                    Math.sqrt(((sun.x - u.x) ** 2) + ((sun.y - u.y) ** 2)) < sun.radius + this.game.projectileRadius);
+        const deadProj = this.game.projectiles.filter(
+            (u) =>
+                u.x < 0 ||
+                u.y < 0 ||
+                u.fuel < 0 ||
+                u.target.x < 0 ||
+                Math.sqrt((sun.x - u.x) ** 2 + (sun.y - u.y) ** 2) <
+                    sun.radius + this.game.projectileRadius,
+        );
 
         // add up destroyed mythicite.
         for (const unit of deadUnits) {
@@ -518,15 +635,15 @@ export class StardashGameManager extends BaseClasses.GameManager {
             if (ast.amount <= 0 && this.game.regenerateRate === 0) {
                 ast.x = -1;
                 ast.y = -1;
-            }
-            else if (this.game.regenerateRate > 0) {
+            } else if (this.game.regenerateRate > 0) {
                 ast.amount += this.game.regenerateRate;
             }
         }
 
         // Properly remove all killed asteroids.
-        const deadBodies = this.game.bodies.filter((u) => (u.x < 0 || u.y < 0)
-                                                && u.bodyType === "asteroid");
+        const deadBodies = this.game.bodies.filter(
+            (u) => (u.x < 0 || u.y < 0) && u.bodyType === "asteroid",
+        );
 
         // and remove them from the game
         removeElements(this.game.bodies, ...deadBodies);

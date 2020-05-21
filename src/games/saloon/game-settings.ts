@@ -14,7 +14,8 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -24,17 +25,20 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: schema -->>
 
             turnsDrunk: {
-                description: "The number of turns a cowboy is busy being drunk, after it first gets drunk.",
+                description:
+                    "The number of turns a cowboy is busy being drunk, after it first gets drunk.",
                 default: 5,
                 min: 0,
             },
             bartenderCooldown: {
-                description: "How many turns a Bartender is busy after throwing a bottle.",
+                description:
+                    "How many turns a Bartender is busy after throwing a bottle.",
                 default: 5,
                 min: 0,
             },
             rowdinessToSiesta: {
-                description: "How much rowdiness a player must get to force a siesta.",
+                description:
+                    "How much rowdiness a player must get to force a siesta.",
                 default: 8,
                 min: 1,
             },
@@ -44,17 +48,20 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
                 min: 0,
             },
             maxCowboysPerJob: {
-                description: "Maximum number of cowboys that can be called in per job.",
+                description:
+                    "Maximum number of cowboys that can be called in per job.",
                 default: 2,
                 min: 1,
             },
             sharpshooterDamage: {
-                description: "How much damage a Sharpshooter does to everything it hits.",
+                description:
+                    "How much damage a Sharpshooter does to everything it hits.",
                 default: 2,
                 min: 0,
             },
             brawlerDamage: {
-                description: "How much damage a Brawler does to its surroundings.",
+                description:
+                    "How much damage a Brawler does to its surroundings.",
                 default: 1,
                 min: 0,
             },
@@ -76,14 +83,16 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 200,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game is force ended and a winner is determined.",
             },
 
             // Tiled settings
@@ -92,16 +101,17 @@ export class SaloonGameSettingsManager extends BaseClasses.GameSettings {
                 default: 32,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
-                description: "The width (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The width (in Tiles) for the game map to be initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
                 default: 16,
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
-                description: "The height (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The height (in Tiles) for the game map to be initialized to.",
             },
-
         });
     }
 

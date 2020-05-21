@@ -30,7 +30,11 @@ export interface IBallGen {
  * @param rng - The RNG function
  * @returns A generated ball for the island.
  */
-export function islandBalls(mapWidth: number, mapHeight: number, rng: () => number): IBallGen {
+export function islandBalls(
+    mapWidth: number,
+    mapHeight: number,
+    rng: () => number,
+): IBallGen {
     const balls: IBall[] = [];
     const minRadius = 0.5;
     const maxRadius = 1.5;
@@ -65,7 +69,11 @@ export function islandBalls(mapWidth: number, mapHeight: number, rng: () => numb
  * @param rng - The RNG function
  * @returns A generated ball for the river.
  */
-export function riverBalls(mapWidth: number, mapHeight: number, rng: () => number): IBallGen {
+export function riverBalls(
+    mapWidth: number,
+    mapHeight: number,
+    rng: () => number,
+): IBallGen {
     const balls: IBall[] = [];
     const minRadius = 0.5;
     const maxRadius = 4.0;
@@ -75,7 +83,7 @@ export function riverBalls(mapWidth: number, mapHeight: number, rng: () => numbe
 
     // Initial ball
     const islandX = 0.5;
-    const islandY = (rng() < 0.5) ? 0.5 : (mapHeight - 0.5);
+    const islandY = rng() < 0.5 ? 0.5 : mapHeight - 0.5;
     balls.push({
         x: islandX,
         y: islandY,
@@ -108,7 +116,11 @@ export function riverBalls(mapWidth: number, mapHeight: number, rng: () => numbe
  * @param rng - The RNG function
  * @returns A generated ball for the corner.
  */
-export function cornerBalls(mapWidth: number, mapHeight: number, rng: () => number): IBallGen {
+export function cornerBalls(
+    mapWidth: number,
+    mapHeight: number,
+    rng: () => number,
+): IBallGen {
     const balls: IBall[] = [];
     const minRadius = 0.75;
     const maxRadius = 1.25;

@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBroodMotherConsumeArgs, IBroodMotherProperties,
-         IBroodMotherSpawnArgs, SpiderArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IBroodMotherConsumeArgs,
+    IBroodMotherProperties,
+    IBroodMotherSpawnArgs,
+    SpiderArgs,
+} from "./";
 import { Player } from "./player";
 import { Spider } from "./spider";
 import { Spiderling } from "./spiderling";
@@ -40,13 +44,16 @@ export class BroodMother extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderArgs & IBroodMotherProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Nest this BroodMother exists upon. */
-            nest: Nest;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            SpiderArgs &
+                IBroodMotherProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    /** The Nest this BroodMother exists upon. */
+                    nest: Nest;
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -80,12 +87,10 @@ export class BroodMother extends Spider {
         spiderling: Spiderling,
     ): void | string | IBroodMotherConsumeArgs {
         // <<-- Creer-Merge: invalidate-consume -->>
-
         // Check all the arguments for consume here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
         // <<-- /Creer-Merge: invalidate-consume -->>
     }
 
@@ -129,12 +134,10 @@ export class BroodMother extends Spider {
         spiderlingType: "Spitter" | "Weaver" | "Cutter",
     ): void | string | IBroodMotherSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
-
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
         // <<-- /Creer-Merge: invalidate-spawn -->>
     }
 

@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Stumped game
  * must implement from mixed in game logic.
  */
-export interface IBaseStumpedPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBaseStumpedPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -123,7 +135,6 @@ export interface IBeaverProperties {
      * Number of turns this Beaver is distracted for (0 means not distracted).
      */
     turnsDistracted?: number;
-
 }
 
 /**
@@ -143,8 +154,7 @@ export interface IBeaverAttackArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IBeaverBuildLodgeArgs {
-}
+export interface IBeaverBuildLodgeArgs {}
 
 /**
  * Argument overrides for Beaver's drop function. If you return an object of
@@ -215,8 +225,7 @@ export interface IBeaverPickupArgs {
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Job. */
 export interface IJobProperties {
@@ -269,7 +278,6 @@ export interface IJobProperties {
      * The Job title.
      */
     title?: string;
-
 }
 
 /**
@@ -342,7 +350,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Spawner. */
@@ -368,7 +375,6 @@ export interface ISpawnerProperties {
      * What type of resource this is ('food' or 'branches').
      */
     type?: "food" | "branches";
-
 }
 
 /** All the possible properties for an Tile. */
@@ -443,7 +449,6 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 export * from "./beaver";
@@ -492,9 +497,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Beaver hooked up in the game and ready for you to use.
      */
-    public beaver<T extends BeaverArgs>(
-        args: Readonly<T>,
-    ): Beaver & T {
+    public beaver<T extends BeaverArgs>(args: Readonly<T>): Beaver & T {
         return this.createGameObject("Beaver", Beaver, args);
     }
 
@@ -505,9 +508,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -518,9 +519,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
-    public spawner<T extends SpawnerArgs>(
-        args: Readonly<T>,
-    ): Spawner & T {
+    public spawner<T extends SpawnerArgs>(args: Readonly<T>): Spawner & T {
         return this.createGameObject("Spawner", Spawner, args);
     }
 
@@ -531,12 +530,9 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
-
 }
 
 /**
@@ -559,12 +555,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new StumpedGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -666,8 +660,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Beaver: {
             parentClassName: "GameObject",
@@ -725,8 +718,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 buildLodge: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -943,8 +935,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spawner: {
             parentClassName: "GameObject",
@@ -966,8 +957,7 @@ export const Namespace = makeNamespace({
                     literals: ["food", "branches"],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -1030,9 +1020,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "7de307cae4a9a163a9b3600cb20c4b376b9f9cc42f1b990852878fea0127eed3",
+    gameVersion:
+        "7de307cae4a9a163a9b3600cb20c4b376b9f9cc42f1b990852878fea0127eed3",
 });

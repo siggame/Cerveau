@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Building } from "./building";
 import { Forecast } from "./forecast";
@@ -80,7 +80,7 @@ export class AnarchyGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The width of the entire map along the vertical (y) axis.
@@ -132,7 +132,10 @@ export class AnarchyGame extends BaseClasses.Game {
     // <<-- Creer-Merge: attributes -->>
 
     /** A handy 2D grid of all the buildings. */
-    public readonly buildingsGrid = make2D<Building>(this.mapWidth, this.mapHeight);
+    public readonly buildingsGrid = make2D<Building>(
+        this.mapWidth,
+        this.mapHeight,
+    );
 
     /** The valid cardinal directions buildings can be in. */
     public readonly directions: ["North", "East", "South", "West"] = [
@@ -152,7 +155,7 @@ export class AnarchyGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: AnarchyGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -160,21 +163,28 @@ export class AnarchyGame extends BaseClasses.Game {
 
         const MIN_NUM_POINTS = 8;
         const MAX_NUM_POINTS = 15;
-        const NUM_POINTS = this.manager.random.int(MAX_NUM_POINTS, MIN_NUM_POINTS);
+        const NUM_POINTS = this.manager.random.int(
+            MAX_NUM_POINTS,
+            MIN_NUM_POINTS,
+        );
 
         const MIN_EDGE_POINTS = 1;
         const MAX_EDGE_POINTS = 5;
-        const EDGE_POINTS = this.manager.random.int(MAX_EDGE_POINTS, MIN_EDGE_POINTS);
+        const EDGE_POINTS = this.manager.random.int(
+            MAX_EDGE_POINTS,
+            MIN_EDGE_POINTS,
+        );
         const pointsSet = new Set<string>();
 
         // add random points (regular and edge points)
         for (let i = 0; i < NUM_POINTS + EDGE_POINTS; i++) {
-            const x = i < NUM_POINTS
-                ? this.manager.random.int(this.mapWidth / 2 - 1, 0)
-                : this.mapWidth / 2 - 1;
+            const x =
+                i < NUM_POINTS
+                    ? this.manager.random.int(this.mapWidth / 2 - 1, 0)
+                    : this.mapWidth / 2 - 1;
             const y = this.manager.random.int(this.mapHeight - 1, 0);
 
-            pointsSet.add(pointToKey({x, y}));
+            pointsSet.add(pointToKey({ x, y }));
         }
 
         // now connect the points, after shuffling them
@@ -191,14 +201,12 @@ export class AnarchyGame extends BaseClasses.Game {
                 // Is there a better way to do this?
                 if (from.x < to.x) {
                     changes.push({ x: 1, y: 0 });
-                }
-                else if (from.x > to.x) {
+                } else if (from.x > to.x) {
                     changes.push({ x: -1, y: 0 });
                 }
                 if (from.y < to.y) {
                     changes.push({ x: 0, y: 1 });
-                }
-                else if (from.y > to.y) {
+                } else if (from.y > to.y) {
                     changes.push({ x: 0, y: -1 });
                 }
                 // this means that the point has already been reached
@@ -220,12 +228,17 @@ export class AnarchyGame extends BaseClasses.Game {
         }
         this.manager.random.shuffle(points);
 
-        const buildingTypes = ["Warehouse", "FireDepartment", "PoliceDepartment", "WeatherStation"];
+        const buildingTypes = [
+            "Warehouse",
+            "FireDepartment",
+            "PoliceDepartment",
+            "WeatherStation",
+        ];
         const buildingsByWeight = new Map<string, number>();
-        buildingsByWeight.set("Warehouse", 0.40);
-        buildingsByWeight.set("FireDepartment", 0.30);
-        buildingsByWeight.set("PoliceDepartment", 0.20);
-        buildingsByWeight.set("WeatherStation", 0.10);
+        buildingsByWeight.set("Warehouse", 0.4);
+        buildingsByWeight.set("FireDepartment", 0.3);
+        buildingsByWeight.set("PoliceDepartment", 0.2);
+        buildingsByWeight.set("WeatherStation", 0.1);
 
         const minimumBuildingsPerType = 2;
         const originalBuildings = [];
@@ -237,7 +250,9 @@ export class AnarchyGame extends BaseClasses.Game {
                 // then we have the minimum number of buildings we want, so now
                 // introduce some random-ness
 
-                buildingType = this.manager.random.fromWeights(buildingsByWeight);
+                buildingType = this.manager.random.fromWeights(
+                    buildingsByWeight,
+                );
             }
 
             let isHeadquarters = false;
@@ -251,12 +266,14 @@ export class AnarchyGame extends BaseClasses.Game {
             }
 
             const { x, y } = keyToPoint(points[i]);
-            originalBuildings.push(this.manager.createBuilding(buildingType, {
-                x,
-                y,
-                isHeadquarters,
-                owner: this.manager.random.element(this.players),
-            }));
+            originalBuildings.push(
+                this.manager.createBuilding(buildingType, {
+                    x,
+                    y,
+                    isHeadquarters,
+                    owner: this.manager.random.element(this.players),
+                }),
+            );
         }
 
         // mirror the map
@@ -271,7 +288,9 @@ export class AnarchyGame extends BaseClasses.Game {
 
         // now all the buildings on the map should be created, so hook up the north/east/south/west pointers
         for (const building of this.buildings) {
-            for (const [direction, offset] of Object.entries(DIRECTIONAL_OFFSETS)) {
+            for (const [direction, offset] of Object.entries(
+                DIRECTIONAL_OFFSETS,
+            )) {
                 // tslint:disable-next-line:no-any no-unsafe-any - any other way would be stupid over complex
                 (building as any)[`building${direction}`] = this.getBuildingAt(
                     building.x + offset.x,
@@ -284,25 +303,29 @@ export class AnarchyGame extends BaseClasses.Game {
         // 264 and 265, etc) are the same initial states for each player.
         for (let i = 0; i < this.maxTurns; i += 2) {
             let direction = this.manager.random.element(this.directions);
-            const intensity = this.manager.random.int(this.maxForecastIntensity);
+            const intensity = this.manager.random.int(
+                this.maxForecastIntensity,
+            );
 
             for (let j = 0; j < 2; j++) {
-                if (j === 1) { // for the second player's forecasts mirror the directions East/West
+                if (j === 1) {
+                    // for the second player's forecasts mirror the directions East/West
                     if (direction === "East") {
                         direction = "West";
-                    }
-                    else if (direction === "West") {
+                    } else if (direction === "West") {
                         direction = "East";
                     }
                 }
 
                 direction = direction || "North";
 
-                this.forecasts.push(this.manager.create.forecast({
-                    direction,
-                    intensity,
-                    controllingPlayer: this.players[j],
-                }));
+                this.forecasts.push(
+                    this.manager.create.forecast({
+                        direction,
+                        intensity,
+                        controllingPlayer: this.players[j],
+                    }),
+                );
             }
         }
 

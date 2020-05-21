@@ -1,6 +1,12 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
-         IUnitMoveArgs, IUnitProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IUnitAttackArgs,
+    IUnitBuildArgs,
+    IUnitFishArgs,
+    IUnitMineArgs,
+    IUnitMoveArgs,
+    IUnitProperties,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -61,13 +67,15 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The job to assign this new Unit to */
-            job: UnitJob;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IUnitProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The job to assign this new Unit to */
+                job: UnitJob;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -134,8 +142,12 @@ export class Unit extends GameObject {
         }
 
         // Make sure the tile is in range.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} is trying to attack ${tile}, which is too far away.`;
         }
 
@@ -207,14 +219,11 @@ export class Unit extends GameObject {
 
         if (title === "arrow") {
             towerIndex = 1;
-        }
-        else if (title === "ballista") {
+        } else if (title === "ballista") {
             towerIndex = 2;
-        }
-        else if (title === "cleansing") {
+        } else if (title === "cleansing") {
             towerIndex = 3;
-        }
-        else if (title === "aoe") {
+        } else if (title === "aoe") {
             towerIndex = 4;
         }
 
@@ -249,8 +258,10 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if (player.gold < this.game.towerJobs[towerIndex].goldCost
-            || player.mana < this.game.towerJobs[towerIndex].manaCost) {
+        if (
+            player.gold < this.game.towerJobs[towerIndex].goldCost ||
+            player.mana < this.game.towerJobs[towerIndex].manaCost
+        ) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
@@ -303,14 +314,11 @@ export class Unit extends GameObject {
 
         if (title === "arrow") {
             towerIndex = 1;
-        }
-        else if (title === "ballista") {
+        } else if (title === "ballista") {
             towerIndex = 2;
-        }
-        else if (title === "cleansing") {
+        } else if (title === "cleansing") {
             towerIndex = 3;
-        }
-        else if (title === "aoe") {
+        } else if (title === "aoe") {
             towerIndex = 4;
         }
 
@@ -369,10 +377,14 @@ export class Unit extends GameObject {
             return `${this} is not on a tile! Could they be behind you..?`;
         }
 
-        if (!((this.tile.tileEast && this.tile.tileEast.isRiver)
-            || (this.tile.tileWest && this.tile.tileWest.isRiver)
-            || (this.tile.tileNorth && this.tile.tileNorth.isRiver)
-            || (this.tile.tileSouth && this.tile.tileSouth.isRiver))) {
+        if (
+            !(
+                (this.tile.tileEast && this.tile.tileEast.isRiver) ||
+                (this.tile.tileWest && this.tile.tileWest.isRiver) ||
+                (this.tile.tileNorth && this.tile.tileNorth.isRiver) ||
+                (this.tile.tileSouth && this.tile.tileSouth.isRiver)
+            )
+        ) {
             return `${this} is not near any river tiles!`;
         }
 
@@ -478,11 +490,10 @@ export class Unit extends GameObject {
 
         // Assign Gold gain based on mine type
         // tslint:disable-next-line:prefer-conditional-expression
-        if ((this.tile) && (this.tile.isIslandGoldMine)) {
+        if (this.tile && this.tile.isIslandGoldMine) {
             // Is island Gold Mine
             goldGain = this.game.islandIncomePerUnit;
-        }
-        else {
+        } else {
             // Is Normal Gold Mine
             goldGain = this.game.goldIncomePerUnit;
         }
@@ -530,10 +541,12 @@ export class Unit extends GameObject {
             return `${this} is not on a tile! Could they be behind you..?`;
         }
 
-        if (tile !== this.tile.tileEast
-            && tile !== this.tile.tileWest
-            && tile !== this.tile.tileNorth
-            && tile !== this.tile.tileSouth) {
+        if (
+            tile !== this.tile.tileEast &&
+            tile !== this.tile.tileWest &&
+            tile !== this.tile.tileNorth &&
+            tile !== this.tile.tileSouth
+        ) {
             return `${this} cannot move to a non-adjacent tile!`;
         }
 
@@ -548,7 +561,10 @@ export class Unit extends GameObject {
         }
 
         // Make both players don't own the tile
-        if (this.job.title === "worker" && tile.owner === this.owner.opponent) {
+        if (
+            this.job.title === "worker" &&
+            tile.owner === this.owner.opponent
+        ) {
             return `${this} cannot walk on the enemies side!`;
         }
 
@@ -571,15 +587,23 @@ export class Unit extends GameObject {
         if (tile.unit) {
             if (tile.unit.job !== this.job) {
                 return `${this} is not allowed to walk on ${tile.unit}!`;
-            }
-            else {
-                if (this.job.title === "zombie" && tile.numZombies >= this.game.unitJobs[1].perTile
-                    || this.job.title === "hound" && tile.numHounds >= this.game.unitJobs[4].perTile
-                    || this.job.title === "ghoul" && tile.numGhouls >= this.game.unitJobs[2].perTile) {
+            } else {
+                if (
+                    (this.job.title === "zombie" &&
+                        tile.numZombies >= this.game.unitJobs[1].perTile) ||
+                    (this.job.title === "hound" &&
+                        tile.numHounds >= this.game.unitJobs[4].perTile) ||
+                    (this.job.title === "ghoul" &&
+                        tile.numGhouls >= this.game.unitJobs[2].perTile)
+                ) {
                     return `${this} cannot walk on a fully occupied tile!`;
                 }
-                if (this.job.title === "worker" || this.job.title === "abomination"
-                    || this.job.title === "horseman" || this.job.title === "wraith") {
+                if (
+                    this.job.title === "worker" ||
+                    this.job.title === "abomination" ||
+                    this.job.title === "horseman" ||
+                    this.job.title === "wraith"
+                ) {
                     return `${this} cannot walk on an occupied tile!`;
                 }
             }
@@ -616,17 +640,17 @@ export class Unit extends GameObject {
         if (this.job.title === "ghoul") {
             tile.numGhouls++;
             this.tile.numGhouls--;
-        }
-        else if (this.job.title === "hound") {
+        } else if (this.job.title === "hound") {
             tile.numHounds++;
             this.tile.numHounds--;
-        }
-        else if (this.job.title === "zombie") {
+        } else if (this.job.title === "zombie") {
             tile.numZombies++;
             this.tile.numZombies--;
         }
 
-        this.tile.unit = player.units.find((unit) => unit !== this && unit.tile === this.tile);
+        this.tile.unit = player.units.find(
+            (unit) => unit !== this && unit.tile === this.tile,
+        );
         this.tile = tile;
         tile.unit = this;
         this.moves -= 1;

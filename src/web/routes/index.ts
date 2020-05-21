@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { URL } from "url";
-import { ISettingsSchema, ISettingsSchemas } from "~/core/game";
+import { SettingsSchema, SettingsSchemas } from "~/core/game";
 import { Lobby } from "~/core/server";
 import { formatGamelogInfos } from "~/web/utils";
 
@@ -13,8 +13,8 @@ export * from "./setup";
 export * from "./status";
 
 /** Setting for the view to expect. */
-type Setting = ISettingsSchema & {
-    /** The name of the setting */
+type Setting = SettingsSchema & {
+    /** The name of the setting. */
     name: string;
 };
 
@@ -41,7 +41,9 @@ export function registerRouteIndex(app: Express): void {
 
     const lobby = Lobby.getInstance();
     lobby.gamesInitializedPromise.then(() => {
-        for (const gameName of Array.from(lobby.gameNamespaces.keys()).sort()) {
+        for (const gameName of Array.from(
+            lobby.gameNamespaces.keys(),
+        ).sort()) {
             const namespace = lobby.gameNamespaces.get(gameName);
             if (!namespace) {
                 throw new Error(`${namespace} is not a game namespace!`);
@@ -53,7 +55,8 @@ export function registerRouteIndex(app: Express): void {
                 .sort()
                 .map((name) => ({
                     name,
-                    ...(namespace.gameSettingsManager.schema as ISettingsSchemas)[name],
+                    ...(namespace.gameSettingsManager
+                        .schema as SettingsSchemas)[name],
                 }));
 
             games.push({
@@ -64,25 +67,28 @@ export function registerRouteIndex(app: Express): void {
         }
     });
 
-    app.get("/", async (req, res) => {
+    app.get("/", (req, res) => {
         // get the current gamelogs
         const logs = lobby.gamelogManager.gamelogInfos;
         const hostUrl = req.headers.host
-            ? new URL(`http://${req.headers.host}/`) // tslint:disable-line:no-http-string
+            ? new URL(`http://${req.headers.host}/`)
             : undefined;
 
-        const gamelogs = formatGamelogInfos(logs
-            .slice(-MAX_GAMELOGS_ON_INDEX) // select the last 10 gamelogs from all the logs to render on the index
-            .reverse(), // reverse the order, so that the last is the first element (latest) in the array
-        hostUrl && hostUrl.hostname);
+        const gamelogs = formatGamelogInfos(
+            logs
+                .slice(-MAX_GAMELOGS_ON_INDEX) // select the last 10 gamelogs from all the logs to render on the index
+                .reverse(), // reverse the order, so that the last is the first element (latest) in the array
+            hostUrl && hostUrl.hostname,
+        );
 
         const activeRooms = lobby.getActiveRooms();
 
         res.render("index.hbs", {
             games,
             gamelogs,
-            moreGamelogs: (gamelogs.length === MAX_GAMELOGS_ON_INDEX // If we're showing the max number of gamelogs now
-                        && logs.length > gamelogs.length),           // and there are still more logs remaining to show
+            moreGamelogs:
+                gamelogs.length === MAX_GAMELOGS_ON_INDEX && // If we're showing the max number of gamelogs now
+                logs.length > gamelogs.length, // and there are still more logs remaining to show
             rooms: activeRooms.map((room) => ({
                 id: room.id,
                 gameName: room.gameNamespace.gameName,

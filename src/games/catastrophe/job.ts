@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IJobProperties } from "./";
 import { GameObject } from "./game-object";
 
@@ -9,7 +9,13 @@ import { GameObject } from "./game-object";
 /**
  * The Job title.
  */
-export type JobTitle = "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
+export type JobTitle =
+    | "fresh human"
+    | "cat overlord"
+    | "soldier"
+    | "gatherer"
+    | "builder"
+    | "missionary";
 
 /**
  * Information about a Unit's job.
@@ -38,7 +44,13 @@ export class Job extends GameObject {
     /**
      * The Job title.
      */
-    public readonly title!: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
+    public readonly title!:
+        | "fresh human"
+        | "cat overlord"
+        | "soldier"
+        | "gatherer"
+        | "builder"
+        | "missionary";
 
     /**
      * The amount of food per turn this Unit consumes. If there isn't enough
@@ -61,12 +73,14 @@ export class Job extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IJobProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IJobProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

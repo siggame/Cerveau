@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { NewtonianGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -81,7 +81,7 @@ export class NewtonianGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The maximum number of interns a player can have.
@@ -207,7 +207,7 @@ export class NewtonianGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: NewtonianGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -287,7 +287,9 @@ export class NewtonianGame extends BaseClasses.Game {
         const getMutableTile = (x: number, y: number): Mutable<Tile> => {
             const tile = this.getTile(x, y);
             if (!tile) {
-                throw new Error(`Cannot get a tile for map generation at (${x}, ${y})`);
+                throw new Error(
+                    `Cannot get a tile for map generation at (${x}, ${y})`,
+                );
             }
 
             return tile;
@@ -306,15 +308,16 @@ export class NewtonianGame extends BaseClasses.Game {
         // used to track the maps mid-point.
         const mid = Math.floor(this.mapHeight / 2);
         // iterates over the map and adds basic structure.
-        for (let x = 0; x < (this.mapWidth / 2 + 1); x++) {
+        for (let x = 0; x < this.mapWidth / 2 + 1; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                if (y === 0 // bottom edge of map
-                 || y === (this.mapHeight - 1) // top edge of map
-                 || x === 0 // left edge of map
-                 || x === RMstart
-                 || x === MMstart
-                // || x === Math.floor(this.mapWidth / 2) - 1
-                 || (x < startEnd && (y === spawnEnd || y === genEnd))
+                if (
+                    y === 0 || // bottom edge of map
+                    y === this.mapHeight - 1 || // top edge of map
+                    x === 0 || // left edge of map
+                    x === RMstart ||
+                    x === MMstart ||
+                    // || x === Math.floor(this.mapWidth / 2) - 1
+                    (x < startEnd && (y === spawnEnd || y === genEnd))
                 ) {
                     getMutableTile(x, y).isWall = true;
                 }
@@ -353,27 +356,26 @@ export class NewtonianGame extends BaseClasses.Game {
             direction: Tile["direction"];
         }> = [];
         for (let x = 1; x < startEnd - 1; x++) {
-            conveyors.push({x, y: this.mapHeight - 3, direction: "east"});
+            conveyors.push({ x, y: this.mapHeight - 3, direction: "east" });
         }
         for (let y = this.mapHeight - 3; y > genEnd + 2; y--) {
-            conveyors.push({x: startEnd - 1, y, direction: "north"});
+            conveyors.push({ x: startEnd - 1, y, direction: "north" });
         }
         for (let x = startEnd - 1; x > 1; x--) {
-            conveyors.push({x, y: genEnd + 2, direction: "west"});
+            conveyors.push({ x, y: genEnd + 2, direction: "west" });
         }
-        conveyors.push({x: 1, y: genEnd + 2, direction: "blank"});
+        conveyors.push({ x: 1, y: genEnd + 2, direction: "blank" });
         for (const { x, y, direction } of conveyors) {
             let tile = getMutableTile(x, y);
             tile.type = "conveyor";
             tile.direction = direction;
             this.players[0].conveyors.push(tile as Tile);
-            tile = getMutableTile((this.mapWidth - 1 - x), y);
+            tile = getMutableTile(this.mapWidth - 1 - x, y);
             tile.type = "conveyor";
             let dir = direction;
             if (dir === "east") {
                 dir = "west";
-            }
-            else if (dir === "west") {
+            } else if (dir === "west") {
                 dir = "east";
             }
             tile.direction = dir;
@@ -393,7 +395,9 @@ export class NewtonianGame extends BaseClasses.Game {
         // Determine the size of the center room
         const midSize = this.manager.random.int(6, 3);
         // Determine the rooms offset
-        let shift = this.manager.random.int(Math.floor(this.mapHeight / 2) - midSize);
+        let shift = this.manager.random.int(
+            Math.floor(this.mapHeight / 2) - midSize,
+        );
         // let shift = Math.floor(this.mapHeight / 2) - midSize - 3; // for testing
         // Edge case handling to make sure walls don't touch.
         if (shift === Math.floor(this.mapHeight / 2) - midSize - 1) {
@@ -422,7 +426,7 @@ export class NewtonianGame extends BaseClasses.Game {
         const machine = this.manager.create.machine({
             oreType: "redium",
             refineTime: time,
-            refineInput: (Math.floor(time / 2) + 1),
+            refineInput: Math.floor(time / 2) + 1,
             refineOutput: Math.floor(time / 2),
             tile: loc as Tile,
         });
@@ -440,17 +444,35 @@ export class NewtonianGame extends BaseClasses.Game {
                 this.drawDoor(MMstart, 1, 2, getMutableTile);
             }
             // if there are 2 spaces.
-            else if (shift === -(Math.floor(this.mapHeight / 2) - midSize - 5)) {
-                this.roomCalc(MMstart + 1, Math.floor((this.mapWidth - 2) / 2), 1,
-                              mid - midSize + shift - 3, getMutableTile,
-                              false, true, true, false);
+            else if (
+                shift === -(Math.floor(this.mapHeight / 2) - midSize - 5)
+            ) {
+                this.roomCalc(
+                    MMstart + 1,
+                    Math.floor((this.mapWidth - 2) / 2),
+                    1,
+                    mid - midSize + shift - 3,
+                    getMutableTile,
+                    false,
+                    true,
+                    true,
+                    false,
+                );
             }
             // if the room is bigger.
             else {
                 // generates the rooms.
-                this.roomCalc(MMstart + 1, Math.floor((this.mapWidth - 2) / 2), 1,
-                              mid - midSize + shift - 1, getMutableTile,
-                              false, true, true, false);
+                this.roomCalc(
+                    MMstart + 1,
+                    Math.floor((this.mapWidth - 2) / 2),
+                    1,
+                    mid - midSize + shift - 1,
+                    getMutableTile,
+                    false,
+                    true,
+                    true,
+                    false,
+                );
             }
         }
         // bottom area
@@ -461,39 +483,68 @@ export class NewtonianGame extends BaseClasses.Game {
             }
             // generate 2 tall area.
             else if (shift === Math.floor(this.mapHeight / 2) - midSize - 5) {
-                this.roomCalc(MMstart + 1, Math.floor((this.mapWidth - 2) / 2),
-                              mid + midSize + shift + 3,
-                              this.mapHeight - 2, getMutableTile,
-                              true, true, false, false);
-            }
-            else {
+                this.roomCalc(
+                    MMstart + 1,
+                    Math.floor((this.mapWidth - 2) / 2),
+                    mid + midSize + shift + 3,
+                    this.mapHeight - 2,
+                    getMutableTile,
+                    true,
+                    true,
+                    false,
+                    false,
+                );
+            } else {
                 // generates the rooms.
-                this.roomCalc(MMstart + 1, Math.floor((this.mapWidth - 2) / 2),
-                              mid + midSize + shift + 1,
-                              this.mapHeight - 2, getMutableTile,
-                              true, true, false, false);
+                this.roomCalc(
+                    MMstart + 1,
+                    Math.floor((this.mapWidth - 2) / 2),
+                    mid + midSize + shift + 1,
+                    this.mapHeight - 2,
+                    getMutableTile,
+                    true,
+                    true,
+                    false,
+                    false,
+                );
             }
         }
         // generate Side area
-        this.roomCalc(RMstart + 1, MMstart - 1, 1,
-                        this.mapHeight - 2, getMutableTile,
-                        false, true, false, true,
-                        Math.min((this.mapHeight * this.mapWidth) / 700));
+        this.roomCalc(
+            RMstart + 1,
+            MMstart - 1,
+            1,
+            this.mapHeight - 2,
+            getMutableTile,
+            false,
+            true,
+            false,
+            true,
+            Math.min((this.mapHeight * this.mapWidth) / 700),
+        );
         // mirror map
         // iterate over every tile from the created half.
         for (let y = 0; y < this.mapHeight; y++) {
             for (let x = 0; x < this.mapWidth / 2; x++) {
                 // copies walls.
-                getMutableTile((this.mapWidth - 1 - x), y).isWall = getMutableTile(x, y).isWall;
+                getMutableTile(
+                    this.mapWidth - 1 - x,
+                    y,
+                ).isWall = getMutableTile(x, y).isWall;
                 // copies decoration values.
-                getMutableTile((this.mapWidth - 1 - x), y).decoration = getMutableTile(x, y).decoration;
+                getMutableTile(
+                    this.mapWidth - 1 - x,
+                    y,
+                ).decoration = getMutableTile(x, y).decoration;
                 // check for a machine.
                 if (getMutableTile(x, y).machine) {
                     // grab the machine.
                     const mach = getMutableTile(x, y).machine;
                     // doubly make sure it exists, because typescript.
                     if (mach === undefined) {
-                        throw new Error(`The machine you are copying: ${mach}, doesn't exist!`);
+                        throw new Error(
+                            `The machine you are copying: ${mach}, doesn't exist!`,
+                        );
                     }
                     // make a new machine.
                     const machine2 = this.manager.create.machine({
@@ -501,16 +552,19 @@ export class NewtonianGame extends BaseClasses.Game {
                         refineTime: mach.refineTime,
                         refineInput: mach.refineInput,
                         refineOutput: mach.refineOutput,
-                        tile: getMutableTile((this.mapWidth - 1 - x), y) as Tile,
+                        tile: getMutableTile(this.mapWidth - 1 - x, y) as Tile,
                     });
                     // add te machine to the data.
-                    getMutableTile((this.mapWidth - 1 - x), y).machine = machine2;
+                    getMutableTile(
+                        this.mapWidth - 1 - x,
+                        y,
+                    ).machine = machine2;
                     this.machines.push(machine2);
                 }
                 // if the tile is a spawn tile, copy it.
                 else if (getMutableTile(x, y).type === "spawn") {
                     // grab the mirror tile.
-                    const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    const tile = getMutableTile(this.mapWidth - 1 - x, y);
                     // add the information.
                     tile.type = "spawn";
                     tile.owner = this.players[1];
@@ -520,7 +574,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 // if the tile is a generator tile, copy it.
                 else if (getMutableTile(x, y).type === "generator") {
                     // grab the mirror tile.
-                    const tile = getMutableTile((this.mapWidth - 1 - x), y);
+                    const tile = getMutableTile(this.mapWidth - 1 - x, y);
                     // add the information.
                     tile.type = "generator";
                     tile.owner = this.players[1];
@@ -547,13 +601,29 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param x3 - If the room is 3 wide, this is actually the highest value.
      * @returns - the room object.
      */
-    private makeRoom(x1: number, x2: number, y1: number, y2: number, y3: number = -1, x3: number = -1): IRoom {
+    private makeRoom(
+        x1: number,
+        x2: number,
+        y1: number,
+        y2: number,
+        y3: number = -1,
+        x3: number = -1,
+    ): IRoom {
         return {
-            x1, y1,
-            x2, y2,
-            x3, y3,
-            WNorth: true, WEast: true, WSouth: true, WWest: true,
-            DNorth: false, DEast: false, DSouth: false, DWest: false,
+            x1,
+            y1,
+            x2,
+            y2,
+            x3,
+            y3,
+            WNorth: true,
+            WEast: true,
+            WSouth: true,
+            WWest: true,
+            DNorth: false,
+            DEast: false,
+            DSouth: false,
+            DWest: false,
         };
     }
 
@@ -573,11 +643,18 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param machines - The number of machines you want added to the map.
      * @returns - nothing, calls the next stage
      */
-    private roomCalc(x1: number, x2: number, y1: number, y2: number,
-                     getMutableTile: (x: number, y: number) => Mutable<Tile>,
-                     DNorth: boolean = false, DEast: boolean = false,
-                     DSouth: boolean = false, DWest: boolean = false,
-                     machines: number = 0): void {
+    private roomCalc(
+        x1: number,
+        x2: number,
+        y1: number,
+        y2: number,
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+        DNorth: boolean = false,
+        DEast: boolean = false,
+        DSouth: boolean = false,
+        DWest: boolean = false,
+        machines: number = 0,
+    ): void {
         // determines the number of rooms on the x axis
         const mapW = Math.floor((x2 - x1 + 2) / 3); // MUST be a whole number
         // determines the number of rooms on the y axis
@@ -626,12 +703,12 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (y === yLarge[shiftY]) {
                         // create the room.
                         const room = this.makeRoom(
-                            x1 + (x * 3) + shiftX,
-                            x1 + 1 + (x * 3) + shiftX,
-                            y1 + (y * 3) + shiftY,
-                            y1 + 1 + (y * 3) + shiftY,
-                            y1 + 2 + (y * 3) + shiftY,
-                            x1 + 2 + (x * 3) + shiftX,
+                            x1 + x * 3 + shiftX,
+                            x1 + 1 + x * 3 + shiftX,
+                            y1 + y * 3 + shiftY,
+                            y1 + 1 + y * 3 + shiftY,
+                            y1 + 2 + y * 3 + shiftY,
+                            x1 + 2 + x * 3 + shiftX,
                         );
                         // add the room.
                         map[x][y] = room;
@@ -642,12 +719,12 @@ export class NewtonianGame extends BaseClasses.Game {
                     else {
                         // create the room.
                         const room = this.makeRoom(
-                            x1 + (x * 3) + shiftX,
-                            x1 + 1 + (x * 3) + shiftX,
-                            y1 + (y * 3) + shiftY,
-                            y1 + 1 + (y * 3) + shiftY,
+                            x1 + x * 3 + shiftX,
+                            x1 + 1 + x * 3 + shiftX,
+                            y1 + y * 3 + shiftY,
+                            y1 + 1 + y * 3 + shiftY,
                             -1,
-                            x1 + 2 + (x * 3) + shiftX,
+                            x1 + 2 + x * 3 + shiftX,
                         );
                         // add the room.
                         map[x][y] = room;
@@ -659,11 +736,11 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (y === yLarge[shiftY]) {
                         // create the room.
                         const room = this.makeRoom(
-                            x1 + (x * 3) + shiftX,
-                            x1 + 1 + (x * 3) + shiftX,
-                            y1 + (y * 3) + shiftY,
-                            y1 + 1 + (y * 3) + shiftY,
-                            y1 + 2 + (y * 3) + shiftY,
+                            x1 + x * 3 + shiftX,
+                            x1 + 1 + x * 3 + shiftX,
+                            y1 + y * 3 + shiftY,
+                            y1 + 1 + y * 3 + shiftY,
+                            y1 + 2 + y * 3 + shiftY,
                         );
                         // add the room.
                         map[x][y] = room;
@@ -674,10 +751,10 @@ export class NewtonianGame extends BaseClasses.Game {
                     else {
                         // create the room.
                         const room = this.makeRoom(
-                            x1 + (x * 3) + shiftX,
-                            x1 + 1 + (x * 3) + shiftX,
-                            y1 + (y * 3) + shiftY,
-                            y1 + 1 + (y * 3) + shiftY,
+                            x1 + x * 3 + shiftX,
+                            x1 + 1 + x * 3 + shiftX,
+                            y1 + y * 3 + shiftY,
+                            y1 + 1 + y * 3 + shiftY,
                         );
                         // add the room.
                         map[x][y] = room;
@@ -742,8 +819,11 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param machines - the number of machines to be added to the map.
      * @param getMutableTile - A function that gets a mutable tile given an (x, y)
      */
-    private roomFill(map: IRoom[][], machines: number,
-                     getMutableTile: (x: number, y: number) => Mutable<Tile>): void {
+    private roomFill(
+        map: IRoom[][],
+        machines: number,
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+    ): void {
         // tracks every room in the map list that is unconnected.
         const unconnected: IPoint[] = [];
         // master list of random rooms in a easy to grab fashion.
@@ -757,9 +837,9 @@ export class NewtonianGame extends BaseClasses.Game {
         // adds all the points to the two lists
         for (let x = 0; x < map.length; x++) {
             for (let y = 0; y < map[0].length; y++) {
-                unconnected.push({x, y});
-                roomList.push({x, y});
-                machRooms.push({x, y});
+                unconnected.push({ x, y });
+                roomList.push({ x, y });
+                machRooms.push({ x, y });
             }
         }
         // add machines to the map
@@ -807,19 +887,29 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (room.x3 === -1) {
                         // gets a random location.
                         // check to protect against machine blocked doorways.
-                        const place = (find.x === map.length - 1) ? this.manager.random.int(2, 0) :
-                                       this.manager.random.int(4, 0);
+                        const place =
+                            find.x === map.length - 1
+                                ? this.manager.random.int(2, 0)
+                                : this.manager.random.int(4, 0);
                         // grab the room location
-                        loc = getMutableTile(room.x1 + Math.floor(place / 2), room.y1 + (place % 2));
+                        loc = getMutableTile(
+                            room.x1 + Math.floor(place / 2),
+                            room.y1 + (place % 2),
+                        );
                     }
                     // if the room is 3 wide.
                     else {
                         // gets a random location.
                         // check to protect against machine blocked doorways.
-                        const place = (find.x === map.length - 1) ? this.manager.random.int(4, 0) :
-                                       this.manager.random.int(6, 0);
+                        const place =
+                            find.x === map.length - 1
+                                ? this.manager.random.int(4, 0)
+                                : this.manager.random.int(6, 0);
                         // grab the room location
-                        loc = getMutableTile(room.x1 + Math.floor(place / 2), room.y1 + (place % 2));
+                        loc = getMutableTile(
+                            room.x1 + Math.floor(place / 2),
+                            room.y1 + (place % 2),
+                        );
                     }
                 }
                 // if the room is 3 tall.
@@ -828,19 +918,29 @@ export class NewtonianGame extends BaseClasses.Game {
                     if (room.x3 === -1) {
                         // gets a random location.
                         // check to protect against machine blocked doorways.
-                        const place = (find.x === map.length - 1) ? this.manager.random.int(3, 0) :
-                                       this.manager.random.int(6, 0);
+                        const place =
+                            find.x === map.length - 1
+                                ? this.manager.random.int(3, 0)
+                                : this.manager.random.int(6, 0);
                         // grab the room location
-                        loc = getMutableTile(room.x1 + Math.floor(place / 3), room.y1 + (place % 3));
+                        loc = getMutableTile(
+                            room.x1 + Math.floor(place / 3),
+                            room.y1 + (place % 3),
+                        );
                     }
                     // if the room is 3 wide.
                     else {
                         // gets a random location.
                         // check to protect against machine blocked doorways.
-                        const place = (find.x === map.length - 1) ? this.manager.random.int(6, 0) :
-                                       this.manager.random.int(9, 0);
+                        const place =
+                            find.x === map.length - 1
+                                ? this.manager.random.int(6, 0)
+                                : this.manager.random.int(9, 0);
                         // grab the room location
-                        loc = getMutableTile(room.x1 + Math.floor(place / 3), room.y1 + (place % 3));
+                        loc = getMutableTile(
+                            room.x1 + Math.floor(place / 3),
+                            room.y1 + (place % 3),
+                        );
                     }
                 }
                 // Generate the run time for the machines
@@ -849,7 +949,7 @@ export class NewtonianGame extends BaseClasses.Game {
                 const machine = this.manager.create.machine({
                     oreType: "redium",
                     refineTime: time,
-                    refineInput: (Math.floor(time / 2) + 1),
+                    refineInput: Math.floor(time / 2) + 1,
                     refineOutput: Math.floor(time / 2),
                     tile: loc as Tile,
                 });
@@ -882,15 +982,24 @@ export class NewtonianGame extends BaseClasses.Game {
                     // if the direction is north.
                     if (rot === 0) {
                         // checks if the choice is optimal or at least legal
-                        if (map[find.x][find.y - 1] && (this.has(unconnected, find.x, find.y - 1) >= 0 || num >= 4)) {
+                        if (
+                            map[find.x][find.y - 1] &&
+                            (this.has(unconnected, find.x, find.y - 1) >= 0 ||
+                                num >= 4)
+                        ) {
                             // makes the connection.
                             map[find.x][find.y].WNorth = false;
                             map[find.x][find.y - 1].WSouth = false;
                             // the room is connected, so it is removed from unconnected.
                             unconnected.splice(index, 1);
                             // if the other room is in the unconnected list, remove it as well.
-                            if (this.has(unconnected, find.x, find.y - 1) >= 0) {
-                                unconnected.splice(this.has(unconnected, find.x, find.y - 1), 1);
+                            if (
+                                this.has(unconnected, find.x, find.y - 1) >= 0
+                            ) {
+                                unconnected.splice(
+                                    this.has(unconnected, find.x, find.y - 1),
+                                    1,
+                                );
                             }
                             // it has picked something, let the loop end.
                             done = true;
@@ -904,15 +1013,24 @@ export class NewtonianGame extends BaseClasses.Game {
                     // if the direction is east
                     else if (rot === 1) {
                         // checks if the choice is optimal or at least legal
-                        if (map[find.x + 1] && (this.has(unconnected, find.x + 1, find.y) >= 0 || num >= 5)) {
+                        if (
+                            map[find.x + 1] &&
+                            (this.has(unconnected, find.x + 1, find.y) >= 0 ||
+                                num >= 5)
+                        ) {
                             // makes the connection.
                             map[find.x][find.y].WEast = false;
                             map[find.x + 1][find.y].WWest = false;
                             // the room is connected, so it is removed from unconnected.
                             unconnected.splice(index, 1);
                             // if the other room is in the unconnected list, remove it as well.
-                            if (this.has(unconnected, find.x + 1, find.y) >= 0) {
-                                unconnected.splice(this.has(unconnected, find.x + 1, find.y), 1);
+                            if (
+                                this.has(unconnected, find.x + 1, find.y) >= 0
+                            ) {
+                                unconnected.splice(
+                                    this.has(unconnected, find.x + 1, find.y),
+                                    1,
+                                );
                             }
                             // it has picked something, let the loop end.
                             done = true;
@@ -926,15 +1044,24 @@ export class NewtonianGame extends BaseClasses.Game {
                     // if the direction is south.
                     else if (rot === 2) {
                         // checks if the choice is optimal or at least legal
-                        if (map[find.x][find.y + 1] && (this.has(unconnected, find.x, find.y + 1) >= 0 || num >= 5)) {
+                        if (
+                            map[find.x][find.y + 1] &&
+                            (this.has(unconnected, find.x, find.y + 1) >= 0 ||
+                                num >= 5)
+                        ) {
                             // makes the connection.
                             map[find.x][find.y].WSouth = false;
                             map[find.x][find.y + 1].WNorth = false;
                             // the room is connected, so it is removed from unconnected.
                             unconnected.splice(index, 1);
                             // if the other room is in the unconnected list, remove it as well.
-                            if (this.has(unconnected, find.x, find.y + 1) >= 0) {
-                                unconnected.splice(this.has(unconnected, find.x + 1, find.y), 1);
+                            if (
+                                this.has(unconnected, find.x, find.y + 1) >= 0
+                            ) {
+                                unconnected.splice(
+                                    this.has(unconnected, find.x + 1, find.y),
+                                    1,
+                                );
                             }
                             // it has picked something, let the loop end.
                             done = true;
@@ -948,15 +1075,24 @@ export class NewtonianGame extends BaseClasses.Game {
                     // if the direction is west.
                     else {
                         // checks if the choice is optimal or at least legal
-                        if (map[find.x - 1] && (this.has(unconnected, find.x - 1, find.y) >= 0 || num >= 5)) {
+                        if (
+                            map[find.x - 1] &&
+                            (this.has(unconnected, find.x - 1, find.y) >= 0 ||
+                                num >= 5)
+                        ) {
                             // makes the connection.
                             map[find.x][find.y].WWest = false;
                             map[find.x - 1][find.y].WEast = false;
                             // the room is connected, so it is removed from unconnected.
                             unconnected.splice(index, 1);
                             // if the other room is in the unconnected list, remove it as well.
-                            if (this.has(unconnected, find.x - 1, find.y) >= 0) {
-                                unconnected.splice(this.has(unconnected, find.x - 1, find.y), 1);
+                            if (
+                                this.has(unconnected, find.x - 1, find.y) >= 0
+                            ) {
+                                unconnected.splice(
+                                    this.has(unconnected, find.x - 1, find.y),
+                                    1,
+                                );
                             }
                             // it has picked something, let the loop end.
                             done = true;
@@ -972,7 +1108,8 @@ export class NewtonianGame extends BaseClasses.Game {
             // every room as been connected, do a simpler random connection.
             else {
                 // grabs a random room.
-                const find = roomList[this.manager.random.int(roomList.length, 0)];
+                const find =
+                    roomList[this.manager.random.int(roomList.length, 0)];
                 // makes sure it picks a valid direction
                 done = false;
                 // picks a random direction/
@@ -991,8 +1128,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             rot++;
                         }
-                    }
-                    else if (rot === 1) {
+                    } else if (rot === 1) {
                         // make sure the direction is valid.
                         if (map[find.x + 1]) {
                             // do the connection and end the loop.
@@ -1004,8 +1140,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             rot++;
                         }
-                    }
-                    else if (rot === 2) {
+                    } else if (rot === 2) {
                         // make sure the direction is valid.
                         if (map[find.x][find.y + 1]) {
                             // do the connection and end the loop.
@@ -1017,8 +1152,7 @@ export class NewtonianGame extends BaseClasses.Game {
                         else {
                             rot++;
                         }
-                    }
-                    else {
+                    } else {
                         // make sure the direction is valid.
                         if (map[find.x - 1]) {
                             // do the connection and end the loop.
@@ -1046,16 +1180,16 @@ export class NewtonianGame extends BaseClasses.Game {
         connected.push(start);
         // add existing neighbors to the que
         if (map[start.x - 1]) {
-            toConnectQue.push({x: start.x - 1, y: start.y});
+            toConnectQue.push({ x: start.x - 1, y: start.y });
         }
         if (map[start.x + 1]) {
-            toConnectQue.push({x: start.x + 1, y: start.y});
+            toConnectQue.push({ x: start.x + 1, y: start.y });
         }
         if (map[start.x][start.y - 1]) {
-            toConnectQue.push({x: start.x, y: start.y - 1});
+            toConnectQue.push({ x: start.x, y: start.y - 1 });
         }
         if (map[start.x][start.y + 1]) {
-            toConnectQue.push({x: start.x, y: start.y + 1});
+            toConnectQue.push({ x: start.x, y: start.y + 1 });
         }
         // making each room make a unique connection.
         while (toConnectQue.length !== 0) {
@@ -1070,7 +1204,11 @@ export class NewtonianGame extends BaseClasses.Game {
             // until a room is found.
             while (!found) {
                 // check if the north exists and is connected.
-                if (rot === 0 && map[find.x][find.y - 1] && this.has(connected, find.x, find.y - 1) >= 0) {
+                if (
+                    rot === 0 &&
+                    map[find.x][find.y - 1] &&
+                    this.has(connected, find.x, find.y - 1) >= 0
+                ) {
                     // connect it.
                     map[find.x][find.y].DNorth = true;
                     map[find.x][find.y - 1].DSouth = true;
@@ -1080,12 +1218,15 @@ export class NewtonianGame extends BaseClasses.Game {
                     connected.push(find);
                     // mark that a connection was found.
                     found = true;
-                }
-                else {
+                } else {
                     // if this direction is invalid, move onto the next one.
                     rot++;
                 }
-                if (rot === 1 && map[find.x + 1] && this.has(connected, find.x + 1, find.y) >= 0) {
+                if (
+                    rot === 1 &&
+                    map[find.x + 1] &&
+                    this.has(connected, find.x + 1, find.y) >= 0
+                ) {
                     // connect it.
                     map[find.x][find.y].DEast = true;
                     map[find.x + 1][find.y].DWest = true;
@@ -1095,12 +1236,15 @@ export class NewtonianGame extends BaseClasses.Game {
                     connected.push(find);
                     // mark that a connection was found.
                     found = true;
-                }
-                else {
+                } else {
                     // if this direction is invalid, move onto the next one.
                     rot++;
                 }
-                if (rot === 2 && map[find.x][find.y + 1] && this.has(connected, find.x, find.y + 1) >= 0) {
+                if (
+                    rot === 2 &&
+                    map[find.x][find.y + 1] &&
+                    this.has(connected, find.x, find.y + 1) >= 0
+                ) {
                     // connect it.
                     map[find.x][find.y].DSouth = true;
                     map[find.x][find.y + 1].DNorth = true;
@@ -1110,12 +1254,14 @@ export class NewtonianGame extends BaseClasses.Game {
                     connected.push(find);
                     // mark that a connection was found.
                     found = true;
-                }
-                else {
+                } else {
                     // if this direction is invalid, move onto the next one.
                     rot++;
                 }
-                if (map[find.x - 1] && this.has(connected, find.x - 1, find.y) >= 0) {
+                if (
+                    map[find.x - 1] &&
+                    this.has(connected, find.x - 1, find.y) >= 0
+                ) {
                     // connect it.
                     map[find.x][find.y].DWest = true;
                     map[find.x - 1][find.y].DEast = true;
@@ -1125,32 +1271,43 @@ export class NewtonianGame extends BaseClasses.Game {
                     connected.push(find);
                     // mark that a connection was found.
                     found = true;
-                }
-                else {
+                } else {
                     // if this direction is invalid, move onto the next one.
                     rot = 0;
                 }
                 // if a connection was found.
                 if (found) {
                     // if the room to the left isn't in either list and exists, add it to the queue
-                    if (map[find.x - 1] && this.has(connected, find.x - 1, find.y) === -1 &&
-                        this.has(toConnectQue, find.x - 1, find.y) === -1) {
-                        toConnectQue.push({x: find.x - 1, y: find.y});
+                    if (
+                        map[find.x - 1] &&
+                        this.has(connected, find.x - 1, find.y) === -1 &&
+                        this.has(toConnectQue, find.x - 1, find.y) === -1
+                    ) {
+                        toConnectQue.push({ x: find.x - 1, y: find.y });
                     }
                     // if the room to the right isn't in either list and exists, add it to the queue
-                    if (map[find.x + 1] && this.has(connected, find.x + 1, find.y) === -1 &&
-                    this.has(toConnectQue, find.x + 1, find.y) === -1) {
-                        toConnectQue.push({x: find.x + 1, y: find.y});
+                    if (
+                        map[find.x + 1] &&
+                        this.has(connected, find.x + 1, find.y) === -1 &&
+                        this.has(toConnectQue, find.x + 1, find.y) === -1
+                    ) {
+                        toConnectQue.push({ x: find.x + 1, y: find.y });
                     }
                     // if the room above isn't in either list and exists, add it to the queue
-                    if (map[find.x][find.y - 1] && this.has(connected, find.x, find.y - 1) === -1 &&
-                    this.has(toConnectQue, find.x, find.y - 1) === -1) {
-                        toConnectQue.push({x: find.x, y: find.y - 1});
+                    if (
+                        map[find.x][find.y - 1] &&
+                        this.has(connected, find.x, find.y - 1) === -1 &&
+                        this.has(toConnectQue, find.x, find.y - 1) === -1
+                    ) {
+                        toConnectQue.push({ x: find.x, y: find.y - 1 });
                     }
                     // if the room below isn't in either list and exists, add it to the queue
-                    if (map[find.x][find.y + 1] && this.has(connected, find.x, find.y + 1) === -1 &&
-                    this.has(toConnectQue, find.x, find.y + 1) === -1) {
-                        toConnectQue.push({x: find.x, y: find.y + 1});
+                    if (
+                        map[find.x][find.y + 1] &&
+                        this.has(connected, find.x, find.y + 1) === -1 &&
+                        this.has(toConnectQue, find.x, find.y + 1) === -1
+                    ) {
+                        toConnectQue.push({ x: find.x, y: find.y + 1 });
                     }
                 }
             }
@@ -1165,7 +1322,10 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param map - a 2D array of rooms for it to draw using.
      * @param getMutableTile - the function for it to grab tiles.
      */
-    private draw(map: IRoom[][], getMutableTile: (x: number, y: number) => Mutable<Tile>): void {
+    private draw(
+        map: IRoom[][],
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+    ): void {
         // Test code to help visualize where it actually places rooms.
         /*for (const x of map) {
             for (const y of x) {
@@ -1212,134 +1372,275 @@ export class NewtonianGame extends BaseClasses.Game {
             for (const room of rooms) {
                 // corners.
                 // draw the northern corners
-                this.drawCorner(room.x1 - 1, room.y1 - 1, room.WNorth, room.WWest, getMutableTile);
+                this.drawCorner(
+                    room.x1 - 1,
+                    room.y1 - 1,
+                    room.WNorth,
+                    room.WWest,
+                    getMutableTile,
+                );
                 // if the room is 2 wide.
                 if (room.x3 === -1) {
-                    this.drawCorner(room.x2 + 1, room.y1 - 1, room.WNorth, room.WEast, getMutableTile);
+                    this.drawCorner(
+                        room.x2 + 1,
+                        room.y1 - 1,
+                        room.WNorth,
+                        room.WEast,
+                        getMutableTile,
+                    );
                     // draw the southern corners, account for different heights
                     // if the room is 2 tall.
                     if (room.y3 === -1) {
-                        this.drawCorner(room.x1 - 1, room.y2 + 1, room.WSouth, room.WWest, getMutableTile);
-                        this.drawCorner(room.x2 + 1, room.y2 + 1, room.WSouth, room.WEast, getMutableTile);
+                        this.drawCorner(
+                            room.x1 - 1,
+                            room.y2 + 1,
+                            room.WSouth,
+                            room.WWest,
+                            getMutableTile,
+                        );
+                        this.drawCorner(
+                            room.x2 + 1,
+                            room.y2 + 1,
+                            room.WSouth,
+                            room.WEast,
+                            getMutableTile,
+                        );
                     }
                     // if the room is 3 tall.
                     else {
-                        this.drawCorner(room.x1 - 1, room.y3 + 1, room.WSouth, room.WWest, getMutableTile);
-                        this.drawCorner(room.x2 + 1, room.y3 + 1, room.WSouth, room.WEast, getMutableTile);
+                        this.drawCorner(
+                            room.x1 - 1,
+                            room.y3 + 1,
+                            room.WSouth,
+                            room.WWest,
+                            getMutableTile,
+                        );
+                        this.drawCorner(
+                            room.x2 + 1,
+                            room.y3 + 1,
+                            room.WSouth,
+                            room.WEast,
+                            getMutableTile,
+                        );
                     }
                 }
                 // if the room is 3 wide.
                 else {
-                    this.drawCorner(room.x3 + 1, room.y1 - 1, room.WNorth, room.WEast, getMutableTile);
+                    this.drawCorner(
+                        room.x3 + 1,
+                        room.y1 - 1,
+                        room.WNorth,
+                        room.WEast,
+                        getMutableTile,
+                    );
                     // draw the southern corners, account for different heights
                     // if the room is 2 tall.
                     if (room.y3 === -1) {
-                        this.drawCorner(room.x1 - 1, room.y2 + 1, room.WSouth, room.WWest, getMutableTile);
-                        this.drawCorner(room.x3 + 1, room.y2 + 1, room.WSouth, room.WEast, getMutableTile);
+                        this.drawCorner(
+                            room.x1 - 1,
+                            room.y2 + 1,
+                            room.WSouth,
+                            room.WWest,
+                            getMutableTile,
+                        );
+                        this.drawCorner(
+                            room.x3 + 1,
+                            room.y2 + 1,
+                            room.WSouth,
+                            room.WEast,
+                            getMutableTile,
+                        );
                     }
                     // if the room is 3 tall.
                     else {
-                        this.drawCorner(room.x1 - 1, room.y3 + 1, room.WSouth, room.WWest, getMutableTile);
-                        this.drawCorner(room.x3 + 1, room.y3 + 1, room.WSouth, room.WEast, getMutableTile);
+                        this.drawCorner(
+                            room.x1 - 1,
+                            room.y3 + 1,
+                            room.WSouth,
+                            room.WWest,
+                            getMutableTile,
+                        );
+                        this.drawCorner(
+                            room.x3 + 1,
+                            room.y3 + 1,
+                            room.WSouth,
+                            room.WEast,
+                            getMutableTile,
+                        );
                     }
                 }
                 // if there is a wall to the north, draw it.
                 if (room.WNorth) {
                     const rand = this.manager.random.int(this.cubeConst);
-                    const cube: boolean = map[v][w - 1] && rand <= 8 && ((!map[v][w - 1].WEast && !room.WEast) ||
-                                    (!map[v][w - 1].WWest && !room.WWest)) ? true : false;
+                    const cube: boolean =
+                        map[v][w - 1] &&
+                        rand <= 8 &&
+                        ((!map[v][w - 1].WEast && !room.WEast) ||
+                            (!map[v][w - 1].WWest && !room.WWest))
+                            ? true
+                            : false;
                     // if the room is 3 wide.
                     this.drawWall(room.x1, room.y1 - 1, getMutableTile);
-                    getMutableTile(room.x1, room.y1 - 1).decoration = cube ? 1 : 0;
+                    getMutableTile(room.x1, room.y1 - 1).decoration = cube
+                        ? 1
+                        : 0;
                     this.drawWall(room.x2, room.y1 - 1, getMutableTile);
-                    getMutableTile(room.x2, room.y1 - 1).decoration = cube ? 1 : 0;
+                    getMutableTile(room.x2, room.y1 - 1).decoration = cube
+                        ? 1
+                        : 0;
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         this.drawWall(room.x3, room.y1 - 1, getMutableTile);
-                        getMutableTile(room.x3, room.y1 - 1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x3, room.y1 - 1).decoration = cube
+                            ? 1
+                            : 0;
                     }
                 }
                 // if there is a wall to the east, draw it.
                 if (room.WEast) {
                     const rand = this.manager.random.int(this.cubeConst);
-                    const cube: boolean = map[v + 1] && rand <= 8 && ((!map[v + 1][w].WNorth && !room.WNorth) ||
-                                        (!map[v + 1][w].WSouth && !room.WSouth)) ? true : false;
+                    const cube: boolean =
+                        map[v + 1] &&
+                        rand <= 8 &&
+                        ((!map[v + 1][w].WNorth && !room.WNorth) ||
+                            (!map[v + 1][w].WSouth && !room.WSouth))
+                            ? true
+                            : false;
                     // if the room is 3 wide.
                     if (room.x3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x3 + 1, room.y1, getMutableTile);
-                        getMutableTile(room.x3 + 1, room.y1).decoration = cube ? 2 : 0;
+                        getMutableTile(room.x3 + 1, room.y1).decoration = cube
+                            ? 2
+                            : 0;
                         this.drawWall(room.x3 + 1, room.y2, getMutableTile);
-                        getMutableTile(room.x3 + 1, room.y2).decoration = cube ? 2 : 0;
+                        getMutableTile(room.x3 + 1, room.y2).decoration = cube
+                            ? 2
+                            : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
-                            this.drawWall(room.x3 + 1, room.y3, getMutableTile);
-                            getMutableTile(room.x3 + 1, room.y3).decoration = cube ? 2 : 0;
+                            this.drawWall(
+                                room.x3 + 1,
+                                room.y3,
+                                getMutableTile,
+                            );
+                            getMutableTile(
+                                room.x3 + 1,
+                                room.y3,
+                            ).decoration = cube ? 2 : 0;
                         }
                     }
                     // if the room is 2 wide.
                     else {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x2 + 1, room.y1, getMutableTile);
-                        getMutableTile(room.x2 + 1, room.y1).decoration = cube ? 2 : 0;
+                        getMutableTile(room.x2 + 1, room.y1).decoration = cube
+                            ? 2
+                            : 0;
                         this.drawWall(room.x2 + 1, room.y2, getMutableTile);
-                        getMutableTile(room.x2 + 1, room.y2).decoration = cube ? 2 : 0;
+                        getMutableTile(room.x2 + 1, room.y2).decoration = cube
+                            ? 2
+                            : 0;
                         // if the room is 3 tall.
                         if (room.y3 !== -1) {
                             // place the wall as long as it doesn't cover up a door.
-                            this.drawWall(room.x2 + 1, room.y3, getMutableTile);
-                            getMutableTile(room.x2 + 1, room.y3).decoration = cube ? 2 : 0;
+                            this.drawWall(
+                                room.x2 + 1,
+                                room.y3,
+                                getMutableTile,
+                            );
+                            getMutableTile(
+                                room.x2 + 1,
+                                room.y3,
+                            ).decoration = cube ? 2 : 0;
                         }
                     }
                 }
                 // if there is a wall to the south, drawn it.
                 if (room.WSouth) {
                     const rand = this.manager.random.int(this.cubeConst);
-                    const cube: boolean = map[v][w + 1] && rand <= 8 && ((!map[v][w + 1].WEast && !room.WEast) ||
-                                        (!map[v][w + 1].WWest && !room.WWest)) ? true : false;
+                    const cube: boolean =
+                        map[v][w + 1] &&
+                        rand <= 8 &&
+                        ((!map[v][w + 1].WEast && !room.WEast) ||
+                            (!map[v][w + 1].WWest && !room.WWest))
+                            ? true
+                            : false;
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1, room.y3 + 1, getMutableTile);
-                        getMutableTile(room.x1, room.y3 + 1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x1, room.y3 + 1).decoration = cube
+                            ? 1
+                            : 0;
                         this.drawWall(room.x2, room.y3 + 1, getMutableTile);
-                        getMutableTile(room.x2, room.y3 + 1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x2, room.y3 + 1).decoration = cube
+                            ? 1
+                            : 0;
                         // if the room is 3 wide.
                         if (room.x3 !== -1) {
-                            this.drawWall(room.x3, room.y3 + 1, getMutableTile);
-                            getMutableTile(room.x3, room.y3 + 1).decoration = cube ? 1 : 0;
+                            this.drawWall(
+                                room.x3,
+                                room.y3 + 1,
+                                getMutableTile,
+                            );
+                            getMutableTile(
+                                room.x3,
+                                room.y3 + 1,
+                            ).decoration = cube ? 1 : 0;
                         }
                         // if the room is 2 tall.
-                    }
-                    else {
+                    } else {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1, room.y2 + 1, getMutableTile);
-                        getMutableTile(room.x1, room.y2 + 1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x1, room.y2 + 1).decoration = cube
+                            ? 1
+                            : 0;
                         this.drawWall(room.x2, room.y2 + 1, getMutableTile);
-                        getMutableTile(room.x2, room.y2 + 1).decoration = cube ? 1 : 0;
+                        getMutableTile(room.x2, room.y2 + 1).decoration = cube
+                            ? 1
+                            : 0;
                         // if the room is 3 wide.
                         if (room.x3 !== -1) {
-                            this.drawWall(room.x3, room.y2 + 1, getMutableTile);
-                            getMutableTile(room.x3, room.y2 + 1).decoration = cube ? 1 : 0;
+                            this.drawWall(
+                                room.x3,
+                                room.y2 + 1,
+                                getMutableTile,
+                            );
+                            getMutableTile(
+                                room.x3,
+                                room.y2 + 1,
+                            ).decoration = cube ? 1 : 0;
                         }
                     }
                 }
                 // if there is a wall to the west, draw it.
                 if (room.WWest) {
                     const rand = this.manager.random.int(this.cubeConst);
-                    const cube: boolean = map[v - 1] && rand <= 8 && ((!map[v - 1][w].WNorth && !room.WNorth) ||
-                                        (!map[v - 1][w].WSouth && !room.WSouth)) ? true : false;
+                    const cube: boolean =
+                        map[v - 1] &&
+                        rand <= 8 &&
+                        ((!map[v - 1][w].WNorth && !room.WNorth) ||
+                            (!map[v - 1][w].WSouth && !room.WSouth))
+                            ? true
+                            : false;
                     // place the wall as long as it doesn't cover up a door.
                     this.drawWall(room.x1 - 1, room.y1, getMutableTile);
-                    getMutableTile(room.x1 - 1, room.y1).decoration = cube ? 2 : 0;
+                    getMutableTile(room.x1 - 1, room.y1).decoration = cube
+                        ? 2
+                        : 0;
                     this.drawWall(room.x1 - 1, room.y2, getMutableTile);
-                    getMutableTile(room.x1 - 1, room.y2).decoration = cube ? 2 : 0;
+                    getMutableTile(room.x1 - 1, room.y2).decoration = cube
+                        ? 2
+                        : 0;
                     // if the room is 3 tall.
                     if (room.y3 !== -1) {
                         // place the wall as long as it doesn't cover up a door.
                         this.drawWall(room.x1 - 1, room.y3, getMutableTile);
-                        getMutableTile(room.x1 - 1, room.y3).decoration = cube ? 2 : 0;
+                        getMutableTile(room.x1 - 1, room.y3).decoration = cube
+                            ? 2
+                            : 0;
                     }
                 }
                 w++;
@@ -1372,11 +1673,19 @@ export class NewtonianGame extends BaseClasses.Game {
                             // if the loop is at the current shift.
                             if (shift === i) {
                                 // check if it would create a path-able doorway.
-                                if (((getMutableTile(room.x1 + i, room.y1 - 2).machine !== undefined ||
-                                    getMutableTile(room.x1 + i, room.y1).machine !== undefined) && temp < size) ||
-                                    getMutableTile(room.x1 + i, room.y1 - 2).isWall ||
-                                    getMutableTile(room.x1 + i, room.y1 - 2).decoration === 1 ||
-                                    getMutableTile(room.x1 + i, room.y1 - 2).decoration === 2) {
+                                if (
+                                    ((getMutableTile(room.x1 + i, room.y1 - 2)
+                                        .machine !== undefined ||
+                                        getMutableTile(room.x1 + i, room.y1)
+                                            .machine !== undefined) &&
+                                        temp < size) ||
+                                    getMutableTile(room.x1 + i, room.y1 - 2)
+                                        .isWall ||
+                                    getMutableTile(room.x1 + i, room.y1 - 2)
+                                        .decoration === 1 ||
+                                    getMutableTile(room.x1 + i, room.y1 - 2)
+                                        .decoration === 2
+                                ) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1391,13 +1700,26 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1, room.y1 - 1, 1, getMutableTile);
-                        }
-                        else if (shift === 1) {
-                            this.drawDoor(room.x2, room.y1 - 1, 1, getMutableTile);
-                        }
-                        else {
-                            this.drawDoor(room.x3, room.y1 - 1, 1, getMutableTile);
+                            this.drawDoor(
+                                room.x1,
+                                room.y1 - 1,
+                                1,
+                                getMutableTile,
+                            );
+                        } else if (shift === 1) {
+                            this.drawDoor(
+                                room.x2,
+                                room.y1 - 1,
+                                1,
+                                getMutableTile,
+                            );
+                        } else {
+                            this.drawDoor(
+                                room.x3,
+                                room.y1 - 1,
+                                1,
+                                getMutableTile,
+                            );
                         }
                     }
                 }
@@ -1420,11 +1742,19 @@ export class NewtonianGame extends BaseClasses.Game {
                             // if the loop is at the current shift.
                             if (shift === i) {
                                 // check if it would create a path-able doorway.
-                                if (((getMutableTile(roomX + 2, room.y1 + i).machine !== undefined ||
-                                    getMutableTile(roomX, room.y1 + i).machine !== undefined) && temp < size) ||
-                                    getMutableTile(roomX + 2, room.y1 + i).isWall ||
-                                    getMutableTile(roomX + 2, room.y1 + i).decoration === 1 ||
-                                    getMutableTile(roomX + 2, room.y1 + i).decoration === 2) {
+                                if (
+                                    ((getMutableTile(roomX + 2, room.y1 + i)
+                                        .machine !== undefined ||
+                                        getMutableTile(roomX, room.y1 + i)
+                                            .machine !== undefined) &&
+                                        temp < size) ||
+                                    getMutableTile(roomX + 2, room.y1 + i)
+                                        .isWall ||
+                                    getMutableTile(roomX + 2, room.y1 + i)
+                                        .decoration === 1 ||
+                                    getMutableTile(roomX + 2, room.y1 + i)
+                                        .decoration === 2
+                                ) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1439,13 +1769,26 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(roomX + 1, room.y1, 2, getMutableTile);
-                        }
-                        else if (shift === 1) {
-                            this.drawDoor(roomX + 1, room.y2, 2, getMutableTile);
-                        }
-                        else {
-                            this.drawDoor(roomX + 1, room.y3, 2, getMutableTile);
+                            this.drawDoor(
+                                roomX + 1,
+                                room.y1,
+                                2,
+                                getMutableTile,
+                            );
+                        } else if (shift === 1) {
+                            this.drawDoor(
+                                roomX + 1,
+                                room.y2,
+                                2,
+                                getMutableTile,
+                            );
+                        } else {
+                            this.drawDoor(
+                                roomX + 1,
+                                room.y3,
+                                2,
+                                getMutableTile,
+                            );
                         }
                     }
                 }
@@ -1467,11 +1810,19 @@ export class NewtonianGame extends BaseClasses.Game {
                             // if the loop is at the current shift.
                             if (shift === i) {
                                 // check if it would create a path-able doorway.
-                                if (((getMutableTile(room.x1 + i, roomY + 2).machine !== undefined ||
-                                    getMutableTile(room.x1 + i, roomY).machine !== undefined) && temp < size) ||
-                                    getMutableTile(room.x1 + i, roomY + 2).isWall ||
-                                    getMutableTile(room.x1 + i, roomY + 2).decoration === 1 ||
-                                    getMutableTile(room.x1 + i, roomY + 2).decoration === 2) {
+                                if (
+                                    ((getMutableTile(room.x1 + i, roomY + 2)
+                                        .machine !== undefined ||
+                                        getMutableTile(room.x1 + i, roomY)
+                                            .machine !== undefined) &&
+                                        temp < size) ||
+                                    getMutableTile(room.x1 + i, roomY + 2)
+                                        .isWall ||
+                                    getMutableTile(room.x1 + i, roomY + 2)
+                                        .decoration === 1 ||
+                                    getMutableTile(room.x1 + i, roomY + 2)
+                                        .decoration === 2
+                                ) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1486,13 +1837,26 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1, roomY + 1, 1, getMutableTile);
-                        }
-                        else if (shift === 1) {
-                            this.drawDoor(room.x2, roomY + 1, 1, getMutableTile);
-                        }
-                        else {
-                            this.drawDoor(room.x3, roomY + 1, 1, getMutableTile);
+                            this.drawDoor(
+                                room.x1,
+                                roomY + 1,
+                                1,
+                                getMutableTile,
+                            );
+                        } else if (shift === 1) {
+                            this.drawDoor(
+                                room.x2,
+                                roomY + 1,
+                                1,
+                                getMutableTile,
+                            );
+                        } else {
+                            this.drawDoor(
+                                room.x3,
+                                roomY + 1,
+                                1,
+                                getMutableTile,
+                            );
                         }
                     }
                 }
@@ -1512,11 +1876,19 @@ export class NewtonianGame extends BaseClasses.Game {
                             // if the loop is at the current shift.
                             if (shift === i) {
                                 // check if it would create a path-able doorway.
-                                if (((getMutableTile(room.x1 - 2, room.y1 + i).machine !== undefined ||
-                                    getMutableTile(room.x1, room.y1 + i).machine !== undefined) && temp < size) ||
-                                    getMutableTile(room.x1 - 2, room.y1 + i).isWall ||
-                                    getMutableTile(room.x1 - 2, room.y1 + i).decoration === 1 ||
-                                    getMutableTile(room.x1 - 2, room.y1 + i).decoration === 2) {
+                                if (
+                                    ((getMutableTile(room.x1 - 2, room.y1 + i)
+                                        .machine !== undefined ||
+                                        getMutableTile(room.x1, room.y1 + i)
+                                            .machine !== undefined) &&
+                                        temp < size) ||
+                                    getMutableTile(room.x1 - 2, room.y1 + i)
+                                        .isWall ||
+                                    getMutableTile(room.x1 - 2, room.y1 + i)
+                                        .decoration === 1 ||
+                                    getMutableTile(room.x1 - 2, room.y1 + i)
+                                        .decoration === 2
+                                ) {
                                     // try a different spot.
                                     shift++;
                                     // if the current shift is invalid, make it valid. Restart the loop.
@@ -1531,13 +1903,26 @@ export class NewtonianGame extends BaseClasses.Game {
                         }
                         // depending on the spot chosen, add the door.
                         if (shift === 0) {
-                            this.drawDoor(room.x1 - 1, room.y1, 2, getMutableTile);
-                        }
-                        else if (shift === 1) {
-                            this.drawDoor(room.x1 - 1, room.y2, 2, getMutableTile);
-                        }
-                        else {
-                            this.drawDoor(room.x1 - 1, room.y3, 2, getMutableTile);
+                            this.drawDoor(
+                                room.x1 - 1,
+                                room.y1,
+                                2,
+                                getMutableTile,
+                            );
+                        } else if (shift === 1) {
+                            this.drawDoor(
+                                room.x1 - 1,
+                                room.y2,
+                                2,
+                                getMutableTile,
+                            );
+                        } else {
+                            this.drawDoor(
+                                room.x1 - 1,
+                                room.y3,
+                                2,
+                                getMutableTile,
+                            );
                         }
                     }
                 }
@@ -1555,8 +1940,13 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      * @returns nothing.
      */
-    private drawCorner(x: number, y: number, dir1: boolean, dir2: boolean,
-                       getMutableTile: (x: number, y: number) => Mutable<Tile>): void {
+    private drawCorner(
+        x: number,
+        y: number,
+        dir1: boolean,
+        dir2: boolean,
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+    ): void {
         if (dir1 === true || dir2 === true) {
             getMutableTile(x, y).isWall = true;
         }
@@ -1570,7 +1960,11 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      * @returns nothing.
      */
-    private drawWall(x: number, y: number, getMutableTile: (x: number, y: number) => Mutable<Tile>): void {
+    private drawWall(
+        x: number,
+        y: number,
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+    ): void {
         if (getMutableTile(x, y).decoration !== 1) {
             getMutableTile(x, y).isWall = true;
         }
@@ -1585,8 +1979,12 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param getMutableTile - the function for it to grab tiles.
      * @returns nothing.
      */
-    private drawDoor(x: number, y: number, d: number = 1,
-                     getMutableTile: (x: number, y: number) => Mutable<Tile>): void {
+    private drawDoor(
+        x: number,
+        y: number,
+        d: number = 1,
+        getMutableTile: (x: number, y: number) => Mutable<Tile>,
+    ): void {
         getMutableTile(x, y).isWall = false;
         getMutableTile(x, y).decoration = d;
     }

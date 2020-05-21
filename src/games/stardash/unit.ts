@@ -1,7 +1,14 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitDashArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitSafeArgs, IUnitShootdownArgs, IUnitTransferArgs,
-       } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IUnitAttackArgs,
+    IUnitDashArgs,
+    IUnitMineArgs,
+    IUnitMoveArgs,
+    IUnitProperties,
+    IUnitSafeArgs,
+    IUnitShootdownArgs,
+    IUnitTransferArgs,
+} from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -116,14 +123,16 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Job to set this Unit to. */
-            job: Job;
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IUnitProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The Job to set this Unit to. */
+                job: Job;
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -177,13 +186,20 @@ export class Unit extends GameObject {
         }
 
         // Handle possible coordinate invalidations here:
-        if ((enemy.x < 0) || (enemy.y < 0) || enemy.x > this.game.sizeX ||
-            enemy.y > this.game.sizeY) {
+        if (
+            enemy.x < 0 ||
+            enemy.y < 0 ||
+            enemy.x > this.game.sizeX ||
+            enemy.y > this.game.sizeY
+        ) {
             return `${this} is trying to attack a location that doesn't exist`;
         }
 
         // make sure the target is in range.
-        if ((this.job.range + this.game.shipRadius) < this.distance(this.x, this.y, enemy.x, enemy.y)) {
+        if (
+            this.job.range + this.game.shipRadius <
+            this.distance(this.x, this.y, enemy.x, enemy.y)
+        ) {
             return `${this} is trying to attack a location which is too far away.`;
         }
 
@@ -203,7 +219,10 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit is a attacking job
-        if (this.job.title !== "corvette" && this.job.title !== "missileboat") {
+        if (
+            this.job.title !== "corvette" &&
+            this.job.title !== "missileboat"
+        ) {
             return `${this} is not a unit that can attack.`;
         }
 
@@ -279,11 +298,10 @@ export class Unit extends GameObject {
                 enemy.x = -1;
                 enemy.y = -1;
             }
-        }
-        else {
+        } else {
             // creates the missile to be fired.
             const missile: Projectile = this.manager.create.projectile({
-                fuel: this.game.projectileSpeed * this.job.range / 100,
+                fuel: (this.game.projectileSpeed * this.job.range) / 100,
                 owner: this.owner,
                 target: enemy,
                 x: this.x,
@@ -333,14 +351,21 @@ export class Unit extends GameObject {
 
         // variables for ease of reference.
         const trav = this.distance(this.x, this.y, x, y);
-        const cost = Math.ceil(trav / this.game.dashDistance) * this.game.dashCost;
+        const cost =
+            Math.ceil(trav / this.game.dashDistance) * this.game.dashCost;
         // make sure the unit can move to that locaiton.
         if (this.energy < cost) {
             return `${this} needs at least ${cost} energy to move ${trav} and it has ${this.energy}.`;
         }
 
         // make sure the unit is in bounds.
-        if (x < 0 || y < 0 || x > this.game.sizeX || y > this.game.sizeY || this.energy < 0) {
+        if (
+            x < 0 ||
+            y < 0 ||
+            x > this.game.sizeX ||
+            y > this.game.sizeY ||
+            this.energy < 0
+        ) {
             return `${this} is dead and cannot move.`;
         }
 
@@ -373,7 +398,7 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: dash -->>
 
         // calculate  dash distance
-        const dist = Math.sqrt(((this.x - x) ** 2) + ((this.y - y) ** 2));
+        const dist = Math.sqrt((this.x - x) ** 2 + (this.y - y) ** 2);
 
         // Add logic here for dash.
         this.dashX = x;
@@ -381,7 +406,9 @@ export class Unit extends GameObject {
         this.isBusy = true;
         this.acted = true;
         this.moves = 0;
-        this.energy -= Math.ceil(this.game.dashCost * ((dist) / this.game.dashDistance));
+        this.energy -= Math.ceil(
+            this.game.dashCost * (dist / this.game.dashDistance),
+        );
 
         // return the action was successful.
         return true;
@@ -429,12 +456,15 @@ export class Unit extends GameObject {
         }
 
         // make sure it has some material to mine.
-        if ((body.bodyType !== "asteroid") || (body.amount <= 0)) {
+        if (body.bodyType !== "asteroid" || body.amount <= 0) {
             return `${body} does not have any materials to mine!`;
         }
 
         // make sure the asteroid is in range.
-        if (this.job.range + body.radius < this.distance(this.x, this.y, body.x, body.y)) {
+        if (
+            this.job.range + body.radius <
+            this.distance(this.x, this.y, body.x, body.y)
+        ) {
             return `${this} is too far away from ${body} to mine!`;
         }
 
@@ -444,7 +474,10 @@ export class Unit extends GameObject {
         }
 
         // make sure mining of the mythicite is legal.
-        if (this.game.currentTurn < this.game.orbitsProtected && body.materialType === "mythicite") {
+        if (
+            this.game.currentTurn < this.game.orbitsProtected &&
+            body.materialType === "mythicite"
+        ) {
             return `${this} cannot mine the mythicite yet. It is protected for the first 12 turns.`;
         }
 
@@ -454,8 +487,8 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit can carry more materials.
-        const currentLoad = this.genarium + this.rarium + this.legendarium +
-                          this.mythicite;
+        const currentLoad =
+            this.genarium + this.rarium + this.legendarium + this.mythicite;
         if (this.job.carryLimit <= currentLoad) {
             return `${this} cannot hold any more materials!`;
         }
@@ -483,8 +516,8 @@ export class Unit extends GameObject {
 
         // Add ore to miner based on the mining rate vs what is in the body.
         let actualAmount = Math.min(body.amount, this.game.miningSpeed);
-        const currentLoad = this.genarium + this.legendarium + this.mythicite +
-                            this.rarium;
+        const currentLoad =
+            this.genarium + this.legendarium + this.mythicite + this.rarium;
 
         // Makes sure amount added does not go over the carry limit
         if (this.job.carryLimit < actualAmount + currentLoad) {
@@ -494,14 +527,11 @@ export class Unit extends GameObject {
         // adds the corrected amount to the necessary material.
         if (body.materialType === "genarium") {
             this.genarium += actualAmount;
-        }
-        else if (body.materialType === "legendarium") {
+        } else if (body.materialType === "legendarium") {
             this.legendarium += actualAmount;
-        }
-        else if (body.materialType === "mythicite") {
+        } else if (body.materialType === "mythicite") {
             this.mythicite += actualAmount;
-        }
-        else if (body.materialType === "rarium") {
+        } else if (body.materialType === "rarium") {
             this.rarium += actualAmount;
         }
 
@@ -555,7 +585,12 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit is in bounds.
-        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
+        if (
+            this.x < 0 ||
+            this.y < 0 ||
+            this.x > this.game.sizeX ||
+            this.y > this.game.sizeY
+        ) {
             return `${this} is dead and cannot move.`;
         }
 
@@ -568,7 +603,10 @@ export class Unit extends GameObject {
         const sun = this.game.bodies[2];
 
         // make sure it isn't moving into the sun zone
-        if (this.distance(x, y, sun.x, sun.y) < sun.radius + this.game.shipRadius) {
+        if (
+            this.distance(x, y, sun.x, sun.y) <
+            sun.radius + this.game.shipRadius
+        ) {
             return `${this} cannot move to those coordinates due to landing in the sun.`;
         }
 
@@ -637,7 +675,12 @@ export class Unit extends GameObject {
         }
 
         // make sure the unit is in bounds.
-        if (this.x < 0 || this.y < 0 || this.x > this.game.sizeX || this.y > this.game.sizeY) {
+        if (
+            this.x < 0 ||
+            this.y < 0 ||
+            this.x > this.game.sizeX ||
+            this.y > this.game.sizeY
+        ) {
             return `${this} is dead, why do you bother checking?`;
         }
 
@@ -669,7 +712,10 @@ export class Unit extends GameObject {
         const sun = this.game.bodies[2];
 
         // make sure it isn't moving into the sun zone
-        if (this.distance(x, y, sun.x, sun.y) < sun.radius + this.game.shipRadius) {
+        if (
+            this.distance(x, y, sun.x, sun.y) <
+            sun.radius + this.game.shipRadius
+        ) {
             return false;
         }
 
@@ -708,7 +754,12 @@ export class Unit extends GameObject {
         }
 
         // if the projectile is out of bounds of the map
-        if (missile.x < 0 || missile.x > this.game.sizeX || missile.y < 0 || missile.y > this.game.sizeY) {
+        if (
+            missile.x < 0 ||
+            missile.x > this.game.sizeX ||
+            missile.y < 0 ||
+            missile.y > this.game.sizeY
+        ) {
             return `${this} cannot shoot down ${missile} which is out of bounds. Let it go.`;
         }
 
@@ -723,12 +774,18 @@ export class Unit extends GameObject {
         }
 
         // if this unit is NOT a corvette
-        if (this.job.title !== "corvette" && this.job.title !== "missileboat") {
+        if (
+            this.job.title !== "corvette" &&
+            this.job.title !== "missileboat"
+        ) {
             return `${this} is not a corvette or missileboat. It cannot shoot down missiles.`;
         }
 
         // if the projectile is out of the range of the corvette
-        if (this.distance(this.x, this.y, missile.x, missile.y) > this.game.jobs[0].range) {
+        if (
+            this.distance(this.x, this.y, missile.x, missile.y) >
+            this.game.jobs[0].range
+        ) {
             return `${this} is too far away from the target. Must be within attack range for a corvette.`;
         }
 
@@ -757,8 +814,7 @@ export class Unit extends GameObject {
         // damage the missile.
         if (this.job.title === "corvette") {
             missile.energy -= this.job.damage;
-        }
-        else {
+        } else {
             missile.energy = -1;
         }
 
@@ -834,7 +890,8 @@ export class Unit extends GameObject {
         }
 
         // Check that the ship has space
-        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
+        const currentLoad =
+            this.genarium + this.rarium + this.legendarium + this.mythicite;
         if (currentLoad === this.job.carryLimit) {
             return `${this} already has a full cargo hold!`;
         }
@@ -869,15 +926,20 @@ export class Unit extends GameObject {
         // grab the resources on the ship.
         const totalResourceOnShip = unit[material];
         // grab the current materials on the ship.
-        const currentLoad = this.genarium + this.rarium + this.legendarium + this.mythicite;
+        const currentLoad =
+            this.genarium + this.rarium + this.legendarium + this.mythicite;
 
         // correct the acutal amount to account for a negative argument.
-        let actualAmount = amount <= 0
-            ? totalResourceOnShip
-            : Math.min(totalResourceOnShip, amount);
+        let actualAmount =
+            amount <= 0
+                ? totalResourceOnShip
+                : Math.min(totalResourceOnShip, amount);
 
         // account for carry limit.
-        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
+        actualAmount = Math.min(
+            actualAmount,
+            this.job.carryLimit - currentLoad,
+        );
 
         // shift the amounts for transfer.
         unit[material] -= actualAmount;
@@ -939,11 +1001,11 @@ export class Unit extends GameObject {
      */
     private distance(x1: number, y1: number, x2: number, y2: number): number {
         // grab the differences.
-        const xDif = (x1 - x2);
-        const yDif = (y1 - y2);
+        const xDif = x1 - x2;
+        const yDif = y1 - y2;
 
         // return the distance.
-        return Math.sqrt((xDif ** 2) + (yDif ** 2));
+        return Math.sqrt(xDif ** 2 + yDif ** 2);
     }
 
     /**
@@ -967,11 +1029,12 @@ export class Unit extends GameObject {
         const minDist = sun.radius + this.game.shipRadius;
 
         // make sure it isn't dashing through the sun zone
-        const a = (y1 - y2);
-        const b = (x2 - x1);
-        const c = (x1 * y2) - (x2 * y1);
+        const a = y1 - y2;
+        const b = x2 - x1;
+        const c = x1 * y2 - x2 * y1;
         // grab the distance between the line and the circle at it's closest.
-        const dist = Math.abs((a * sun.x) + (b * sun.y) + c) / Math.sqrt((a ** 2) + (b ** 2));
+        const dist =
+            Math.abs(a * sun.x + b * sun.y + c) / Math.sqrt(a ** 2 + b ** 2);
         if (dist <= minDist) {
             // grab the two bool for possible infinite line catches
             const check1 = this.distance(x1, y1, sun.x, sun.y) > length;

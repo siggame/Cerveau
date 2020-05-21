@@ -23,12 +23,14 @@ export function registerRouteGamelogs(app: Express): void {
      *   "2018.05.25.11.06.21.462-Spiders-Foo.json.gz"
      * ]
      */
-    app.get("/gamelogs/", async (req, res) => {
+    app.get("/gamelogs/", (req, res) => {
         // cross origin safety
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
         res.status(200);
-        res.json(lobby.gamelogManager.gamelogInfos.map((info) => info.filename));
+        res.json(
+            lobby.gamelogManager.gamelogInfos.map((info) => info.filename),
+        );
     });
 }

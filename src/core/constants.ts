@@ -5,7 +5,7 @@ import { IDeltaMergeConstants } from "@cadre/ts-utils/cadre";
 
 /**
  * These constants will be sent to clients.
- * (hence shared between the server here and clients)
+ * (hence shared between the server here and clients).
  */
 export const SHARED_CONSTANTS = Object.freeze<IDeltaMergeConstants>({
     /**

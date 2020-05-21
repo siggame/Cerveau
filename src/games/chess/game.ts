@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { ChessGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -34,7 +34,7 @@ export class ChessGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The list of [known] moves that have occurred in the game, in Standard
@@ -68,15 +68,14 @@ export class ChessGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: ChessGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
         if (this.settings.fen) {
             this.chess.load(this.settings.fen);
-        }
-        else if (this.settings.pgn) {
+        } else if (this.settings.pgn) {
             this.chess.load_pgn(this.settings.pgn);
         }
 

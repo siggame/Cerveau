@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Body } from "./body";
 import { StardashGameManager } from "./game-manager";
@@ -57,7 +57,7 @@ export class StardashGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The value of every unit of genarium.
@@ -220,7 +220,7 @@ export class StardashGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: StardashGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -249,13 +249,17 @@ export class StardashGame extends BaseClasses.Game {
         // reset the units protector
         unit.protector = undefined;
         // all martyr ships owned by the player that can protect.
-        const martyrs = unit.owner.units.filter((u) =>
-                      u.shield > 0 && u.job.title === "martyr");
+        const martyrs = unit.owner.units.filter(
+            (u) => u.shield > 0 && u.job.title === "martyr",
+        );
         // iterate over martyr that can protect.
         for (const martyr of martyrs) {
             // if the unit isn't protected and is in range.
-            if (Math.sqrt(((unit.x - martyr.x) ** 2) +
-                ((unit.y - martyr.y) ** 2)) < martyr.job.range) {
+            if (
+                Math.sqrt(
+                    (unit.x - martyr.x) ** 2 + (unit.y - martyr.y) ** 2,
+                ) < martyr.job.range
+            ) {
                 // protected.
                 unit.protector = martyr;
 
@@ -357,7 +361,7 @@ export class StardashGame extends BaseClasses.Game {
                 owner: this.players[1],
                 materialType: "none",
                 radius: this.sizeY / 12,
-                x: this.sizeX - (this.sizeX / 16),
+                x: this.sizeX - this.sizeX / 16,
                 y: this.sizeY / 2,
                 amount: this.planetEnergyCap,
                 angle: -1,
@@ -382,9 +386,9 @@ export class StardashGame extends BaseClasses.Game {
                 amount: this.mythiciteAmount,
                 radius: this.sizeY / 20,
                 x: this.sizeX / 2,
-                y: ((this.sizeY * 3) / 4) + (this.sizeY / 12),
+                y: (this.sizeY * 3) / 4 + this.sizeY / 12,
                 angle: 0,
-                distance: (this.sizeY / 4) + (this.sizeY / 12),
+                distance: this.sizeY / 4 + this.sizeY / 12,
             }),
         );
 
@@ -473,7 +477,11 @@ export class StardashGame extends BaseClasses.Game {
      * @param minSize: the minimum size of a asteroid.
      * @param maxSize: the maximum size of a asteroid.
      */
-    private generateAsteroids(amount: number, minSize: number, maxSize: number): void {
+    private generateAsteroids(
+        amount: number,
+        minSize: number,
+        maxSize: number,
+    ): void {
         // create lists to handle asteroid collision tracking and tracking the asteroids.
         let upper: Body[] = [];
         let lower: Body[] = [];
@@ -485,43 +493,59 @@ export class StardashGame extends BaseClasses.Game {
             let material: "genarium" | "rarium" | "legendarium" | undefined;
             if (matNum < this.oreRarityGenarium) {
                 material = "genarium";
-            }
-            else if (matNum < this.oreRarityGenarium + this.oreRarityRarium) {
+            } else if (
+                matNum <
+                this.oreRarityGenarium + this.oreRarityRarium
+            ) {
                 material = "rarium";
-            }
-            else {
+            } else {
                 material = "legendarium";
             }
             // places the asteroid in one of the sectors based on num for even distribution.
             if (i < amount / 2) {
                 // generate the radius and distance
-                const dist: number = Math.abs(this.manager.random.float(
-                                            (this.sizeY / 4) + (this.sizeY / 18),
-                                            (this.sizeY / 2.4)));
-                const ang: number = Math.abs(this.manager.random.float(0, 22.5));
+                const dist: number = Math.abs(
+                    this.manager.random.float(
+                        this.sizeY / 4 + this.sizeY / 18,
+                        this.sizeY / 2.4,
+                    ),
+                );
+                const ang: number = Math.abs(
+                    this.manager.random.float(0, 22.5),
+                );
                 // make the new asteroid
                 const ast: Body = this.manager.create.body({
                     bodyType: "asteroid",
                     materialType: material,
-                    amount: this.manager.random.int(this.minAsteroid, this.maxAsteroid + 1),
+                    amount: this.manager.random.int(
+                        this.minAsteroid,
+                        this.maxAsteroid + 1,
+                    ),
                     radius: minSize,
                     angle: ang,
                     distance: dist,
                 });
                 // adds the asteroid.
                 lower.push(ast);
-            }
-            else {
+            } else {
                 // generate the radius and distance
-                const dist: number = Math.abs(this.manager.random.float(
-                                            (this.sizeY / 4) + (this.sizeY / 18),
-                                            (this.sizeY / 2.4)));
-                const ang: number = Math.abs(this.manager.random.float(22.5, 45));
+                const dist: number = Math.abs(
+                    this.manager.random.float(
+                        this.sizeY / 4 + this.sizeY / 18,
+                        this.sizeY / 2.4,
+                    ),
+                );
+                const ang: number = Math.abs(
+                    this.manager.random.float(22.5, 45),
+                );
                 // make the new asteroid
                 const ast: Body = this.manager.create.body({
                     bodyType: "asteroid",
                     materialType: material,
-                    amount: this.manager.random.int(this.minAsteroid, this.maxAsteroid + 1),
+                    amount: this.manager.random.int(
+                        this.minAsteroid,
+                        this.maxAsteroid + 1,
+                    ),
                     radius: minSize,
                     angle: ang,
                     distance: dist,
@@ -574,11 +598,12 @@ export class StardashGame extends BaseClasses.Game {
         const vAst = this.bodies[3];
         // removes any asteroids colliding into it by not adding them.
         for (const ast of master) {
-            const dist = Math.sqrt(((ast.x - vAst.x) ** 2) + ((ast.y - vAst.y) ** 2));
+            const dist = Math.sqrt(
+                (ast.x - vAst.x) ** 2 + (ast.y - vAst.y) ** 2,
+            );
             if (dist >= ast.radius + vAst.radius) {
                 this.bodies.push(ast);
-            }
-            else if (dist >= vAst.radius + minSize) {
+            } else if (dist >= vAst.radius + minSize) {
                 ast.radius = minSize;
                 this.bodies.push(ast);
             }
@@ -598,7 +623,12 @@ export class StardashGame extends BaseClasses.Game {
      *
      * @returns: nothing, it edits the asteroids, and will remove collisions.
      */
-    private growAsteroids(asteroids: Body[], minSize: number, maxSize: number, preGrown: boolean = false): void {
+    private growAsteroids(
+        asteroids: Body[],
+        minSize: number,
+        maxSize: number,
+        preGrown: boolean = false,
+    ): void {
         // tracks which asteroids have grown.
         const grown: boolean[] = [];
         // tracks how many asteroids are done growing.
@@ -612,14 +642,12 @@ export class StardashGame extends BaseClasses.Game {
                 if (asteroids[x].radius === minSize) {
                     // make it isn't grown.
                     grown.push(false);
-                }
-                else {
+                } else {
                     // otherwise mark it as grown.
                     grown.push(true);
                 }
             }
-        }
-        else {
+        } else {
             // tslint:disable-next-line: prefer-for-of
             for (let x = 0; x < asteroids.length; x++) {
                 // mark it isn't grown.
@@ -633,8 +661,7 @@ export class StardashGame extends BaseClasses.Game {
             for (let x = 0; x < asteroids.length; x++) {
                 if (!grown[x] && asteroids[x].radius < maxSize) {
                     asteroids[x].radius += (maxSize - minSize) / 16;
-                }
-                else if (!grown[x]) {
+                } else if (!grown[x]) {
                     grown[x] = true;
                     amtGrown++;
                 }
@@ -657,7 +684,12 @@ export class StardashGame extends BaseClasses.Game {
                     // grab the asteroid for ease of reference and readability.
                     const cAst = asteroids[y];
                     // if they collide, shrink them and end their growth.
-                    if (Math.sqrt(((sAst.x - cAst.x) ** 2) + ((sAst.y - cAst.y) ** 2)) <= sAst.radius + cAst.radius) {
+                    if (
+                        Math.sqrt(
+                            (sAst.x - cAst.x) ** 2 + (sAst.y - cAst.y) ** 2,
+                        ) <=
+                        sAst.radius + cAst.radius
+                    ) {
                         if (!grown[x]) {
                             grown.splice(x, 1, true);
                             // ungrow the asteroid.
@@ -707,7 +739,12 @@ export class StardashGame extends BaseClasses.Game {
             for (let y = x + 1; y < asteroids.length; y++) {
                 const cAst = asteroids[y];
                 // if they collide, note the collision.
-                if (Math.sqrt(((sAst.x - cAst.x) ** 2) + ((sAst.y - cAst.y) ** 2)) <= sAst.radius + cAst.radius) {
+                if (
+                    Math.sqrt(
+                        (sAst.x - cAst.x) ** 2 + (sAst.y - cAst.y) ** 2,
+                    ) <=
+                    sAst.radius + cAst.radius
+                ) {
                     collide[x].push(y);
                     // update the largest number.
                     if (collide[x].length > largest) {
@@ -729,8 +766,7 @@ export class StardashGame extends BaseClasses.Game {
                     for (const col of collide[x]) {
                         if (collide[col] && collide[col].indexOf(x) !== -1) {
                             collide[col].splice(collide[col].indexOf(x), 1);
-                        }
-                        else if (collide[col].indexOf(x) !== -1) {
+                        } else if (collide[col].indexOf(x) !== -1) {
                             collide.splice(x, 1);
                             break;
                         }
@@ -781,7 +817,9 @@ export class StardashGame extends BaseClasses.Game {
                 // grab the asteroid for ease of reference and readability.
                 const cAst = s1[y];
                 // grab the distance for ease of use
-                const dist = Math.sqrt(((sAst.x - cAst.x) ** 2) + ((sAst.y - cAst.y) ** 2));
+                const dist = Math.sqrt(
+                    (sAst.x - cAst.x) ** 2 + (sAst.y - cAst.y) ** 2,
+                );
                 // if they collide, shrink them and end their growth.
                 if (dist <= sAst.radius + cAst.radius) {
                     // count the collision.
@@ -819,7 +857,12 @@ export class StardashGame extends BaseClasses.Game {
      *
      * @returns: it edits s2.
      */
-    private collideSize(s1: Body[], s2: Body[], minSize: number, shift: number = 0): Body[] {
+    private collideSize(
+        s1: Body[],
+        s2: Body[],
+        minSize: number,
+        shift: number = 0,
+    ): Body[] {
         // tracks the valid asteroids to be returned
         const valid: Body[] = [];
 
@@ -835,7 +878,9 @@ export class StardashGame extends BaseClasses.Game {
             // iterate over the remaining asteroids.
             for (const cAst of s1) {
                 // grab the distance for ease of use
-                const dist = Math.sqrt(((sAst.x - cAst.x) ** 2) + ((sAst.y - cAst.y) ** 2));
+                const dist = Math.sqrt(
+                    (sAst.x - cAst.x) ** 2 + (sAst.y - cAst.y) ** 2,
+                );
                 // if they collide, shrink them and end their growth.
                 while (dist <= sAst.radius + cAst.radius) {
                     // count the collision.
@@ -966,9 +1011,11 @@ export class StardashGame extends BaseClasses.Game {
     private getX(distance: number, angle: number): number {
         // gets the x location if there is a passed distance.
         if (distance >= 0 && angle >= 0) {
-            return distance * Math.cos(((angle + 90) / 180) * Math.PI) + this.bodies[2].x;
-        }
-        else {
+            return (
+                distance * Math.cos(((angle + 90) / 180) * Math.PI) +
+                this.bodies[2].x
+            );
+        } else {
             return -1;
         }
     }
@@ -985,9 +1032,11 @@ export class StardashGame extends BaseClasses.Game {
     private getY(distance: number, angle: number): number {
         // gets the y location if there is a passed distance.
         if (distance >= 0 && angle >= 0) {
-            return distance * Math.sin(((angle + 90) / 180) * Math.PI) + this.bodies[2].y;
-        }
-        else {
+            return (
+                distance * Math.sin(((angle + 90) / 180) * Math.PI) +
+                this.bodies[2].y
+            );
+        } else {
             return -1;
         }
     }

@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IWeaverProperties, IWeaverStrengthenArgs, IWeaverWeakenArgs,
-         SpiderlingArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IWeaverProperties,
+    IWeaverStrengthenArgs,
+    IWeaverWeakenArgs,
+    SpiderlingArgs,
+} from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
 import { Web } from "./web";
@@ -40,12 +44,15 @@ export class Weaver extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderlingArgs & IWeaverProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            SpiderlingArgs &
+                IWeaverProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -79,9 +86,7 @@ export class Weaver extends Spiderling {
             return true; // because they finished moving or something the base Spiderling class can handle
         }
 
-        const web = weakening
-            ? this.weakeningWeb
-            : this.strengtheningWeb;
+        const web = weakening ? this.weakeningWeb : this.strengtheningWeb;
 
         this.weakeningWeb = undefined;
         this.strengtheningWeb = undefined;
@@ -230,14 +235,16 @@ export class Weaver extends Spiderling {
     ): true {
         this.busy = weaveType;
 
-        const webField = weaveType === "Strengthening"
-            ? "strengtheningWeb"
-            : "weakeningWeb";
+        const webField =
+            weaveType === "Strengthening"
+                ? "strengtheningWeb"
+                : "weakeningWeb";
 
         this[webField] = web;
 
         // workRemaining = distance * sqrt(strength) / speed
-        this.workRemaining = web.length * Math.sqrt(web.strength) / this.game.weaveSpeed;
+        this.workRemaining =
+            (web.length * Math.sqrt(web.strength)) / this.game.weaveSpeed;
 
         // find coworkers
         for (const spider of web.getSideSpiders()) {

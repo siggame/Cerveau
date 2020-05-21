@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICowboyActArgs, ICowboyMoveArgs, ICowboyPlayArgs, ICowboyProperties,
-       } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    ICowboyActArgs,
+    ICowboyMoveArgs,
+    ICowboyPlayArgs,
+    ICowboyProperties,
+} from "./";
 import { Furnishing } from "./furnishing";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -102,16 +106,18 @@ export class Cowboy extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ICowboyProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The owner of this Cowboy. */
-            owner: Player;
+        args: Readonly<
+            ICowboyProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The owner of this Cowboy. */
+                owner: Player;
 
-            /** The Tile to spawn this cowboy on. */
-            tile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+                /** The Tile to spawn this cowboy on. */
+                tile: Tile;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -174,7 +180,8 @@ export class Cowboy extends GameObject {
 
         this.canMove = false;
 
-        if (this.owner.siesta === 0) { // then they did not start a siesta, so they actually get drunk
+        if (this.owner.siesta === 0) {
+            // then they did not start a siesta, so they actually get drunk
             this.isDrunk = true;
             this.turnsBusy = this.game.turnsDrunk;
             this.drunkDirection = drunkDirection;
@@ -216,7 +223,11 @@ export class Cowboy extends GameObject {
         // job specific acts
         switch (this.job) {
             case "Bartender":
-                invalid = this.invalidateBartender(player, tile, drunkDirection);
+                invalid = this.invalidateBartender(
+                    player,
+                    tile,
+                    drunkDirection,
+                );
                 break;
             case "Brawler":
                 return `${this} is a Brawler and cannot act`;
@@ -285,17 +296,15 @@ export class Cowboy extends GameObject {
             return `${this} has already moved.`;
         }
 
-        if (tile) { // check if blocked or not adjacent
+        if (tile) {
+            // check if blocked or not adjacent
             if (this.tile && !this.tile.hasNeighbor(tile)) {
                 return `${tile} is not adjacent to ${this.tile}`;
-            }
-            else if (tile.isBalcony) {
+            } else if (tile.isBalcony) {
                 return `${tile} is a balcony and cannot be moved onto.`;
-            }
-            else if (tile.cowboy) {
+            } else if (tile.cowboy) {
                 return `${tile} is blocked by ${tile.cowboy} and cannot be moved into.`;
-            }
-            else if (tile.furnishing) {
+            } else if (tile.furnishing) {
                 return `${tile} is blocked by ${tile.furnishing} and cannot be moved into.`;
             }
         }
@@ -388,10 +397,7 @@ export class Cowboy extends GameObject {
      * @param piano - The Furnishing that is a piano you want to play.
      * @returns True if the play worked, false otherwise.
      */
-    protected async play(
-        player: Player,
-        piano: Furnishing,
-    ): Promise<boolean> {
+    protected async play(player: Player, piano: Furnishing): Promise<boolean> {
         // <<-- Creer-Merge: play -->>
 
         piano.isPlaying = true;
@@ -415,7 +421,10 @@ export class Cowboy extends GameObject {
      * @returns The reason this is invalid (still in need of formatting),
      * undefined if valid.
      */
-    private invalidate(player: Player, tile: Tile | undefined): string | undefined {
+    private invalidate(
+        player: Player,
+        tile: Tile | undefined,
+    ): string | undefined {
         if (this.owner !== player) {
             return `${this} is not owned by you.`;
         }
@@ -442,7 +451,10 @@ export class Cowboy extends GameObject {
      * @returns The invalid reason if invalid (format not invoked against it),
      * undefined if valid.
      */
-    private invalidateSharpshooter(player: Player, tile: Tile): string | undefined {
+    private invalidateSharpshooter(
+        player: Player,
+        tile: Tile,
+    ): string | undefined {
         if (!this.tile) {
             return `${this} must be on a tile`;
         }
@@ -465,10 +477,10 @@ export class Cowboy extends GameObject {
      * @returns True because it worked.
      */
     private actSharpshooter(player: Player, tile: Tile): true {
-
         let shot: Tile | undefined = tile;
         let distance = this.focus;
-        while (shot && distance > 0) { // shoot things
+        while (shot && distance > 0) {
+            // shoot things
             distance--; // yes we could do this above but it reads stupid
 
             if (!shot || shot.isBalcony) {
@@ -544,10 +556,15 @@ export class Cowboy extends GameObject {
      * bottle to go.
      * @returns True because it worked.
      */
-    private actBartender(player: Player, tile: Tile, drunkDirection: CowboyDrunkDirection): true {
+    private actBartender(
+        player: Player,
+        tile: Tile,
+        drunkDirection: CowboyDrunkDirection,
+    ): true {
         // check to make sure the tile the bottle spawns on would not cause it to instantly break
         // because if so, don't create it, just instantly get the cowboy there drunk
-        if (!tile.isPathableToBottles() || tile.bottle) { // don't spawn a bottle, just splash the beer at them
+        if (!tile.isPathableToBottles() || tile.bottle) {
+            // don't spawn a bottle, just splash the beer at them
             if (tile.cowboy) {
                 tile.cowboy.getDrunk(drunkDirection);
             }
@@ -555,8 +572,8 @@ export class Cowboy extends GameObject {
             if (tile.bottle) {
                 tile.bottle.break();
             }
-        }
-        else { // the adjacent tile is empty, so spawn one
+        } else {
+            // the adjacent tile is empty, so spawn one
             if (!this.tile) {
                 throw new Error("Bartender act called in illegal state!");
             }

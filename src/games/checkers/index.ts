@@ -8,13 +8,24 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,11 +34,10 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Checkers game
  * must implement from mixed in game logic.
  */
-export interface IBaseCheckersPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface IBaseCheckersPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -90,7 +100,6 @@ export interface ICheckerProperties {
      * The y coordinate of the checker.
      */
     y?: number;
-
 }
 
 /**
@@ -98,8 +107,7 @@ export interface ICheckerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICheckerIsMineArgs {
-}
+export interface ICheckerIsMineArgs {}
 
 /**
  * Argument overrides for Checker's move function. If you return an object of
@@ -118,8 +126,7 @@ export interface ICheckerMoveArgs {
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -173,7 +180,6 @@ export interface IPlayerProperties {
      * The direction your checkers must go along the y-axis until kinged.
      */
     yDirection?: number;
-
 }
 
 export * from "./checker";
@@ -207,12 +213,9 @@ export class CheckersGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Checker hooked up in the game and ready for you to use.
      */
-    public checker<T extends CheckerArgs>(
-        args: Readonly<T>,
-    ): Checker & T {
+    public checker<T extends CheckerArgs>(args: Readonly<T>): Checker & T {
         return this.createGameObject("Checker", Checker, args);
     }
-
 }
 
 /**
@@ -235,8 +238,7 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CheckersGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 gotCaptured: {
                     args: [
@@ -252,8 +254,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -321,8 +322,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Checker: {
             parentClassName: "GameObject",
@@ -344,8 +344,7 @@ export const Namespace = makeNamespace({
             },
             functions: {
                 isMine: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -441,9 +440,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "49f1e5586cc4c62b6f74081e803d8edf9f54e8315f221c62c638f963cea8ab31",
+    gameVersion:
+        "49f1e5586cc4c62b6f74081e803d8edf9f54e8315f221c62c638f963cea8ab31",
 });

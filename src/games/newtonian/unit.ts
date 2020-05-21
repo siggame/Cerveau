@@ -1,6 +1,12 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitActArgs, IUnitAttackArgs, IUnitDropArgs, IUnitMoveArgs,
-         IUnitPickupArgs, IUnitProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IUnitActArgs,
+    IUnitAttackArgs,
+    IUnitDropArgs,
+    IUnitMoveArgs,
+    IUnitPickupArgs,
+    IUnitProperties,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -9,7 +15,9 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 
-const materialNameToVariableName = (material: Required<IUnitPickupArgs>["material"]) => {
+const materialNameToVariableName = (
+    material: Required<IUnitPickupArgs>["material"],
+) => {
     switch (material) {
         case "redium":
         case "blueium":
@@ -109,13 +117,15 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The Job this Unit will have. */
-            job: Job;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IUnitProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The Job this Unit will have. */
+                job: Job;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -166,8 +176,12 @@ export class Unit extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         // make sure the tile is next to the unit
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only act on an adjacent tile.`;
         }
         // make sure valid target
@@ -183,10 +197,15 @@ export class Unit extends GameObject {
             // if there isn't a machine.
             else if (tile.machine) {
                 if (tile.machine.worked <= 0) {
-                    if (tile.machine.oreType === "redium" && tile.rediumOre < tile.machine.refineInput) {
+                    if (
+                        tile.machine.oreType === "redium" &&
+                        tile.rediumOre < tile.machine.refineInput
+                    ) {
                         return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
-                    }
-                    else if (tile.machine.oreType === "blueium" && tile.blueiumOre < tile.machine.refineInput) {
+                    } else if (
+                        tile.machine.oreType === "blueium" &&
+                        tile.blueiumOre < tile.machine.refineInput
+                    ) {
                         return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
                     }
                 }
@@ -343,8 +362,12 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
@@ -443,8 +466,13 @@ export class Unit extends GameObject {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
         // make sure it is selecting a adjacent tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            tile !== this.tile &&
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -480,8 +508,7 @@ export class Unit extends GameObject {
             tile.redium += this.redium;
             tile.rediumOre += this.rediumOre;
             this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
-        }
-        else {
+        } else {
             tile[memberName] += amt;
             this[memberName] -= amt;
         }
@@ -535,8 +562,12 @@ export class Unit extends GameObject {
             return `${this} cannot walk through the unit on tile ${tile}. Yet.....`;
         }
         // make sure the tile is next to the unit.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only travel to an adjacent tile. Tile ${tile} too far away.`;
         }
         // make sure they aren't entering a spawn area.
@@ -617,8 +648,13 @@ export class Unit extends GameObject {
             return `${this} can only pick things up off tiles that exist`;
         }
         // make sure the tile is adjacent to the current tile, or its tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            tile !== this.tile &&
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -656,12 +692,14 @@ export class Unit extends GameObject {
             }
         }
 
-        const actualAmount = amount <= 0
-            ? totalMaterialOnTile
-            : Math.min(totalMaterialOnTile, amount);
+        const actualAmount =
+            amount <= 0
+                ? totalMaterialOnTile
+                : Math.min(totalMaterialOnTile, amount);
 
         // Amount of materials the unit is currently carrying
-        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+        const currentLoad =
+            this.rediumOre + this.redium + this.blueium + this.blueiumOre;
         // if the unit can't carry anymore.
         if (currentLoad === this.job.carryLimit) {
             return `${this} is already carrying as many resources as it can.`;
@@ -694,12 +732,17 @@ export class Unit extends GameObject {
         const memberName = materialNameToVariableName(material);
         const totalMaterialOnTile = tile[memberName];
 
-        let actualAmount = amount <= 0
-            ? totalMaterialOnTile
-            : Math.min(totalMaterialOnTile, amount);
-        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+        let actualAmount =
+            amount <= 0
+                ? totalMaterialOnTile
+                : Math.min(totalMaterialOnTile, amount);
+        const currentLoad =
+            this.rediumOre + this.redium + this.blueium + this.blueiumOre;
 
-        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
+        actualAmount = Math.min(
+            actualAmount,
+            this.job.carryLimit - currentLoad,
+        );
 
         tile[memberName] -= actualAmount;
         this[memberName] += actualAmount;

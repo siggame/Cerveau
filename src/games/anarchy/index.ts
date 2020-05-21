@@ -8,13 +8,24 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,11 +34,10 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Anarchy game
  * must implement from mixed in game logic.
  */
-export interface IBaseAnarchyPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface IBaseAnarchyPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -134,7 +144,6 @@ export interface IBuildingProperties {
      * The location of the Building along the y-axis.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an FireDepartment. */
@@ -144,7 +153,6 @@ export interface IFireDepartmentProperties {
      * building.
      */
     fireExtinguished?: number;
-
 }
 
 /**
@@ -178,12 +186,10 @@ export interface IForecastProperties {
      * Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     intensity?: number;
-
 }
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Player. */
 export interface IPlayerProperties {
@@ -265,12 +271,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an PoliceDepartment. */
-export interface IPoliceDepartmentProperties {
-}
+export interface IPoliceDepartmentProperties {}
 
 /**
  * Argument overrides for PoliceDepartment's raid function. If you return an
@@ -298,7 +302,6 @@ export interface IWarehouseProperties {
      * Headquarters add more fire than normal Warehouses.
      */
     fireAdded?: number;
-
 }
 
 /**
@@ -314,8 +317,7 @@ export interface IWarehouseIgniteArgs {
 }
 
 /** All the possible properties for an WeatherStation. */
-export interface IWeatherStationProperties {
-}
+export interface IWeatherStationProperties {}
 
 /**
  * Argument overrides for WeatherStation's intensify function. If you return an
@@ -373,19 +375,25 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 export type BuildingArgs = FirstArgumentFromConstructor<typeof Building>;
 
 /** The arguments used to construct a FireDepartment */
-export type FireDepartmentArgs = FirstArgumentFromConstructor<typeof FireDepartment>;
+export type FireDepartmentArgs = FirstArgumentFromConstructor<
+    typeof FireDepartment
+>;
 
 /** The arguments used to construct a Forecast */
 export type ForecastArgs = FirstArgumentFromConstructor<typeof Forecast>;
 
 /** The arguments used to construct a PoliceDepartment */
-export type PoliceDepartmentArgs = FirstArgumentFromConstructor<typeof PoliceDepartment>;
+export type PoliceDepartmentArgs = FirstArgumentFromConstructor<
+    typeof PoliceDepartment
+>;
 
 /** The arguments used to construct a Warehouse */
 export type WarehouseArgs = FirstArgumentFromConstructor<typeof Warehouse>;
 
 /** The arguments used to construct a WeatherStation */
-export type WeatherStationArgs = FirstArgumentFromConstructor<typeof WeatherStation>;
+export type WeatherStationArgs = FirstArgumentFromConstructor<
+    typeof WeatherStation
+>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -399,9 +407,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Building hooked up in the game and ready for you to use.
      */
-    public building<T extends BuildingArgs>(
-        args: Readonly<T>,
-    ): Building & T {
+    public building<T extends BuildingArgs>(args: Readonly<T>): Building & T {
         return this.createGameObject("Building", Building, args);
     }
 
@@ -426,9 +432,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Forecast hooked up in the game and ready for you to use.
      */
-    public forecast<T extends ForecastArgs>(
-        args: Readonly<T>,
-    ): Forecast & T {
+    public forecast<T extends ForecastArgs>(args: Readonly<T>): Forecast & T {
         return this.createGameObject("Forecast", Forecast, args);
     }
 
@@ -444,7 +448,11 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     public policeDepartment<T extends PoliceDepartmentArgs>(
         args: Readonly<T>,
     ): PoliceDepartment & T {
-        return this.createGameObject("PoliceDepartment", PoliceDepartment, args);
+        return this.createGameObject(
+            "PoliceDepartment",
+            PoliceDepartment,
+            args,
+        );
     }
 
     /**
@@ -473,7 +481,6 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     ): WeatherStation & T {
         return this.createGameObject("WeatherStation", WeatherStation, args);
     }
-
 }
 
 /**
@@ -496,12 +503,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new AnarchyGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -588,8 +593,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Building: {
             parentClassName: "GameObject",
@@ -638,8 +642,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         FireDepartment: {
             parentClassName: "Building",
@@ -682,8 +685,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -792,13 +794,11 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         PoliceDepartment: {
             parentClassName: "Building",
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 raid: {
                     args: [
@@ -845,8 +845,7 @@ export const Namespace = makeNamespace({
         },
         WeatherStation: {
             parentClassName: "Building",
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 intensify: {
                     args: [
@@ -877,5 +876,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "2bc66f9a5d7babd553079e149c7466feb6f553935b608ff722872e195fbadab8",
+    gameVersion:
+        "2bc66f9a5d7babd553079e149c7466feb6f553935b608ff722872e195fbadab8",
 });

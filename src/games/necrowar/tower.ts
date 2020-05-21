@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { ITowerAttackArgs, ITowerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -58,15 +58,17 @@ export class Tower extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ITowerProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The TowerJob to assign this tower to */
-            job: TowerJob;
-            /** The starting tile */
-            tile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            ITowerProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The TowerJob to assign this tower to */
+                job: TowerJob;
+                /** The starting tile */
+                tile: Tile;
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -108,7 +110,7 @@ export class Tower extends GameObject {
         }
 
         // Check if any unit belongs to the player
-        if ((tile.unit) && (tile.unit.owner === player)) {
+        if (tile.unit && tile.unit.owner === player) {
             return `${this}, cannot attack allied units!`;
         }
 
@@ -131,11 +133,16 @@ export class Tower extends GameObject {
         }
 
         if (this.job.title === "cleansing") {
-            if (tile.unit.job.title !== "wraith" && tile.unit.job.title !== "abomination") {
+            if (
+                tile.unit.job.title !== "wraith" &&
+                tile.unit.job.title !== "abomination"
+            ) {
                 return `Cleansing towers can only attack wraiths and abominations!`;
             }
-        }
-        else if (this.job.title !== "castle" && tile.unit.job.title === "wraith") {
+        } else if (
+            this.job.title !== "castle" &&
+            tile.unit.job.title === "wraith"
+        ) {
             return `${this} cannot attack wraiths! They are incorporeal!`;
         }
 
@@ -158,15 +165,14 @@ export class Tower extends GameObject {
         }
 
         // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
+        if (range < this.distance(this.tile.x, this.tile.y, tile.x, tile.y)) {
             return `${this}, cannot attack because target tile is out of range`;
         }
 
         // Check if job is valid
         if (!this.job) {
             return `${this}, has an unknown job`;
-        }
-        else {
+        } else {
             if (!this.job.title) {
                 return `${this}, has an unknown job name`;
             }
@@ -210,8 +216,7 @@ export class Tower extends GameObject {
             for (const unit of tileUnits) {
                 unit.health = Math.max(0, unit.health - this.job.damage);
             }
-        }
-        else {
+        } else {
             tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
         }
 
@@ -233,10 +238,10 @@ export class Tower extends GameObject {
      */
     private distance(x1: number, y1: number, x2: number, y2: number): number {
         // Calculate differences
-        const xDif: number = (x1 - x2);
-        const yDif: number = (y1 - y2);
+        const xDif: number = x1 - x2;
+        const yDif: number = y1 - y2;
 
-        return Math.sqrt((xDif ** 2) + (yDif ** 2));
+        return Math.sqrt(xDif ** 2 + yDif ** 2);
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>

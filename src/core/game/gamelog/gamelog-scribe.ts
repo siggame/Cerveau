@@ -1,5 +1,13 @@
-import { Delta, IDisconnectDelta, IFinishedDelta, IGamelog, IOrderDelta,
-         IOverDelta, IRanDelta, IStartDelta } from "@cadre/ts-utils/cadre";
+import {
+    Delta,
+    IDisconnectDelta,
+    IFinishedDelta,
+    IGamelog,
+    IOrderDelta,
+    IOverDelta,
+    IRanDelta,
+    IStartDelta,
+} from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { SHARED_CONSTANTS } from "~/core/constants";
@@ -8,7 +16,7 @@ import { DeltaManager } from "~/core/game/delta-manager";
 import { Session } from "~/core/server";
 import { Immutable } from "~/utils";
 
-/** Observes a game and creates a gamelog by transcribing its events */
+/** Observes a game and creates a gamelog by transcribing its events. */
 export class GamelogScribe {
     /** The events the game logger emits when it logs something. */
     public readonly events = events({
@@ -80,7 +88,6 @@ export class GamelogScribe {
 
             const { id } = client.player;
             client.events.disconnected.on(() => {
-
                 this.add<IDisconnectDelta>("disconnect", {
                     player: { id },
                     timeout: client.hasTimedOut(),
@@ -93,7 +100,6 @@ export class GamelogScribe {
      * Generates the game log from all the events that happened in this game.
      *
      * @param clients - The list of clients that played this game.
-     * @returns The gamelog that was generated.
      */
     private finalizeGamelog(clients: Immutable<BaseClient[]>): void {
         // update the winners and losers of the gamelog
@@ -113,17 +119,16 @@ export class GamelogScribe {
                 index: i,
                 id: player.id,
                 name: player.name,
-                reason: player.won
-                        ? player.reasonWon
-                        : player.reasonLost,
-                disconnected: client.hasDisconnected() && !client.hasTimedOut(),
-                              // then they lost because they disconnected
+                reason: player.won ? player.reasonWon : player.reasonLost,
+                disconnected:
+                    client.hasDisconnected() && !client.hasTimedOut(),
+                // then they lost because they disconnected
                 timedOut: client.hasTimedOut(),
-                          // then they lost because the timed out
+                // then they lost because the timed out
             });
         }
 
-        this.gamelog.epoch = (new Date()).getTime();
+        this.gamelog.epoch = new Date().getTime();
         this.finalized = true;
     }
 
@@ -134,7 +139,10 @@ export class GamelogScribe {
      * @param data - The data about why it changed, such as what data made the
      * delta occur.
      */
-    private add<T extends Delta>(type: T["type"], data?: Immutable<T["data"]>): void {
+    private add<T extends Delta>(
+        type: T["type"],
+        data?: Immutable<T["data"]>,
+    ): void {
         if (this.finalized) {
             return; // Gamelog is finalized, we can't add things.
         }

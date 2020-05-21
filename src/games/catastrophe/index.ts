@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Catastrophe game
  * must implement from mixed in game logic.
  */
-export interface IBaseCatastrophePlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBaseCatastrophePlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -72,8 +84,7 @@ export const BaseClasses = {
 // so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Job. */
 export interface IJobProperties {
@@ -100,14 +111,19 @@ export interface IJobProperties {
     /**
      * The Job title.
      */
-    title?: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
+    title?:
+        | "fresh human"
+        | "cat overlord"
+        | "soldier"
+        | "gatherer"
+        | "builder"
+        | "missionary";
 
     /**
      * The amount of food per turn this Unit consumes. If there isn't enough
      * food for every Unit, all Units become starved and do not consume food.
      */
     upkeep?: number;
-
 }
 
 /** All the possible properties for an Player. */
@@ -179,7 +195,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Structure. */
@@ -211,7 +226,6 @@ export interface IStructureProperties {
      * 'neutral').
      */
     type?: "neutral" | "shelter" | "monument" | "wall" | "road";
-
 }
 
 /** All the possible properties for an Tile. */
@@ -279,7 +293,6 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an Unit. */
@@ -348,7 +361,6 @@ export interface IUnitProperties {
      * fresh humans created from combat. Otherwise, 0.
      */
     turnsToDie?: number;
-
 }
 
 /**
@@ -487,8 +499,7 @@ export interface IUnitPickupArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitRestArgs {
-}
+export interface IUnitRestArgs {}
 
 export * from "./game-object";
 export * from "./job";
@@ -536,9 +547,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -562,9 +571,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -575,12 +582,9 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -603,12 +607,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CatastropheGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -731,8 +733,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -781,14 +782,20 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "fresh human",
-                    literals: ["fresh human", "cat overlord", "soldier", "gatherer", "builder", "missionary"],
+                    literals: [
+                        "fresh human",
+                        "cat overlord",
+                        "soldier",
+                        "gatherer",
+                        "builder",
+                        "missionary",
+                    ],
                 },
                 upkeep: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -847,8 +854,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Structure: {
             parentClassName: "GameObject",
@@ -872,11 +878,16 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "neutral",
-                    literals: ["neutral", "shelter", "monument", "wall", "road"],
+                    literals: [
+                        "neutral",
+                        "shelter",
+                        "monument",
+                        "wall",
+                        "road",
+                    ],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -930,8 +941,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1007,7 +1017,12 @@ export const Namespace = makeNamespace({
                             argName: "job",
                             typeName: "string",
                             defaultValue: "soldier",
-                            literals: ["soldier", "gatherer", "builder", "missionary"],
+                            literals: [
+                                "soldier",
+                                "gatherer",
+                                "builder",
+                                "missionary",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1027,7 +1042,13 @@ export const Namespace = makeNamespace({
                             argName: "type",
                             typeName: "string",
                             defaultValue: "neutral",
-                            literals: ["neutral", "shelter", "monument", "wall", "road"],
+                            literals: [
+                                "neutral",
+                                "shelter",
+                                "monument",
+                                "wall",
+                                "road",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1142,8 +1163,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 rest: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1152,5 +1172,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "ede84ab86376b00287c09558f05e8f2a61b92109d93aad9ebd3379ff4215fb53",
+    gameVersion:
+        "ede84ab86376b00287c09558f05e8f2a61b92109d93aad9ebd3379ff4215fb53",
 });

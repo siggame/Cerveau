@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IWebProperties } from "./";
 import { GameObject } from "./game-object";
 import { Nest } from "./nest";
@@ -64,12 +64,14 @@ export class Web extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IWebProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IWebProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -100,16 +102,17 @@ export class Web extends GameObject {
         for (const spider of sideSpiders) {
             if (
                 (spider instanceof Cutter && spider.cuttingWeb === this) ||
-                (spider instanceof Weaver && (
-                    spider.strengtheningWeb === this ||
-                    spider.weakeningWeb === this
-                ))
-            ) { // then they may be busy with this
+                (spider instanceof Weaver &&
+                    (spider.strengtheningWeb === this ||
+                        spider.weakeningWeb === this))
+            ) {
+                // then they may be busy with this
                 spider.finish(true);
             }
         }
 
-        removeElementFrom(this,
+        removeElementFrom(
+            this,
             this.game.webs,
             this.nestA.webs,
             this.nestB.webs,
@@ -165,8 +168,10 @@ export class Web extends GameObject {
             return this.nestA === nest || this.nestB === nest;
         }
 
-        return (this.nestA === nest && this.nestB === otherNest) ||
-                (this.nestA === otherNest && this.nestB === nest);
+        return (
+            (this.nestA === nest && this.nestB === otherNest) ||
+            (this.nestA === otherNest && this.nestB === nest)
+        );
     }
 
     /**
@@ -204,7 +209,11 @@ export class Web extends GameObject {
      * @param num - number to add to this Web's strength
      */
     public addStrength(num: number): void {
-        this.strength = clamp(this.strength + num, 1, this.game.maxWebStrength);
+        this.strength = clamp(
+            this.strength + num,
+            1,
+            this.game.maxWebStrength,
+        );
         if (this.load >= this.strength) {
             this.snap();
         }
@@ -216,7 +225,7 @@ export class Web extends GameObject {
      * @returns An array of Spiders in nest A and B (the sides of this web).
      */
     public getSideSpiders(): Spider[] {
-        return (this.nestA && this.nestB)
+        return this.nestA && this.nestB
             ? this.nestA.spiders.concat(this.nestB.spiders)
             : [];
     }

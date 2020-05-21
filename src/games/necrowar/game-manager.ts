@@ -115,7 +115,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
         const playersWithCastlesStanding = this.game.players.filter(
-            (player) => player.towers.length > 0 && player.towers[0].job.title === "castle",
+            (player) =>
+                player.towers.length > 0 &&
+                player.towers[0].job.title === "castle",
         );
 
         if (playersWithCastlesStanding.length === 0) {
@@ -125,8 +127,14 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
 
         if (playersWithCastlesStanding.length === 1) {
-            this.declareWinner("You defeated the enemy Necromancer!", playersWithCastlesStanding[0]);
-            this.declareLosers("The enemy Necromancer has bested you!", playersWithCastlesStanding[0].opponent);
+            this.declareWinner(
+                "You defeated the enemy Necromancer!",
+                playersWithCastlesStanding[0],
+            );
+            this.declareLosers(
+                "The enemy Necromancer has bested you!",
+                playersWithCastlesStanding[0].opponent,
+            );
 
             return true;
         }
@@ -146,21 +154,52 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
 
-        if (this.game.players[0].towerKills > this.game.players[1].towerKills) {
-            this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[0]);
-            this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[1]);
-        }
-        else if (this.game.players[1].towerKills > this.game.players[0].towerKills) {
-            this.declareWinner(`${reason}: You had more tower kills!`, this.game.players[1]);
-            this.declareLoser(`${reason}: Your opponent had more tower kills!`, this.game.players[0]);
-        }
-        else if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0]);
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1]);
-        }
-        else if (this.game.players[1].towers[0].health > this.game.players[0].towers[0].health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1]);
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0]);
+        if (
+            this.game.players[0].towerKills > this.game.players[1].towerKills
+        ) {
+            this.declareWinner(
+                `${reason}: You had more tower kills!`,
+                this.game.players[0],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent had more tower kills!`,
+                this.game.players[1],
+            );
+        } else if (
+            this.game.players[1].towerKills > this.game.players[0].towerKills
+        ) {
+            this.declareWinner(
+                `${reason}: You had more tower kills!`,
+                this.game.players[1],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent had more tower kills!`,
+                this.game.players[0],
+            );
+        } else if (
+            this.game.players[0].towers[0].health >
+            this.game.players[1].towers[0].health
+        ) {
+            this.declareWinner(
+                `${reason}: You had higher castle health!`,
+                this.game.players[0],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent's castle had higher health!`,
+                this.game.players[1],
+            );
+        } else if (
+            this.game.players[1].towers[0].health >
+            this.game.players[0].towers[0].health
+        ) {
+            this.declareWinner(
+                `${reason}: You had higher castle health!`,
+                this.game.players[1],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent's castle had higher health!`,
+                this.game.players[0],
+            );
         }
 
         // <<-- /Creer-Merge: secondary-win-conditions -->>
@@ -178,7 +217,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     private updateUnits(): void {
         // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+        const deadUnits = this.game.units.filter(
+            (u) => !u.tile || u.health <= 0,
+        );
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {
@@ -186,7 +227,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
-         // mark them dead
+        // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
                 if (unit.job.title !== "zombie") {
@@ -212,7 +253,9 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     private updateTowers(): void {
         // Properly remove all killed towers
-        const deadTowers = this.game.towers.filter((t) => !t.tile || t.health <= 0);
+        const deadTowers = this.game.towers.filter(
+            (t) => !t.tile || t.health <= 0,
+        );
 
         // remove dead towers from all player's towers list
         for (const player of this.game.players) {
@@ -220,7 +263,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.towers, ...deadTowers);
-         // mark them dead
+        // mark them dead
         for (const tower of deadTowers) {
             if (tower.tile) {
                 tower.tile.isGrass = true;

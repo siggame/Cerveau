@@ -77,7 +77,10 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         this.updateSpawnedCowboys();
 
-        this.game.currentPlayer.siesta = Math.max(0, this.game.currentPlayer.siesta - 1);
+        this.game.currentPlayer.siesta = Math.max(
+            0,
+            this.game.currentPlayer.siesta - 1,
+        );
         this.updateCowboys();
         this.advanceBottles();
         this.resetPianoPlaying();
@@ -104,26 +107,32 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: primary-win-conditions -->>
 
-        const alivePianos = this.game.furnishings.filter((f) => !f.isDestroyed && f.isPiano);
+        const alivePianos = this.game.furnishings.filter(
+            (f) => !f.isDestroyed && f.isPiano,
+        );
 
-        if (alivePianos.length === 0) { // game over
+        if (alivePianos.length === 0) {
+            // game over
             this.secondaryWinConditions("all pianos destroyed.");
         }
 
         // check to see if one player has more score than the other can possibly get
-        const winning = this.game.players[0].score > this.game.players[1].score
-            ? this.game.players[0]
-            : this.game.players[1];
+        const winning =
+            this.game.players[0].score > this.game.players[1].score
+                ? this.game.players[0]
+                : this.game.players[1];
 
         // this assumes they play every piano on every remaining turn
         const remainingTurns = this.game.maxTurns - this.game.currentTurn;
-        const maxAdditionalScore = Math.ceil(alivePianos.length * remainingTurns / 2);
+        const maxAdditionalScore = Math.ceil(
+            (alivePianos.length * remainingTurns) / 2,
+        );
         if (winning.score > winning.opponent.score + maxAdditionalScore) {
             // then the losing player can't catch up to the winner's score,
             // so end the game early
             this.declareWinner(
-                `Score (${winning.score}) high enough that the opponent can't `
-                + `win in the remaining turns (${remainingTurns}).`,
+                `Score (${winning.score}) high enough that the opponent can't ` +
+                    `win in the remaining turns (${remainingTurns}).`,
                 winning,
             );
 
@@ -150,24 +159,30 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: secondary-win-conditions -->>
 
         const { players } = this.game;
-        if (players[0].score !== players[1].score) { // someone won with a higher score
-            const winner = players[0].score > players[1].score
-                ? players[0]
-                : players[1];
+        if (players[0].score !== players[1].score) {
+            // someone won with a higher score
+            const winner =
+                players[0].score > players[1].score ? players[0] : players[1];
 
-            this.declareWinner(`${reason} - Has highest score (${winner.score}).`, winner);
+            this.declareWinner(
+                `${reason} - Has highest score (${winner.score}).`,
+                winner,
+            );
             this.declareLoser("Lower score than winner", winner.opponent);
             this.endGame();
 
             return;
         }
 
-        if (players[0].kills !== players[1].kills) { // someone won with a higher kills
-            const winner = players[0].kills > players[1].kills
-                ? players[0]
-                : players[1];
+        if (players[0].kills !== players[1].kills) {
+            // someone won with a higher kills
+            const winner =
+                players[0].kills > players[1].kills ? players[0] : players[1];
 
-            this.declareWinner(`${reason} - Has the most kills (${winner.kills}).`, winner);
+            this.declareWinner(
+                `${reason} - Has the most kills (${winner.kills}).`,
+                winner,
+            );
             this.declareLoser("Less kills than winner", winner.opponent);
             this.endGame();
 
@@ -190,7 +205,6 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         for (const cowboy of this.spawnedCowboys) {
             this.game.cowboys.push(cowboy);
             cowboy.owner.cowboys.push(cowboy);
-
         }
 
         this.spawnedCowboys.length = 0;
@@ -208,24 +222,30 @@ export class SaloonGameManager extends BaseClasses.GameManager {
             if (cowboy.isDrunk) {
                 if (cowboy.drunkDirection !== "") {
                     // then they are not drunk because of a siesta, so move them
-                    const next = cowboy.tile.getNeighbor(cowboy.drunkDirection);
+                    const next = cowboy.tile.getNeighbor(
+                        cowboy.drunkDirection,
+                    );
                     if (!next) {
-                        throw new Error(`${this} somehow is trying to walk off the map!`);
+                        throw new Error(
+                            `${this} somehow is trying to walk off the map!`,
+                        );
                     }
 
-                    if (next.isBalcony || next.cowboy || next.furnishing) { // then something is in the way
+                    if (next.isBalcony || next.cowboy || next.furnishing) {
+                        // then something is in the way
                         if (next.cowboy) {
                             next.cowboy.focus = 0;
                         }
 
                         if (next.isBalcony || next.furnishing) {
                             cowboy.damage(1);
-                            if (cowboy.isDead) { // RIP he died from that
+                            if (cowboy.isDead) {
+                                // RIP he died from that
                                 continue; // don't update dead dudes, they won't come back
                             }
                         }
-                    }
-                    else { // the next tile is valid
+                    } else {
+                        // the next tile is valid
                         cowboy.tile.cowboy = undefined;
                         cowboy.tile = next;
                         next.cowboy = cowboy;
@@ -237,11 +257,15 @@ export class SaloonGameManager extends BaseClasses.GameManager {
                 }
 
                 cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
-                cowboy.isDrunk = (cowboy.turnsBusy !== 0);
+                cowboy.isDrunk = cowboy.turnsBusy !== 0;
                 cowboy.canMove = !cowboy.isDrunk;
-            }
-            else { // they are not drunk, so update them for use next turn
-                if (cowboy.job === "Sharpshooter" && cowboy.canMove && cowboy.turnsBusy === 0) {
+            } else {
+                // they are not drunk, so update them for use next turn
+                if (
+                    cowboy.job === "Sharpshooter" &&
+                    cowboy.canMove &&
+                    cowboy.turnsBusy === 0
+                ) {
                     // then the sharpshooter didn't move, so increase his focus
                     cowboy.focus++;
                 }
@@ -251,12 +275,15 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
             cowboy.turnsBusy = Math.max(0, cowboy.turnsBusy - 1);
 
-            if (cowboy.job === "Brawler") { // damage surroundings
+            if (cowboy.job === "Brawler") {
+                // damage surroundings
                 for (const neighbor of cowboy.tile.getNeighbors()) {
-                    if (neighbor.cowboy) { // if there is a cowboy, damage them
+                    if (neighbor.cowboy) {
+                        // if there is a cowboy, damage them
                         neighbor.cowboy.damage(this.game.brawlerDamage);
                     }
-                    if (neighbor.furnishing) { // if there is a furnishing, damage it
+                    if (neighbor.furnishing) {
+                        // if there is a furnishing, damage it
                         neighbor.furnishing.damage(this.game.brawlerDamage);
                     }
                 }
@@ -264,9 +291,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         }
     }
 
-   /**
-    * Moves all bottles currently in the game
-    */
+    /**
+     * Moves all bottles currently in the game
+     */
     private advanceBottles(): void {
         const bottlesAtTile = new Map<Tile, Bottle[]>();
 
@@ -290,12 +317,13 @@ export class SaloonGameManager extends BaseClasses.GameManager {
 
         // now check for bottle <--> bottle collisions, and cleanup
         for (const [tile, bottles] of bottlesAtTile) {
-            if (bottles.length > 1) { // there's more than 1 bottle on that tile, break them all
+            if (bottles.length > 1) {
+                // there's more than 1 bottle on that tile, break them all
                 for (const bottle of bottles) {
                     bottle.break();
                 }
-            }
-            else { // there is 1 or 0 bottles on the tile with `id`
+            } else {
+                // there is 1 or 0 bottles on the tile with `id`
                 tile.bottle = bottles[0];
             }
 

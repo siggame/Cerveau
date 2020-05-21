@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBodyNextXArgs, IBodyNextYArgs, IBodyProperties, IBodySpawnArgs,
-       } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    IBodyNextXArgs,
+    IBodyNextYArgs,
+    IBodyProperties,
+    IBodySpawnArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -17,7 +21,12 @@ export type BodyBodyType = "planet" | "asteroid" | "sun";
  * The type of material the celestial body has. Either 'none', 'genarium',
  * 'rarium', 'legendarium', or 'mythicite'.
  */
-export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+export type BodyMaterialType =
+    | "none"
+    | "genarium"
+    | "rarium"
+    | "legendarium"
+    | "mythicite";
 
 /**
  * A celestial body located within the game.
@@ -37,7 +46,12 @@ export class Body extends GameObject {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+    public readonly materialType!:
+        | "none"
+        | "genarium"
+        | "rarium"
+        | "legendarium"
+        | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -84,16 +98,18 @@ export class Body extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IBodyProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            /** The angle */
-            angle: number;
-            /** The distance */
-            distance: number;
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IBodyProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                /** The angle */
+                angle: number;
+                /** The distance */
+                distance: number;
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -116,9 +132,12 @@ export class Body extends GameObject {
     public getX(offset: number = 0): number {
         // gets the location of the asteroid at the angle and distance.
         if (this.distance > 0 && this.angle > 0) {
-            return this.distance * Math.cos(((this.angle + offset + 90) / 180) * Math.PI) + this.game.bodies[2].x;
-        }
-        else {
+            return (
+                this.distance *
+                    Math.cos(((this.angle + offset + 90) / 180) * Math.PI) +
+                this.game.bodies[2].x
+            );
+        } else {
             return this.x;
         }
     }
@@ -133,9 +152,12 @@ export class Body extends GameObject {
     public getY(offset: number = 0): number {
         // gets the location of the asteroid at the angle and distance.
         if (this.distance > 0 && this.angle > 0) {
-            return this.distance * Math.sin(((this.angle + offset + 90) / 180) * Math.PI) + this.game.bodies[2].y;
-        }
-        else {
+            return (
+                this.distance *
+                    Math.sin(((this.angle + offset + 90) / 180) * Math.PI) +
+                this.game.bodies[2].y
+            );
+        } else {
             return this.y;
         }
     }
@@ -162,12 +184,10 @@ export class Body extends GameObject {
         num: number,
     ): void | string | IBodyNextXArgs {
         // <<-- Creer-Merge: invalidate-nextX -->>
-
         // Check all the arguments for nextX here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
         // <<-- /Creer-Merge: invalidate-nextX -->>
     }
 
@@ -187,10 +207,18 @@ export class Body extends GameObject {
 
         // gets the location of the asteroid at the angle and distance.
         if (this.distance && this.angle) {
-            return this.distance * Math.cos(((this.angle + 90 + (num * 360 / this.game.turnsToOrbit)) / 180) *
-            Math.PI) + this.game.bodies[2].x;
-        }
-        else {
+            return (
+                this.distance *
+                    Math.cos(
+                        ((this.angle +
+                            90 +
+                            (num * 360) / this.game.turnsToOrbit) /
+                            180) *
+                            Math.PI,
+                    ) +
+                this.game.bodies[2].x
+            );
+        } else {
             return this.x;
         }
 
@@ -213,12 +241,10 @@ export class Body extends GameObject {
         num: number,
     ): void | string | IBodyNextYArgs {
         // <<-- Creer-Merge: invalidate-nextY -->>
-
         // Check all the arguments for nextY here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
         // <<-- /Creer-Merge: invalidate-nextY -->>
     }
 
@@ -238,10 +264,18 @@ export class Body extends GameObject {
 
         // gets the location of the asteroid at the angle and distance.
         if (this.distance && this.angle) {
-            return this.distance * Math.sin(((this.angle + 90 + (num * 360 / this.game.turnsToOrbit)) / 180) *
-            Math.PI) + this.game.bodies[2].y;
-        }
-        else {
+            return (
+                this.distance *
+                    Math.sin(
+                        ((this.angle +
+                            90 +
+                            (num * 360) / this.game.turnsToOrbit) /
+                            180) *
+                            Math.PI,
+                    ) +
+                this.game.bodies[2].y
+            );
+        } else {
             return this.y;
         }
 
@@ -274,8 +308,13 @@ export class Body extends GameObject {
         }
 
         // Check if the supplied title is valid
-        if (title !== "corvette" && title !== "missileboat" && title !== "martyr"
-            && title !== "transport" && title !== "miner") {
+        if (
+            title !== "corvette" &&
+            title !== "missileboat" &&
+            title !== "martyr" &&
+            title !== "transport" &&
+            title !== "miner"
+        ) {
             return `You must supply a valid job title.`;
         }
 
@@ -290,18 +329,23 @@ export class Body extends GameObject {
         }
 
         // Check if the player is trying to spawn the unit too far from their planet's surface
-        if (Math.sqrt(((x - this.x) ** 2) + ((y - this.y) ** 2)) > this.radius) {
+        if (Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2) > this.radius) {
             return `You must spawn units on your planet!`;
         }
 
         // Check if the player has the resources to spawn the ship
         // Slow solution; proposed: identify input job and check individual cost?
         // Unsure of how to implement above proposal
-        if ((player.money < this.game.jobs[4].unitCost && title === "miner") ||
-            (player.money < this.game.jobs[3].unitCost && title === "transport") ||
-            (player.money < this.game.jobs[0].unitCost && title === "corvette") ||
-            (player.money < this.game.jobs[1].unitCost && title === "missileboat") ||
-            (player.money < this.game.jobs[2].unitCost && title === "martyr")) {
+        if (
+            (player.money < this.game.jobs[4].unitCost && title === "miner") ||
+            (player.money < this.game.jobs[3].unitCost &&
+                title === "transport") ||
+            (player.money < this.game.jobs[0].unitCost &&
+                title === "corvette") ||
+            (player.money < this.game.jobs[1].unitCost &&
+                title === "missileboat") ||
+            (player.money < this.game.jobs[2].unitCost && title === "martyr")
+        ) {
             return `You do not have enough resources to spawn this ship.`;
         }
 
@@ -359,8 +403,7 @@ export class Body extends GameObject {
                 x,
                 y,
             });
-        }
-        else if (title === "missileboat") {
+        } else if (title === "missileboat") {
             // Deduct ship cost from player's balance
             player.money -= this.game.jobs[1].unitCost;
             // Adds desired unit to player's unit arsenal
@@ -372,8 +415,7 @@ export class Body extends GameObject {
                 x,
                 y,
             });
-        }
-        else if (title === "martyr") {
+        } else if (title === "martyr") {
             // Deduct ship cost from player's balance
             player.money -= this.game.jobs[2].unitCost;
             // Adds desired unit to player's unit arsenal
@@ -386,8 +428,7 @@ export class Body extends GameObject {
                 x,
                 y,
             });
-        }
-        else if (title === "transport") {
+        } else if (title === "transport") {
             // Deduct ship cost from player's balance
             player.money -= this.game.jobs[3].unitCost;
             // Adds desired unit to player's unit arsenal
@@ -399,8 +440,7 @@ export class Body extends GameObject {
                 x,
                 y,
             });
-        }
-        else {
+        } else {
             // Deduct ship cost from player's balance
             player.money -= this.game.jobs[4].unitCost;
             // Adds desired unit to player's unit arsenal

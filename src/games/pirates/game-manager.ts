@@ -94,17 +94,21 @@ export class PiratesGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: primary-win-conditions -->>
 
         // Primary win conditions: destroy your enemy's units and rob them of enough of their gold
-        const killedOff = this.game.players.filter((p) => p.gold < this.game.shipCost && p.units.length === 0);
+        const killedOff = this.game.players.filter(
+            (p) => p.gold < this.game.shipCost && p.units.length === 0,
+        );
 
         if (killedOff.length === 2) {
             this.secondaryWinConditions("Ye killed each other");
 
             return true;
-        }
-        else if (killedOff.length === 1) {
+        } else if (killedOff.length === 1) {
             const loser = killedOff[0];
             this.declareWinner("Ye killed the other pirate!", loser.opponent);
-            this.declareLoser("Crew be in Davy Jones' locker, and can't build a ship", loser);
+            this.declareLoser(
+                "Crew be in Davy Jones' locker, and can't build a ship",
+                loser,
+            );
 
             return true;
         }
@@ -136,8 +140,14 @@ export class PiratesGameManager extends BaseClasses.GameManager {
         // 2. Most net worth
         players.sort((a, b) => b.netWorth() - a.netWorth());
         if (players[0].netWorth() > players[1].netWorth()) {
-            this.declareWinner(`${reason}: Had the highest net worth`, players[0]);
-            this.declareLoser(`${reason}: Had the lowest net worth`, players[1]);
+            this.declareWinner(
+                `${reason}: Had the highest net worth`,
+                players[0],
+            );
+            this.declareLoser(
+                `${reason}: Had the lowest net worth`,
+                players[1],
+            );
         }
 
         // 3. Coin toss (handled by default below)
@@ -181,17 +191,16 @@ export class PiratesGameManager extends BaseClasses.GameManager {
             // Reset the unit
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
-                unit.moves = Math.max(this.game.crewMoves, unit.shipHealth > 0
-                    ? this.game.shipMoves
-                    : 0,
+                unit.moves = Math.max(
+                    this.game.crewMoves,
+                    unit.shipHealth > 0 ? this.game.shipMoves : 0,
                 );
             }
 
             // Decrease turns stunned
             if (unit.stunTurns > 0) {
                 unit.stunTurns--;
-            }
-            else if (!unit.owner && unit.targetPort) {
+            } else if (!unit.owner && unit.targetPort) {
                 // Move merchant units
                 // Check current path
                 let pathValid = true;
@@ -200,8 +209,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     if (next.unit || (next.port && next.port.owner)) {
                         pathValid = false;
                     }
-                }
-                else {
+                } else {
                     pathValid = false;
                 }
 
@@ -211,11 +219,13 @@ export class PiratesGameManager extends BaseClasses.GameManager {
 
                 // Find path to target port (BFS)
                 if (!pathValid) {
-                    const open: IPath[] = [{
-                        tile: unit.tile,
-                        g: 1,
-                        parent: undefined,
-                    }];
+                    const open: IPath[] = [
+                        {
+                            tile: unit.tile,
+                            g: 1,
+                            parent: undefined,
+                        },
+                    ];
 
                     const closed = new Set<Tile>();
 
@@ -243,9 +253,15 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                         // Add neighbors
                         const neighbors = [
                             { tile: current.tile.tileNorth, cost: 1 },
-                            { tile: current.tile.tileEast, cost: 1 / Math.min(current.g * 10, 1000) + 1 },
+                            {
+                                tile: current.tile.tileEast,
+                                cost: 1 / Math.min(current.g * 10, 1000) + 1,
+                            },
                             { tile: current.tile.tileSouth, cost: 1 },
-                            { tile: current.tile.tileWest, cost: 1 / Math.min(current.g * 10, 1000) + 1},
+                            {
+                                tile: current.tile.tileWest,
+                                cost: 1 / Math.min(current.g * 10, 1000) + 1,
+                            },
                         ];
 
                         let unsorted = false;
@@ -257,12 +273,18 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                                 }
 
                                 // Don't path through player ports
-                                if (neighbor.tile.port && neighbor.tile.port.owner) {
+                                if (
+                                    neighbor.tile.port &&
+                                    neighbor.tile.port.owner
+                                ) {
                                     continue;
                                 }
 
                                 // Don't path through friendly units unless it's a port
-                                if (neighbor.tile.unit && !neighbor.tile.port) {
+                                if (
+                                    neighbor.tile.unit &&
+                                    !neighbor.tile.port
+                                ) {
                                     continue;
                                 }
 
@@ -290,7 +312,9 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     }
 
                     // Check if in range
-                    const range = (unit.tile.x - u.tile.x) ** 2 + (unit.tile.y - u.tile.y) ** 2;
+                    const range =
+                        (unit.tile.x - u.tile.x) ** 2 +
+                        (unit.tile.y - u.tile.y) ** 2;
 
                     return range <= this.game.shipRange ** 2;
                 });
@@ -313,8 +337,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                         // Mark it as dead
                         unit.tile.unit = undefined;
                         unit.tile = undefined;
-                    }
-                    else {
+                    } else {
                         const tile = unit.path.shift() as Tile; // must exist from above check
                         unit.tile.unit = undefined;
                         unit.tile = tile;
@@ -350,8 +373,13 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                 port.gold -= merchantCost;
 
                 // Calculate crew and gold
-                const gold = merchantGold + (port.investment * this.game.merchantInterestRate);
-                const invested = Math.floor(port.investment * this.game.merchantInterestRate / this.game.crewCost);
+                const gold =
+                    merchantGold +
+                    port.investment * this.game.merchantInterestRate;
+                const invested = Math.floor(
+                    (port.investment * this.game.merchantInterestRate) /
+                        this.game.crewCost,
+                );
                 const crew = merchantBaseCrew + invested;
 
                 // Get the opposite port of this one

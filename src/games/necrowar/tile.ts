@@ -1,7 +1,11 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties, ITileResArgs, ITileSpawnUnitArgs,
-         ITileSpawnWorkerArgs } from "./";
+import {
+    ITileProperties,
+    ITileResArgs,
+    ITileSpawnUnitArgs,
+    ITileSpawnWorkerArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tower } from "./tower";
@@ -154,7 +158,7 @@ export class Tile extends GameObject implements BaseTile {
     constructor(
         // never directly created by game developers
         args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -182,7 +186,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -201,8 +208,12 @@ export class Tile extends GameObject implements BaseTile {
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**
@@ -280,7 +291,11 @@ export class Tile extends GameObject implements BaseTile {
 
         // Ensure there isn't another unit currently on this tile
         const unitCount = Math.max(spawnTile.numGhouls, spawnTile.numHounds);
-        if (unitCount > 0 || (spawnTile.unit !== undefined && spawnTile.unit.job.title !== "zombie")) {
+        if (
+            unitCount > 0 ||
+            (spawnTile.unit !== undefined &&
+                spawnTile.unit.job.title !== "zombie")
+        ) {
             return `Your unit spawn tile is already occupied by another unit!`;
         }
 
@@ -303,7 +318,7 @@ export class Tile extends GameObject implements BaseTile {
         // <<-- Creer-Merge: res -->>
 
         // Reduce player mana
-        this.game.currentPlayer.mana -= (num * this.game.unitJobs[1].manaCost);
+        this.game.currentPlayer.mana -= num * this.game.unitJobs[1].manaCost;
 
         // Find spawn tile
         let spawnTile;
@@ -371,17 +386,13 @@ export class Tile extends GameObject implements BaseTile {
 
         if (title === "ghoul") {
             unitIndex = 2;
-        }
-        else if (title === "abomination") {
+        } else if (title === "abomination") {
             unitIndex = 3;
-        }
-        else if (title === "hound") {
+        } else if (title === "hound") {
             unitIndex = 4;
-        }
-        else if (title === "wraith") {
+        } else if (title === "wraith") {
             unitIndex = 5;
-        }
-        else if (title === "horseman") {
+        } else if (title === "horseman") {
             unitIndex = 6;
         }
 
@@ -389,8 +400,10 @@ export class Tile extends GameObject implements BaseTile {
             return `Invalid unit type!`;
         }
 
-        if (player.gold < this.game.unitJobs[unitIndex].goldCost
-            || player.mana < this.game.unitJobs[unitIndex].manaCost) {
+        if (
+            player.gold < this.game.unitJobs[unitIndex].goldCost ||
+            player.mana < this.game.unitJobs[unitIndex].manaCost
+        ) {
             return `You cannot afford to spawn this unit.`;
         }
 
@@ -403,19 +416,27 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         if (this.unit) {
-            if (this.unit.job.title === "zombie"
-                || this.unit.job.title === "horseman"
-                || this.unit.job.title === "abomination"
-                || this.unit.job.title === "wraith"
-                || this.unit.job.title !== title) {
+            if (
+                this.unit.job.title === "zombie" ||
+                this.unit.job.title === "horseman" ||
+                this.unit.job.title === "abomination" ||
+                this.unit.job.title === "wraith" ||
+                this.unit.job.title !== title
+            ) {
                 return `You cannot fit another unit on this tile!`;
             }
 
-            if (this.unit.job.title === "ghoul" && this.numGhouls >= this.game.unitJobs[2].perTile) {
+            if (
+                this.unit.job.title === "ghoul" &&
+                this.numGhouls >= this.game.unitJobs[2].perTile
+            ) {
                 return `The maximum number of ghouls are already on this tile!`;
             }
 
-            if (this.unit.job.title === "hound" && this.numHounds >= this.game.unitJobs[4].perTile) {
+            if (
+                this.unit.job.title === "hound" &&
+                this.numHounds >= this.game.unitJobs[4].perTile
+            ) {
                 return `The maximum number of hounds are already on this tile!`;
             }
         }
@@ -440,17 +461,13 @@ export class Tile extends GameObject implements BaseTile {
 
         if (title === "ghoul") {
             unitIndex = 2;
-        }
-        else if (title === "abomination") {
+        } else if (title === "abomination") {
             unitIndex = 3;
-        }
-        else if (title === "hound") {
+        } else if (title === "hound") {
             unitIndex = 4;
-        }
-        else if (title === "wraith") {
+        } else if (title === "wraith") {
             unitIndex = 5;
-        }
-        else if (title === "horseman") {
+        } else if (title === "horseman") {
             unitIndex = 6;
         }
 
@@ -475,17 +492,14 @@ export class Tile extends GameObject implements BaseTile {
         if (this.unit) {
             if (this.numGhouls !== 0) {
                 this.numGhouls += 1;
-            }
-            else {
+            } else {
                 this.numHounds += 1;
             }
-        }
-        else {
+        } else {
             this.unit = unit;
             if (title === "hound") {
                 this.numHounds = 1;
-            }
-            else if (title === "ghoul") {
+            } else if (title === "ghoul") {
                 this.numGhouls = 1;
             }
         }
@@ -514,8 +528,10 @@ export class Tile extends GameObject implements BaseTile {
             return `It isn't your turn, ${player}.`;
         }
 
-        if (player.gold < this.game.unitJobs[0].goldCost
-            || player.mana < this.game.unitJobs[0].manaCost) {
+        if (
+            player.gold < this.game.unitJobs[0].goldCost ||
+            player.mana < this.game.unitJobs[0].manaCost
+        ) {
             return `You cannot afford to spawn a worker.`;
         }
 

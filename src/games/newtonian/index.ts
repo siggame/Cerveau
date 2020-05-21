@@ -8,13 +8,26 @@
 // ^ because we need to build a bunch of base class wrappers here
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
@@ -23,12 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface the Player for the Newtonian game
  * must implement from mixed in game logic.
  */
-export interface IBaseNewtonianPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface IBaseNewtonianPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -72,8 +84,7 @@ export const BaseClasses = {
 // so we can start importing/exporting the classes that need them.
 
 /** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+export interface IGameObjectProperties {}
 
 /** All the possible properties for an Job. */
 export interface IJobProperties {
@@ -101,7 +112,6 @@ export interface IJobProperties {
      * The Job title. 'intern', 'manager', or 'physicist'.
      */
     title?: "intern" | "manager" | "physicist";
-
 }
 
 /** All the possible properties for an Machine. */
@@ -138,7 +148,6 @@ export interface IMachineProperties {
      * Tracks how many times this machine has been worked. (0 to refineTime).
      */
     worked?: number;
-
 }
 
 /** All the possible properties for an Player. */
@@ -225,7 +234,6 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /** All the possible properties for an Tile. */
@@ -322,7 +330,6 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 /** All the possible properties for an Unit. */
@@ -390,7 +397,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -519,9 +525,7 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -532,9 +536,7 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Machine hooked up in the game and ready for you to use.
      */
-    public machine<T extends MachineArgs>(
-        args: Readonly<T>,
-    ): Machine & T {
+    public machine<T extends MachineArgs>(args: Readonly<T>): Machine & T {
         return this.createGameObject("Machine", Machine, args);
     }
 
@@ -545,9 +547,7 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -558,12 +558,9 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -586,12 +583,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new NewtonianGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -705,8 +700,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -758,8 +752,7 @@ export const Namespace = makeNamespace({
                     literals: ["intern", "manager", "physicist"],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Machine: {
             parentClassName: "GameObject",
@@ -787,8 +780,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -859,8 +851,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -935,8 +926,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1029,7 +1019,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
+                            literals: [
+                                "redium ore",
+                                "redium",
+                                "blueium",
+                                "blueium ore",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1067,7 +1062,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
+                            literals: [
+                                "redium ore",
+                                "redium",
+                                "blueium",
+                                "blueium ore",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1078,5 +1078,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "7c19f909ee5faa0ac3faf4e989032b5a37ba94aeb5d6ae7654a15a2bb1401bbe",
+    gameVersion:
+        "7c19f909ee5faa0ac3faf4e989032b5a37ba94aeb5d6ae7654a15a2bb1401bbe",
 });

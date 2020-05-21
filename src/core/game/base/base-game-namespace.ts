@@ -7,36 +7,40 @@ import { BaseGameObjectFactory } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
 import { BasePlayer } from "./base-player";
 
-/** Namespace schema for a base game object */
-export interface IBaseGameObjectSchema {
+/** Namespace schema for a base game object. */
+export interface BaseGameObjectSchema {
     /** The parent class name as a string. */
     parentClassName?: string;
-    /** Key/value pairs of the attributes of this game object */
-    attributes: TypedObject<ISanitizableType & {
-        /** Optional default value for this attribute. */
-        defaultValue?: unknown;
-    }>;
+    /** Key/value pairs of the attributes of this game object. */
+    attributes: TypedObject<
+        ISanitizableType & {
+            /** Optional default value for this attribute. */
+            defaultValue?: unknown;
+        }
+    >;
     /** The functions that can be invoked for this game object and their arg & return schemas. */
-    functions: TypedObject<IBaseGameObjectFunctionSchema>;
+    functions: TypedObject<BaseGameObjectFunctionSchema>;
 }
 
-/** Namespace schema for functions that game objects can invoke */
-export interface IBaseGameObjectFunctionSchema {
+/** Namespace schema for functions that game objects can invoke. */
+export interface BaseGameObjectFunctionSchema {
     /** Arguments to this function when called. */
-    args: Array<ISanitizableType & {
-        /** The name of the argument. */
-        argName: string;
-        /** The default value, if it is optional. */
-        defaultValue?: unknown;
-    }>;
+    args: Array<
+        ISanitizableType & {
+            /** The name of the argument. */
+            argName: string;
+            /** The default value, if it is optional. */
+            defaultValue?: unknown;
+        }
+    >;
     /** The schema about what type it returns. */
     returns: ISanitizableType;
     /** The value returned if the function call fails to validate. */
     invalidValue?: unknown;
 }
 
-/** The namespace all game index files should export */
-export interface IBaseGameNamespace {
+/** The namespace all game index files should export. */
+export interface BaseGameNamespace {
     /** The class for AIs playing this game. */
     AI: typeof BaseAI;
     /** The class for the Game this namespace wraps. */
@@ -53,16 +57,16 @@ export interface IBaseGameNamespace {
     gameName: string;
     /** The schema about what GameObjects are valid in game settings for this Game. */
     gameObjectsSchema: {
-        /** The AI's schema */
-        AI: IBaseGameObjectSchema;
+        /** The AI's schema. */
+        AI: BaseGameObjectSchema;
         /** The Game's base attribute's schema. */
-        Game: IBaseGameObjectSchema;
-        /** key/value pairs of the game object class name to their schema. */
-        [gameObjectName: string]: IBaseGameObjectSchema | undefined;
+        Game: BaseGameObjectSchema;
+        /** Key/value pairs of the game object class name to their schema. */
+        [gameObjectName: string]: BaseGameObjectSchema | undefined;
     };
     /** A static settings manager for the Lobby to check initial settings sent. */
     gameSettingsManager: BaseGameSettingsManager;
-    /** The hashed game temlate used to represent the version of this game */
+    /** The hashed game temlate used to represent the version of this game. */
     gameVersion: string;
 }
 
@@ -72,12 +76,15 @@ export interface IBaseGameNamespace {
  * @param namespace - The base game namespace to use. Will be mutated.
  * @returns The same game namespace ready to be used to play games with.
  */
-export function makeNamespace<T extends IBaseGameNamespace>(
+export function makeNamespace<T extends BaseGameNamespace>(
     namespace: Readonly<T>, // readonly as keys do not change, but their values do mutate a bit.
-): Immutable<T> { // do not mutate the returned namespaces
+): Immutable<T> {
+    // do not mutate the returned namespaces
     for (const obj of Object.values(namespace.gameObjectsSchema)) {
         if (!obj) {
-            throw new Error(`unexpected non object in namespace ${namespace.gameName}`);
+            throw new Error(
+                `unexpected non object in namespace ${namespace.gameName}`,
+            );
         }
 
         let depth = obj;
@@ -85,7 +92,9 @@ export function makeNamespace<T extends IBaseGameNamespace>(
             // hook up the parent classes' attributes/functions
             const parent = namespace.gameObjectsSchema[depth.parentClassName];
             if (!parent) {
-                throw new Error(`No parent for namespace ${namespace.gameName} recursively constructing!`);
+                throw new Error(
+                    `No parent for namespace ${namespace.gameName} recursively constructing!`,
+                );
             }
 
             Object.assign(obj.attributes, parent.attributes);

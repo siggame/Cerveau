@@ -14,7 +14,8 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -28,10 +29,11 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: cutSpeed -->>
             },
             eggsScalar: {
-                description: "Constant used to calculate how many eggs "
-                           + "BroodMothers get on their owner's turns.",
+                description:
+                    "Constant used to calculate how many eggs " +
+                    "BroodMothers get on their owner's turns.",
                 // <<-- Creer-Merge: eggsScalar -->>
-                default: 0.10,
+                default: 0.1,
                 // <<-- /Creer-Merge: eggsScalar -->>
             },
             initialWebStrength: {
@@ -41,8 +43,8 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: initialWebStrength -->>
             },
             maxWebStrength: {
-                description: "The maximum strength a web can be strengthened "
-                           + "to.",
+                description:
+                    "The maximum strength a web can be strengthened " + "to.",
                 // <<-- Creer-Merge: maxWebStrength -->>
                 default: 15,
                 // <<-- /Creer-Merge: maxWebStrength -->>
@@ -54,30 +56,32 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: movementSpeed -->>
             },
             spitSpeed: {
-                description: "The speed at which Spitters work to spit new "
-                           + "Webs.",
+                description:
+                    "The speed at which Spitters work to spit new " + "Webs.",
                 // <<-- Creer-Merge: spitSpeed -->>
                 default: 24,
                 // <<-- /Creer-Merge: spitSpeed -->>
             },
             weavePower: {
-                description: "How much web strength is added or removed from "
-                           + "Webs when they are weaved.",
+                description:
+                    "How much web strength is added or removed from " +
+                    "Webs when they are weaved.",
                 // <<-- Creer-Merge: weavePower -->>
                 default: 1,
                 // <<-- /Creer-Merge: weavePower -->>
             },
             weaveSpeed: {
-                description: "The speed at which Weavers work to do "
-                           + "strengthens and weakens on Webs.",
+                description:
+                    "The speed at which Weavers work to do " +
+                    "strengthens and weakens on Webs.",
                 // <<-- Creer-Merge: weaveSpeed -->>
                 default: 16,
                 // <<-- /Creer-Merge: weaveSpeed -->>
             },
             // <<-- Creer-Merge: schema -->>
 
-        // you can add more settings here, e.g.:
-        /*
+            // you can add more settings here, e.g.:
+            /*
         someVariableLikeUnitHealth: {
             description: "Describe what this setting does for the players.",
             default: 1337,
@@ -102,16 +106,17 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 300,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game is force ended and a winner is determined.",
             },
-
         });
     }
 

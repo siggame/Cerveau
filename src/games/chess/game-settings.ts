@@ -16,7 +16,8 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -24,8 +25,9 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
 
             // Chess game specific settings
             fen: {
-                description: "Forsyth-Edwards Notation (fen), a notation that "
-                           + "describes the game board state.",
+                description:
+                    "Forsyth-Edwards Notation (fen), a notation that " +
+                    "describes the game board state.",
                 // <<-- Creer-Merge: fen -->>
                 default: "",
                 // <<-- /Creer-Merge: fen -->>
@@ -33,17 +35,20 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
             // <<-- Creer-Merge: schema -->>
 
             pgn: {
-                description: "The starting board state in Portable Game Notation (PGN).",
+                description:
+                    "The starting board state in Portable Game Notation (PGN).",
                 default: "",
             },
 
             enableSTFR: {
-                description: "Enable non standard chess rule Simplified Three-Fold Repetition rule.",
+                description:
+                    "Enable non standard chess rule Simplified Three-Fold Repetition rule.",
                 default: true,
             },
 
             enableTFR: {
-                description: "Enable the standard chess rule Three-Fold Repetition rule.",
+                description:
+                    "Enable the standard chess rule Three-Fold Repetition rule.",
                 default: false,
             },
 
@@ -57,7 +62,6 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
                 min: 0,
                 description: "The starting time (in ns) for each player.",
             },
-
         });
     }
 
@@ -83,7 +87,9 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
         // <<-- Creer-Merge: invalidate -->>
 
         if (settings.fen && settings.pgn) {
-            return new Error("Cannot set FEN and PGN at the same time. Use only one for an initial board state.");
+            return new Error(
+                "Cannot set FEN and PGN at the same time. Use only one for an initial board state.",
+            );
         }
 
         if (settings.fen) {

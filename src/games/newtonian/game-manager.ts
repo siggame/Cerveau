@@ -10,9 +10,13 @@ import { Player } from "./player";
 import { Tile } from "./tile";
 
 // Scores a list of players for easy game win checking
-const score = (players: Player[]) => players
-    .map((player) => ({ player, score: Math.max(player.heat, 1) * Math.max(player.pressure, 1) }))
-    .sort((a, b) => b.score - a.score);
+const score = (players: Player[]) =>
+    players
+        .map((player) => ({
+            player,
+            score: Math.max(player.heat, 1) * Math.max(player.pressure, 1),
+        }))
+        .sort((a, b) => b.score - a.score);
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -80,10 +84,13 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // Iterate through all the player's units to find how many of each type there are.
         for (const u of player.units) {
-            units[(
+            units[
                 u.job.title === this.game.jobs[0].title
-                ? 0 : u.job.title === this.game.jobs[1].title ? 1 : 2
-            )]++;
+                    ? 0
+                    : u.job.title === this.game.jobs[1].title
+                    ? 1
+                    : 2
+            ]++;
         }
 
         // If Intern Cap has not been met then try to spawn an Intern.
@@ -109,46 +116,64 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
         // Manager Incrementing spawner Timers
 
-        player.internSpawn = (units[0] >= this.game.internCap)
-          ? this.game.spawnTime : player.internSpawn - 1;
-        player.physicistSpawn = (units[1] >= this.game.physicistCap)
-          ? this.game.spawnTime : player.physicistSpawn - 1;
-        player.managerSpawn = (units[2] >= this.game.managerCap)
-         ? this.game.spawnTime : player.managerSpawn - 1;
+        player.internSpawn =
+            units[0] >= this.game.internCap
+                ? this.game.spawnTime
+                : player.internSpawn - 1;
+        player.physicistSpawn =
+            units[1] >= this.game.physicistCap
+                ? this.game.spawnTime
+                : player.physicistSpawn - 1;
+        player.managerSpawn =
+            units[2] >= this.game.managerCap
+                ? this.game.spawnTime
+                : player.managerSpawn - 1;
 
         // code the generator below this:
         // iterate through each tile on the map
         for (const tile of this.game.tiles) {
             // focus specifically on generator tiles owned by the current player
-            if (tile.type === "generator" && tile.owner === this.game.currentPlayer) {
+            if (
+                tile.type === "generator" &&
+                tile.owner === this.game.currentPlayer
+            ) {
                 // if the tile has redium or blueium, heat and pressure are increased accordingly
                 // the redium and blueium is then removed from the map
                 if (tile.redium > 0) {
-                    this.game.currentPlayer.heat += (tile.redium * this.game.refinedValue);
+                    this.game.currentPlayer.heat +=
+                        tile.redium * this.game.refinedValue;
                     tile.redium = 0;
                 }
                 if (tile.blueium > 0) {
-                    this.game.currentPlayer.pressure += (tile.blueium * this.game.refinedValue);
+                    this.game.currentPlayer.pressure +=
+                        tile.blueium * this.game.refinedValue;
                     tile.blueium = 0;
                 }
                 // if there's a unit on a generator tile...
                 if (tile.unit !== undefined) {
                     // scores the refined materials on the unit before removing them
                     if (tile.unit.redium > 0) {
-                        this.game.currentPlayer.heat += (tile.unit.redium * this.game.refinedValue);
+                        this.game.currentPlayer.heat +=
+                            tile.unit.redium * this.game.refinedValue;
                     }
                     tile.unit.redium = 0;
                     if (tile.unit.blueium > 0) {
-                        this.game.currentPlayer.pressure += (tile.unit.blueium * this.game.refinedValue);
+                        this.game.currentPlayer.pressure +=
+                            tile.unit.blueium * this.game.refinedValue;
                     }
                     tile.unit.blueium = 0;
                     // if there's an enemy intern in your generator...
-                    if (tile.unit.job.title === "intern" && tile.unit.owner !== this.game.currentPlayer) {
+                    if (
+                        tile.unit.job.title === "intern" &&
+                        tile.unit.owner !== this.game.currentPlayer
+                    ) {
                         // the intern dies
                         tile.unit.health = 0;
                         // the player gains internium (+resources to both scores)
-                        this.game.currentPlayer.pressure += ((tile.unit.blueium + 1) * this.game.refinedValue);
-                        this.game.currentPlayer.heat += ((tile.unit.redium + 1) * this.game.refinedValue);
+                        this.game.currentPlayer.pressure +=
+                            (tile.unit.blueium + 1) * this.game.refinedValue;
+                        this.game.currentPlayer.heat +=
+                            (tile.unit.redium + 1) * this.game.refinedValue;
                     }
                     // RIP intern
                 }
@@ -169,17 +194,23 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        const winners = score(this.game.players).filter((p) => p.score >= this.game.victoryAmount);
+        const winners = score(this.game.players).filter(
+            (p) => p.score >= this.game.victoryAmount,
+        );
 
         // Add logic here checking for the primary win condition(s)
         if (winners.length === this.game.players.length) {
-            this.secondaryWinConditions("Both players achieved fusion at the same time.");
+            this.secondaryWinConditions(
+                "Both players achieved fusion at the same time.",
+            );
 
             return true;
-        }
-        else if (winners.length === 1) {
+        } else if (winners.length === 1) {
             this.declareWinner("You achieved fusion!", winners[0].player);
-            this.declareLosers("Your opponents achieved fusion.", winners[0].player.opponent);
+            this.declareLosers(
+                "Your opponents achieved fusion.",
+                winners[0].player.opponent,
+            );
 
             return true;
         }
@@ -199,8 +230,14 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         // Add logic here for the secondary win conditions
         const scored = score(this.game.players);
         if (scored[0].score !== scored[1].score) {
-            this.declareWinner(`${reason}: You were closer to achieving fusion`, scored[0].player);
-            this.declareLosers(`${reason}: Your opponent is closer to achieving fusion`, scored[1].player);
+            this.declareWinner(
+                `${reason}: You were closer to achieving fusion`,
+                scored[0].player,
+            );
+            this.declareLosers(
+                `${reason}: Your opponent is closer to achieving fusion`,
+                scored[1].player,
+            );
 
             return;
         }
@@ -306,13 +343,11 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * Makes sure all conveyers move units and materials ontop of them.
      */
     private manageMaterials(): void {
-
         // Spawns the appropriate ore at the start of the conveyor
         // on the side of the the player who's turns it currently isn't
         if (this.game.players[0] === this.game.currentPlayer) {
             this.game.players[0].conveyors[0].blueiumOre += this.game.materialSpawn;
-        }
-        else {
+        } else {
             this.game.players[1].conveyors[0].rediumOre += this.game.materialSpawn;
         }
         this.conveyMaterials(this.game.players[0].conveyors);
@@ -324,7 +359,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     /** Updates all arrays in the game with new/dead game objects */
     private updateArrays(): void {
         // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+        const deadUnits = this.game.units.filter(
+            (u) => !u.tile || u.health <= 0,
+        );
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {
@@ -332,7 +369,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
-         // mark them dead
+        // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
                 unit.tile.unit = undefined;
@@ -352,11 +389,15 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
             }
             if (!unit.owner || unit.owner === this.game.currentPlayer) {
                 unit.acted = false;
-                unit.moves = unit.attacked ? unit.job.moves + 1 : unit.job.moves;
+                unit.moves = unit.attacked
+                    ? unit.job.moves + 1
+                    : unit.job.moves;
             }
             unit.attacked = false;
             if (unit.tile && unit.tile.owner === unit.owner) {
-                unit.health += Math.ceil(unit.job.health * this.game.regenerateRate);
+                unit.health += Math.ceil(
+                    unit.job.health * this.game.regenerateRate,
+                );
                 if (unit.health > unit.job.health) {
                     unit.health = unit.job.health;
                 }

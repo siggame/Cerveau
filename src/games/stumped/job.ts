@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { IJobProperties, IJobRecruitArgs } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
@@ -78,12 +78,14 @@ export class Job extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IJobProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            IJobProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
+                // You can add more constructor args in here
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -130,7 +132,10 @@ export class Job extends GameObject {
         if (tile.beaver) {
             return `There's already ${tile.beaver} at that lodge`;
         }
-        if (player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.food < this.cost) {
+        if (
+            player.getAliveBeavers().length >= this.game.freeBeaversCount &&
+            tile.food < this.cost
+        ) {
             return `${tile} does not have enough food available. (${tile.food}/${this.cost})`;
         }
 

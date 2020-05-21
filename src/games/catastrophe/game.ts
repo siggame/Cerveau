@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { CatastropheGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -51,7 +51,7 @@ export class CatastropheGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The amount of turns it takes for a Tile that was just harvested to grow
@@ -185,7 +185,7 @@ export class CatastropheGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CatastropheGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -311,8 +311,7 @@ export class CatastropheGame extends BaseClasses.Game {
                         tile,
                         type: "road",
                     });
-                }
-                else {
+                } else {
                     const cx = this.mapWidth / 2;
                     const cy = this.mapHeight / 2;
                     const exp = 2;
@@ -321,15 +320,16 @@ export class CatastropheGame extends BaseClasses.Game {
                     const maxD = cx ** exp + cy ** exp;
 
                     // This is a fancy function based on some easing functions
-                    const factor = Math.abs(
-                        Math.pow(Math.abs(x - cx) - cx, exp)
-                        +
-                        Math.pow(Math.abs(y - cy) - cy, exp),
-                    ) / maxD;
+                    const factor =
+                        Math.abs(
+                            Math.pow(Math.abs(x - cx) - cx, exp) +
+                                Math.pow(Math.abs(y - cy) - cy, exp),
+                        ) / maxD;
 
                     // Food chance increases toward center of map
                     const foodChanceRange = maxFoodChance - minFoodChance;
-                    const foodChance = factor * foodChanceRange + minFoodChance;
+                    const foodChance =
+                        factor * foodChanceRange + minFoodChance;
 
                     // Try to place food or structure
                     if (this.manager.random.float() < foodChance) {
@@ -338,13 +338,16 @@ export class CatastropheGame extends BaseClasses.Game {
                         const dx = cx - x;
                         const dy = cy - y;
                         const distFromCenter = Math.sqrt(dx * dx + dy * dy);
-                        const harvestRateMult = 1 - distFromCenter / maxDistFromCenter;
-                        const harvestRateRange = maxHarvestRate - minHarvestRate;
+                        const harvestRateMult =
+                            1 - distFromCenter / maxDistFromCenter;
+                        const harvestRateRange =
+                            maxHarvestRate - minHarvestRate;
 
                         // Generate food spawner
-                        tile.harvestRate = minHarvestRate + Math.ceil(harvestRateRange * harvestRateMult);
-                    }
-                    else if (this.manager.random.float() < structureChance) {
+                        tile.harvestRate =
+                            minHarvestRate +
+                            Math.ceil(harvestRateRange * harvestRateMult);
+                    } else if (this.manager.random.float() < structureChance) {
                         // Generate neutral structures
                         tile.structure = this.manager.create.structure({
                             tile,
@@ -363,7 +366,10 @@ export class CatastropheGame extends BaseClasses.Game {
             }
 
             // Make sure tile is close enough to a corner of the map
-            return t.x < halfWidth / 2 && (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2);
+            return (
+                t.x < halfWidth / 2 &&
+                (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2)
+            );
         });
 
         if (!arrayHasElements(possibleTiles)) {
@@ -380,11 +386,14 @@ export class CatastropheGame extends BaseClasses.Game {
         });
 
         // Cat
-        (this.players[0] as MutablePlayer).cat = selected.unit = this.manager.create.unit({
-            owner: this.players[0],
-            tile: selected,
-            job: this.jobs.find((j) => j.title === "cat overlord"),
-        });
+        (this
+            .players[0] as MutablePlayer).cat = selected.unit = this.manager.create.unit(
+            {
+                owner: this.players[0],
+                tile: selected,
+                job: this.jobs.find((j) => j.title === "cat overlord"),
+            },
+        );
 
         // Place starting units
         const cat = this.players[0].cat;
@@ -413,12 +422,17 @@ export class CatastropheGame extends BaseClasses.Game {
                     }
 
                     // Check if the tile is close enough to the cat
-                    return Math.abs(cat.tile.x - t.x) <= maxDist && Math.abs(cat.tile.y - t.y) <= maxDist;
+                    return (
+                        Math.abs(cat.tile.x - t.x) <= maxDist &&
+                        Math.abs(cat.tile.y - t.y) <= maxDist
+                    );
                 });
             }
 
             if (!arrayHasElements(possibleTiles)) {
-                throw new Error("No possible tiles to generate map from again.");
+                throw new Error(
+                    "No possible tiles to generate map from again.",
+                );
             }
 
             // Choose a tile
@@ -435,10 +449,15 @@ export class CatastropheGame extends BaseClasses.Game {
         for (let x = 0; x < halfWidth; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const orig = this.getTile(x, y);
-                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+                const target = this.getTile(
+                    this.mapWidth - x - 1,
+                    this.mapHeight - y - 1,
+                );
 
                 if (!orig || !target) {
-                    throw new Error("No origin or target tile to mirror the map with");
+                    throw new Error(
+                        "No origin or target tile to mirror the map with",
+                    );
                 }
 
                 // Copy data
@@ -449,7 +468,9 @@ export class CatastropheGame extends BaseClasses.Game {
                     target.structure = this.manager.create.structure({
                         tile: target,
                         type: orig.structure.type,
-                        owner: orig.structure.owner && orig.structure.owner.opponent,
+                        owner:
+                            orig.structure.owner &&
+                            orig.structure.owner.opponent,
                     });
                 }
 

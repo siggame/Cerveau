@@ -48,7 +48,8 @@ export class SpidersGameManager extends BaseClasses.GameManager {
 
         const player = this.game.currentPlayer;
         player.broodMother.eggs = Math.ceil(
-            (player.maxSpiderlings - player.spiders.length - 1) * this.game.eggsScalar,
+            (player.maxSpiderlings - player.spiders.length - 1) *
+                this.game.eggsScalar,
         ); // -1 for the BroodMother in player.spiders that is not a Spiderling
 
         // <<-- /Creer-Merge: before-turn -->>
@@ -73,12 +74,14 @@ export class SpidersGameManager extends BaseClasses.GameManager {
             if (spider.workRemaining > 0) {
                 spider.workRemaining -= Math.sqrt(spider.coworkers.size + 1); // + 1 for the spiderling itself
 
-                if (spider.workRemaining <= 0) { // then they are done
+                if (spider.workRemaining <= 0) {
+                    // then they are done
                     if (spider.busy === "Moving") {
                         movers.push(spider); // they will finish moving AFTER other actions (e.g. cut)
-                    }
-                    else { // they finish now
-                        for (const coworker of spider.coworkers) { // all the co-workers are done too
+                    } else {
+                        // they finish now
+                        for (const coworker of spider.coworkers) {
+                            // all the co-workers are done too
                             coworker.finish(true); // force finish them
                         }
 
@@ -89,7 +92,8 @@ export class SpidersGameManager extends BaseClasses.GameManager {
         }
 
         for (const mover of movers) {
-            if (!mover.isDead) { // they may have died because of an action above (e.g. cut)
+            if (!mover.isDead) {
+                // they may have died because of an action above (e.g. cut)
                 mover.finish(); // now the spiderling moving can finish, because his Web may have been snapped above
             }
         }
@@ -112,17 +116,24 @@ export class SpidersGameManager extends BaseClasses.GameManager {
 
         const losers = this.game.players.filter((p) => p.broodMother.isDead);
 
-        if (losers.length > 0) { // someone lost
+        if (losers.length > 0) {
+            // someone lost
             if (losers.length === this.game.players.length) {
-                this.secondaryWinConditions("All BroodMothers died on same turn");
-            }
-            else {
+                this.secondaryWinConditions(
+                    "All BroodMothers died on same turn",
+                );
+            } else {
                 this.declareLosers("BroodMother died", ...losers);
 
-                const notLosers = this.game.players.filter((p) => !p.broodMother.isDead);
+                const notLosers = this.game.players.filter(
+                    (p) => !p.broodMother.isDead,
+                );
                 if (notLosers.length === 1) {
                     // they win!
-                    this.declareWinner("Eliminated enemy BroodMother!", notLosers[0]);
+                    this.declareWinner(
+                        "Eliminated enemy BroodMother!",
+                        notLosers[0],
+                    );
                 }
             }
 
@@ -170,8 +181,13 @@ export class SpidersGameManager extends BaseClasses.GameManager {
             return;
         }
 
-        players.sort((a, b) => b.numberOfNestsControlled - a.numberOfNestsControlled);
-        if (players[0].numberOfNestsControlled !== players[1].numberOfNestsControlled) {
+        players.sort(
+            (a, b) => b.numberOfNestsControlled - a.numberOfNestsControlled,
+        );
+        if (
+            players[0].numberOfNestsControlled !==
+            players[1].numberOfNestsControlled
+        ) {
             const winner = players.shift();
             if (!winner) {
                 throw new Error("No winners for Spiders game!");

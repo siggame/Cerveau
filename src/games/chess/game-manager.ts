@@ -17,7 +17,8 @@ function checkMoveForSTFR(move: Move): boolean {
 
 const toUCI = (move: Move) => move.from + move.to + (move.promotion || "");
 
-const gameOver50TurnMessage = "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
+const gameOver50TurnMessage =
+    "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -75,11 +76,16 @@ export class ChessGameManager extends BaseClasses.GameManager {
         const validMove = this.game.chess.move(cleanedMove, { sloppy: true });
 
         if (!validMove) {
-            this.declareLoser(`Made an invalid move ('${move}').
-Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid moves,
-    .map((m) => `'${toUCI(m)}'`)                            // Wrap them in '' quotes,
-    .join(", ")                                             // Then finally add commas between each for readability
-}`, player);
+            this.declareLoser(
+                `Made an invalid move ('${move}').
+Valid moves: ${
+                    this.game.chess
+                        .moves({ verbose: true }) // Take all valid moves,
+                        .map((m) => `'${toUCI(m)}'`) // Wrap them in '' quotes,
+                        .join(", ") // Then finally add commas between each for readability
+                }`,
+                player,
+            );
             this.declareWinner(
                 "Opponent made an invalid move.",
                 player.opponent,
@@ -99,14 +105,13 @@ Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid mo
                 : this.halfMoveCountSTFR + 1; // else increase by 1
         }
 
-        const [ loserReason, winnerReason ] = this.checkForGameOverReasons();
+        const [loserReason, winnerReason] = this.checkForGameOverReasons();
         if (loserReason) {
             if (winnerReason) {
                 // first won, second lost
                 this.declareWinner(winnerReason, player);
                 this.declareLoser(loserReason, player.opponent);
-            }
-            else {
+            } else {
                 // they all lost because the game is a draw
                 this.declareLosers(loserReason, ...this.game.players);
             }
@@ -134,18 +139,22 @@ Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid mo
         }
 
         if (chess.insufficient_material()) {
-            return [ "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate." ];
+            return [
+                "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate.",
+            ];
         }
         if (chess.in_stalemate()) {
             return [
-                "Stalemate - The side to move has been stalemated "
-              + "because they are not in check, but have no valid moves.",
+                "Stalemate - The side to move has been stalemated " +
+                    "because they are not in check, but have no valid moves.",
             ];
         }
 
         if (this.game.settings.enableTFR) {
             if (chess.in_threefold_repetition()) {
-                return [ "Stalemate - Board position has occurred three or more times." ];
+                return [
+                    "Stalemate - Board position has occurred three or more times.",
+                ];
             }
 
             // chess.js checks for draws by checking:
@@ -155,20 +164,20 @@ Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid mo
             // - three fold repetition
             // Keeping this check last, guarantees everything but the 50-move rule have been checked
             if (chess.in_draw()) {
-                return [ gameOver50TurnMessage ];
+                return [gameOver50TurnMessage];
             }
         }
 
         if (this.game.settings.enableSTFR) {
             if (this.isInSimplifiedThreefoldRepetition()) {
-                return [ "Draw - Simplified threefold repetition occurred." ];
+                return ["Draw - Simplified threefold repetition occurred."];
             }
 
             // chess.js.in_draw() should be true at the same time, but we are tracking the turns anyways,
             // and chess.js.in_draw() checks for more than the 50-turn rule so the checks following this one would
             // never be reached, so we must do this check because simplified TFR is different
             if (this.halfMoveCountSTFR >= 100) {
-                return [ gameOver50TurnMessage ];
+                return [gameOver50TurnMessage];
             }
         }
 
@@ -208,13 +217,17 @@ Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid mo
             //    Two moves are identical if the starting position (file and
             //    rank) and ending position (file and rank) of the moves are
             //    identical.
-            if (move.piece !== move.piece || move.to !== nextMove.to || move.from !== nextMove.from) {
+            if (
+                move.piece !== move.piece ||
+                move.to !== nextMove.to ||
+                move.from !== nextMove.from
+            ) {
                 return false; // has not occurred
             }
         }
 
         return true; // if we got here the last 8 moves are repeats,
-                     // so it is in STFR
+        // so it is in STFR
     }
 
     /**
@@ -239,9 +252,11 @@ Valid moves: ${this.game.chess.moves({ verbose: true })     // Take all valid mo
 
         // \-> now check all moves to see if the from, to, and promotion match. If so use the SAN for it
         const moves = this.game.chess.moves({ verbose: true });
-        const ourMove = moves.find((valid) => valid.from === from
-                                           && valid.to === to
-                                           && valid.promotion === promotion,
+        const ourMove = moves.find(
+            (valid) =>
+                valid.from === from &&
+                valid.to === to &&
+                valid.promotion === promotion,
         );
 
         if (ourMove) {

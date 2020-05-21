@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { SpidersGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -53,7 +53,7 @@ export class SpidersGame extends BaseClasses.Game {
      * used by the server and client to easily refer to the game objects via
      * ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The starting strength for Webs.
@@ -133,7 +133,7 @@ export class SpidersGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: SpidersGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -200,10 +200,13 @@ export class SpidersGame extends BaseClasses.Game {
         }
 
         // create the BroodMother
-        (this.players[0] as MutablePlayer).broodMother = this.manager.create.broodMother({
-            owner: this.players[0],
-            nest: this.manager.random.element(this.nests),
-        });
+        (this
+            .players[0] as MutablePlayer).broodMother = this.manager.create.broodMother(
+            {
+                owner: this.players[0],
+                nest: this.manager.random.element(this.nests),
+            },
+        );
 
         // now mirror it
 
@@ -235,12 +238,17 @@ export class SpidersGame extends BaseClasses.Game {
         }
 
         // webs that cross the middle of the game
-        const numCrossWebs = this.manager.random.int(minCrossWebs, maxCrossWebs);
+        const numCrossWebs = this.manager.random.int(
+            minCrossWebs,
+            maxCrossWebs,
+        );
         for (let i = 0; i < numCrossWebs; i++) {
             // the first half the the array has the nests on player 0's side
             const nestA = this.nests[this.manager.random.int(numNests - 1)];
-             // and the other half has player 1's
-            const nestB = this.nests[this.manager.random.int(numNests, numNests * 2 - 1)];
+            // and the other half has player 1's
+            const nestB = this.nests[
+                this.manager.random.int(numNests, numNests * 2 - 1)
+            ];
             this.manager.create.web({ nestA, nestB });
 
             const mirrorA = mirrorNests.get(nestA);

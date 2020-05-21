@@ -4,14 +4,17 @@ import { DeltaMergeable } from "~/core/game/delta-mergeable";
 import { Immutable } from "~/utils";
 import { BaseGameDeltaMergeables } from "./base-game-delta-mergeables";
 import { BaseGameManager } from "./base-game-manager";
-import { IBaseGameNamespace, IBaseGameObjectSchema } from "./base-game-namespace";
+import {
+    BaseGameNamespace,
+    BaseGameObjectSchema,
+} from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { createGameObject } from "./base-game-object-factory";
 import { BaseGameSettingsManager } from "./base-game-settings";
-import { BasePlayer, IBasePlayerData } from "./base-player";
+import { BasePlayer, BasePlayerData } from "./base-player";
 
 /** Arguments a game instance will need to initialize. */
-export interface IBaseGameRequiredData {
+export interface BaseGameRequiredData {
     /** The session id this Game is in. */
     sessionID: string;
     /** The array of clients that are playing this Game. */
@@ -21,16 +24,16 @@ export interface IBaseGameRequiredData {
     /** The IDs of the players in this game. */
     playerIDs: Immutable<string[]>;
     /** The Namespace object used to create new class instances in this Game. */
-    namespace: Immutable<IBaseGameNamespace>;
+    namespace: Immutable<BaseGameNamespace>;
     /** The delta mergeable schema used to validate all inputs/outputs. */
-    schema: Immutable<IBaseGameObjectSchema>;
+    schema: Immutable<BaseGameObjectSchema>;
     /** The initialized game manager that already has control of the clients. */
     manager: BaseGameManager;
     /** An event to invoke once this Game has been fully initialized. */
     gameCreated: Event<{
         /** This game. */
         game: BaseGame;
-        /** The rootDeltaMergeable */
+        /** The rootDeltaMergeable. */
         gameObjectsDeltaMergeable: DeltaMergeable;
     }>;
 }
@@ -56,9 +59,9 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
     /**
      * A special key/value object indexed by GameObject id's to the actual
-     * game object
+     * game object.
      */
-    public readonly gameObjects!: {[id: string]: BaseGameObject | undefined};
+    public readonly gameObjects!: { [id: string]: BaseGameObject | undefined };
 
     /**
      * The players playing this game.
@@ -73,7 +76,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
      */
     constructor(
         protected settingsManager: BaseGameSettingsManager,
-        requiredData: Readonly<IBaseGameRequiredData>, // not Immutable, as some of the values will mutate
+        requiredData: Readonly<BaseGameRequiredData>, // not Immutable, as some of the values will mutate
     ) {
         super({
             key: "game",
@@ -84,8 +87,9 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
         // Our super has now created our delta mergeables,
         // let's reach in and grab the game objects all hack-y like.
-        // tslint:disable-next-line:no-any no-non-null-assertion
-        const gameObjectsDeltaMergeable = ((this as any).deltaMergeable as DeltaMergeable).child("gameObjects")!;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion
+        const gameObjectsDeltaMergeable = ((this as any)
+            .deltaMergeable as DeltaMergeable).child("gameObjects")!;
 
         this.manager = requiredData.manager;
 
@@ -97,8 +101,11 @@ export class BaseGame extends BaseGameDeltaMergeables {
             const client = clients[i];
             client.aiManager.game = this; // kind of hack-y, we are hooking this up here
 
-            const playerData: IBasePlayerData = {
-                name: this.settings.playerNames[i] || client.name || `Player ${i}`,
+            const playerData: BasePlayerData = {
+                name:
+                    this.settings.playerNames[i] ||
+                    client.name ||
+                    `Player ${i}`,
                 clientType: client.programmingLanguage || "Unknown",
             };
 

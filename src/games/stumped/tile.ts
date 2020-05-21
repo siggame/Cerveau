@@ -1,4 +1,4 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { ITileProperties } from "./";
 import { Beaver } from "./beaver";
@@ -113,7 +113,7 @@ export class Tile extends GameObject implements BaseTile {
     constructor(
         // never directly created by game developers
         args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -125,24 +125,24 @@ export class Tile extends GameObject implements BaseTile {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Checks if a tile is in flow with another tile
+     * Checks if a tile is in flow with another tile.
      *
-     * @param tile - the tile to check in flow with
-     * @returns boolean if this tile is in flow with the provided tile
+     * @param tile - The tile to check in flow with.
+     * @returns Boolean if this tile is in flow with the provided tile.
      */
     public isInFlowDirection(tile: Tile): boolean {
         return Boolean(
             tile &&
-            this.flowDirection !== "" &&
-            this.getNeighbor(this.flowDirection) === tile,
+                this.flowDirection !== "" &&
+                this.getNeighbor(this.flowDirection) === tile,
         );
     }
 
     /**
-     * Checks if a tile is in flow with another tile
+     * Checks if a tile is in flow with another tile.
      *
-     * @param tile - the tile to check in flow with
-     * @returns boolean if this tile is in flow with the provided tile
+     * @param tile - The tile to check in flow with.
+     * @returns Boolean if this tile is in flow with the provided tile.
      */
     public isAgainstFlowDirection(tile: Tile): boolean {
         if (!tile.flowDirection) {
@@ -151,16 +151,16 @@ export class Tile extends GameObject implements BaseTile {
 
         return Boolean(
             tile &&
-            this.getNeighbor(
-                this.game.invertTileDirection(tile.flowDirection) || "",
-            ) === tile,
+                this.getNeighbor(
+                    this.game.invertTileDirection(tile.flowDirection) || "",
+                ) === tile,
         );
     }
 
     /**
-     * Gets the cost to move from this tile to another tile
+     * Gets the cost to move from this tile to another tile.
      *
-     * @param tile - other tile to check against
+     * @param tile - Other tile to check against.
      * @returns  NaN if this Tile and the passed in ones are not neighbors and
      * thus can never have a bonus. 2 if flow direction does not matter, 1 if
      * same direction bonus, 3 if against direction bonus.
@@ -169,11 +169,9 @@ export class Tile extends GameObject implements BaseTile {
         if (this.hasNeighbor(tile)) {
             if (this.isInFlowDirection(tile)) {
                 return 1; // same direction, bonus -1
-            }
-            else if (this.isAgainstFlowDirection(tile)) {
+            } else if (this.isAgainstFlowDirection(tile)) {
                 return 3; // against direction, bonus +1
-            }
-            else {
+            } else {
                 return 2; // neighbor with no flow, so no bonus +0
             }
         }
@@ -194,7 +192,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -207,14 +208,18 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**
@@ -228,7 +233,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * toString override.
+     * ToString override.
      *
      * @returns A string representation of the Tile.
      */

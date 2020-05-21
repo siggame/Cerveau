@@ -6,11 +6,9 @@ import { logger } from "./logger";
 const UPDATE_INTERVAL = 1000; // 1 sec in ms
 const GITHUB_URL = "https://api.github.com/repos/siggame/cerveau/commits";
 
-// tslint:disable:no-multiline-string - we use them here
-
-/** Manages and automatically updates this repository */
+/** Manages and automatically updates this repository. */
 export class Updater {
-    /** The events that this Updater emits */
+    /** The events that this Updater emits. */
     public readonly events = events({
         updateFound: new Event(),
     });
@@ -22,15 +20,15 @@ export class Updater {
     private interval: NodeJS.Timer | undefined;
 
     /** If an update was found. */
-    private updateFound: boolean = false;
+    private updateFound = false;
 
-    /** Creates a new Updater to check for updates */
+    /** Creates a new Updater to check for updates. */
     public constructor() {
         // Thanks to: https://stackoverflow.com/questions/34518389/get-hash-of-most-recent-git-commit-in-node
-        exec("git rev-parse HEAD", async (err, stdout) => {
+        exec("git rev-parse HEAD", (err, stdout) => {
             if (err) {
                 logger.error(
-`Updater cannot determine the current version of this Cerveau instance.
+                    `Updater cannot determine the current version of this Cerveau instance.
 Is this a git repo with git installed on your system?`,
                 );
 
@@ -83,8 +81,7 @@ Is this a git repo with git installed on your system?`,
         let githubResponse = "";
         try {
             githubResponse = await httpRequest(GITHUB_URL);
-        }
-        catch (err) {
+        } catch (err) {
             return `Error with GitHub API. Request failed: ${err}
 Updater shuting down.`;
         }
@@ -112,7 +109,7 @@ Updater shuting down.`;
 Updater shuting down.`;
         }
 
-        const headSHA = String(first.sha).toLowerCase().trim(); // tslint:disable-line:no-unsafe-any
+        const headSHA = String(first.sha).toLowerCase().trim();
 
         if (this.sha !== headSHA) {
             this.updateFound = true;

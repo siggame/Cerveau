@@ -1,10 +1,13 @@
 import { IGamelog, IGamelogWinnerLoser } from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
-import { BaseGameSettingsManager, GamelogManager, IBaseGameNamespace,
-       } from "~/core/game";
+import {
+    BaseGameSettingsManager,
+    GamelogManager,
+    BaseGameNamespace,
+} from "~/core/game";
 import { logger } from "~/core/logger";
 import { Immutable, removeElements, UnknownObject } from "~/utils";
-import { BaseClient, IClientInfo } from "../clients/";
+import { BaseClient, ClientInfo } from "../clients/";
 import { Updater } from "../updater";
 
 /**
@@ -18,36 +21,36 @@ export abstract class Room {
     });
 
     /**
-     * All the clients connected to this room (spectators and players alike)
+     * All the clients connected to this room (spectators and players alike).
      */
     public readonly clients: BaseClient[] = [];
 
     /**
      * Once written to disk, this will be the filename of the gamelog for this
-     * room
+     * room.
      */
     public gamelogFilename?: string;
 
-    /** Once the game is over, this will exist and be the list of winners */
+    /** Once the game is over, this will exist and be the list of winners. */
     public winners?: IGamelogWinnerLoser[];
 
-    /** Once the game is over, this will exist and be the list of losers */
+    /** Once the game is over, this will exist and be the list of losers. */
     public losers?: IGamelogWinnerLoser[];
 
     /** The password to entry this room. If undefined open to anyone. */
     public password?: string;
 
-    /** The time this room was created */
+    /** The time this room was created. */
     public readonly timeCreated = new Date();
 
-    /** The manager we use to validate game settings against */
+    /** The manager we use to validate game settings against. */
     protected readonly gameSettingsManager: BaseGameSettingsManager;
 
-    /** If the game this room is playing has been ran and it is over */
+    /** If the game this room is playing has been ran and it is over. */
     private over = false;
 
     /** The infos about the client once the game is over. */
-    private clientInfos?: IClientInfo[];
+    private clientInfos?: ClientInfo[];
 
     /**
      * Creates a room for a lobby to hold clients before they play the game.
@@ -60,7 +63,7 @@ export abstract class Room {
      */
     constructor(
         public readonly id: string,
-        public readonly gameNamespace: Immutable<IBaseGameNamespace>,
+        public readonly gameNamespace: Immutable<BaseGameNamespace>,
         protected readonly gamelogManager: GamelogManager,
         private readonly updater?: Updater,
     ) {
@@ -79,7 +82,7 @@ export abstract class Room {
     /**
      * Adds a client to this session.
      *
-     * @param client - the client to add to this session
+     * @param client - The client to add to this session.
      */
     public addClient(client: BaseClient): void {
         this.clients.push(client);
@@ -88,24 +91,25 @@ export abstract class Room {
     /**
      * Removes a client from this session.
      *
-     * @param client - the client to remove from this session
+     * @param client - The client to remove from this session.
      */
     public removeClient(client: BaseClient): void {
         removeElements(this.clients, client);
     }
 
     /**
-     * Checks if the game for this session is over
-     * @returns True if the game is over, false otherwise
+     * Checks if the game for this session is over.
+     *
+     * @returns True if the game is over, false otherwise.
      */
     public isOver(): boolean {
         return this.over;
     }
 
     /**
-     * If this session is open to more clients joining
+     * If this session is open to more clients joining.
      *
-     * @returns true if open, false otherwise
+     * @returns True if open, false otherwise.
      */
     public isOpen(): boolean {
         return !this.isOver() && !this.isRunning() && !this.canStart();
@@ -115,14 +119,16 @@ export abstract class Room {
      * If this session has enough playing clients in it to start running.
      * The Lobby uses this to know when it should start.
      *
-     * @returns true if ready to start running, false otherwise
+     * @returns True if ready to start running, false otherwise.
      */
     public canStart(): boolean {
         const { requiredNumberOfPlayers } = this.gameNamespace.GameManager;
 
-        return !this.isOver()
-            && !this.isRunning()
-            && this.getClientsPlaying().length === requiredNumberOfPlayers;
+        return (
+            !this.isOver() &&
+            !this.isRunning() &&
+            this.getClientsPlaying().length === requiredNumberOfPlayers
+        );
     }
 
     /**
@@ -130,7 +136,8 @@ export abstract class Room {
      * game instance.
      */
     public start(): void {
-        if (this.updater) { // && this.updater.foundUpdates()) {
+        if (this.updater) {
+            // && this.updater.foundUpdates()) {
             logger.warn("Starting a game session without updates!");
         }
 
@@ -139,7 +146,8 @@ export abstract class Room {
 
     /**
      * If this session has a game instance running on a worker thread.
-     * @returns true if it is running, false otherwise
+     *
+     * @returns True if it is running, false otherwise.
      */
     public isRunning(): boolean {
         return false; // super lobbies should do the thing
@@ -149,41 +157,40 @@ export abstract class Room {
      * Adds game settings to this game instance, parsing them from strings to
      * correct types.
      *
-     * @param settings - the key/value pair settings to add
-     * @returns An error if the settings were invalid, otherwise nothing
+     * @param settings - The key/value pair settings to add.
+     * @returns An error if the settings were invalid, otherwise nothing.
      */
     public addGameSettings(settings: Immutable<UnknownObject>): void | Error {
         return this.gameSettingsManager.addSettings(settings);
     }
 
     /**
-     * Gets the data about the game, if over
+     * Gets the data about the game, if over.
      *
-     * @returns nothing if not over, otherwise info about the clients.
+     * @returns Nothing if not over, otherwise info about the clients.
      */
-    public getOverData(): undefined | IClientInfo[] {
-        return this.isOver()
-            ? this.clientInfos
-            : undefined;
+    public getOverData(): undefined | ClientInfo[] {
+        return this.isOver() ? this.clientInfos : undefined;
     }
 
     /**
      * Invoked when a sub class knows its game session.
      *
      * @param clientInfos - A list of information about clients state as the game ended.
-     * @returns Once the over event is emitted.
      */
-    protected async handleOver(clientInfos: Immutable<IClientInfo[]> | undefined): Promise<void> {
+    protected handleOver(
+        clientInfos: Immutable<ClientInfo[]> | undefined,
+    ): void {
         this.clients.length = 0;
-        this.clientInfos = clientInfos as IClientInfo[];
+        this.clientInfos = clientInfos as ClientInfo[];
 
         this.events.over.emit();
     }
 
     /**
-     * Cleans everything up once the same session is over
+     * Cleans everything up once the same session is over.
      *
-     * @param gamelog The gamelog resulting from the game played in the session
+     * @param gamelog - The gamelog resulting from the game played in the session.
      * @returns A promise that resolves once the gamelog is written to disk.
      */
     protected async cleanUp(gamelog?: Immutable<IGamelog>): Promise<void> {

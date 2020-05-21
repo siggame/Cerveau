@@ -1,6 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpiderlingAttackArgs, ISpiderlingMoveArgs, ISpiderlingProperties,
-         SpiderArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    ISpiderlingAttackArgs,
+    ISpiderlingMoveArgs,
+    ISpiderlingProperties,
+    SpiderArgs,
+} from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spider } from "./spider";
@@ -14,7 +18,14 @@ import { removeElements } from "~/utils";
  * When empty string this Spiderling is not busy, and can act. Otherwise a
  * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
  */
-export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+export type SpiderlingBusy =
+    | ""
+    | "Moving"
+    | "Attacking"
+    | "Strengthening"
+    | "Weakening"
+    | "Cutting"
+    | "Spitting";
 
 /**
  * A Spider spawned by the BroodMother.
@@ -24,7 +35,14 @@ export class Spiderling extends Spider {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+    public busy!:
+        | ""
+        | "Moving"
+        | "Attacking"
+        | "Strengthening"
+        | "Weakening"
+        | "Cutting"
+        | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -65,12 +83,15 @@ export class Spiderling extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderArgs & ISpiderlingProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: Readonly<
+            SpiderArgs &
+                ISpiderlingProperties & {
+                    // <<-- Creer-Merge: constructor-args -->>
+                    // You can add more constructor args in here
+                    // <<-- /Creer-Merge: constructor-args -->>
+                }
+        >,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -131,7 +152,10 @@ export class Spiderling extends Spider {
             const enemyBroodMother = this.owner.opponent.broodMother;
             if (this.nest === enemyBroodMother.nest) {
                 // then we reached the enemy's BroodMother! Kamikaze into her!
-                enemyBroodMother.health = Math.max(enemyBroodMother.health - 1, 0);
+                enemyBroodMother.health = Math.max(
+                    enemyBroodMother.health - 1,
+                    0,
+                );
                 if (enemyBroodMother.health === 0) {
                     enemyBroodMother.isDead = true;
                 }
@@ -139,11 +163,10 @@ export class Spiderling extends Spider {
             }
 
             return true;
-        }
-        else if (finishing === "Attacking") {
+        } else if (finishing === "Attacking") {
             return true;
-        }
-        else { // they finished doing a different action (cut, weave, spit)
+        } else {
+            // they finished doing a different action (cut, weave, spit)
             this.coworkers.clear();
             this.numberOfCoworkers = this.coworkers.size;
 
@@ -211,23 +234,30 @@ export class Spiderling extends Spider {
         // Cutter > Weaver > Spitter > Cutter
         // Ties, both die
 
-        if (this.gameObjectName === spiderling.gameObjectName) { // they are the same type, so
+        if (this.gameObjectName === spiderling.gameObjectName) {
+            // they are the same type, so
             this.kill();
             spiderling.kill();
         }
 
         if (
-            (this.gameObjectName === "Cutter" && spiderling.gameObjectName === "Weaver") ||
-            (this.gameObjectName === "Weaver" && spiderling.gameObjectName === "Spitter") ||
-            (this.gameObjectName === "Spitter" && spiderling.gameObjectName === "Cutter")
+            (this.gameObjectName === "Cutter" &&
+                spiderling.gameObjectName === "Weaver") ||
+            (this.gameObjectName === "Weaver" &&
+                spiderling.gameObjectName === "Spitter") ||
+            (this.gameObjectName === "Spitter" &&
+                spiderling.gameObjectName === "Cutter")
         ) {
             spiderling.kill();
         }
 
         if (
-            (spiderling.gameObjectName === "Cutter" && this.gameObjectName === "Weaver") ||
-            (spiderling.gameObjectName === "Weaver" && this.gameObjectName === "Spitter") ||
-            (spiderling.gameObjectName === "Spitter" && this.gameObjectName === "Cutter")
+            (spiderling.gameObjectName === "Cutter" &&
+                this.gameObjectName === "Weaver") ||
+            (spiderling.gameObjectName === "Weaver" &&
+                this.gameObjectName === "Spitter") ||
+            (spiderling.gameObjectName === "Spitter" &&
+                this.gameObjectName === "Cutter")
         ) {
             this.kill();
         }

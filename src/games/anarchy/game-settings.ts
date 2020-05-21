@@ -14,7 +14,8 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    public get schema() {
+        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
             // tslint:disable-next-line:no-any
@@ -26,38 +27,45 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
             mapWidth: {
                 default: 40,
                 min: 2,
-                description: "The width (in Buildings) for the game map to be initialized to.",
+                description:
+                    "The width (in Buildings) for the game map to be initialized to.",
             },
             mapHeight: {
                 default: 20,
                 min: 2,
-                description: "The height (in Buildings) for the game map to be initialized to.",
+                description:
+                    "The height (in Buildings) for the game map to be initialized to.",
             },
             maxFire: {
                 default: 20,
                 min: 1,
-                description: "The maximum amount of fire value for any Building.",
+                description:
+                    "The maximum amount of fire value for any Building.",
             },
             baseBribesPerTurn: {
                 default: 10,
                 min: 1,
-                description: "How many bribes players get at the beginning of "
-                + "their turn, not counting their burned down Buildings.",
+                description:
+                    "How many bribes players get at the beginning of " +
+                    "their turn, not counting their burned down Buildings.",
             },
             buildingStartingHealth: {
                 default: 100,
                 min: 1,
-                description: "The amount of health buildings start the game with.",
+                description:
+                    "The amount of health buildings start the game with.",
             },
             headquartersHealthScalar: {
                 default: 3,
                 min: 1,
-                description: "How much health to scale (multiply a Headquarters health by",
+                description:
+                    "How much health to scale (multiply a Headquarters health by",
             },
             maxForecastIntensity: {
                 default: 10,
                 min: 1,
-                description: "The maximum intensity to allow Forecasts to have.",
+                description:
+                    "The maximum intensity to allow Forecasts to have.",
             },
             firePerTurnReduction: {
                 default: 1,
@@ -87,16 +95,17 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 200,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game is force ended and a winner is determined.",
             },
-
         });
     }
 
