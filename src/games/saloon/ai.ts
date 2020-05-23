@@ -13,7 +13,6 @@ export class AI extends BaseClasses.AI {
     // If the AI needs additional attributes add them here.
     // NOTE: these are not set in client AIs.
     // <<-- /Creer-Merge: attributes -->>
-
     // <<-- Creer-Merge: functions -->>
     // If the AI needs additional attributes add them here.
     /// NOTE: these will not be callable in client AIs.

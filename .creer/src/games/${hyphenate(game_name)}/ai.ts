@@ -27,8 +27,8 @@ optional=True, help=False)}
 ",\n            ".join([''] + [arg['name'] for arg in function_parms['arguments']]) + ",\n        "
 )});
     }
-% endfor
 
+% endfor
 ${merge('    // ', 'functions',
 """// If the AI needs additional attributes add them here.
 /// NOTE: these will not be callable in client AIs.""",
