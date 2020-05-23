@@ -36,11 +36,11 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface that the Player for the Saloon game
  * must implement from mixed in game logic.
  */
-export interface BaseSaloonPlayer extends
-    BasePlayer,
-    TwoPlayerPlayer,
-    TurnBasedPlayer,
-    TiledPlayer {}
+export interface BaseSaloonPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,

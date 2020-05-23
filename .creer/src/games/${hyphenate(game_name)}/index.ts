@@ -42,13 +42,13 @@ import { FirstArgumentFromConstructor } from "~/utils";
  * The interface that the Player for the ${game_name} game
  * must implement from mixed in game logic.
  */<%
-front = 'export interface Base{}Player extends'.format(game_name)
-one_line = front + ' ' + ', '.join(mixed_players) + ' {' + '}'
+front = 'export interface Base{}Player'.format(game_name)
+one_line = front + ' extends ' + ', '.join(mixed_players) + ' {' + '}'
 
 if len(one_line) < 80:
     base_player_interface = one_line
 else:
-    base_player_interface = front + '\n' + ',\n'.join(['    ' + m for m in mixed_players]) + ' {' + '}'
+    base_player_interface = front + '\n    extends ' + ',\n'.join([('        ' if i > 0 else '') + m for i, m in enumerate(mixed_players)]) + ' {' + '}'
 %>
 ${base_player_interface}
 <% base_index = 1 %>
