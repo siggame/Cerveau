@@ -120,7 +120,7 @@ ${'}\n' if attrs else ''}
     '',
     "Argument overrides for {}'s {} function. If you return an object of this interface from the invalidate functions, the value(s) you set will be used in the actual function.".format(game_obj_name, function_name)
 )}
-export interface I${game_obj_name}${upcase_first(function_name)}Args {
+export interface ${game_obj_name}${upcase_first(function_name)}Args {
 %       for arg in function_parms['arguments']:
 ${shared['cerveau']['block_comment']('    ', arg)}
     ${arg['name']}?: ${shared['cerveau']['type'](arg['type'])};
@@ -170,7 +170,7 @@ for game_obj_name in sort_dict_keys(game_objs):
     if game_obj_name in ['Player', 'GameObject']:
         continue # skip these, they can never be created via game logic
 
-    game_objs_factory.append(game_objs_factory)
+    game_objs_factory.append(game_obj_name)
 %>
 export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {${'}' if not game_objs_factory else ''}
 % for game_obj_name in game_objs_factory:

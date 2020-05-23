@@ -28,7 +28,7 @@ else:
         if function_name == 'log' and obj_key == 'GameObject':
             continue
 
-        function_args_import = 'I{}{}Args'.format(obj_key, upcase_first(function_name))
+        function_args_import = '{}{}Args'.format(obj_key, upcase_first(function_name))
         imports['./'].append(function_args_import)
 
     if 'log' in functions: # log is server implimented
@@ -279,7 +279,7 @@ ${merge('    // ', 'public-functions', """
         'description': 'If the arguments are invalid, return a string explaining to human players why it is invalid. If it is valid return nothing, or an object with new arguments to use in the actual function.',
         'invalidValue': None,
         'type': {
-            'name': 'void | string | I{}{}Args'.format(obj_key, upcase_first_function_name),
+            'name': 'void | string | {}{}Args'.format(obj_key, upcase_first_function_name),
             'is_game_object': False,
             'valueType': None,
             'keyType': None,

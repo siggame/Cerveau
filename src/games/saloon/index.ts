@@ -33,14 +33,14 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Saloon game
+ * The interface that the Player for the Saloon game
  * must implement from mixed in game logic.
  */
-export interface IBaseSaloonPlayer
-    extends BasePlayer,
-        TwoPlayerPlayer,
-        TurnBasedPlayer,
-        TiledPlayer {}
+export interface BaseSaloonPlayer extends
+    BasePlayer,
+    TwoPlayerPlayer,
+    TurnBasedPlayer,
+    TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -83,8 +83,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Bottle. */
-export interface IBottleProperties {
+/** All the possible properties for Bottle instances. */
+export interface BottleProperties {
     /**
      * The Direction this Bottle is flying and will move to between turns, can
      * be 'North', 'East', 'South', or 'West'.
@@ -109,8 +109,8 @@ export interface IBottleProperties {
     tile?: Tile;
 }
 
-/** All the possible properties for an Cowboy. */
-export interface ICowboyProperties {
+/** All the possible properties for Cowboy instances. */
+export interface CowboyProperties {
     /**
      * If the Cowboy can be moved this turn via its owner.
      */
@@ -178,7 +178,7 @@ export interface ICowboyProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyActArgs {
+export interface CowboyActArgs {
     /**
      * The Tile you want this Cowboy to act on.
      */
@@ -195,7 +195,7 @@ export interface ICowboyActArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyMoveArgs {
+export interface CowboyMoveArgs {
     /**
      * The Tile you want to move this Cowboy to.
      */
@@ -207,15 +207,15 @@ export interface ICowboyMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyPlayArgs {
+export interface CowboyPlayArgs {
     /**
      * The Furnishing that is a piano you want to play.
      */
     piano?: Furnishing;
 }
 
-/** All the possible properties for an Furnishing. */
-export interface IFurnishingProperties {
+/** All the possible properties for Furnishing instances. */
+export interface FurnishingProperties {
     /**
      * How much health this Furnishing currently has.
      */
@@ -243,11 +243,11 @@ export interface IFurnishingProperties {
     tile?: Tile;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -322,8 +322,8 @@ export interface IPlayerProperties {
     youngGun?: YoungGun;
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The beer Bottle currently flying over this Tile, undefined otherwise.
      */
@@ -391,8 +391,8 @@ export interface ITileProperties {
     youngGun?: YoungGun;
 }
 
-/** All the possible properties for an YoungGun. */
-export interface IYoungGunProperties {
+/** All the possible properties for YoungGun instances. */
+export interface YoungGunProperties {
     /**
      * The Tile that a Cowboy will be called in on if this YoungGun calls in a
      * Cowboy.
@@ -420,7 +420,7 @@ export interface IYoungGunProperties {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IYoungGunCallInArgs {
+export interface YoungGunCallInArgs {
     /**
      * The job you want the Cowboy being brought to have.
      */
@@ -478,7 +478,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public bottle<T extends BottleArgs>(args: Readonly<T>): Bottle & T {
+    public bottle<T extends BottleArgs>(
+        args: Readonly<T>,
+    ): Bottle & T {
         return this.createGameObject("Bottle", Bottle, args);
     }
 
@@ -489,7 +491,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public cowboy<T extends CowboyArgs>(args: Readonly<T>): Cowboy & T {
+    public cowboy<T extends CowboyArgs>(
+        args: Readonly<T>,
+    ): Cowboy & T {
         return this.createGameObject("Cowboy", Cowboy, args);
     }
 
@@ -514,7 +518,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
+    public tile<T extends TileArgs>(
+        args: Readonly<T>,
+    ): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -525,9 +531,12 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public youngGun<T extends YoungGunArgs>(args: Readonly<T>): YoungGun & T {
+    public youngGun<T extends YoungGunArgs>(
+        args: Readonly<T>,
+    ): YoungGun & T {
         return this.createGameObject("YoungGun", YoungGun, args);
     }
+
 }
 
 /**
