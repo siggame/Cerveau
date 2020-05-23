@@ -2,9 +2,9 @@
 imports = shared['cerveau']['generate_imports'](obj_key, obj, {})
 
 imports['./'] = []
-imports['~/core/game'] = [ 'IBaseGameRequiredData' if obj_key == 'Game' else 'IBaseGameObjectRequiredData' ]
+imports['~/core/game'] = [ 'BaseGameRequiredData' if obj_key == 'Game' else 'BaseGameObjectRequiredData' ]
 
-i_base_player = 'IBase{}Player'.format(game_name)
+i_base_player = 'Base{}Player'.format(game_name)
 
 if 'TiledGame' in game['serverParentClasses'] and obj_key == 'Tile':
     imports['~/core/game/mixins/tiled'] = [ 'BaseTile' ]
@@ -21,7 +21,7 @@ else:
         imports['./'].append(i_base_player)
         imports['./ai'] = [ 'AI' ]
     else:
-        imports['./'].append('I{}Properties'.format(obj_key))
+        imports['./'].append('{}Properties'.format(obj_key))
 
     functions = list(obj['function_names'])
     for function_name in functions:
@@ -138,7 +138,7 @@ ${merge('    // ', 'attributes', """
     constructor(
 % if obj_key == 'Game':
         protected settingsManager: ${game_name}GameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
 % else: # if not a base class, or it is a `Tile`, and this is not a tiled game
 %   if obj_key not in ['Player', 'GameObject', 'Tile'] or (obj_key == 'Tile' and 'TiledGame' not in game['serverParentClasses']):
 <%
@@ -147,7 +147,7 @@ for parent_class in obj['parentClasses']:
     if parent_class == 'GameObject':
         continue
     parent_unions.append('{}Args'.format(parent_class))
-unions = parent_unions + [ 'I' + obj_key + 'Properties' ] + ['{']
+unions = parent_unions + [ obj_key + 'Properties' ] + ['{']
 wrapper = shared['cerveau']['TextWrapper'](
     width=79,
     initial_indent='        args: Readonly<',
@@ -159,9 +159,9 @@ ${merge('            // ', 'constructor-args', """            // You can add mor
         }>,
 %   else:
         // never directly created by game developers
-        args: Readonly<${'I' + (('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))}>,
+        args: Readonly<${(('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))}>,
 %   endif
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
 % endif
     ) {
         super(${'settingsManager' if (obj_key == 'Game') else 'args'}, required);

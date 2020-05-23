@@ -35,7 +35,7 @@ if not 'cerveau' in shared:
             return ' | '.join(literals)
 
         if base_type == "dictionary":
-            return "{[id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + "}"
+            return "{ [id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + " }"
         elif base_type == "list":
             ret = cerveau_type(type_obj['valueType'], False)
             if ' ' in ret:
@@ -171,27 +171,10 @@ if not 'cerveau' in shared:
             if len(one_line) <= 79:
                 doc += one_line
             else:
-                # too long for one line, so it needs to be wrapped
-                initial_indent = 'import { '
-                import_from_line = '}$from$"' + pair[0] + '";'
+                doc += 'import {\n'
+                doc += '\n'.join(['    {},'.format(n) for n in names ])
+                doc +=  '\n}' + ' from "{}";'.format(pair[0])
 
-                wrapper = TextWrapper(
-                    initial_indent=initial_indent,
-                    subsequent_indent=(' ' * len(initial_indent)),
-                    width=79,
-                )
-
-                wrapped = wrapper.wrap(', '.join(names + [import_from_line]))
-                last_line = wrapped[-1].strip()
-                if last_line[0] == '}':
-                    # then import_from_line wrapped to the last line, so there
-                    # needs to be a dangling comma on the end
-                    wrapped[-1] = (' ' * len('import ')) + import_from_line
-                else:
-                    # remove the last comma
-                    comma_index = wrapped[-1].rfind(',')
-                    wrapped[-1] = wrapped[-1][:comma_index] + wrapped[-1][comma_index+1:]
-                doc += ('\n'.join(wrapped)).replace('$', ' ')
             doc += '\n'
         return doc
     shared['cerveau']['imports'] = cerveau_imports

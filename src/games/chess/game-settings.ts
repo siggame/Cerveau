@@ -4,8 +4,6 @@ import { BaseClasses } from "./";
 
 // <<-- Creer-Merge: imports -->>
 import * as chessjs from "chess.js";
-
-const chess = new chessjs.Chess();
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -17,10 +15,9 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() {
-        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(super.schema || (this as any).schema),
 
             // Chess game specific settings
@@ -32,23 +29,27 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
                 default: "",
                 // <<-- /Creer-Merge: fen -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
             pgn: {
                 description:
-                    "The starting board state in Portable Game Notation (PGN).",
+                    "The starting board state in " +
+                    "Portable Game Notation (PGN).",
                 default: "",
             },
 
             enableSTFR: {
                 description:
-                    "Enable non standard chess rule Simplified Three-Fold Repetition rule.",
+                    "Enable non standard chess rule " +
+                    "Simplified Three-Fold Repetition rule.",
                 default: true,
             },
 
             enableTFR: {
                 description:
-                    "Enable the standard chess rule Three-Fold Repetition rule.",
+                    "Enable the standard chess rule " +
+                    "Three-Fold Repetition rule.",
                 default: false,
             },
 
@@ -92,6 +93,7 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
             );
         }
 
+        const chess = new chessjs.Chess();
         if (settings.fen) {
             // try to validate the FEN string
             const validated = chess.validate_fen(settings.fen);
@@ -103,7 +105,6 @@ export class ChessGameSettingsManager extends BaseClasses.GameSettings {
 
         if (settings.pgn) {
             const valid = chess.load_pgn(settings.pgn, { sloppy: true });
-            chess.reset(); // we just wanted to validate, not actually load.
 
             if (!valid) {
                 return new Error("Could not load PGN.");

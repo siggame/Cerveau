@@ -26,10 +26,8 @@ export class BaseAI {
      * @returns A promise that resolves to the value the AI returned from that
      * order, once they finish that order.
      */
-    protected executeOrder(
-        name: string,
-        ...args: unknown[]
-    ): Promise<unknown> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    protected executeOrder(name: string, ...args: unknown[]): Promise<any> {
         return this.manager.executeOrder(name, ...args);
     }
 }

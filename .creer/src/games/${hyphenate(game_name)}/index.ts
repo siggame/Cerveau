@@ -14,12 +14,12 @@ ${shared['cerveau']['imports']({
 // mixins<%
 
 mixin_imports = []
-mixed_players = []
+mixed_players = ['BasePlayer']
 mixins = []
 for parent_class in game['serverParentClasses']:
     no_game = upcase_first(parent_class[:-4]) # slice off "Game" from the end of the string
 
-    mixed_player = 'I' + no_game + 'Player'
+    mixed_player = no_game + 'Player'
     mixed_players.append(mixed_player)
 
     mixin = 'mix' + no_game
@@ -39,12 +39,18 @@ import { FirstArgumentFromConstructor } from "~/utils";
 
 % endif
 /**
- * The interface the Player for the ${game_name} game
+ * The interface that the Player for the ${game_name} game
  * must implement from mixed in game logic.
- */
-export interface IBase${game_name}Player extends
-    BasePlayer${',\n    '.join([''] + [m for m in mixed_players])} {
-}
+ */<%
+front = 'export interface Base{}Player extends'.format(game_name)
+one_line = front + ' ' + ', '.join(mixed_players) + ' {' + '}'
+
+if len(one_line) < 80:
+    base_player_interface = one_line
+else:
+    base_player_interface = front + '\n' + ',\n'.join(['    ' + m for m in mixed_players]) + ' {' + '}'
+%>
+${base_player_interface}
 <% base_index = 1 %>
 const base0 = {
     AI: BaseAI,
@@ -90,20 +96,21 @@ export const BaseClasses = {
 % for game_obj_name in sort_dict_keys(game_objs):
 <%
 game_obj = game_objs[game_obj_name]
-%>/** All the possible properties for an ${game_obj_name}. */
-export interface I${game_obj_name}Properties {
-%   for attr_name in sort_dict_keys(game_obj['attributes']):
-<%
-if attr_name in ['gameObjectName', 'id', 'logs']:
-    continue
+attrs = []
+attr_i = 0
+for attr_name in sort_dict_keys(game_obj['attributes']):
+    if attr_name in ['gameObjectName', 'id', 'logs']:
+        continue
 
-attr = game_obj['attributes'][attr_name]
-%>${shared['cerveau']['block_comment']('    ', attr)}
+    attrs.append((attr_i, attr_name, game_obj['attributes'][attr_name]))
+    attr_i += 1
+%>/** All the possible properties for ${game_obj_name} instances. */
+export interface ${game_obj_name}Properties {${'}' if not attrs else ''}
+%   for i, attr_name, attr in attrs:
+${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', attr)}
     ${attr_name}?: ${shared['cerveau']['type'](attr['type'], nullable=False)};
-
 %   endfor
-}
-
+${'}\n' if attrs else ''}
 %    for function_name in game_obj['function_names']:
 <%
     if game_obj_name == 'GameObject' and function_name == 'log':
@@ -157,13 +164,17 @@ export type ${game_obj_name}Args = FirstArgumentFromConstructor<typeof ${game_ob
 /**
  * The factory that **must** be used to create any game objects in
  * the ${game_name} game.
- */
-export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
-% for game_obj_name in sort_dict_keys(game_objs):
-<%
+ */<%
+game_objs_factory = []
+for game_obj_name in sort_dict_keys(game_objs):
     if game_obj_name in ['Player', 'GameObject']:
         continue # skip these, they can never be created via game logic
-%>${shared['cerveau']['block_comment']('    ', {
+
+    game_objs_factory.append(game_objs_factory)
+%>
+export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {${'}' if not game_objs_factory else ''}
+% for game_obj_name in game_objs_factory:
+${shared['cerveau']['block_comment']('    ', {
     'description': 'Creates a new {} in the Game and tracks it for all players.'.format(game_obj_name),
     'arguments': [
         {
@@ -182,8 +193,7 @@ export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {
     }
 
 % endfor
-}
-
+${'}\n' if game_objs_factory else ''}
 /**
  * The shared namespace for ${game_name} that is used to
  * initialize each game instance.
@@ -218,33 +228,39 @@ else:
 %   if 'parentClasses' in obj and len(obj['parentClasses']) > 0:
             parentClassName: "${obj['parentClasses'][0]}",
 %   endif
+%   if 'attributes' in obj and obj['attributes']:
             attributes: {
-%   if 'attributes' in obj:
-%           for attr_name in sort_dict_keys(obj['attributes']):
+%       for attr_name in sort_dict_keys(obj['attributes']):
                 ${attr_name}: {
 ${shared['cerveau']['schema_type'](obj['attributes'][attr_name]['type'], 5)}
                 },
 %       endfor
-%   endif
             },
+%   else:
+            attributes: {},
+%   endif
+%   if 'functions' in obj and obj['functions']:
             functions: {
-%   if 'functions' in obj:
 %       for function_name in sort_dict_keys(obj['functions']):
 <%
     function_parms = obj['functions'][function_name]
     returns = function_parms['returns']
 %>                ${function_name}: {
+%           if function_parms['arguments']:
                     args: [
-%           for arg in function_parms['arguments']:
+%               for arg in function_parms['arguments']:
                         {
                             argName: "${arg['name']}",
 ${shared['cerveau']['schema_type'](arg['type'], 7, arg['optional'])}
-%               if arg['optional']:
+%                   if arg['optional']:
                             defaultValue: ${shared['cerveau']['value'](arg['type'], arg['default'])},
-%               endif
+%                   endif
                         },
-%           endfor
+%               endfor
                     ],
+%           else:
+                    args: [],
+%           endif
 %           if returns and 'invalidValue' in returns:
                     invalidValue: ${shared['cerveau']['value'](returns['type'], returns['invalidValue']) if returns else 'undefined'},
 %           endif
@@ -258,9 +274,12 @@ ${shared['cerveau']['schema_type'](returns['type'], 6)}
                 },
 %       endfor
             },
+%   else:
+            functions: {},
 %   endif
         },
 % endfor
     },
-    gameVersion: "${game_version}",
+    gameVersion:
+        "${game_version}",
 });

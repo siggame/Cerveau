@@ -23,10 +23,10 @@ import {
 import { TwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
 
 /**
- * The interface the Player for the Chess game
+ * The interface that the Player for the Chess game
  * must implement from mixed in game logic.
  */
-export interface IBaseChessPlayer extends BasePlayer, TwoPlayerPlayer {}
+export interface BaseChessPlayer extends BasePlayer, TwoPlayerPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -67,11 +67,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.

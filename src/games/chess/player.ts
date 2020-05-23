@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IBaseChessPlayer } from "./";
+import { BaseChessPlayer } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 
@@ -16,7 +16,7 @@ export type PlayerColor = "black" | "white";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseChessPlayer {
+export class Player extends GameObject implements BaseChessPlayer {
     /** The AI controlling this Player */
     public readonly ai!: AI;
 
@@ -83,7 +83,7 @@ export class Player extends GameObject implements IBaseChessPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseChessPlayer>,
+        args: Readonly<BaseChessPlayer>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

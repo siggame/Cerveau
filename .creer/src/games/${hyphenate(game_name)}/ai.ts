@@ -12,8 +12,7 @@ optional=True, help=False)}
  * the AI orders to execute.
  */
 export class AI extends BaseClasses.AI {
-
-${merge('// ', 'attributes',
+${merge('    // ', 'attributes',
 """// If the AI needs additional attributes add them here.
 // NOTE: these are not set in client AIs.""",
 optional=True, help=False)}
@@ -30,9 +29,8 @@ optional=True, help=False)}
     }
 % endfor
 
-${merge('// ', 'functions',
+${merge('    // ', 'functions',
 """// If the AI needs additional attributes add them here.
 /// NOTE: these will not be callable in client AIs.""",
 optional=True, help=False)}
-
 }
