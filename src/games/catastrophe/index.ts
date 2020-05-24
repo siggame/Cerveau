@@ -111,7 +111,13 @@ export interface JobProperties {
     /**
      * The Job title.
      */
-    title?: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
+    title?:
+        | "fresh human"
+        | "cat overlord"
+        | "soldier"
+        | "gatherer"
+        | "builder"
+        | "missionary";
 
     /**
      * The amount of food per turn this Unit consumes. If there isn't enough

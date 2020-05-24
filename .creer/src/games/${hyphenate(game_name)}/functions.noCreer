@@ -25,14 +25,19 @@ if not 'cerveau' in shared:
             return "undefined"
     shared['cerveau']['default'] = cerveau_default
 
-    def cerveau_type(type_obj, nullable=None):
+    def cerveau_type(type_obj, nullable=None, wrap_literals_indent=False):
         base_type = type_obj['name']
 
         if 'literals' in type_obj and type_obj['literals']:
             literals = list(type_obj['literals'])
             if base_type == 'string':
                 literals = [ '"{}"'.format(lit) for lit in literals ]
-            return ' | '.join(literals)
+            one_line = ' | '.join(literals)
+            if wrap_literals_indent == False:
+                return one_line
+            else:
+                indent = '    ' * wrap_literals_indent if type(wrap_literals_indent) == int else ''
+                return '\n' + '\n'.join(['{}    | "{}"'.format(indent, l) for l in type_obj['literals']])
 
         if base_type == "dictionary":
             return "{ [id: " + cerveau_type(type_obj['keyType']) + "]: " + cerveau_type(type_obj['valueType']) + " }"

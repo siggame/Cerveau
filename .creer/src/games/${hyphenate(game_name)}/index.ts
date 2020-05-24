@@ -108,7 +108,13 @@ for attr_name in sort_dict_keys(game_obj['attributes']):
 export interface ${game_obj_name}Properties {${'}' if not attrs else ''}
 %   for i, attr_name, attr in attrs:
 ${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', attr)}
-    ${attr_name}?: ${shared['cerveau']['type'](attr['type'], nullable=False)};
+<%
+    prop_name = '    {}?:'.format(attr_name)
+    type_val = shared['cerveau']['type'](attr['type'], nullable=False)
+    attr_type = prop_name + ' ' + type_val
+    if len(attr_type) > 79:
+        attr_type = prop_name + shared['cerveau']['type'](attr['type'], nullable=False, wrap_literals_indent=1)
+%>${attr_type};
 %   endfor
 ${'}\n' if attrs else ''}
 %    for function_name in game_obj['function_names']:

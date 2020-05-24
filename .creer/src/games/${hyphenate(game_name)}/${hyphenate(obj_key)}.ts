@@ -68,7 +68,13 @@ if not attr_parms['type']['literals']:
     continue
 %>
 ${shared['cerveau']['block_comment']('', attr_parms)}
-export type ${obj_key}${upcase_first(attr_name)} = ${shared['cerveau']['type'](attr_parms['type'])};
+<%
+    prop_name = 'export type {}{} ='.format(obj_key, upcase_first(attr_name))
+    type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
+    attr_type = prop_name + ' ' + type_val
+    if len(attr_type) > 79:
+        attr_type = prop_name + shared['cerveau']['type'](attr_parms['type'], nullable=False, wrap_literals_indent=True)
+%>${attr_type};
 % endfor
 
 ${shared['cerveau']['block_comment']('', obj)}
@@ -110,7 +116,13 @@ else:
     nullable = '!'
 
 %>${shared['cerveau']['block_comment']('    ', attr_parms)}
-    public ${readonly}${attr_name}${nullable}: ${shared['cerveau']['type'](attr_type)};
+<%
+    prop_name = '    public ' + readonly + attr_name + nullable + ':'
+    type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
+    attr_type = prop_name + ' ' + type_val
+    if len(attr_type) > 79:
+        attr_type = prop_name + shared['cerveau']['type'](attr_parms['type'], nullable=False, wrap_literals_indent=1)
+%>${attr_type};
 
 % endfor
 ${merge('    // ', 'attributes', """

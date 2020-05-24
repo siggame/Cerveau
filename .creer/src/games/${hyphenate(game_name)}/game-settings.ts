@@ -5,7 +5,7 @@ import { BaseClasses } from "./";
 ${merge('// ', 'imports', '// any additional imports you want can be placed here safely between creer runs', optional=True, help=False)}<%
 import textwrap
 def wrap_desc(desc):
-    if len(desc) < 47:
+    if len(desc) <= 47:
         return ' "{}"'.format(desc)
 
     lines = textwrap.wrap(desc,

@@ -12,7 +12,12 @@ import { Tile } from "./tile";
  * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
  * 'neutral').
  */
-export type StructureType = "neutral" | "shelter" | "monument" | "wall" | "road";
+export type StructureType =
+    | "neutral"
+    | "shelter"
+    | "monument"
+    | "wall"
+    | "road";
 
 /**
  * A structure on a Tile.
