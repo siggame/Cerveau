@@ -148,15 +148,12 @@ for parent_class in obj['parentClasses']:
         continue
     parent_unions.append('{}Args'.format(parent_class))
 unions = parent_unions + [ obj_key + 'Properties' ] + ['{']
-wrapper = shared['cerveau']['TextWrapper'](
-    width=79,
-    initial_indent='        args: Readonly<',
-    subsequent_indent='        ',
-)
-%>${'\n'.join(wrapper.wrap(' & '.join(unions)))}
-${merge('            // ', 'constructor-args', """            // You can add more constructor args in here
+%>        args: Readonly<
+            ${' & '.join(unions)}
+${merge('                // ', 'constructor-args', """                // You can add more constructor args in here
 """, optional=True, help=False)}
-        }>,
+            }
+        >,
 %   else:
         // never directly created by game developers
         args: Readonly<${(('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))}>,
@@ -202,7 +199,10 @@ ${merge('    // ', 'public-functions', """
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -221,8 +221,12 @@ ${merge('    // ', 'public-functions', """
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**

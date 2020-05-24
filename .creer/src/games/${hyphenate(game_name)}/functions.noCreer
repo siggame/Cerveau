@@ -239,7 +239,7 @@ if not 'cerveau' in shared:
 
         formatted_function_signature = None
         as_one_line = formatted_name + formatted_args + formatted_return
-        if len(as_one_line) < 79:
+        if len(as_one_line) < 80:
             formatted_function_signature = as_one_line
         else:
             # it does not all fit on one line, so split up by arg

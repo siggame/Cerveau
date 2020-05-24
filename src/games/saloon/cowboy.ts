@@ -106,15 +106,17 @@ export class Cowboy extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<CowboyProperties & {
-            // <<-- Creer-Merge: constructor-args -->>
+        args: Readonly<
+            CowboyProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                 /** The owner of this Cowboy. */
                 owner: Player;
 
                 /** The Tile to spawn this cowboy on. */
                 tile: Tile;
-            // <<-- /Creer-Merge: constructor-args -->>
-        }>,
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
+        >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
@@ -395,10 +397,7 @@ export class Cowboy extends GameObject {
      * @param piano - The Furnishing that is a piano you want to play.
      * @returns True if the play worked, false otherwise.
      */
-    protected async play(
-        player: Player,
-        piano: Furnishing,
-    ): Promise<boolean> {
+    protected async play(player: Player, piano: Furnishing): Promise<boolean> {
         // <<-- Creer-Merge: play -->>
 
         piano.isPlaying = true;
