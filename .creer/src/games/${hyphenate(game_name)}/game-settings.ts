@@ -114,7 +114,7 @@ ${merge('                // ', 'map-height',
     /**
      * The current values for the game's settings
      */
-    public values!: SettingsFromSchema<${game['name']}GameSettingsManager["schema"]>;
+${shared['cerveau']['wrap_between']('public values!: SettingsFromSchema<', game['name'] + 'GameSettingsManager["schema"]', '>;', indent=1)}
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not

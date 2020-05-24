@@ -112,7 +112,7 @@ ${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', attr)}
     prop_name = '    {}?:'.format(attr_name)
     type_val = shared['cerveau']['type'](attr['type'], nullable=False)
     attr_type = prop_name + ' ' + type_val
-    if len(attr_type) > 79:
+    if len(attr_type) > 80:
         attr_type = prop_name + shared['cerveau']['type'](attr['type'], nullable=False, wrap_literals_indent=1)
 %>${attr_type};
 %   endfor

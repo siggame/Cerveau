@@ -267,4 +267,13 @@ if not 'cerveau' in shared:
             (w + " ") if i < (len(wrapped) - 1) else w) for i, w in enumerate(wrapped) ]
         return '\n'.join(quote_wrapped)
     shared['cerveau']['wrap_string'] = cerveau_wrap_string
+
+    def cerveau_wrap_between(prefix, inner, suffix, indent=0):
+        indent = '    ' * indent
+        one_line = indent + prefix + inner + suffix;
+        if len(one_line) <= 80:
+            return one_line
+
+        return indent + prefix + '\n    ' + indent + inner + '\n' + indent + suffix
+    shared['cerveau']['wrap_between'] = cerveau_wrap_between
 %>
