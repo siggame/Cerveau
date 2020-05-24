@@ -196,7 +196,9 @@ export class CatastropheGameSettingsManager extends BaseClasses.GameSettings {
     /**
      * The current values for the game's settings
      */
-    public values!: SettingsFromSchema<CatastropheGameSettingsManager["schema"]>;
+    public values!: SettingsFromSchema<
+        CatastropheGameSettingsManager["schema"]
+    >;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
