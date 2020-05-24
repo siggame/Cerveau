@@ -512,7 +512,11 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     public policeDepartment<T extends PoliceDepartmentArgs>(
         args: Readonly<T>,
     ): PoliceDepartment & T {
-        return this.createGameObject("PoliceDepartment", PoliceDepartment, args);
+        return this.createGameObject(
+            "PoliceDepartment",
+            PoliceDepartment,
+            args,
+        );
     }
 
     /**

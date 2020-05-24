@@ -224,9 +224,21 @@ def build_fac_top():
     if (len(fac_one_line) < 80):
         return fac_one_line
     return fac_sig + '\n        ' + fac_arg + ',\n    ' + fac_ret
+
+def build_cgo_func():
+    cgo_sig = '        return this.createGameObject('
+    cgo_args = ['"{}"'.format(game_obj_name), game_obj_name, 'args']
+    cgo_end = ');'
+
+    one_line = cgo_sig + ', '.join(cgo_args) + cgo_end
+    if len(one_line) <= 80:
+        return one_line
+
+    return cgo_sig + '\n' + ''.join(['            {},\n'.format(a) for a in cgo_args]) + '        ' + cgo_end
+
 %>
 ${build_fac_top()}
-        return this.createGameObject("${game_obj_name}", ${game_obj_name}, args);
+${build_cgo_func()}
     }
 % endfor
 ${'}\n' if game_objs_factory else ''}
