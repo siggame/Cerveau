@@ -20,8 +20,8 @@ else:
     if obj_key == 'Player':
         imports['./'].append(i_base_player)
         imports['./ai'] = [ 'AI' ]
-    else:
-        imports['./'].append('{}Properties'.format(obj_key))
+
+    imports['./'].append('{}ConstructorArgs'.format(obj_key))
 
     functions = list(obj['function_names'])
     for function_name in functions:
@@ -54,11 +54,6 @@ for parent_class in obj['parentClasses']:
 
     if not parent_class in imports[filename]:
         imports[filename].append(parent_class)
-
-    if obj_key != 'Player' and parent_class != 'GameObject':
-        constructor_args = '{}Args'.format(parent_class)
-        if not constructor_args in imports['./']:
-            imports['./'].append(constructor_args)
 
 if obj_key == 'Player':
     extends = extends + ' implements ' + i_base_player
@@ -141,22 +136,13 @@ ${merge('    // ', 'attributes', """
         required: Readonly<BaseGameRequiredData>,
 % else: # if not a base class, or it is a `Tile`, and this is not a tiled game
 %   if obj_key not in ['Player', 'GameObject', 'Tile'] or (obj_key == 'Tile' and 'TiledGame' not in game['serverParentClasses']):
-<%
-parent_unions = []
-for parent_class in obj['parentClasses']:
-    if parent_class == 'GameObject':
-        continue
-    parent_unions.append('{}Args'.format(parent_class))
-unions = parent_unions + [ obj_key + 'Properties' ] + ['{']
-%>        args: Readonly<
-            ${' & '.join(unions)}
-${merge('                // ', 'constructor-args', """                // You can add more constructor args in here
+        args: ${obj_key}ConstructorArgs<{
+${merge('            // ', 'constructor-args', """            // You can add more constructor args in here
 """, optional=True, help=False)}
-            }
-        >,
+        }>,
 %   else:
         // never directly created by game developers
-        args: Readonly<${(('Base' + game_name + 'Player') if obj_key == 'Player' else (obj_key + 'Properties'))}>,
+        args: ${obj_key}ConstructorArgs,
 %   endif
         required: Readonly<BaseGameObjectRequiredData>,
 % endif

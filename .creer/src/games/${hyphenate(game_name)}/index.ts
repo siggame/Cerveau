@@ -129,6 +129,26 @@ ${shared['cerveau']['block_comment']('    ', arg)}
 
 %    endfor
 % endfor
+% for i, game_obj_name in enumerate(sort_dict_keys(game_objs)):
+<%
+game_obj = game_objs[game_obj_name]
+parent_unions = []
+for parent_class in game_obj['parentClasses']:
+    if parent_class == 'GameObject':
+        continue
+    parent_unions.append('{}Args'.format(parent_class))
+if game_obj_name == 'Player':
+    parent_unions.append('Base' + game_name + 'Player')
+unions = parent_unions + [ game_obj_name + 'Properties', 'T' ]
+%>/**
+ * The default args passed to a constructor function for
+ * ${game_obj_name} instances.
+ */
+export type ${game_obj_name}ConstructorArgs<T extends {} = {}> = Readonly<
+    ${' & '.join(unions)}
+>;
+
+%endfor
 % for game_obj_name in sort_dict_keys(game_objs):
 export * from "./${hyphenate(game_obj_name)}";
 % endfor

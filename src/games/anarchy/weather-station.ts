@@ -1,8 +1,7 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    BuildingArgs,
+    WeatherStationConstructorArgs,
     WeatherStationIntensifyArgs,
-    WeatherStationProperties,
     WeatherStationRotateArgs,
 } from "./";
 import { Building } from "./building";
@@ -31,13 +30,11 @@ export class WeatherStation extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BuildingArgs & WeatherStationProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
-                    // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+        args: WeatherStationConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

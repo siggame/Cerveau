@@ -1,8 +1,7 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    BuildingArgs,
+    FireDepartmentConstructorArgs,
     FireDepartmentExtinguishArgs,
-    FireDepartmentProperties,
 } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
@@ -36,13 +35,11 @@ export class FireDepartment extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BuildingArgs & FireDepartmentProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
-                    // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+        args: FireDepartmentConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

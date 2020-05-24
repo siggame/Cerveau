@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseAnarchyPlayer } from "./";
+import { BaseAnarchyPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { Building } from "./building";
 import { FireDepartment } from "./fire-department";
@@ -114,7 +114,7 @@ export class Player extends GameObject implements BaseAnarchyPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BaseAnarchyPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -345,6 +345,70 @@ export interface WeatherStationRotateArgs {
     counterclockwise?: boolean;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * Building instances.
+ */
+export type BuildingConstructorArgs<T extends {} = {}> = Readonly<
+    BuildingProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * FireDepartment instances.
+ */
+export type FireDepartmentConstructorArgs<T extends {} = {}> = Readonly<
+    BuildingArgs & FireDepartmentProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Forecast instances.
+ */
+export type ForecastConstructorArgs<T extends {} = {}> = Readonly<
+    ForecastProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseAnarchyPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * PoliceDepartment instances.
+ */
+export type PoliceDepartmentConstructorArgs<T extends {} = {}> = Readonly<
+    BuildingArgs & PoliceDepartmentProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Warehouse instances.
+ */
+export type WarehouseConstructorArgs<T extends {} = {}> = Readonly<
+    BuildingArgs & WarehouseProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * WeatherStation instances.
+ */
+export type WeatherStationConstructorArgs<T extends {} = {}> = Readonly<
+    BuildingArgs & WeatherStationProperties & T
+>;
+
 export * from "./building";
 export * from "./fire-department";
 export * from "./forecast";

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, WarehouseIgniteArgs, WarehouseProperties } from "./";
+import { WarehouseConstructorArgs, WarehouseIgniteArgs } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -41,13 +41,11 @@ export class Warehouse extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BuildingArgs & WarehouseProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
-                    // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+        args: WarehouseConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

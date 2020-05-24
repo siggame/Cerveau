@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ForecastProperties } from "./";
+import { ForecastConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -51,18 +51,16 @@ export class Forecast extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            ForecastProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
-                /** The direction this Forecast will be. */
-                direction: ForecastDirection;
-                /** The intensity value of this Forecast. */
-                intensity: number;
-                /** The player whose turn it will be on the turn this Forecast can be manipulated. */
-                controllingPlayer: Player;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+        args: ForecastConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
+            /** The direction this Forecast will be. */
+            direction: ForecastDirection;
+            /** The intensity value of this Forecast. */
+            intensity: number;
+            /** The player whose turn it will be on the turn this Forecast can be manipulated. */
+            controllingPlayer: Player;
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
