@@ -452,6 +452,54 @@ export interface TileProperties {
     y?: number;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * Beaver instances.
+ */
+export type BeaverConstructorArgs<T extends {} = {}> = Readonly<
+    BeaverProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Job instances.
+ */
+export type JobConstructorArgs<T extends {} = {}> = Readonly<
+    JobProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseStumpedPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Spawner instances.
+ */
+export type SpawnerConstructorArgs<T extends {} = {}> = Readonly<
+    SpawnerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tile instances.
+ */
+export type TileConstructorArgs<T extends {} = {}> = Readonly<
+    TileProperties & T
+>;
+
 export * from "./beaver";
 export * from "./game-object";
 export * from "./job";

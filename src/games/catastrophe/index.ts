@@ -496,6 +496,54 @@ export interface UnitPickupArgs {
 export interface UnitRestArgs {
 }
 
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Job instances.
+ */
+export type JobConstructorArgs<T extends {} = {}> = Readonly<
+    JobProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseCatastrophePlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Structure instances.
+ */
+export type StructureConstructorArgs<T extends {} = {}> = Readonly<
+    StructureProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tile instances.
+ */
+export type TileConstructorArgs<T extends {} = {}> = Readonly<
+    TileProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Unit instances.
+ */
+export type UnitConstructorArgs<T extends {} = {}> = Readonly<
+    UnitProperties & T
+>;
+
 export * from "./game-object";
 export * from "./job";
 export * from "./player";

@@ -507,6 +507,54 @@ export interface UnitTransferArgs {
     material?: "genarium" | "rarium" | "legendarium" | "mythicite";
 }
 
+/**
+ * The default args passed to a constructor function for
+ * Body instances.
+ */
+export type BodyConstructorArgs<T extends {} = {}> = Readonly<
+    BodyProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Job instances.
+ */
+export type JobConstructorArgs<T extends {} = {}> = Readonly<
+    JobProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseStardashPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Projectile instances.
+ */
+export type ProjectileConstructorArgs<T extends {} = {}> = Readonly<
+    ProjectileProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Unit instances.
+ */
+export type UnitConstructorArgs<T extends {} = {}> = Readonly<
+    UnitProperties & T
+>;
+
 export * from "./body";
 export * from "./game-object";
 export * from "./job";

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { UnitJobProperties } from "./";
+import { UnitJobConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
@@ -72,13 +72,11 @@ export class UnitJob extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            UnitJobProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: UnitJobConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

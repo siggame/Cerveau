@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { CutterCutArgs, CutterProperties, SpiderlingArgs } from "./";
+import { CutterConstructorArgs, CutterCutArgs } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
 import { Web } from "./web";
@@ -32,13 +32,11 @@ export class Cutter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpiderlingArgs & CutterProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: CutterConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

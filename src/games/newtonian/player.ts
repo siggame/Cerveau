@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseNewtonianPlayer } from "./";
+import { BaseNewtonianPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -119,7 +119,7 @@ export class Player extends GameObject implements BaseNewtonianPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BaseNewtonianPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

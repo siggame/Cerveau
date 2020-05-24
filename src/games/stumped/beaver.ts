@@ -2,11 +2,11 @@ import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     BeaverAttackArgs,
     BeaverBuildLodgeArgs,
+    BeaverConstructorArgs,
     BeaverDropArgs,
     BeaverHarvestArgs,
     BeaverMoveArgs,
     BeaverPickupArgs,
-    BeaverProperties,
 } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -88,18 +88,16 @@ export class Beaver extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BeaverProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: BeaverConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Job of this Beaver. */
                 job: Job;
                 /** The controlling Player of this Beaver. */
                 owner: Player;
                 /** The Tile to spawn this Beaver upon. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -1,7 +1,6 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    SpiderlingArgs,
-    WeaverProperties,
+    WeaverConstructorArgs,
     WeaverStrengthenArgs,
     WeaverWeakenArgs,
 } from "./";
@@ -44,13 +43,11 @@ export class Weaver extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpiderlingArgs & WeaverProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: WeaverConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

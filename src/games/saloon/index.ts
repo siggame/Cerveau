@@ -427,6 +427,62 @@ export interface YoungGunCallInArgs {
     job?: "Bartender" | "Brawler" | "Sharpshooter";
 }
 
+/**
+ * The default args passed to a constructor function for
+ * Bottle instances.
+ */
+export type BottleConstructorArgs<T extends {} = {}> = Readonly<
+    BottleProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Cowboy instances.
+ */
+export type CowboyConstructorArgs<T extends {} = {}> = Readonly<
+    CowboyProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Furnishing instances.
+ */
+export type FurnishingConstructorArgs<T extends {} = {}> = Readonly<
+    FurnishingProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseSaloonPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tile instances.
+ */
+export type TileConstructorArgs<T extends {} = {}> = Readonly<
+    TileProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * YoungGun instances.
+ */
+export type YoungGunConstructorArgs<T extends {} = {}> = Readonly<
+    YoungGunProperties & T
+>;
+
 export * from "./bottle";
 export * from "./cowboy";
 export * from "./furnishing";

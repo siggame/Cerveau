@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { WebProperties } from "./";
+import { WebConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Spiderling } from "./spiderling";
@@ -64,13 +64,11 @@ export class Web extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            WebProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: WebConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

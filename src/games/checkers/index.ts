@@ -183,6 +183,30 @@ export interface PlayerProperties {
     yDirection?: number;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * Checker instances.
+ */
+export type CheckerConstructorArgs<T extends {} = {}> = Readonly<
+    CheckerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseCheckersPlayer & PlayerProperties & T
+>;
+
 export * from "./checker";
 export * from "./game-object";
 export * from "./player";

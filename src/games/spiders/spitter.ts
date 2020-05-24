@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { SpiderlingArgs, SpitterProperties, SpitterSpitArgs } from "./";
+import { SpitterConstructorArgs, SpitterSpitArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
@@ -34,13 +34,11 @@ export class Spitter extends Spiderling {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpiderlingArgs & SpitterProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: SpitterConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

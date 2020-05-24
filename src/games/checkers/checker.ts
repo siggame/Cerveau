@@ -1,5 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { CheckerIsMineArgs, CheckerMoveArgs, CheckerProperties } from "./";
+import {
+    CheckerConstructorArgs,
+    CheckerIsMineArgs,
+    CheckerMoveArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -46,14 +50,12 @@ export class Checker extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            CheckerProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: CheckerConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Player that owns this Checker. */
                 owner: Player;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

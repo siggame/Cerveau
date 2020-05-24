@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BottleProperties } from "./";
+import { BottleConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -62,14 +62,12 @@ export class Bottle extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BottleProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: BottleConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to spawn this Bottle upon. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

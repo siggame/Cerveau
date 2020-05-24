@@ -2,10 +2,10 @@ import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     UnitAttackArgs,
     UnitBuryArgs,
+    UnitConstructorArgs,
     UnitDepositArgs,
     UnitDigArgs,
     UnitMoveArgs,
-    UnitProperties,
     UnitRestArgs,
     UnitSplitArgs,
     UnitWithdrawArgs,
@@ -99,14 +99,12 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            UnitProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: UnitConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Unit upon. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

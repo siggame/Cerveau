@@ -407,6 +407,86 @@ export interface WebProperties {
     strength?: number;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * BroodMother instances.
+ */
+export type BroodMotherConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderArgs & BroodMotherProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Cutter instances.
+ */
+export type CutterConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderlingArgs & CutterProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Nest instances.
+ */
+export type NestConstructorArgs<T extends {} = {}> = Readonly<
+    NestProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseSpidersPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Spider instances.
+ */
+export type SpiderConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Spiderling instances.
+ */
+export type SpiderlingConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderArgs & SpiderlingProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Spitter instances.
+ */
+export type SpitterConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderlingArgs & SpitterProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Weaver instances.
+ */
+export type WeaverConstructorArgs<T extends {} = {}> = Readonly<
+    SpiderlingArgs & WeaverProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Web instances.
+ */
+export type WebConstructorArgs<T extends {} = {}> = Readonly<
+    WebProperties & T
+>;
+
 export * from "./brood-mother";
 export * from "./cutter";
 export * from "./game-object";

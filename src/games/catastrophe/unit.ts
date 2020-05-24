@@ -3,13 +3,13 @@ import {
     UnitAttackArgs,
     UnitChangeJobArgs,
     UnitConstructArgs,
+    UnitConstructorArgs,
     UnitConvertArgs,
     UnitDeconstructArgs,
     UnitDropArgs,
     UnitHarvestArgs,
     UnitMoveArgs,
     UnitPickupArgs,
-    UnitProperties,
     UnitRestArgs,
 } from "./";
 import { GameObject } from "./game-object";
@@ -105,13 +105,11 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            UnitProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: UnitConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

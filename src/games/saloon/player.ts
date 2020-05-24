@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseSaloonPlayer } from "./";
+import { BaseSaloonPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
@@ -105,7 +105,7 @@ export class Player extends GameObject implements BaseSaloonPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BaseSaloonPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

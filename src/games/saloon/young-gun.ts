@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { YoungGunCallInArgs, YoungGunProperties } from "./";
+import { YoungGunCallInArgs, YoungGunConstructorArgs } from "./";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -49,18 +49,16 @@ export class YoungGun extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            YoungGunProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: YoungGunConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The controlling Player of this YoungGun. */
                 owner: Player;
                 /** The Tile to spawn this YoungGun upon. */
                 tile: Tile;
                 /** The previous Tile he would have moved from, used to figure out movement direction. */
                 previousTile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

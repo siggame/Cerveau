@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseClasses, GameObjectProperties } from "./";
+import { BaseClasses, GameObjectConstructorArgs } from "./";
 import { ChessGame } from "./game";
 import { ChessGameManager } from "./game-manager";
 
@@ -53,7 +53,7 @@ export class GameObject extends BaseClasses.GameObject {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<GameObjectProperties>,
+        args: GameObjectConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -1,6 +1,6 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { TileProperties } from "./";
+import { TileConstructorArgs } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -112,7 +112,7 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<TileProperties>,
+        args: TileConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

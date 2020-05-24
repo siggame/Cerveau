@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { FurnishingProperties } from "./";
+import { FurnishingConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -52,14 +52,12 @@ export class Furnishing extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            FurnishingProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: FurnishingConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to spawn this Furnishing upon. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

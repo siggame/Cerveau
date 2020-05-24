@@ -1,9 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     CowboyActArgs,
+    CowboyConstructorArgs,
     CowboyMoveArgs,
     CowboyPlayArgs,
-    CowboyProperties,
 } from "./";
 import { Furnishing } from "./furnishing";
 import { GameObject } from "./game-object";
@@ -106,17 +106,15 @@ export class Cowboy extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            CowboyProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: CowboyConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The owner of this Cowboy. */
                 owner: Player;
 
                 /** The Tile to spawn this cowboy on. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

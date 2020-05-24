@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BasePiratesPlayer } from "./";
+import { BasePiratesPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Port } from "./port";
@@ -93,7 +93,7 @@ export class Player extends GameObject implements BasePiratesPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BasePiratesPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

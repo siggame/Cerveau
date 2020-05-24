@@ -120,6 +120,22 @@ export interface PlayerProperties {
     won?: boolean;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseChessPlayer & PlayerProperties & T
+>;
+
 export * from "./game-object";
 export * from "./player";
 export * from "./game";

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { StructureProperties } from "./";
+import { StructureConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -61,16 +61,14 @@ export class Structure extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            StructureProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: StructureConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile this Structure will be placed on. */
                 tile: Tile;
                 /** The type of structure it is. */
                 type: StructureType;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

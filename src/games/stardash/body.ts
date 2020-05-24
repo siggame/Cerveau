@@ -1,8 +1,8 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
+    BodyConstructorArgs,
     BodyNextXArgs,
     BodyNextYArgs,
-    BodyProperties,
     BodySpawnArgs,
 } from "./";
 import { GameObject } from "./game-object";
@@ -88,17 +88,15 @@ export class Body extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            BodyProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: BodyConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The angle */
                 angle: number;
                 /** The distance */
                 distance: number;
                 // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

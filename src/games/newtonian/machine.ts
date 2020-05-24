@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { MachineProperties } from "./";
+import { MachineConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -65,15 +65,13 @@ export class Machine extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            MachineProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: MachineConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to spawn this Machine upon. */
                 tile: Tile;
                 // You can add more constructor args in here
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -425,6 +425,46 @@ export interface UnitWithdrawArgs {
     amount?: number;
 }
 
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BasePiratesPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Port instances.
+ */
+export type PortConstructorArgs<T extends {} = {}> = Readonly<
+    PortProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tile instances.
+ */
+export type TileConstructorArgs<T extends {} = {}> = Readonly<
+    TileProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Unit instances.
+ */
+export type UnitConstructorArgs<T extends {} = {}> = Readonly<
+    UnitProperties & T
+>;
+
 export * from "./game-object";
 export * from "./player";
 export * from "./port";

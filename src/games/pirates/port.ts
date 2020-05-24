@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { PortProperties, PortSpawnArgs } from "./";
+import { PortConstructorArgs, PortSpawnArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -50,14 +50,12 @@ export class Port extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            PortProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: PortConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Port upon. */
                 tile: Tile;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

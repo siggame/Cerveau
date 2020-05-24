@@ -1,9 +1,8 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
+    BroodMotherConstructorArgs,
     BroodMotherConsumeArgs,
-    BroodMotherProperties,
     BroodMotherSpawnArgs,
-    SpiderArgs,
 } from "./";
 import { Player } from "./player";
 import { Spider } from "./spider";
@@ -44,14 +43,12 @@ export class BroodMother extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpiderArgs & BroodMotherProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: BroodMotherConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                     /** The Nest this BroodMother exists upon. */
                     nest: Nest;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

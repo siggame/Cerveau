@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseCheckersPlayer } from "./";
+import { BaseCheckersPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { Checker } from "./checker";
 import { GameObject } from "./game-object";
@@ -82,7 +82,7 @@ export class Player extends GameObject implements BaseCheckersPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BaseCheckersPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

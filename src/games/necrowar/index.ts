@@ -549,6 +549,62 @@ export interface UnitJobProperties {
     title?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
 }
 
+/**
+ * The default args passed to a constructor function for
+ * GameObject instances.
+ */
+export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
+    GameObjectProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Player instances.
+ */
+export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
+    BaseNecrowarPlayer & PlayerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tile instances.
+ */
+export type TileConstructorArgs<T extends {} = {}> = Readonly<
+    TileProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Tower instances.
+ */
+export type TowerConstructorArgs<T extends {} = {}> = Readonly<
+    TowerProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * TowerJob instances.
+ */
+export type TowerJobConstructorArgs<T extends {} = {}> = Readonly<
+    TowerJobProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * Unit instances.
+ */
+export type UnitConstructorArgs<T extends {} = {}> = Readonly<
+    UnitProperties & T
+>;
+
+/**
+ * The default args passed to a constructor function for
+ * UnitJob instances.
+ */
+export type UnitJobConstructorArgs<T extends {} = {}> = Readonly<
+    UnitJobProperties & T
+>;
+
 export * from "./game-object";
 export * from "./player";
 export * from "./tile";

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseStardashPlayer } from "./";
+import { BaseStardashPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
@@ -101,7 +101,7 @@ export class Player extends GameObject implements BaseStardashPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<BaseStardashPlayer>,
+        args: PlayerConstructorArgs,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

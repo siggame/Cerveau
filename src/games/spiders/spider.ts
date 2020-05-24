@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { SpiderProperties } from "./";
+import { SpiderConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Player } from "./player";
@@ -44,14 +44,12 @@ export class Spider extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpiderProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: SpiderConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The controlling Player of this Spider. */
                 owner: Player;
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { SpawnerProperties } from "./";
+import { SpawnerConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -52,16 +52,14 @@ export class Spawner extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<
-            SpawnerProperties & {
-                // <<-- Creer-Merge: constructor-args -->>
+        args: SpawnerConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Spawner upon. */
                 tile: Tile;
                 /** The type of resource this Spawner produces. */
                 type: "branches" | "food";
-                // <<-- /Creer-Merge: constructor-args -->>
-            }
-        >,
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
