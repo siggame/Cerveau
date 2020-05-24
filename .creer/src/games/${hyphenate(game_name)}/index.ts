@@ -173,8 +173,8 @@ for game_obj_name in sort_dict_keys(game_objs):
     game_objs_factory.append(game_obj_name)
 %>
 export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {${'}' if not game_objs_factory else ''}
-% for game_obj_name in game_objs_factory:
-${shared['cerveau']['block_comment']('    ', {
+% for i, game_obj_name in enumerate(game_objs_factory):
+${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', {
     'description': 'Creates a new {} in the Game and tracks it for all players.'.format(game_obj_name),
     'arguments': [
         {
@@ -185,13 +185,20 @@ ${shared['cerveau']['block_comment']('    ', {
     'returns': {
         'description': 'A new {} hooked up in the game and ready for you to use.'.format(game_obj_name)
     }
-})}
-    public ${uncapitalize(game_obj_name)}<T extends ${game_obj_name}Args>(
-        args: Readonly<T>,
-    ): ${game_obj_name} & T {
+})}<%
+def build_fac_top():
+    fac_sig = '    public {}<T extends {}Args>('.format(uncapitalize(game_obj_name), game_obj_name)
+    fac_arg = 'args: Readonly<T>'
+    fac_ret = '): {} & T {{'.format(game_obj_name)
+
+    fac_one_line = fac_sig + fac_arg + fac_ret
+    if (len(fac_one_line) < 80):
+        return fac_one_line
+    return fac_sig + '\n        ' + fac_arg + ',\n    ' + fac_ret
+%>
+${build_fac_top()}
         return this.createGameObject("${game_obj_name}", ${game_obj_name}, args);
     }
-
 % endfor
 ${'}\n' if game_objs_factory else ''}
 /**
