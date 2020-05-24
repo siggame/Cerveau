@@ -63,7 +63,7 @@ export class Job extends GameObject {
     constructor(
         args: JobConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                // You can add more constructor args in here
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

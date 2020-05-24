@@ -66,8 +66,7 @@ export class CatastropheGameSettingsManager extends BaseClasses.GameSettings {
             },
 
             neutralMaterials: {
-                description:
-                    "The number of materials in a neutral Structure.",
+                description: "The number of materials in a neutral Structure.",
                 // <<-- Creer-Merge: neutralMaterials -->>
                 default: 200,
                 // <<-- /Creer-Merge: neutralMaterials -->>
