@@ -439,19 +439,25 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 export type BuildingArgs = FirstArgumentFromConstructor<typeof Building>;
 
 /** The arguments used to construct a FireDepartment */
-export type FireDepartmentArgs = FirstArgumentFromConstructor<typeof FireDepartment>;
+export type FireDepartmentArgs = FirstArgumentFromConstructor<
+    typeof FireDepartment
+>;
 
 /** The arguments used to construct a Forecast */
 export type ForecastArgs = FirstArgumentFromConstructor<typeof Forecast>;
 
 /** The arguments used to construct a PoliceDepartment */
-export type PoliceDepartmentArgs = FirstArgumentFromConstructor<typeof PoliceDepartment>;
+export type PoliceDepartmentArgs = FirstArgumentFromConstructor<
+    typeof PoliceDepartment
+>;
 
 /** The arguments used to construct a Warehouse */
 export type WarehouseArgs = FirstArgumentFromConstructor<typeof Warehouse>;
 
 /** The arguments used to construct a WeatherStation */
-export type WeatherStationArgs = FirstArgumentFromConstructor<typeof WeatherStation>;
+export type WeatherStationArgs = FirstArgumentFromConstructor<
+    typeof WeatherStation
+>;
 
 /**
  * The factory that **must** be used to create any game objects in

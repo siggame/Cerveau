@@ -177,8 +177,17 @@ import { AI } from "./ai";
 <%
     if game_obj_name in ['Player', 'GameObject']:
         continue
+
+    oargs_front = 'export type ' + game_obj_name + 'Args = FirstArgumentFromConstructor<'
+    oargs_typeof = 'typeof ' + game_obj_name
+    oargs_end = ">;"
+
+    oargs = oargs_front + oargs_typeof + oargs_end
+
+    if len(oargs) > 80:
+        oargs = oargs_front + '\n    ' + oargs_typeof + '\n' + oargs_end
 %>/** The arguments used to construct a ${game_obj_name} */
-export type ${game_obj_name}Args = FirstArgumentFromConstructor<typeof ${game_obj_name}>;
+${oargs}
 
 % endfor
 /**
