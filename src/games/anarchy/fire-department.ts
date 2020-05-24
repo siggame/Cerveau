@@ -1,8 +1,8 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     BuildingArgs,
-    IFireDepartmentExtinguishArgs,
-    IFireDepartmentProperties,
+    FireDepartmentExtinguishArgs,
+    FireDepartmentProperties,
 } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
@@ -37,12 +37,11 @@ export class FireDepartment extends Building {
      */
     constructor(
         args: Readonly<
-            BuildingArgs &
-                IFireDepartmentProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            BuildingArgs & FireDepartmentProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -75,7 +74,7 @@ export class FireDepartment extends Building {
     protected invalidateExtinguish(
         player: Player,
         building: Building,
-    ): void | string | IFireDepartmentExtinguishArgs {
+    ): void | string | FireDepartmentExtinguishArgs {
         // <<-- Creer-Merge: invalidate-extinguish -->>
 
         const invalid = this.invalidateBribe(player);

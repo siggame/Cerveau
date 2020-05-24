@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IPortProperties, IPortSpawnArgs } from "./";
+import { PortProperties, PortSpawnArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -51,7 +51,7 @@ export class Port extends GameObject {
      */
     constructor(
         args: Readonly<
-            IPortProperties & {
+            PortProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Port upon. */
                 tile: Tile;
@@ -89,7 +89,7 @@ export class Port extends GameObject {
     protected invalidateSpawn(
         player: Player,
         type: "crew" | "ship",
-    ): void | string | IPortSpawnArgs {
+    ): void | string | PortSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
 
         if (this.owner !== player) {

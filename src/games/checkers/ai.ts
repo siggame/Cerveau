@@ -21,7 +21,9 @@ export class AI extends BaseClasses.AI {
      * @param checker - The checker that was captured.
      */
     public async gotCaptured(checker: Checker): Promise<void> {
-        this.executeOrder("gotCaptured", checker);
+        this.executeOrder("gotCaptured",
+            checker,
+        );
     }
 
     // <<-- Creer-Merge: functions -->>

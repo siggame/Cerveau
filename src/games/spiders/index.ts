@@ -31,10 +31,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Spiders game
+ * The interface that the Player for the Spiders game
  * must implement from mixed in game logic.
  */
-export interface IBaseSpidersPlayer
+export interface BaseSpidersPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer {}
@@ -79,8 +79,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an BroodMother. */
-export interface IBroodMotherProperties {
+/** All the possible properties for BroodMother instances. */
+export interface BroodMotherProperties {
     /**
      * How many eggs the BroodMother has to spawn Spiderlings this turn.
      */
@@ -98,7 +98,7 @@ export interface IBroodMotherProperties {
  * object of this interface from the invalidate functions, the value(s) you set
  * will be used in the actual function.
  */
-export interface IBroodMotherConsumeArgs {
+export interface BroodMotherConsumeArgs {
     /**
      * The Spiderling to consume. It must be on the same Nest as this
      * BroodMother.
@@ -111,7 +111,7 @@ export interface IBroodMotherConsumeArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IBroodMotherSpawnArgs {
+export interface BroodMotherSpawnArgs {
     /**
      * The string name of the Spiderling class you want to Spawn. Must be
      * 'Spitter', 'Weaver', or 'Cutter'.
@@ -119,8 +119,8 @@ export interface IBroodMotherSpawnArgs {
     spiderlingType?: "Spitter" | "Weaver" | "Cutter";
 }
 
-/** All the possible properties for an Cutter. */
-export interface ICutterProperties {
+/** All the possible properties for Cutter instances. */
+export interface CutterProperties {
     /**
      * The Web that this Cutter is trying to cut. Undefined if not cutting.
      */
@@ -132,7 +132,7 @@ export interface ICutterProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICutterCutArgs {
+export interface CutterCutArgs {
     /**
      * The web you want to Cut. Must be connected to the Nest this Cutter is
      * currently on.
@@ -140,11 +140,11 @@ export interface ICutterCutArgs {
     web?: Web;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Nest. */
-export interface INestProperties {
+/** All the possible properties for Nest instances. */
+export interface NestProperties {
     /**
      * The Player that 'controls' this Nest as they have the most Spiders on
      * this nest.
@@ -172,8 +172,8 @@ export interface INestProperties {
     y?: number;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * This player's BroodMother. If it dies they lose the game.
      */
@@ -236,8 +236,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Spider. */
-export interface ISpiderProperties {
+/** All the possible properties for Spider instances. */
+export interface SpiderProperties {
     /**
      * If this Spider is dead and has been removed from the game.
      */
@@ -255,20 +255,13 @@ export interface ISpiderProperties {
     owner?: Player;
 }
 
-/** All the possible properties for an Spiderling. */
-export interface ISpiderlingProperties {
+/** All the possible properties for Spiderling instances. */
+export interface SpiderlingProperties {
     /**
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    busy?:
-        | ""
-        | "Moving"
-        | "Attacking"
-        | "Strengthening"
-        | "Weakening"
-        | "Cutting"
-        | "Spitting";
+    busy?: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -298,7 +291,7 @@ export interface ISpiderlingProperties {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface ISpiderlingAttackArgs {
+export interface SpiderlingAttackArgs {
     /**
      * The Spiderling to attack.
      */
@@ -310,15 +303,15 @@ export interface ISpiderlingAttackArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface ISpiderlingMoveArgs {
+export interface SpiderlingMoveArgs {
     /**
      * The Web you want to move across to the other Nest.
      */
     web?: Web;
 }
 
-/** All the possible properties for an Spitter. */
-export interface ISpitterProperties {
+/** All the possible properties for Spitter instances. */
+export interface SpitterProperties {
     /**
      * The Nest that this Spitter is creating a Web to spit at, thus connecting
      * them. Undefined if not spitting.
@@ -331,7 +324,7 @@ export interface ISpitterProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ISpitterSpitArgs {
+export interface SpitterSpitArgs {
     /**
      * The Nest you want to spit a Web to, thus connecting that Nest and the
      * one the Spitter is on.
@@ -339,8 +332,8 @@ export interface ISpitterSpitArgs {
     nest?: Nest;
 }
 
-/** All the possible properties for an Weaver. */
-export interface IWeaverProperties {
+/** All the possible properties for Weaver instances. */
+export interface WeaverProperties {
     /**
      * The Web that this Weaver is strengthening. Undefined if not
      * strengthening.
@@ -358,7 +351,7 @@ export interface IWeaverProperties {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IWeaverStrengthenArgs {
+export interface WeaverStrengthenArgs {
     /**
      * The web you want to strengthen. Must be connected to the Nest this
      * Weaver is currently on.
@@ -371,7 +364,7 @@ export interface IWeaverStrengthenArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IWeaverWeakenArgs {
+export interface WeaverWeakenArgs {
     /**
      * The web you want to weaken. Must be connected to the Nest this Weaver is
      * currently on.
@@ -379,8 +372,8 @@ export interface IWeaverWeakenArgs {
     web?: Web;
 }
 
-/** All the possible properties for an Web. */
-export interface IWebProperties {
+/** All the possible properties for Web instances. */
+export interface WebProperties {
     /**
      * How long this Web is, i.e., the distance between its nestA and nestB.
      */
@@ -886,15 +879,7 @@ export const Namespace = makeNamespace({
                 busy: {
                     typeName: "string",
                     defaultValue: "",
-                    literals: [
-                        "",
-                        "Moving",
-                        "Attacking",
-                        "Strengthening",
-                        "Weakening",
-                        "Cutting",
-                        "Spitting",
-                    ],
+                    literals: ["", "Moving", "Attacking", "Strengthening", "Weakening", "Cutting", "Spitting"],
                 },
                 movingOnWeb: {
                     typeName: "gameObject",

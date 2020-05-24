@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IJobProperties, IJobRecruitArgs } from "./";
+import { JobProperties, JobRecruitArgs } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -79,7 +79,7 @@ export class Job extends GameObject {
      */
     constructor(
         args: Readonly<
-            IJobProperties & {
+            JobProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>
@@ -117,7 +117,7 @@ export class Job extends GameObject {
     protected invalidateRecruit(
         player: Player,
         tile: Tile,
-    ): void | string | IJobRecruitArgs {
+    ): void | string | JobRecruitArgs {
         // <<-- Creer-Merge: invalidate-recruit -->>
 
         if (!player || player !== this.game.currentPlayer) {

@@ -1,12 +1,12 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IBeaverAttackArgs,
-    IBeaverBuildLodgeArgs,
-    IBeaverDropArgs,
-    IBeaverHarvestArgs,
-    IBeaverMoveArgs,
-    IBeaverPickupArgs,
-    IBeaverProperties,
+    BeaverAttackArgs,
+    BeaverBuildLodgeArgs,
+    BeaverDropArgs,
+    BeaverHarvestArgs,
+    BeaverMoveArgs,
+    BeaverPickupArgs,
+    BeaverProperties,
 } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -89,7 +89,7 @@ export class Beaver extends GameObject {
      */
     constructor(
         args: Readonly<
-            IBeaverProperties & {
+            BeaverProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Job of this Beaver. */
                 job: Job;
@@ -142,7 +142,7 @@ export class Beaver extends GameObject {
     protected invalidateAttack(
         player: Player,
         beaver: Beaver,
-    ): void | string | IBeaverAttackArgs {
+    ): void | string | BeaverAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = this.invalidate(player);
@@ -226,7 +226,7 @@ export class Beaver extends GameObject {
      */
     protected invalidateBuildLodge(
         player: Player,
-    ): void | string | IBeaverBuildLodgeArgs {
+    ): void | string | BeaverBuildLodgeArgs {
         // <<-- Creer-Merge: invalidate-buildLodge -->>
 
         const invalid = this.invalidate(player);
@@ -310,7 +310,7 @@ export class Beaver extends GameObject {
         tile: Tile,
         resource: "branches" | "food",
         amount: number = 0,
-    ): void | string | IBeaverDropArgs {
+    ): void | string | BeaverDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const invalid = this.invalidate(player);
@@ -398,7 +398,7 @@ export class Beaver extends GameObject {
     protected invalidateHarvest(
         player: Player,
         spawner: Spawner,
-    ): void | string | IBeaverHarvestArgs {
+    ): void | string | BeaverHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const invalid = this.invalidate(player);
@@ -482,7 +482,7 @@ export class Beaver extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IBeaverMoveArgs {
+    ): void | string | BeaverMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, true);
@@ -580,7 +580,7 @@ export class Beaver extends GameObject {
         tile: Tile,
         resource: "branches" | "food",
         amount: number = 0,
-    ): void | string | IBeaverPickupArgs {
+    ): void | string | BeaverPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const invalid = this.invalidate(player);

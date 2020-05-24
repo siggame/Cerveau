@@ -33,10 +33,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Catastrophe game
+ * The interface that the Player for the Catastrophe game
  * must implement from mixed in game logic.
  */
-export interface IBaseCatastrophePlayer
+export interface BaseCatastrophePlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer,
@@ -83,11 +83,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * The amount of energy this Job normally uses to perform its actions.
      */
@@ -111,13 +111,7 @@ export interface IJobProperties {
     /**
      * The Job title.
      */
-    title?:
-        | "fresh human"
-        | "cat overlord"
-        | "soldier"
-        | "gatherer"
-        | "builder"
-        | "missionary";
+    title?: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
 
     /**
      * The amount of food per turn this Unit consumes. If there isn't enough
@@ -126,8 +120,8 @@ export interface IJobProperties {
     upkeep?: number;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The overlord cat Unit owned by this Player.
      */
@@ -197,8 +191,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Structure. */
-export interface IStructureProperties {
+/** All the possible properties for Structure instances. */
+export interface StructureProperties {
     /**
      * The range of this Structure's effect. For example, a radius of 1 means
      * this Structure affects a 3x3 square centered on this Structure.
@@ -228,8 +222,8 @@ export interface IStructureProperties {
     type?: "neutral" | "shelter" | "monument" | "wall" | "road";
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The number of food dropped on this Tile.
      */
@@ -295,8 +289,8 @@ export interface ITileProperties {
     y?: number;
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether this Unit has performed its action this turn.
      */
@@ -368,7 +362,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -380,7 +374,7 @@ export interface IUnitAttackArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitChangeJobArgs {
+export interface UnitChangeJobArgs {
     /**
      * The name of the Job to change to.
      */
@@ -392,7 +386,7 @@ export interface IUnitChangeJobArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitConstructArgs {
+export interface UnitConstructArgs {
     /**
      * The Tile to construct the Structure on. It must have enough materials on
      * it for a Structure to be constructed.
@@ -409,7 +403,7 @@ export interface IUnitConstructArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitConvertArgs {
+export interface UnitConvertArgs {
     /**
      * The Tile with the Unit to convert.
      */
@@ -421,7 +415,7 @@ export interface IUnitConvertArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IUnitDeconstructArgs {
+export interface UnitDeconstructArgs {
     /**
      * The Tile to deconstruct. It must have a Structure on it.
      */
@@ -433,7 +427,7 @@ export interface IUnitDeconstructArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitDropArgs {
+export interface UnitDropArgs {
     /**
      * The Tile to drop materials/food on.
      */
@@ -454,7 +448,7 @@ export interface IUnitDropArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitHarvestArgs {
+export interface UnitHarvestArgs {
     /**
      * The Tile you want to harvest.
      */
@@ -466,7 +460,7 @@ export interface IUnitHarvestArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -478,7 +472,7 @@ export interface IUnitMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitPickupArgs {
+export interface UnitPickupArgs {
     /**
      * The Tile to pickup materials/food from.
      */
@@ -499,7 +493,8 @@ export interface IUnitPickupArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitRestArgs {}
+export interface UnitRestArgs {
+}
 
 export * from "./game-object";
 export * from "./job";
@@ -782,14 +777,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "fresh human",
-                    literals: [
-                        "fresh human",
-                        "cat overlord",
-                        "soldier",
-                        "gatherer",
-                        "builder",
-                        "missionary",
-                    ],
+                    literals: ["fresh human", "cat overlord", "soldier", "gatherer", "builder", "missionary"],
                 },
                 upkeep: {
                     typeName: "int",
@@ -878,13 +866,7 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "neutral",
-                    literals: [
-                        "neutral",
-                        "shelter",
-                        "monument",
-                        "wall",
-                        "road",
-                    ],
+                    literals: ["neutral", "shelter", "monument", "wall", "road"],
                 },
             },
             functions: {},
@@ -1017,12 +999,7 @@ export const Namespace = makeNamespace({
                             argName: "job",
                             typeName: "string",
                             defaultValue: "soldier",
-                            literals: [
-                                "soldier",
-                                "gatherer",
-                                "builder",
-                                "missionary",
-                            ],
+                            literals: ["soldier", "gatherer", "builder", "missionary"],
                         },
                     ],
                     invalidValue: false,
@@ -1042,13 +1019,7 @@ export const Namespace = makeNamespace({
                             argName: "type",
                             typeName: "string",
                             defaultValue: "neutral",
-                            literals: [
-                                "neutral",
-                                "shelter",
-                                "monument",
-                                "wall",
-                                "road",
-                            ],
+                            literals: ["neutral", "shelter", "monument", "wall", "road"],
                         },
                     ],
                     invalidValue: false,

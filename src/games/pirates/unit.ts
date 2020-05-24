@@ -1,14 +1,14 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IUnitAttackArgs,
-    IUnitBuryArgs,
-    IUnitDepositArgs,
-    IUnitDigArgs,
-    IUnitMoveArgs,
-    IUnitProperties,
-    IUnitRestArgs,
-    IUnitSplitArgs,
-    IUnitWithdrawArgs,
+    UnitAttackArgs,
+    UnitBuryArgs,
+    UnitDepositArgs,
+    UnitDigArgs,
+    UnitMoveArgs,
+    UnitProperties,
+    UnitRestArgs,
+    UnitSplitArgs,
+    UnitWithdrawArgs,
 } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -100,7 +100,7 @@ export class Unit extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitProperties & {
+            UnitProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Unit upon. */
                 tile: Tile;
@@ -144,7 +144,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         target: "crew" | "ship",
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true);
@@ -321,7 +321,7 @@ export class Unit extends GameObject {
     protected invalidateBury(
         player: Player,
         amount: number,
-    ): void | string | IUnitBuryArgs {
+    ): void | string | UnitBuryArgs {
         // <<-- Creer-Merge: invalidate-bury -->>
 
         const reason = this.invalidate(player);
@@ -411,7 +411,7 @@ export class Unit extends GameObject {
     protected invalidateDeposit(
         player: Player,
         amount: number = 0,
-    ): void | string | IUnitDepositArgs {
+    ): void | string | UnitDepositArgs {
         // <<-- Creer-Merge: invalidate-deposit -->>
 
         const reason = this.invalidate(player);
@@ -510,7 +510,7 @@ export class Unit extends GameObject {
     protected invalidateDig(
         player: Player,
         amount: number = 0,
-    ): void | string | IUnitDigArgs {
+    ): void | string | UnitDigArgs {
         // <<-- Creer-Merge: invalidate-dig -->>
 
         const reason = this.invalidate(player);
@@ -579,7 +579,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const reason = this.invalidate(player);
@@ -692,7 +692,7 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
+    protected invalidateRest(player: Player): void | string | UnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true);
@@ -769,7 +769,7 @@ export class Unit extends GameObject {
         tile: Tile,
         amount: number = 1,
         gold: number = 0,
-    ): void | string | IUnitSplitArgs {
+    ): void | string | UnitSplitArgs {
         // <<-- Creer-Merge: invalidate-split -->>
 
         const reason = this.invalidate(player);
@@ -946,7 +946,7 @@ export class Unit extends GameObject {
     protected invalidateWithdraw(
         player: Player,
         amount: number = 0,
-    ): void | string | IUnitWithdrawArgs {
+    ): void | string | UnitWithdrawArgs {
         // <<-- Creer-Merge: invalidate-withdraw -->>
 
         const reason = this.invalidate(player);

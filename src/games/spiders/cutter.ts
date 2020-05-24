@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ICutterCutArgs, ICutterProperties, SpiderlingArgs } from "./";
+import { CutterCutArgs, CutterProperties, SpiderlingArgs } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
 import { Web } from "./web";
@@ -33,12 +33,11 @@ export class Cutter extends Spiderling {
      */
     constructor(
         args: Readonly<
-            SpiderlingArgs &
-                ICutterProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            SpiderlingArgs & CutterProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -95,7 +94,7 @@ export class Cutter extends Spiderling {
     protected invalidateCut(
         player: Player,
         web: Web,
-    ): void | string | ICutterCutArgs {
+    ): void | string | CutterCutArgs {
         // <<-- Creer-Merge: invalidate-cut -->>
 
         const invalid = super.invalidate(player);

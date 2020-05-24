@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IBaseSpidersPlayer } from "./";
+import { BaseSpidersPlayer } from "./";
 import { AI } from "./ai";
 import { BroodMother } from "./brood-mother";
 import { GameObject } from "./game-object";
@@ -12,7 +12,7 @@ import { Spider } from "./spider";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseSpidersPlayer {
+export class Player extends GameObject implements BaseSpidersPlayer {
     /** The AI controlling this Player */
     public readonly ai!: AI;
 
@@ -93,7 +93,7 @@ export class Player extends GameObject implements IBaseSpidersPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseSpidersPlayer>,
+        args: Readonly<BaseSpidersPlayer>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

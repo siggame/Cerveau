@@ -1,13 +1,13 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IUnitAttackArgs,
-    IUnitDashArgs,
-    IUnitMineArgs,
-    IUnitMoveArgs,
-    IUnitProperties,
-    IUnitSafeArgs,
-    IUnitShootdownArgs,
-    IUnitTransferArgs,
+    UnitAttackArgs,
+    UnitDashArgs,
+    UnitMineArgs,
+    UnitMoveArgs,
+    UnitProperties,
+    UnitSafeArgs,
+    UnitShootdownArgs,
+    UnitTransferArgs,
 } from "./";
 import { Body } from "./body";
 import { GameObject } from "./game-object";
@@ -124,7 +124,7 @@ export class Unit extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitProperties & {
+            UnitProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Job to set this Unit to. */
                 job: Job;
@@ -170,7 +170,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         enemy: Unit,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         // check widely consistent things.
@@ -339,7 +339,7 @@ export class Unit extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): void | string | IUnitDashArgs {
+    ): void | string | UnitDashArgs {
         // <<-- Creer-Merge: invalidate-dash -->>
 
         // check widely consistent things.
@@ -430,7 +430,7 @@ export class Unit extends GameObject {
     protected invalidateMine(
         player: Player,
         body: Body,
-    ): void | string | IUnitMineArgs {
+    ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
 
         // check widely consistent things.
@@ -569,7 +569,7 @@ export class Unit extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // check widely consistent things.
@@ -666,7 +666,7 @@ export class Unit extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): void | string | IUnitSafeArgs {
+    ): void | string | UnitSafeArgs {
         // <<-- Creer-Merge: invalidate-safe -->>
 
         // make sure the unit is in bounds.
@@ -739,7 +739,7 @@ export class Unit extends GameObject {
     protected invalidateShootdown(
         player: Player,
         missile: Projectile,
-    ): void | string | IUnitShootdownArgs {
+    ): void | string | UnitShootdownArgs {
         // <<-- Creer-Merge: invalidate-shootdown -->>
         // check widely consistent things.
         const reason = this.invalidate(player, true);
@@ -854,7 +854,7 @@ export class Unit extends GameObject {
         unit: Unit,
         amount: number,
         material: "genarium" | "rarium" | "legendarium" | "mythicite",
-    ): void | string | IUnitTransferArgs {
+    ): void | string | UnitTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
 
         // Check all the arguments for transfer here and try to

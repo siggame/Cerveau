@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IWarehouseIgniteArgs, IWarehouseProperties } from "./";
+import { BuildingArgs, WarehouseIgniteArgs, WarehouseProperties } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -42,12 +42,11 @@ export class Warehouse extends Building {
      */
     constructor(
         args: Readonly<
-            BuildingArgs &
-                IWarehouseProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            BuildingArgs & WarehouseProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -88,7 +87,7 @@ export class Warehouse extends Building {
     protected invalidateIgnite(
         player: Player,
         building: Building,
-    ): void | string | IWarehouseIgniteArgs {
+    ): void | string | WarehouseIgniteArgs {
         // <<-- Creer-Merge: invalidate-ignite -->>
 
         const invalid = this.invalidateBribe(player);

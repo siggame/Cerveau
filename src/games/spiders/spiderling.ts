@@ -1,9 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    ISpiderlingAttackArgs,
-    ISpiderlingMoveArgs,
-    ISpiderlingProperties,
     SpiderArgs,
+    SpiderlingAttackArgs,
+    SpiderlingMoveArgs,
+    SpiderlingProperties,
 } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
@@ -18,14 +18,7 @@ import { removeElements } from "~/utils";
  * When empty string this Spiderling is not busy, and can act. Otherwise a
  * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
  */
-export type SpiderlingBusy =
-    | ""
-    | "Moving"
-    | "Attacking"
-    | "Strengthening"
-    | "Weakening"
-    | "Cutting"
-    | "Spitting";
+export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
 /**
  * A Spider spawned by the BroodMother.
@@ -35,14 +28,7 @@ export class Spiderling extends Spider {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    public busy!:
-        | ""
-        | "Moving"
-        | "Attacking"
-        | "Strengthening"
-        | "Weakening"
-        | "Cutting"
-        | "Spitting";
+    public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -84,12 +70,11 @@ export class Spiderling extends Spider {
      */
     constructor(
         args: Readonly<
-            SpiderArgs &
-                ISpiderlingProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            SpiderArgs & SpiderlingProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -190,7 +175,7 @@ export class Spiderling extends Spider {
     protected invalidateAttack(
         player: Player,
         spiderling: Spiderling,
-    ): void | string | ISpiderlingAttackArgs {
+    ): void | string | SpiderlingAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = super.invalidate(player);
@@ -286,7 +271,7 @@ export class Spiderling extends Spider {
     protected invalidateMove(
         player: Player,
         web: Web,
-    ): void | string | ISpiderlingMoveArgs {
+    ): void | string | SpiderlingMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = super.invalidate(player);

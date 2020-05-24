@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IUnitJobProperties } from "./";
+import { UnitJobProperties } from "./";
 import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
@@ -10,14 +10,7 @@ import { GameObject } from "./game-object";
  * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
  * 'wraith' or 'horseman'.
  */
-export type UnitJobTitle =
-    | "worker"
-    | "zombie"
-    | "ghoul"
-    | "hound"
-    | "abomination"
-    | "wraith"
-    | "horseman";
+export type UnitJobTitle = "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
 
 /**
  * Information about a unit's job/type.
@@ -62,14 +55,7 @@ export class UnitJob extends GameObject {
      * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
      * 'wraith' or 'horseman'.
      */
-    public readonly title!:
-        | "worker"
-        | "zombie"
-        | "ghoul"
-        | "hound"
-        | "abomination"
-        | "wraith"
-        | "horseman";
+    public readonly title!: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -87,7 +73,7 @@ export class UnitJob extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitJobProperties & {
+            UnitJobProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>

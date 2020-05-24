@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IJobProperties } from "./";
+import { JobProperties } from "./";
 import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
@@ -10,12 +10,7 @@ import { GameObject } from "./game-object";
  * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or 'miner'.
  * (in this order from 0-4).
  */
-export type JobTitle =
-    | "corvette"
-    | "missileboat"
-    | "martyr"
-    | "transport"
-    | "miner";
+export type JobTitle = "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
 /**
  * Information about a unit's job.
@@ -55,12 +50,7 @@ export class Job extends GameObject {
      * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
      * 'miner'. (in this order from 0-4).
      */
-    public readonly title!:
-        | "corvette"
-        | "missileboat"
-        | "martyr"
-        | "transport"
-        | "miner";
+    public readonly title!: "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
     /**
      * How much money it costs to spawn a unit.
@@ -83,7 +73,7 @@ export class Job extends GameObject {
      */
     constructor(
         args: Readonly<
-            IJobProperties & {
+            JobProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>

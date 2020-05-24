@@ -1,7 +1,7 @@
-import { IJobProperties } from "./";
+import { JobProperties } from "./";
 
 /** The default stats for each job if not overridden */
-const defaultJobStats: IJobProperties = {
+const defaultJobStats: JobProperties = {
     actionCost: 75,
     carryLimit: 10,
     moves: 4,
@@ -10,7 +10,7 @@ const defaultJobStats: IJobProperties = {
 };
 
 /** The stats for each job in the Catastrophe game */
-export const jobStats: { [jobName: string]: IJobProperties } = {
+export const jobStats: { [jobName: string]: JobProperties } = {
     "fresh human": {
         actionCost: 0,
         upkeep: 1,

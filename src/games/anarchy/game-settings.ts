@@ -15,10 +15,9 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() {
-        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(super.schema || (this as any).schema),
 
             // Anarchy game specific settings
@@ -96,7 +95,8 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
                 description:
-                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
@@ -104,7 +104,8 @@ export class AnarchyGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description:
-                    "The maximum number of turns before the game is force ended and a winner is determined.",
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
         });
     }

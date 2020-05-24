@@ -33,10 +33,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Newtonian game
+ * The interface that the Player for the Newtonian game
  * must implement from mixed in game logic.
  */
-export interface IBaseNewtonianPlayer
+export interface BaseNewtonianPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer,
@@ -83,11 +83,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * How many combined resources a unit with this Job can hold at once.
      */
@@ -114,8 +114,8 @@ export interface IJobProperties {
     title?: "intern" | "manager" | "physicist";
 }
 
-/** All the possible properties for an Machine. */
-export interface IMachineProperties {
+/** All the possible properties for Machine instances. */
+export interface MachineProperties {
     /**
      * What type of ore the machine takes it. Also determines the type of
      * material it outputs. (redium or blueium).
@@ -150,8 +150,8 @@ export interface IMachineProperties {
     worked?: number;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -236,8 +236,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The amount of blueium on this tile.
      */
@@ -332,8 +332,8 @@ export interface ITileProperties {
     y?: number;
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn.
      */
@@ -404,7 +404,7 @@ export interface IUnitProperties {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitActArgs {
+export interface UnitActArgs {
     /**
      * The tile the unit acts on.
      */
@@ -416,7 +416,7 @@ export interface IUnitActArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -428,7 +428,7 @@ export interface IUnitAttackArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitDropArgs {
+export interface UnitDropArgs {
     /**
      * The tile the materials will be dropped on.
      */
@@ -450,7 +450,7 @@ export interface IUnitDropArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -462,7 +462,7 @@ export interface IUnitMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitPickupArgs {
+export interface UnitPickupArgs {
     /**
      * The tile the materials will be picked up from.
      */
@@ -1019,12 +1019,7 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: [
-                                "redium ore",
-                                "redium",
-                                "blueium",
-                                "blueium ore",
-                            ],
+                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
                         },
                     ],
                     invalidValue: false,
@@ -1062,12 +1057,7 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: [
-                                "redium ore",
-                                "redium",
-                                "blueium",
-                                "blueium ore",
-                            ],
+                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
                         },
                     ],
                     invalidValue: false,

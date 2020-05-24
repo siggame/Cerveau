@@ -15,10 +15,9 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() {
-        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(super.schema || (this as any).schema),
 
             // Stardash game specific settings
@@ -28,24 +27,28 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1,
                 // <<-- /Creer-Merge: dashCost -->>
             },
+
             dashDistance: {
                 description: "The distance traveled each turn by dashing.",
                 // <<-- Creer-Merge: dashDistance -->>
                 default: 50,
                 // <<-- /Creer-Merge: dashDistance -->>
             },
+
             genariumValue: {
                 description: "The value of every unit of genarium.",
                 // <<-- Creer-Merge: genariumValue -->>
                 default: 2,
                 // <<-- /Creer-Merge: genariumValue -->>
             },
+
             legendariumValue: {
                 description: "The value of every unit of legendarium.",
                 // <<-- Creer-Merge: legendariumValue -->>
                 default: 10,
                 // <<-- /Creer-Merge: legendariumValue -->>
             },
+
             maxAsteroid: {
                 description:
                     "The highest amount of material, that can be in a " +
@@ -54,30 +57,33 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 default: 250,
                 // <<-- /Creer-Merge: maxAsteroid -->>
             },
+
             minAsteroid: {
                 description:
-                    "The smallest amount of material, that can be in " +
-                    "a asteroid.",
+                    "The smallest amount of material, that can be in a " +
+                    "asteroid.",
                 // <<-- Creer-Merge: minAsteroid -->>
                 default: 100,
                 // <<-- /Creer-Merge: minAsteroid -->>
             },
+
             miningSpeed: {
                 description:
-                    "The rate at which miners grab minerals from " +
-                    "asteroids.",
+                    "The rate at which miners grab minerals from asteroids.",
                 // <<-- Creer-Merge: miningSpeed -->>
                 default: 10,
                 // <<-- /Creer-Merge: miningSpeed -->>
             },
+
             mythiciteAmount: {
                 description:
-                    "The amount of mythicite that spawns at the start " +
-                    "of the game.",
+                    "The amount of mythicite that spawns at the start of " +
+                    "the game.",
                 // <<-- Creer-Merge: mythiciteAmount -->>
                 default: 2000,
                 // <<-- /Creer-Merge: mythiciteAmount -->>
             },
+
             orbitsProtected: {
                 description:
                     "The number of orbit updates you cannot mine the " +
@@ -86,6 +92,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 default: 20,
                 // <<-- /Creer-Merge: orbitsProtected -->>
             },
+
             oreRarityGenarium: {
                 description:
                     "The rarity modifier of the most common ore. This " +
@@ -94,89 +101,100 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 default: 5,
                 // <<-- /Creer-Merge: oreRarityGenarium -->>
             },
+
             oreRarityLegendarium: {
                 description:
-                    "The rarity modifier of the rarest ore. This " +
-                    "controls how much spawns.",
+                    "The rarity modifier of the rarest ore. This controls " +
+                    "how much spawns.",
                 // <<-- Creer-Merge: oreRarityLegendarium -->>
                 default: 1,
                 // <<-- /Creer-Merge: oreRarityLegendarium -->>
             },
+
             oreRarityRarium: {
                 description:
-                    "The rarity modifier of the second rarest ore. " +
-                    "This controls how much spawns.",
+                    "The rarity modifier of the second rarest ore. This " +
+                    "controls how much spawns.",
                 // <<-- Creer-Merge: oreRarityRarium -->>
                 default: 2,
                 // <<-- /Creer-Merge: oreRarityRarium -->>
             },
+
             planetEnergyCap: {
-                description: "The amount of energy a planet can hold at once.",
+                description:
+                    "The amount of energy a planet can hold at once.",
                 // <<-- Creer-Merge: planetEnergyCap -->>
                 default: 5000,
                 // <<-- /Creer-Merge: planetEnergyCap -->>
             },
+
             planetRechargeRate: {
                 description:
-                    "The amount of energy the planets restore each " +
-                    "round.",
+                    "The amount of energy the planets restore each round.",
                 // <<-- Creer-Merge: planetRechargeRate -->>
                 default: 50,
                 // <<-- /Creer-Merge: planetRechargeRate -->>
             },
+
             projectileRadius: {
                 description: "The standard size of ships.",
                 // <<-- Creer-Merge: projectileRadius -->>
                 default: 5,
                 // <<-- /Creer-Merge: projectileRadius -->>
             },
+
             projectileSpeed: {
                 description:
-                    "The amount of distance missiles travel through " +
-                    "space.",
+                    "The amount of distance missiles travel through space.",
                 // <<-- Creer-Merge: projectileSpeed -->>
                 default: 100,
                 // <<-- /Creer-Merge: projectileSpeed -->>
             },
+
             rariumValue: {
                 description: "The value of every unit of rarium.",
                 // <<-- Creer-Merge: rariumValue -->>
                 default: 5,
                 // <<-- /Creer-Merge: rariumValue -->>
             },
+
             regenerateRate: {
                 description: "The regeneration rate of asteroids.",
                 // <<-- Creer-Merge: regenerateRate -->>
                 default: 0,
                 // <<-- /Creer-Merge: regenerateRate -->>
             },
+
             shipRadius: {
                 description: "The standard size of ships.",
                 // <<-- Creer-Merge: shipRadius -->>
                 default: 20,
                 // <<-- /Creer-Merge: shipRadius -->>
             },
+
             sizeX: {
                 description: "The size of the map in the X direction.",
                 // <<-- Creer-Merge: sizeX -->>
                 default: 3200,
                 // <<-- /Creer-Merge: sizeX -->>
             },
+
             sizeY: {
                 description: "The size of the map in the Y direction.",
                 // <<-- Creer-Merge: sizeY -->>
                 default: 1800,
                 // <<-- /Creer-Merge: sizeY -->>
             },
+
             turnsToOrbit: {
                 description:
-                    "The number of turns it takes for a asteroid to " +
-                    "orbit the sun. (Asteroids move after each " +
-                    "players turn).",
+                    "The number of turns it takes for a asteroid to orbit " +
+                    "the sun. (Asteroids move after each players turn).",
                 // <<-- Creer-Merge: turnsToOrbit -->>
                 default: 40,
                 // <<-- /Creer-Merge: turnsToOrbit -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
             // you can add more settings here, e.g.:
@@ -206,7 +224,8 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
                 description:
-                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
@@ -214,7 +233,8 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description:
-                    "The maximum number of turns before the game is force ended and a winner is determined.",
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
         });
     }

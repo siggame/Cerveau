@@ -1,8 +1,8 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     BuildingArgs,
-    IPoliceDepartmentProperties,
-    IPoliceDepartmentRaidArgs,
+    PoliceDepartmentProperties,
+    PoliceDepartmentRaidArgs,
 } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
@@ -32,12 +32,11 @@ export class PoliceDepartment extends Building {
      */
     constructor(
         args: Readonly<
-            BuildingArgs &
-                IPoliceDepartmentProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            BuildingArgs & PoliceDepartmentProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -70,7 +69,7 @@ export class PoliceDepartment extends Building {
     protected invalidateRaid(
         player: Player,
         warehouse: Warehouse,
-    ): void | string | IPoliceDepartmentRaidArgs {
+    ): void | string | PoliceDepartmentRaidArgs {
         // <<-- Creer-Merge: invalidate-raid -->>
 
         const invalid = this.invalidateBribe(player);

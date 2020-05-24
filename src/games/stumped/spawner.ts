@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ISpawnerProperties } from "./";
+import { SpawnerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -53,7 +53,7 @@ export class Spawner extends GameObject {
      */
     constructor(
         args: Readonly<
-            ISpawnerProperties & {
+            SpawnerProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to place this Spawner upon. */
                 tile: Tile;

@@ -1,9 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
     BuildingArgs,
-    IWeatherStationIntensifyArgs,
-    IWeatherStationProperties,
-    IWeatherStationRotateArgs,
+    WeatherStationIntensifyArgs,
+    WeatherStationProperties,
+    WeatherStationRotateArgs,
 } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
@@ -32,12 +32,11 @@ export class WeatherStation extends Building {
      */
     constructor(
         args: Readonly<
-            BuildingArgs &
-                IWeatherStationProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            BuildingArgs & WeatherStationProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -71,7 +70,7 @@ export class WeatherStation extends Building {
     protected invalidateIntensify(
         player: Player,
         negative: boolean = false,
-    ): void | string | IWeatherStationIntensifyArgs {
+    ): void | string | WeatherStationIntensifyArgs {
         // <<-- Creer-Merge: invalidate-intensify -->>
 
         const invalid = this.invalidateBribe(player);
@@ -148,7 +147,7 @@ export class WeatherStation extends Building {
     protected invalidateRotate(
         player: Player,
         counterclockwise: boolean = false,
-    ): void | string | IWeatherStationRotateArgs {
+    ): void | string | WeatherStationRotateArgs {
         // <<-- Creer-Merge: invalidate-rotate -->>
 
         const invalid = this.invalidateBribe(player);

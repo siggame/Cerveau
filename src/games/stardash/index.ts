@@ -31,10 +31,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Stardash game
+ * The interface that the Player for the Stardash game
  * must implement from mixed in game logic.
  */
-export interface IBaseStardashPlayer
+export interface BaseStardashPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer {}
@@ -79,8 +79,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Body. */
-export interface IBodyProperties {
+/** All the possible properties for Body instances. */
+export interface BodyProperties {
     /**
      * The amount of material the object has, or energy if it is a planet.
      */
@@ -95,12 +95,7 @@ export interface IBodyProperties {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    materialType?:
-        | "none"
-        | "genarium"
-        | "rarium"
-        | "legendarium"
-        | "mythicite";
+    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -128,7 +123,7 @@ export interface IBodyProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodyNextXArgs {
+export interface BodyNextXArgs {
     /**
      * The number of turns in the future you wish to check.
      */
@@ -140,7 +135,7 @@ export interface IBodyNextXArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodyNextYArgs {
+export interface BodyNextYArgs {
     /**
      * The number of turns in the future you wish to check.
      */
@@ -152,7 +147,7 @@ export interface IBodyNextYArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodySpawnArgs {
+export interface BodySpawnArgs {
     /**
      * The x value of the spawned unit.
      */
@@ -167,11 +162,11 @@ export interface IBodySpawnArgs {
     title?: string;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * How many combined resources a unit with this Job can hold at once.
      */
@@ -214,8 +209,8 @@ export interface IJobProperties {
     unitCost?: number;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -285,8 +280,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Projectile. */
-export interface IProjectileProperties {
+/** All the possible properties for Projectile instances. */
+export interface ProjectileProperties {
     /**
      * The remaining health of the projectile.
      */
@@ -318,8 +313,8 @@ export interface IProjectileProperties {
     y?: number;
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn.
      */
@@ -411,7 +406,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Unit being attacked.
      */
@@ -423,7 +418,7 @@ export interface IUnitAttackArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitDashArgs {
+export interface UnitDashArgs {
     /**
      * The x value of the destination's coordinates.
      */
@@ -439,7 +434,7 @@ export interface IUnitDashArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMineArgs {
+export interface UnitMineArgs {
     /**
      * The object to be mined.
      */
@@ -451,7 +446,7 @@ export interface IUnitMineArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The x value of the destination's coordinates.
      */
@@ -467,7 +462,7 @@ export interface IUnitMoveArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitSafeArgs {
+export interface UnitSafeArgs {
     /**
      * The x position of the location you wish to arrive.
      */
@@ -483,7 +478,7 @@ export interface IUnitSafeArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitShootdownArgs {
+export interface UnitShootdownArgs {
     /**
      * The projectile being shot down.
      */
@@ -495,7 +490,7 @@ export interface IUnitShootdownArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitTransferArgs {
+export interface UnitTransferArgs {
     /**
      * The unit you are grabbing the resources from.
      */
@@ -782,13 +777,7 @@ export const Namespace = makeNamespace({
                 materialType: {
                     typeName: "string",
                     defaultValue: "none",
-                    literals: [
-                        "none",
-                        "genarium",
-                        "rarium",
-                        "legendarium",
-                        "mythicite",
-                    ],
+                    literals: ["none", "genarium", "rarium", "legendarium", "mythicite"],
                 },
                 owner: {
                     typeName: "gameObject",
@@ -905,13 +894,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "corvette",
-                    literals: [
-                        "corvette",
-                        "missileboat",
-                        "martyr",
-                        "transport",
-                        "miner",
-                    ],
+                    literals: ["corvette", "missileboat", "martyr", "transport", "miner"],
                 },
                 unitCost: {
                     typeName: "int",
@@ -1171,12 +1154,7 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "genarium",
-                            literals: [
-                                "genarium",
-                                "rarium",
-                                "legendarium",
-                                "mythicite",
-                            ],
+                            literals: ["genarium", "rarium", "legendarium", "mythicite"],
                         },
                     ],
                     invalidValue: false,

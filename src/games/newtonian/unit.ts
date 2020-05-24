@@ -1,11 +1,11 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IUnitActArgs,
-    IUnitAttackArgs,
-    IUnitDropArgs,
-    IUnitMoveArgs,
-    IUnitPickupArgs,
-    IUnitProperties,
+    UnitActArgs,
+    UnitAttackArgs,
+    UnitDropArgs,
+    UnitMoveArgs,
+    UnitPickupArgs,
+    UnitProperties,
 } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -16,7 +16,7 @@ import { Tile } from "./tile";
 // any additional imports you want can be placed here safely between creer runs
 
 const materialNameToVariableName = (
-    material: Required<IUnitPickupArgs>["material"],
+    material: Required<UnitPickupArgs>["material"],
 ) => {
     switch (material) {
         case "redium":
@@ -118,7 +118,7 @@ export class Unit extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitProperties & {
+            UnitProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Job this Unit will have. */
                 job: Job;
@@ -158,7 +158,7 @@ export class Unit extends GameObject {
     protected invalidateAct(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitActArgs {
+    ): void | string | UnitActArgs {
         // <<-- Creer-Merge: invalidate-act -->>
 
         // Check all the arguments for act here and try to
@@ -344,7 +344,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         // Check all the arguments for attack here and try to
@@ -449,7 +449,7 @@ export class Unit extends GameObject {
         tile: Tile,
         amount: number,
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
-    ): void | string | IUnitDropArgs {
+    ): void | string | UnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
         const reason = this.invalidate(player, false);
         // if there is a reason, return it.
@@ -532,7 +532,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // check widespread reasons.
@@ -629,7 +629,7 @@ export class Unit extends GameObject {
         tile: Tile,
         amount: number,
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
-    ): void | string | IUnitPickupArgs {
+    ): void | string | UnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         // Check all the arguments for pickup here and try to

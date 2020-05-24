@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ICheckerIsMineArgs, ICheckerMoveArgs, ICheckerProperties } from "./";
+import { CheckerIsMineArgs, CheckerMoveArgs, CheckerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -47,7 +47,7 @@ export class Checker extends GameObject {
      */
     constructor(
         args: Readonly<
-            ICheckerProperties & {
+            CheckerProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Player that owns this Checker. */
                 owner: Player;
@@ -83,7 +83,7 @@ export class Checker extends GameObject {
      */
     protected invalidateIsMine(
         player: Player,
-    ): void | string | ICheckerIsMineArgs {
+    ): void | string | CheckerIsMineArgs {
         // <<-- Creer-Merge: invalidate-isMine -->>
         // Check all the arguments for isMine here and try to
         // return a string explaining why the input is wrong.
@@ -124,7 +124,7 @@ export class Checker extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): void | string | ICheckerMoveArgs {
+    ): void | string | CheckerMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         if (this.game.currentPlayer !== player) {

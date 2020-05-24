@@ -1,9 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IBodyNextXArgs,
-    IBodyNextYArgs,
-    IBodyProperties,
-    IBodySpawnArgs,
+    BodyNextXArgs,
+    BodyNextYArgs,
+    BodyProperties,
+    BodySpawnArgs,
 } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -21,12 +21,7 @@ export type BodyBodyType = "planet" | "asteroid" | "sun";
  * The type of material the celestial body has. Either 'none', 'genarium',
  * 'rarium', 'legendarium', or 'mythicite'.
  */
-export type BodyMaterialType =
-    | "none"
-    | "genarium"
-    | "rarium"
-    | "legendarium"
-    | "mythicite";
+export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
 /**
  * A celestial body located within the game.
@@ -46,12 +41,7 @@ export class Body extends GameObject {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    public readonly materialType!:
-        | "none"
-        | "genarium"
-        | "rarium"
-        | "legendarium"
-        | "mythicite";
+    public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -99,7 +89,7 @@ export class Body extends GameObject {
      */
     constructor(
         args: Readonly<
-            IBodyProperties & {
+            BodyProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The angle */
                 angle: number;
@@ -182,7 +172,7 @@ export class Body extends GameObject {
     protected invalidateNextX(
         player: Player,
         num: number,
-    ): void | string | IBodyNextXArgs {
+    ): void | string | BodyNextXArgs {
         // <<-- Creer-Merge: invalidate-nextX -->>
         // Check all the arguments for nextX here and try to
         // return a string explaining why the input is wrong.
@@ -239,7 +229,7 @@ export class Body extends GameObject {
     protected invalidateNextY(
         player: Player,
         num: number,
-    ): void | string | IBodyNextYArgs {
+    ): void | string | BodyNextYArgs {
         // <<-- Creer-Merge: invalidate-nextY -->>
         // Check all the arguments for nextY here and try to
         // return a string explaining why the input is wrong.
@@ -300,7 +290,7 @@ export class Body extends GameObject {
         x: number,
         y: number,
         title: string,
-    ): void | string | IBodySpawnArgs {
+    ): void | string | BodySpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
         // Check if it is the spawning player's turn
         if (!player || player !== this.game.currentPlayer) {

@@ -1,9 +1,9 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IWeaverProperties,
-    IWeaverStrengthenArgs,
-    IWeaverWeakenArgs,
     SpiderlingArgs,
+    WeaverProperties,
+    WeaverStrengthenArgs,
+    WeaverWeakenArgs,
 } from "./";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
@@ -45,12 +45,11 @@ export class Weaver extends Spiderling {
      */
     constructor(
         args: Readonly<
-            SpiderlingArgs &
-                IWeaverProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            SpiderlingArgs & WeaverProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -117,7 +116,7 @@ export class Weaver extends Spiderling {
     protected invalidateStrengthen(
         player: Player,
         web: Web,
-    ): void | string | IWeaverStrengthenArgs {
+    ): void | string | WeaverStrengthenArgs {
         // <<-- Creer-Merge: invalidate-strengthen -->>
 
         const invalid = this.invalidateWeave(player, web, false);
@@ -160,7 +159,7 @@ export class Weaver extends Spiderling {
     protected invalidateWeaken(
         player: Player,
         web: Web,
-    ): void | string | IWeaverWeakenArgs {
+    ): void | string | WeaverWeakenArgs {
         // <<-- Creer-Merge: invalidate-weaken -->>
 
         const invalid = this.invalidateWeave(player, web, true);

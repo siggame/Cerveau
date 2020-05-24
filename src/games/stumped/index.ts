@@ -33,10 +33,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Stumped game
+ * The interface that the Player for the Stumped game
  * must implement from mixed in game logic.
  */
-export interface IBaseStumpedPlayer
+export interface BaseStumpedPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer,
@@ -83,8 +83,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Beaver. */
-export interface IBeaverProperties {
+/** All the possible properties for Beaver instances. */
+export interface BeaverProperties {
     /**
      * The number of actions remaining for the Beaver this turn.
      */
@@ -142,7 +142,7 @@ export interface IBeaverProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverAttackArgs {
+export interface BeaverAttackArgs {
     /**
      * The Beaver to attack. Must be on an adjacent Tile.
      */
@@ -154,14 +154,15 @@ export interface IBeaverAttackArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IBeaverBuildLodgeArgs {}
+export interface BeaverBuildLodgeArgs {
+}
 
 /**
  * Argument overrides for Beaver's drop function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverDropArgs {
+export interface BeaverDropArgs {
     /**
      * The Tile to drop branches/food on. Must be the same Tile that the Beaver
      * is on, or an adjacent one.
@@ -183,7 +184,7 @@ export interface IBeaverDropArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverHarvestArgs {
+export interface BeaverHarvestArgs {
     /**
      * The Spawner you want to harvest. Must be on an adjacent Tile.
      */
@@ -195,7 +196,7 @@ export interface IBeaverHarvestArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverMoveArgs {
+export interface BeaverMoveArgs {
     /**
      * The Tile this Beaver should move to.
      */
@@ -207,7 +208,7 @@ export interface IBeaverMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverPickupArgs {
+export interface BeaverPickupArgs {
     /**
      * The Tile to pickup branches/food from. Must be the same Tile that the
      * Beaver is on, or an adjacent one.
@@ -224,11 +225,11 @@ export interface IBeaverPickupArgs {
     amount?: number;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * The number of actions this Job can make per turn.
      */
@@ -285,7 +286,7 @@ export interface IJobProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IJobRecruitArgs {
+export interface JobRecruitArgs {
     /**
      * The Tile that is a lodge owned by you that you wish to spawn the Beaver
      * of this Job on.
@@ -293,8 +294,8 @@ export interface IJobRecruitArgs {
     tile?: Tile;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The list of Beavers owned by this Player.
      */
@@ -352,8 +353,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Spawner. */
-export interface ISpawnerProperties {
+/** All the possible properties for Spawner instances. */
+export interface SpawnerProperties {
     /**
      * True if this Spawner has been harvested this turn, and it will not heal
      * at the end of the turn, false otherwise.
@@ -377,8 +378,8 @@ export interface ISpawnerProperties {
     type?: "food" | "branches";
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The Beaver on this Tile if present, otherwise undefined.
      */

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IWebProperties } from "./";
+import { WebProperties } from "./";
 import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Spiderling } from "./spiderling";
@@ -65,7 +65,7 @@ export class Web extends GameObject {
      */
     constructor(
         args: Readonly<
-            IWebProperties & {
+            WebProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>

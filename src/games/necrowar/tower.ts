@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ITowerAttackArgs, ITowerProperties } from "./";
+import { TowerAttackArgs, TowerProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -59,7 +59,7 @@ export class Tower extends GameObject {
      */
     constructor(
         args: Readonly<
-            ITowerProperties & {
+            TowerProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The TowerJob to assign this tower to */
                 job: TowerJob;
@@ -100,7 +100,7 @@ export class Tower extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | ITowerAttackArgs {
+    ): void | string | TowerAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
         const range = 2.2; // Attack range
 

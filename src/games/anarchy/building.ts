@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IBuildingProperties } from "./";
+import { BuildingProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -92,7 +92,7 @@ export class Building extends GameObject {
      */
     constructor(
         args: Readonly<
-            IBuildingProperties & {
+            BuildingProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The owner of this building. */
                 owner: Player;

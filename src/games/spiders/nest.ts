@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { INestProperties } from "./";
+import { NestProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Spider } from "./spider";
@@ -56,7 +56,7 @@ export class Nest extends GameObject {
      */
     constructor(
         args: Readonly<
-            INestProperties & {
+            NestProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>

@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IProjectileProperties } from "./";
+import { ProjectileProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Unit } from "./unit";
@@ -58,7 +58,7 @@ export class Projectile extends GameObject {
      */
     constructor(
         args: Readonly<
-            IProjectileProperties & {
+            ProjectileProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The target */
                 target: Unit;

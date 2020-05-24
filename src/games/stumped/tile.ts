@@ -1,6 +1,6 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties } from "./";
+import { TileProperties } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -112,7 +112,7 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
+        args: Readonly<TileProperties>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
@@ -208,7 +208,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction.
+     * Gets a neighbor in a particular direction
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -233,7 +233,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * ToString override.
+     * toString override.
      *
      * @returns A string representation of the Tile.
      */

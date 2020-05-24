@@ -31,10 +31,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Checkers game
+ * The interface that the Player for the Checkers game
  * must implement from mixed in game logic.
  */
-export interface IBaseCheckersPlayer
+export interface BaseCheckersPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer {}
@@ -79,8 +79,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Checker. */
-export interface ICheckerProperties {
+/** All the possible properties for Checker instances. */
+export interface CheckerProperties {
     /**
      * If the checker has been kinged and can move backwards.
      */
@@ -107,14 +107,15 @@ export interface ICheckerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICheckerIsMineArgs {}
+export interface CheckerIsMineArgs {
+}
 
 /**
  * Argument overrides for Checker's move function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICheckerMoveArgs {
+export interface CheckerMoveArgs {
     /**
      * The x coordinate to move to.
      */
@@ -125,11 +126,11 @@ export interface ICheckerMoveArgs {
     y?: number;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * All the checkers currently in the game owned by this player.
      */

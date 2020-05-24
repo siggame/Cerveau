@@ -33,10 +33,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Pirates game
+ * The interface that the Player for the Pirates game
  * must implement from mixed in game logic.
  */
-export interface IBasePiratesPlayer
+export interface BasePiratesPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer,
@@ -83,11 +83,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -150,8 +150,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Port. */
-export interface IPortProperties {
+/** All the possible properties for Port instances. */
+export interface PortProperties {
     /**
      * For players, how much more gold this Port can spend this turn. For
      * merchants, how much gold this Port has accumulated (it will spawn a ship
@@ -181,15 +181,15 @@ export interface IPortProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IPortSpawnArgs {
+export interface PortSpawnArgs {
     /**
      * What type of Unit to create ('crew' or 'ship').
      */
     type?: "crew" | "ship";
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * (Visualizer only) Whether this tile is deep sea or grassy. This has no
      * effect on gameplay, but feel free to use it if you want.
@@ -251,8 +251,8 @@ export interface ITileProperties {
     y?: number;
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether this Unit has performed its action this turn.
      */
@@ -320,7 +320,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -337,7 +337,7 @@ export interface IUnitAttackArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitBuryArgs {
+export interface UnitBuryArgs {
     /**
      * How much gold this Unit should bury. Amounts <= 0 will bury as much as
      * possible.
@@ -350,7 +350,7 @@ export interface IUnitBuryArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitDepositArgs {
+export interface UnitDepositArgs {
     /**
      * The amount of gold to deposit. Amounts <= 0 will deposit all the gold on
      * this Unit.
@@ -363,7 +363,7 @@ export interface IUnitDepositArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitDigArgs {
+export interface UnitDigArgs {
     /**
      * How much gold this Unit should take. Amounts <= 0 will dig up as much as
      * possible.
@@ -376,7 +376,7 @@ export interface IUnitDigArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -388,14 +388,15 @@ export interface IUnitMoveArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitRestArgs {}
+export interface UnitRestArgs {
+}
 
 /**
  * Argument overrides for Unit's split function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitSplitArgs {
+export interface UnitSplitArgs {
     /**
      * The Tile to move the crew to.
      */
@@ -417,7 +418,7 @@ export interface IUnitSplitArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitWithdrawArgs {
+export interface UnitWithdrawArgs {
     /**
      * The amount of gold to withdraw. Amounts <= 0 will withdraw everything.
      */

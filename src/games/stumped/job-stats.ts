@@ -1,7 +1,7 @@
-import { IJobProperties } from "./";
+import { JobProperties } from "./";
 
 /** The default stats for each job if not overridden */
-const defaultJobStats: IJobProperties = {
+const defaultJobStats: JobProperties = {
     cost: 3,
     damage: 1,
     health: 3,
@@ -14,7 +14,7 @@ const defaultJobStats: IJobProperties = {
 };
 
 /** The job stats for each Job, indexed by job name. */
-export const jobStats: { [jobName: string]: IJobProperties } = {
+export const jobStats: { [jobName: string]: JobProperties } = {
     Basic: {},
     Fighter: {
         cost: 12,

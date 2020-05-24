@@ -1,8 +1,8 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IBroodMotherConsumeArgs,
-    IBroodMotherProperties,
-    IBroodMotherSpawnArgs,
+    BroodMotherConsumeArgs,
+    BroodMotherProperties,
+    BroodMotherSpawnArgs,
     SpiderArgs,
 } from "./";
 import { Player } from "./player";
@@ -45,13 +45,12 @@ export class BroodMother extends Spider {
      */
     constructor(
         args: Readonly<
-            SpiderArgs &
-                IBroodMotherProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            SpiderArgs & BroodMotherProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     /** The Nest this BroodMother exists upon. */
                     nest: Nest;
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -85,7 +84,7 @@ export class BroodMother extends Spider {
     protected invalidateConsume(
         player: Player,
         spiderling: Spiderling,
-    ): void | string | IBroodMotherConsumeArgs {
+    ): void | string | BroodMotherConsumeArgs {
         // <<-- Creer-Merge: invalidate-consume -->>
         // Check all the arguments for consume here and try to
         // return a string explaining why the input is wrong.
@@ -132,7 +131,7 @@ export class BroodMother extends Spider {
     protected invalidateSpawn(
         player: Player,
         spiderlingType: "Spitter" | "Weaver" | "Cutter",
-    ): void | string | IBroodMotherSpawnArgs {
+    ): void | string | BroodMotherSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.

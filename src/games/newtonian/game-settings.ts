@@ -15,10 +15,9 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() {
-        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(super.schema || (this as any).schema),
 
             // Newtonian game specific settings
@@ -30,47 +29,53 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 min: 0,
                 // <<-- /Creer-Merge: internCap -->>
             },
+
             managerCap: {
                 description:
-                    "The maximum number of managers a player can " + "have.",
+                    "The maximum number of managers a player can have.",
                 // <<-- Creer-Merge: managerCap -->>
                 default: 4,
                 min: 0,
                 // <<-- /Creer-Merge: managerCap -->>
             },
+
             materialSpawn: {
                 description:
-                    "The number of materials that spawn per spawn " + "cycle.",
+                    "The number of materials that spawn per spawn cycle.",
                 // <<-- Creer-Merge: materialSpawn -->>
                 default: 2,
                 min: 0,
                 // <<-- /Creer-Merge: materialSpawn -->>
             },
+
             physicistCap: {
                 description:
-                    "The maximum number of physicists a player can " + "have.",
+                    "The maximum number of physicists a player can have.",
                 // <<-- Creer-Merge: physicistCap -->>
                 default: 4,
                 min: 0,
                 // <<-- /Creer-Merge: physicistCap -->>
             },
+
             refinedValue: {
                 description:
-                    "The amount of victory points added when a " +
-                    "refined ore is consumed by the generator.",
+                    "The amount of victory points added when a refined ore " +
+                    "is consumed by the generator.",
                 // <<-- Creer-Merge: refinedValue -->>
                 default: 5,
                 min: 1,
                 // <<-- /Creer-Merge: refinedValue -->>
             },
+
             regenerateRate: {
                 description:
-                    "The percent of max HP regained when a unit end " +
-                    "their turn on a tile owned by their player.",
+                    "The percent of max HP regained when a unit end their " +
+                    "turn on a tile owned by their player.",
                 // <<-- Creer-Merge: regenerateRate -->>
                 default: 0.5,
                 // <<-- /Creer-Merge: regenerateRate -->>
             },
+
             spawnTime: {
                 description: "The amount of turns it takes a unit to spawn.",
                 // <<-- Creer-Merge: spawnTime -->>
@@ -78,32 +83,36 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: spawnTime -->>
             },
+
             stunTime: {
                 description:
-                    "The amount of turns a unit cannot do anything " +
-                    "when stunned.",
+                    "The amount of turns a unit cannot do anything when " +
+                    "stunned.",
                 // <<-- Creer-Merge: stunTime -->>
                 default: 2,
                 min: 1,
                 // <<-- /Creer-Merge: stunTime -->>
             },
+
             timeImmune: {
                 description:
-                    "The number turns a unit is immune to being " + "stunned.",
+                    "The number turns a unit is immune to being stunned.",
                 // <<-- Creer-Merge: timeImmune -->>
                 default: 4,
                 min: 1,
                 // <<-- /Creer-Merge: timeImmune -->>
             },
+
             victoryAmount: {
                 description:
-                    "The amount of combined heat and pressure that " +
-                    "you need to win.",
+                    "The amount of combined heat and pressure that you need" +
+                    " to win.",
                 // <<-- Creer-Merge: victoryAmount -->>
                 default: 800,
                 min: 1,
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
             // you can add more settings here, e.g.:
@@ -133,7 +142,8 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
                 description:
-                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
@@ -141,7 +151,8 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description:
-                    "The maximum number of turns before the game is force ended and a winner is determined.",
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
 
             // Tiled settings
@@ -151,7 +162,8 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
                 description:
-                    "The width (in Tiles) for the game map to be initialized to.",
+                    "The width (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
@@ -159,7 +171,8 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
                 description:
-                    "The height (in Tiles) for the game map to be initialized to.",
+                    "The height (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
         });
     }

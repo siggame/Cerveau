@@ -1,10 +1,10 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import {
-    ITileProperties,
-    ITileResArgs,
-    ITileSpawnUnitArgs,
-    ITileSpawnWorkerArgs,
+    TileProperties,
+    TileResArgs,
+    TileSpawnUnitArgs,
+    TileSpawnWorkerArgs,
 } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -157,7 +157,7 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
+        args: Readonly<TileProperties>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
@@ -249,7 +249,7 @@ export class Tile extends GameObject implements BaseTile {
     protected invalidateRes(
         player: Player,
         num: number,
-    ): void | string | ITileResArgs {
+    ): void | string | TileResArgs {
         // <<-- Creer-Merge: invalidate-res -->>
 
         // Player invalidation
@@ -375,7 +375,7 @@ export class Tile extends GameObject implements BaseTile {
     protected invalidateSpawnUnit(
         player: Player,
         title: string,
-    ): void | string | ITileSpawnUnitArgs {
+    ): void | string | TileSpawnUnitArgs {
         // <<-- Creer-Merge: invalidate-spawnUnit -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -521,7 +521,7 @@ export class Tile extends GameObject implements BaseTile {
      */
     protected invalidateSpawnWorker(
         player: Player,
-    ): void | string | ITileSpawnWorkerArgs {
+    ): void | string | TileSpawnWorkerArgs {
         // <<-- Creer-Merge: invalidate-spawnWorker -->>
 
         if (!player || player !== this.game.currentPlayer) {

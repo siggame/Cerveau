@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ITowerJobProperties } from "./";
+import { TowerJobProperties } from "./";
 import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
@@ -9,12 +9,7 @@ import { GameObject } from "./game-object";
 /**
  * The type title. 'arrow', 'aoe', 'ballista', 'cleansing', or 'castle'.
  */
-export type TowerJobTitle =
-    | "arrow"
-    | "aoe"
-    | "ballista"
-    | "cleansing"
-    | "castle";
+export type TowerJobTitle = "arrow" | "aoe" | "ballista" | "cleansing" | "castle";
 
 /**
  * Information about a tower's job/type.
@@ -54,12 +49,7 @@ export class TowerJob extends GameObject {
     /**
      * The type title. 'arrow', 'aoe', 'ballista', 'cleansing', or 'castle'.
      */
-    public readonly title!:
-        | "arrow"
-        | "aoe"
-        | "ballista"
-        | "cleansing"
-        | "castle";
+    public readonly title!: "arrow" | "aoe" | "ballista" | "cleansing" | "castle";
 
     /**
      * How many turns have to take place between this type's attacks.
@@ -82,7 +72,7 @@ export class TowerJob extends GameObject {
      */
     constructor(
         args: Readonly<
-            ITowerJobProperties & {
+            TowerJobProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>

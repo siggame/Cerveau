@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IMachineProperties } from "./";
+import { MachineProperties } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -66,7 +66,7 @@ export class Machine extends GameObject {
      */
     constructor(
         args: Readonly<
-            IMachineProperties & {
+            MachineProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The Tile to spawn this Machine upon. */
                 tile: Tile;

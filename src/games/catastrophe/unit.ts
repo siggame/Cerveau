@@ -1,16 +1,16 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IUnitAttackArgs,
-    IUnitChangeJobArgs,
-    IUnitConstructArgs,
-    IUnitConvertArgs,
-    IUnitDeconstructArgs,
-    IUnitDropArgs,
-    IUnitHarvestArgs,
-    IUnitMoveArgs,
-    IUnitPickupArgs,
-    IUnitProperties,
-    IUnitRestArgs,
+    UnitAttackArgs,
+    UnitChangeJobArgs,
+    UnitConstructArgs,
+    UnitConvertArgs,
+    UnitDeconstructArgs,
+    UnitDropArgs,
+    UnitHarvestArgs,
+    UnitMoveArgs,
+    UnitPickupArgs,
+    UnitProperties,
+    UnitRestArgs,
 } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
@@ -106,7 +106,7 @@ export class Unit extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitProperties & {
+            UnitProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 // You can add more constructor args in here
                 // <<-- /Creer-Merge: constructor-args -->>
@@ -159,7 +159,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true, false);
@@ -317,7 +317,7 @@ export class Unit extends GameObject {
     protected invalidateChangeJob(
         player: Player,
         job: "soldier" | "gatherer" | "builder" | "missionary",
-    ): void | string | IUnitChangeJobArgs {
+    ): void | string | UnitChangeJobArgs {
         // <<-- Creer-Merge: invalidate-changeJob -->>
 
         const reason = this.invalidate(player, true, false);
@@ -408,7 +408,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         type: "neutral" | "shelter" | "monument" | "wall" | "road",
-    ): void | string | IUnitConstructArgs {
+    ): void | string | UnitConstructArgs {
         // <<-- Creer-Merge: invalidate-construct -->>
 
         const reason = this.invalidate(player, true, true);
@@ -490,7 +490,7 @@ export class Unit extends GameObject {
     protected invalidateConvert(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitConvertArgs {
+    ): void | string | UnitConvertArgs {
         // <<-- Creer-Merge: invalidate-convert -->>
 
         const reason = this.invalidate(player, true, true);
@@ -574,7 +574,7 @@ export class Unit extends GameObject {
     protected invalidateDeconstruct(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitDeconstructArgs {
+    ): void | string | UnitDeconstructArgs {
         // <<-- Creer-Merge: invalidate-deconstruct -->>
 
         const reason = this.invalidate(player, true, true);
@@ -672,7 +672,7 @@ export class Unit extends GameObject {
         tile: Tile,
         resource: "materials" | "food",
         amount: number = 0,
-    ): void | string | IUnitDropArgs {
+    ): void | string | UnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const reason = this.invalidate(player, false, false);
@@ -766,7 +766,7 @@ export class Unit extends GameObject {
     protected invalidateHarvest(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitHarvestArgs {
+    ): void | string | UnitHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const reason = this.invalidate(player, true, true);
@@ -850,7 +850,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         const reason = this.invalidate(player, false, false);
         if (reason) {
@@ -935,7 +935,7 @@ export class Unit extends GameObject {
         tile: Tile,
         resource: "materials" | "food",
         amount: number = 0,
-    ): void | string | IUnitPickupArgs {
+    ): void | string | UnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const reason = this.invalidate(player, false, false);
@@ -1021,7 +1021,7 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
+    protected invalidateRest(player: Player): void | string | UnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true, false);

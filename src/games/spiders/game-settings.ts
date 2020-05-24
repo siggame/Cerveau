@@ -15,69 +15,77 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
      * generate the values, as well as basic type and range checking.
      */
     public get schema() {
-        // tslint:disable-line:typedef
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(super.schema || (this as any).schema),
 
             // Spiders game specific settings
             cutSpeed: {
-                description: "The speed at which Cutters work to do cut Webs.",
+                description:
+                    "The speed at which Cutters work to do cut Webs.",
                 // <<-- Creer-Merge: cutSpeed -->>
                 default: 2,
                 // <<-- /Creer-Merge: cutSpeed -->>
             },
+
             eggsScalar: {
                 description:
-                    "Constant used to calculate how many eggs " +
-                    "BroodMothers get on their owner's turns.",
+                    "Constant used to calculate how many eggs BroodMothers " +
+                    "get on their owner's turns.",
                 // <<-- Creer-Merge: eggsScalar -->>
                 default: 0.1,
                 // <<-- /Creer-Merge: eggsScalar -->>
             },
+
             initialWebStrength: {
                 description: "The starting strength for Webs.",
                 // <<-- Creer-Merge: initialWebStrength -->>
                 default: 5,
                 // <<-- /Creer-Merge: initialWebStrength -->>
             },
+
             maxWebStrength: {
                 description:
-                    "The maximum strength a web can be strengthened " + "to.",
+                    "The maximum strength a web can be strengthened to.",
                 // <<-- Creer-Merge: maxWebStrength -->>
                 default: 15,
                 // <<-- /Creer-Merge: maxWebStrength -->>
             },
+
             movementSpeed: {
                 description: "The speed at which Spiderlings move on Webs.",
                 // <<-- Creer-Merge: movementSpeed -->>
                 default: 10,
                 // <<-- /Creer-Merge: movementSpeed -->>
             },
+
             spitSpeed: {
                 description:
-                    "The speed at which Spitters work to spit new " + "Webs.",
+                    "The speed at which Spitters work to spit new Webs.",
                 // <<-- Creer-Merge: spitSpeed -->>
                 default: 24,
                 // <<-- /Creer-Merge: spitSpeed -->>
             },
+
             weavePower: {
                 description:
-                    "How much web strength is added or removed from " +
-                    "Webs when they are weaved.",
+                    "How much web strength is added or removed from Webs " +
+                    "when they are weaved.",
                 // <<-- Creer-Merge: weavePower -->>
                 default: 1,
                 // <<-- /Creer-Merge: weavePower -->>
             },
+
             weaveSpeed: {
                 description:
-                    "The speed at which Weavers work to do " +
-                    "strengthens and weakens on Webs.",
+                    "The speed at which Weavers work to do strengthens and " +
+                    "weakens on Webs.",
                 // <<-- Creer-Merge: weaveSpeed -->>
                 default: 16,
                 // <<-- /Creer-Merge: weaveSpeed -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
             // you can add more settings here, e.g.:
@@ -107,7 +115,8 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
                 description:
-                    "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
@@ -115,7 +124,8 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description:
-                    "The maximum number of turns before the game is force ended and a winner is determined.",
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
         });
     }

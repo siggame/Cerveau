@@ -1,11 +1,11 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import {
-    IUnitAttackArgs,
-    IUnitBuildArgs,
-    IUnitFishArgs,
-    IUnitMineArgs,
-    IUnitMoveArgs,
-    IUnitProperties,
+    UnitAttackArgs,
+    UnitBuildArgs,
+    UnitFishArgs,
+    UnitMineArgs,
+    UnitMoveArgs,
+    UnitProperties,
 } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -68,7 +68,7 @@ export class Unit extends GameObject {
      */
     constructor(
         args: Readonly<
-            IUnitProperties & {
+            UnitProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The job to assign this new Unit to */
                 job: UnitJob;
@@ -106,7 +106,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -213,7 +213,7 @@ export class Unit extends GameObject {
     protected invalidateBuild(
         player: Player,
         title: string,
-    ): void | string | IUnitBuildArgs {
+    ): void | string | UnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
         let towerIndex = -1;
 
@@ -359,7 +359,7 @@ export class Unit extends GameObject {
     protected invalidateFish(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitFishArgs {
+    ): void | string | UnitFishArgs {
         // <<-- Creer-Merge: invalidate-fish -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
@@ -434,7 +434,7 @@ export class Unit extends GameObject {
     protected invalidateMine(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMineArgs {
+    ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
@@ -523,7 +523,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;

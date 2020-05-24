@@ -33,10 +33,10 @@ import {
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Necrowar game
+ * The interface that the Player for the Necrowar game
  * must implement from mixed in game logic.
  */
-export interface IBaseNecrowarPlayer
+export interface BaseNecrowarPlayer
     extends BasePlayer,
         TwoPlayerPlayer,
         TurnBasedPlayer,
@@ -83,11 +83,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -165,8 +165,8 @@ export interface IPlayerProperties {
     won?: boolean;
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The amount of corpses on this tile.
      */
@@ -295,7 +295,7 @@ export interface ITileProperties {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface ITileResArgs {
+export interface TileResArgs {
     /**
      * Number of zombies to resurrect.
      */
@@ -307,7 +307,7 @@ export interface ITileResArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ITileSpawnUnitArgs {
+export interface TileSpawnUnitArgs {
     /**
      * The title of the desired unit type.
      */
@@ -319,10 +319,11 @@ export interface ITileSpawnUnitArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface ITileSpawnWorkerArgs {}
+export interface TileSpawnWorkerArgs {
+}
 
-/** All the possible properties for an Tower. */
-export interface ITowerProperties {
+/** All the possible properties for Tower instances. */
+export interface TowerProperties {
     /**
      * Whether this tower has attacked this turn or not.
      */
@@ -359,15 +360,15 @@ export interface ITowerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ITowerAttackArgs {
+export interface TowerAttackArgs {
     /**
      * The Tile to attack.
      */
     tile?: Tile;
 }
 
-/** All the possible properties for an TowerJob. */
-export interface ITowerJobProperties {
+/** All the possible properties for TowerJob instances. */
+export interface TowerJobProperties {
     /**
      * Whether this tower type hits all of the units on a tile (true) or one at
      * a time (false).
@@ -410,8 +411,8 @@ export interface ITowerJobProperties {
     turnsBetweenAttacks?: number;
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn (attack or
      * build).
@@ -449,7 +450,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -461,7 +462,7 @@ export interface IUnitAttackArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitBuildArgs {
+export interface UnitBuildArgs {
     /**
      * The tower type to build, as a string.
      */
@@ -473,7 +474,7 @@ export interface IUnitBuildArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitFishArgs {
+export interface UnitFishArgs {
     /**
      * The tile the unit will stand on as it fishes.
      */
@@ -485,7 +486,7 @@ export interface IUnitFishArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMineArgs {
+export interface UnitMineArgs {
     /**
      * The tile the mine is located on.
      */
@@ -497,15 +498,15 @@ export interface IUnitMineArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
     tile?: Tile;
 }
 
-/** All the possible properties for an UnitJob. */
-export interface IUnitJobProperties {
+/** All the possible properties for UnitJob instances. */
+export interface UnitJobProperties {
     /**
      * The amount of damage this type does per attack.
      */
@@ -545,14 +546,7 @@ export interface IUnitJobProperties {
      * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
      * 'wraith' or 'horseman'.
      */
-    title?:
-        | "worker"
-        | "zombie"
-        | "ghoul"
-        | "hound"
-        | "abomination"
-        | "wraith"
-        | "horseman";
+    title?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
 }
 
 export * from "./game-object";
@@ -1076,13 +1070,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "arrow",
-                    literals: [
-                        "arrow",
-                        "aoe",
-                        "ballista",
-                        "cleansing",
-                        "castle",
-                    ],
+                    literals: ["arrow", "aoe", "ballista", "cleansing", "castle"],
                 },
                 turnsBetweenAttacks: {
                     typeName: "int",
@@ -1216,15 +1204,7 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "worker",
-                    literals: [
-                        "worker",
-                        "zombie",
-                        "ghoul",
-                        "hound",
-                        "abomination",
-                        "wraith",
-                        "horseman",
-                    ],
+                    literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
                 },
             },
             functions: {},

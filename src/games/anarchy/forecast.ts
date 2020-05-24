@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { IForecastProperties } from "./";
+import { ForecastProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -52,7 +52,7 @@ export class Forecast extends GameObject {
      */
     constructor(
         args: Readonly<
-            IForecastProperties & {
+            ForecastProperties & {
                 // <<-- Creer-Merge: constructor-args -->>
                 /** The direction this Forecast will be. */
                 direction: ForecastDirection;

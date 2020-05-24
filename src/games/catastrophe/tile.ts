@@ -1,6 +1,6 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties } from "./";
+import { TileProperties } from "./";
 import { GameObject } from "./game-object";
 import { Structure } from "./structure";
 import { Unit } from "./unit";
@@ -93,7 +93,7 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
+        args: Readonly<TileProperties>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

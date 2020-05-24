@@ -1,5 +1,5 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { ISpitterProperties, ISpitterSpitArgs, SpiderlingArgs } from "./";
+import { SpiderlingArgs, SpitterProperties, SpitterSpitArgs } from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spiderling } from "./spiderling";
@@ -35,12 +35,11 @@ export class Spitter extends Spiderling {
      */
     constructor(
         args: Readonly<
-            SpiderlingArgs &
-                ISpitterProperties & {
-                    // <<-- Creer-Merge: constructor-args -->>
+            SpiderlingArgs & SpitterProperties & {
+                // <<-- Creer-Merge: constructor-args -->>
                     // You can add more constructor args in here
-                    // <<-- /Creer-Merge: constructor-args -->>
-                }
+                // <<-- /Creer-Merge: constructor-args -->>
+            }
         >,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
@@ -117,7 +116,7 @@ export class Spitter extends Spiderling {
     protected invalidateSpit(
         player: Player,
         nest: Nest,
-    ): void | string | ISpitterSpitArgs {
+    ): void | string | SpitterSpitArgs {
         // <<-- Creer-Merge: invalidate-spit -->>
 
         const invalid = super.invalidate(player);
