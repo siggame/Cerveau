@@ -107,8 +107,7 @@ export interface CheckerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface CheckerIsMineArgs {
-}
+export interface CheckerIsMineArgs {}
 
 /**
  * Argument overrides for Checker's move function. If you return an object of

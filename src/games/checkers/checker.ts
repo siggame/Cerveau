@@ -52,8 +52,8 @@ export class Checker extends GameObject {
     constructor(
         args: CheckerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Player that owns this Checker. */
-                owner: Player;
+            /** The Player that owns this Checker. */
+            owner: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,
