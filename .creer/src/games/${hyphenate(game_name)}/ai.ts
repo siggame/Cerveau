@@ -23,9 +23,12 @@ optional=True, help=False)}
     function_parms = ai['functions'][function_name]
     ret = function_parms['returns']
 %>${shared['cerveau']['formatted_function_top'](function_name, ai, scope='public')}
-        ${'return ' if ret else ''}this.executeOrder("${function_name}"${"" if not function_parms['arguments'] else '' + (
-",\n            ".join([''] + [arg['name'] for arg in function_parms['arguments']]) + ",\n        "
-)});
+${shared['cerveau']['wrap_between'](
+    ('return ' if ret else '') + 'this.executeOrder(',
+    ['"{}"'.format(function_name)] + [arg['name'] for arg in function_parms['arguments']],
+    ');',
+    indent=2
+)}
     }
 
 % endfor
