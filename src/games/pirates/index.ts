@@ -388,8 +388,7 @@ export interface UnitMoveArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface UnitRestArgs {
-}
+export interface UnitRestArgs {}
 
 /**
  * Argument overrides for Unit's split function. If you return an object of

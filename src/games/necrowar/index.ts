@@ -319,8 +319,7 @@ export interface TileSpawnUnitArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface TileSpawnWorkerArgs {
-}
+export interface TileSpawnWorkerArgs {}
 
 /** All the possible properties for Tower instances. */
 export interface TowerProperties {
@@ -546,7 +545,14 @@ export interface UnitJobProperties {
      * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
      * 'wraith' or 'horseman'.
      */
-    title?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
+    title?:
+        | "worker"
+        | "zombie"
+        | "ghoul"
+        | "hound"
+        | "abomination"
+        | "wraith"
+        | "horseman";
 }
 
 /**
@@ -1126,7 +1132,13 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "arrow",
-                    literals: ["arrow", "aoe", "ballista", "cleansing", "castle"],
+                    literals: [
+                        "arrow",
+                        "aoe",
+                        "ballista",
+                        "cleansing",
+                        "castle",
+                    ],
                 },
                 turnsBetweenAttacks: {
                     typeName: "int",
@@ -1260,7 +1272,15 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "worker",
-                    literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
+                    literals: [
+                        "worker",
+                        "zombie",
+                        "ghoul",
+                        "hound",
+                        "abomination",
+                        "wraith",
+                        "horseman",
+                    ],
                 },
             },
             functions: {},

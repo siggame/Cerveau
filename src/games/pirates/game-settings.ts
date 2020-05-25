@@ -68,8 +68,7 @@ export class PiratesGameSettingsManager extends BaseClasses.GameSettings {
             },
 
             healFactor: {
-                description:
-                    "How much health a Unit recovers when they rest.",
+                description: "How much health a Unit recovers when they rest.",
                 // <<-- Creer-Merge: healFactor -->>
                 default: 0,
                 // <<-- /Creer-Merge: healFactor -->>

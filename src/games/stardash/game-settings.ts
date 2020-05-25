@@ -121,8 +121,7 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
             },
 
             planetEnergyCap: {
-                description:
-                    "The amount of energy a planet can hold at once.",
+                description: "The amount of energy a planet can hold at once.",
                 // <<-- Creer-Merge: planetEnergyCap -->>
                 default: 5000,
                 // <<-- /Creer-Merge: planetEnergyCap -->>

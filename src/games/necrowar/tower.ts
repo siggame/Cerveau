@@ -60,10 +60,10 @@ export class Tower extends GameObject {
     constructor(
         args: TowerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The TowerJob to assign this tower to */
-                job: TowerJob;
-                /** The starting tile */
-                tile: Tile;
+            /** The TowerJob to assign this tower to */
+            job: TowerJob;
+            /** The starting tile */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

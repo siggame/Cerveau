@@ -21,7 +21,12 @@ export type BodyBodyType = "planet" | "asteroid" | "sun";
  * The type of material the celestial body has. Either 'none', 'genarium',
  * 'rarium', 'legendarium', or 'mythicite'.
  */
-export type BodyMaterialType = "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+export type BodyMaterialType =
+    | "none"
+    | "genarium"
+    | "rarium"
+    | "legendarium"
+    | "mythicite";
 
 /**
  * A celestial body located within the game.
@@ -41,7 +46,12 @@ export class Body extends GameObject {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    public readonly materialType!: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+    public readonly materialType!:
+        | "none"
+        | "genarium"
+        | "rarium"
+        | "legendarium"
+        | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -90,11 +100,11 @@ export class Body extends GameObject {
     constructor(
         args: BodyConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The angle */
-                angle: number;
-                /** The distance */
-                distance: number;
-                // You can add more constructor args in here
+            /** The angle */
+            angle: number;
+            /** The distance */
+            distance: number;
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

@@ -125,9 +125,9 @@ export class Unit extends GameObject {
     constructor(
         args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Job to set this Unit to. */
-                job: Job;
-                // You can add more constructor args in here
+            /** The Job to set this Unit to. */
+            job: Job;
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

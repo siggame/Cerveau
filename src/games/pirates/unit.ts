@@ -101,8 +101,8 @@ export class Unit extends GameObject {
     constructor(
         args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Tile to place this Unit upon. */
-                tile: Tile;
+            /** The Tile to place this Unit upon. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

@@ -52,8 +52,8 @@ export class Port extends GameObject {
     constructor(
         args: PortConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Tile to place this Port upon. */
-                tile: Tile;
+            /** The Tile to place this Port upon. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

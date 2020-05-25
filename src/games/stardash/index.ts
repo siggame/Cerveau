@@ -825,7 +825,13 @@ export const Namespace = makeNamespace({
                 materialType: {
                     typeName: "string",
                     defaultValue: "none",
-                    literals: ["none", "genarium", "rarium", "legendarium", "mythicite"],
+                    literals: [
+                        "none",
+                        "genarium",
+                        "rarium",
+                        "legendarium",
+                        "mythicite",
+                    ],
                 },
                 owner: {
                     typeName: "gameObject",
@@ -942,7 +948,13 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "corvette",
-                    literals: ["corvette", "missileboat", "martyr", "transport", "miner"],
+                    literals: [
+                        "corvette",
+                        "missileboat",
+                        "martyr",
+                        "transport",
+                        "miner",
+                    ],
                 },
                 unitCost: {
                     typeName: "int",
@@ -1202,7 +1214,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "genarium",
-                            literals: ["genarium", "rarium", "legendarium", "mythicite"],
+                            literals: [
+                                "genarium",
+                                "rarium",
+                                "legendarium",
+                                "mythicite",
+                            ],
                         },
                     ],
                     invalidValue: false,

@@ -59,9 +59,9 @@ export class Projectile extends GameObject {
     constructor(
         args: ProjectileConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The target */
-                target: Unit;
-                // You can add more constructor args in here
+            /** The target */
+            target: Unit;
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

@@ -67,9 +67,9 @@ export class Machine extends GameObject {
     constructor(
         args: MachineConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Tile to spawn this Machine upon. */
-                tile: Tile;
-                // You can add more constructor args in here
+            /** The Tile to spawn this Machine upon. */
+            tile: Tile;
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,
