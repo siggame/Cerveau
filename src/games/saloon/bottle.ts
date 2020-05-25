@@ -64,8 +64,8 @@ export class Bottle extends GameObject {
     constructor(
         args: BottleConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Tile to spawn this Bottle upon. */
-                tile: Tile;
+            /** The Tile to spawn this Bottle upon. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

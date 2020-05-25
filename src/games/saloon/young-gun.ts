@@ -51,12 +51,12 @@ export class YoungGun extends GameObject {
     constructor(
         args: YoungGunConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The controlling Player of this YoungGun. */
-                owner: Player;
-                /** The Tile to spawn this YoungGun upon. */
-                tile: Tile;
-                /** The previous Tile he would have moved from, used to figure out movement direction. */
-                previousTile: Tile;
+            /** The controlling Player of this YoungGun. */
+            owner: Player;
+            /** The Tile to spawn this YoungGun upon. */
+            tile: Tile;
+            /** The previous Tile he would have moved from, used to figure out movement direction. */
+            previousTile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

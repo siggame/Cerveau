@@ -108,11 +108,11 @@ export class Cowboy extends GameObject {
     constructor(
         args: CowboyConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The owner of this Cowboy. */
-                owner: Player;
+            /** The owner of this Cowboy. */
+            owner: Player;
 
-                /** The Tile to spawn this cowboy on. */
-                tile: Tile;
+            /** The Tile to spawn this cowboy on. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,
