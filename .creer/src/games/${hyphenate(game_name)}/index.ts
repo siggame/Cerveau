@@ -112,7 +112,7 @@ ${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', attr)}
     prop_name = '    {}?:'.format(attr_name)
     type_val = shared['cerveau']['type'](attr['type'], nullable=False)
     attr_type = prop_name + ' ' + type_val
-    if len(attr_type) > 80:
+    if len(attr_type) > 79:
         attr_type = prop_name + shared['cerveau']['type'](attr['type'], nullable=False, wrap_literals_indent=1)
 %>${attr_type};
 %   endfor
@@ -126,13 +126,12 @@ ${'}\n' if attrs else ''}
     '',
     "Argument overrides for {}'s {} function. If you return an object of this interface from the invalidate functions, the value(s) you set will be used in the actual function.".format(game_obj_name, function_name)
 )}
-export interface ${game_obj_name}${upcase_first(function_name)}Args {
+export interface ${game_obj_name}${upcase_first(function_name)}Args {${'}' if not function_parms['arguments'] else ''}
 %       for arg in function_parms['arguments']:
 ${shared['cerveau']['block_comment']('    ', arg)}
     ${arg['name']}?: ${shared['cerveau']['type'](arg['type'])};
 %       endfor
-}
-
+${'}\n' if function_parms['arguments'] else ''}
 %    endfor
 % endfor
 % for i, game_obj_name in enumerate(sort_dict_keys(game_objs)):

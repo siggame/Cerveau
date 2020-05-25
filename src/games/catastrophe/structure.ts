@@ -12,7 +12,12 @@ import { Tile } from "./tile";
  * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
  * 'neutral').
  */
-export type StructureType = "neutral" | "shelter" | "monument" | "wall" | "road";
+export type StructureType =
+    | "neutral"
+    | "shelter"
+    | "monument"
+    | "wall"
+    | "road";
 
 /**
  * A structure on a Tile.
@@ -44,7 +49,12 @@ export class Structure extends GameObject {
      * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
      * 'neutral').
      */
-    public readonly type!: "neutral" | "shelter" | "monument" | "wall" | "road";
+    public readonly type!:
+        | "neutral"
+        | "shelter"
+        | "monument"
+        | "wall"
+        | "road";
 
     // <<-- Creer-Merge: attributes -->>
 

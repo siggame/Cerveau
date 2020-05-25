@@ -72,7 +72,7 @@ ${shared['cerveau']['block_comment']('', attr_parms)}
     prop_name = 'export type {}{} ='.format(obj_key, upcase_first(attr_name))
     type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
     attr_type = prop_name + ' ' + type_val
-    if len(attr_type) > 80:
+    if len(attr_type) > 79:
         attr_type = prop_name + shared['cerveau']['type'](attr_parms['type'], nullable=False, wrap_literals_indent=True)
 %>${attr_type};
 % endfor
@@ -120,7 +120,7 @@ else:
     prop_name = '    public ' + readonly + attr_name + nullable + ':'
     type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
     attr_type = prop_name + ' ' + type_val
-    if len(attr_type) > 80:
+    if len(attr_type) > 78:
         attr_type = prop_name + shared['cerveau']['type'](attr_parms['type'], nullable=False, wrap_literals_indent=1)
 %>${attr_type};
 

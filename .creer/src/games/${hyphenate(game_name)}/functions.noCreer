@@ -86,9 +86,8 @@ if not 'cerveau' in shared:
 
             if base_type == 'string':
                 literals = [ '"{}"'.format(lit) for lit in literals ]
-            string = string + '\n' + ('    ' * depth) + 'literals: [{}],'.format(
-                ', '.join(literals)
-            )
+
+            string += '\n' + cerveau_wrap_between('literals: [', literals, '],', indent=depth)
 
         if 'keyType' in type_obj and type_obj['keyType']:
                 string = string + """
@@ -268,12 +267,20 @@ if not 'cerveau' in shared:
         return '\n'.join(quote_wrapped)
     shared['cerveau']['wrap_string'] = cerveau_wrap_string
 
-    def cerveau_wrap_between(prefix, inner, suffix, indent=0):
+    def cerveau_wrap_between(prefix, inner, suffix, indent=0, one_line_joiner=', ', multiline_format='    {},'):
         indent = '    ' * indent
-        one_line = indent + prefix + inner + suffix;
+        inner_str = inner
+        if type(inner) != str:
+            inner_str = one_line_joiner.join(inner)
+        one_line = indent + prefix + inner_str + suffix;
         if len(one_line) <= 80:
             return one_line
 
-        return indent + prefix + '\n    ' + indent + inner + '\n' + indent + suffix
+        if type(inner) != str:
+            inner_str = '\n'.join([indent + multiline_format.format(l) for l in inner])
+        else:
+            inner_str = indent + '    ' + inner
+
+        return indent + prefix + '\n' + inner_str + '\n' + indent + suffix
     shared['cerveau']['wrap_between'] = cerveau_wrap_between
 %>

@@ -499,8 +499,7 @@ export interface UnitPickupArgs {
  * interface from the invalidate functions, the value(s) you set will be used
  * in the actual function.
  */
-export interface UnitRestArgs {
-}
+export interface UnitRestArgs {}
 
 /**
  * The default args passed to a constructor function for
@@ -831,7 +830,14 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "fresh human",
-                    literals: ["fresh human", "cat overlord", "soldier", "gatherer", "builder", "missionary"],
+                    literals: [
+                        "fresh human",
+                        "cat overlord",
+                        "soldier",
+                        "gatherer",
+                        "builder",
+                        "missionary",
+                    ],
                 },
                 upkeep: {
                     typeName: "int",
@@ -920,7 +926,13 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "neutral",
-                    literals: ["neutral", "shelter", "monument", "wall", "road"],
+                    literals: [
+                        "neutral",
+                        "shelter",
+                        "monument",
+                        "wall",
+                        "road",
+                    ],
                 },
             },
             functions: {},
@@ -1053,7 +1065,12 @@ export const Namespace = makeNamespace({
                             argName: "job",
                             typeName: "string",
                             defaultValue: "soldier",
-                            literals: ["soldier", "gatherer", "builder", "missionary"],
+                            literals: [
+                                "soldier",
+                                "gatherer",
+                                "builder",
+                                "missionary",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1073,7 +1090,13 @@ export const Namespace = makeNamespace({
                             argName: "type",
                             typeName: "string",
                             defaultValue: "neutral",
-                            literals: ["neutral", "shelter", "monument", "wall", "road"],
+                            literals: [
+                                "neutral",
+                                "shelter",
+                                "monument",
+                                "wall",
+                                "road",
+                            ],
                         },
                     ],
                     invalidValue: false,
