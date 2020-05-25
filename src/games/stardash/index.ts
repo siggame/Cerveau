@@ -95,7 +95,12 @@ export interface BodyProperties {
      * The type of material the celestial body has. Either 'none', 'genarium',
      * 'rarium', 'legendarium', or 'mythicite'.
      */
-    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+    materialType?:
+        | "none"
+        | "genarium"
+        | "rarium"
+        | "legendarium"
+        | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
