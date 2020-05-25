@@ -154,8 +154,7 @@ export interface BeaverAttackArgs {
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface BeaverBuildLodgeArgs {
-}
+export interface BeaverBuildLodgeArgs {}
 
 /**
  * Argument overrides for Beaver's drop function. If you return an object of

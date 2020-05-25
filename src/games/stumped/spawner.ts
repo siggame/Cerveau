@@ -54,10 +54,10 @@ export class Spawner extends GameObject {
     constructor(
         args: SpawnerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Tile to place this Spawner upon. */
-                tile: Tile;
-                /** The type of resource this Spawner produces. */
-                type: "branches" | "food";
+            /** The Tile to place this Spawner upon. */
+            tile: Tile;
+            /** The type of resource this Spawner produces. */
+            type: "branches" | "food";
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

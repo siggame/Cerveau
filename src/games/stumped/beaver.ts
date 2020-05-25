@@ -90,12 +90,12 @@ export class Beaver extends GameObject {
     constructor(
         args: BeaverConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The Job of this Beaver. */
-                job: Job;
-                /** The controlling Player of this Beaver. */
-                owner: Player;
-                /** The Tile to spawn this Beaver upon. */
-                tile: Tile;
+            /** The Job of this Beaver. */
+            job: Job;
+            /** The controlling Player of this Beaver. */
+            owner: Player;
+            /** The Tile to spawn this Beaver upon. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,
