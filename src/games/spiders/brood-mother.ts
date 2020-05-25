@@ -45,8 +45,8 @@ export class BroodMother extends Spider {
     constructor(
         args: BroodMotherConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                    /** The Nest this BroodMother exists upon. */
-                    nest: Nest;
+            /** The Nest this BroodMother exists upon. */
+            nest: Nest;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

@@ -46,8 +46,8 @@ export class Spider extends GameObject {
     constructor(
         args: SpiderConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                /** The controlling Player of this Spider. */
-                owner: Player;
+            /** The controlling Player of this Spider. */
+            owner: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

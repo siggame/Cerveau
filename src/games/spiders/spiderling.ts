@@ -17,7 +17,14 @@ import { removeElements } from "~/utils";
  * When empty string this Spiderling is not busy, and can act. Otherwise a
  * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
  */
-export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+export type SpiderlingBusy =
+    | ""
+    | "Moving"
+    | "Attacking"
+    | "Strengthening"
+    | "Weakening"
+    | "Cutting"
+    | "Spitting";
 
 /**
  * A Spider spawned by the BroodMother.
@@ -27,7 +34,14 @@ export class Spiderling extends Spider {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+    public busy!:
+        | ""
+        | "Moving"
+        | "Attacking"
+        | "Strengthening"
+        | "Weakening"
+        | "Cutting"
+        | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -70,7 +84,7 @@ export class Spiderling extends Spider {
     constructor(
         args: SpiderlingConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                    // You can add more constructor args in here
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

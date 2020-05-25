@@ -57,7 +57,7 @@ export class Nest extends GameObject {
     constructor(
         args: NestConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-                // You can add more constructor args in here
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
         required: Readonly<BaseGameObjectRequiredData>,

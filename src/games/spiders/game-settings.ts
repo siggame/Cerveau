@@ -22,8 +22,7 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
 
             // Spiders game specific settings
             cutSpeed: {
-                description:
-                    "The speed at which Cutters work to do cut Webs.",
+                description: "The speed at which Cutters work to do cut Webs.",
                 // <<-- Creer-Merge: cutSpeed -->>
                 default: 2,
                 // <<-- /Creer-Merge: cutSpeed -->>
