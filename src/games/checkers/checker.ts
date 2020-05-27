@@ -87,10 +87,13 @@ export class Checker extends GameObject {
         player: Player,
     ): void | string | CheckerIsMineArgs {
         // <<-- Creer-Merge: invalidate-isMine -->>
+
         // Check all the arguments for isMine here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        return undefined; // means nothing could be found that was ivalid.
+
         // <<-- /Creer-Merge: invalidate-isMine -->>
     }
 
@@ -189,7 +192,7 @@ export class Checker extends GameObject {
      * @param x - The x coordinate to move to.
      * @param y - The y coordinate to move to.
      * @returns Returns the same checker that moved if the move was successful.
-     * undefined otherwise.
+     * Otherwise undefined.
      */
     protected async move(
         player: Player,
@@ -234,10 +237,11 @@ export class Checker extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Gets the checker that was jumped at a given position
+     * Gets the checker that was jumped at a given position.
+     *
      * @param x - The x coordinate.
      * @param y - The y coordinate.
-     * @returns A checker, if one was jumped. undefined otherwise.
+     * @returns A checker, if one was jumped. Undefined otherwise.
      */
     private getJumped(x: number, y: number): Checker | undefined {
         const dy = y - this.y;

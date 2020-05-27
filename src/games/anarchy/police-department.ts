@@ -75,8 +75,8 @@ export class PoliceDepartment extends Building {
     }
 
     /**
-     * Bribe the police to raid a Warehouse, dealing damage equal based on the
-     * Warehouse's current exposure, and then resetting it to 0.
+     * Bribe the police to raid a Warehouse, dealing damage equal based on
+     * the Warehouse's current exposure, and then resetting it to 0.
      *
      * @param player - The player that called this.
      * @param warehouse - The warehouse you want to raid.

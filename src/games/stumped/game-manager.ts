@@ -15,7 +15,7 @@ import { Tile } from "./tile";
  * together.
  */
 export class StumpedGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -25,10 +25,10 @@ export class StumpedGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: StumpedGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: StumpedGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -191,7 +191,9 @@ export class StumpedGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -218,10 +220,10 @@ export class StumpedGameManager extends BaseClasses.GameManager {
         // check if someone won by having more branches or food
         for (const resource of ["branches", "food"]) {
             /**
-             * counts the number of resources a player has
+             * Counts the number of resources a player has.
              *
-             * @param p - player to count for
-             * @returns the count f resource
+             * @param p - Player to count for.
+             * @returns The count f resource.
              */
             const count = (p: Player) =>
                 p.lodges
@@ -277,7 +279,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Updates the resources by moving them down water and such
+     * Updates the resources by moving them down water and such.
      */
     private updateResources(): void {
         const newResources = new Map<
@@ -285,7 +287,7 @@ export class StumpedGameManager extends BaseClasses.GameManager {
             {
                 /** The number of branches that will exist on this Tile key. */
                 branches: number;
-                /** The number of food that will exist on this Tile key */
+                /** The number of food that will exist on this Tile key. */
                 food: number;
             }
         >();

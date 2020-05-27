@@ -25,10 +25,10 @@ type MutableTile = Mutable<Tile>;
  * Gather branches and build up your lodge as beavers fight to survive.
  */
 export class StumpedGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: StumpedGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -48,15 +48,14 @@ export class StumpedGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
-     * When a Player has less Beavers than this number, then recruiting other
-     * Beavers is free.
+     * When a Player has less Beavers than this number, then recruiting
+     * other Beavers is free.
      */
     public readonly freeBeaversCount!: number;
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -198,11 +197,11 @@ export class StumpedGame extends BaseClasses.Game {
 
         // Generate random metaballs where the lake will be
         const balls: Array<{
-            /** X position of the ball */
+            /** X position of the ball. */
             x: number;
-            /** Y position of the ball */
+            /** Y position of the ball. */
             y: number;
-            /** Radius of the ball */
+            /** Radius of the ball. */
             r: number;
         }> = [];
         const minRadius = 0.5;
@@ -260,7 +259,8 @@ export class StumpedGame extends BaseClasses.Game {
         const thetaDeltaRange = maxThetaDelta - minThetaDelta;
 
         let theta = minTheta - minThetaDelta;
-        while (true) {
+        let bail = 0;
+        while (bail++ < 1e8) {
             theta +=
                 this.manager.random.float() * thetaDeltaRange + minThetaDelta;
             if (theta >= maxTheta) {
@@ -270,9 +270,9 @@ export class StumpedGame extends BaseClasses.Game {
 
             // Define the line segments
             const points: Array<{
-                /** X position */
+                /** X position. */
                 x: number;
-                /** Y positoion */
+                /** Y positoion. */
                 y: number;
             }> = [];
 

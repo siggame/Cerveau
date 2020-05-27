@@ -9,8 +9,8 @@ import { manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * A typical abandoned warehouse... that anarchists hang out in and can be
- * bribed to burn down Buildings.
+ * A typical abandoned warehouse that anarchists hang out in and can be bribed
+ * to burn down Buildings.
  */
 export class Warehouse extends Building {
     /**

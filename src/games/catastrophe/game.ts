@@ -12,9 +12,8 @@ import { Unit } from "./unit";
 // <<-- Creer-Merge: imports -->>
 import { arrayHasElements, Mutable, removeElements } from "~/utils";
 import { jobStats } from "./jobs-stats";
-import { StructureType } from "./structure";
 
-/** A player that we can mutate before the game begins */
+/** A player that we can mutate before the game begins. */
 type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
@@ -23,10 +22,10 @@ type MutablePlayer = Mutable<Player>;
  * wasteland.
  */
 export class CatastropheGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: CatastropheGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -48,8 +47,7 @@ export class CatastropheGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -172,7 +170,9 @@ export class CatastropheGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** New structures created but not yet inserted into the structures array */
+    /**
+     * New structures created but not yet inserted into the structures array.
+     */
     public readonly newStructures: Structure[] = [];
 
     // <<-- /Creer-Merge: attributes -->>
@@ -231,10 +231,10 @@ export class CatastropheGame extends BaseClasses.Game {
     /**
      * Gets the cost of a given structure type.
      *
-     * @param structureType - The type of the structure
+     * @param structureType - The type of the structure.
      * @returns A number of its cost.
      */
-    public getStructureCost(structureType: StructureType): number {
+    public getStructureCost(structureType: Structure["type"]): number {
         switch (structureType) {
             case "neutral":
                 return this.neutralMaterials;
@@ -252,10 +252,10 @@ export class CatastropheGame extends BaseClasses.Game {
     /**
      * Gets the range of a Structure by its type.
      *
-     * @param structureType The type of the structure to get for
+     * @param structureType - The type of the structure to get for.
      * @returns A number representing its range.
      */
-    public getStructureRange(structureType: StructureType): number {
+    public getStructureRange(structureType: Structure["type"]): number {
         switch (structureType) {
             case "neutral":
             case "road":
@@ -284,7 +284,7 @@ export class CatastropheGame extends BaseClasses.Game {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Generates the map and places the resources, players, and starting units
+     * Generates the map and places the resources, players, and starting units.
      */
     private generateMap(): void {
         const structureChance = 0.025;

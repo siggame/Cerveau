@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -222,8 +221,8 @@ export interface StructureProperties {
     tile?: Tile;
 
     /**
-     * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
-     * 'neutral').
+     * The type of Structure this
+     * is ('shelter', 'monument', 'wall', 'road', 'neutral').
      */
     type?: "neutral" | "shelter" | "monument" | "wall" | "road";
 }
@@ -303,7 +302,7 @@ export interface UnitProperties {
     acted?: boolean;
 
     /**
-     * The amount of energy this Unit has (from 0.0 to 100.0).
+     * The amount of energy this Unit has (from 0 to 100).
      */
     energy?: number;
 
@@ -418,8 +417,8 @@ export interface UnitConvertArgs {
 
 /**
  * Argument overrides for Unit's deconstruct function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface UnitDeconstructArgs {
     /**
@@ -430,8 +429,8 @@ export interface UnitDeconstructArgs {
 
 /**
  * Argument overrides for Unit's drop function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitDropArgs {
     /**
@@ -463,8 +462,8 @@ export interface UnitHarvestArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMoveArgs {
     /**
@@ -496,54 +495,54 @@ export interface UnitPickupArgs {
 
 /**
  * Argument overrides for Unit's rest function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitRestArgs {}
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Job instances.
+ * The default args passed to a constructor function for class
+ * instances of Job.
  */
 export type JobConstructorArgs<T extends {} = {}> = Readonly<
     JobProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseCatastrophePlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Structure instances.
+ * The default args passed to a constructor function for class
+ * instances of Structure.
  */
 export type StructureConstructorArgs<T extends {} = {}> = Readonly<
     StructureProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tile instances.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
 export type TileConstructorArgs<T extends {} = {}> = Readonly<
     TileProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Unit instances.
+ * The default args passed to a constructor function for class
+ * instances of Unit.
  */
 export type UnitConstructorArgs<T extends {} = {}> = Readonly<
     UnitProperties & T
@@ -571,16 +570,16 @@ import { CatastropheGame } from "./game";
 import { CatastropheGameManager } from "./game-manager";
 import { CatastropheGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Structure */
+/** The arguments used to construct a Structure. */
 export type StructureArgs = FirstArgumentFromConstructor<typeof Structure>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -615,8 +614,8 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
@@ -626,8 +625,8 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
     public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {

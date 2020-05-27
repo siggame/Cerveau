@@ -98,7 +98,7 @@ export class Spiderling extends Spider {
 
     // <<-- Creer-Merge: public-functions -->>
 
-    /** Kills the Spiderling */
+    /** Kills the Spiderling. */
     public kill(): void {
         super.kill();
 
@@ -121,14 +121,14 @@ export class Spiderling extends Spider {
     }
 
     /**
-     * Tells the Spiderling to finish what it is doing
-     * (moving, cutting, spitting, weaving)
-     *   Note: coworkers are finished in the Game class, not here
+     * Tells the Spiderling to finish what it is doing.
+     * Example: moving, cutting, spitting, or weaving.
+     * Note: coworkers are finished in the Game class, not here.
      *
-     * @param forceFinish - True if the task was not finished by THIS spiderling
-     * @returns true if finished, false otherwise
+     * @param forceFinish - If it should force finish.
+     * @returns True if finished, false otherwise.
      */
-    public finish(forceFinish: boolean = false): boolean {
+    public finish(forceFinish = false): boolean {
         const finishing = this.busy;
         this.busy = "";
         this.workRemaining = 0;
@@ -214,7 +214,7 @@ export class Spiderling extends Spider {
     }
 
     /**
-     * Attacks another Spiderling
+     * Attacks another Spiderling.
      *
      * @param player - The player that called this.
      * @param spiderling - The Spiderling to attack.

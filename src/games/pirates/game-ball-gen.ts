@@ -1,5 +1,5 @@
 /** A ball to generate around. */
-export interface IBall {
+export interface Ball {
     /** The x position of the Ball. */
     x: number;
     /** The y position of the Ball. */
@@ -9,9 +9,9 @@ export interface IBall {
 }
 
 /** A generated ball. */
-export interface IBallGen {
+export interface BallGen {
     /** List of balls being generated. */
-    balls: IBall[];
+    balls: Ball[];
     /** The elasticity of the ball. */
     gooeyness: number;
     /** Water threshold for generation. */
@@ -26,16 +26,16 @@ export interface IBallGen {
  * Creates a ball around islands.
  *
  * @param mapWidth - The width of the map.
- * @param mapHeight  - The height of the map.
- * @param rng - The RNG function
+ * @param mapHeight -  - The height of the map.
+ * @param rng - The RNG function.
  * @returns A generated ball for the island.
  */
 export function islandBalls(
     mapWidth: number,
     mapHeight: number,
     rng: () => number,
-): IBallGen {
-    const balls: IBall[] = [];
+): BallGen {
+    const balls: Ball[] = [];
     const minRadius = 0.5;
     const maxRadius = 1.5;
     const maxOffset = mapWidth * 0.2;
@@ -65,16 +65,16 @@ export function islandBalls(
  * Creates a ball around rivers.
  *
  * @param mapWidth - The width of the map.
- * @param mapHeight  - The height of the map.
- * @param rng - The RNG function
+ * @param mapHeight -  - The height of the map.
+ * @param rng - The RNG function.
  * @returns A generated ball for the river.
  */
 export function riverBalls(
     mapWidth: number,
     mapHeight: number,
     rng: () => number,
-): IBallGen {
-    const balls: IBall[] = [];
+): BallGen {
+    const balls: Ball[] = [];
     const minRadius = 0.5;
     const maxRadius = 4.0;
     const maxOffset = mapHeight / 2;
@@ -112,16 +112,16 @@ export function riverBalls(
  * Creates a ball around corners of the map.
  *
  * @param mapWidth - The width of the map.
- * @param mapHeight  - The height of the map.
- * @param rng - The RNG function
+ * @param mapHeight - The height of the map.
+ * @param rng - The RNG function.
  * @returns A generated ball for the corner.
  */
 export function cornerBalls(
     mapWidth: number,
     mapHeight: number,
     rng: () => number,
-): IBallGen {
-    const balls: IBall[] = [];
+): BallGen {
+    const balls: Ball[] = [];
     const minRadius = 0.75;
     const maxRadius = 1.25;
     const maxOffset = 10.0;

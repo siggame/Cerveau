@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -92,8 +91,8 @@ export interface BodyProperties {
     bodyType?: "planet" | "asteroid" | "sun";
 
     /**
-     * The type of material the celestial body has. Either 'none', 'genarium',
-     * 'rarium', 'legendarium', or 'mythicite'.
+     * The type of material the celestial body
+     * has. Either 'none', 'genarium', 'rarium', 'legendarium', or 'mythicite'.
      */
     materialType?:
         | "none"
@@ -203,8 +202,8 @@ export interface JobProperties {
     shield?: number;
 
     /**
-     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
-     * 'miner'. (in this order from 0-4).
+     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport',
+     * or 'miner'. (in this order from 0-4).
      */
     title?: "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
@@ -420,8 +419,8 @@ export interface UnitAttackArgs {
 
 /**
  * Argument overrides for Unit's dash function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitDashArgs {
     /**
@@ -436,8 +435,8 @@ export interface UnitDashArgs {
 
 /**
  * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMineArgs {
     /**
@@ -448,8 +447,8 @@ export interface UnitMineArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMoveArgs {
     /**
@@ -464,8 +463,8 @@ export interface UnitMoveArgs {
 
 /**
  * Argument overrides for Unit's safe function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitSafeArgs {
     /**
@@ -513,48 +512,48 @@ export interface UnitTransferArgs {
 }
 
 /**
- * The default args passed to a constructor function for
- * Body instances.
+ * The default args passed to a constructor function for class
+ * instances of Body.
  */
 export type BodyConstructorArgs<T extends {} = {}> = Readonly<
     BodyProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Job instances.
+ * The default args passed to a constructor function for class
+ * instances of Job.
  */
 export type JobConstructorArgs<T extends {} = {}> = Readonly<
     JobProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseStardashPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Projectile instances.
+ * The default args passed to a constructor function for class
+ * instances of Projectile.
  */
 export type ProjectileConstructorArgs<T extends {} = {}> = Readonly<
     ProjectileProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Unit instances.
+ * The default args passed to a constructor function for class
+ * instances of Unit.
  */
 export type UnitConstructorArgs<T extends {} = {}> = Readonly<
     UnitProperties & T
@@ -582,16 +581,16 @@ import { StardashGame } from "./game";
 import { StardashGameManager } from "./game-manager";
 import { StardashGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Body */
+/** The arguments used to construct a Body. */
 export type BodyArgs = FirstArgumentFromConstructor<typeof Body>;
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Projectile */
+/** The arguments used to construct a Projectile. */
 export type ProjectileArgs = FirstArgumentFromConstructor<typeof Projectile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -602,8 +601,8 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Body in the Game and tracks it for all players.
      *
-     * @param args - Data about the Body to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Body to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Body hooked up in the game and ready for you to use.
      */
     public body<T extends BodyArgs>(args: Readonly<T>): Body & T {
@@ -626,8 +625,7 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Projectile to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Projectile hooked up in the game and ready for you to
-     * use.
+     * @returns A new Projectile hooked up in the game and ready for you to use.
      */
     public projectile<T extends ProjectileArgs>(
         args: Readonly<T>,
@@ -638,8 +636,8 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
     public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {

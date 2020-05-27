@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -151,8 +150,8 @@ export interface BeaverAttackArgs {
 
 /**
  * Argument overrides for Beaver's buildLodge function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface BeaverBuildLodgeArgs {}
 
@@ -209,8 +208,8 @@ export interface BeaverMoveArgs {
  */
 export interface BeaverPickupArgs {
     /**
-     * The Tile to pickup branches/food from. Must be the same Tile that the
-     * Beaver is on, or an adjacent one.
+     * The Tile to pickup branches/food from. Must be the same Tile that
+     * the Beaver is on, or an adjacent one.
      */
     tile?: Tile;
     /**
@@ -390,8 +389,8 @@ export interface TileProperties {
     branches?: number;
 
     /**
-     * The cardinal direction water is flowing on this Tile ('North', 'East',
-     * 'South', 'West').
+     * The cardinal direction water is flowing on
+     * this Tile ('North', 'East', 'South', 'West').
      */
     flowDirection?: "North" | "East" | "South" | "West" | "";
 
@@ -452,48 +451,48 @@ export interface TileProperties {
 }
 
 /**
- * The default args passed to a constructor function for
- * Beaver instances.
+ * The default args passed to a constructor function for class
+ * instances of Beaver.
  */
 export type BeaverConstructorArgs<T extends {} = {}> = Readonly<
     BeaverProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Job instances.
+ * The default args passed to a constructor function for class
+ * instances of Job.
  */
 export type JobConstructorArgs<T extends {} = {}> = Readonly<
     JobProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseStumpedPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Spawner instances.
+ * The default args passed to a constructor function for class
+ * instances of Spawner.
  */
 export type SpawnerConstructorArgs<T extends {} = {}> = Readonly<
     SpawnerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tile instances.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
 export type TileConstructorArgs<T extends {} = {}> = Readonly<
     TileProperties & T
@@ -521,16 +520,16 @@ import { StumpedGame } from "./game";
 import { StumpedGameManager } from "./game-manager";
 import { StumpedGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Beaver */
+/** The arguments used to construct a Beaver. */
 export type BeaverArgs = FirstArgumentFromConstructor<typeof Beaver>;
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Spawner */
+/** The arguments used to construct a Spawner. */
 export type SpawnerArgs = FirstArgumentFromConstructor<typeof Spawner>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
 /**
@@ -563,8 +562,8 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Spawner in the Game and tracks it for all players.
      *
-     * @param args - Data about the Spawner to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Spawner to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
     public spawner<T extends SpawnerArgs>(args: Readonly<T>): Spawner & T {
@@ -574,8 +573,8 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {

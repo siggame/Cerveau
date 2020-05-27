@@ -141,7 +141,7 @@ export class Job extends GameObject {
     }
 
     /**
-     * Recruits a Beaver of this Job to a lodge
+     * Recruits a Beaver of this Job to a lodge.
      *
      * @param player - The player that called this.
      * @param tile - The Tile that is a lodge owned by you that you wish to

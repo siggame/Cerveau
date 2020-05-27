@@ -19,7 +19,7 @@ import { Tile } from "./tile";
  * together.
  */
 export class CatastropheGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -28,10 +28,10 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: CatastropheGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: CatastropheGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -124,7 +124,9 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -173,7 +175,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: protected-private-methods -->>
 
-    /** Updates all arrays in the game with new/dead game objects */
+    /** Updates all arrays in the game with new/dead game objects. */
     private updateArrays(): void {
         // Add new structures
         for (const structure of this.game.newStructures) {
@@ -220,7 +222,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates all the units in the game */
+    /** Updates all the units in the game. */
     private updateUnits(): void {
         // Reset all upkeeps
         for (const player of this.game.players) {
@@ -345,7 +347,7 @@ export class CatastropheGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates the resources in between turns */
+    /** Updates the resources in between turns. */
     private updateResources(): void {
         const lowerHarvests =
             this.game.currentTurn % this.game.turnsToLowerHarvest === 0;

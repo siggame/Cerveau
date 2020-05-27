@@ -58,9 +58,53 @@ if not 'cerveau' in shared:
             return base_type
     shared['cerveau']['type'] = cerveau_type
 
-    def cerveai_description_format(description):
-        return description.replace('Null', 'Undefined').replace('null', 'undefined')
-    shared['cerveau']['description'] = cerveai_description_format
+    def _jsdoc_description(description, start='', indent=0):
+        description = description.replace('Null', 'Undefined').replace('null', 'undefined')
+        words = description.split(' ')
+        indent = indent * '    '
+        max_len = 80 - len(indent) - len(' * ')
+
+        lines = []
+        line = []
+        line_len = len(start)
+        while words:
+            word = words.pop(0)
+            next_len = line_len + len(word) + 1
+            if next_len > max_len:
+                # need to wrap this word to the next line
+                next_line = []
+                if word[0].islower() or (line and line[-1][-1] == '.'):
+                    # no need to pop, we can move this to the next line right away
+                    pass
+                else:
+                    while line:
+                        popped = line.pop()
+                        next_line.insert(0, popped)
+                        if popped[0].islower() or popped[-1] == '.':
+                            break
+
+                    if not line:
+                        raise Exception('Could not jsdoc format description: "{}", ran out of lines.'.format(description))
+                    # we need to pop off words from this line to pad the next line
+
+                lines.append(line)
+                next_line.append(word)
+                line = next_line
+                line_len = -1
+                for word in line:
+                    line_len += 1 + len(word)
+
+                if line_len > max_len:
+                    raise Exception('Could not jsdoc format description: "{}", next line force to be too long.'.format(description))
+            else:
+                line_len = next_len
+                line.append(word)
+
+        if line:
+            lines.append(line)
+        if start:
+            lines[0].insert(0, start)
+        return '\n'.join([(indent + ' * ' + ' '.join(line)) for line in lines])
 
     def cerveau_schema_type(type_obj, depth=1, optional=False):
         base_type = type_obj['name']
@@ -125,35 +169,29 @@ if not 'cerveau' in shared:
             properties.append({
                 'name': attr_name,
                 'type': cerveau_type(attr['type']),
-                'description': cerveai_description_format(attr["description"])
+                'description': attr["description"]
             })
         return properties
     shared['cerveau']['properties'] = cerveau_properties
 
-    def cerveau_block_comment(prefix, doc):
-        wrapper = TextWrapper(
-            initial_indent=prefix+' * ',
-            subsequent_indent=prefix+' * ',
-            width=79,
-        )
+    def cerveau_block_comment(doc, indent=0):
         if isinstance(doc, str):
             doc = {'description': doc}
 
-        description = cerveai_description_format(doc['description'])
-        lines = wrapper.wrap(description)
+        indent_str = ('    ' * indent)
+        jsdoc = indent_str + '/**\n' + _jsdoc_description(doc['description'], indent=indent) + '\n'
 
         if ('arguments' in doc and doc['arguments']) or 'returns' in doc and doc['returns']:
-            lines.append(prefix+' *')
+            jsdoc += indent_str + ' *\n'
 
         if 'arguments' in doc and doc['arguments']:
             for arg in doc['arguments']:
-                lines += wrapper.wrap('@param ' + arg['name'] + ' - ' + cerveai_description_format(arg['description']))
+                jsdoc += _jsdoc_description(arg['description'], start='@param {} -'.format(arg['name']), indent=indent) + '\n'
         if 'returns' in doc and doc['returns']:
-            lines += wrapper.wrap('@returns ' + cerveai_description_format(doc['returns']['description']))
+            jsdoc += _jsdoc_description(doc['returns']['description'], start='@returns', indent=indent) + '\n'
 
-        lines.insert(0, prefix+'/**')
-        lines.append(prefix+' */')
-        return '\n'.join(lines)
+        jsdoc += indent_str + ' */'
+        return jsdoc
     shared['cerveau']['block_comment'] = cerveau_block_comment
 
     def cerveau_imports(imports):
@@ -225,18 +263,21 @@ if not 'cerveau' in shared:
 
     def cerveau_formatted_function_top(function_name, obj, scope='protected', promise=True):
         function_parms = dict(obj['functions'][function_name])
-        docstring = cerveau_block_comment('    ', function_parms)
+        docstring = cerveau_block_comment(function_parms, indent=1)
 
         returns = 'void'
         if function_parms['returns']:
             returns = shared['cerveau']['type'](function_parms['returns']['type'], nullable=True)
 
         formatted_name = '    {} '.format(scope)+('async ' if promise else '')+function_name+'('
-        unformatted_args = (
-            [(a['name']+': '+shared['cerveau']['type'](a['type'], nullable=True)+(
-                (' = '+shared['cerveau']['value'](a['type'], a['default'])) if a['default'] != None else ''
-            )) for a in function_parms['arguments']]
-        )
+        def arg_format(a):
+            s = a['name']
+            if a['default'] != None and a['type']['literals'] == None:
+                s += ' = ' + shared['cerveau']['value'](a['type'], a['default'])
+            else:
+                s += ': ' + shared['cerveau']['type'](a['type'], nullable=True)
+            return s
+        unformatted_args = [arg_format(a) for a in function_parms['arguments']]
 
         formatted_return = '): '+ ('Promise<{}>' if promise else '{}').format(returns) +' {'
         formatted_args = ', '.join(unformatted_args)

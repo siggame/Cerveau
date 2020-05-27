@@ -19,8 +19,8 @@ export class Spider extends GameObject {
     public isDead!: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Undefined when moving on a
-     * Web.
+     * The Nest that this Spider is currently on. Undefined when moving on
+     * a Web.
      */
     public nest?: Nest;
 
@@ -80,7 +80,7 @@ export class Spider extends GameObject {
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
-    /** Kill the spider and remove it from arrays */
+    /** Kill the spider and remove it from arrays. */
     public kill(): void {
         this.isDead = true;
 

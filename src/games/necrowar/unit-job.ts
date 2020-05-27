@@ -7,8 +7,9 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
- * 'wraith' or 'horseman'.
+ * The type
+ * title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination', 'wraith'
+ * or 'horseman'.
  */
 export type UnitJobTitle =
     | "worker"
@@ -59,8 +60,9 @@ export class UnitJob extends GameObject {
     public readonly range!: number;
 
     /**
-     * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
-     * 'wraith' or 'horseman'.
+     * The type
+     * title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination', 'wraith'
+     * or 'horseman'.
      */
     public readonly title!:
         | "worker"

@@ -8,14 +8,14 @@ import { filterInPlace } from "~/utils";
 import { Tile } from "./tile";
 import { Unit } from "./unit";
 
-/** A node on the merchant path-finding stack */
-interface IPath {
+/** A node on the merchant path-finding stack. */
+interface Path {
     /** The Tile on this path. */
     tile: Tile;
-    /** Score heuristic */
+    /** Score heuristic. */
     g: number;
     /** Parent Tile node to reconstruct the path. */
-    parent: IPath | undefined;
+    parent: Path | undefined;
 }
 
 // <<-- /Creer-Merge: imports -->>
@@ -27,7 +27,7 @@ interface IPath {
  * together.
  */
 export class PiratesGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -36,10 +36,10 @@ export class PiratesGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: PiratesGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: PiratesGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -122,7 +122,9 @@ export class PiratesGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -185,7 +187,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates units in-between turns */
+    /** Updates units in-between turns. */
     private updateUnits(): void {
         for (const unit of this.game.units) {
             // Reset the unit
@@ -219,7 +221,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
 
                 // Find path to target port (BFS)
                 if (!pathValid) {
-                    const open: IPath[] = [
+                    const open: Path[] = [
                         {
                             tile: unit.tile,
                             g: 1,
@@ -232,7 +234,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
                     unit.path = [];
                     while (open.length > 0) {
                         // Pop the first open element (lowest distance)
-                        let current: IPath | undefined = open.shift() as IPath; // must exist from above check
+                        let current: Path | undefined = open.shift() as Path; // must exist from above check
                         if (closed.has(current.tile)) {
                             continue;
                         }
@@ -412,7 +414,7 @@ export class PiratesGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Update other variables in-between turns */
+    /** Update other variables in-between turns. */
     private updateOtherStuff(): void {
         for (const tile of this.game.tiles) {
             const gold = tile.gold * this.game.buryInterestRate;

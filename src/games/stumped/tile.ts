@@ -11,8 +11,8 @@ import { Spawner } from "./spawner";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The cardinal direction water is flowing on this Tile ('North', 'East',
- * 'South', 'West').
+ * The cardinal direction water is flowing on
+ * this Tile ('North', 'East', 'South', 'West').
  */
 export type TileFlowDirection = "North" | "East" | "South" | "West" | "";
 
@@ -36,8 +36,8 @@ export class Tile extends GameObject implements BaseTile {
     public branches!: number;
 
     /**
-     * The cardinal direction water is flowing on this Tile ('North', 'East',
-     * 'South', 'West').
+     * The cardinal direction water is flowing on
+     * this Tile ('North', 'East', 'South', 'West').
      */
     public readonly flowDirection!: "North" | "East" | "South" | "West" | "";
 
@@ -208,7 +208,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -233,7 +233,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */

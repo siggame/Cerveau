@@ -11,8 +11,8 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
- * 'west'). blank means conveyor doesn't move.
+ * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+ * or 'west'). Blank means conveyor doesn't move.
  */
 export type TileDirection = "blank" | "north" | "east" | "south" | "west";
 
@@ -42,8 +42,8 @@ export class Tile extends GameObject implements BaseTile {
     public decoration!: number;
 
     /**
-     * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank means conveyor doesn't move.
+     * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+     * or 'west'). Blank means conveyor doesn't move.
      */
     public readonly direction!: "blank" | "north" | "east" | "south" | "west";
 
@@ -98,8 +98,8 @@ export class Tile extends GameObject implements BaseTile {
     public readonly tileWest?: Tile;
 
     /**
-     * The type of Tile this is ('normal', 'generator', 'conveyor', or
-     * 'spawn').
+     * The type of Tile this is ('normal', 'generator', 'conveyor',
+     * or 'spawn').
      */
     public readonly type!: "normal" | "generator" | "conveyor" | "spawn";
 
@@ -179,7 +179,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -204,7 +204,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */

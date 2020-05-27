@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -79,8 +78,8 @@ export interface PlayerProperties {
     clientType?: string;
 
     /**
-     * The color (side) of this player. Either 'white' or 'black', with the
-     * 'white' player having the first move.
+     * The color (side) of this player. Either 'white' or 'black', with
+     * the 'white' player having the first move.
      */
     color?: "black" | "white";
 
@@ -121,16 +120,16 @@ export interface PlayerProperties {
 }
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseChessPlayer & PlayerProperties & T

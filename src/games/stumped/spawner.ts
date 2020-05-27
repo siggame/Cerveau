@@ -40,7 +40,7 @@ export class Spawner extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** The cooldown on being harvested */
+    /** The cooldown on being harvested. */
     public harvestCooldown = 0;
 
     // <<-- /Creer-Merge: attributes -->>

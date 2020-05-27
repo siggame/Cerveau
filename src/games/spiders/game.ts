@@ -10,20 +10,20 @@ import { Web } from "./web";
 // <<-- Creer-Merge: imports -->>
 import { arrayHasElements, euclideanDistance, IPoint, Mutable } from "~/utils";
 
-/** A Player that can mutate before the game begins */
+/** A Player that can mutate before the game begins. */
 type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
  * There's an infestation of enemy spiders challenging your queen broodmother
- * spider! Protect her and attack the other broodmother in this turn based,
- * node based, game.
+ * spider! Protect her and attack the other broodmother in this turn based, node
+ * based, game.
  */
 export class SpidersGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: SpidersGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -50,8 +50,7 @@ export class SpidersGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 

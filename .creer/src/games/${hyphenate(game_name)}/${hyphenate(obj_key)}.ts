@@ -67,7 +67,7 @@ attr_parms = obj['attributes'][attr_name]
 if not attr_parms['type']['literals']:
     continue
 %>
-${shared['cerveau']['block_comment']('', attr_parms)}
+${shared['cerveau']['block_comment'](attr_parms)}
 <%
     prop_name = 'export type {}{} ='.format(obj_key, upcase_first(attr_name))
     type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
@@ -77,26 +77,26 @@ ${shared['cerveau']['block_comment']('', attr_parms)}
 %>${attr_type};
 % endfor
 
-${shared['cerveau']['block_comment']('', obj)}
+${shared['cerveau']['block_comment'](obj)}
 export class ${obj_key if obj_key != 'Game' else (game_name + 'Game')} extends ${extends}${
     ' implements BaseTile' if 'TiledGame' in game['serverParentClasses'] and obj_key == 'Tile' else ''
 } {
 % if obj_key == 'Game':
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: ${game_name}GameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
 % elif obj_key == 'Player':
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
 % elif obj_key == 'GameObject':
-    /** The game this game object is in */
+    /** The game this game object is in. */
     public readonly game!: ${game_name}Game;
 
-    /** The manager of the game that controls this */
+    /** The manager of the game that controls this. */
     public readonly manager!: ${game_name}GameManager;
 
 % endif
@@ -115,7 +115,7 @@ if attr_type['is_game_object'] and obj_key != 'Player':
 else:
     nullable = '!'
 
-%>${shared['cerveau']['block_comment']('    ', attr_parms)}
+%>${shared['cerveau']['block_comment'](attr_parms, indent=1)}
 <%
     prop_name = '    public ' + readonly + attr_name + nullable + ':'
     type_val = shared['cerveau']['type'](attr_parms['type'], nullable=False)
@@ -213,7 +213,7 @@ ${merge('    // ', 'public-functions', """
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -238,7 +238,7 @@ ${merge('    // ', 'public-functions', """
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */
@@ -295,6 +295,7 @@ ${merge('        // ', 'invalidate-' + function_name, """
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        return undefined; // means nothing could be found that was ivalid.
 
 """.format(function_name), optional=True, help=False)}
     }

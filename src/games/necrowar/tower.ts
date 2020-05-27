@@ -60,9 +60,9 @@ export class Tower extends GameObject {
     constructor(
         args: TowerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            /** The TowerJob to assign this tower to */
+            /** The TowerJob to assign this tower to. */
             job: TowerJob;
-            /** The starting tile */
+            /** The starting tile. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -225,14 +225,13 @@ export class Tower extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Returns the distance between the points
+     * Returns the distance between the points.
      *
-     * @param x1: the first x coordinate.
-     * @param y1: the first y coordinate.
-     * @param x2: the second x coordinate.
-     * @param y2: the second y coordinate.
-     *
-     * @returns the distance between the points.
+     * @param x1 - The first x coordinate.
+     * @param y1 - The first y coordinate.
+     * @param x2 - The second x coordinate.
+     * @param y2 - The second y coordinate.
+     * @returns The distance between the points.
      */
     private distance(x1: number, y1: number, x2: number, y2: number): number {
         // Calculate differences

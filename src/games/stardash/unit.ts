@@ -500,7 +500,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * allows a miner to mine a asteroid
+     * Allows a miner to mine a asteroid.
      *
      * @param player - The player that called this.
      * @param body - The object to be mined.
@@ -691,7 +691,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * tells you if your ship can move to that location from were it is without
+     * Tells you if your ship can move to that location from were it is without
      * clipping the sun.
      *
      * @param player - The player that called this.
@@ -839,10 +839,10 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param unit - The unit you are grabbing the resources from.
-     * @param amount - The amount of materials to you with to grab. Amounts <=
-     * 0 will pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'genarium',
-     * 'rarium', 'legendarium', or 'mythicite'.
+     * @param amount - The amount of materials to you with to grab. Amounts <= 0
+     * will pick up all the materials that the unit can.
+     * @param material - The material the unit will pick
+     * up. 'genarium', 'rarium', 'legendarium', or 'mythicite'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -907,10 +907,10 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param unit - The unit you are grabbing the resources from.
-     * @param amount - The amount of materials to you with to grab. Amounts <=
-     * 0 will pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'genarium',
-     * 'rarium', 'legendarium', or 'mythicite'.
+     * @param amount - The amount of materials to you with to grab. Amounts <= 0
+     * will pick up all the materials that the unit can.
+     * @param material - The material the unit will pick
+     * up. 'genarium', 'rarium', 'legendarium', or 'mythicite'.
      * @returns True if successfully taken, false otherwise.
      */
     protected async transfer(
@@ -952,15 +952,15 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
      * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,
-        checkAction: boolean = false,
+        checkAction = false,
     ): string | undefined {
         // make sure there is a player and it is their turn.
         if (!player || player !== this.game.currentPlayer) {
@@ -988,14 +988,13 @@ export class Unit extends GameObject {
     }
 
     /**
-     * returns the distance between the points
+     * Returns the distance between the points.
      *
-     * @param x1: the start x coordinate.
-     * @param y1: the start y coordinate.
-     * @param x2: the end x coordinate.
-     * @param y2: the end y coordinate.
-     *
-     * @returns the distance between the points.
+     * @param x1 - The start x coordinate.
+     * @param y1 - The start y coordinate.
+     * @param x2 - The end x coordinate.
+     * @param y2 - The end y coordinate.
+     * @returns The distance between the points.
      */
     private distance(x1: number, y1: number, x2: number, y2: number): number {
         // grab the differences.
@@ -1007,13 +1006,12 @@ export class Unit extends GameObject {
     }
 
     /**
-     * detects if the given line intersects the sun.
+     * Detects if the given line intersects the sun.
      *
-     * @param x1: the start x coordinate.
-     * @param y1: the start y coordinate.
-     * @param x2: the end x coordinate.
-     * @param y2: the end y coordinate.
-     *
+     * @param x1 - The start x coordinate.
+     * @param y1 - The start y coordinate.
+     * @param x2 - The end x coordinate.
+     * @param y2 - The end y coordinate.
      * @returns True = collide, false = no collide.
      */
     private collide(x1: number, y1: number, x2: number, y2: number): boolean {

@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -118,8 +117,8 @@ export interface BuildingProperties {
     fire?: number;
 
     /**
-     * How much health this building currently has. When this reaches 0 the
-     * Building has been burned down.
+     * How much health this building currently has. When this reaches 0
+     * the Building has been burned down.
      */
     health?: number;
 
@@ -176,14 +175,14 @@ export interface ForecastProperties {
     controllingPlayer?: Player;
 
     /**
-     * The direction the wind will blow fires in. Can be 'north', 'east',
-     * 'south', or 'west'.
+     * The direction the wind will blow fires in. Can
+     * be 'north', 'east', 'south', or 'west'.
      */
     direction?: "North" | "East" | "South" | "West";
 
     /**
-     * How much of a Building's fire that can be blown in the direction of this
-     * Forecast. Fire is duplicated (copied), not moved (transfered).
+     * How much of a Building's fire that can be blown in the direction of
+     * this Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     intensity?: number;
 }
@@ -306,8 +305,8 @@ export interface WarehouseProperties {
 
 /**
  * Argument overrides for Warehouse's ignite function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface WarehouseIgniteArgs {
     /**
@@ -346,64 +345,64 @@ export interface WeatherStationRotateArgs {
 }
 
 /**
- * The default args passed to a constructor function for
- * Building instances.
+ * The default args passed to a constructor function for class
+ * instances of Building.
  */
 export type BuildingConstructorArgs<T extends {} = {}> = Readonly<
     BuildingProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * FireDepartment instances.
+ * The default args passed to a constructor function for class
+ * instances of FireDepartment.
  */
 export type FireDepartmentConstructorArgs<T extends {} = {}> = Readonly<
     BuildingArgs & FireDepartmentProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Forecast instances.
+ * The default args passed to a constructor function for class
+ * instances of Forecast.
  */
 export type ForecastConstructorArgs<T extends {} = {}> = Readonly<
     ForecastProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseAnarchyPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * PoliceDepartment instances.
+ * The default args passed to a constructor function for class
+ * instances of PoliceDepartment.
  */
 export type PoliceDepartmentConstructorArgs<T extends {} = {}> = Readonly<
     BuildingArgs & PoliceDepartmentProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Warehouse instances.
+ * The default args passed to a constructor function for class
+ * instances of Warehouse.
  */
 export type WarehouseConstructorArgs<T extends {} = {}> = Readonly<
     BuildingArgs & WarehouseProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * WeatherStation instances.
+ * The default args passed to a constructor function for class
+ * instances of WeatherStation.
  */
 export type WeatherStationConstructorArgs<T extends {} = {}> = Readonly<
     BuildingArgs & WeatherStationProperties & T
@@ -435,26 +434,26 @@ import { AnarchyGame } from "./game";
 import { AnarchyGameManager } from "./game-manager";
 import { AnarchyGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Building */
+/** The arguments used to construct a Building. */
 export type BuildingArgs = FirstArgumentFromConstructor<typeof Building>;
 
-/** The arguments used to construct a FireDepartment */
+/** The arguments used to construct a FireDepartment. */
 export type FireDepartmentArgs = FirstArgumentFromConstructor<
     typeof FireDepartment
 >;
 
-/** The arguments used to construct a Forecast */
+/** The arguments used to construct a Forecast. */
 export type ForecastArgs = FirstArgumentFromConstructor<typeof Forecast>;
 
-/** The arguments used to construct a PoliceDepartment */
+/** The arguments used to construct a PoliceDepartment. */
 export type PoliceDepartmentArgs = FirstArgumentFromConstructor<
     typeof PoliceDepartment
 >;
 
-/** The arguments used to construct a Warehouse */
+/** The arguments used to construct a Warehouse. */
 export type WarehouseArgs = FirstArgumentFromConstructor<typeof Warehouse>;
 
-/** The arguments used to construct a WeatherStation */
+/** The arguments used to construct a WeatherStation. */
 export type WeatherStationArgs = FirstArgumentFromConstructor<
     typeof WeatherStation
 >;
@@ -504,8 +503,8 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * Creates a new PoliceDepartment in the Game and tracks it for all
      * players.
      *
-     * @param args - Data about the PoliceDepartment to set. Any keys matching
-     * a property in the game object's class will be automatically set for you.
+     * @param args - Data about the PoliceDepartment to set. Any keys matching a
+     * property in the game object's class will be automatically set for you.
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */

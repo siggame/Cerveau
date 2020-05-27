@@ -13,7 +13,7 @@ import { Tile } from "./tile";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseCatastrophePlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -115,9 +115,9 @@ export class Player extends GameObject implements BaseCatastrophePlayer {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Gets every structure owned by this player, including new structures
+     * Gets every structure owned by this player, including new structures.
      *
-     * @returns All of this player's structures
+     * @returns All of this player's structures.
      */
     public getAllStructures(): Structure[] {
         return this.structures.concat(

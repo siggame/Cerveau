@@ -20,10 +20,10 @@ import { Mutable } from "~/utils";
  * theirs to win.
  */
 export class NecrowarGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: NecrowarGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -39,8 +39,7 @@ export class NecrowarGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -188,7 +187,7 @@ export class NecrowarGame extends BaseClasses.Game {
         this.players[1].mana = 100;
     }
 
-    /** Creates all unit types in the game */
+    /** Creates all unit types in the game. */
     private createunitJobs(): void {
         // pushes all unit types
         this.unitJobs.push(
@@ -335,7 +334,7 @@ export class NecrowarGame extends BaseClasses.Game {
     }
 
     /**
-     * Generates the map
+     * Generates the map.
      */
     private createMap(): void {
         /**
@@ -345,6 +344,7 @@ export class NecrowarGame extends BaseClasses.Game {
          * running createMap(), and it wraps the current scope, so that `this`
          * refers to the Game running `createMap()`, even though the game was
          * not passed.
+         *
          * @param x - The x coordinate. If off map throws an Error.
          * @param y - The y coordinate. If off map throws an Error.
          * @returns A Tile that is mutable JUST for this function scope.

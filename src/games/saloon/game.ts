@@ -14,7 +14,7 @@ import { Tile } from "./tile";
 import * as gaussian from "gaussian";
 import { Mutable } from "~/utils";
 
-/** A player that can mutate before the game starts */
+/** A player that can mutate before the game starts. */
 type MutablePlayer = Mutable<Player>;
 
 // <<-- /Creer-Merge: imports -->>
@@ -24,10 +24,10 @@ type MutablePlayer = Mutable<Player>;
  * brawling with enemy Cowboys.
  */
 export class SaloonGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: SaloonGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -69,8 +69,7 @@ export class SaloonGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -229,7 +228,8 @@ export class SaloonGame extends BaseClasses.Game {
             let x = 0;
             let y = 0;
 
-            while (true) {
+            let maxCheck = 1e8;
+            while (maxCheck-- > 0) {
                 x = Math.round(distributionX.ppf(this.manager.random.float()));
                 y = Math.round(distributionY.ppf(this.manager.random.float()));
                 const tile = this.getTile(x, y);

@@ -13,7 +13,7 @@ import { Spider } from "./spider";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseSpidersPlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**

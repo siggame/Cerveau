@@ -10,8 +10,8 @@ import { Web } from "./web";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * A location (node) connected to other Nests via Webs (edges) in the game that
- * Spiders can converge on, regardless of owner.
+ * A location (node) connected to other Nests via Webs (edges) in the game
+ * that Spiders can converge on, regardless of owner.
  */
 export class Nest extends GameObject {
     /**

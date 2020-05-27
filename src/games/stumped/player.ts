@@ -13,7 +13,7 @@ import { Tile } from "./tile";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseStumpedPlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -115,7 +115,7 @@ export class Player extends GameObject implements BaseStumpedPlayer {
             .filter((beaver) => beaver.health > 0);
     }
 
-    /** Re-calculates this player's branchesToBuildLodge number */
+    /** Re-calculates this player's branchesToBuildLodge number. */
     public calculateBranchesToBuildLodge(): void {
         this.branchesToBuildLodge = Math.ceil(
             this.game.lodgeCostConstant ** this.lodges.length,

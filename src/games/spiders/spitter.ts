@@ -50,7 +50,7 @@ export class Spitter extends Spiderling {
 
     // <<-- Creer-Merge: public-functions -->>
 
-    /** Kills the Spitter */
+    /** Kills the Spitter. */
     public kill(): void {
         super.kill();
 
@@ -58,10 +58,10 @@ export class Spitter extends Spiderling {
     }
 
     /**
-     * Finishes the actions of the Spitter
+     * Finishes the actions of the Spitter.
      *
-     * @param forceFinish - true if forcing the finish prematurely
-     * @returns True if the base finished, false otherwise
+     * @param forceFinish - True if forcing the finish prematurely.
+     * @returns True if the base finished, false otherwise.
      */
     public finish(forceFinish?: boolean): boolean {
         if (super.finish(forceFinish)) {
@@ -105,8 +105,8 @@ export class Spitter extends Spiderling {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param nest - The Nest you want to spit a Web to, thus connecting that
-     * Nest and the one the Spitter is on.
+     * @param nest - The Nest you want to spit a Web to, thus connecting
+     * that Nest and the one the Spitter is on.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -140,12 +140,12 @@ export class Spitter extends Spiderling {
     }
 
     /**
-     * Creates and spits a new Web from the Nest the Spitter is on to another
-     * Nest, connecting them.
+     * Creates and spits a new Web from the Nest the Spitter is on to
+     * another Nest, connecting them.
      *
      * @param player - The player that called this.
-     * @param nest - The Nest you want to spit a Web to, thus connecting that
-     * Nest and the one the Spitter is on.
+     * @param nest - The Nest you want to spit a Web to, thus connecting
+     * that Nest and the one the Spitter is on.
      * @returns True if the spit was successful, false otherwise.
      */
     protected async spit(player: Player, nest: Nest): Promise<boolean> {

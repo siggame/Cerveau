@@ -69,7 +69,7 @@ export class Unit extends GameObject {
     constructor(
         args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            /** The job to assign this new Unit to */
+            /** The job to assign this new Unit to. */
             job: UnitJob;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
@@ -484,17 +484,11 @@ export class Unit extends GameObject {
     protected async mine(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
 
-        let goldGain = 0;
-
-        // Assign Gold gain based on mine type
-        // tslint:disable-next-line:prefer-conditional-expression
-        if (this.tile && this.tile.isIslandGoldMine) {
-            // Is island Gold Mine
-            goldGain = this.game.islandIncomePerUnit;
-        } else {
-            // Is Normal Gold Mine
-            goldGain = this.game.goldIncomePerUnit;
-        }
+        const goldGain =
+            // Assign Gold gain based on mine type
+            this.tile && this.tile.isIslandGoldMine
+                ? this.game.islandIncomePerUnit // Is island Gold Mine
+                : this.game.goldIncomePerUnit; // Is Normal Gold Mine
 
         // Give gold to player
         player.gold += goldGain;

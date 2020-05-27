@@ -66,7 +66,7 @@ export class WeatherStation extends Building {
      */
     protected invalidateIntensify(
         player: Player,
-        negative: boolean = false,
+        negative = false,
     ): void | string | WeatherStationIntensifyArgs {
         // <<-- Creer-Merge: invalidate-intensify -->>
 
@@ -99,7 +99,7 @@ export class WeatherStation extends Building {
     }
 
     /**
-     * Bribe the weathermen to intensity the next Forecast by 1 or -1
+     * Bribe the weathermen to intensity the next Forecast by 1 or -1.
      *
      * @param player - The player that called this.
      * @param negative - By default the intensity will be increased by 1,
@@ -108,7 +108,7 @@ export class WeatherStation extends Building {
      */
     protected async intensify(
         player: Player,
-        negative: boolean = false,
+        negative = false,
     ): Promise<boolean> {
         // <<-- Creer-Merge: intensify -->>
 
@@ -143,7 +143,7 @@ export class WeatherStation extends Building {
      */
     protected invalidateRotate(
         player: Player,
-        counterclockwise: boolean = false,
+        counterclockwise = false,
     ): void | string | WeatherStationRotateArgs {
         // <<-- Creer-Merge: invalidate-rotate -->>
 
@@ -171,7 +171,7 @@ export class WeatherStation extends Building {
      */
     protected async rotate(
         player: Player,
-        counterclockwise: boolean = false,
+        counterclockwise = false,
     ): Promise<boolean> {
         // <<-- Creer-Merge: rotate -->>
 

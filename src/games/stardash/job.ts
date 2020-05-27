@@ -52,8 +52,8 @@ export class Job extends GameObject {
     public readonly shield!: number;
 
     /**
-     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
-     * 'miner'. (in this order from 0-4).
+     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport',
+     * or 'miner'. (in this order from 0-4).
      */
     public readonly title!:
         | "corvette"

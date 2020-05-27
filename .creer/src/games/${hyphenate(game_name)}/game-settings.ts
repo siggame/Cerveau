@@ -112,15 +112,17 @@ ${merge('                // ', 'map-height',
     }
 
     /**
-     * The current values for the game's settings
+     * The current values for the game's settings.
      */
 ${shared['cerveau']['wrap_between']('public values!: SettingsFromSchema<', game['name'] + 'GameSettingsManager["schema"]', '>;', indent=1)}
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
-     * @param someSettings A subset of settings that will be tested
-     * @returns An error if the settings fail to validate.
+     *
+     * @param someSettings - A subset of settings that will be tested.
+     * @returns An error if the settings fail to validate, otherwise the
+     * valid game settings for this game.
      */
     protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);

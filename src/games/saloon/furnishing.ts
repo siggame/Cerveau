@@ -84,9 +84,10 @@ export class Furnishing extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Damages this Furnishing for some amount of damage, setting isDestroyed if it dies
+     * Damages this Furnishing for some amount of damage, setting isDestroyed
+     * if it dies.
      *
-     * @param damage How much damage to do to this.
+     * @param damage - How much damage to do to this.
      */
     public damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);

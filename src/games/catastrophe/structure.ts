@@ -9,8 +9,8 @@ import { Tile } from "./tile";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
- * 'neutral').
+ * The type of Structure this
+ * is ('shelter', 'monument', 'wall', 'road', 'neutral').
  */
 export type StructureType =
     | "neutral"
@@ -46,8 +46,8 @@ export class Structure extends GameObject {
     public tile?: Tile;
 
     /**
-     * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
-     * 'neutral').
+     * The type of Structure this
+     * is ('shelter', 'monument', 'wall', 'road', 'neutral').
      */
     public readonly type!:
         | "neutral"

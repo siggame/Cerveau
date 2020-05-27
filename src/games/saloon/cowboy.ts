@@ -15,8 +15,9 @@ import { TileDirection } from "~/core/game/mixins/tiled";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The direction this Cowboy is moving while drunk. Will be 'North', 'East',
- * 'South', or 'West' when drunk; or '' (empty string) when not drunk.
+ * The direction this Cowboy is moving while drunk. Will
+ * be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string) when
+ * not drunk.
  */
 export type CowboyDrunkDirection = "" | "North" | "East" | "South" | "West";
 
@@ -36,9 +37,9 @@ export class Cowboy extends GameObject {
     public canMove!: boolean;
 
     /**
-     * The direction this Cowboy is moving while drunk. Will be 'North',
-     * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
-     * drunk.
+     * The direction this Cowboy is moving while drunk. Will
+     * be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string)
+     * when not drunk.
      */
     public drunkDirection!: "" | "North" | "East" | "South" | "West";
 
@@ -140,16 +141,17 @@ export class Cowboy extends GameObject {
     /**
      * String coercion override.
      *
-     * @returns string stating what this cowboy is
+     * @returns A string stating what this cowboy is.
      */
     public toString(): string {
         return `'${this.job}' ${this.gameObjectName} #${this.id}`;
     }
 
     /**
-     * Damages this cowboy for some amount of damage, setting isDead if it dies
+     * Damages this cowboy for some amount of damage,
+     * setting isDead if it dies.
      *
-     * @param damage How much damage to do to this
+     * @param damage - How much damage to do to this.
      */
     public damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);
@@ -169,9 +171,9 @@ export class Cowboy extends GameObject {
     }
 
     /**
-     * Gets this cowboy drunk
+     * Gets this cowboy drunk.
      *
-     * @param drunkDirection The valid string direction to set this.drunkDirection
+     * @param drunkDirection - The valid string direction to set this.drunkDirection.
      */
     public getDrunk(drunkDirection: CowboyDrunkDirection): void {
         this.owner.addRowdiness(1);
@@ -196,8 +198,8 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want this Cowboy to act on.
-     * @param drunkDirection - The direction the bottle will cause drunk
-     * cowboys to be in, can be 'North', 'East', 'South', or 'West'.
+     * @param drunkDirection - The direction the bottle will cause drunk cowboys
+     * to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -205,7 +207,7 @@ export class Cowboy extends GameObject {
     protected invalidateAct(
         player: Player,
         tile: Tile,
-        drunkDirection: "" | "North" | "East" | "South" | "West" = "",
+        drunkDirection: "" | "North" | "East" | "South" | "West",
     ): void | string | CowboyActArgs {
         // <<-- Creer-Merge: invalidate-act -->>
 
@@ -245,14 +247,14 @@ export class Cowboy extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile you want this Cowboy to act on.
-     * @param drunkDirection - The direction the bottle will cause drunk
-     * cowboys to be in, can be 'North', 'East', 'South', or 'West'.
+     * @param drunkDirection - The direction the bottle will cause drunk cowboys
+     * to be in, can be 'North', 'East', 'South', or 'West'.
      * @returns True if the act worked, false otherwise.
      */
     protected async act(
         player: Player,
         tile: Tile,
-        drunkDirection: "" | "North" | "East" | "South" | "West" = "",
+        drunkDirection: "" | "North" | "East" | "South" | "West",
     ): Promise<boolean> {
         // <<-- Creer-Merge: act -->>
 

@@ -46,8 +46,8 @@ export class Unit extends GameObject {
     public blueium!: number;
 
     /**
-     * The amount of blueium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of blueium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     public blueiumOre!: number;
 
@@ -78,8 +78,8 @@ export class Unit extends GameObject {
     public redium!: number;
 
     /**
-     * The amount of redium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of redium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     public rediumOre!: number;
 
@@ -100,11 +100,8 @@ export class Unit extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    // Any additional member attributes can go here
-    // NOTE: They will not be sent to the AIs, those must be defined
-    // in the creer file.
     /**
-     * tracks if a unit was attacked.
+     * Tracks if a unit was attacked.
      */
     public attacked: boolean;
 
@@ -436,8 +433,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be dropped on.
      * @param amount - The number of materials to dropped. Amounts <= 0 will
      * drop all the materials.
-     * @param material - The material the unit will drop. 'redium', 'blueium',
-     * 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will
+     * drop. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -485,8 +482,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be dropped on.
      * @param amount - The number of materials to dropped. Amounts <= 0 will
      * drop all the materials.
-     * @param material - The material the unit will drop. 'redium', 'blueium',
-     * 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will
+     * drop. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns True if successfully deposited, false otherwise.
      */
     protected async drop(
@@ -616,8 +613,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
      * pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'redium',
-     * 'blueium', 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will pick
+     * up. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -716,8 +713,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
      * pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'redium',
-     * 'blueium', 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will pick
+     * up. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns True if successfully deposited, false otherwise.
      */
     protected async pickup(
@@ -753,15 +750,15 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
      * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,
-        checkAction: boolean = false,
+        checkAction = false,
     ): string | undefined {
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;

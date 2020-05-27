@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -183,24 +182,24 @@ export interface PlayerProperties {
 }
 
 /**
- * The default args passed to a constructor function for
- * Checker instances.
+ * The default args passed to a constructor function for class
+ * instances of Checker.
  */
 export type CheckerConstructorArgs<T extends {} = {}> = Readonly<
     CheckerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseCheckersPlayer & PlayerProperties & T
@@ -222,7 +221,7 @@ import { CheckersGame } from "./game";
 import { CheckersGameManager } from "./game-manager";
 import { CheckersGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Checker */
+/** The arguments used to construct a Checker. */
 export type CheckerArgs = FirstArgumentFromConstructor<typeof Checker>;
 
 /**
@@ -233,8 +232,8 @@ export class CheckersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Checker in the Game and tracks it for all players.
      *
-     * @param args - Data about the Checker to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Checker to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Checker hooked up in the game and ready for you to use.
      */
     public checker<T extends CheckerArgs>(args: Readonly<T>): Checker & T {

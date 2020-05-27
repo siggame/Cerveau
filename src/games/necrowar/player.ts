@@ -14,7 +14,7 @@ import { Unit } from "./unit";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseNecrowarPlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**

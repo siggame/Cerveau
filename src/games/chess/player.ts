@@ -17,7 +17,7 @@ export type PlayerColor = "black" | "white";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseChessPlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -27,8 +27,8 @@ export class Player extends GameObject implements BaseChessPlayer {
     public readonly clientType!: string;
 
     /**
-     * The color (side) of this player. Either 'white' or 'black', with the
-     * 'white' player having the first move.
+     * The color (side) of this player. Either 'white' or 'black', with
+     * the 'white' player having the first move.
      */
     public readonly color!: "black" | "white";
 

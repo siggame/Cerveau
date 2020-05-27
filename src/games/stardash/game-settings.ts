@@ -198,12 +198,12 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
 
             // you can add more settings here, e.g.:
             /*
-        someVariableLikeUnitHealth: {
-            description: "Describe what this setting does for the players.",
-            default: 1337,
-            min: 1,
-        },
-        */
+            someVariableLikeUnitHealth: {
+                description: "Describe what this setting does for the players.",
+                default: 1337,
+                min: 1,
+            },
+            */
 
             // <<-- /Creer-Merge: schema -->>
 
@@ -239,15 +239,17 @@ export class StardashGameSettingsManager extends BaseClasses.GameSettings {
     }
 
     /**
-     * The current values for the game's settings
+     * The current values for the game's settings.
      */
     public values!: SettingsFromSchema<StardashGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
-     * @param someSettings A subset of settings that will be tested
-     * @returns An error if the settings fail to validate.
+     *
+     * @param someSettings - A subset of settings that will be tested.
+     * @returns An error if the settings fail to validate, otherwise the
+     * valid game settings for this game.
      */
     protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);

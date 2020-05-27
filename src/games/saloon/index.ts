@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -92,8 +91,8 @@ export interface BottleProperties {
     direction?: "North" | "East" | "South" | "West";
 
     /**
-     * The direction any Cowboys hit by this will move, can be 'North', 'East',
-     * 'South', or 'West'.
+     * The direction any Cowboys hit by this will move, can
+     * be 'North', 'East', 'South', or 'West'.
      */
     drunkDirection?: "North" | "East" | "South" | "West";
 
@@ -117,9 +116,9 @@ export interface CowboyProperties {
     canMove?: boolean;
 
     /**
-     * The direction this Cowboy is moving while drunk. Will be 'North',
-     * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
-     * drunk.
+     * The direction this Cowboy is moving while drunk. Will
+     * be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string)
+     * when not drunk.
      */
     drunkDirection?: "" | "North" | "East" | "South" | "West";
 
@@ -184,8 +183,8 @@ export interface CowboyActArgs {
      */
     tile?: Tile;
     /**
-     * The direction the bottle will cause drunk cowboys to be in, can be
-     * 'North', 'East', 'South', or 'West'.
+     * The direction the bottle will cause drunk cowboys to be in, can
+     * be 'North', 'East', 'South', or 'West'.
      */
     drunkDirection?: "" | "North" | "East" | "South" | "West";
 }
@@ -394,8 +393,8 @@ export interface TileProperties {
 /** All the possible properties for YoungGun instances. */
 export interface YoungGunProperties {
     /**
-     * The Tile that a Cowboy will be called in on if this YoungGun calls in a
-     * Cowboy.
+     * The Tile that a Cowboy will be called in on if this YoungGun calls in
+     * a Cowboy.
      */
     callInTile?: Tile;
 
@@ -417,8 +416,8 @@ export interface YoungGunProperties {
 
 /**
  * Argument overrides for YoungGun's callIn function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface YoungGunCallInArgs {
     /**
@@ -428,56 +427,56 @@ export interface YoungGunCallInArgs {
 }
 
 /**
- * The default args passed to a constructor function for
- * Bottle instances.
+ * The default args passed to a constructor function for class
+ * instances of Bottle.
  */
 export type BottleConstructorArgs<T extends {} = {}> = Readonly<
     BottleProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Cowboy instances.
+ * The default args passed to a constructor function for class
+ * instances of Cowboy.
  */
 export type CowboyConstructorArgs<T extends {} = {}> = Readonly<
     CowboyProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Furnishing instances.
+ * The default args passed to a constructor function for class
+ * instances of Furnishing.
  */
 export type FurnishingConstructorArgs<T extends {} = {}> = Readonly<
     FurnishingProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseSaloonPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tile instances.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
 export type TileConstructorArgs<T extends {} = {}> = Readonly<
     TileProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * YoungGun instances.
+ * The default args passed to a constructor function for class
+ * instances of YoungGun.
  */
 export type YoungGunConstructorArgs<T extends {} = {}> = Readonly<
     YoungGunProperties & T
@@ -507,19 +506,19 @@ import { SaloonGame } from "./game";
 import { SaloonGameManager } from "./game-manager";
 import { SaloonGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Bottle */
+/** The arguments used to construct a Bottle. */
 export type BottleArgs = FirstArgumentFromConstructor<typeof Bottle>;
 
-/** The arguments used to construct a Cowboy */
+/** The arguments used to construct a Cowboy. */
 export type CowboyArgs = FirstArgumentFromConstructor<typeof Cowboy>;
 
-/** The arguments used to construct a Furnishing */
+/** The arguments used to construct a Furnishing. */
 export type FurnishingArgs = FirstArgumentFromConstructor<typeof Furnishing>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a YoungGun */
+/** The arguments used to construct a YoungGun. */
 export type YoungGunArgs = FirstArgumentFromConstructor<typeof YoungGun>;
 
 /**
@@ -554,8 +553,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Furnishing to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Furnishing hooked up in the game and ready for you to
-     * use.
+     * @returns A new Furnishing hooked up in the game and ready for you to use.
      */
     public furnishing<T extends FurnishingArgs>(
         args: Readonly<T>,
@@ -566,8 +564,8 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {

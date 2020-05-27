@@ -4,7 +4,6 @@ import { BaseClasses, StardashGame, StardashGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 import { removeElements } from "~/utils";
-// any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -14,7 +13,7 @@ import { removeElements } from "~/utils";
  * together.
  */
 export class StardashGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -23,10 +22,10 @@ export class StardashGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: StardashGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: StardashGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -175,7 +174,9 @@ export class StardashGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -373,7 +374,8 @@ export class StardashGameManager extends BaseClasses.GameManager {
      * Update martyr protections.
      * This will take in the player to update protections for and update the
      * martyr protections for all of their units.
-     * @param player: the player to be updated.
+     *
+     * @param player - The player to be updated.
      */
     private updateMartyr(player: number): void {
         // all martyr ships owned by the player that can protect.
@@ -411,8 +413,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Game-Manager Materials
-     * This goes into the after turn function
+     * This goes into the after turn function.
      * Make planets pull materials off of ships and convert them into cash and
      * VP points. Regardless of owner if it is in range.
      */
@@ -439,11 +440,6 @@ export class StardashGameManager extends BaseClasses.GameManager {
                 unit.rarium = 0;
                 unit.legendarium = 0;
                 unit.mythicite = 0;
-                // thank them if they are the enemy
-                if (unit.owner !== baseA.owner) {
-                    // tslint:disable-next-line: no-console
-                    console.log("Thank you for the donation.");
-                }
                 // if it is a friendly ship, recharge it.
                 if (unit.owner === baseA.owner) {
                     const dif = unit.job.energy - unit.energy;
@@ -490,7 +486,7 @@ export class StardashGameManager extends BaseClasses.GameManager {
         return;
     }
 
-    /** Updates all arrays in the game with new/dead game objects */
+    /** Updates all arrays in the game with new/dead game objects. */
     private updateArrays(): void {
         // the sun
         const sun = this.game.bodies[2];

@@ -49,8 +49,8 @@ export class Building extends GameObject {
     public fire!: number;
 
     /**
-     * How much health this building currently has. When this reaches 0 the
-     * Building has been burned down.
+     * How much health this building currently has. When this reaches 0
+     * the Building has been burned down.
      */
     public health!: number;
 
@@ -117,7 +117,8 @@ export class Building extends GameObject {
 
     /**
      * Gets the neighbor in a direction of the building.
-     * @param direction The direction to get at
+     *
+     * @param direction - The direction to get at.
      * @returns The building in that direction, if there is one.
      */
     public getNeighbor(direction: string): Building | undefined {
@@ -138,10 +139,10 @@ export class Building extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to find a reason why the bribe (action) is invalid
+     * Tries to find a reason why the bribe (action) is invalid.
      *
-     * @param player - the player trying to bribe this building
-     * @returns a game logic error is returned if the bribe is NOT valid, undefined otherwise
+     * @param player - The player trying to bribe this building.
+     * @returns A game logic error is returned if the bribe is NOT valid, undefined otherwise.
      */
     protected invalidateBribe(player: Player): string | undefined {
         if (player !== this.owner) {

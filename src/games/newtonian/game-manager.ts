@@ -26,7 +26,7 @@ const score = (players: Player[]) =>
  * together.
  */
 export class NewtonianGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -35,10 +35,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: NewtonianGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: NewtonianGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -223,7 +223,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -254,6 +256,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
 
     /**
      * Attempts to spawn in a unit for a given player.
+     *
      * @param player - The player that will own the unit.
      * @param job - The job of the unit.
      * @returns True if unit is spawned, otherwise returns false.
@@ -288,9 +291,9 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * conveyMaterials
-     * This function moves materials and units on conveyor
-     * @param conveyors - a list of conveyors.
+     * This function moves materials and units on conveyor.
+     *
+     * @param conveyors - A list of conveyors.
      */
     private conveyMaterials(conveyors: Tile[]): void {
         for (let i = conveyors.length - 1; i >= 0; i--) {
@@ -336,11 +339,10 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Game-Manager Materials
-     * This goes into the after turn function
-     * Select the player who's turns it currently isn't, and spawn materials
+     * This goes into the after turn function.
+     * Selects the player who's turns it currently isn't, and spawn materials
      * on their side of the base.
-     * Makes sure all conveyers move units and materials ontop of them.
+     * Makes sure all conveyers move units and materials on top of them.
      */
     private manageMaterials(): void {
         // Spawns the appropriate ore at the start of the conveyor
@@ -356,7 +358,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         return;
     }
 
-    /** Updates all arrays in the game with new/dead game objects */
+    /** Updates all arrays in the game with new/dead game objects. */
     private updateArrays(): void {
         // Properly remove all killed units
         const deadUnits = this.game.units.filter(
@@ -378,7 +380,7 @@ export class NewtonianGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates all units */
+    /** Updates all units. */
     private updateUnits(): void {
         for (const unit of this.game.units) {
             if (unit.stunTime > 0) {

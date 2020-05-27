@@ -92,8 +92,8 @@ export class Tile extends GameObject implements BaseTile {
     public numZombies!: number;
 
     /**
-     * Which player owns this tile, only applies to grass tiles for workers,
-     * NULL otherwise.
+     * Which player owns this tile, only applies to grass tiles for
+     * workers, NULL otherwise.
      */
     public owner?: Player;
 
@@ -202,7 +202,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -227,7 +227,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */

@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 <%include file="functions.noCreer" />
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 ${shared['cerveau']['imports']({
@@ -107,7 +106,7 @@ for attr_name in sort_dict_keys(game_obj['attributes']):
 %>/** All the possible properties for ${game_obj_name} instances. */
 export interface ${game_obj_name}Properties {${'}' if not attrs else ''}
 %   for i, attr_name, attr in attrs:
-${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', attr)}
+${'\n' if i > 0 else ''}${shared['cerveau']['block_comment'](attr, indent=1)}
 <%
     prop_name = '    {}?:'.format(attr_name)
     type_val = shared['cerveau']['type'](attr['type'], nullable=False)
@@ -123,12 +122,11 @@ ${'}\n' if attrs else ''}
         continue
     function_parms = game_obj['functions'][function_name]
 %>${shared['cerveau']['block_comment'](
-    '',
     "Argument overrides for {}'s {} function. If you return an object of this interface from the invalidate functions, the value(s) you set will be used in the actual function.".format(game_obj_name, function_name)
 )}
 export interface ${game_obj_name}${upcase_first(function_name)}Args {${'}' if not function_parms['arguments'] else ''}
 %       for arg in function_parms['arguments']:
-${shared['cerveau']['block_comment']('    ', arg)}
+${shared['cerveau']['block_comment'](arg, indent=1)}
     ${arg['name']}?: ${shared['cerveau']['type'](arg['type'])};
 %       endfor
 ${'}\n' if function_parms['arguments'] else ''}
@@ -146,8 +144,8 @@ if game_obj_name == 'Player':
     parent_unions.append('Base' + game_name + 'Player')
 unions = parent_unions + [ game_obj_name + 'Properties', 'T' ]
 %>/**
- * The default args passed to a constructor function for
- * ${game_obj_name} instances.
+ * The default args passed to a constructor function for class
+ * instances of ${game_obj_name}.
  */
 export type ${game_obj_name}ConstructorArgs<T extends {} = {}> = Readonly<
     ${' & '.join(unions)}
@@ -191,7 +189,7 @@ import { AI } from "./ai";
 
     if len(oargs) > 80:
         oargs = oargs_front + '\n    ' + oargs_typeof + '\n' + oargs_end
-%>/** The arguments used to construct a ${game_obj_name} */
+%>/** The arguments used to construct a ${game_obj_name}. */
 ${oargs}
 
 % endfor
@@ -208,7 +206,7 @@ for game_obj_name in sort_dict_keys(game_objs):
 %>
 export class ${game_name}GameObjectFactory extends BaseGameObjectFactory {${'}' if not game_objs_factory else ''}
 % for i, game_obj_name in enumerate(game_objs_factory):
-${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', {
+${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']({
     'description': 'Creates a new {} in the Game and tracks it for all players.'.format(game_obj_name),
     'arguments': [
         {
@@ -219,7 +217,7 @@ ${'\n' if i > 0 else ''}${shared['cerveau']['block_comment']('    ', {
     'returns': {
         'description': 'A new {} hooked up in the game and ready for you to use.'.format(game_obj_name)
     }
-})}<%
+}, indent=1)}<%
 def build_fac_top():
     fac_sig = '    public {}<T extends {}Args>('.format(uncapitalize(game_obj_name), game_obj_name)
     fac_arg = 'args: Readonly<T>'

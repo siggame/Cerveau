@@ -16,9 +16,10 @@ export class AI extends BaseClasses.AI {
     /**
      * This is called every time it is this AI.player's turn to make a move.
      *
-     * @returns A string in Universal Chess Inferface (UCI) or Standard
-     * Algebraic Notation (SAN) formatting for the move you want to make. If
-     * the move is invalid or not properly formatted you will lose the game.
+     * @returns A string in Universal Chess Inferface (UCI)
+     * or Standard Algebraic Notation (SAN) formatting for the move you want to
+     * make. If the move is invalid or not properly formatted you will lose the
+     * game.
      */
     public async makeMove(): Promise<string> {
         return this.executeOrder("makeMove");

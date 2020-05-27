@@ -6,10 +6,10 @@ import { BaseClasses, ChessGame, ChessGameObjectFactory } from "./";
 import { Move } from "chess.js";
 
 /**
- * Checks if the move a capture, promotion, or pawn movement
+ * Checks if the move a capture, promotion, or pawn movement.
  *
- * @param move - The move to check against
- * @returns True is so, false otherwise
+ * @param move - The move to check against.
+ * @returns True is so, false otherwise.
  */
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
@@ -28,7 +28,7 @@ const gameOver50TurnMessage =
  * together.
  */
 export class ChessGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -37,10 +37,10 @@ export class ChessGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: ChessGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: ChessGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -51,17 +51,20 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: protected-private-methods -->>
 
-    /** How many turns till 50 move draw during simplified three fold repetition */
+    /**
+     * How many turns till 50 move draw during simplified three fold
+     * repetition.
+     */
     private halfMoveCountSTFR = 0; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
-    /** Starts the game play */
+    /** Starts the game play. */
     protected start(): void {
         super.start();
         this.runSideToMove();
     }
 
     /**
-     * Runs the current turn of the player whose turn it is
+     * Runs the current turn of the player whose turn it is.
      *
      * @returns A promise that resolves once this specific turn is ended.
      */
@@ -233,8 +236,8 @@ Valid moves: ${
     /**
      * Cleans a move so chess.js can accept a wider range of moves.
      *
-     * @param uncleanedMoved - The SAN move to clean
-     * @returns A new SAN move that more easily works with chess.js
+     * @param uncleanedMoved - The SAN move to clean.
+     * @returns A new SAN move that more easily works with chess.js.
      */
     private cleanMove(uncleanedMoved: string): string {
         // remove all whitespace from move

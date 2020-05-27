@@ -138,7 +138,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
@@ -163,7 +163,7 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */

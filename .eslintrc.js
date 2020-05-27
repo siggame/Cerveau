@@ -9,7 +9,7 @@ process.env.ESLINT_PATH_TSCONFIG = resolve("./tsconfig.eslint.json");
 /** @type {import("eslint").Linter.Config} */
 const baseEslintConfig = {
     extends: ["jacobfischer/node"],
-    ignorePatterns: ["dist/*", "docs/*", "logs/*", "src/games/*"],
+    ignorePatterns: ["dist/*", "docs/*", "logs/*"],
     rules: {
         "no-console": "error",
 

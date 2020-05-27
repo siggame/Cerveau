@@ -372,7 +372,7 @@ export class Unit extends GameObject {
 
     /**
      * Buries gold on this Unit's Tile. Gold must be a certain distance away
-     * for it to get interest (Game.minInterestDistance).
+     * for it to get interest (`Game.minInterestDistance`).
      *
      * @param player - The player that called this.
      * @param amount - How much gold this Unit should bury. Amounts <= 0 will
@@ -408,7 +408,7 @@ export class Unit extends GameObject {
      */
     protected invalidateDeposit(
         player: Player,
-        amount: number = 0,
+        amount = 0,
     ): void | string | UnitDepositArgs {
         // <<-- Creer-Merge: invalidate-deposit -->>
 
@@ -446,18 +446,15 @@ export class Unit extends GameObject {
 
     /**
      * Puts gold into an adjacent Port. If that Port is the Player's port, the
-     * gold is added to that Player. If that Port is owned by merchants, it
-     * adds to that Port's investment.
+     * gold is added to that Player. If that Port is owned by merchants, it adds
+     * to that Port's investment.
      *
      * @param player - The player that called this.
      * @param amount - The amount of gold to deposit. Amounts <= 0 will deposit
      * all the gold on this Unit.
      * @returns True if successfully deposited, false otherwise.
      */
-    protected async deposit(
-        player: Player,
-        amount: number = 0,
-    ): Promise<boolean> {
+    protected async deposit(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: deposit -->>
 
         this.gold -= amount;
@@ -507,7 +504,7 @@ export class Unit extends GameObject {
      */
     protected invalidateDig(
         player: Player,
-        amount: number = 0,
+        amount = 0,
     ): void | string | UnitDigArgs {
         // <<-- Creer-Merge: invalidate-dig -->>
 
@@ -546,7 +543,7 @@ export class Unit extends GameObject {
      * dig up as much as possible.
      * @returns True if successfully dug up, false otherwise.
      */
-    protected async dig(player: Player, amount: number = 0): Promise<boolean> {
+    protected async dig(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: dig -->>
 
         if (!this.tile) {
@@ -641,8 +638,8 @@ export class Unit extends GameObject {
     /**
      * Moves this Unit from its current Tile to an adjacent Tile. If this Unit
      * merges with another one, the other Unit will be destroyed and its tile
-     * will be set to undefined. Make sure to check that your Unit's tile is
-     * not undefined before doing things with it.
+     * will be set to undefined. Make sure to check that your Unit's tile is not
+     * undefined before doing things with it.
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Unit should move to.
@@ -756,8 +753,8 @@ export class Unit extends GameObject {
      * @param tile - The Tile to move the crew to.
      * @param amount - The number of crew to move onto that Tile. Amount <= 0
      * will move all the crew to that Tile.
-     * @param gold - The amount of gold the crew should take with them. Gold <
-     * 0 will move all the gold to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold < 0
+     * will move all the gold to that Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -765,8 +762,8 @@ export class Unit extends GameObject {
     protected invalidateSplit(
         player: Player,
         tile: Tile,
-        amount: number = 1,
-        gold: number = 0,
+        amount = 1,
+        gold = 0,
     ): void | string | UnitSplitArgs {
         // <<-- Creer-Merge: invalidate-split -->>
 
@@ -840,15 +837,15 @@ export class Unit extends GameObject {
      * @param tile - The Tile to move the crew to.
      * @param amount - The number of crew to move onto that Tile. Amount <= 0
      * will move all the crew to that Tile.
-     * @param gold - The amount of gold the crew should take with them. Gold <
-     * 0 will move all the gold to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold < 0
+     * will move all the gold to that Tile.
      * @returns True if successfully split, false otherwise.
      */
     protected async split(
         player: Player,
         tile: Tile,
-        amount: number = 1,
-        gold: number = 0,
+        amount = 1,
+        gold = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: split -->>
 
@@ -943,7 +940,7 @@ export class Unit extends GameObject {
      */
     protected invalidateWithdraw(
         player: Player,
-        amount: number = 0,
+        amount = 0,
     ): void | string | UnitWithdrawArgs {
         // <<-- Creer-Merge: invalidate-withdraw -->>
 
@@ -985,10 +982,7 @@ export class Unit extends GameObject {
      * withdraw everything.
      * @returns True if successfully withdrawn, false otherwise.
      */
-    protected async withdraw(
-        player: Player,
-        amount: number = 0,
-    ): Promise<boolean> {
+    protected async withdraw(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: withdraw -->>
 
         this.gold += amount;
@@ -1002,11 +996,11 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
-     * @returns the reason this is invalid, undefined if looks valid so far
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
+     * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,

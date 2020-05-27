@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -240,8 +239,8 @@ export interface TileProperties {
     numZombies?: number;
 
     /**
-     * Which player owns this tile, only applies to grass tiles for workers,
-     * NULL otherwise.
+     * Which player owns this tile, only applies to grass tiles for
+     * workers, NULL otherwise.
      */
     owner?: Player;
 
@@ -292,8 +291,8 @@ export interface TileProperties {
 
 /**
  * Argument overrides for Tile's res function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface TileResArgs {
     /**
@@ -316,8 +315,8 @@ export interface TileSpawnUnitArgs {
 
 /**
  * Argument overrides for Tile's spawnWorker function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface TileSpawnWorkerArgs {}
 
@@ -470,8 +469,8 @@ export interface UnitBuildArgs {
 
 /**
  * Argument overrides for Unit's fish function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitFishArgs {
     /**
@@ -482,8 +481,8 @@ export interface UnitFishArgs {
 
 /**
  * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMineArgs {
     /**
@@ -494,8 +493,8 @@ export interface UnitMineArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMoveArgs {
     /**
@@ -542,8 +541,9 @@ export interface UnitJobProperties {
     range?: number;
 
     /**
-     * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
-     * 'wraith' or 'horseman'.
+     * The type
+     * title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination', 'wraith'
+     * or 'horseman'.
      */
     title?:
         | "worker"
@@ -556,56 +556,56 @@ export interface UnitJobProperties {
 }
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseNecrowarPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tile instances.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
 export type TileConstructorArgs<T extends {} = {}> = Readonly<
     TileProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tower instances.
+ * The default args passed to a constructor function for class
+ * instances of Tower.
  */
 export type TowerConstructorArgs<T extends {} = {}> = Readonly<
     TowerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * TowerJob instances.
+ * The default args passed to a constructor function for class
+ * instances of TowerJob.
  */
 export type TowerJobConstructorArgs<T extends {} = {}> = Readonly<
     TowerJobProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Unit instances.
+ * The default args passed to a constructor function for class
+ * instances of Unit.
  */
 export type UnitConstructorArgs<T extends {} = {}> = Readonly<
     UnitProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * UnitJob instances.
+ * The default args passed to a constructor function for class
+ * instances of UnitJob.
  */
 export type UnitJobConstructorArgs<T extends {} = {}> = Readonly<
     UnitJobProperties & T
@@ -635,19 +635,19 @@ import { NecrowarGame } from "./game";
 import { NecrowarGameManager } from "./game-manager";
 import { NecrowarGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Tower */
+/** The arguments used to construct a Tower. */
 export type TowerArgs = FirstArgumentFromConstructor<typeof Tower>;
 
-/** The arguments used to construct a TowerJob */
+/** The arguments used to construct a TowerJob. */
 export type TowerJobArgs = FirstArgumentFromConstructor<typeof TowerJob>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
-/** The arguments used to construct a UnitJob */
+/** The arguments used to construct a UnitJob. */
 export type UnitJobArgs = FirstArgumentFromConstructor<typeof UnitJob>;
 
 /**
@@ -658,8 +658,8 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
@@ -691,8 +691,8 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
     public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
@@ -702,8 +702,8 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new UnitJob in the Game and tracks it for all players.
      *
-     * @param args - Data about the UnitJob to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the UnitJob to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new UnitJob hooked up in the game and ready for you to use.
      */
     public unitJob<T extends UnitJobArgs>(args: Readonly<T>): UnitJob & T {

@@ -25,14 +25,14 @@ export class Forecast extends GameObject {
     public readonly controllingPlayer: Player;
 
     /**
-     * The direction the wind will blow fires in. Can be 'north', 'east',
-     * 'south', or 'west'.
+     * The direction the wind will blow fires in. Can
+     * be 'north', 'east', 'south', or 'west'.
      */
     public direction!: "North" | "East" | "South" | "West";
 
     /**
-     * How much of a Building's fire that can be blown in the direction of this
-     * Forecast. Fire is duplicated (copied), not moved (transfered).
+     * How much of a Building's fire that can be blown in the direction of
+     * this Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     public intensity!: number;
 

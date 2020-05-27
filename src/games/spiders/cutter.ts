@@ -48,7 +48,7 @@ export class Cutter extends Spiderling {
 
     // <<-- Creer-Merge: public-functions -->>
 
-    /** Kills the Cutter */
+    /** Kills the Cutter. */
     public kill(): void {
         super.kill();
 
@@ -56,10 +56,10 @@ export class Cutter extends Spiderling {
     }
 
     /**
-     * Finishes the actions of the Cutter
+     * Finishes the actions of the Cutter.
      *
-     * @param forceFinish - true if forcing the finish prematurely
-     * @returns True if the base logic can handle finishing
+     * @param forceFinish - True if forcing the finish prematurely.
+     * @returns True if the base logic can handle finishing.
      */
     public finish(forceFinish?: boolean): boolean {
         if (this.finish(forceFinish)) {
@@ -83,8 +83,8 @@ export class Cutter extends Spiderling {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param web - The web you want to Cut. Must be connected to the Nest this
-     * Cutter is currently on.
+     * @param web - The web you want to Cut. Must be connected to the Nest
+     * this Cutter is currently on.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -115,8 +115,8 @@ export class Cutter extends Spiderling {
      * Cuts a web, destroying it, and any Spiderlings on it.
      *
      * @param player - The player that called this.
-     * @param web - The web you want to Cut. Must be connected to the Nest this
-     * Cutter is currently on.
+     * @param web - The web you want to Cut. Must be connected to the Nest
+     * this Cutter is currently on.
      * @returns True if the cut was successfully started, false otherwise.
      */
     protected async cut(player: Player, web: Web): Promise<boolean> {

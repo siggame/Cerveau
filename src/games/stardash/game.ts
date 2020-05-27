@@ -18,10 +18,10 @@ import { Unit } from "./unit";
  * outcompete your competetor.
  */
 export class StardashGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: StardashGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -54,8 +54,7 @@ export class StardashGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -65,8 +64,8 @@ export class StardashGame extends BaseClasses.Game {
     public readonly genariumValue!: number;
 
     /**
-     * A list of all jobs. first item is corvette, second is missileboat, third
-     * is martyr, fourth is transport, and fifth is miner.
+     * A list of all jobs. The first element is corvette, second is
+     * missileboat, third is martyr, fourth is transport, and fifth is miner.
      */
     public jobs!: Job[];
 
@@ -202,7 +201,7 @@ export class StardashGame extends BaseClasses.Game {
     // <<-- Creer-Merge: attributes -->>
 
     /**
-     * stores mythicite that was lost via unit death.
+     * Stores mythicite that was lost via unit death.
      */
     public lostMythicite!: number;
 
@@ -239,7 +238,7 @@ export class StardashGame extends BaseClasses.Game {
     /**
      * Updates the protector for a unit.
      *
-     * @param unit: the unit that needs it's protector updated.
+     * @param unit - The unit that needs it's protector updated.
      */
     public updateProtector(unit: Unit): void {
         // if it has no owner, cancel the function.
@@ -276,7 +275,7 @@ export class StardashGame extends BaseClasses.Game {
     // <<-- /Creer-Merge: public-functions -->>
 
     // <<-- Creer-Merge: protected-private-functions -->>
-    /** Creates all the Jobs in the game */
+    /** Creates all the Jobs in the game. */
     private createJobs(): void {
         // push all three jobs.
         this.jobs.push(
@@ -338,7 +337,7 @@ export class StardashGame extends BaseClasses.Game {
         );
     }
 
-    /** Generates the map for testing */
+    /** Generates the map for testing. */
     private createMap(): void {
         // push all the bodies that are made in the generator.
         this.bodies.push(
@@ -473,9 +472,10 @@ export class StardashGame extends BaseClasses.Game {
      * Creates the asteroids on the map.
      * This function creates asteroids around the sun, and mirrors them
      * so there is a copy on the other side.
-     * @param amount: the number of asteroids to be generated.
-     * @param minSize: the minimum size of a asteroid.
-     * @param maxSize: the maximum size of a asteroid.
+     *
+     * @param amount - The number of asteroids to be generated.
+     * @param minSize - The minimum size of a asteroid.
+     * @param maxSize - The maximum size of a asteroid.
      */
     private generateAsteroids(
         amount: number,
@@ -616,30 +616,27 @@ export class StardashGame extends BaseClasses.Game {
     /**
      * Function the tries to grow the asteroids to the set max size.
      *
-     * @param asteroids: a list of the asteroids to be grown.
-     * @param minSize: the minimum size that a asteroid will grow from.
-     * @param maxSize: the maximum size that a asteroid will grow to.
-     * @param preGrown: tracks if some pregrowing has been done.
-     *
-     * @returns: nothing, it edits the asteroids, and will remove collisions.
+     * @param asteroids - A list of the asteroids to be grown.
+     * @param minSize - The minimum size that a asteroid will grow from.
+     * @param maxSize - The maximum size that a asteroid will grow to.
+     * @param preGrown - Tracks if some pregrowing has been done.
      */
     private growAsteroids(
         asteroids: Body[],
         minSize: number,
         maxSize: number,
-        preGrown: boolean = false,
+        preGrown = false,
     ): void {
         // tracks which asteroids have grown.
         const grown: boolean[] = [];
         // tracks how many asteroids are done growing.
-        let amtGrown: number = 0;
+        let amtGrown = 0;
 
         // grows each asteroid and sets up the grown tracker.
         if (preGrown) {
-            // tslint:disable-next-line: prefer-for-of
-            for (let x = 0; x < asteroids.length; x++) {
+            for (const asteroid of asteroids) {
                 // if the asteroid hasn't already been grown.
-                if (asteroids[x].radius === minSize) {
+                if (asteroid.radius === minSize) {
                     // make it isn't grown.
                     grown.push(false);
                 } else {
@@ -648,7 +645,6 @@ export class StardashGame extends BaseClasses.Game {
                 }
             }
         } else {
-            // tslint:disable-next-line: prefer-for-of
             for (let x = 0; x < asteroids.length; x++) {
                 // mark it isn't grown.
                 grown.push(false);
@@ -714,9 +710,8 @@ export class StardashGame extends BaseClasses.Game {
      * Function that handles collisions between asteroids. Removes asteroids
      * with the highest collision count.
      *
-     * @param asteroids: a list of the asteroids to be grown.
-     *
-     * @returns: a list of the asteroids after the pruning.
+     * @param asteroids - A list of the asteroids to be grown.
+     * @returns A list of the asteroids after the pruning.
      */
     private collideAsteroids(asteroids: Body[]): Body[] {
         // track the largest number of collisions.
@@ -727,7 +722,6 @@ export class StardashGame extends BaseClasses.Game {
         const collide: number[][] = [];
 
         // initialize valid.
-        // tslint:disable-next-line: prefer-for-of
         for (let x = 0; x < asteroids.length; x++) {
             collide.push([]);
         }
@@ -764,9 +758,9 @@ export class StardashGame extends BaseClasses.Game {
             for (let x = 0; x < asteroids.length; x++) {
                 if (collide[x].length === length) {
                     for (const col of collide[x]) {
-                        if (collide[col] && collide[col].indexOf(x) !== -1) {
+                        if (collide[col] && collide[col].includes(x)) {
                             collide[col].splice(collide[col].indexOf(x), 1);
-                        } else if (collide[col].indexOf(x) !== -1) {
+                        } else if (collide[col].includes(x)) {
                             collide.splice(x, 1);
                             break;
                         }
@@ -790,13 +784,12 @@ export class StardashGame extends BaseClasses.Game {
      * designated amount and checks to see if they collide.
      * It removes the asteroids from the first list.
      *
-     * @param s1: this is the list of asteroids to be shifted and edited.
-     * @param s2: this is the list of asteroids to be compared to.
-     * @param shift: this is the amount the copy of the first list will be shifted
-     *
-     * @returns: it edits s2.
+     * @param s1 - The list of asteroids to be shifted and edited.
+     * @param s2 - The list of asteroids to be compared to.
+     * @param shift - The amount the copy of the first list will be shifted.
+     * @returns The Body passed as `s2` returned and mutated.
      */
-    private collideSectors(s1: Body[], s2: Body[], shift: number = 0): Body[] {
+    private collideSectors(s1: Body[], s2: Body[], shift = 0): Body[] {
         // tracks the valid asteroids to be returned
         const valid: Body[] = [];
         // track any asteroids that collided
@@ -850,18 +843,17 @@ export class StardashGame extends BaseClasses.Game {
      * designated amount and checks to see if they collide.
      * It removes the asteroids from the first list.
      *
-     * @param s1: this is the list of asteroids to be shifted and edited.
-     * @param s2: this is the list of asteroids to be compared to.
-     * @param minSize: the minimum size of a asteroid.
-     * @param shift: this is the amount the copy of the first list will be shifted
-     *
-     * @returns: it edits s2.
+     * @param s1 - This is the list of asteroids to be shifted and edited.
+     * @param s2 - This is the list of asteroids to be compared to.
+     * @param minSize - The minimum size of a asteroid.
+     * @param shift - This is the amount the copy of the first list will be shifted.
+     * @returns The Body passed in as `s2` now mutated.
      */
     private collideSize(
         s1: Body[],
         s2: Body[],
         minSize: number,
-        shift: number = 0,
+        shift = 0,
     ): Body[] {
         // tracks the valid asteroids to be returned
         const valid: Body[] = [];
@@ -904,13 +896,11 @@ export class StardashGame extends BaseClasses.Game {
     }
 
     /**
-     * this function clones the asteroids in the second list into the first list
+     * This function clones the asteroids in the second list into the first list
      * with it's 8 rotations around the sun.
      *
-     * @param master: The list to be added to.
-     * @param clone: the list that is being cloned from.
-     *
-     * @returns: it adds the rotations of list two into list one.
+     * @param master - The list to be added to.
+     * @param clone - The list that is being cloned from.
      */
     private cloneAsteroids(master: Body[], clone: Body[]): void {
         // iterate over each of the asteroids to be clones.
@@ -1002,11 +992,10 @@ export class StardashGame extends BaseClasses.Game {
     /**
      * Gets the x value of the angle and distance.
      *
-     * @param distance: the distance from the center.
-     * @param angle: the angle from a top, like a rotated 90 degree to the right
-     * unit circle.
-     *
-     * @returns the x value at it's distance and angle
+     * @param distance - The distance from the center.
+     * @param angle - The angle from a top, like a rotated 90 degree to the
+     * right unit circle.
+     * @returns The x value at its distance and angle.
      */
     private getX(distance: number, angle: number): number {
         // gets the x location if there is a passed distance.
@@ -1023,11 +1012,10 @@ export class StardashGame extends BaseClasses.Game {
     /**
      * Gets the y value of the angle and distance.
      *
-     * @param distance: the distance from the center.
-     * @param angle: the angle from a top, like a rotated 90 degree to the right
-     * unit circle.
-     *
-     * @returns the y value at it's distance and angle
+     * @param distance - The distance from the center.
+     * @param angle - The angle from a top, like a rotated 90 degree to the
+     * right unit circle.
+     * @returns The y value at it's distance and angle.
      */
     private getY(distance: number, angle: number): number {
         // gets the y location if there is a passed distance.

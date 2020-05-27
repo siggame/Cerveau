@@ -16,7 +16,7 @@ import { Tile } from "./tile";
  * together.
  */
 export class SaloonGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -26,24 +26,22 @@ export class SaloonGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: SaloonGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: SaloonGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
 
     /**
-     * list of cowboys to add to their cowboy lists between turns (so we don't
-     * resize arrays during players turns)
+     * List of cowboys to add to their cowboy lists between turns (so we don't
+     * resize arrays during players turns).
      */
     public readonly spawnedCowboys: Cowboy[] = [];
 
     /**
-     * Checks if someone won, and if so declares a winner
-     *
-     * @returns True if there was a winner and the game is over, false otherwise
+     * Checks if someone won, and if so declares a winner.
      */
     public checkForWinner(): void {
         if (this.primaryWinConditionsCheck()) {
@@ -153,7 +151,9 @@ export class SaloonGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -199,7 +199,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     /**
-     * Take all the cowboys spawned during the turn and put them in the appropriate arrays
+     * Take all the cowboys spawned during the turn and put them in the appropriate arrays.
      */
     private updateSpawnedCowboys(): void {
         for (const cowboy of this.spawnedCowboys) {
@@ -292,7 +292,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Moves all bottles currently in the game
+     * Moves all bottles currently in the game.
      */
     private advanceBottles(): void {
         const bottlesAtTile = new Map<Tile, Bottle[]>();
@@ -332,7 +332,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Damages all pianos 1 damage, accelerating the game
+     * Damages all pianos 1 damage, accelerating the game.
      */
     private resetPianoPlaying(): void {
         for (const furnishing of this.game.furnishings) {
@@ -345,7 +345,7 @@ export class SaloonGameManager extends BaseClasses.GameManager {
     }
 
     /**
-     * Damages all cowboys which are standing on a hazard
+     * Damages all cowboys which are standing on a hazard.
      */
     private applyHazardDamage(): void {
         for (const cowboy of this.game.cowboys) {

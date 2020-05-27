@@ -16,7 +16,7 @@ import { WeatherStation } from "./weather-station";
  * A player in this game. Every AI controls one player.
  */
 export class Player extends GameObject implements BaseAnarchyPlayer {
-    /** The AI controlling this Player */
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**

@@ -8,7 +8,7 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, IPoint, make2D } from "~/utils";
+import { arrayHasElements, IPoint, make2D, Mutable } from "~/utils";
 
 const DIRECTIONAL_OFFSETS = {
     North: { x: 0, y: -1 },
@@ -17,10 +17,22 @@ const DIRECTIONAL_OFFSETS = {
     West: { x: -1, y: 0 },
 };
 
+/**
+ * Transforms a point to a string key.
+ *
+ * @param pt - The point to transform to a key.
+ * @returns The string key.
+ */
 function pointToKey(pt: IPoint): string {
     return `${pt.x},${pt.y}`;
 }
 
+/**
+ * Transforms a string key to a point.
+ *
+ * @param str - The string key to transform to a point.
+ * @returns The point.
+ */
 function keyToPoint(str: string): IPoint {
     const split = str.split(",");
 
@@ -37,10 +49,10 @@ function keyToPoint(str: string): IPoint {
  * player's buildings. Let it burn.
  */
 export class AnarchyGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: AnarchyGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -77,8 +89,7 @@ export class AnarchyGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -196,7 +207,8 @@ export class AnarchyGame extends BaseClasses.Game {
             let from: IPoint = keyToPoint(points[i]);
             const to: IPoint = keyToPoint(points[i + 1]);
 
-            while (true) {
+            let itter = 0;
+            while (itter++ < 1e9) {
                 const changes: IPoint[] = [];
                 // Is there a better way to do this?
                 if (from.x < to.x) {
@@ -291,8 +303,15 @@ export class AnarchyGame extends BaseClasses.Game {
             for (const [direction, offset] of Object.entries(
                 DIRECTIONAL_OFFSETS,
             )) {
-                // tslint:disable-next-line:no-any no-unsafe-any - any other way would be stupid over complex
-                (building as any)[`building${direction}`] = this.getBuildingAt(
+                const buildingDirection = `building${direction}` as
+                    | "buildingNorth"
+                    | "buildingSouth"
+                    | "buildingEast"
+                    | "buildingWest";
+
+                (building as Mutable<Building>)[
+                    buildingDirection
+                ] = this.getBuildingAt(
                     building.x + offset.x,
                     building.y + offset.y,
                 );

@@ -9,14 +9,14 @@ import { Cowboy } from "./cowboy";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The Direction this Bottle is flying and will move to between turns, can be
- * 'North', 'East', 'South', or 'West'.
+ * The Direction this Bottle is flying and will move to between turns, can
+ * be 'North', 'East', 'South', or 'West'.
  */
 export type BottleDirection = "North" | "East" | "South" | "West";
 
 /**
- * The direction any Cowboys hit by this will move, can be 'North', 'East',
- * 'South', or 'West'.
+ * The direction any Cowboys hit by this will move, can
+ * be 'North', 'East', 'South', or 'West'.
  */
 export type BottleDrunkDirection = "North" | "East" | "South" | "West";
 
@@ -31,8 +31,8 @@ export class Bottle extends GameObject {
     public readonly direction!: "North" | "East" | "South" | "West";
 
     /**
-     * The direction any Cowboys hit by this will move, can be 'North', 'East',
-     * 'South', or 'West'.
+     * The direction any Cowboys hit by this will move, can
+     * be 'North', 'East', 'South', or 'West'.
      */
     public readonly drunkDirection!: "North" | "East" | "South" | "West";
 
@@ -85,8 +85,8 @@ export class Bottle extends GameObject {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Advances the bottle (moves it) 1 tile in between turns
-     * Note: game calls this so game will update this bottle's tile
+     * Advances the bottle (moves it) 1 tile in between turns.
+     * Note: game calls this so game will update this bottle's tile.
      */
     public advance(): void {
         // We won't update this.tile.bottle to us, as the game will handle
@@ -109,9 +109,9 @@ export class Bottle extends GameObject {
     }
 
     /**
-     * Breaks (destroys) this bottle, getting cowboys drunk in the process
+     * Breaks (destroys) this bottle, getting cowboys drunk in the process.
      *
-     * @param cowboy The cowboy to break on
+     * @param cowboy - The cowboy to break on.
      */
     public break(cowboy?: Cowboy): void {
         if (this.isDestroyed || !this.tile) {

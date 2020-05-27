@@ -60,7 +60,7 @@ export class Weaver extends Spiderling {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Kills the Weaver
+     * Kills the Weaver.
      */
     public kill(): void {
         super.kill();
@@ -70,15 +70,15 @@ export class Weaver extends Spiderling {
     }
 
     /**
-     * Finishes the actions of the Weaver
+     * Finishes the actions of the Weaver.
      *
-     * @param forceFinish - true if forcing the finish prematurely
-     * @returns True if they finished, false otherwise
+     * @param forceFinish - True if forcing the finish prematurely.
+     * @returns True if they finished, false otherwise.
      */
     public finish(forceFinish?: boolean): boolean {
         const weakening = this.busy === "Weakening";
 
-        if (super.finish(forceFinish)) {
+        if (super.finish()) {
             return true; // because they finished moving or something the base Spiderling class can handle
         }
 
@@ -104,8 +104,8 @@ export class Weaver extends Spiderling {
      * telling them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param web - The web you want to strengthen. Must be connected to the
-     * Nest this Weaver is currently on.
+     * @param web - The web you want to strengthen. Must be connected to
+     * the Nest this Weaver is currently on.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -128,8 +128,8 @@ export class Weaver extends Spiderling {
      * Weaves more silk into an existing Web to strengthen it.
      *
      * @param player - The player that called this.
-     * @param web - The web you want to strengthen. Must be connected to the
-     * Nest this Weaver is currently on.
+     * @param web - The web you want to strengthen. Must be connected to
+     * the Nest this Weaver is currently on.
      * @returns True if the strengthen was successfully started, false
      * otherwise.
      */
@@ -186,12 +186,14 @@ export class Weaver extends Spiderling {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * A generic strengthen/weaken wrapper because both are so similar to try to invalidate it
+     * A generic strengthen/weaken wrapper because both are so similar to try
+     * to invalidate it.
      *
-     * @param player - the player that called this.
-     * @param web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
-     * @param weaveType - should be "Strengthening" or "Weakening" as appropriate
-     * @returns True if the weaken was successfully started, false otherwise.
+     * @param player - The player that called this.
+     * @param web - The web you want to weaken. Must be connected to the Nest
+     * this Weaver is currently on.
+     * @param weakening - True if weakening, false if strengthening.
+     * @returns The reason why the weave was invalid, or undefined if valid.
      */
     protected invalidateWeave(
         player: Player,
@@ -217,11 +219,13 @@ export class Weaver extends Spiderling {
     }
 
     /**
-     * A generic strengthen/weaken wrapper because both are so similar
+     * A generic strengthen/weaken wrapper because both are so similar.
      *
-     * @param player - the player that called this.
-     * @param web - The web you want to weaken. Must be connected to the Nest this Weaver is currently on.
-     * @param weaveType - should be "Strengthening" or "Weakening" as appropriate
+     * @param player - The player that called this.
+     * @param web - The web you want to weaken. Must be connected to the Nest
+     * this Weaver is currently on.
+     * @param weaveType - Should be "Strengthening" or "Weakening" as
+     * appropriate.
      * @returns True if the weaken was successfully started, false otherwise.
      */
     private weave(

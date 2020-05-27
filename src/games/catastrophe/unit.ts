@@ -31,7 +31,7 @@ export class Unit extends GameObject {
     public acted!: boolean;
 
     /**
-     * The amount of energy this Unit has (from 0.0 to 100.0).
+     * The amount of energy this Unit has (from 0 to 100).
      */
     public energy!: number;
 
@@ -354,7 +354,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.
+     * Changes this Unit's Job. Must be at max energy (100) to change Jobs.
      *
      * @param player - The player that called this.
      * @param job - The name of the Job to change to.
@@ -395,8 +395,8 @@ export class Unit extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to construct the Structure on. It must have
-     * enough materials on it for a Structure to be constructed.
+     * @param tile - The Tile to construct the Structure on. It must have enough
+     * materials on it for a Structure to be constructed.
      * @param type - The type of Structure to construct on that Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -444,8 +444,8 @@ export class Unit extends GameObject {
      * Constructs a Structure on an adjacent Tile.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to construct the Structure on. It must have
-     * enough materials on it for a Structure to be constructed.
+     * @param tile - The Tile to construct the Structure on. It must have enough
+     * materials on it for a Structure to be constructed.
      * @param type - The type of Structure to construct on that Tile.
      * @returns True if successfully constructed a structure, false otherwise.
      */
@@ -610,7 +610,7 @@ export class Unit extends GameObject {
 
     /**
      * Removes materials from an adjacent Tile's Structure. You cannot
-     * deconstruct friendly structures (see Unit.attack).
+     * deconstruct friendly structures (see `Unit.attack`).
      *
      * @param player - The player that called this.
      * @param tile - The Tile to deconstruct. It must have a Structure on it.
@@ -669,7 +669,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): void | string | UnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
@@ -690,7 +690,10 @@ export class Unit extends GameObject {
             if (tile.structure.type === "shelter") {
                 if (tile.structure.owner !== player) {
                     return `${this} can't drop things in enemy shelters. Nice thought though.`;
-                } else if (resource[0] !== "f" && resource[0] !== "F") {
+                } else if (
+                    !resource.startsWith("f") &&
+                    !resource.startsWith("F")
+                ) {
                     return `${this} can only store food in shelters.`;
                 }
             } else if (tile.structure.type !== "road") {
@@ -724,7 +727,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
@@ -920,8 +923,7 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to pickup materials/food from.
-     * @param resource - The type of resource to pickup ('materials' or
-     * 'food').
+     * @param resource - The type of resource to pickup ('materials' or 'food').
      * @param amount - The amount of the resource to pickup. Amounts <= 0 will
      * pickup as much as possible.
      * @returns If the arguments are invalid, return a string explaining to
@@ -932,7 +934,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): void | string | UnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
@@ -986,8 +988,7 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to pickup materials/food from.
-     * @param resource - The type of resource to pickup ('materials' or
-     * 'food').
+     * @param resource - The type of resource to pickup ('materials' or 'food').
      * @param amount - The amount of the resource to pickup. Amounts <= 0 will
      * pickup as much as possible.
      * @returns True if successfully picked up a resource, false otherwise.
@@ -996,7 +997,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
@@ -1119,17 +1120,17 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
-     * @param checkEnergy - true to check if this Unit has enough energy
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
+     * @param checkEnergy - True to check if this Unit has enough energy.
      * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,
-        checkAction: boolean = false,
-        checkEnergy: boolean = false,
+        checkAction = false,
+        checkEnergy = false,
     ): string | undefined {
         if (this.owner !== player) {
             return `${this} isn't owned by you.`;
@@ -1150,8 +1151,8 @@ export class Unit extends GameObject {
     /**
      * Checks if this unit is in range of a structure of the given type.
      *
-     * @param type - The type of structure to search for
-     * @returns The structure this unit is in range of, or undefined if none exist
+     * @param type - The type of structure to search for.
+     * @returns The structure this unit is in range of, or undefined if none exist.
      */
     private isInRange(type: StructureType): boolean {
         return Boolean(
@@ -1181,7 +1182,7 @@ export class Unit extends GameObject {
      * Returns how much stuff this unit can pickup or be given before hitting
      * the carry limit.
      *
-     * @returns How much this can still carry
+     * @returns How much this can still carry.
      */
     private getCarryLeft(): number {
         return this.job.carryLimit - this.materials - this.food;

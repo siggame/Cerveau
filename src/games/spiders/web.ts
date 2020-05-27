@@ -121,9 +121,10 @@ export class Web extends GameObject {
     }
 
     /**
-     * Returns if this Web has been snapped, and is thus no longer part of the game.
+     * Returns if this Web has been snapped, and is thus no longer part of the
+     * game.
      *
-     * @returns True if the web has been snapped (is dead), false otherwise
+     * @returns True if the web has been snapped (is dead), false otherwise.
      */
     public hasSnapped(): this is Web & {
         /** No nest in this case. */
@@ -137,7 +138,7 @@ export class Web extends GameObject {
     /**
      * Returns if this Web has been NOT snapped, and thus has nests.
      *
-     * @returns False if the web has been snapped (is dead), True otherwise
+     * @returns False if the web has been snapped (is dead), True otherwise.
      */
     public hasNotSnapped(): this is Web & {
         /** The Nest it is connected to. */
@@ -149,10 +150,10 @@ export class Web extends GameObject {
     }
 
     /**
-     * Checks if the Web is connected to some Nest
+     * Checks if the Web is connected to some Nest.
      *
-     * @param nest - The nest to check if is connected to at nestA or nestB
-     * @param otherNest - if passed then checks if nestA and nestB are the
+     * @param nest - The nest to check if is connected to at nestA or nestB.
+     * @param otherNest - If passed then checks if nestA and nestB are the
      * otherNest and the previous arg nest (in either order).
      * @returns True if it is connected to that web, false otherwise,
      * undefined if nest is undefined.
@@ -173,10 +174,10 @@ export class Web extends GameObject {
     }
 
     /**
-     * Gets the other nest, given one of its nests A or B
+     * Gets the other nest, given one of its nests A or B.
      *
-     * @param nest - the nest to get the other one
-     * @returns the other Nest that the passed in nest is not, undefined is
+     * @param nest - The nest to get the other one.
+     * @returns The other Nest that the passed in nest is not, undefined is
      * nest is not part of this Web.
      */
     public getOtherNest(nest: Nest): Nest | undefined {
@@ -191,7 +192,7 @@ export class Web extends GameObject {
      * Should be called whenever something changes on the web, so it needs to
      * re-calculate its current load and maybe snap.
      *
-     * @param num - the load (weight) of a spiderling to add
+     * @param num - The load (weight) of a spiderling to add.
      */
     public addLoad(num: number): void {
         this.load = Math.max(this.load + num, 0);
@@ -202,9 +203,9 @@ export class Web extends GameObject {
     }
 
     /**
-     * Adds some number to this web's strength, and might snap it
+     * Adds some number to this web's strength, and might snap it.
      *
-     * @param num - number to add to this Web's strength
+     * @param num - Number to add to this Web's strength.
      */
     public addStrength(num: number): void {
         this.strength = clamp(

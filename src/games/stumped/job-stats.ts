@@ -1,6 +1,6 @@
 import { JobProperties } from "./";
 
-/** The default stats for each job if not overridden */
+/** The default stats for each job if not overridden. */
 const defaultJobStats: JobProperties = {
     cost: 3,
     damage: 1,

@@ -12,20 +12,20 @@ import { Unit } from "./unit";
 // <<-- Creer-Merge: imports -->>
 import { IPoint, Mutable } from "~/utils";
 
-/** interface used to create rooms.s */
-interface IRoom {
+/** Interface used to create roomss. */
+interface Room {
     // room locations to be stored.
-    /** x1 position */
+    /** X1 position. */
     x1: number;
-    /** y1 position */
+    /** Y1 position. */
     y1: number;
-    /** x2 position */
+    /** X2 position. */
     x2: number;
-    /** y2 position */
+    /** Y2 position. */
     y2: number;
-    /** x3 position */
+    /** X3 position. */
     x3: number;
-    /** y3 position */
+    /** Y3 position. */
     y3: number;
 
     // tracks doors and walls.
@@ -59,10 +59,10 @@ interface IRoom {
  * Combine elements and be the first scientists to create fusion.
  */
 export class NewtonianGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: NewtonianGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -78,8 +78,7 @@ export class NewtonianGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
@@ -89,8 +88,8 @@ export class NewtonianGame extends BaseClasses.Game {
     public readonly internCap!: number;
 
     /**
-     * A list of all jobs. first item is intern, second is physicists, and
-     * third is manager.
+     * A list of all jobs. The first element is intern, second is physicists,
+     * and third is manager.
      */
     public jobs!: Job[];
 
@@ -239,7 +238,7 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
-    /** Creates all the Jobs in the game */
+    /** Creates all the Jobs in the game. */
     private createJobs(): void {
         // push all three jobs.
         this.jobs.push(
@@ -280,6 +279,7 @@ export class NewtonianGame extends BaseClasses.Game {
          * running createMap(), and it wraps the current scope, so that `this`
          * refers to the Game running `createMap()`, even though the game was
          * not passed.
+         *
          * @param x - The x coordinate. If off map throws an Error.
          * @param y - The y coordinate. If off map throws an Error.
          * @returns A Tile that is mutable JUST for this function scope.
@@ -348,11 +348,11 @@ export class NewtonianGame extends BaseClasses.Game {
 
         // --- Set resource spawn --- \\
         const conveyors: Array<{
-            /** x position for the conveyor */
+            /** X position for the conveyor. */
             x: number;
-            /** y position for the conveyor */
+            /** Y position for the conveyor. */
             y: number;
-            /** The direction of the conveyor */
+            /** The direction of the conveyor. */
             direction: Tile["direction"];
         }> = [];
         for (let x = 1; x < startEnd - 1; x++) {
@@ -404,14 +404,14 @@ export class NewtonianGame extends BaseClasses.Game {
             shift++;
         }
         // Decides if the rooms shifts upwards or downwards
-        /** used to determine random shifts and doorways */
+        // Used to determine random shifts and doorways
         let shiftDir = this.manager.random.int(2, 0); // 0 = small south, 1 = small north
         // shiftDir = 0; // used for testing.
-        /** Determines the ship of the middle room */
+        // Determines the ship of the middle room
         if (shiftDir === 1) {
             shift = -shift;
         }
-        /** Determines machines shift */
+        // Determines machines shift
         shiftDir = this.manager.random.int(2, 0);
         let mShift = this.manager.random.int(midSize);
         if (shiftDir === 1) {
@@ -593,22 +593,23 @@ export class NewtonianGame extends BaseClasses.Game {
      * This creates a room struct and returns it. Saves a lot of space.
      *
      * All of these parameters are for the INSIDE of the room, walls not included!
-     * @param x1 - lowest x value of the room.
-     * @param x2 - highest x value of a 2 by 2 room.
-     * @param y1 - lowest y value of the room.
-     * @param y2 - highest y value of a 2 by 2 room.
+     *
+     * @param x1 - Lowest x value of the room.
+     * @param x2 - Highest x value of a 2 by 2 room.
+     * @param y1 - Lowest y value of the room.
+     * @param y2 - Highest y value of a 2 by 2 room.
      * @param y3 - If the room is 3 tall, this is actually the highest value.
      * @param x3 - If the room is 3 wide, this is actually the highest value.
-     * @returns - the room object.
+     * @returns - The room object.
      */
     private makeRoom(
         x1: number,
         x2: number,
         y1: number,
         y2: number,
-        y3: number = -1,
-        x3: number = -1,
-    ): IRoom {
+        y3 = -1,
+        x3 = -1,
+    ): Room {
         return {
             x1,
             y1,
@@ -628,20 +629,20 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * takes a area and starts the process of filling it with rooms.
+     * Takes a area and starts the process of filling it with rooms.
      *
-     * All of these parameters are for the INSIDE of the room, walls not included!
-     * @param x1 - lowest x value of the area.
-     * @param x2 - highest x value of the area.
-     * @param y1 - lowest y value of the area.
-     * @param y2 - highest y value of the area.
-     * @param getMutableTile - A function that gets a mutable tile given an (x, y)
+     * All of these parameters are for the INSIDE of the room, walls not included.
+     *
+     * @param x1 - Lowest x value of the area.
+     * @param x2 - Highest x value of the area.
+     * @param y1 - Lowest y value of the area.
+     * @param y2 - Highest y value of the area.
+     * @param getMutableTile - A function that gets a mutable tile given an (x, y).
      * @param DNorth - If there should be doors to the north.
      * @param DEast - If there should be doors to the East.
      * @param DSouth - If there should be doors to the south.
      * @param DWest - If there should be doors to the west.
      * @param machines - The number of machines you want added to the map.
-     * @returns - nothing, calls the next stage
      */
     private roomCalc(
         x1: number,
@@ -649,11 +650,11 @@ export class NewtonianGame extends BaseClasses.Game {
         y1: number,
         y2: number,
         getMutableTile: (x: number, y: number) => Mutable<Tile>,
-        DNorth: boolean = false,
-        DEast: boolean = false,
-        DSouth: boolean = false,
-        DWest: boolean = false,
-        machines: number = 0,
+        DNorth = false,
+        DEast = false,
+        DSouth = false,
+        DWest = false,
+        machines = 0,
     ): void {
         // determines the number of rooms on the x axis
         const mapW = Math.floor((x2 - x1 + 2) / 3); // MUST be a whole number
@@ -663,7 +664,7 @@ export class NewtonianGame extends BaseClasses.Game {
             return;
         }
         // map used for mapgen.
-        const map: IRoom[][] = [];
+        const map: Room[][] = [];
         // sets sets up the rest of the map.
         for (let i = 0; i < mapW; i++) {
             map[i] = new Array(mapH);
@@ -815,12 +816,12 @@ export class NewtonianGame extends BaseClasses.Game {
     /**
      * Generates the room connections and doorway connections.
      *
-     * @param map - a 2D array that contains room structs that contain map information.
-     * @param machines - the number of machines to be added to the map.
-     * @param getMutableTile - A function that gets a mutable tile given an (x, y)
+     * @param map - A 2D array that contains room structs that contain map information.
+     * @param machines - The number of machines to be added to the map.
+     * @param getMutableTile - A function that gets a mutable tile given an (x, y).
      */
     private roomFill(
-        map: IRoom[][],
+        map: Room[][],
         machines: number,
         getMutableTile: (x: number, y: number) => Mutable<Tile>,
     ): void {
@@ -1317,13 +1318,13 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * This draws the rooms. only handles simple room clusters, 3 tall, not 3 wide.
+     * This draws the rooms. Only handles simple room clusters, 3 tall, not 3 wide.
      *
-     * @param map - a 2D array of rooms for it to draw using.
-     * @param getMutableTile - the function for it to grab tiles.
+     * @param map - A 2D array of rooms for it to draw using.
+     * @param getMutableTile - The function for it to grab tiles.
      */
     private draw(
-        map: IRoom[][],
+        map: Room[][],
         getMutableTile: (x: number, y: number) => Mutable<Tile>,
     ): void {
         // Test code to help visualize where it actually places rooms.
@@ -1366,8 +1367,8 @@ export class NewtonianGame extends BaseClasses.Game {
             }
         }*/
         // iterate through the rooms of the map.
-        let v: number = 0;
-        let w: number = 0;
+        let v = 0;
+        let w = 0;
         for (const rooms of map) {
             for (const room of rooms) {
                 // corners.
@@ -1931,14 +1932,13 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * this draws a corner if there aren't room connections in that direction.
+     * This draws a corner if there aren't room connections in that direction.
      *
-     * @param x - the x point the corner will be placed at.
-     * @param y - the y point the corner will be placed at.
-     * @param dir1 - direction one to check to see if the corner should be placed.
-     * @param dir2 - direction two to check to see if the corner should be placed.
-     * @param getMutableTile - the function for it to grab tiles.
-     * @returns nothing.
+     * @param x - The x point the corner will be placed at.
+     * @param y - The y point the corner will be placed at.
+     * @param dir1 - Direction one to check to see if the corner should be placed.
+     * @param dir2 - Direction two to check to see if the corner should be placed.
+     * @param getMutableTile - The function for it to grab tiles.
      */
     private drawCorner(
         x: number,
@@ -1953,12 +1953,11 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * this draws walls and makes sure that there isn't a door there.
+     * This draws walls and makes sure that there isn't a door there.
      *
-     * @param x - the x point the corner will be placed at.
-     * @param y - the y point the corner will be placed at.
-     * @param getMutableTile - the function for it to grab tiles.
-     * @returns nothing.
+     * @param x - The x point the corner will be placed at.
+     * @param y - The y point the corner will be placed at.
+     * @param getMutableTile - The function for it to grab tiles.
      */
     private drawWall(
         x: number,
@@ -1971,18 +1970,17 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * this draws walls and makes sure that there isn't a door there.
+     * This draws walls and makes sure that there isn't a door there.
      *
-     * @param x - the x point the corner will be placed at.
-     * @param y - the y point the corner will be placed at.
-     * @param d - decoration value of the door. Default of 1
-     * @param getMutableTile - the function for it to grab tiles.
-     * @returns nothing.
+     * @param x - The x point the corner will be placed at.
+     * @param y - The y point the corner will be placed at.
+     * @param d - Decoration value of the door. Default of 1.
+     * @param getMutableTile - The function for it to grab tiles.
      */
     private drawDoor(
         x: number,
         y: number,
-        d: number = 1,
+        d = 1,
         getMutableTile: (x: number, y: number) => Mutable<Tile>,
     ): void {
         getMutableTile(x, y).isWall = false;
@@ -1990,12 +1988,12 @@ export class NewtonianGame extends BaseClasses.Game {
     }
 
     /**
-     * this makes sure the room is in the list. I was uncreative with the name.
+     * This makes sure the room is in the list. I was uncreative with the name.
      *
-     * @param uncon - a list of x and y points.
-     * @param x - the x point you are checking for.
-     * @param y - the y point you are checking for.
-     * @returns returns it's index or -1 if it doesn't exist.
+     * @param uncon - A list of x and y points.
+     * @param x - The x point you are checking for.
+     * @param y - The y point you are checking for.
+     * @returns Returns it's index or -1 if it doesn't exist.
      */
     private has(uncon: IPoint[], x: number, y: number): number {
         for (let w = 0; w < uncon.length; w++) {
@@ -2009,6 +2007,7 @@ export class NewtonianGame extends BaseClasses.Game {
 
     /**
      * Attempts to spawn in a unit for a given player.
+     *
      * @param player - The player that will own the unit.
      * @param job - The job of the unit.
      */

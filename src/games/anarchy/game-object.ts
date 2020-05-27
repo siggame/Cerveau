@@ -12,10 +12,10 @@ import { AnarchyGameManager } from "./game-manager";
  * inherit from automatically.
  */
 export class GameObject extends BaseClasses.GameObject {
-    /** The game this game object is in */
+    /** The game this game object is in. */
     public readonly game!: AnarchyGame;
 
-    /** The manager of the game that controls this */
+    /** The manager of the game that controls this. */
     public readonly manager!: AnarchyGameManager;
 
     /**

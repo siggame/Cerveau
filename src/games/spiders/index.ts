@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -100,21 +99,21 @@ export interface BroodMotherProperties {
  */
 export interface BroodMotherConsumeArgs {
     /**
-     * The Spiderling to consume. It must be on the same Nest as this
-     * BroodMother.
+     * The Spiderling to consume. It must be on the same Nest as
+     * this BroodMother.
      */
     spiderling?: Spiderling;
 }
 
 /**
  * Argument overrides for BroodMother's spawn function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface BroodMotherSpawnArgs {
     /**
-     * The string name of the Spiderling class you want to Spawn. Must be
-     * 'Spitter', 'Weaver', or 'Cutter'.
+     * The string name of the Spiderling class you want to Spawn. Must
+     * be 'Spitter', 'Weaver', or 'Cutter'.
      */
     spiderlingType?: "Spitter" | "Weaver" | "Cutter";
 }
@@ -244,8 +243,8 @@ export interface SpiderProperties {
     isDead?: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Undefined when moving on a
-     * Web.
+     * The Nest that this Spider is currently on. Undefined when moving on
+     * a Web.
      */
     nest?: Nest;
 
@@ -295,8 +294,8 @@ export interface SpiderlingProperties {
 
 /**
  * Argument overrides for Spiderling's attack function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface SpiderlingAttackArgs {
     /**
@@ -307,8 +306,8 @@ export interface SpiderlingAttackArgs {
 
 /**
  * Argument overrides for Spiderling's move function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface SpiderlingMoveArgs {
     /**
@@ -355,13 +354,13 @@ export interface WeaverProperties {
 
 /**
  * Argument overrides for Weaver's strengthen function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
 export interface WeaverStrengthenArgs {
     /**
-     * The web you want to strengthen. Must be connected to the Nest this
-     * Weaver is currently on.
+     * The web you want to strengthen. Must be connected to the Nest
+     * this Weaver is currently on.
      */
     web?: Web;
 }
@@ -415,80 +414,80 @@ export interface WebProperties {
 }
 
 /**
- * The default args passed to a constructor function for
- * BroodMother instances.
+ * The default args passed to a constructor function for class
+ * instances of BroodMother.
  */
 export type BroodMotherConstructorArgs<T extends {} = {}> = Readonly<
     SpiderArgs & BroodMotherProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Cutter instances.
+ * The default args passed to a constructor function for class
+ * instances of Cutter.
  */
 export type CutterConstructorArgs<T extends {} = {}> = Readonly<
     SpiderlingArgs & CutterProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Nest instances.
+ * The default args passed to a constructor function for class
+ * instances of Nest.
  */
 export type NestConstructorArgs<T extends {} = {}> = Readonly<
     NestProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseSpidersPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Spider instances.
+ * The default args passed to a constructor function for class
+ * instances of Spider.
  */
 export type SpiderConstructorArgs<T extends {} = {}> = Readonly<
     SpiderProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Spiderling instances.
+ * The default args passed to a constructor function for class
+ * instances of Spiderling.
  */
 export type SpiderlingConstructorArgs<T extends {} = {}> = Readonly<
     SpiderArgs & SpiderlingProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Spitter instances.
+ * The default args passed to a constructor function for class
+ * instances of Spitter.
  */
 export type SpitterConstructorArgs<T extends {} = {}> = Readonly<
     SpiderlingArgs & SpitterProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Weaver instances.
+ * The default args passed to a constructor function for class
+ * instances of Weaver.
  */
 export type WeaverConstructorArgs<T extends {} = {}> = Readonly<
     SpiderlingArgs & WeaverProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Web instances.
+ * The default args passed to a constructor function for class
+ * instances of Web.
  */
 export type WebConstructorArgs<T extends {} = {}> = Readonly<
     WebProperties & T
@@ -524,28 +523,28 @@ import { SpidersGame } from "./game";
 import { SpidersGameManager } from "./game-manager";
 import { SpidersGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a BroodMother */
+/** The arguments used to construct a BroodMother. */
 export type BroodMotherArgs = FirstArgumentFromConstructor<typeof BroodMother>;
 
-/** The arguments used to construct a Cutter */
+/** The arguments used to construct a Cutter. */
 export type CutterArgs = FirstArgumentFromConstructor<typeof Cutter>;
 
-/** The arguments used to construct a Nest */
+/** The arguments used to construct a Nest. */
 export type NestArgs = FirstArgumentFromConstructor<typeof Nest>;
 
-/** The arguments used to construct a Spider */
+/** The arguments used to construct a Spider. */
 export type SpiderArgs = FirstArgumentFromConstructor<typeof Spider>;
 
-/** The arguments used to construct a Spiderling */
+/** The arguments used to construct a Spiderling. */
 export type SpiderlingArgs = FirstArgumentFromConstructor<typeof Spiderling>;
 
-/** The arguments used to construct a Spitter */
+/** The arguments used to construct a Spitter. */
 export type SpitterArgs = FirstArgumentFromConstructor<typeof Spitter>;
 
-/** The arguments used to construct a Weaver */
+/** The arguments used to construct a Weaver. */
 export type WeaverArgs = FirstArgumentFromConstructor<typeof Weaver>;
 
-/** The arguments used to construct a Web */
+/** The arguments used to construct a Web. */
 export type WebArgs = FirstArgumentFromConstructor<typeof Web>;
 
 /**
@@ -581,8 +580,8 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Nest in the Game and tracks it for all players.
      *
-     * @param args - Data about the Nest to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Nest to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
     public nest<T extends NestArgs>(args: Readonly<T>): Nest & T {
@@ -605,8 +604,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Spiderling to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Spiderling hooked up in the game and ready for you to
-     * use.
+     * @returns A new Spiderling hooked up in the game and ready for you to use.
      */
     public spiderling<T extends SpiderlingArgs>(
         args: Readonly<T>,
@@ -617,8 +615,8 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Spitter in the Game and tracks it for all players.
      *
-     * @param args - Data about the Spitter to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Spitter to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
     public spitter<T extends SpitterArgs>(args: Readonly<T>): Spitter & T {

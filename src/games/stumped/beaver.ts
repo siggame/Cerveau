@@ -307,7 +307,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): void | string | BeaverDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
@@ -365,7 +365,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
@@ -387,8 +387,8 @@ export class Beaver extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param spawner - The Spawner you want to harvest. Must be on an adjacent
-     * Tile.
+     * @param spawner - The Spawner you want to harvest. Must be on an
+     * adjacent Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -428,8 +428,8 @@ export class Beaver extends GameObject {
      * Harvests the branches or food from a Spawner on an adjacent Tile.
      *
      * @param player - The player that called this.
-     * @param spawner - The Spawner you want to harvest. Must be on an adjacent
-     * Tile.
+     * @param spawner - The Spawner you want to harvest. Must be on an
+     * adjacent Tile.
      * @returns True if successfully harvested, false otherwise.
      */
     protected async harvest(
@@ -564,8 +564,8 @@ export class Beaver extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to pickup branches/food from. Must be the same
-     * Tile that the Beaver is on, or an adjacent one.
+     * @param tile - The Tile to pickup branches/food from. Must be the
+     * same Tile that the Beaver is on, or an adjacent one.
      * @param resource - The type of resource to pickup ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * pickup all of the resource type.
@@ -577,7 +577,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): void | string | BeaverPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
@@ -641,8 +641,8 @@ export class Beaver extends GameObject {
      * Picks up some branches or food on the beaver's tile.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to pickup branches/food from. Must be the same
-     * Tile that the Beaver is on, or an adjacent one.
+     * @param tile - The Tile to pickup branches/food from. Must be the
+     * same Tile that the Beaver is on, or an adjacent one.
      * @param resource - The type of resource to pickup ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * pickup all of the resource type.
@@ -652,7 +652,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
@@ -676,11 +676,11 @@ export class Beaver extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Beaver
-     * @param dontCheckActions - pass true to not check if the beaver has enough actions
-     * @returns The reason this is invalid, undefined if looks valid so far
+     * @param player - The player commanding this Beaver.
+     * @param dontCheckActions - Pass true to not check if the beaver has enough actions.
+     * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,

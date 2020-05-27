@@ -18,8 +18,8 @@ import { Player } from "./player";
 export type BodyBodyType = "planet" | "asteroid" | "sun";
 
 /**
- * The type of material the celestial body has. Either 'none', 'genarium',
- * 'rarium', 'legendarium', or 'mythicite'.
+ * The type of material the celestial body
+ * has. Either 'none', 'genarium', 'rarium', 'legendarium', or 'mythicite'.
  */
 export type BodyMaterialType =
     | "none"
@@ -43,8 +43,8 @@ export class Body extends GameObject {
     public readonly bodyType!: "planet" | "asteroid" | "sun";
 
     /**
-     * The type of material the celestial body has. Either 'none', 'genarium',
-     * 'rarium', 'legendarium', or 'mythicite'.
+     * The type of material the celestial body
+     * has. Either 'none', 'genarium', 'rarium', 'legendarium', or 'mythicite'.
      */
     public readonly materialType!:
         | "none"
@@ -100,9 +100,9 @@ export class Body extends GameObject {
     constructor(
         args: BodyConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            /** The angle */
+            /** The angle. */
             angle: number;
-            /** The distance */
+            /** The distance. */
             distance: number;
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
@@ -123,11 +123,10 @@ export class Body extends GameObject {
     /**
      * Gets the x value of the asteroid at the current angle and distance.
      *
-     * @param offset: the difference in angle you wish to apply. By base 0.
-     *
-     * @returns the x value at it's distance and angle
+     * @param offset - The difference in angle you wish to apply. By base 0.
+     * @returns The x value at it's distance and angle.
      */
-    public getX(offset: number = 0): number {
+    public getX(offset = 0): number {
         // gets the location of the asteroid at the angle and distance.
         if (this.distance > 0 && this.angle > 0) {
             return (
@@ -143,11 +142,10 @@ export class Body extends GameObject {
     /**
      * Gets the y value of the asteroid at the current angle and distance.
      *
-     * @param offset: the difference in angle you wish to apply. By base 0.
-     *
-     * @returns the y value at it's distance and angle
+     * @param offset - The difference in angle you wish to apply. By base 0.
+     * @returns The y value at it's distance and angle.
      */
-    public getY(offset: number = 0): number {
+    public getY(offset = 0): number {
         // gets the location of the asteroid at the angle and distance.
         if (this.distance > 0 && this.angle > 0) {
             return (
@@ -182,10 +180,13 @@ export class Body extends GameObject {
         num: number,
     ): void | string | BodyNextXArgs {
         // <<-- Creer-Merge: invalidate-nextX -->>
+
         // Check all the arguments for nextX here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        return undefined;
+
         // <<-- /Creer-Merge: invalidate-nextX -->>
     }
 
@@ -239,10 +240,13 @@ export class Body extends GameObject {
         num: number,
     ): void | string | BodyNextYArgs {
         // <<-- Creer-Merge: invalidate-nextY -->>
+
         // Check all the arguments for nextY here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        return undefined; // means nothing could be found that was ivalid.
+
         // <<-- /Creer-Merge: invalidate-nextY -->>
     }
 

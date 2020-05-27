@@ -15,8 +15,8 @@ import { Tile } from "./tile";
  */
 export class YoungGun extends GameObject {
     /**
-     * The Tile that a Cowboy will be called in on if this YoungGun calls in a
-     * Cowboy.
+     * The Tile that a Cowboy will be called in on if this YoungGun calls in
+     * a Cowboy.
      */
     public callInTile: Tile;
 
@@ -37,7 +37,7 @@ export class YoungGun extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** The previous tile this Young Gun came from */
+    /** The previous tile this Young Gun came from. */
     public previousTile: Tile;
 
     // <<-- /Creer-Merge: attributes -->>
@@ -75,7 +75,7 @@ export class YoungGun extends GameObject {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Updates Young Gun related logic: moving them clockwise
+     * Updates Young Gun related logic: moving them clockwise.
      */
     public update(): void {
         this.canCallIn = true; // they can call in a cowboy on their next turn
@@ -151,8 +151,8 @@ export class YoungGun extends GameObject {
     }
 
     /**
-     * Tells the YoungGun to call in a new Cowboy of the given job to the open
-     * Tile nearest to them.
+     * Tells the YoungGun to call in a new Cowboy of the given job to the
+     * open Tile nearest to them.
      *
      * @param player - The player that called this.
      * @param job - The job you want the Cowboy being brought to have.

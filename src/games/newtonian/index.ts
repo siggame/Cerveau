@@ -4,8 +4,7 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
 import {
@@ -255,8 +254,8 @@ export interface TileProperties {
     decoration?: number;
 
     /**
-     * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank means conveyor doesn't move.
+     * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+     * or 'west'). Blank means conveyor doesn't move.
      */
     direction?: "blank" | "north" | "east" | "south" | "west";
 
@@ -311,8 +310,8 @@ export interface TileProperties {
     tileWest?: Tile;
 
     /**
-     * The type of Tile this is ('normal', 'generator', 'conveyor', or
-     * 'spawn').
+     * The type of Tile this is ('normal', 'generator', 'conveyor',
+     * or 'spawn').
      */
     type?: "normal" | "generator" | "conveyor" | "spawn";
 
@@ -346,8 +345,8 @@ export interface UnitProperties {
     blueium?: number;
 
     /**
-     * The amount of blueium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of blueium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     blueiumOre?: number;
 
@@ -378,8 +377,8 @@ export interface UnitProperties {
     redium?: number;
 
     /**
-     * The amount of redium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of redium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     rediumOre?: number;
 
@@ -401,8 +400,8 @@ export interface UnitProperties {
 
 /**
  * Argument overrides for Unit's act function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitActArgs {
     /**
@@ -425,8 +424,8 @@ export interface UnitAttackArgs {
 
 /**
  * Argument overrides for Unit's drop function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitDropArgs {
     /**
@@ -439,16 +438,16 @@ export interface UnitDropArgs {
      */
     amount?: number;
     /**
-     * The material the unit will drop. 'redium', 'blueium', 'redium ore', or
-     * 'blueium ore'.
+     * The material the unit will drop. 'redium', 'blueium', 'redium ore',
+     * or 'blueium ore'.
      */
     material?: "redium ore" | "redium" | "blueium" | "blueium ore";
 }
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
 export interface UnitMoveArgs {
     /**
@@ -480,48 +479,48 @@ export interface UnitPickupArgs {
 }
 
 /**
- * The default args passed to a constructor function for
- * GameObject instances.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
 export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
     GameObjectProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Job instances.
+ * The default args passed to a constructor function for class
+ * instances of Job.
  */
 export type JobConstructorArgs<T extends {} = {}> = Readonly<
     JobProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Machine instances.
+ * The default args passed to a constructor function for class
+ * instances of Machine.
  */
 export type MachineConstructorArgs<T extends {} = {}> = Readonly<
     MachineProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Player instances.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
 export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
     BaseNewtonianPlayer & PlayerProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Tile instances.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
 export type TileConstructorArgs<T extends {} = {}> = Readonly<
     TileProperties & T
 >;
 
 /**
- * The default args passed to a constructor function for
- * Unit instances.
+ * The default args passed to a constructor function for class
+ * instances of Unit.
  */
 export type UnitConstructorArgs<T extends {} = {}> = Readonly<
     UnitProperties & T
@@ -549,16 +548,16 @@ import { NewtonianGame } from "./game";
 import { NewtonianGameManager } from "./game-manager";
 import { NewtonianGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Machine */
+/** The arguments used to construct a Machine. */
 export type MachineArgs = FirstArgumentFromConstructor<typeof Machine>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -580,8 +579,8 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Machine in the Game and tracks it for all players.
      *
-     * @param args - Data about the Machine to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Machine to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Machine hooked up in the game and ready for you to use.
      */
     public machine<T extends MachineArgs>(args: Readonly<T>): Machine & T {
@@ -591,8 +590,8 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
     public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
@@ -602,8 +601,8 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
     public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
