@@ -82,7 +82,7 @@ export class SpidersGameManager extends BaseClasses.GameManager {
                         // they finish now
                         for (const coworker of spider.coworkers) {
                             // all the co-workers are done too
-                            coworker.finish(); // force finish them
+                            coworker.finish(true); // force finish them
                         }
 
                         spider.finish();
