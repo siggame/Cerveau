@@ -129,6 +129,7 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
      * object.
      * @param message - The string to log.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     protected async log(player: BasePlayer, message: string): Promise<void> {
         this.logs.push(message);
     }

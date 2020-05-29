@@ -40,7 +40,7 @@ export function registerRouteIndex(app: Express): void {
     // as well as the most recent game logs
 
     const lobby = Lobby.getInstance();
-    lobby.gamesInitializedPromise.then(() => {
+    void lobby.gamesInitializedPromise.then(() => {
         for (const gameName of Array.from(
             lobby.gameNamespaces.keys(),
         ).sort()) {

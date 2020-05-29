@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
-import { ISanitizableType, sanitizeType } from "~/core/sanitize/";
+import { SanitizableType, sanitizeType } from "~/core/sanitize/";
 import { Immutable, TypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
@@ -14,7 +15,7 @@ import { createObject } from "./delta-mergeable-object";
  * @returns A function that will accept a value and try to sanitize it.
  */
 function sanitize(
-    type: Immutable<ISanitizableType>,
+    type: Immutable<SanitizableType>,
 ): (val: unknown, current: any, forceSet: boolean) => any {
     return function transformSanitize(
         val: unknown,
@@ -58,9 +59,9 @@ export function createDeltaMergeable(args: {
     /** The key of the DeltaMergeable to create. */
     key: string;
     /** The type of the DeltaMergeable to create. */
-    type: Immutable<ISanitizableType>;
+    type: Immutable<SanitizableType>;
     /** The child types of this DeltaMergeable. */
-    childTypes?: Immutable<TypedObject<ISanitizableType>>;
+    childTypes?: Immutable<TypedObject<SanitizableType>>;
     /** The parent DeltaMergable, if none then assumed to be root node. */
     parent?: DeltaMergeable;
     /** The initial value of this DeltaMergable. */

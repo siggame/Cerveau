@@ -19,6 +19,7 @@ export interface TwoPlayerPlayer extends BasePlayer {
  * @param base.GameSettings - The GameSettings to extend.
  * @returns A new BaseGame class with TwoPlayer logic mixed in.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mixTwoPlayer<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,

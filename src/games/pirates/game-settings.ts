@@ -14,10 +14,11 @@ export class PiratesGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     public get schema() {
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             ...(super.schema || (this as any).schema),
 
             // Pirates game specific settings

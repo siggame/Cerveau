@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
@@ -23,6 +24,7 @@ export class DeltaMergeable<T = any> {
     /**
      * Wraps this delta mergeable in some object like an array or js object.
      */
+    // eslint-disable-next-line @typescript-eslint/ban-types
     public wrapper?: object;
 
     /** The events this delta mergeable emits when it mutates. */
@@ -102,6 +104,7 @@ export class DeltaMergeable<T = any> {
      * @param forceSet - Force the set to occur, even if the current value is
      * the same.
      */
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     public set(newValue: any, forceSet = false): void {
         const value = this.transform
             ? this.transform(newValue, this.get(), forceSet)

@@ -45,6 +45,7 @@ export class BaseGameSettingsManager {
     /**
      * The schema used to build and validate settings' values.
      */
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     public get schema() {
         return this.makeSchema({
             playerStartingTime: {

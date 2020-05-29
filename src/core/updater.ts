@@ -37,12 +37,13 @@ Is this a git repo with git installed on your system?`,
 
             this.sha = stdout.toLowerCase().trim();
 
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             this.interval = setInterval(async () => {
                 await this.intervalCheck();
             }, UPDATE_INTERVAL);
 
             // do it immediately too
-            this.intervalCheck();
+            void this.intervalCheck();
         });
     }
 

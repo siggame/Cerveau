@@ -559,57 +559,57 @@ export interface UnitJobProperties {
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseNecrowarPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseNecrowarPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tile.
  */
-export type TileConstructorArgs<T extends {} = {}> = Readonly<
-    TileProperties & T
->;
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tower.
  */
-export type TowerConstructorArgs<T extends {} = {}> = Readonly<
-    TowerProperties & T
->;
+export type TowerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TowerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of TowerJob.
  */
-export type TowerJobConstructorArgs<T extends {} = {}> = Readonly<
-    TowerJobProperties & T
->;
+export type TowerJobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TowerJobProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Unit.
  */
-export type UnitConstructorArgs<T extends {} = {}> = Readonly<
-    UnitProperties & T
->;
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of UnitJob.
  */
-export type UnitJobConstructorArgs<T extends {} = {}> = Readonly<
-    UnitJobProperties & T
->;
+export type UnitJobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitJobProperties & T>;
 
 export * from "./game-object";
 export * from "./player";

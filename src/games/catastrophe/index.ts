@@ -504,49 +504,49 @@ export interface UnitRestArgs {}
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Job.
  */
-export type JobConstructorArgs<T extends {} = {}> = Readonly<
-    JobProperties & T
->;
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseCatastrophePlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseCatastrophePlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Structure.
  */
-export type StructureConstructorArgs<T extends {} = {}> = Readonly<
-    StructureProperties & T
->;
+export type StructureConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<StructureProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tile.
  */
-export type TileConstructorArgs<T extends {} = {}> = Readonly<
-    TileProperties & T
->;
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Unit.
  */
-export type UnitConstructorArgs<T extends {} = {}> = Readonly<
-    UnitProperties & T
->;
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./job";

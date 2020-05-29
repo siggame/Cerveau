@@ -87,7 +87,7 @@ export class BaseGame extends BaseGameDeltaMergeables {
 
         // Our super has now created our delta mergeables,
         // let's reach in and grab the game objects all hack-y like.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unsafe-member-access
         const gameObjectsDeltaMergeable = ((this as any)
             .deltaMergeable as DeltaMergeable).child("gameObjects")!;
 

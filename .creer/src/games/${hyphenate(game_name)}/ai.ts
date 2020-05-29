@@ -22,11 +22,14 @@ optional=True, help=False)}
         continue #//this is implimented in based mixins for this project
     function_parms = ai['functions'][function_name]
     ret = function_parms['returns']
+    ret_type = 'void'
+    if ret:
+        ret_type = shared['cerveau']['type'](function_parms['returns']['type'])
 %>${shared['cerveau']['formatted_function_top'](function_name, ai, scope='public')}
 ${shared['cerveau']['wrap_between'](
     ('return ' if ret else '') + 'this.executeOrder(',
     ['"{}"'.format(function_name)] + [arg['name'] for arg in function_parms['arguments']],
-    ');',
+    ') as Promise<' + ret_type + '>;',
     indent=2
 )}
     }

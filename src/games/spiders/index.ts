@@ -417,81 +417,81 @@ export interface WebProperties {
  * The default args passed to a constructor function for class
  * instances of BroodMother.
  */
-export type BroodMotherConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderArgs & BroodMotherProperties & T
->;
+export type BroodMotherConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderArgs & BroodMotherProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Cutter.
  */
-export type CutterConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderlingArgs & CutterProperties & T
->;
+export type CutterConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & CutterProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Nest.
  */
-export type NestConstructorArgs<T extends {} = {}> = Readonly<
-    NestProperties & T
->;
+export type NestConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<NestProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseSpidersPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseSpidersPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Spider.
  */
-export type SpiderConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderProperties & T
->;
+export type SpiderConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Spiderling.
  */
-export type SpiderlingConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderArgs & SpiderlingProperties & T
->;
+export type SpiderlingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderArgs & SpiderlingProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Spitter.
  */
-export type SpitterConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderlingArgs & SpitterProperties & T
->;
+export type SpitterConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & SpitterProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Weaver.
  */
-export type WeaverConstructorArgs<T extends {} = {}> = Readonly<
-    SpiderlingArgs & WeaverProperties & T
->;
+export type WeaverConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & WeaverProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Web.
  */
-export type WebConstructorArgs<T extends {} = {}> = Readonly<
-    WebProperties & T
->;
+export type WebConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<WebProperties & T>;
 
 export * from "./brood-mother";
 export * from "./cutter";

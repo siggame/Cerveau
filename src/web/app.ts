@@ -14,6 +14,8 @@ export function setupWebServer(): void {
     if (Config.WEB_ENABLED || Config.API_ENABLED) {
         const app = express();
 
+        // bad express types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         app.locals.site = {
             title: Config.MAIN_TITLE,
         };

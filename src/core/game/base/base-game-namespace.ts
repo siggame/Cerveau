@@ -1,4 +1,4 @@
-import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { Constructor, Immutable, TypedObject } from "~/utils";
 import { BaseAI } from "./base-ai";
 import { BaseGame } from "./base-game";
@@ -13,7 +13,7 @@ export interface BaseGameObjectSchema {
     parentClassName?: string;
     /** Key/value pairs of the attributes of this game object. */
     attributes: TypedObject<
-        ISanitizableType & {
+        SanitizableType & {
             /** Optional default value for this attribute. */
             defaultValue?: unknown;
         }
@@ -26,7 +26,7 @@ export interface BaseGameObjectSchema {
 export interface BaseGameObjectFunctionSchema {
     /** Arguments to this function when called. */
     args: Array<
-        ISanitizableType & {
+        SanitizableType & {
             /** The name of the argument. */
             argName: string;
             /** The default value, if it is optional. */
@@ -34,7 +34,7 @@ export interface BaseGameObjectFunctionSchema {
         }
     >;
     /** The schema about what type it returns. */
-    returns: ISanitizableType;
+    returns: SanitizableType;
     /** The value returned if the function call fails to validate. */
     invalidValue?: unknown;
 }

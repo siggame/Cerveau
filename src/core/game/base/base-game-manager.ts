@@ -271,7 +271,7 @@ export class BaseGameManager {
      *
      * @returns A string for the new id. **Must be unique**.
      */
-    protected generateNextGameObjectID = () => {
+    protected generateNextGameObjectID = (): string => {
         // returns this.nextGameObjectID then increments by 1
         return String(this.nextGameObjectID++);
     };
@@ -383,7 +383,7 @@ export class BaseGameManager {
         const client = this.playerToClient.get(player);
 
         if (!client) {
-            throw new Error(`No client for player ${player}`);
+            throw new Error(`No client for player ${player.toString()}`);
         }
 
         return client;

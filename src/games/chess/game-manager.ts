@@ -60,7 +60,7 @@ export class ChessGameManager extends BaseClasses.GameManager {
     /** Starts the game play. */
     protected start(): void {
         super.start();
-        this.runSideToMove();
+        void this.runSideToMove();
     }
 
     /**
@@ -125,7 +125,7 @@ Valid moves: ${
         }
 
         // now it is a new side's move
-        this.runSideToMove();
+        void this.runSideToMove();
     }
 
     /**

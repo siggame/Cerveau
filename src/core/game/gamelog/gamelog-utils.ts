@@ -1,4 +1,4 @@
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import { basename } from "path";
 import { Config } from "~/core/config";
 import { Immutable, momentString } from "~/utils";
@@ -91,7 +91,7 @@ export function filenameFor(gamelogData: {
  * @returns - Undefined if no visualizer set, url to the gamelog in visualizer otherwise.
  */
 export function getVisualizerURL(
-    gamelogOrFilename: Immutable<IGamelog> | string,
+    gamelogOrFilename: Immutable<Gamelog> | string,
 ): string | undefined {
     const vis = Config.VISUALIZER_URL;
     if (vis) {

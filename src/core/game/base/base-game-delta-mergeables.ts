@@ -2,7 +2,7 @@ import {
     createDeltaMergeable,
     DeltaMergeable,
 } from "~/core/game/delta-mergeable";
-import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import {
     Immutable,
     objectHasProperty,
@@ -33,7 +33,7 @@ export class BaseGameDeltaMergeables {
         /** The parent delta mergable, if null then this is the root. */
         parent?: DeltaMergeable; // will mutate as it gets a new child
         /** Schema about the attributes to follow for this entry. */
-        attributesSchema: Immutable<TypedObject<ISanitizableType>>;
+        attributesSchema: Immutable<TypedObject<SanitizableType>>;
         /** Initial value(s) to set to upon creation. */
         initialValues: Immutable<{ [key: string]: unknown }>;
     }) {
@@ -44,6 +44,7 @@ export class BaseGameDeltaMergeables {
             childTypes: args.attributesSchema,
             type: {
                 typeName: "gameObject",
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                 gameObjectClass: Object.getPrototypeOf(this).constructor,
                 nullable: false,
             },
@@ -90,7 +91,8 @@ export class BaseGameDeltaMergeables {
                 get:
                     schema.typeName === "list" // Lists are behind Proxies
                         ? () => dm.wrapper
-                        : () => dm.get(),
+                        : // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                          () => dm.get(),
                 set: (val: unknown) => {
                     dm.set(val);
                 },

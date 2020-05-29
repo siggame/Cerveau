@@ -1,5 +1,5 @@
 import { Immutable, isNil } from "~/utils";
-import { ISanitizableType } from "./sanitizable-interfaces";
+import { SanitizableType } from "./sanitizable-interfaces";
 import { sanitizeArray } from "./sanitize-array";
 import { sanitizeBoolean } from "./sanitize-boolean";
 import { sanitizeGameObject } from "./sanitize-game-object";
@@ -19,7 +19,7 @@ import { sanitizeString } from "./sanitize-string";
  * @returns A value now sanitized and guaranteed to be of that type.
  */
 export function sanitizeType(
-    type: Immutable<ISanitizableType>,
+    type: Immutable<SanitizableType>,
     obj: unknown,
     allowError = true,
 ): unknown {

@@ -6,7 +6,7 @@ import { setupThread } from "../setup-thread";
 setupThread(); // we have to do this before doing aliased imports below
 
 // this also loads the command line arguments from process.env
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import { isMaster } from "cluster";
 import { Socket } from "net";
 import * as Clients from "~/core/clients";
@@ -51,7 +51,7 @@ export interface WorkerOverMessage {
     error?: Error;
 
     /** The gamelog, if everything went smoothly and it was generated. */
-    gamelog?: Immutable<IGamelog>;
+    gamelog?: Immutable<Gamelog>;
 
     /** The client infos for the completed game. */
     clientInfos?: Clients.ClientInfo[];
@@ -139,13 +139,13 @@ process.on(
             });
 
             process.on("unhandledRejection", (reason, promise) => {
-                session.kill(
+                void session.kill(
                     `Unhandled promise (${String(promise)} - ${reason}`,
                 );
             });
 
             process.on("uncaughtException", (err) => {
-                session.kill(`Uncaught exception thrown: ${err.message}`);
+                void session.kill(`Uncaught exception thrown: ${err.message}`);
             });
 
             session.events.ended.once((data) => {

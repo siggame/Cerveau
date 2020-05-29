@@ -18,6 +18,7 @@ export type TurnBasedPlayer = BasePlayer;
  * @param base.GameSettings - The GameSettings to extend.
  * @returns A new BaseGame class with TwoPlayerGame logic mixed in.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mixTurnBased<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -54,7 +55,7 @@ export function mixTurnBased<
         public get schema() {
             return this.makeSchema({
                 // HACK: super should work. but schema is undefined on it
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
                 ...(super.schema || (this as any).schema),
                 timeAddedPerTurn: {
                     default: 1e9, // 1 sec in ns,
@@ -163,7 +164,7 @@ export function mixTurnBased<
 
         /** Starts the game. */
         protected start(): void {
-            this.runCurrentTurn();
+            void this.runCurrentTurn();
         }
 
         /**
@@ -257,7 +258,7 @@ export function mixTurnBased<
                 this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
             }
 
-            this.runCurrentTurn();
+            void this.runCurrentTurn();
         }
     }
 

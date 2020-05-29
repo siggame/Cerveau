@@ -123,17 +123,17 @@ export interface PlayerProperties {
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseChessPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseChessPlayer & PlayerProperties & T>;
 
 export * from "./game-object";
 export * from "./player";

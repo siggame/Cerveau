@@ -327,6 +327,7 @@ export class BaseClient {
      *
      * @param str - The raw string to send. Should be EOT_CHAR terminated.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     protected async sendRaw(str: string): Promise<void> {
         if (Config.PRINT_TCP) {
             logger.debug(`> to client ${this.name} --> ${str}\n---`);
@@ -375,7 +376,7 @@ export class BaseClient {
             !objectHasProperty(jsonData, "event") ||
             typeof jsonData.event !== "string"
         ) {
-            this.disconnect("Sent malformed json event");
+            void this.disconnect("Sent malformed json event");
 
             return;
         }
@@ -384,7 +385,7 @@ export class BaseClient {
             [eventName: string]: undefined | Event<unknown>;
         })[jsonData.event];
         if (!event) {
-            this.disconnect(`Sent unknown event '${jsonData.event}'.`);
+            void this.disconnect(`Sent unknown event '${jsonData.event}'.`);
 
             return;
         }
@@ -423,12 +424,12 @@ export class BaseClient {
             try {
                 return JSON.parse(json) as Json;
             } catch (err) {
-                invalid = `Sent malformed JSON: '${String(err)}'`;
+                invalid = `Sent malformed JSON: '${err}'`;
             }
         }
 
         if (invalid) {
-            this.disconnect(invalid);
+            void this.disconnect(invalid);
         }
     }
 
@@ -466,7 +467,7 @@ export class BaseClient {
         this.timedOut = true;
         this.pauseTicking();
         this.events.timedOut.emit();
-        this.disconnect(
+        void this.disconnect(
             "Your client has run out of time, and has been timed out.",
         );
     }

@@ -13,7 +13,10 @@ const gamesEslintConfig = {
         // sometimes it's required to re-import a file because it was already
         // imported by Creer written code.
         "import/no-duplicates": "off",
+
+        "@typescript-eslint/require-await": "off",
     },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 module.exports = gamesEslintConfig;

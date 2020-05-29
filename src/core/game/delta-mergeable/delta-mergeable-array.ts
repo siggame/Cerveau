@@ -3,7 +3,7 @@
 // ^ as DeltaMergeables are black magic anyways
 
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { Immutable } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
@@ -54,7 +54,7 @@ export function createArray<T = any>(args: {
     /** The key of this array in its parent delta mergable. */
     key: string;
     /** The type of all children in this Array. */
-    childType: Immutable<ISanitizableType>;
+    childType: Immutable<SanitizableType>;
     /** The parent of this node. */
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
@@ -111,6 +111,7 @@ export function createArray<T = any>(args: {
                         container.adopt(values[i]);
                         values[i].set(currentValue, true);
                     } else {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                         values[i] = createDeltaMergeable({
                             key: String(i),
                             parent: container,

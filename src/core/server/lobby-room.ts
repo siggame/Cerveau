@@ -1,4 +1,4 @@
-import { IGamelog, IGamelogWinnerLoser } from "@cadre/ts-utils/cadre";
+import { Gamelog, GamelogWinnerLoser } from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import {
     BaseGameSettingsManager,
@@ -32,10 +32,10 @@ export abstract class Room {
     public gamelogFilename?: string;
 
     /** Once the game is over, this will exist and be the list of winners. */
-    public winners?: IGamelogWinnerLoser[];
+    public winners?: GamelogWinnerLoser[];
 
     /** Once the game is over, this will exist and be the list of losers. */
-    public losers?: IGamelogWinnerLoser[];
+    public losers?: GamelogWinnerLoser[];
 
     /** The password to entry this room. If undefined open to anyone. */
     public password?: string;
@@ -193,7 +193,7 @@ export abstract class Room {
      * @param gamelog - The gamelog resulting from the game played in the session.
      * @returns A promise that resolves once the gamelog is written to disk.
      */
-    protected async cleanUp(gamelog?: Immutable<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog?: Immutable<Gamelog>): Promise<void> {
         this.over = true;
 
         if (gamelog) {

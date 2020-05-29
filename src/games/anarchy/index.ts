@@ -348,65 +348,65 @@ export interface WeatherStationRotateArgs {
  * The default args passed to a constructor function for class
  * instances of Building.
  */
-export type BuildingConstructorArgs<T extends {} = {}> = Readonly<
-    BuildingProperties & T
->;
+export type BuildingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of FireDepartment.
  */
-export type FireDepartmentConstructorArgs<T extends {} = {}> = Readonly<
-    BuildingArgs & FireDepartmentProperties & T
->;
+export type FireDepartmentConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & FireDepartmentProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Forecast.
  */
-export type ForecastConstructorArgs<T extends {} = {}> = Readonly<
-    ForecastProperties & T
->;
+export type ForecastConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<ForecastProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseAnarchyPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseAnarchyPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of PoliceDepartment.
  */
-export type PoliceDepartmentConstructorArgs<T extends {} = {}> = Readonly<
-    BuildingArgs & PoliceDepartmentProperties & T
->;
+export type PoliceDepartmentConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & PoliceDepartmentProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Warehouse.
  */
-export type WarehouseConstructorArgs<T extends {} = {}> = Readonly<
-    BuildingArgs & WarehouseProperties & T
->;
+export type WarehouseConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & WarehouseProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of WeatherStation.
  */
-export type WeatherStationConstructorArgs<T extends {} = {}> = Readonly<
-    BuildingArgs & WeatherStationProperties & T
->;
+export type WeatherStationConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & WeatherStationProperties & T>;
 
 export * from "./building";
 export * from "./fire-department";

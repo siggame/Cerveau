@@ -1,9 +1,9 @@
 import {
     Delta,
-    IFinishedDelta,
-    IGamelog,
-    IOrderDelta,
-    IRanDelta,
+    FinishedDelta,
+    Gamelog,
+    OrderDelta,
+    RanDelta,
 } from "@cadre/ts-utils/cadre";
 import delay from "delay";
 import { writeFile } from "fs-extra";
@@ -33,13 +33,14 @@ export interface SessionEnded {
     /** The clients as the game ended. */
     clientInfos: Immutable<ClientInfo[]>;
     /** The gamelog resulting from the game. */
-    gamelog: Immutable<IGamelog>;
+    gamelog: Immutable<Gamelog>;
 }
 
 const TIMEOUT_PADDING = 30 * 1000; // 30 sec padding for internal computations
 
 let profiler: Profiler | undefined;
-import("v8-profiler")
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+void import("v8-profiler")
     .then((imported) => {
         profiler = imported;
     })
@@ -72,9 +73,9 @@ export class Session {
         ended: new Event<Error | SessionEnded>(),
 
         // -- Events proxies through from AIs in our game -- \\
-        aiOrdered: new Event<Immutable<IOrderDelta["data"]>>(),
-        aiRan: new Event<Immutable<IRanDelta["data"]>>(),
-        aiFinished: new Event<Immutable<IFinishedDelta["data"]>>(),
+        aiOrdered: new Event<Immutable<OrderDelta["data"]>>(),
+        aiRan: new Event<Immutable<RanDelta["data"]>>(),
+        aiFinished: new Event<Immutable<FinishedDelta["data"]>>(),
     });
 
     /** The session ID. */
@@ -225,7 +226,7 @@ export class Session {
         this.events.start.emit();
 
         for (const client of this.clients) {
-            client.send({
+            void client.send({
                 event: "start",
                 data: { playerID: client.player && client.player.id },
             });
@@ -265,7 +266,7 @@ ${fatal.message}`,
      *
      * @param gamelog - The gamelog we made to send back to the master thread.
      */
-    private async end(gamelog?: Readonly<IGamelog>): Promise<void> {
+    private async end(gamelog?: Readonly<Gamelog>): Promise<void> {
         if (this.timeout) {
             // then we are done, so we cannot timeout
             clearTimeout(this.timeout);
@@ -364,7 +365,7 @@ ${fatal.message}`,
         this.timeout = setTimeout(() => {
             this.timeout = undefined;
             // if this triggers the game of this session timed out, so kill it
-            this.kill(`Game session timed out after ${timeoutTime} ms.`);
+            void this.kill(`Game session timed out after ${timeoutTime} ms.`);
         }, timeoutTime);
     }
 
@@ -376,11 +377,11 @@ ${fatal.message}`,
      *
      * @param delta - The Delta to send to all clients.
      */
-    private readonly sendDeltas = (delta: Immutable<Delta>) => {
+    private readonly sendDeltas = (delta: Immutable<Delta>): void => {
         if (!isObjectEmpty(delta.game)) {
             for (const client of this.clients) {
                 // TODO: different deltas by player for hidden object games
-                client.send(
+                void client.send(
                     client.sendMetaDeltas
                         ? { event: "meta-delta", data: delta }
                         : { event: "delta", data: delta.game },
@@ -416,13 +417,13 @@ ${visualizerURL}
 ---`;
 
         for (const client of this.clients) {
-            client.send({
+            void client.send({
                 event: "over",
                 data: { gamelogURL, visualizerURL, message },
             });
         }
 
-        this.end(gamelog);
+        void this.end(gamelog);
     }
 
     /**

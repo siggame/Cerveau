@@ -407,6 +407,7 @@ args.BASE_DIR = args.BASE_DIR || __dirname;
 
 if (process.env.WORKER_GAME_SESSION_DATA) {
     // hackish, but let's assume if the data is set it is in the correct format.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     args.WORKER_DATA = JSON.parse(process.env.WORKER_GAME_SESSION_DATA);
 }
 

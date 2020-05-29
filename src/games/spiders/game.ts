@@ -8,7 +8,7 @@ import { Player } from "./player";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, euclideanDistance, IPoint, Mutable } from "~/utils";
+import { arrayHasElements, euclideanDistance, Point, Mutable } from "~/utils";
 
 /** A Player that can mutate before the game begins. */
 type MutablePlayer = Mutable<Player>;
@@ -156,7 +156,7 @@ export class SpidersGame extends BaseClasses.Game {
         let retries = 1000;
         for (let i = 0; i < numNests; i++) {
             while (--retries > 0) {
-                let point: IPoint | undefined = {
+                let point: Point | undefined = {
                     x: this.manager.random.int(mapWidth / 2 - deadzone / 2),
                     y: this.manager.random.int(mapHeight),
                 };

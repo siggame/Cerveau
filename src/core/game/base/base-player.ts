@@ -1,4 +1,4 @@
-import { IBasePlayer } from "@cadre/ts-utils/cadre";
+import { BasePlayer as CadreBasePlayer } from "@cadre/ts-utils/cadre";
 import { BaseAI } from "./base-ai";
 import { BaseGameObject, BaseGameObjectData } from "./base-game-object";
 
@@ -18,7 +18,7 @@ export interface BasePlayerData extends BaseGameObjectData {
  * NOTE: A type because we don't want to deal with multiple-inheritance in TS.
  */
 export type BasePlayer = BaseGameObject &
-    IBasePlayer & {
+    CadreBasePlayer & {
         /** The AI representation of this Player. */
         ai: BaseAI;
     };

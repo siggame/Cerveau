@@ -69,7 +69,7 @@ export class TCPClient extends BaseClient {
      */
     protected sendRaw(str: string): Promise<void> {
         return new Promise((resolve) => {
-            super.sendRaw(str);
+            void super.sendRaw(str);
 
             if (!this.hasDisconnected() && this.socket) {
                 this.socket.write(str + EOT_CHAR, (err) => {

@@ -430,57 +430,57 @@ export interface YoungGunCallInArgs {
  * The default args passed to a constructor function for class
  * instances of Bottle.
  */
-export type BottleConstructorArgs<T extends {} = {}> = Readonly<
-    BottleProperties & T
->;
+export type BottleConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BottleProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Cowboy.
  */
-export type CowboyConstructorArgs<T extends {} = {}> = Readonly<
-    CowboyProperties & T
->;
+export type CowboyConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<CowboyProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Furnishing.
  */
-export type FurnishingConstructorArgs<T extends {} = {}> = Readonly<
-    FurnishingProperties & T
->;
+export type FurnishingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<FurnishingProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseSaloonPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseSaloonPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tile.
  */
-export type TileConstructorArgs<T extends {} = {}> = Readonly<
-    TileProperties & T
->;
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of YoungGun.
  */
-export type YoungGunConstructorArgs<T extends {} = {}> = Readonly<
-    YoungGunProperties & T
->;
+export type YoungGunConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<YoungGunProperties & T>;
 
 export * from "./bottle";
 export * from "./cowboy";

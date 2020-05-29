@@ -454,49 +454,49 @@ export interface TileProperties {
  * The default args passed to a constructor function for class
  * instances of Beaver.
  */
-export type BeaverConstructorArgs<T extends {} = {}> = Readonly<
-    BeaverProperties & T
->;
+export type BeaverConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BeaverProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Job.
  */
-export type JobConstructorArgs<T extends {} = {}> = Readonly<
-    JobProperties & T
->;
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BaseStumpedPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseStumpedPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Spawner.
  */
-export type SpawnerConstructorArgs<T extends {} = {}> = Readonly<
-    SpawnerProperties & T
->;
+export type SpawnerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpawnerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tile.
  */
-export type TileConstructorArgs<T extends {} = {}> = Readonly<
-    TileProperties & T
->;
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 export * from "./beaver";
 export * from "./game-object";

@@ -22,7 +22,7 @@ export class AI extends BaseClasses.AI {
      * game.
      */
     public async makeMove(): Promise<string> {
-        return this.executeOrder("makeMove");
+        return this.executeOrder("makeMove") as Promise<string>;
     }
 
     // <<-- Creer-Merge: functions -->>

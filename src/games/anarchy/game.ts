@@ -8,7 +8,7 @@ import { AnarchyGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, IPoint, make2D, Mutable } from "~/utils";
+import { arrayHasElements, Point, make2D, Mutable } from "~/utils";
 
 const DIRECTIONAL_OFFSETS = {
     North: { x: 0, y: -1 },
@@ -23,7 +23,7 @@ const DIRECTIONAL_OFFSETS = {
  * @param pt - The point to transform to a key.
  * @returns The string key.
  */
-function pointToKey(pt: IPoint): string {
+function pointToKey(pt: Point): string {
     return `${pt.x},${pt.y}`;
 }
 
@@ -33,7 +33,7 @@ function pointToKey(pt: IPoint): string {
  * @param str - The string key to transform to a point.
  * @returns The point.
  */
-function keyToPoint(str: string): IPoint {
+function keyToPoint(str: string): Point {
     const split = str.split(",");
 
     return {
@@ -204,12 +204,12 @@ export class AnarchyGame extends BaseClasses.Game {
 
         const startingLength = points.length;
         for (let i = 0; i < startingLength; i++) {
-            let from: IPoint = keyToPoint(points[i]);
-            const to: IPoint = keyToPoint(points[i + 1]);
+            let from: Point = keyToPoint(points[i]);
+            const to: Point = keyToPoint(points[i + 1]);
 
             let itter = 0;
             while (itter++ < 1e9) {
-                const changes: IPoint[] = [];
+                const changes: Point[] = [];
                 // Is there a better way to do this?
                 if (from.x < to.x) {
                     changes.push({ x: 1, y: 0 });

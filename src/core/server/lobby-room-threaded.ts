@@ -1,4 +1,4 @@
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import * as cluster from "cluster";
 import * as path from "path";
 import { events } from "ts-typed-events";
@@ -107,7 +107,7 @@ export class ThreadedRoom extends Room {
         // this message should only happen once, when the game is over
         this.worker.once("message", (data: WorkerOverMessage) => {
             overData = data;
-            this.cleanUp(data.gamelog);
+            void this.cleanUp(data.gamelog);
         });
 
         this.worker.on("exit", () => {
@@ -121,7 +121,7 @@ export class ThreadedRoom extends Room {
      * @param gamelog - The gamelog sent from the session.
      * @returns A promise that resolves once we've cleaned up.
      */
-    protected async cleanUp(gamelog?: Immutable<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog?: Immutable<Gamelog>): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
 
         await super.cleanUp(gamelog);

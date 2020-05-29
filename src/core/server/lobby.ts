@@ -138,13 +138,14 @@ export class Lobby {
         // ReadLine: listens for CTRL+C to kill off child threads gracefully
         // (letting their games complete)
         rl.setPrompt("");
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         rl.on("SIGINT", () => this.shutDown());
 
         if (Config.UPDATER_ENABLED) {
             this.updater = new Updater();
 
             this.updater.events.updateFound.on(() => {
-                this.shutDown();
+                void this.shutDown();
             });
         }
     }
@@ -345,6 +346,7 @@ export class Lobby {
         this.clients.add(client);
 
         client.sent.alias.on((data) => this.clientSentAlias(client, data));
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         client.sent.play.on((data) => this.clientSentPlay(client, data));
         client.events.disconnected.on(() =>
             this.clientDisconnected(client, "Disconnected unexpectedly"),
@@ -438,6 +440,7 @@ There's probably another Cerveau server running on this same computer.`,
         for (const dir of dirs) {
             let gameNamespace: Immutable<BaseGameNamespace> | undefined;
             try {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 const data = (await import(GAMES_DIR + dir)) as GamesExport;
                 gameNamespace = data.Namespace;
             } catch (err) {
@@ -568,7 +571,7 @@ Cannot put you in a room for a game we don't host.`;
 
         if (typeof playData === "string") {
             // It did not validate, so playData is the invalid message
-            client.disconnect(playData);
+            void client.disconnect(playData);
 
             return;
         }
@@ -585,7 +588,7 @@ Cannot put you in a room for a game we don't host.`;
         }
 
         if (authenticationError) {
-            client.disconnect(
+            void client.disconnect(
                 `Authentication Error: '${authenticationError}'`,
             );
 
@@ -598,13 +601,15 @@ Cannot put you in a room for a game we don't host.`;
         );
 
         if (typeof room === "string") {
-            client.disconnect(room);
+            void client.disconnect(room);
 
             return;
         }
 
         if (room.password && room.password !== playData.password) {
-            client.disconnect(`Incorrect password for private room session`);
+            void client.disconnect(
+                "Incorrect password for private room session",
+            );
 
             return;
         }
@@ -620,7 +625,7 @@ Cannot put you in a room for a game we don't host.`;
                 // Then there is already a client in this room that requested
                 // this player index so the existing client gets the index,
                 // and this client gets rejected
-                client.disconnect(
+                void client.disconnect(
                     `Player index ${playData.playerIndex} is already taken`,
                 );
 
@@ -646,7 +651,7 @@ Cannot put you in a room for a game we don't host.`;
         }
 
         const gameNamespace = this.getGameNamespace(playData.gameName);
-        client.send({
+        void client.send({
             event: "lobbied",
             data: {
                 gameName: data.gameName,
@@ -816,14 +821,14 @@ Must be one string in the url parameters format.${footer}`;
         const gameName = this.getGameNameForAlias(alias);
 
         if (!gameName) {
-            client.disconnect(
+            void client.disconnect(
                 `${alias} is not a known game alias for any game.`,
             );
 
             return;
         }
 
-        client.send({ event: "named", data: gameName });
+        void client.send({ event: "named", data: gameName });
     }
 
     /**

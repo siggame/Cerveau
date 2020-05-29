@@ -1,8 +1,8 @@
 import {
-    IFinishedDelta,
-    IGameObjectReference,
-    IOrderDelta,
-    IRanDelta,
+    FinishedDelta,
+    GameObjectReference,
+    OrderDelta,
+    RanDelta,
 } from "@cadre/ts-utils/cadre";
 import { upperFirst } from "lodash";
 import { Event, events } from "ts-typed-events";
@@ -57,9 +57,9 @@ const MAX_ORDER_ERRORS = 10;
 export class BaseAIManager {
     /** The events this AI (manager) emits. */
     public readonly events = events({
-        ordered: new Event<Immutable<IOrderDelta["data"]>>(),
-        finished: new Event<Immutable<IFinishedDelta["data"]>>(),
-        ran: new Event<Immutable<IRanDelta["data"]>>(),
+        ordered: new Event<Immutable<OrderDelta["data"]>>(),
+        finished: new Event<Immutable<FinishedDelta["data"]>>(),
+        ran: new Event<Immutable<RanDelta["data"]>>(),
     });
 
     /** **This must be set externally before use**. */
@@ -97,7 +97,7 @@ export class BaseAIManager {
         });
 
         this.client.sent.run.on((run) => {
-            this.requestedRun(run.caller, run.functionName, run.args);
+            void this.requestedRun(run.caller, run.functionName, run.args);
         });
     }
 
@@ -122,7 +122,7 @@ export class BaseAIManager {
             if (sanitizedArgs instanceof Error) {
                 // Then the structure of the order is so bad that we
                 // can't figure out what to do
-                this.client.disconnect(
+                void this.client.disconnect(
                     `We could not make you execute ${name}.`,
                 );
                 reject(sanitizedArgs);
@@ -167,7 +167,7 @@ export class BaseAIManager {
      * NOTE: while game logic runs a delta will probably be sent out.
      */
     private async requestedRun<T>(
-        callerReference: Immutable<IGameObjectReference>,
+        callerReference: Immutable<GameObjectReference>,
         functionName: string,
         unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
@@ -195,12 +195,12 @@ export class BaseAIManager {
      * this run command, or undefined if the command is incomprehensible.
      */
     private async tryToRun<T>(
-        callerReference: Immutable<IGameObjectReference>,
+        callerReference: Immutable<GameObjectReference>,
         functionName: string,
         unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
         if (!this.client.player) {
-            this.client.disconnect(
+            void this.client.disconnect(
                 "You do not have a Player to send run commands for",
             );
 
@@ -212,7 +212,7 @@ export class BaseAIManager {
 
         if (!rawGameObject) {
             // they sent us an invalid caller
-            this.client.disconnect(
+            void this.client.disconnect(
                 `Cannot determine the calling game object of ${callerReference} to run for.`,
             );
 
@@ -231,7 +231,7 @@ export class BaseAIManager {
         if (sanitizedArgs instanceof Error) {
             // The structure of their run command is so malformed we can't even
             // run it, so something is wrong with their client, disconnect them
-            this.client.disconnect(sanitizedArgs.message);
+            void this.client.disconnect(sanitizedArgs.message);
 
             return undefined;
         }
@@ -241,7 +241,7 @@ export class BaseAIManager {
         ];
         if (!gameObjectSchema) {
             // the caller is malformed in some unexpected way
-            this.client.disconnect(
+            void this.client.disconnect(
                 `Cannot find schema for game object '${gameObject.gameObjectName}'.`,
             );
 
@@ -274,7 +274,7 @@ export class BaseAIManager {
         // If the game said the run is invalid for all runs
         if (invalid) {
             // Tell the client it is invalid
-            this.client.send({
+            void this.client.send({
                 event: "invalid",
                 data: { message: invalid },
             });
@@ -284,6 +284,7 @@ export class BaseAIManager {
             let argsMap = sanitizedArgs as Map<string, unknown>;
 
             const invalidateName = `invalidate${upperFirst(functionName)}`;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const validated: string | void | UnknownObject = gameObject[
                 invalidateName
             ](this.client.player, ...argsMap.values());
@@ -319,12 +320,13 @@ ${JSON.stringify(mapToObject(argsMap))}
             if (invalid) {
                 // Their arguments did not validate,
                 // so they get told it was invalid
-                this.client.send({
+                void this.client.send({
                     event: "invalid",
                     data: { message: invalid },
                 });
             } else {
                 // It's valid!
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const unsanitizedReturned: unknown = await gameObject[
                     functionName
                 ](this.client.player, ...argsMap.values());
@@ -353,7 +355,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             returned,
         });
 
-        this.client.send({ event: "ran", data: returned });
+        void this.client.send({ event: "ran", data: returned });
 
         return returned as T;
     }
@@ -383,7 +385,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             order: simpleOrder,
         });
 
-        this.client.send({ event: "order", data: simpleOrder });
+        void this.client.send({ event: "order", data: simpleOrder });
     }
 
     /**
@@ -401,7 +403,7 @@ ${JSON.stringify(mapToObject(argsMap))}
     ): void {
         const order = this.orders.get(orderIndex);
         if (!order || !this.client.player) {
-            this.client.disconnect(
+            void this.client.disconnect(
                 `Cannot find order # ${orderIndex} you claim to have finished.`,
             );
 
@@ -436,7 +438,7 @@ ${JSON.stringify(mapToObject(argsMap))}
         });
 
         if (invalid) {
-            this.client.send({
+            void this.client.send({
                 event: "invalid",
                 data: {
                     message: `Return value (${quoteIfString(
@@ -448,7 +450,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             order.errors++;
 
             if (order.errors >= MAX_ORDER_ERRORS) {
-                this.client.disconnect(
+                void this.client.disconnect(
                     `Exceeded max number of errors (${MAX_ORDER_ERRORS}) ` +
                         `executing order '${order.name}' #${order.index}.`,
                 );

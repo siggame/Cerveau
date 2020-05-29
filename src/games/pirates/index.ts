@@ -427,41 +427,41 @@ export interface UnitWithdrawArgs {
  * The default args passed to a constructor function for class
  * instances of GameObject.
  */
-export type GameObjectConstructorArgs<T extends {} = {}> = Readonly<
-    GameObjectProperties & T
->;
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Player.
  */
-export type PlayerConstructorArgs<T extends {} = {}> = Readonly<
-    BasePiratesPlayer & PlayerProperties & T
->;
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BasePiratesPlayer & PlayerProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Port.
  */
-export type PortConstructorArgs<T extends {} = {}> = Readonly<
-    PortProperties & T
->;
+export type PortConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<PortProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Tile.
  */
-export type TileConstructorArgs<T extends {} = {}> = Readonly<
-    TileProperties & T
->;
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 /**
  * The default args passed to a constructor function for class
  * instances of Unit.
  */
-export type UnitConstructorArgs<T extends {} = {}> = Readonly<
-    UnitProperties & T
->;
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./player";

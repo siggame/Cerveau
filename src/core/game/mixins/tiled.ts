@@ -3,7 +3,7 @@ import {
     BaseGameObjectFactory,
     BasePlayer,
 } from "~/core/game";
-import { IPoint, Mutable } from "~/utils";
+import { Point, Mutable } from "~/utils";
 import * as Base from "./base";
 
 /** The possible directions a tile can be in. */
@@ -140,6 +140,7 @@ type MutableBaseTile = Mutable<BaseTile>;
  * @returns A new BaseGame class with Tiled logic mixed in.
  */
 // Because it will be a weird mixin type inferred from the return statement
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mixTiled<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -164,7 +165,7 @@ export function mixTiled<
         public get schema() {
             return this.makeSchema({
                 // HACK: super should work. but schema is undefined on it
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
                 ...(super.schema || (this as any).schema),
                 mapWidth: {
                     default: 32,
@@ -268,7 +269,7 @@ export function mixTiled<
          * @param index - The index to get.
          * @returns A point with the { x, y } value at that index's point.
          */
-        public getIndex(index: number): IPoint {
+        public getIndex(index: number): Point {
             const y = index / this.mapWidth;
             const x = index - y * this.mapWidth;
 

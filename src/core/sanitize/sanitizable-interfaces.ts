@@ -10,7 +10,7 @@ interface SanitizableBaseType {
 }
 
 /** The various types we can sanitize. */
-export type ISanitizableType = (
+export type SanitizableType = (
     | SanitizableTypePrimitive
     | SanitizableTypeList
     | SanitizableTypeDictionary
@@ -31,7 +31,7 @@ export interface SanitizableTypeList {
     /** When the type is a list. */
     typeName: "list";
     /** It has a value type for its children. */
-    valueType: ISanitizableType;
+    valueType: SanitizableType;
 }
 
 /** A dictionary (object/map) that can be sanitized. */
@@ -39,9 +39,9 @@ export interface SanitizableTypeDictionary {
     /** When the type is a dictionary. */
     typeName: "dictionary";
     /** All values must be of this type. */
-    valueType: ISanitizableType;
+    valueType: SanitizableType;
     /** All keys must be of this type. */
-    keyType: ISanitizableType;
+    keyType: SanitizableType;
 }
 
 /** A game object in a game that can be sanitized. */

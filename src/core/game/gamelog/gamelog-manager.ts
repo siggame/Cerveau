@@ -1,4 +1,4 @@
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";
@@ -65,7 +65,7 @@ export class GamelogManager {
         public readonly gamelogDirectory: string = DEFAULT_LOGS_DIR,
     ) {
         if (Config.LOAD_EXISTING_GAMELOGS) {
-            this.initializeGamelogInfos();
+            void this.initializeGamelogInfos();
         }
     }
 
@@ -76,7 +76,7 @@ export class GamelogManager {
      * representation of the gamelog.
      * @returns A promise that resolves to the filename written.
      */
-    public log(gamelog: Immutable<IGamelog>): Promise<string> {
+    public log(gamelog: Immutable<Gamelog>): Promise<string> {
         const serialized = JSON.stringify(gamelog);
         const filename = filenameFor(gamelog);
 

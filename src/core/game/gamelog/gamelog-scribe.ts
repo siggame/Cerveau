@@ -1,12 +1,12 @@
 import {
     Delta,
-    IDisconnectDelta,
-    IFinishedDelta,
-    IGamelog,
-    IOrderDelta,
-    IOverDelta,
-    IRanDelta,
-    IStartDelta,
+    DisconnectDelta,
+    FinishedDelta,
+    Gamelog,
+    OrderDelta,
+    OverDelta,
+    RanDelta,
+    StartDelta,
 } from "@cadre/ts-utils/cadre";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
@@ -25,7 +25,7 @@ export class GamelogScribe {
     });
 
     /** The gamelog we are building up. */
-    public readonly gamelog: IGamelog;
+    public readonly gamelog: Gamelog;
 
     /** If our gamelog is finalized and should never be changed after. */
     private finalized = false;
@@ -61,24 +61,24 @@ export class GamelogScribe {
 
         // this assumes the GameManager goes first
         session.events.start.on(() => {
-            this.add<IStartDelta>("start");
+            this.add<StartDelta>("start");
         });
 
         session.events.gameOver.on(() => {
-            this.add<IOverDelta>("over");
+            this.add<OverDelta>("over");
             this.finalizeGamelog(clients);
         });
 
         session.events.aiOrdered.on((ordered) => {
-            this.add<IOrderDelta>("order", ordered);
+            this.add<OrderDelta>("order", ordered);
         });
 
         session.events.aiFinished.on((finished) => {
-            this.add<IFinishedDelta>("finished", finished);
+            this.add<FinishedDelta>("finished", finished);
         });
 
         session.events.aiRan.on((ran) => {
-            this.add<IRanDelta>("ran", ran);
+            this.add<RanDelta>("ran", ran);
         });
 
         for (const client of clients) {
@@ -88,7 +88,7 @@ export class GamelogScribe {
 
             const { id } = client.player;
             client.events.disconnected.on(() => {
-                this.add<IDisconnectDelta>("disconnect", {
+                this.add<DisconnectDelta>("disconnect", {
                     player: { id },
                     timeout: client.hasTimedOut(),
                 });

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
-import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import {
     Immutable,
     objectHasProperty,
@@ -27,9 +28,9 @@ export function createObject(
         /** The parent node. If undefined assumed to be the root node. */
         parent?: DeltaMergeable;
         /** The type of all child values in this object. */
-        childTypes?: Immutable<TypedObject<ISanitizableType>>;
+        childTypes?: Immutable<TypedObject<SanitizableType>>;
         /** The singular type of all children in this object. */
-        childType?: Immutable<ISanitizableType>;
+        childType?: Immutable<SanitizableType>;
         /**
          * The transform function to apply on all sets to this object
          * so new objects are not created to maintain references.
@@ -69,6 +70,7 @@ export function createObject(
                                 key,
                             )
                         ) {
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                             currentValue![key] = copyFrom[key];
                         }
                     }
@@ -89,12 +91,12 @@ export function createObject(
                 if (newKey) {
                     // then we need to create this new child we've never seen before
 
-                    let type: ISanitizableType | undefined;
+                    let type: SanitizableType | undefined;
                     if (
                         args.childTypes &&
                         objectHasProperty(args.childTypes, property)
                     ) {
-                        type = args.childTypes[property] as ISanitizableType;
+                        type = args.childTypes[property] as SanitizableType;
                     } else if (args.childType) {
                         type = args.childType;
                     }

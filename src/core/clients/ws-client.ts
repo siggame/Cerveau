@@ -30,6 +30,7 @@ export class WSClient extends BaseClient {
             socket instanceof net.Socket
                 ? // hackish, we need to re - set socket before super is called,
                   // but the super method wants to be called first
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                   ws.createClient(socket) // then we need to create a websocket interface wrapped around this net.Socket
                 : socket, // normal socket fail through
         );
@@ -97,6 +98,7 @@ export class WSClient extends BaseClient {
      * @param str - The raw string to send. Should be EOT_CHAR terminated.
      * @returns A promise that resolves after it sends the data.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     protected async sendRaw(str: string): Promise<void> {
         if (this.socket && !this.socket.closed) {
             this.socket.send(str);

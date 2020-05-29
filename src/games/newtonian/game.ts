@@ -10,7 +10,7 @@ import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
-import { IPoint, Mutable } from "~/utils";
+import { Point, Mutable } from "~/utils";
 
 /** Interface used to create roomss. */
 interface Room {
@@ -667,7 +667,7 @@ export class NewtonianGame extends BaseClasses.Game {
         const map: Room[][] = [];
         // sets sets up the rest of the map.
         for (let i = 0; i < mapW; i++) {
-            map[i] = new Array(mapH);
+            map[i] = new Array(mapH) as Room[];
         }
         // counts the extra y tiles.
         const extraY = (y2 - y1 + 2) % 3;
@@ -826,11 +826,11 @@ export class NewtonianGame extends BaseClasses.Game {
         getMutableTile: (x: number, y: number) => Mutable<Tile>,
     ): void {
         // tracks every room in the map list that is unconnected.
-        const unconnected: IPoint[] = [];
+        const unconnected: Point[] = [];
         // master list of random rooms in a easy to grab fashion.
-        const roomList: IPoint[] = [];
+        const roomList: Point[] = [];
         // tracks all rooms that are eligible to get machines.
-        const machRooms: IPoint[] = [];
+        const machRooms: Point[] = [];
         // tracks the number of connections that need to be made.
         let connect = Math.floor((map.length * map[0].length) / 2);
         // used to track if a direction has been chosen.
@@ -1172,9 +1172,9 @@ export class NewtonianGame extends BaseClasses.Game {
         // cleanup List to reduce memory usage
         unconnected.length = 0;
         // Que of rooms to be connected
-        const toConnectQue: IPoint[] = [];
+        const toConnectQue: Point[] = [];
         // used to track rooms that are connected.
-        const connected: IPoint[] = [];
+        const connected: Point[] = [];
         // find a starting room.
         const start = roomList[this.manager.random.int(roomList.length, 0)];
         // add starting room.
@@ -1995,7 +1995,7 @@ export class NewtonianGame extends BaseClasses.Game {
      * @param y - The y point you are checking for.
      * @returns Returns it's index or -1 if it doesn't exist.
      */
-    private has(uncon: IPoint[], x: number, y: number): number {
+    private has(uncon: Point[], x: number, y: number): number {
         for (let w = 0; w < uncon.length; w++) {
             if (uncon[w].x === x && uncon[w].y === y) {
                 return w;

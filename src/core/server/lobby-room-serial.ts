@@ -22,6 +22,7 @@ export class SerialRoom extends Room {
             gameNamespace: this.gameNamespace,
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         this.session.events.ended.once(async (data) => {
             if (data instanceof Error) {
                 logger.error("Session had a fatal error", data);
