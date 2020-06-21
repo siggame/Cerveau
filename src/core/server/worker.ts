@@ -82,7 +82,7 @@ const workerData = Config.WORKER_DATA;
 
 process.title = `${workerData.gameName} - ${workerData.sessionID}`;
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const required = require(`~/games/${workerData.gameName.toLowerCase()}/`) as GamesExport;
 
 if (!required.Namespace) {

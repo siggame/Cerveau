@@ -47,11 +47,6 @@ interface Room {
     DWest: boolean;
 }
 
-/*interface IConveyor {
-    x: number; y: number;
-    direction: Tile["direction"];
-}*/
-
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 

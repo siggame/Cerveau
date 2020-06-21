@@ -5,7 +5,7 @@ import { Immutable, momentString } from "~/utils";
 
 // Typings bug. No default export exist for this library, yet TS thinks there should be.
 // This side steps the bug by reverting to old school requires.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const sanitizeFilename = require("sanitize-filename") as typeof import("sanitize-filename");
 
 /** The extension for gamelog files. */
