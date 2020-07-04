@@ -125,7 +125,11 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
             },
             */
-
+            maxMiners: {
+                description: "The maximum number of miners a player may own.",
+                default: 10,
+                min: 1,
+            },
             // <<-- /Creer-Merge: schema -->>
 
             // Base settings
