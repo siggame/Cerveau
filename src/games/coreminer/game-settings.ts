@@ -62,7 +62,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of victory points awarded when ore is "
                            + "deposited in the base.",
                 // <<-- Creer-Merge: oreValue -->>
-                default: 1,
+                default: 5,
                 min: 1,
                 // <<-- /Creer-Merge: oreValue -->>
             },

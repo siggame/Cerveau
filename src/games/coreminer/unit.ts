@@ -357,7 +357,7 @@ export class Unit extends GameObject {
                 trueAmount = this.ore;
             }
             player.money += trueAmount * this.game.oreValue;
-            player.value += trueAmount * this.game.oreValue;
+            player.value += trueAmount;
             this.ore -= trueAmount;
         }
 
