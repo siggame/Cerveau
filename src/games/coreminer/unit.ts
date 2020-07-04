@@ -442,6 +442,12 @@ export class Unit extends GameObject {
             return `${this} must be a miner to mine.`;
         }
 
+        const trueAmount = amount + (tile.isSupport ? this.game.settings.supportCost : 0)
+                                    + (tile.isLadder ? this.game.settings.ladderCost : 0);
+        if (this.miningPower < trueAmount) {
+            return `${this} doesn't have enough mining power to mine that amount!`;
+        }
+
         const newLoad = (this.bombs * this.game.bombSize)
         + this.buildingMaterials + this.dirt + this.ore + amount;
         if (this.maxCargoCapacity <= newLoad) {
@@ -487,14 +493,27 @@ export class Unit extends GameObject {
         let currentLoad = (this.bombs * this.game.bombSize)
         + this.buildingMaterials + this.dirt + this.ore;
 
-        if (tile.ore > 0) {
+        if (tile.isLadder && this.miningPower) {
+            this.miningPower -= this.game.settings.ladderCost;
+        }
+
+        if (tile.isSupport && this.miningPower) {
+            this.miningPower -= this.game.settings.supportCost;
+        }
+
+        if (tile.shielding > 0 && this.miningPower) {
+            this.miningPower -= tile.shielding * this.game.settings.shieldCost;
+        }
+
+        if (tile.ore > 0 && this.miningPower) {
             const actualOreAmount = Math.min(
             tile.ore, this.miningPower, this.maxCargoCapacity - currentLoad);
             tile.ore -= actualOreAmount;
             this.ore += actualOreAmount;
+            this.miningPower -= actualOreAmount;
         }
 
-        if (tile.dirt > 0 && amountLeft > 0) {
+        if (tile.dirt > 0 && amountLeft > 0 && this.miningPower) {
             const actualDirtAmount = Math.min(
                 tile.dirt, this.miningPower, this.maxCargoCapacity - currentLoad);
 
@@ -502,6 +521,7 @@ export class Unit extends GameObject {
             this.dirt += actualDirtAmount;
             amountLeft -= actualDirtAmount;
             currentLoad += actualDirtAmount;
+            this.miningPower -= actualDirtAmount;
         }
 
         // Check if mined tile is still filled
