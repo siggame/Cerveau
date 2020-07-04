@@ -261,8 +261,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt', 'ore', or
-     * 'bomb'.
+     * @param material - The material the Unit will drop. 'dirt', 'ore',
+     * 'bomb', or buildingMaterials.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns If the arguments are invalid, return a string explaining to
@@ -272,12 +272,16 @@ export class Unit extends GameObject {
     protected invalidateDump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore" | "bomb",
+        material: "dirt" | "ore" | "bomb" | "buildingMaterials",
         amount: number,
     ): void | string | IUnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
+        }
+
+        if (material === "buildingMaterials" && !tile.isHopper) {
+            return `${this} can only dump building materials in a hopper!`;
         }
 
         // Make sure the unit is alive.
@@ -347,7 +351,7 @@ export class Unit extends GameObject {
     protected async dump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore" | "bomb",
+        material: "dirt" | "ore" | "bomb" | "buildingMaterials",
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>
@@ -373,6 +377,11 @@ export class Unit extends GameObject {
         else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
             player.bombs += trueAmount;
             this.bombs -= trueAmount;
+        }
+
+        else if (material === "buildingMaterials") {
+            player.buildingMaterials += amount;
+            this.buildingMaterials -= amount;
         }
 
         else {
