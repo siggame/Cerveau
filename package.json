@@ -35,7 +35,7 @@
     "gaussian": "1.1.0",
     "json5": "2.1.1",
     "lark-websocket": "github:JacobFischer/lark-websocket.git#19c02d13cd5e0de098196e4b43089d571c55714c",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "moment": "2.24.0",
     "sanitize-filename": "1.6.3",
     "seedrandom": "3.0.5",
