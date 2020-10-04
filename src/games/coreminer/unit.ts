@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IUnitBuildArgs, IUnitDumpArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitUpgradeArgs } from "./";
+         IUnitProperties, IUnitTransferArgs, IUnitUpgradeArgs } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -87,6 +87,11 @@ export class Unit extends GameObject {
      * The Tile this Unit is on.
      */
     public tile?: Tile;
+
+    /**
+     * The upgrade level of this unit. Starts at 0.
+     */
+    public upgradeLevel!: number;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -272,16 +277,12 @@ export class Unit extends GameObject {
     protected invalidateDump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        material: "dirt" | "ore" | "bomb",
         amount: number,
     ): void | string | IUnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
-        }
-
-        if (material === "buildingMaterials" && !tile.isHopper) {
-            return `${this} can only dump building materials in a hopper!`;
         }
 
         // Make sure the unit is alive.
@@ -338,7 +339,8 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Dumps materials from cargo to an adjacent tile.
+     * Dumps materials from cargo to an adjacent tile. If the tile is a base or
+     * hopper tile, materials are sold instead of placed.
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
@@ -351,7 +353,7 @@ export class Unit extends GameObject {
     protected async dump(
         player: Player,
         tile: Tile,
-        material: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        material: "dirt" | "ore" | "bomb",
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>
@@ -375,16 +377,11 @@ export class Unit extends GameObject {
         }
 
         else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
-            player.bombs += trueAmount;
-            this.bombs -= trueAmount;
+            player.money += amount * this.game.bombPrice; // sell bombs at sale price
+            this.bombs -= amount;
         }
-
-        else if (material === "buildingMaterials") {
-            player.buildingMaterials += amount;
-            this.buildingMaterials -= amount;
-        }
-
         else {
+            // Not dumping into base/hopper
             if (material === `dirt`) {
                 tile.dirt += trueAmount;
                 this.dirt -= trueAmount;
@@ -437,6 +434,10 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: invalidate-mine -->>
         if (!this) {
             return `Unit doesn't exist`;
+        }
+
+        if (!this.health) {
+            return `This unit is destroyed!`;
         }
 
         if (!tile) {
@@ -580,8 +581,36 @@ export class Unit extends GameObject {
             return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
         }
 
+        if (!this) {
+            return `This unit does not exist!`;
+        }
+
+        if (this.owner !== player) {
+            return `This is not your unit!`;
+        }
+
+        if (this.game.currentPlayer !== player) {
+            return `It is not your turn!`;
+        }
+
+        if (this.moves <= 0) {
+            return `This unit is out of moves!`;
+        }
+
         if (!this.tile) {
-            return `${this} is in an uncharted part of the mine!`;
+            return `This unit is not on a tile!`;
+        }
+
+        if (this.tile.dirt + this.tile.ore > 0) {
+            return `This unit is stuck in a filled tile and cannot move!`;
+        }
+
+        if (this.tile.getNeighbor("North") === tile && !this.tile.isLadder) {
+            return `This unit cannot fly upwards! It needs a ladder!`;
+        }
+
+        if (tile.dirt + tile.ore !== 0) {
+            return `This unit cannot enter a filled tile!`;
         }
 
         if (this.moves <= 0) {
@@ -616,23 +645,21 @@ export class Unit extends GameObject {
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
+        let tilesFallen = 0;
+        let tileBelow = tile.tileSouth;
+
+        // Move unit
         if (!this.tile) {
             throw new Error(`${this} has no Tile to move from!`);
         }
-
-        // Moving in place (could happen after falling)
-        if (this.tile === tile) {
-            return true;
-        }
-
-        this.tile.units.splice(this.tile.units.indexOf(this), 1);
+        this.tile.units = this.tile.units.filter((value) => value !== this);
         this.tile = tile;
         tile.units.push(this);
         this.moves -= 1;
 
         // Fall logic
         let distance = 0;
-        while (this.tile.tileSouth !== undefined && this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
+        while (this.tile.tileSouth !== undefined && this.tile.tileSouth.ore + this.tile.tileSouth.dirt >= 0 &&
             !this.tile.tileSouth.isLadder) {
             this.tile.units.splice(this.tile.units.indexOf(this), 1);
             this.tile = this.tile.tileSouth;
@@ -656,19 +683,145 @@ export class Unit extends GameObject {
     }
 
     /**
+     * Invalidation function for transfer. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param unit - The Unit to transfer materials to.
+     * @param resource - The type of resource to transfer.
+     * @param amount - The amount of resource to transfer.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateTransfer(
+        player: Player,
+        unit: Unit,
+        resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): void | string | IUnitTransferArgs {
+        // <<-- Creer-Merge: invalidate-transfer -->>
+
+        if (!this) {
+            return `This unit does not exist!`;
+        }
+
+        if (!this.health) {
+            return `This unit is destroyed!`;
+        }
+
+        if (!unit) {
+            return `The target unit does not exist!`;
+        }
+
+        if (!this.tile) {
+            return `This unit is not on a tile!`;
+        }
+
+        if (!unit.tile) {
+            return `The target unit is not on a tile!`;
+        }
+
+        if (this.tile.getNeighbors().indexOf(unit.tile) === -1 && this.tile !== unit.tile) {
+            return `The target unit is not adjacent to this unit!`;
+        }
+
+        let actualAmount;
+        switch (resource) {
+            case "dirt":
+                if (this.dirt < amount) {
+                    return `This unit cannot transfer more dirt than they have!`;
+                }
+                actualAmount = amount === -1 ? this.dirt : amount;
+                break;
+            case "ore":
+                if (this.ore < amount) {
+                    return `This unit cannot transfer more ore than they have!`;
+                }
+                actualAmount = amount === -1 ? this.ore : amount;
+                break;
+            case "bomb":
+                if (this.bombs < amount) {
+                    return `This unit cannot transfer more bombs than they have!`;
+                }
+                actualAmount = amount === -1 ? this.bombs : amount;
+                break;
+            case "buildingMaterials":
+                if (this.buildingMaterials < amount) {
+                    return `This unit cannot transfer more building materials than they have!`;
+                }
+                actualAmount = amount === -1 ? this.buildingMaterials : amount;
+                break;
+            default:
+                return `Invalid transfer material!`;
+        }
+
+        const unitCargoCapacity = unit.dirt + unit.ore + (unit.bombs * this.game.bombSize) + unit.buildingMaterials;
+        if (actualAmount > unitCargoCapacity) {
+            return `The target unit cannot hold that many materials!`;
+        }
+
+        // <<-- /Creer-Merge: invalidate-transfer -->>
+    }
+
+    /**
+     * Transfers a resource from the one Unit to another.
+     *
+     * @param player - The player that called this.
+     * @param unit - The Unit to transfer materials to.
+     * @param resource - The type of resource to transfer.
+     * @param amount - The amount of resource to transfer.
+     * @returns True if successfully transfered, false otherwise.
+     */
+    protected async transfer(
+        player: Player,
+        unit: Unit,
+        resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: transfer -->>
+
+        let actualAmount;
+        switch (resource) {
+            case "dirt":
+                actualAmount = amount === -1 ? this.dirt : amount;
+                this.dirt -= actualAmount;
+                unit.dirt += actualAmount;
+                break;
+            case "ore":
+                actualAmount = amount === -1 ? this.ore : amount;
+                this.ore -= actualAmount;
+                unit.ore += actualAmount;
+                break;
+            case "bomb":
+                actualAmount = amount === -1 ? this.bombs : amount;
+                this.bombs -= actualAmount;
+                unit.bombs += actualAmount;
+                break;
+            case "buildingMaterials":
+                actualAmount = amount === -1 ? this.buildingMaterials : amount;
+                this.buildingMaterials -= actualAmount;
+                unit.buildingMaterials += actualAmount;
+        }
+
+        return true;
+
+        // <<-- /Creer-Merge: transfer -->>
+    }
+
+    /**
      * Invalidation function for upgrade. Try to find a reason why the passed
      * in parameters are invalid, and return a human readable string telling
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param attribute - The attribute of the Unit to be upgraded.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
     protected invalidateUpgrade(
         player: Player,
-        attribute: "health" | "miningPower" | "moves" | "capacity",
     ): void | string | IUnitUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
         if (!player || player !== this.game.currentPlayer) {
@@ -695,38 +848,12 @@ export class Unit extends GameObject {
             return `${this} must be on your base or hopper to upgrade!`;
         }
 
-        let cost;
-        switch (attribute) {
-            case "capacity":
-                cost = this.game.upgradeCargoCapacityCost;
-                if (this.job.cargoCapacity.indexOf(this.maxCargoCapacity) === this.job.cargoCapacity.length - 1) {
-                    return `${this} already has max capacity upgrades!`;
-                }
-                break;
+        if (this.upgradeLevel >= this.game.upgradePrice.length) {
+            return `This unit is already fully upgraded!`;
+        }
 
-            case "health":
-                cost = this.game.upgradeHealthCost;
-                if (this.job.health.indexOf(this.maxHealth) === this.job.health.length - 1) {
-                    return `${this} already has max health upgrades!`;
-                }
-                break;
-
-            case "miningPower":
-                cost = this.game.upgradeMiningPowerCost;
-                if (this.job.miningPower.indexOf(this.maxMiningPower) === this.job.miningPower.length - 1) {
-                    return `${this} already has max mining power upgrades!`;
-                }
-                break;
-
-            case "moves":
-                cost = this.game.upgradeMovesCost;
-                if (this.job.moves.indexOf(this.maxMoves) === this.job.moves.length - 1) {
-                    return `${this} already has max move upgrades!`;
-                }
-                break;
-
-            default:
-                return `Units cannot upgrade ${attribute}!`;
+        if (player.money < this.game.upgradePrice[this.upgradeLevel + 1]) {
+            return `You cannot afford this upgrade!`;
         }
 
         if (cost > player.money) {
@@ -736,43 +863,18 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Upgrade an attribute of this Unit. "health", "miningPower", "moves", or
-     * "capacity".
+     * Upgrade this Unit.
      *
      * @param player - The player that called this.
-     * @param attribute - The attribute of the Unit to be upgraded.
      * @returns True if successfully upgraded, False otherwise.
      */
-    protected async upgrade(
-        player: Player,
-        attribute: "health" | "miningPower" | "moves" | "capacity",
-    ): Promise<boolean> {
+    protected async upgrade(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: upgrade -->>
-        let nextLevelIndex;
-        switch (attribute) {
-            case "capacity":
-                player.money -= this.game.upgradeCargoCapacityCost;
-                nextLevelIndex = this.job.cargoCapacity.indexOf(this.maxCargoCapacity) + 1;
-                this.maxCargoCapacity = this.job.cargoCapacity[nextLevelIndex];
-                break;
-
-            case "health":
-                player.money -= this.game.upgradeHealthCost;
-                nextLevelIndex = this.job.health.indexOf(this.maxHealth) + 1;
-                this.maxHealth = this.job.health[nextLevelIndex];
-                break;
-
-            case "miningPower":
-                player.money -= this.game.upgradeMiningPowerCost;
-                nextLevelIndex = this.job.miningPower.indexOf(this.maxMiningPower) + 1;
-                this.maxMiningPower = this.job.miningPower[nextLevelIndex];
-                break;
-
-            case "moves":
-                player.money -= this.game.upgradeMovesCost;
-                nextLevelIndex = this.job.moves.indexOf(this.maxMoves) + 1;
-                this.maxMoves = this.job.moves[nextLevelIndex];
-        }
+        this.upgradeLevel++;
+        this.maxCargoCapacity = this.job.cargoCapacity[this.upgradeLevel];
+        this.maxHealth = this.job.health[this.upgradeLevel];
+        this.maxMiningPower = this.job.miningPower[this.upgradeLevel];
+        this.maxMoves = this.job.moves[this.upgradeLevel];
 
         return true;
         // <<-- /Creer-Merge: upgrade -->>

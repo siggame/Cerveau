@@ -21,12 +21,12 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             ...(super.schema || (this as any).schema),
 
             // Coreminer game specific settings
-            bombCost: {
-                description: "The price of buying a bomb.",
-                // <<-- Creer-Merge: bombCost -->>
-                default: 50,
-                min: 1,
-                // <<-- /Creer-Merge: bombCost -->>
+            bombPrice: {
+                description: "The monetary price of a bomb when bought or "
+                           + "sold.",
+                // <<-- Creer-Merge: bombPrice -->>
+                default: 0,
+                // <<-- /Creer-Merge: bombPrice -->>
             },
             bombSize: {
                 description: "The amount of cargo space taken up by a bomb.",
@@ -35,20 +35,18 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: bombSize -->>
             },
-            buildingMaterialCost: {
-                description: "The price of buying building materials.",
-                // <<-- Creer-Merge: buildingMaterialCost -->>
-                default: 1,
-                min: 1,
-                // <<-- /Creer-Merge: buildingMaterialCost -->>
+            buildingMaterialPrice: {
+                description: "The monetary price of building materials when "
+                           + "bought.",
+                // <<-- Creer-Merge: buildingMaterialPrice -->>
+                default: 0,
+                // <<-- /Creer-Merge: buildingMaterialPrice -->>
             },
-            freeBombInterval: {
-                description: "The amount of turns it takes to gain a free "
-                           + "Bomb.",
-                // <<-- Creer-Merge: freeBombInterval -->>
-                default: 100,
-                min: 10,
-                // <<-- /Creer-Merge: freeBombInterval -->>
+            dirtPrice: {
+                description: "The monetary price of dirt when bought or sold.",
+                // <<-- Creer-Merge: dirtPrice -->>
+                default: 0,
+                // <<-- /Creer-Merge: dirtPrice -->>
             },
             ladderCost: {
                 description: "The amount of building material required to "
@@ -58,9 +56,16 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: ladderCost -->>
             },
+            orePrice: {
+                description: "The amount of money awarded when ore is dumped "
+                           + "in the base and sold.",
+                // <<-- Creer-Merge: orePrice -->>
+                default: 0,
+                // <<-- /Creer-Merge: orePrice -->>
+            },
             oreValue: {
                 description: "The amount of victory points awarded when ore is "
-                           + "deposited in the base.",
+                           + "dumped in the base and sold.",
                 // <<-- Creer-Merge: oreValue -->>
                 default: 5,
                 min: 1,
@@ -74,6 +79,12 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: shieldCost -->>
             },
+            spawnPrice: {
+                description: "The monetary price of spawning a Miner.",
+                // <<-- Creer-Merge: spawnPrice -->>
+                default: 0,
+                // <<-- /Creer-Merge: spawnPrice -->>
+            },
             supportCost: {
                 description: "The amount of building material required to "
                            + "build a support.",
@@ -82,33 +93,11 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: supportCost -->>
             },
-            upgradeCargoCapacityCost: {
-                description: "The cost to upgrade a Unit's cargo capacity.",
-                // <<-- Creer-Merge: upgradeCargoCapacityCost -->>
-                default: 500,
-                min: 1,
-                // <<-- /Creer-Merge: upgradeCargoCapacityCost -->>
-            },
-            upgradeHealthCost: {
-                description: "The cost to upgrade a Unit's health.",
-                // <<-- Creer-Merge: upgradeHealthCost -->>
-                default: 500,
-                min: 1,
-                // <<-- /Creer-Merge: upgradeHealthCost -->>
-            },
-            upgradeMiningPowerCost: {
-                description: "The cost to upgrade a Unit's mining power.",
-                // <<-- Creer-Merge: upgradeMiningPowerCost -->>
-                default: 500,
-                min: 1,
-                // <<-- /Creer-Merge: upgradeMiningPowerCost -->>
-            },
-            upgradeMovesCost: {
-                description: "The cost to upgrade a Unit's movement speed.",
-                // <<-- Creer-Merge: upgradeMovesCost -->>
-                default: 500,
-                min: 1,
-                // <<-- /Creer-Merge: upgradeMovesCost -->>
+            upgradePrice: {
+                description: "The cost to upgrade a Unit at each level.",
+                // <<-- Creer-Merge: upgradePrice -->>
+                default: [],
+                // <<-- /Creer-Merge: upgradePrice -->>
             },
             victoryAmount: {
                 description: "The amount of victory points required to win.",
@@ -118,18 +107,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
             // <<-- Creer-Merge: schema -->>
-            /*
-            someVariableLikeUnitHealth: {
-                description: "Describe what this setting does for the players.",
-                default: 1337,
-                min: 1,
-            },
-            */
-            maxMiners: {
-                description: "The maximum number of miners a player may own.",
-                default: 10,
-                min: 1,
-            },
+
             // <<-- /Creer-Merge: schema -->>
 
             // Base settings

@@ -1,6 +1,6 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties, ITileSpawnMinerArgs } from "./";
+import { ITileProperties } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Unit } from "./unit";
@@ -19,7 +19,7 @@ export class Tile extends GameObject implements BaseTile {
     public dirt!: number;
 
     /**
-     * Whether or not the tile is an indestructible base Tile.
+     * Whether or not the tile is a base Tile.
      */
     public isBase!: boolean;
 
@@ -49,8 +49,7 @@ export class Tile extends GameObject implements BaseTile {
     public ore!: number;
 
     /**
-     * The owner of this Tile, or undefined if owned by no-one. Only for bases
-     * and hoppers.
+     * The owner of this Tile, or undefined if owned by no-one.
      */
     public owner?: Player;
 
@@ -187,70 +186,61 @@ export class Tile extends GameObject implements BaseTile {
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
-     * Invalidation function for spawnMiner. Try to find a reason why the
-     * passed in parameters are invalid, and return a human readable string
-     * telling them why it is invalid.
+     * Gets the adjacent direction between this Tile and an adjacent Tile
+     * (if one exists).
      *
-     * @param player - The player that called this.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
+     * @param adjacentTile - A tile that should be adjacent to this Tile.
+     * @returns "North", "East", "South", or "West" if the tile is adjacent to
+     * this Tile in that direction. Otherwise undefined.
      */
-    protected invalidateSpawnMiner(
-        player: Player,
-    ): void | string | ITileSpawnMinerArgs {
-        // <<-- Creer-Merge: invalidate-spawnMiner -->>
-
-        if (!this) {
-            return `The chosen tile does not exist!`;
-        }
-
-        if (!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
-        }
-
-        if (this.owner !== player) {
-            return `This tile isn't owned by you!`;
-        }
-
-        if (player.money < this.game.jobs[0].cost) {
-            return `You cannot afford a miner!`;
-        }
-
-        // <<-- /Creer-Merge: invalidate-spawnMiner -->>
+    public getAdjacentDirection(
+        adjacentTile: Tile | undefined,
+    ): "North" | "South" | "East" | "West" | undefined {
+        // tslint:disable-next-line:no-unsafe-any
+        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
     }
 
     /**
-     * Spawns a Miner Unit on this Tile - Must be on the surface on their side
-     * of the map.
+     * Gets a list of all the neighbors of this Tile.
      *
-     * @param player - The player that called this.
-     * @returns True if successfully spawned, false otherwise.
+     * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
-    protected async spawnMiner(player: Player): Promise<boolean> {
-        // <<-- Creer-Merge: spawnMiner -->>
-        const newUnit = this.game.manager.create.unit({
-            job: this.game.jobs[0],
-            tile: this,
-            health: this.game.jobs[0].health[0],
-            maxHealth: this.game.jobs[0].health[0],
-            maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
-            miningPower: this.game.jobs[0].miningPower[0],
-            maxMiningPower: this.game.jobs[0].miningPower[0],
-            moves: this.game.jobs[0].moves[0],
-            maxMoves: this.game.jobs[0].moves[0],
-            owner: player,
-        });
+    public getNeighbors(): Tile[] {
+        // tslint:disable-next-line:no-unsafe-any
+        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
+    }
 
-        player.money -= this.game.jobs[0].cost;
+    /**
+     * Gets a neighbor in a particular direction
+     *
+     * @param direction - The direction you want, must be
+     * "North", "East", "South", or "West".
+     * @returns The Tile in that direction, or undefined if there is none.
+     */
+    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
+        // tslint:disable-next-line:no-unsafe-any
+        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    }
 
-        this.game.units.push(newUnit);
-        player.units.push(newUnit);
-        this.units.push(newUnit);
+    /**
+     * Checks if a Tile has another Tile as its neighbor.
+     *
+     * @param tile - The Tile to check.
+     * @returns True if neighbor, false otherwise.
+     */
+    public hasNeighbor(tile: Tile | undefined): boolean {
+        // tslint:disable-next-line:no-unsafe-any
+        return BaseTile.prototype.hasNeighbor.call(this, tile);
+    }
 
-        return true;
-
-        // <<-- /Creer-Merge: spawnMiner -->>
+    /**
+     * toString override.
+     *
+     * @returns A string representation of the Tile.
+     */
+    public toString(): string {
+        // tslint:disable-next-line:no-unsafe-any
+        return BaseTile.prototype.toString.call(this);
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>

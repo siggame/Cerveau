@@ -117,25 +117,10 @@ export interface IPlayerProperties {
     baseTile?: Tile;
 
     /**
-     * The bombs stored in the Player's supply.
-     */
-    bombs?: number;
-
-    /**
-     * The building material stored in the Player's supply.
-     */
-    buildingMaterials?: number;
-
-    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
     clientType?: string;
-
-    /**
-     * The dirt stored in the Player's supply.
-     */
-    dirt?: number;
 
     /**
      * The Tiles this Player's hoppers are on.
@@ -205,39 +190,11 @@ export interface IPlayerProperties {
 }
 
 /**
- * Argument overrides for Player's buy function. If you return an object of
- * this interface from the invalidate functions, the value(s) you set will be
- * used in the actual function.
- */
-export interface IPlayerBuyArgs {
-    /**
-     * The type of resource to buy.
-     */
-    resource?: "dirt" | "bomb" | "buildingMaterials";
-    /**
-     * The amount of resource to buy.
-     */
-    amount?: number;
-}
-
-/**
- * Argument overrides for Player's transfer function. If you return an object
+ * Argument overrides for Player's spawnMiner function. If you return an object
  * of this interface from the invalidate functions, the value(s) you set will
  * be used in the actual function.
  */
-export interface IPlayerTransferArgs {
-    /**
-     * The Unit to transfer materials to.
-     */
-    unit?: Unit;
-    /**
-     * The type of resource to transfer.
-     */
-    resource?: "dirt" | "bomb" | "buildingMaterials";
-    /**
-     * The amount of resource to transfer.
-     */
-    amount?: number;
+export interface IPlayerSpawnMinerArgs {
 }
 
 /** All the possible properties for an Tile. */
@@ -248,7 +205,7 @@ export interface ITileProperties {
     dirt?: number;
 
     /**
-     * Whether or not the tile is an indestructible base Tile.
+     * Whether or not the tile is a base Tile.
      */
     isBase?: boolean;
 
@@ -278,8 +235,7 @@ export interface ITileProperties {
     ore?: number;
 
     /**
-     * The owner of this Tile, or undefined if owned by no-one. Only for bases
-     * and hoppers.
+     * The owner of this Tile, or undefined if owned by no-one.
      */
     owner?: Player;
 
@@ -327,14 +283,6 @@ export interface ITileProperties {
      */
     y?: number;
 
-}
-
-/**
- * Argument overrides for Tile's spawnMiner function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
- */
-export interface ITileSpawnMinerArgs {
 }
 
 /** All the possible properties for an Unit. */
@@ -413,6 +361,11 @@ export interface IUnitProperties {
      */
     tile?: Tile;
 
+    /**
+     * The upgrade level of this unit. Starts at 0.
+     */
+    upgradeLevel?: number;
+
 }
 
 /**
@@ -482,15 +435,31 @@ export interface IUnitMoveArgs {
 }
 
 /**
+ * Argument overrides for Unit's transfer function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface IUnitTransferArgs {
+    /**
+     * The Unit to transfer materials to.
+     */
+    unit?: Unit;
+    /**
+     * The type of resource to transfer.
+     */
+    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to transfer.
+     */
+    amount?: number;
+}
+
+/**
  * Argument overrides for Unit's upgrade function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
 export interface IUnitUpgradeArgs {
-    /**
-     * The attribute of the Unit to be upgraded.
-     */
-    attribute?: "health" | "miningPower" | "moves" | "capacity";
 }
 
 export * from "./game-object";
@@ -602,13 +571,13 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
-                bombCost: {
+                bombPrice: {
                     typeName: "int",
                 },
                 bombSize: {
                     typeName: "int",
                 },
-                buildingMaterialCost: {
+                buildingMaterialPrice: {
                     typeName: "int",
                 },
                 currentPlayer: {
@@ -619,7 +588,7 @@ export const Namespace = makeNamespace({
                 currentTurn: {
                     typeName: "int",
                 },
-                freeBombInterval: {
+                dirtPrice: {
                     typeName: "int",
                 },
                 gameObjects: {
@@ -653,6 +622,9 @@ export const Namespace = makeNamespace({
                 maxTurns: {
                     typeName: "int",
                 },
+                orePrice: {
+                    typeName: "int",
+                },
                 oreValue: {
                     typeName: "int",
                 },
@@ -668,6 +640,9 @@ export const Namespace = makeNamespace({
                     typeName: "string",
                 },
                 shieldCost: {
+                    typeName: "int",
+                },
+                spawnPrice: {
                     typeName: "int",
                 },
                 supportCost: {
@@ -692,17 +667,11 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
-                upgradeCargoCapacityCost: {
-                    typeName: "int",
-                },
-                upgradeHealthCost: {
-                    typeName: "int",
-                },
-                upgradeMiningPowerCost: {
-                    typeName: "int",
-                },
-                upgradeMovesCost: {
-                    typeName: "int",
+                upgradePrice: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "int",
+                    },
                 },
                 victoryAmount: {
                     typeName: "int",
@@ -787,17 +756,8 @@ export const Namespace = makeNamespace({
                     gameObjectClass: Tile,
                     nullable: false,
                 },
-                bombs: {
-                    typeName: "int",
-                },
-                buildingMaterials: {
-                    typeName: "int",
-                },
                 clientType: {
                     typeName: "string",
-                },
-                dirt: {
-                    typeName: "int",
                 },
                 hopperTiles: {
                     typeName: "list",
@@ -862,42 +822,8 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
-                buy: {
+                spawnMiner: {
                     args: [
-                        {
-                            argName: "resource",
-                            typeName: "string",
-                            defaultValue: "dirt",
-                            literals: ["dirt", "bomb", "buildingMaterials"],
-                        },
-                        {
-                            argName: "amount",
-                            typeName: "int",
-                        },
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-                transfer: {
-                    args: [
-                        {
-                            argName: "unit",
-                            typeName: "gameObject",
-                            gameObjectClass: Unit,
-                            nullable: false,
-                        },
-                        {
-                            argName: "resource",
-                            typeName: "string",
-                            defaultValue: "dirt",
-                            literals: ["dirt", "bomb", "buildingMaterials"],
-                        },
-                        {
-                            argName: "amount",
-                            typeName: "int",
-                        },
                     ],
                     invalidValue: false,
                     returns: {
@@ -974,14 +900,6 @@ export const Namespace = makeNamespace({
                 },
             },
             functions: {
-                spawnMiner: {
-                    args: [
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
             },
         },
         Unit: {
@@ -1034,6 +952,9 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Tile,
                     nullable: true,
+                },
+                upgradeLevel: {
+                    typeName: "int",
                 },
             },
             functions: {
@@ -1113,14 +1034,32 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
-                upgrade: {
+                transfer: {
                     args: [
                         {
-                            argName: "attribute",
-                            typeName: "string",
-                            defaultValue: "health",
-                            literals: ["health", "miningPower", "moves", "capacity"],
+                            argName: "unit",
+                            typeName: "gameObject",
+                            gameObjectClass: Unit,
+                            nullable: false,
                         },
+                        {
+                            argName: "resource",
+                            typeName: "string",
+                            defaultValue: "dirt",
+                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                        },
+                        {
+                            argName: "amount",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+                upgrade: {
+                    args: [
                     ],
                     invalidValue: false,
                     returns: {
@@ -1130,5 +1069,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "46abaae0c6f41ba8536de3714cb964013777223bc6d6753f838182f9673db93e",
+    gameVersion: "230d41da5f9e95a58b66fbaa7d6d61f4853e459517e93b553d829607b0286082",
 });
