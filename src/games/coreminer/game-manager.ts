@@ -76,7 +76,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        const winners = this.game.players.filter(player => player.value >= this.game.victoryAmount);
+        const winners = this.game.players.filter((player) => player.value >= this.game.victoryAmount);
 
         if (winners.length === this.game.players.length) {
             this.secondaryWinConditions("Both players qualified for a promotion!");

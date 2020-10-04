@@ -1,8 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseCoreminerPlayer, IPlayerBuyArgs, IPlayerTransferArgs } from "./";
+import { IBaseCoreminerPlayer, IPlayerSpawnMinerArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
-import { Player } from "./player";
 import { Tile } from "./tile";
 import { Unit } from "./unit";
 
@@ -23,25 +22,10 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     public baseTile!: Tile;
 
     /**
-     * The bombs stored in the Player's supply.
-     */
-    public bombs!: number;
-
-    /**
-     * The building material stored in the Player's supply.
-     */
-    public buildingMaterials!: number;
-
-    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
     public readonly clientType!: string;
-
-    /**
-     * The dirt stored in the Player's supply.
-     */
-    public dirt!: number;
 
     /**
      * The Tiles this Player's hoppers are on.
@@ -143,203 +127,57 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
-     * Invalidation function for buy. Try to find a reason why the passed in
-     * parameters are invalid, and return a human readable string telling them
-     * why it is invalid.
+     * Invalidation function for spawnMiner. Try to find a reason why the
+     * passed in parameters are invalid, and return a human readable string
+     * telling them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param resource - The type of resource to buy.
-     * @param amount - The amount of resource to buy.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateBuy(
+    protected invalidateSpawnMiner(
         player: Player,
-        resource: "dirt" | "bomb" | "buildingMaterials",
-        amount: number,
-    ): void | string | IPlayerBuyArgs {
-        // <<-- Creer-Merge: invalidate-buy -->>
+    ): void | string | IPlayerSpawnMinerArgs {
+        // <<-- Creer-Merge: invalidate-spawnMiner -->>
 
-        if (!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
+        if (this !== this.game.currentPlayer) {
+            return `It is not your turn!`;
         }
 
-        if (amount <= 0) {
-            return `Sorry ${player}, you cannot buy negative resources.`;
+        if (this.money < this.game.spawnPrice) {
+            return `You do not have enough money to spawn a Miner!`;
         }
 
-        let cost = amount;
-        switch (resource) {
-            case "dirt":
-                cost *= 1;
-                break;
-
-            case "bomb":
-                cost *= this.game.bombCost;
-                break;
-
-            case "buildingMaterials":
-                cost *= this.game.buildingMaterialCost;
-                break;
-
-            default:
-                return `${resource} is not a valid resource.`;
-        }
-
-        if (cost > player.money) {
-            return `Sorry ${player}, you cannot afford to buy that.`;
-        }
-
-        // <<-- /Creer-Merge: invalidate-buy -->>
+        // <<-- /Creer-Merge: invalidate-spawnMiner -->>
     }
 
     /**
-     * Purchases a resource and adds it to the Player's supply.
+     * Spawns a Miner Unit on this Player's base tile.
      *
      * @param player - The player that called this.
-     * @param resource - The type of resource to buy.
-     * @param amount - The amount of resource to buy.
-     * @returns True if successfully purchased, false otherwise.
+     * @returns True if successfully spawned, false otherwise.
      */
-    protected async buy(
-        player: Player,
-        resource: "dirt" | "bomb" | "buildingMaterials",
-        amount: number,
-    ): Promise<boolean> {
-        // <<-- Creer-Merge: buy -->>
-        let cost = amount;
-        switch (resource) {
-            case "dirt":
-                cost *= 1;
-                player.dirt += amount;
-                break;
+    protected async spawnMiner(player: Player): Promise<boolean> {
+        // <<-- Creer-Merge: spawnMiner -->>
 
-            case "bomb":
-                cost *= this.game.bombCost;
-                player.bombs += amount;
-                break;
+        this.money -= this.game.spawnPrice;
+        const unit = this.game.manager.create.unit({
+            owner: player,
+            tile: this.baseTile,
+            job: this.game.jobs[0],
+            upgradeLevel: 1,
+            health: this.game.jobs[0].health[0],
+            miningPower: this.game.jobs[0].miningPower[0],
+            moves: this.game.jobs[0].moves[0],
+        });
 
-            case "buildingMaterials":
-                cost *= this.game.buildingMaterialCost;
-                player.buildingMaterials += amount;
-        }
-
-        player.money -= cost;
+        this.baseTile.units.push(unit);
+        this.units.push(unit);
 
         return true;
-        // <<-- /Creer-Merge: buy -->>
-    }
 
-    /**
-     * Invalidation function for transfer. Try to find a reason why the passed
-     * in parameters are invalid, and return a human readable string telling
-     * them why it is invalid.
-     *
-     * @param player - The player that called this.
-     * @param unit - The Unit to transfer materials to.
-     * @param resource - The type of resource to transfer.
-     * @param amount - The amount of resource to transfer.
-     * @returns If the arguments are invalid, return a string explaining to
-     * human players why it is invalid. If it is valid return nothing, or an
-     * object with new arguments to use in the actual function.
-     */
-    protected invalidateTransfer(
-        player: Player,
-        unit: Unit,
-        resource: "dirt" | "bomb" | "buildingMaterials",
-        amount: number,
-    ): void | string | IPlayerTransferArgs {
-        // <<-- Creer-Merge: invalidate-transfer -->>
-        if (!player || player !== this.game.currentPlayer) {
-            return `It isn't your turn, ${player}.`;
-        }
-
-        if (amount <= 0) {
-            return `Sorry ${player}, you cannot transfer negative resources.`;
-        }
-
-        if (!unit) {
-            return `The unit specified, ${unit}, does not exist.`;
-        }
-
-        if (!unit.tile) {
-            return `That unit, ${unit}, is currently lost in space.`;
-        }
-
-        if (unit.owner !== player) {
-            return `${unit} will not accept transfers from a stranger!`;
-        }
-
-        if (unit.tile.owner !== player && !(unit.tile.isBase || unit.tile.isHopper)) {
-            return `${unit} is not on your base or hopper tiles!`;
-        }
-
-        switch (resource) {
-            case "dirt":
-                if (player.dirt < amount) {
-                    return `You do not have enough dirt to transfer ${amount} dirt!`;
-                }
-                break;
-
-            case "bomb":
-                if (player.bombs < amount) {
-                    return `You do not have enough bombs to transfer ${amount} bombs!`;
-                }
-                break;
-
-            case "buildingMaterials":
-                if (player.buildingMaterials < amount) {
-                    return `You do not have enough building materials to transfer ${amount} building materials!`;
-                }
-                break;
-
-            default:
-                return `${resource} is not a valid resource.`;
-        }
-
-        const currCargo = (unit.bombs * this.game.bombSize) + unit.buildingMaterials + unit.dirt + unit.ore;
-        const addedCargo = amount * (resource === "bomb" ? this.game.bombSize : 1);
-        if (currCargo + addedCargo > unit.maxCargoCapacity) {
-            return `${unit} cannot hold that much additional cargo!`;
-        }
-        // <<-- /Creer-Merge: invalidate-transfer -->>
-    }
-
-    /**
-     * Transfers a resource from the Player's supply to a Unit.
-     *
-     * @param player - The player that called this.
-     * @param unit - The Unit to transfer materials to.
-     * @param resource - The type of resource to transfer.
-     * @param amount - The amount of resource to transfer.
-     * @returns True if successfully transfered, false otherwise.
-     */
-    protected async transfer(
-        player: Player,
-        unit: Unit,
-        resource: "dirt" | "bomb" | "buildingMaterials",
-        amount: number,
-    ): Promise<boolean> {
-        // <<-- Creer-Merge: transfer -->>
-        switch (resource) {
-            case "dirt":
-                unit.dirt += amount;
-                player.dirt -= amount;
-                break;
-
-            case "bomb":
-                unit.bombs += amount;
-                player.bombs -= amount;
-                break;
-
-            case "buildingMaterials":
-                unit.buildingMaterials += amount;
-                player.buildingMaterials -= amount;
-        }
-
-        return true;
-        // <<-- /Creer-Merge: transfer -->>
+        // <<-- /Creer-Merge: spawnMiner -->>
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>

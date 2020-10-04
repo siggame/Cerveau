@@ -13,7 +13,7 @@ import { Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Mine resources to obtain more wealth than your opponent.
+ * Mine resources to obtain more value than your opponent.
  */
 export class CoreminerGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it */
@@ -23,9 +23,9 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
-     * The price of buying a bomb.
+     * The monetary price of a bomb when bought or sold.
      */
-    public readonly bombCost!: number;
+    public readonly bombPrice!: number;
 
     /**
      * The amount of cargo space taken up by a bomb.
@@ -33,9 +33,9 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly bombSize!: number;
 
     /**
-     * The price of buying building materials.
+     * The monetary price of building materials when bought or sold.
      */
-    public readonly buildingMaterialCost!: number;
+    public readonly buildingMaterialPrice!: number;
 
     /**
      * The player whose turn it is currently. That player can send commands.
@@ -49,9 +49,9 @@ export class CoreminerGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
-     * The amount of turns it takes to gain a free Bomb.
+     * The monetary price of dirt when bought or sold.
      */
-    public readonly freeBombInterval!: number;
+    public readonly dirtPrice!: number;
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
@@ -86,7 +86,13 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly maxTurns!: number;
 
     /**
-     * The amount of victory points awarded when ore is deposited in the base.
+     * The amount of money awarded when ore is dumped in the base and sold.
+     */
+    public readonly orePrice!: number;
+
+    /**
+     * The amount of victory points awarded when ore is dumped in the base and
+     * sold.
      */
     public readonly oreValue!: number;
 
@@ -104,6 +110,11 @@ export class CoreminerGame extends BaseClasses.Game {
      * The amount of building material required to shield a Tile.
      */
     public readonly shieldCost!: number;
+
+    /**
+     * The monetary price of spawning a Miner.
+     */
+    public readonly spawnPrice!: number;
 
     /**
      * The amount of building material required to build a support.
@@ -128,24 +139,9 @@ export class CoreminerGame extends BaseClasses.Game {
     public units!: Unit[];
 
     /**
-     * The cost to upgrade a Unit's cargo capacity.
+     * The cost to upgrade a Unit at each level.
      */
-    public readonly upgradeCargoCapacityCost!: number;
-
-    /**
-     * The cost to upgrade a Unit's health.
-     */
-    public readonly upgradeHealthCost!: number;
-
-    /**
-     * The cost to upgrade a Unit's mining power.
-     */
-    public readonly upgradeMiningPowerCost!: number;
-
-    /**
-     * The cost to upgrade a Unit's movement speed.
-     */
-    public readonly upgradeMovesCost!: number;
+    public readonly upgradePrice!: number[];
 
     /**
      * The amount of victory points required to win.
