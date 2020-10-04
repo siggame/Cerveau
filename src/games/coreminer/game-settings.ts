@@ -36,7 +36,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
             buildingMaterialPrice: {
                 description: "The monetary price of building materials when "
-                           + "bought or sold.",
+                           + "bought.",
                 // <<-- Creer-Merge: buildingMaterialPrice -->>
                 default: 0,
                 // <<-- /Creer-Merge: buildingMaterialPrice -->>

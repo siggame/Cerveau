@@ -33,7 +33,7 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly bombSize!: number;
 
     /**
-     * The monetary price of building materials when bought or sold.
+     * The monetary price of building materials when bought.
      */
     public readonly buildingMaterialPrice!: number;
 
