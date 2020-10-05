@@ -59,8 +59,18 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: after-turn -->>
         // clean up dead units
         this.updateArrays();
+
         // update units
         this.updateUnits();
+
+        // gravity
+        this.updateGravity();
+
+        // hoppers
+        this.updateHoppers();
+
+        // free unit if have none
+        this.grantUnit();
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -153,6 +163,98 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             if (unit.tile && unit.tile.owner === unit.owner) {
                 unit.health = unit.maxHealth;
             }
+        }
+    }
+
+    /** Updates all falling tiles */
+    private updateGravity(): void {
+        while (this.game.fallingTiles.length > 0) {
+            const tile = this.game.fallingTiles[this.game.fallingTiles.length - 1];
+            if (tile.tileSouth) {
+                let willFall = true;
+                // Supports prevent falling
+                if (tile.tileSouth.isSupport) {
+                    willFall = false;
+                }
+                else if (tile.tileSouth.tileEast && tile.tileSouth.tileEast.isSupport) {
+                    willFall = false;
+                }
+                else if (tile.tileSouth.tileWest && tile.tileSouth.tileWest.isSupport) {
+                    willFall = false;
+                }
+
+                if (willFall) {
+                    // Fall logic
+                    let curTile = tile;
+                    while (curTile.tileSouth && !curTile.tileSouth.isSupport &&
+                        curTile.tileSouth.dirt + curTile.tileSouth.ore <= 0) {
+                        curTile.tileSouth.ore = curTile.ore;
+                        curTile.tileSouth.dirt = curTile.dirt;
+                        curTile.ore = 0;
+                        curTile.dirt = 0;
+                        curTile.isFalling = false;
+                        curTile = curTile.tileSouth;
+                    }
+                }
+            }
+            this.game.fallingTiles.pop();
+        }
+    }
+
+    /** Updates all hopper extensions */
+    private updateHoppers(): void {
+        const currPlayer = this.game.currentPlayer;
+        if (currPlayer.hopperTiles.length === 0) {
+            // no hoppers, check from base tile
+            const nextHopperPos = this.game.currentPlayer.baseTile.tileSouth;
+            if (nextHopperPos === undefined) {
+                // there is no space for hoppers in this map
+                return;
+            }
+            if (nextHopperPos.dirt === 0 && nextHopperPos.ore === 0) {
+                nextHopperPos.isHopper = true;
+                currPlayer.hopperTiles.push(nextHopperPos);
+            }
+        }
+
+        if (currPlayer.hopperTiles.length > 0) {
+            // try to extend hoppers
+            let nextHopperPos = currPlayer.hopperTiles[currPlayer.hopperTiles.length - 1].tileSouth;
+            while (nextHopperPos !== undefined) {
+                if (nextHopperPos.ore === 0 && nextHopperPos.dirt === 0) {
+                    nextHopperPos.isHopper = true;
+                    nextHopperPos = nextHopperPos.tileSouth;
+                }
+                else {
+                    return;
+                }
+            }
+        }
+    }
+
+    /** Gives the opponent a free miner if they have none. */
+    private grantUnit(): void {
+        const player = this.game.currentPlayer.opponent;
+
+        if (player.units.length === 0) {
+            const newUnit = this.game.manager.create.unit({
+                job: this.game.jobs[0],
+                tile: player.spawnTiles[0],
+                health: this.game.jobs[0].health[0],
+                maxHealth: this.game.jobs[0].health[0],
+                maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
+                miningPower: this.game.jobs[0].miningPower[0],
+                maxMiningPower: this.game.jobs[0].miningPower[0],
+                moves: this.game.jobs[0].moves[0],
+                maxMoves: this.game.jobs[0].moves[0],
+                owner: player,
+            });
+
+            player.money -= this.game.jobs[0].cost;
+
+            this.game.units.push(newUnit);
+            player.units.push(newUnit);
+            player.spawnTiles[0].units.push(newUnit);
         }
     }
 
