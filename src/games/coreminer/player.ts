@@ -2,7 +2,6 @@ import { IBaseGameObjectRequiredData } from "~/core/game";
 import { IBaseCoreminerPlayer, IPlayerSpawnMinerArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
-import { Player } from "./player";
 import { Tile } from "./tile";
 import { Unit } from "./unit";
 
