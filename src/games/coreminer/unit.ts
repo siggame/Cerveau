@@ -266,8 +266,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt', 'ore',
-     * 'bomb', or buildingMaterials.
+     * @param material - The material the Unit will drop. 'dirt', 'ore', or
+     * 'bomb'.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns If the arguments are invalid, return a string explaining to

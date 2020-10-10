@@ -139,9 +139,9 @@ export class CoreminerGame extends BaseClasses.Game {
     public units!: Unit[];
 
     /**
-     * The cost to upgrade a Unit at each level.
+     * The cost to upgrade a Unit.
      */
-    public readonly upgradePrice!: number[];
+    public readonly upgradePrice!: number;
 
     /**
      * The amount of victory points required to win.

@@ -83,11 +83,6 @@ export interface IJobProperties {
     cargoCapacity?: number[];
 
     /**
-     * The cost of spawning a Unit with this Job.
-     */
-    cost?: number;
-
-    /**
      * The amount of starting health this Job has per level.
      */
     health?: number[];
@@ -668,10 +663,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 upgradePrice: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "int",
-                    },
+                    typeName: "int",
                 },
                 victoryAmount: {
                     typeName: "int",
@@ -717,9 +709,6 @@ export const Namespace = makeNamespace({
                     valueType: {
                         typeName: "int",
                     },
-                },
-                cost: {
-                    typeName: "int",
                 },
                 health: {
                     typeName: "list",
@@ -1069,5 +1058,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "230d41da5f9e95a58b66fbaa7d6d61f4853e459517e93b553d829607b0286082",
+    gameVersion: "cf0da2dd981969e39b8de1dd6332be0ea8f725b9b62baa0cb102a1d12a7179bf",
 });

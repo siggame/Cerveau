@@ -21,11 +21,6 @@ export class Job extends GameObject {
     public readonly cargoCapacity!: number[];
 
     /**
-     * The cost of spawning a Unit with this Job.
-     */
-    public readonly cost!: number;
-
-    /**
      * The amount of starting health this Job has per level.
      */
     public readonly health!: number[];

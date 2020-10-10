@@ -94,7 +94,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: supportCost -->>
             },
             upgradePrice: {
-                description: "The cost to upgrade a Unit at each level.",
+                description: "The cost to upgrade a Unit.",
                 // <<-- Creer-Merge: upgradePrice -->>
                 default: [],
                 // <<-- /Creer-Merge: upgradePrice -->>
