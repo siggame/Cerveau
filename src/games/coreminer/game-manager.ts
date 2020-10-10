@@ -68,9 +68,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // hoppers
         this.updateHoppers();
-
-        // free unit if have none
-        this.grantUnit();
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -231,32 +228,5 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             }
         }
     }
-
-    /** Gives the opponent a free miner if they have none. */
-    private grantUnit(): void {
-        const player = this.game.currentPlayer.opponent;
-
-        if (player.units.length === 0) {
-            const newUnit = this.game.manager.create.unit({
-                job: this.game.jobs[0],
-                tile: player.spawnTiles[0],
-                health: this.game.jobs[0].health[0],
-                maxHealth: this.game.jobs[0].health[0],
-                maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
-                miningPower: this.game.jobs[0].miningPower[0],
-                maxMiningPower: this.game.jobs[0].miningPower[0],
-                moves: this.game.jobs[0].moves[0],
-                maxMoves: this.game.jobs[0].moves[0],
-                owner: player,
-            });
-
-            player.money -= this.game.jobs[0].cost;
-
-            this.game.units.push(newUnit);
-            player.units.push(newUnit);
-            player.spawnTiles[0].units.push(newUnit);
-        }
-    }
-
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
