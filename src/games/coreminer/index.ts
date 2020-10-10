@@ -158,11 +158,6 @@ export interface IPlayerProperties {
     side?: Tile[];
 
     /**
-     * The Tiles this Player may spawn Units on.
-     */
-    spawnTiles?: Tile[];
-
-    /**
      * The amount of time (in ns) remaining for this AI to send commands.
      */
     timeRemaining?: number;
@@ -377,6 +372,22 @@ export interface IUnitBuildArgs {
      * The structure to build (support, ladder, or shield).
      */
     type?: "support" | "ladder" | "shield";
+}
+
+/**
+ * Argument overrides for Unit's buy function. If you return an object of this
+ * interface from the invalidate functions, the value(s) you set will be used
+ * in the actual function.
+ */
+export interface IUnitBuyArgs {
+    /**
+     * The type of resource to buy.
+     */
+    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to buy.
+     */
+    amount?: number;
 }
 
 /**
@@ -784,14 +795,6 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
-                spawnTiles: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Tile,
-                        nullable: false,
-                    },
-                },
                 timeRemaining: {
                     typeName: "float",
                 },
@@ -967,6 +970,24 @@ export const Namespace = makeNamespace({
                         typeName: "boolean",
                     },
                 },
+                buy: {
+                    args: [
+                        {
+                            argName: "resource",
+                            typeName: "string",
+                            defaultValue: "dirt",
+                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                        },
+                        {
+                            argName: "amount",
+                            typeName: "int",
+                        },
+                    ],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
                 dump: {
                     args: [
                         {
@@ -1058,5 +1079,5 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "cf0da2dd981969e39b8de1dd6332be0ea8f725b9b62baa0cb102a1d12a7179bf",
+    gameVersion: "d9d8a113b95637751dbb349edb0a873d53ebb6df7c375956772b72fba4dff9f3",
 });

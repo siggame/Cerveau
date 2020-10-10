@@ -68,11 +68,6 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
     public side!: Tile[];
 
     /**
-     * The Tiles this Player may spawn Units on.
-     */
-    public spawnTiles!: Tile[];
-
-    /**
      * The amount of time (in ns) remaining for this AI to send commands.
      */
     public timeRemaining!: number;

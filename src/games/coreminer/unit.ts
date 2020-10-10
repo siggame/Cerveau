@@ -1,6 +1,7 @@
 import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitBuildArgs, IUnitDumpArgs, IUnitMineArgs, IUnitMoveArgs,
-         IUnitProperties, IUnitTransferArgs, IUnitUpgradeArgs } from "./";
+import { IUnitBuildArgs, IUnitBuyArgs, IUnitDumpArgs, IUnitMineArgs,
+         IUnitMoveArgs, IUnitProperties, IUnitTransferArgs, IUnitUpgradeArgs,
+       } from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -257,6 +258,56 @@ export class Unit extends GameObject {
 
         return true;
         // <<-- /Creer-Merge: build -->>
+    }
+
+    /**
+     * Invalidation function for buy. Try to find a reason why the passed in
+     * parameters are invalid, and return a human readable string telling them
+     * why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @param resource - The type of resource to buy.
+     * @param amount - The amount of resource to buy.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing, or an
+     * object with new arguments to use in the actual function.
+     */
+    protected invalidateBuy(
+        player: Player,
+        resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): void | string | IUnitBuyArgs {
+        // <<-- Creer-Merge: invalidate-buy -->>
+
+        // Check all the arguments for buy here and try to
+        // return a string explaining why the input is wrong.
+        // If you need to change an argument for the real function, then
+        // changing its value in this scope is enough.
+
+        // <<-- /Creer-Merge: invalidate-buy -->>
+    }
+
+    /**
+     * Purchase a resource from the player's base or hopper.
+     *
+     * @param player - The player that called this.
+     * @param resource - The type of resource to buy.
+     * @param amount - The amount of resource to buy.
+     * @returns True if successfully purchased, false otherwise.
+     */
+    protected async buy(
+        player: Player,
+        resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
+        amount: number,
+    ): Promise<boolean> {
+        // <<-- Creer-Merge: buy -->>
+
+        // Add logic here for buy.
+
+        // TODO: replace this with actual logic
+        return false;
+
+        // <<-- /Creer-Merge: buy -->>
     }
 
     /**
