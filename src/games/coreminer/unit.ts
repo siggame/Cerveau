@@ -645,9 +645,6 @@ export class Unit extends GameObject {
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
-        let tilesFallen = 0;
-        let tileBelow = tile.tileSouth;
-
         // Move unit
         if (!this.tile) {
             throw new Error(`${this} has no Tile to move from!`);
@@ -856,8 +853,8 @@ export class Unit extends GameObject {
             return `You cannot afford this upgrade!`;
         }
 
-        if (cost > player.money) {
-            return `You cannot afford that upgrade! It costs $${cost}!`;
+        if (this.game.upgradePrice[this.upgradeLevel] > player.money) {
+            return `You cannot afford that upgrade! It costs $${this.game.upgradePrice}!`;
         }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
