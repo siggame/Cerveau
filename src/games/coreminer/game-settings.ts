@@ -25,7 +25,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The monetary price of a bomb when bought or "
                            + "sold.",
                 // <<-- Creer-Merge: bombPrice -->>
-                default: 0,
+                default: 25,
                 // <<-- /Creer-Merge: bombPrice -->>
             },
             bombSize: {
@@ -39,13 +39,13 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The monetary price of building materials when "
                            + "bought.",
                 // <<-- Creer-Merge: buildingMaterialPrice -->>
-                default: 0,
+                default: 2,
                 // <<-- /Creer-Merge: buildingMaterialPrice -->>
             },
             dirtPrice: {
                 description: "The monetary price of dirt when bought or sold.",
                 // <<-- Creer-Merge: dirtPrice -->>
-                default: 0,
+                default: 1,
                 // <<-- /Creer-Merge: dirtPrice -->>
             },
             ladderCost: {
@@ -60,7 +60,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description: "The amount of money awarded when ore is dumped "
                            + "in the base and sold.",
                 // <<-- Creer-Merge: orePrice -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: orePrice -->>
             },
             oreValue: {
@@ -82,7 +82,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             spawnPrice: {
                 description: "The monetary price of spawning a Miner.",
                 // <<-- Creer-Merge: spawnPrice -->>
-                default: 0,
+                default: 200,
                 // <<-- /Creer-Merge: spawnPrice -->>
             },
             supportCost: {
@@ -96,7 +96,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             upgradePrice: {
                 description: "The cost to upgrade a Unit.",
                 // <<-- Creer-Merge: upgradePrice -->>
-                default: [],
+                default: 350,
                 // <<-- /Creer-Merge: upgradePrice -->>
             },
             victoryAmount: {

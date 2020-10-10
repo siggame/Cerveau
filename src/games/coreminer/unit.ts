@@ -845,16 +845,12 @@ export class Unit extends GameObject {
             return `${this} must be on your base or hopper to upgrade!`;
         }
 
-        if (this.upgradeLevel >= this.game.upgradePrice.length) {
+        if (this.upgradeLevel >= this.game.jobs[0].health.length) {
             return `This unit is already fully upgraded!`;
         }
 
-        if (player.money < this.game.upgradePrice[this.upgradeLevel + 1]) {
+        if (player.money < this.game.upgradePrice) {
             return `You cannot afford this upgrade!`;
-        }
-
-        if (this.game.upgradePrice[this.upgradeLevel] > player.money) {
-            return `You cannot afford that upgrade! It costs $${this.game.upgradePrice}!`;
         }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }

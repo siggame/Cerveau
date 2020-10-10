@@ -179,7 +179,7 @@ export class CoreminerGame extends BaseClasses.Game {
         this.createMap();
 
         for (const player of this.players) {
-            player.money = this.jobs[0].cost * 4;
+            player.money = this.spawnPrice * 3;
         }
 
         // Strangely, this starts undefined
