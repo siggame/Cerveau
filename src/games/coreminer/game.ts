@@ -218,12 +218,15 @@ export class CoreminerGame extends BaseClasses.Game {
                 moves: [2, 3, 4, 5],
                 miningPower: [50, 100, 150, 200],
                 cargoCapacity: [250, 500, 750, 1000],
-                cost: 200,
             }),
 
             this.manager.create.job({
                 title: "bomb",
                 cost: 0,
+                health: [],
+                moves: [],
+                miningPower: [],
+                cargoCapacity: [],
             }),
         );
     }
