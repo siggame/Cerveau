@@ -302,10 +302,10 @@ export class CoreminerGame extends BaseClasses.Game {
                     // Surface layer
                     tile.dirt = 0;
                     tile.ore = 0;
-                    tile.owner = this.players[0];
 
                     if (x === 0) {
                         tile.isBase = true;
+                        tile.owner = this.players[0];
                         this.players[0].baseTile = tile as Tile;
                     }
                 }
@@ -403,7 +403,7 @@ export class CoreminerGame extends BaseClasses.Game {
                 const oreAmount = layerOreDensities[i];
 
                 chosenTile.ore = oreAmount;
-                chosenTile.dirt -= oreAmount;
+                chosenTile.dirt = 0;
 
                 layerRows[i][randomY].splice(randomX, 1);
 

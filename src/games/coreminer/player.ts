@@ -163,11 +163,16 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
             job: this.game.jobs[0],
             upgradeLevel: 1,
             health: this.game.jobs[0].health[0],
+            maxHealth: this.game.jobs[0].health[0],
             miningPower: this.game.jobs[0].miningPower[0],
+            maxMiningPower: this.game.jobs[0].miningPower[0],
             moves: this.game.jobs[0].moves[0],
+            maxMoves: this.game.jobs[0].moves[0],
+            maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
         });
 
         this.baseTile.units.push(unit);
+        this.game.units.push(unit);
         this.units.push(unit);
 
         return true;
