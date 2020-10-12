@@ -1,7 +1,13 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBeaverAttackArgs, IBeaverBuildLodgeArgs, IBeaverDropArgs,
-         IBeaverHarvestArgs, IBeaverMoveArgs, IBeaverPickupArgs,
-         IBeaverProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    BeaverAttackArgs,
+    BeaverBuildLodgeArgs,
+    BeaverConstructorArgs,
+    BeaverDropArgs,
+    BeaverHarvestArgs,
+    BeaverMoveArgs,
+    BeaverPickupArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -82,7 +88,7 @@ export class Beaver extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IBeaverProperties & {
+        args: BeaverConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Job of this Beaver. */
             job: Job;
@@ -92,7 +98,7 @@ export class Beaver extends GameObject {
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -134,7 +140,7 @@ export class Beaver extends GameObject {
     protected invalidateAttack(
         player: Player,
         beaver: Beaver,
-    ): void | string | IBeaverAttackArgs {
+    ): void | string | BeaverAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = this.invalidate(player);
@@ -179,7 +185,8 @@ export class Beaver extends GameObject {
 
         // If the beaver is already distracted, keep that value, otherwise they
         // get distracted by this attack
-        beaver.turnsDistracted = beaver.turnsDistracted || this.job.distractionPower;
+        beaver.turnsDistracted =
+            beaver.turnsDistracted || this.job.distractionPower;
         this.actions--;
 
         // Check if the enemy beaver died.
@@ -217,7 +224,7 @@ export class Beaver extends GameObject {
      */
     protected invalidateBuildLodge(
         player: Player,
-    ): void | string | IBeaverBuildLodgeArgs {
+    ): void | string | BeaverBuildLodgeArgs {
         // <<-- Creer-Merge: invalidate-buildLodge -->>
 
         const invalid = this.invalidate(player);
@@ -229,7 +236,7 @@ export class Beaver extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if ((this.branches + this.tile.branches) < player.branchesToBuildLodge) {
+        if (this.branches + this.tile.branches < player.branchesToBuildLodge) {
             return `${this} does not have enough branches to build the lodge.`;
         }
 
@@ -254,7 +261,9 @@ export class Beaver extends GameObject {
         // <<-- Creer-Merge: buildLodge -->>
 
         if (!this.tile) {
-            throw new Error(`${this} is not on a tile but is trying to build a lodge!`);
+            throw new Error(
+                `${this} is not on a tile but is trying to build a lodge!`,
+            );
         }
 
         // Overcharge tile's branches
@@ -298,8 +307,8 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
-    ): void | string | IBeaverDropArgs {
+        amount = 0,
+    ): void | string | BeaverDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const invalid = this.invalidate(player);
@@ -312,9 +321,7 @@ export class Beaver extends GameObject {
         }
 
         // transform the amount if they passed in a number =< 0
-        const actualAmount = amount <= 0
-            ? this[resource]
-            : amount;
+        const actualAmount = amount <= 0 ? this[resource] : amount;
 
         if (actualAmount <= 0) {
             return `${this} cannot drop ${actualAmount} of ${resource}`;
@@ -358,7 +365,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
@@ -380,8 +387,8 @@ export class Beaver extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param spawner - The Spawner you want to harvest. Must be on an adjacent
-     * Tile.
+     * @param spawner - The Spawner you want to harvest. Must be on an
+     * adjacent Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -389,7 +396,7 @@ export class Beaver extends GameObject {
     protected invalidateHarvest(
         player: Player,
         spawner: Spawner,
-    ): void | string | IBeaverHarvestArgs {
+    ): void | string | BeaverHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const invalid = this.invalidate(player);
@@ -421,8 +428,8 @@ export class Beaver extends GameObject {
      * Harvests the branches or food from a Spawner on an adjacent Tile.
      *
      * @param player - The player that called this.
-     * @param spawner - The Spawner you want to harvest. Must be on an adjacent
-     * Tile.
+     * @param spawner - The Spawner you want to harvest. Must be on an
+     * adjacent Tile.
      * @returns True if successfully harvested, false otherwise.
      */
     protected async harvest(
@@ -435,20 +442,15 @@ export class Beaver extends GameObject {
 
         const load = this.food + this.branches;
         const spaceAvailable = this.job.carryLimit - load;
-        const skillScalar = spawner.type === "branches"
-            ? this.job.chopping
-            : this.job.munching;
+        const skillScalar =
+            spawner.type === "branches"
+                ? this.job.chopping
+                : this.job.munching;
 
-        const maxCanHarvest = (
-            this.game.spawnerHarvestConstant *
-            spawner.health *
-            skillScalar
-        );
+        const maxCanHarvest =
+            this.game.spawnerHarvestConstant * spawner.health * skillScalar;
 
-        this[spawner.type] += Math.min(
-            spaceAvailable,
-            maxCanHarvest,
-        );
+        this[spawner.type] += Math.min(spaceAvailable, maxCanHarvest);
         this.actions--;
 
         // damage the spawner because we harvested from it
@@ -478,7 +480,7 @@ export class Beaver extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IBeaverMoveArgs {
+    ): void | string | BeaverMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = this.invalidate(player, true);
@@ -562,8 +564,8 @@ export class Beaver extends GameObject {
      * why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to pickup branches/food from. Must be the same
-     * Tile that the Beaver is on, or an adjacent one.
+     * @param tile - The Tile to pickup branches/food from. Must be the
+     * same Tile that the Beaver is on, or an adjacent one.
      * @param resource - The type of resource to pickup ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * pickup all of the resource type.
@@ -575,8 +577,8 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
-    ): void | string | IBeaverPickupArgs {
+        amount = 0,
+    ): void | string | BeaverPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const invalid = this.invalidate(player);
@@ -612,9 +614,8 @@ export class Beaver extends GameObject {
         const spaceAvailable = this.job.carryLimit - this.branches - this.food;
 
         // Transform the amount if they passed in a number =< 0
-        const actualAmount = amount <= 0
-            ? Math.min(tile[resource], spaceAvailable)
-            : amount;
+        const actualAmount =
+            amount <= 0 ? Math.min(tile[resource], spaceAvailable) : amount;
 
         if (actualAmount <= 0) {
             return `${this} cannot pick up ${actualAmount} of ${resource}`;
@@ -626,8 +627,8 @@ export class Beaver extends GameObject {
 
         if (actualAmount > spaceAvailable) {
             return (
-                `${this} cannot carry ${actualAmount} of ${resource} because it `
-                + `only can carry ${spaceAvailable} more resources`
+                `${this} cannot carry ${actualAmount} of ${resource} because it ` +
+                `only can carry ${spaceAvailable} more resources`
             );
         }
 
@@ -640,8 +641,8 @@ export class Beaver extends GameObject {
      * Picks up some branches or food on the beaver's tile.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to pickup branches/food from. Must be the same
-     * Tile that the Beaver is on, or an adjacent one.
+     * @param tile - The Tile to pickup branches/food from. Must be the
+     * same Tile that the Beaver is on, or an adjacent one.
      * @param resource - The type of resource to pickup ('branches' or 'food').
      * @param amount - The amount of the resource to drop, numbers <= 0 will
      * pickup all of the resource type.
@@ -651,7 +652,7 @@ export class Beaver extends GameObject {
         player: Player,
         tile: Tile,
         resource: "branches" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
@@ -675,11 +676,11 @@ export class Beaver extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Beaver
-     * @param dontCheckActions - pass true to not check if the beaver has enough actions
-     * @returns The reason this is invalid, undefined if looks valid so far
+     * @param player - The player commanding this Beaver.
+     * @param dontCheckActions - Pass true to not check if the beaver has enough actions.
+     * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,

@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseSaloonPlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseSaloonPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
@@ -12,8 +12,8 @@ import { YoungGun } from "./young-gun";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseSaloonPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseSaloonPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -105,8 +105,8 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseSaloonPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -126,9 +126,9 @@ export class Player extends GameObject implements IBaseSaloonPlayer {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Adds rowdiness to the player, which may cause a siesta
+     * Adds rowdiness to the player, which may cause a siesta.
      *
-     * @param rowdiness The amount of rowdiness to add
+     * @param rowdiness - The amount of rowdiness to add.
      */
     public addRowdiness(rowdiness: number): void {
         this.rowdiness += rowdiness;

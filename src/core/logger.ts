@@ -8,10 +8,11 @@ import { momentString } from "~/utils";
  *
  * Not sure why they don't expose a base interface for these...
  */
-type TransportInstance = winston.transports.ConsoleTransportInstance
-                       | winston.transports.FileTransportInstance
-                       | winston.transports.HttpTransportInstance
-                       | winston.transports.StreamTransportInstance;
+type TransportInstance =
+    | winston.transports.ConsoleTransportInstance
+    | winston.transports.FileTransportInstance
+    | winston.transports.HttpTransportInstance
+    | winston.transports.StreamTransportInstance;
 
 const alignedWithColorsAndTime = winston.format.combine(
     winston.format.colorize(),
@@ -23,9 +24,8 @@ const alignedWithColorsAndTime = winston.format.combine(
 
         const ts = String(timestamp).slice(0, 19).replace("T", " ");
 
-        return `${ts} [${level}]: ${message} ${Object.keys(args).length
-            ? JSON.stringify(args, null, 2)
-            : ""
+        return `${ts} [${level}]: ${message} ${
+            Object.keys(args).length ? JSON.stringify(args, null, 2) : ""
         }`;
     }),
 );

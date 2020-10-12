@@ -7,3 +7,6 @@
 
 # NodeJS & NPM
 node_modules/
+
+# creer templates
+.creer/

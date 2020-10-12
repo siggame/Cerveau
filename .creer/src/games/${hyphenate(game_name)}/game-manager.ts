@@ -17,7 +17,7 @@ ${merge('// ', 'imports', """// any additional imports you want can be placed he
  * together.
  */
 export class ${game['name']}GameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
 ${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
@@ -26,7 +26,7 @@ ${merge('            // ', 'aliases', """            \"MegaMinerAI-##-{}\",
     }
 
 % if 'TwoPlayerGame' not in game['serverParentClasses']:
-    /** The number of players that must connect to play this game */
+    /** The number of players that must connect to play this game. */
     public static get requiredNumberOfPlayers(): number {
 ${merge('        // ', 'required-number-of-players', """        // override this if you want to set a different number of players
         return super.requiredNumberOfPlayers;
@@ -34,10 +34,10 @@ ${merge('        // ', 'required-number-of-players', """        // override this
     }
 
 % endif
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: ${game['name']}Game;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: ${game['name']}GameObjectFactory;
 
 ${merge('    // ', 'public-methods', """
@@ -91,7 +91,9 @@ ${merge('        // ', 'primary-win-conditions', """        // Add logic here ch
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
 ${merge('        // ', 'secondary-win-conditions', """        // Add logic here for the secondary win conditions

@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IWarehouseIgniteArgs, IWarehouseProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { WarehouseConstructorArgs, WarehouseIgniteArgs } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -9,8 +9,8 @@ import { manhattanDistance } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * A typical abandoned warehouse... that anarchists hang out in and can be
- * bribed to burn down Buildings.
+ * A typical abandoned warehouse that anarchists hang out in and can be bribed
+ * to burn down Buildings.
  */
 export class Warehouse extends Building {
     /**
@@ -41,12 +41,12 @@ export class Warehouse extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<BuildingArgs & IWarehouseProperties & {
+        args: WarehouseConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -85,7 +85,7 @@ export class Warehouse extends Building {
     protected invalidateIgnite(
         player: Player,
         building: Building,
-    ): void | string | IWarehouseIgniteArgs {
+    ): void | string | WarehouseIgniteArgs {
         // <<-- Creer-Merge: invalidate-ignite -->>
 
         const invalid = this.invalidateBribe(player);
@@ -116,7 +116,11 @@ export class Warehouse extends Building {
     ): Promise<number> {
         // <<-- Creer-Merge: ignite -->>
 
-        building.fire = clamp(building.fire + this.fireAdded, 0, this.game.maxFire);
+        building.fire = clamp(
+            building.fire + this.fireAdded,
+            0,
+            this.game.maxFire,
+        );
         const exposure = manhattanDistance(this, building);
         this.exposure += exposure; // Do we want a cap on this?
 

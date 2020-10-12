@@ -14,20 +14,24 @@ export function setupWebServer(): void {
     if (Config.WEB_ENABLED || Config.API_ENABLED) {
         const app = express();
 
-        // tslint:disable-next-line:no-unsafe-any
+        // bad express types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         app.locals.site = {
             title: Config.MAIN_TITLE,
         };
 
         if (Config.WEB_ENABLED) {
             // setup handlebars as the views
-            app.engine("hbs", expressHandlebars({
-                extname: "hbs",
-                defaultLayout: "main.hbs",
-                partialsDir: join(__dirname, "views/partials"),
-                layoutsDir: join(__dirname, "views/layouts"),
-                helpers,
-            }) as any); // tslint:disable-line:no-any - express-hbs definitions are borked
+            app.engine(
+                "hbs",
+                expressHandlebars({
+                    extname: "hbs",
+                    defaultLayout: "main.hbs",
+                    partialsDir: join(__dirname, "views/partials"),
+                    layoutsDir: join(__dirname, "views/layouts"),
+                    helpers,
+                }),
+            );
 
             app.set("view engine", "hbs");
             app.set("views", join(__dirname, "views"));

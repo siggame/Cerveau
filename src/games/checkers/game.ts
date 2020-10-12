@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Checker } from "./checker";
 import { CheckersGameManager } from "./game-manager";
@@ -15,10 +15,10 @@ import { Player } from "./player";
  * each side that must move diagonally to the opposing side until kinged.
  */
 export class CheckersGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: CheckersGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -60,10 +60,9 @@ export class CheckersGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The maximum number of turns before the game will automatically end.
@@ -102,7 +101,7 @@ export class CheckersGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CheckersGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -120,10 +119,11 @@ export class CheckersGame extends BaseClasses.Game {
                 if ((x + y) % 2 === 1) {
                     let owner: Player | undefined;
 
-                    if (y < 3) { // then it is player 0's checker
+                    if (y < 3) {
+                        // then it is player 0's checker
                         owner = this.players[0];
-                    }
-                    else if (y > 4) { // then it is player 1's checker
+                    } else if (y > 4) {
+                        // then it is player 1's checker
                         owner = this.players[1];
                     } // else is the middle, which has no initial checker pieces
 
@@ -139,7 +139,6 @@ export class CheckersGame extends BaseClasses.Game {
                         owner.checkers.push(checker);
                     }
                 }
-
             }
         }
 

@@ -1,6 +1,12 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitBuildArgs, IUnitFishArgs, IUnitMineArgs,
-         IUnitMoveArgs, IUnitProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    UnitAttackArgs,
+    UnitBuildArgs,
+    UnitConstructorArgs,
+    UnitFishArgs,
+    UnitMineArgs,
+    UnitMoveArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -29,7 +35,7 @@ export class Unit extends GameObject {
     /**
      * The type of unit this is.
      */
-    public readonly job!: UnitJob;
+    public readonly job: UnitJob;
 
     /**
      * The number of moves this unit has left this turn.
@@ -61,17 +67,18 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
+        args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
+            /** The job to assign this new Unit to. */
+            job: UnitJob;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+        this.job = args.job;
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -97,7 +104,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -133,8 +140,12 @@ export class Unit extends GameObject {
         }
 
         // Make sure the tile is in range.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} is trying to attack ${tile}, which is too far away.`;
         }
 
@@ -176,6 +187,9 @@ export class Unit extends GameObject {
         }
 
         tile.tower.health -= this.job.damage;
+        if (tile.tower.health <= 0) {
+            player.towerKills++;
+        }
 
         this.acted = true;
 
@@ -197,20 +211,17 @@ export class Unit extends GameObject {
     protected invalidateBuild(
         player: Player,
         title: string,
-    ): void | string | IUnitBuildArgs {
+    ): void | string | UnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
         let towerIndex = -1;
 
         if (title === "arrow") {
             towerIndex = 1;
-        }
-        else if (title === "ballista") {
+        } else if (title === "ballista") {
             towerIndex = 2;
-        }
-        else if (title === "cleansing") {
+        } else if (title === "cleansing") {
             towerIndex = 3;
-        }
-        else if (title === "aoe") {
+        } else if (title === "aoe") {
             towerIndex = 4;
         }
 
@@ -245,8 +256,10 @@ export class Unit extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        if (player.gold < this.game.TowerJobs[towerIndex].goldCost
-            || player.mana < this.game.TowerJobs[towerIndex].manaCost) {
+        if (
+            player.gold < this.game.towerJobs[towerIndex].goldCost ||
+            player.mana < this.game.towerJobs[towerIndex].manaCost
+        ) {
             return `You don't have enough gold or mana to build this tower.`;
         }
 
@@ -299,23 +312,21 @@ export class Unit extends GameObject {
 
         if (title === "arrow") {
             towerIndex = 1;
-        }
-        else if (title === "ballista") {
+        } else if (title === "ballista") {
             towerIndex = 2;
-        }
-        else if (title === "cleansing") {
+        } else if (title === "cleansing") {
             towerIndex = 3;
-        }
-        else if (title === "aoe") {
+        } else if (title === "aoe") {
             towerIndex = 4;
         }
 
         this.tile.tower = this.game.manager.create.tower({
             owner: player,
             attacked: false,
-            health: this.game.TowerJobs[towerIndex].health,
-            job: this.game.TowerJobs[towerIndex],
+            health: this.game.towerJobs[towerIndex].health,
+            job: this.game.towerJobs[towerIndex],
             tile: this.tile,
+            cooldown: 0,
         });
 
         this.game.towers.push(this.tile.tower);
@@ -324,8 +335,8 @@ export class Unit extends GameObject {
 
         this.tile.isTower = true;
 
-        player.gold -= this.game.TowerJobs[towerIndex].goldCost;
-        player.mana -= this.game.TowerJobs[towerIndex].manaCost;
+        player.gold -= this.game.towerJobs[towerIndex].goldCost;
+        player.mana -= this.game.towerJobs[towerIndex].manaCost;
 
         return true;
 
@@ -346,7 +357,7 @@ export class Unit extends GameObject {
     protected invalidateFish(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitFishArgs {
+    ): void | string | UnitFishArgs {
         // <<-- Creer-Merge: invalidate-fish -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
@@ -364,10 +375,14 @@ export class Unit extends GameObject {
             return `${this} is not on a tile! Could they be behind you..?`;
         }
 
-        if (!((this.tile.tileEast && this.tile.tileEast.isRiver)
-            || (this.tile.tileWest && this.tile.tileWest.isRiver)
-            || (this.tile.tileNorth && this.tile.tileNorth.isRiver)
-            || (this.tile.tileSouth && this.tile.tileSouth.isRiver))) {
+        if (
+            !(
+                (this.tile.tileEast && this.tile.tileEast.isRiver) ||
+                (this.tile.tileWest && this.tile.tileWest.isRiver) ||
+                (this.tile.tileNorth && this.tile.tileNorth.isRiver) ||
+                (this.tile.tileSouth && this.tile.tileSouth.isRiver)
+            )
+        ) {
             return `${this} is not near any river tiles!`;
         }
 
@@ -417,7 +432,7 @@ export class Unit extends GameObject {
     protected invalidateMine(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMineArgs {
+    ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
@@ -443,6 +458,14 @@ export class Unit extends GameObject {
             return `${tile} must be a gold mine!`;
         }
 
+        if (!tile.unit) {
+            return `You are not on the target tile!`;
+        }
+
+        if (tile.unit.owner !== player) {
+            return `You are trying to mine where another player's unit is!`;
+        }
+
         // Make sure unit is a worker
         if (this.job.title !== "worker") {
             return `${this} must be a worker to mine!`;
@@ -461,17 +484,11 @@ export class Unit extends GameObject {
     protected async mine(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
 
-        let goldGain = 0;
-
-        // Assign Gold gain based on mine type
-        if ((this.tile) && (this.tile.isIslandGoldMine)) {
-            // Is island Gold Mine
-            goldGain = this.game.islandIncomePerUnit;
-        }
-        else {
-            // Is Normal Gold Mine
-            goldGain = this.game.goldIncomePerUnit;
-        }
+        const goldGain =
+            // Assign Gold gain based on mine type
+            this.tile && this.tile.isIslandGoldMine
+                ? this.game.islandIncomePerUnit // Is island Gold Mine
+                : this.game.goldIncomePerUnit; // Is Normal Gold Mine
 
         // Give gold to player
         player.gold += goldGain;
@@ -498,7 +515,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
@@ -516,6 +533,15 @@ export class Unit extends GameObject {
             return `${this} is not on a tile! Could they be behind you..?`;
         }
 
+        if (
+            tile !== this.tile.tileEast &&
+            tile !== this.tile.tileWest &&
+            tile !== this.tile.tileNorth &&
+            tile !== this.tile.tileSouth
+        ) {
+            return `${this} cannot move to a non-adjacent tile!`;
+        }
+
         // Make sure the tile is on the map
         if (!tile) {
             return `${this}, unit cannot plane shift, tile does not exist in this plane.`;
@@ -526,7 +552,11 @@ export class Unit extends GameObject {
             return `${this} has no more moves and might fall apart!`;
         }
 
-        if (this.owner === this.owner.opponent) {
+        // Make both players don't own the tile
+        if (
+            this.job.title === "worker" &&
+            tile.owner === this.owner.opponent
+        ) {
             return `${this} cannot walk on the enemies side!`;
         }
 
@@ -549,15 +579,23 @@ export class Unit extends GameObject {
         if (tile.unit) {
             if (tile.unit.job !== this.job) {
                 return `${this} is not allowed to walk on ${tile.unit}!`;
-            }
-            else {
-                if (this.job.title === "zombie" && tile.numZombies >= this.game.UnitJobs[1].perTile
-                    || this.job.title === "hound" && tile.numHounds >= this.game.UnitJobs[4].perTile
-                    || this.job.title === "ghoul" && tile.numGhouls >= this.game.UnitJobs[2].perTile) {
+            } else {
+                if (
+                    (this.job.title === "zombie" &&
+                        tile.numZombies >= this.game.unitJobs[1].perTile) ||
+                    (this.job.title === "hound" &&
+                        tile.numHounds >= this.game.unitJobs[4].perTile) ||
+                    (this.job.title === "ghoul" &&
+                        tile.numGhouls >= this.game.unitJobs[2].perTile)
+                ) {
                     return `${this} cannot walk on a fully occupied tile!`;
                 }
-                if (this.job.title === "worker" || this.job.title === "abomination"
-                    || this.job.title === "horseman" || this.job.title === "wraith") {
+                if (
+                    this.job.title === "worker" ||
+                    this.job.title === "abomination" ||
+                    this.job.title === "horseman" ||
+                    this.job.title === "wraith"
+                ) {
                     return `${this} cannot walk on an occupied tile!`;
                 }
             }
@@ -591,20 +629,23 @@ export class Unit extends GameObject {
             return false;
         }
 
-        this.tile.unit = undefined;
+        if (this.job.title === "ghoul") {
+            tile.numGhouls++;
+            this.tile.numGhouls--;
+        } else if (this.job.title === "hound") {
+            tile.numHounds++;
+            this.tile.numHounds--;
+        } else if (this.job.title === "zombie") {
+            tile.numZombies++;
+            this.tile.numZombies--;
+        }
+
+        this.tile.unit = player.units.find(
+            (unit) => unit !== this && unit.tile === this.tile,
+        );
         this.tile = tile;
         tile.unit = this;
         this.moves -= 1;
-
-        if (this.job.title === "ghoul") {
-            tile.numGhouls++;
-        }
-        else if (this.job.title === "hound") {
-            tile.numHounds++;
-        }
-        else if (this.job.title === "zombie") {
-            tile.numZombies++;
-        }
 
         return true;
         // <<-- /Creer-Merge: move -->>

@@ -7,15 +7,18 @@ import * as moment from "moment";
  * @param format - The moment format string.
  * @returns The date now formatted via moment in the format.
  */
-export function formatDate(date: Date | string | number | moment.Moment, format: string): string {
+export function formatDate(
+    date: Date | string | number | moment.Moment,
+    format: string,
+): string {
     return moment(date).format(format);
 }
 
 /**
- * exec passthrough for handlebars... scary
+ * Exec passthrough for handlebars... Scary.
  *
- * @param args - The arguments to be evaluated, spaces are auto inserted in between in arg
- * @returns whatever resolves from this sketch code.
+ * @param args - The arguments to be evaluated, spaces are auto inserted in between in arg.
+ * @returns Whatever resolves from this sketch code.
  */
 export function exec(...args: unknown[]): unknown {
     args.pop(); // last element is Handlebars stuff we don't care about
@@ -24,5 +27,5 @@ export function exec(...args: unknown[]): unknown {
         return undefined;
     }
 
-    return global.eval(args.join(" ")) as unknown; // tslint:disable-line:no-banned-terms
+    return global.eval(args.join(" ")) as unknown;
 }

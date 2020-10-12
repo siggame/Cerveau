@@ -1,5 +1,9 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ICheckerIsMineArgs, ICheckerMoveArgs, ICheckerProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    CheckerConstructorArgs,
+    CheckerIsMineArgs,
+    CheckerMoveArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -46,13 +50,13 @@ export class Checker extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ICheckerProperties & {
+        args: CheckerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Player that owns this Checker. */
             owner: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -81,13 +85,14 @@ export class Checker extends GameObject {
      */
     protected invalidateIsMine(
         player: Player,
-    ): void | string | ICheckerIsMineArgs {
+    ): void | string | CheckerIsMineArgs {
         // <<-- Creer-Merge: invalidate-isMine -->>
 
         // Check all the arguments for isMine here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
+        return undefined; // means nothing could be found that was ivalid.
 
         // <<-- /Creer-Merge: invalidate-isMine -->>
     }
@@ -103,7 +108,7 @@ export class Checker extends GameObject {
 
         // Add logic here for isMine.
 
-        return (player === this.owner);
+        return player === this.owner;
 
         // <<-- /Creer-Merge: isMine -->>
     }
@@ -124,7 +129,7 @@ export class Checker extends GameObject {
         player: Player,
         x: number,
         y: number,
-    ): void | string | ICheckerMoveArgs {
+    ): void | string | CheckerMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         if (this.game.currentPlayer !== player) {
@@ -138,8 +143,7 @@ export class Checker extends GameObject {
         if (this.game.checkerMoved) {
             if (this.game.checkerMoved !== this) {
                 return "Tried to move a check after already moving one.";
-            }
-            else if (!this.game.checkerMovedJumped) {
+            } else if (!this.game.checkerMovedJumped) {
                 return "Tried to move again after not jumping another checker.";
             }
         }
@@ -156,8 +160,9 @@ export class Checker extends GameObject {
         if (!this.kinged) {
             // Then check if they are moving the right direction via dy when
             // not kinged.
-            if ((this.owner.yDirection === 1 && dy < 1) ||
-               (this.owner.yDirection === -1 && dy > -1)
+            if (
+                (this.owner.yDirection === 1 && dy < 1) ||
+                (this.owner.yDirection === -1 && dy > -1)
             ) {
                 return `Moved ${this} in the wrong vertical direction ${fromString}`;
             }
@@ -167,15 +172,13 @@ export class Checker extends GameObject {
         if (jumped && jumped.owner === this.owner) {
             // then it's jumping something
             return `${this} tried to jump its own checker ${fromString}`;
-        }
-        else if (Math.abs(dx) === 1 && Math.abs(dy) === 1) {
+        } else if (Math.abs(dx) === 1 && Math.abs(dy) === 1) {
             // then they are just moving 1 tile diagonally
             if (this.game.checkerMovedJumped) {
                 return `The current checker must jump again, not move diagonally one tile ${fromString}`;
             }
             // else valid as normal move
-        }
-        else {
+        } else {
             return `Invalid move ${fromString}`;
         }
 
@@ -189,7 +192,7 @@ export class Checker extends GameObject {
      * @param x - The x coordinate to move to.
      * @param y - The y coordinate to move to.
      * @returns Returns the same checker that moved if the move was successful.
-     * undefined otherwise.
+     * Otherwise undefined.
      */
     protected async move(
         player: Player,
@@ -202,8 +205,10 @@ export class Checker extends GameObject {
         this.y = y;
 
         // check if they need to be kinged
-        if (this.y === (this.owner.yDirection === 1
-                ? (this.game.boardHeight - 1) : 0)) {
+        if (
+            this.y ===
+            (this.owner.yDirection === 1 ? this.game.boardHeight - 1 : 0)
+        ) {
             this.kinged = true;
         }
 
@@ -232,10 +237,11 @@ export class Checker extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Gets the checker that was jumped at a given position
+     * Gets the checker that was jumped at a given position.
+     *
      * @param x - The x coordinate.
      * @param y - The y coordinate.
-     * @returns A checker, if one was jumped. undefined otherwise.
+     * @returns A checker, if one was jumped. Undefined otherwise.
      */
     private getJumped(x: number, y: number): Checker | undefined {
         const dy = y - this.y;

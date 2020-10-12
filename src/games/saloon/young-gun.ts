@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IYoungGunCallInArgs, IYoungGunProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { YoungGunCallInArgs, YoungGunConstructorArgs } from "./";
 import { Cowboy } from "./cowboy";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -15,8 +15,8 @@ import { Tile } from "./tile";
  */
 export class YoungGun extends GameObject {
     /**
-     * The Tile that a Cowboy will be called in on if this YoungGun calls in a
-     * Cowboy.
+     * The Tile that a Cowboy will be called in on if this YoungGun calls in
+     * a Cowboy.
      */
     public callInTile: Tile;
 
@@ -37,7 +37,7 @@ export class YoungGun extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** The previous tile this Young Gun came from */
+    /** The previous tile this Young Gun came from. */
     public previousTile: Tile;
 
     // <<-- /Creer-Merge: attributes -->>
@@ -49,7 +49,7 @@ export class YoungGun extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IYoungGunProperties & {
+        args: YoungGunConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The controlling Player of this YoungGun. */
             owner: Player;
@@ -59,7 +59,7 @@ export class YoungGun extends GameObject {
             previousTile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -75,7 +75,7 @@ export class YoungGun extends GameObject {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Updates Young Gun related logic: moving them clockwise
+     * Updates Young Gun related logic: moving them clockwise.
      */
     public update(): void {
         this.canCallIn = true; // they can call in a cowboy on their next turn
@@ -83,14 +83,16 @@ export class YoungGun extends GameObject {
         // find the adjacent tile that they were not on last turn,
         //   this way all YoungGuns continue walking clockwise
         const tiles = this.tile.getNeighbors();
-        const moveTo = tiles.find((tile) => tile.isBalcony && this.previousTile !== tile);
+        const moveTo = tiles.find(
+            (tile) => tile.isBalcony && this.previousTile !== tile,
+        );
 
         if (!moveTo) {
             throw new Error(`${this} cannot move to a new Tile!`);
         }
 
         // do a quick BFS to find the callInTile
-        const searchTiles = [ moveTo ];
+        const searchTiles = [moveTo];
         const searched = new Set();
         while (searchTiles.length > 0) {
             const searchTile = searchTiles.shift() as Tile; // will exist because above check
@@ -98,10 +100,10 @@ export class YoungGun extends GameObject {
             if (!searched.has(searchTile)) {
                 searched.add(searchTile);
 
-                if (searchTile.isBalcony) { // add its neighbors to be searched
+                if (searchTile.isBalcony) {
+                    // add its neighbors to be searched
                     searchTiles.push(...searchTile.getNeighbors());
-                }
-                else {
+                } else {
                     this.callInTile = searchTile;
                     break; // we found it
                 }
@@ -130,7 +132,7 @@ export class YoungGun extends GameObject {
     protected invalidateCallIn(
         player: Player,
         job: "Bartender" | "Brawler" | "Sharpshooter",
-    ): void | string | IYoungGunCallInArgs {
+    ): void | string | YoungGunCallInArgs {
         // <<-- Creer-Merge: invalidate-callIn -->>
 
         if (!this.canCallIn) {
@@ -138,7 +140,9 @@ export class YoungGun extends GameObject {
         }
 
         // make sure they are not trying to go above the limit
-        const count = this.owner.cowboys.filter((c) => c.job === job && !c.isDead).length;
+        const count = this.owner.cowboys.filter(
+            (c) => c.job === job && !c.isDead,
+        ).length;
         if (count >= this.game.maxCowboysPerJob) {
             return `You cannot call in any more '${job}' Cowboys (max of ${this.game.maxCowboysPerJob})`;
         }
@@ -147,8 +151,8 @@ export class YoungGun extends GameObject {
     }
 
     /**
-     * Tells the YoungGun to call in a new Cowboy of the given job to the open
-     * Tile nearest to them.
+     * Tells the YoungGun to call in a new Cowboy of the given job to the
+     * open Tile nearest to them.
      *
      * @param player - The player that called this.
      * @param job - The job you want the Cowboy being brought to have.

@@ -2,41 +2,41 @@
 // Basically http responses that are not HTML, probably JSON
 
 import { Express } from "express";
-import { IClientInfo } from "~/core/clients/client-info";
+import { ClientInfo } from "~/core/clients/client-info";
 import { Config } from "~/core/config";
 import { Lobby } from "~/core/server/lobby";
 import { objectHasProperty } from "~/utils";
 
 /** Information about the room to be returned via the status API. */
-interface IRoomInfo {
+interface RoomInfo {
     /** The room's current status. */
     status: "empty" | "open" | "running" | "over";
     /** The unique name of the game being played. */
     gameName: string;
-    /** The id of the game session */
+    /** The id of the game session. */
     gameSession: string;
-    /** Number of players required to start this room's game */
+    /** Number of players required to start this room's game. */
     requiredNumberOfPlayers: number;
-    /** filename of the gamelog. When undefined not finished, when null still writing to filesystem. */
+    /** Filename of the gamelog. When undefined not finished, when null still writing to filesystem. */
     gamelogFilename?: string | null;
     /** The array of client info in the room. */
-    clients: IClientInfo[];
+    clients: ClientInfo[];
 }
 
 /** Information about an error getting room info. */
-interface IErrorInfo {
-    /** Human readable error message */
+interface ErrorInfo {
+    /** Human readable error message. */
     error: string;
 }
 
 /**
- * Gets the info for some session of some game
+ * Gets the info for some session of some game.
  *
- * @param gameAlias - name of the game
- * @param id - id of the session of that gameName
- * @returns information about the session for the api
+ * @param gameAlias - Name of the game.
+ * @param id - Id of the session of that gameName.
+ * @returns Information about the session for the api.
  */
-function getRoomInfo(gameAlias: string, id: string): IErrorInfo | IRoomInfo {
+function getRoomInfo(gameAlias: string, id: string): ErrorInfo | RoomInfo {
     const lobby = Lobby.getInstance();
     const room = lobby.getRoom(gameAlias, id);
 
@@ -60,7 +60,7 @@ function getRoomInfo(gameAlias: string, id: string): IErrorInfo | IRoomInfo {
 
     const { requiredNumberOfPlayers } = gameNamespace.GameManager;
 
-    const info: IRoomInfo = {
+    const info: RoomInfo = {
         status: "empty",
         gameName,
         gameSession: id,
@@ -113,14 +113,15 @@ function getRoomInfo(gameAlias: string, id: string): IErrorInfo | IRoomInfo {
     }
 
     return {
-        error: "Requested game name and room are in an unexpected state of running while over.",
+        error:
+            "Requested game name and room are in an unexpected state of running while over.",
     };
 }
 
 /**
- * Registers the status route with some express app
+ * Registers the status route with some express app.
  *
- * @param app - The Express app instance to register the route on
+ * @param app - The Express app instance to register the route on.
  */
 export function registerRouteStatus(app: Express): void {
     if (!Config.API_ENABLED) {
@@ -151,15 +152,15 @@ export function registerRouteStatus(app: Express): void {
      * means the gamelog does not exist yet because it is still being written
      * to the filesystem.
      * @apiSuccess {string} status What the status of this game session is:
-     *  * "empty" if the game session is valid, but does not exist because no
-     *    clients have ever connected to it.
-     *  * "open" if the game session has had a least 1 client connect, but the
-     *    game has not started.
-     *  * "running" if all players have connected, and the game is actively in
-     *    progress, but not over.
-     *  * "over" if the game session has ran to completion and clients have
-     *    disconnected.
-     *  * "error" otherwise, such as if the gameName was invalid.
+     * * "empty" if the game session is valid, but does not exist because no
+     * clients have ever connected to it.
+     * * "open" if the game session has had a least 1 client connect, but the
+     * game has not started.
+     * * "running" if all players have connected, and the game is actively in
+     * progress, but not over.
+     * * "over" if the game session has ran to completion and clients have
+     * disconnected.
+     * * "error" otherwise, such as if the gameName was invalid.
      * @apiSuccess {number} numberOfPlayers The number of clients that are
      * playing needed to connect to make the game session start running.
      * @apiSuccess {Client[]} clients An array of clients currently in that
@@ -250,8 +251,8 @@ export function registerRouteStatus(app: Express): void {
      *  }
      *
      * @apiSuccessExample {json} Almost Over
-     *  In this example the game is over, but the gamelog is still being
-     *  handled internally and is not available via the `gamelog/` API yet.
+     *  // In this example the game is over, but the gamelog is still being
+     *  // handled internally and is not available via the `gamelog/` API yet.
      *  {
      *      status: "over",
      *      gameName: "Chess",
@@ -290,21 +291,22 @@ export function registerRouteStatus(app: Express): void {
      *      gameName: "unknownGameName"
      *  }
      */
-    app.get("/status/:gameName/:gameSession", async (req, res) => {
+    app.get("/status/:gameName/:gameSession", (req, res) => {
         const params = req.params as {
-            /** The game name being requested */
+            /** The game name being requested. */
             gameName: unknown;
 
-            /** the game session being requested */
+            /** The game session being requested. */
             gameSession: unknown;
         };
 
         const gameName = String(params.gameName);
         const gameSession = String(params.gameSession);
 
-        const info = (!gameName || !gameSession)
-            ? { error: "gameName and gameSession are required" }
-            : getRoomInfo(gameName, gameSession);
+        const info =
+            !gameName || !gameSession
+                ? { error: "gameName and gameSession are required" }
+                : getRoomInfo(gameName, gameSession);
 
         if (objectHasProperty(info, "error")) {
             res.status(400);

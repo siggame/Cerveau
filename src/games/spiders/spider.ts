@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpiderProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { SpiderConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Nest } from "./nest";
 import { Player } from "./player";
@@ -19,8 +19,8 @@ export class Spider extends GameObject {
     public isDead!: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Undefined when moving on a
-     * Web.
+     * The Nest that this Spider is currently on. Undefined when moving on
+     * a Web.
      */
     public nest?: Nest;
 
@@ -44,13 +44,13 @@ export class Spider extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ISpiderProperties & {
+        args: SpiderConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The controlling Player of this Spider. */
             owner: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -80,7 +80,7 @@ export class Spider extends GameObject {
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
-    /** Kill the spider and remove it from arrays */
+    /** Kill the spider and remove it from arrays. */
     public kill(): void {
         this.isDead = true;
 

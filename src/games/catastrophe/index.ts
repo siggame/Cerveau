@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Catastrophe game
+ * The interface that the Player for the Catastrophe game
  * must implement from mixed in game logic.
  */
-export interface IBaseCatastrophePlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseCatastrophePlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,12 +82,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * The amount of energy this Job normally uses to perform its actions.
      */
@@ -100,18 +110,23 @@ export interface IJobProperties {
     /**
      * The Job title.
      */
-    title?: "fresh human" | "cat overlord" | "soldier" | "gatherer" | "builder" | "missionary";
+    title?:
+        | "fresh human"
+        | "cat overlord"
+        | "soldier"
+        | "gatherer"
+        | "builder"
+        | "missionary";
 
     /**
      * The amount of food per turn this Unit consumes. If there isn't enough
      * food for every Unit, all Units become starved and do not consume food.
      */
     upkeep?: number;
-
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The overlord cat Unit owned by this Player.
      */
@@ -179,11 +194,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Structure. */
-export interface IStructureProperties {
+/** All the possible properties for Structure instances. */
+export interface StructureProperties {
     /**
      * The range of this Structure's effect. For example, a radius of 1 means
      * this Structure affects a 3x3 square centered on this Structure.
@@ -207,15 +221,14 @@ export interface IStructureProperties {
     tile?: Tile;
 
     /**
-     * The type of Structure this is ('shelter', 'monument', 'wall', 'road',
-     * 'neutral').
+     * The type of Structure this
+     * is ('shelter', 'monument', 'wall', 'road', 'neutral').
      */
     type?: "neutral" | "shelter" | "monument" | "wall" | "road";
-
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The number of food dropped on this Tile.
      */
@@ -279,18 +292,17 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether this Unit has performed its action this turn.
      */
     acted?: boolean;
 
     /**
-     * The amount of energy this Unit has (from 0.0 to 100.0).
+     * The amount of energy this Unit has (from 0 to 100).
      */
     energy?: number;
 
@@ -348,7 +360,6 @@ export interface IUnitProperties {
      * fresh humans created from combat. Otherwise, 0.
      */
     turnsToDie?: number;
-
 }
 
 /**
@@ -356,7 +367,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -368,7 +379,7 @@ export interface IUnitAttackArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitChangeJobArgs {
+export interface UnitChangeJobArgs {
     /**
      * The name of the Job to change to.
      */
@@ -380,7 +391,7 @@ export interface IUnitChangeJobArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitConstructArgs {
+export interface UnitConstructArgs {
     /**
      * The Tile to construct the Structure on. It must have enough materials on
      * it for a Structure to be constructed.
@@ -397,7 +408,7 @@ export interface IUnitConstructArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitConvertArgs {
+export interface UnitConvertArgs {
     /**
      * The Tile with the Unit to convert.
      */
@@ -406,10 +417,10 @@ export interface IUnitConvertArgs {
 
 /**
  * Argument overrides for Unit's deconstruct function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IUnitDeconstructArgs {
+export interface UnitDeconstructArgs {
     /**
      * The Tile to deconstruct. It must have a Structure on it.
      */
@@ -418,10 +429,10 @@ export interface IUnitDeconstructArgs {
 
 /**
  * Argument overrides for Unit's drop function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitDropArgs {
+export interface UnitDropArgs {
     /**
      * The Tile to drop materials/food on.
      */
@@ -442,7 +453,7 @@ export interface IUnitDropArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitHarvestArgs {
+export interface UnitHarvestArgs {
     /**
      * The Tile you want to harvest.
      */
@@ -451,10 +462,10 @@ export interface IUnitHarvestArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -466,7 +477,7 @@ export interface IUnitMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitPickupArgs {
+export interface UnitPickupArgs {
     /**
      * The Tile to pickup materials/food from.
      */
@@ -484,11 +495,58 @@ export interface IUnitPickupArgs {
 
 /**
  * Argument overrides for Unit's rest function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitRestArgs {
-}
+export interface UnitRestArgs {}
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Job.
+ */
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseCatastrophePlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Structure.
+ */
+export type StructureConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<StructureProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./job";
@@ -512,16 +570,16 @@ import { CatastropheGame } from "./game";
 import { CatastropheGameManager } from "./game-manager";
 import { CatastropheGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Structure */
+/** The arguments used to construct a Structure. */
 export type StructureArgs = FirstArgumentFromConstructor<typeof Structure>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -536,9 +594,7 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -558,29 +614,24 @@ export class CatastropheGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -603,12 +654,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CatastropheGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -731,8 +780,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -781,14 +829,20 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "fresh human",
-                    literals: ["fresh human", "cat overlord", "soldier", "gatherer", "builder", "missionary"],
+                    literals: [
+                        "fresh human",
+                        "cat overlord",
+                        "soldier",
+                        "gatherer",
+                        "builder",
+                        "missionary",
+                    ],
                 },
                 upkeep: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -847,8 +901,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Structure: {
             parentClassName: "GameObject",
@@ -872,11 +925,16 @@ export const Namespace = makeNamespace({
                 type: {
                     typeName: "string",
                     defaultValue: "neutral",
-                    literals: ["neutral", "shelter", "monument", "wall", "road"],
+                    literals: [
+                        "neutral",
+                        "shelter",
+                        "monument",
+                        "wall",
+                        "road",
+                    ],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -930,8 +988,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1007,7 +1064,12 @@ export const Namespace = makeNamespace({
                             argName: "job",
                             typeName: "string",
                             defaultValue: "soldier",
-                            literals: ["soldier", "gatherer", "builder", "missionary"],
+                            literals: [
+                                "soldier",
+                                "gatherer",
+                                "builder",
+                                "missionary",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1027,7 +1089,13 @@ export const Namespace = makeNamespace({
                             argName: "type",
                             typeName: "string",
                             defaultValue: "neutral",
-                            literals: ["neutral", "shelter", "monument", "wall", "road"],
+                            literals: [
+                                "neutral",
+                                "shelter",
+                                "monument",
+                                "wall",
+                                "road",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1142,8 +1210,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 rest: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1152,5 +1219,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "ede84ab86376b00287c09558f05e8f2a61b92109d93aad9ebd3379ff4215fb53",
+    gameVersion:
+        "ede84ab86376b00287c09558f05e8f2a61b92109d93aad9ebd3379ff4215fb53",
 });

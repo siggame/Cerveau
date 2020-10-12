@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Bottle } from "./bottle";
 import { Cowboy } from "./cowboy";
@@ -14,7 +14,7 @@ import { Tile } from "./tile";
 import * as gaussian from "gaussian";
 import { Mutable } from "~/utils";
 
-/** A player that can mutate before the game starts */
+/** A player that can mutate before the game starts. */
 type MutablePlayer = Mutable<Player>;
 
 // <<-- /Creer-Merge: imports -->>
@@ -24,10 +24,10 @@ type MutablePlayer = Mutable<Player>;
  * brawling with enemy Cowboys.
  */
 export class SaloonGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: SaloonGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -69,10 +69,9 @@ export class SaloonGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * All the jobs that Cowboys can be called in with.
@@ -159,17 +158,13 @@ export class SaloonGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: SaloonGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
 
-        this.jobs.push(
-            "Sharpshooter",
-            "Bartender",
-            "Brawler",
-        );
+        this.jobs.push("Sharpshooter", "Bartender", "Brawler");
 
         const minFurnishings = 0;
         const maxFurnishings = 5;
@@ -181,7 +176,9 @@ export class SaloonGame extends BaseClasses.Game {
             const topTile = this.getTile(x, 0);
             const bottomTile = this.getTile(x, this.mapHeight - 1);
             if (!topTile || !bottomTile) {
-                throw new Error(`Could not make top or bottom tile at x=${x} a balcony.`);
+                throw new Error(
+                    `Could not make top or bottom tile at x=${x} a balcony.`,
+                );
             }
 
             topTile.isBalcony = true;
@@ -193,19 +190,22 @@ export class SaloonGame extends BaseClasses.Game {
             const leftTile = this.getTile(0, y);
             const rightTile = this.getTile(this.mapWidth - 1, y);
             if (!leftTile || !rightTile) {
-                throw new Error(`Could not make top or bottom tile at y=${y} a balcony.`);
+                throw new Error(
+                    `Could not make top or bottom tile at y=${y} a balcony.`,
+                );
             }
             leftTile.isBalcony = true;
             rightTile.isBalcony = true;
         }
 
         // spawn some random furnishings in quadrants
-        let numFurnishings = this.manager.random.int(maxFurnishings, minFurnishings) * 2; // *2 for each side
+        let numFurnishings =
+            this.manager.random.int(maxFurnishings, minFurnishings) * 2; // *2 for each side
 
         const rand = this.manager.random.float();
         let numPianos = 2;
         // 80% of the time, have 4 pianos
-        if (rand < 0.80) {
+        if (rand < 0.8) {
             numPianos = 4;
         }
         // the other 15% of the time have 6
@@ -228,36 +228,44 @@ export class SaloonGame extends BaseClasses.Game {
             let x = 0;
             let y = 0;
 
-            while (true) {
+            let maxCheck = 1e8;
+            while (maxCheck-- > 0) {
                 x = Math.round(distributionX.ppf(this.manager.random.float()));
                 y = Math.round(distributionY.ppf(this.manager.random.float()));
                 const tile = this.getTile(x, y);
 
                 if (tile && !tile.furnishing && !tile.isBalcony) {
                     break; // because we found a tile that does not have a
-                           // furnishing to spawn one on, else we continue our
-                           // random search
+                    // furnishing to spawn one on, else we continue our
+                    // random search
                 }
             }
 
-            for (let side = 0; side < 2; side++) { // for each side (left and right)
-                if (side === 1) { // if the right side, invert the x, y coordinate
+            for (let side = 0; side < 2; side++) {
+                // for each side (left and right)
+                if (side === 1) {
+                    // if the right side, invert the x, y coordinate
                     x = this.mapWidth - x - 1;
                     y = this.mapHeight - y - 1;
                 }
 
-                if (numHazards > 0) { // if there are hazards to spawn
+                if (numHazards > 0) {
+                    // if there are hazards to spawn
                     numHazards--;
                     const tile = this.getTile(x, y);
                     if (!tile) {
-                        throw new Error(`(${x},${y} is out of range to place a hazard on!`);
+                        throw new Error(
+                            `(${x},${y} is out of range to place a hazard on!`,
+                        );
                     }
                     tile.hasHazard = true; // "spawn" it by setting that tile's hasHazard to true
-                }
-                else { // need to spawn a furnishing
+                } else {
+                    // need to spawn a furnishing
                     const tile = this.getTile(x, y);
                     if (!tile) {
-                        throw new Error(`No tile at (${x}, ${y}) to place Furnishing on!`);
+                        throw new Error(
+                            `No tile at (${x}, ${y}) to place Furnishing on!`,
+                        );
                     }
                     this.manager.create.furnishing({
                         tile,
@@ -265,10 +273,10 @@ export class SaloonGame extends BaseClasses.Game {
                         isPiano: numPianos > 0,
                     });
 
-                    if (numPianos > 0) { // decrement whatever we spawned
+                    if (numPianos > 0) {
+                        // decrement whatever we spawned
                         numPianos--;
-                    }
-                    else {
+                    } else {
                         numFurnishings--;
                     }
                 }
@@ -282,7 +290,8 @@ export class SaloonGame extends BaseClasses.Game {
             let x = 0;
             let y = 0;
             let dy = 1;
-            if (i > 0) { // then change x, y for the second player
+            if (i > 0) {
+                // then change x, y for the second player
                 x = this.mapWidth - 1;
                 y = this.mapHeight - 1;
                 dy = -1;
@@ -324,7 +333,6 @@ export class SaloonGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 

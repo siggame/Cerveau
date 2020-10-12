@@ -56,7 +56,7 @@ export function registerRouteSetup(app: Express): void {
      *     "error": "gameName 'undefined' is not a known game alias"
      * }
      */
-    app.post("/setup", async (req, res) => {
+    app.post("/setup", (req, res) => {
         if (!isObject(req.body as unknown)) {
             res.status(400);
             res.json({ error: "No body sent." });
@@ -82,39 +82,40 @@ export function registerRouteSetup(app: Express): void {
         let numPlayers = -1;
         if (!gameNamespace) {
             errors.push(`gameName '${gameAlias}' is not a known game alias`);
-        }
-        else {
+        } else {
             numPlayers = gameNamespace.GameManager.requiredNumberOfPlayers;
         }
 
         if (typeof body.session !== "string") {
             errors.push(`session id required`);
-        }
-        else if (body.session === "*" || body.session === "new") {
-            errors.push(`session '${body.session}' is a reserved session name`);
+        } else if (body.session === "*" || body.session === "new") {
+            errors.push(
+                `session '${body.session}' is a reserved session name`,
+            );
         }
         const session = String(body.session);
 
         const gameSettings = body.gameSettings;
         if (!gameSettings || !isObject(gameSettings)) {
             errors.push("gameSettings is required");
-        }
-        else if (!gameSettings.playerNames) {
+        } else if (!gameSettings.playerNames) {
             errors.push("gameSettings.playerNames is required");
-        }
-        else if (!Array.isArray(gameSettings.playerNames)) {
+        } else if (!Array.isArray(gameSettings.playerNames)) {
             errors.push("gameSettings.playerNames must be an array");
-        }
-        else if (gameNamespace && gameSettings.playerNames.length !== numPlayers) {
-            errors.push(`gameSettings.playerNames must be an array of length ${numPlayers}`);
+        } else if (
+            gameNamespace &&
+            gameSettings.playerNames.length !== numPlayers
+        ) {
+            errors.push(
+                `gameSettings.playerNames must be an array of length ${numPlayers}`,
+            );
         }
 
         let password: string | undefined;
         if (body.password) {
             if (typeof body.password === "string") {
                 password = body.password;
-            }
-            else {
+            } else {
                 errors.push("password must be a string");
             }
         }
@@ -129,8 +130,7 @@ export function registerRouteSetup(app: Express): void {
 
             if (error) {
                 errors.push(error);
-            }
-            else {
+            } else {
                 // else it has now been setup successfully!
                 res.status(200); // it was ok
                 res.json({}); // empty object

@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Newtonian game
+ * The interface that the Player for the Newtonian game
  * must implement from mixed in game logic.
  */
-export interface IBaseNewtonianPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseNewtonianPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,12 +82,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * How many combined resources a unit with this Job can hold at once.
      */
@@ -101,11 +111,10 @@ export interface IJobProperties {
      * The Job title. 'intern', 'manager', or 'physicist'.
      */
     title?: "intern" | "manager" | "physicist";
-
 }
 
-/** All the possible properties for an Machine. */
-export interface IMachineProperties {
+/** All the possible properties for Machine instances. */
+export interface MachineProperties {
     /**
      * What type of ore the machine takes it. Also determines the type of
      * material it outputs. (redium or blueium).
@@ -138,11 +147,10 @@ export interface IMachineProperties {
      * Tracks how many times this machine has been worked. (0 to refineTime).
      */
     worked?: number;
-
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -225,11 +233,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The amount of blueium on this tile.
      */
@@ -247,8 +254,8 @@ export interface ITileProperties {
     decoration?: number;
 
     /**
-     * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank means conveyor doesn't move.
+     * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+     * or 'west'). Blank means conveyor doesn't move.
      */
     direction?: "blank" | "north" | "east" | "south" | "west";
 
@@ -303,8 +310,8 @@ export interface ITileProperties {
     tileWest?: Tile;
 
     /**
-     * The type of Tile this is ('normal', 'generator', 'conveyor', or
-     * 'spawn').
+     * The type of Tile this is ('normal', 'generator', 'conveyor',
+     * or 'spawn').
      */
     type?: "normal" | "generator" | "conveyor" | "spawn";
 
@@ -322,11 +329,10 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn.
      */
@@ -339,8 +345,8 @@ export interface IUnitProperties {
     blueium?: number;
 
     /**
-     * The amount of blueium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of blueium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     blueiumOre?: number;
 
@@ -371,8 +377,8 @@ export interface IUnitProperties {
     redium?: number;
 
     /**
-     * The amount of redium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of redium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     rediumOre?: number;
 
@@ -390,15 +396,14 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
  * Argument overrides for Unit's act function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitActArgs {
+export interface UnitActArgs {
     /**
      * The tile the unit acts on.
      */
@@ -410,7 +415,7 @@ export interface IUnitActArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -419,10 +424,10 @@ export interface IUnitAttackArgs {
 
 /**
  * Argument overrides for Unit's drop function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitDropArgs {
+export interface UnitDropArgs {
     /**
      * The tile the materials will be dropped on.
      */
@@ -433,18 +438,18 @@ export interface IUnitDropArgs {
      */
     amount?: number;
     /**
-     * The material the unit will drop. 'redium', 'blueium', 'redium ore', or
-     * 'blueium ore'.
+     * The material the unit will drop. 'redium', 'blueium', 'redium ore',
+     * or 'blueium ore'.
      */
     material?: "redium ore" | "redium" | "blueium" | "blueium ore";
 }
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -456,7 +461,7 @@ export interface IUnitMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitPickupArgs {
+export interface UnitPickupArgs {
     /**
      * The tile the materials will be picked up from.
      */
@@ -472,6 +477,54 @@ export interface IUnitPickupArgs {
      */
     material?: "redium ore" | "redium" | "blueium" | "blueium ore";
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Job.
+ */
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Machine.
+ */
+export type MachineConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<MachineProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseNewtonianPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./job";
@@ -495,16 +548,16 @@ import { NewtonianGame } from "./game";
 import { NewtonianGameManager } from "./game-manager";
 import { NewtonianGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Machine */
+/** The arguments used to construct a Machine. */
 export type MachineArgs = FirstArgumentFromConstructor<typeof Machine>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -519,51 +572,42 @@ export class NewtonianGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
     /**
      * Creates a new Machine in the Game and tracks it for all players.
      *
-     * @param args - Data about the Machine to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Machine to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Machine hooked up in the game and ready for you to use.
      */
-    public machine<T extends MachineArgs>(
-        args: Readonly<T>,
-    ): Machine & T {
+    public machine<T extends MachineArgs>(args: Readonly<T>): Machine & T {
         return this.createGameObject("Machine", Machine, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -586,12 +630,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new NewtonianGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -705,8 +747,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -758,8 +799,7 @@ export const Namespace = makeNamespace({
                     literals: ["intern", "manager", "physicist"],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Machine: {
             parentClassName: "GameObject",
@@ -787,8 +827,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -859,8 +898,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -935,8 +973,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1029,7 +1066,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
+                            literals: [
+                                "redium ore",
+                                "redium",
+                                "blueium",
+                                "blueium ore",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1067,7 +1109,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "redium ore",
-                            literals: ["redium ore", "redium", "blueium", "blueium ore"],
+                            literals: [
+                                "redium ore",
+                                "redium",
+                                "blueium",
+                                "blueium ore",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1078,5 +1125,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "7c19f909ee5faa0ac3faf4e989032b5a37ba94aeb5d6ae7654a15a2bb1401bbe",
+    gameVersion:
+        "7c19f909ee5faa0ac3faf4e989032b5a37ba94aeb5d6ae7654a15a2bb1401bbe",
 });

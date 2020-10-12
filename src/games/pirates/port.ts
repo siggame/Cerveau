@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IPortProperties, IPortSpawnArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { PortConstructorArgs, PortSpawnArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -50,13 +50,13 @@ export class Port extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IPortProperties & {
+        args: PortConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Tile to place this Port upon. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -87,7 +87,7 @@ export class Port extends GameObject {
     protected invalidateSpawn(
         player: Player,
         type: "crew" | "ship",
-    ): void | string | IPortSpawnArgs {
+    ): void | string | PortSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
 
         if (this.owner !== player) {
@@ -98,7 +98,8 @@ export class Port extends GameObject {
             return `Avast, it ain't yer turn, ${player}.`;
         }
 
-        if (type === "crew") { // Crew
+        if (type === "crew") {
+            // Crew
             if (player.gold < this.game.crewCost) {
                 return `Ye don't have enough gold to spawn a crew at ${this}.`;
             }
@@ -106,8 +107,8 @@ export class Port extends GameObject {
             if (this.gold < this.game.crewCost) {
                 return `${this} can't spend enough gold to spawn a crew this turn! Ye gotta wait til next turn.`;
             }
-        }
-        else { // Ships
+        } else {
+            // Ships
             if (player.gold < this.game.shipCost) {
                 return `Ye don't have enough gold to spawn a ship at ${this}.`;
             }
@@ -146,7 +147,7 @@ export class Port extends GameObject {
             this.game.manager.newUnits.push(this.tile.unit);
         }
 
-        if (type === "crew")		{
+        if (type === "crew") {
             this.tile.unit.crew++;
             this.tile.unit.crewHealth += this.game.crewHealth;
             this.tile.unit.acted = true;
@@ -154,8 +155,7 @@ export class Port extends GameObject {
             this.tile.unit.owner = player;
             player.gold -= this.game.crewCost;
             this.gold -= this.game.crewCost;
-        }
-        else {
+        } else {
             this.tile.unit.shipHealth = this.game.shipHealth;
             this.tile.unit.acted = true;
             this.tile.unit.moves = 0;

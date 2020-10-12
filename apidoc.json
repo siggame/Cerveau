@@ -5,6 +5,6 @@
   "title": "Cerveau API",
   "url" : "http://localhost:3080",
   "template": {
-    "withCompare": false
+    "withCompare": true
   }
 }

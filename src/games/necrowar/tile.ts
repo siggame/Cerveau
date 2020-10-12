@@ -1,7 +1,11 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties, ITileResArgs, ITileSpawnUnitArgs,
-         ITileSpawnWorkerArgs } from "./";
+import {
+    TileConstructorArgs,
+    TileResArgs,
+    TileSpawnUnitArgs,
+    TileSpawnWorkerArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tower } from "./tower";
@@ -88,8 +92,8 @@ export class Tile extends GameObject implements BaseTile {
     public numZombies!: number;
 
     /**
-     * Which player owns this tile, only applies to grass tiles for workers,
-     * undefined otherwise.
+     * Which player owns this tile, only applies to grass tiles for
+     * workers, NULL otherwise.
      */
     public owner?: Player;
 
@@ -153,8 +157,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: TileConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -169,6 +173,8 @@ export class Tile extends GameObject implements BaseTile {
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
 
+    // <<-- /Creer-Merge: public-functions -->>
+
     /**
      * Gets the adjacent direction between this Tile and an adjacent Tile
      * (if one exists).
@@ -180,8 +186,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -190,23 +198,22 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbors.call(this);
+        return BaseTile.prototype.getNeighbors.call(this) as Tile[];
     }
 
-    public getNeighbor(direction: "North" | "South" | "East" | "West"): Tile;
-    public getNeighbor(direction: string): Tile | undefined;
-
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: string): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction);
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**
@@ -216,21 +223,17 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */
     public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
-
-    // <<-- /Creer-Merge: public-functions -->>
 
     /**
      * Invalidation function for res. Try to find a reason why the passed in
@@ -246,7 +249,7 @@ export class Tile extends GameObject implements BaseTile {
     protected invalidateRes(
         player: Player,
         num: number,
-    ): void | string | ITileResArgs {
+    ): void | string | TileResArgs {
         // <<-- Creer-Merge: invalidate-res -->>
 
         // Player invalidation
@@ -270,7 +273,7 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure the player has enough mana
-        const cost = num * this.game.UnitJobs[1].manaCost;
+        const cost = num * this.game.unitJobs[1].manaCost;
         if (this.game.currentPlayer.mana < cost) {
             return `You do not have enough mana to resurrect ${num} corpses!`;
         }
@@ -287,13 +290,17 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         // Ensure there isn't another unit currently on this tile
-        const unitCount = Math.max(this.numGhouls, this.numHounds);
-        if (unitCount > 0 || (this.unit !== undefined && this.unit.job.title !== "zombie")) {
+        const unitCount = Math.max(spawnTile.numGhouls, spawnTile.numHounds);
+        if (
+            unitCount > 0 ||
+            (spawnTile.unit !== undefined &&
+                spawnTile.unit.job.title !== "zombie")
+        ) {
             return `Your unit spawn tile is already occupied by another unit!`;
         }
 
         // Ensure there wouldn't be too many zombies
-        if (spawnTile.numZombies + num > this.game.UnitJobs[1].perTile) {
+        if (spawnTile.numZombies + num > this.game.unitJobs[1].perTile) {
             return `Your spawn tile cannot fit an additional ${num} zombies!`;
         }
 
@@ -311,7 +318,7 @@ export class Tile extends GameObject implements BaseTile {
         // <<-- Creer-Merge: res -->>
 
         // Reduce player mana
-        this.game.currentPlayer.mana -= (num * this.game.UnitJobs[1].manaCost);
+        this.game.currentPlayer.mana -= num * this.game.unitJobs[1].manaCost;
 
         // Find spawn tile
         let spawnTile;
@@ -330,11 +337,11 @@ export class Tile extends GameObject implements BaseTile {
         for (let i = 0; i < num; i++) {
             unit = this.manager.create.unit({
                 acted: false,
-                health: this.game.UnitJobs[1].health,
+                health: this.game.unitJobs[1].health,
                 owner: this.game.currentPlayer,
                 tile: spawnTile,
-                job: this.game.UnitJobs[1],
-                moves: this.game.UnitJobs[1].moves,
+                job: this.game.unitJobs[1],
+                moves: this.game.unitJobs[1].moves,
             });
             if (!spawnTile.unit) {
                 spawnTile.unit = unit;
@@ -368,7 +375,7 @@ export class Tile extends GameObject implements BaseTile {
     protected invalidateSpawnUnit(
         player: Player,
         title: string,
-    ): void | string | ITileSpawnUnitArgs {
+    ): void | string | TileSpawnUnitArgs {
         // <<-- Creer-Merge: invalidate-spawnUnit -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -379,17 +386,13 @@ export class Tile extends GameObject implements BaseTile {
 
         if (title === "ghoul") {
             unitIndex = 2;
-        }
-        else if (title === "abomination") {
+        } else if (title === "abomination") {
             unitIndex = 3;
-        }
-        else if (title === "hound") {
+        } else if (title === "hound") {
             unitIndex = 4;
-        }
-        else if (title === "wraith") {
+        } else if (title === "wraith") {
             unitIndex = 5;
-        }
-        else if (title === "horseman") {
+        } else if (title === "horseman") {
             unitIndex = 6;
         }
 
@@ -397,8 +400,10 @@ export class Tile extends GameObject implements BaseTile {
             return `Invalid unit type!`;
         }
 
-        if (player.gold < this.game.UnitJobs[unitIndex].goldCost
-            || player.mana < this.game.UnitJobs[unitIndex].manaCost) {
+        if (
+            player.gold < this.game.unitJobs[unitIndex].goldCost ||
+            player.mana < this.game.unitJobs[unitIndex].manaCost
+        ) {
             return `You cannot afford to spawn this unit.`;
         }
 
@@ -411,19 +416,27 @@ export class Tile extends GameObject implements BaseTile {
         }
 
         if (this.unit) {
-            if (this.unit.job.title === "zombie"
-                || this.unit.job.title === "horseman"
-                || this.unit.job.title === "abomination"
-                || this.unit.job.title === "wraith"
-                || this.unit.job.title !== title) {
+            if (
+                this.unit.job.title === "zombie" ||
+                this.unit.job.title === "horseman" ||
+                this.unit.job.title === "abomination" ||
+                this.unit.job.title === "wraith" ||
+                this.unit.job.title !== title
+            ) {
                 return `You cannot fit another unit on this tile!`;
             }
 
-            if (this.unit.job.title === "ghoul" && this.numGhouls >= this.game.UnitJobs[2].perTile) {
+            if (
+                this.unit.job.title === "ghoul" &&
+                this.numGhouls >= this.game.unitJobs[2].perTile
+            ) {
                 return `The maximum number of ghouls are already on this tile!`;
             }
 
-            if (this.unit.job.title === "hound" && this.numHounds >= this.game.UnitJobs[4].perTile) {
+            if (
+                this.unit.job.title === "hound" &&
+                this.numHounds >= this.game.unitJobs[4].perTile
+            ) {
                 return `The maximum number of hounds are already on this tile!`;
             }
         }
@@ -448,34 +461,30 @@ export class Tile extends GameObject implements BaseTile {
 
         if (title === "ghoul") {
             unitIndex = 2;
-        }
-        else if (title === "abomination") {
+        } else if (title === "abomination") {
             unitIndex = 3;
-        }
-        else if (title === "hound") {
+        } else if (title === "hound") {
             unitIndex = 4;
-        }
-        else if (title === "wraith") {
+        } else if (title === "wraith") {
             unitIndex = 5;
-        }
-        else if (title === "horseman") {
+        } else if (title === "horseman") {
             unitIndex = 6;
         }
 
-        const goldCost = this.game.UnitJobs[unitIndex].goldCost;
-        const manaCost = this.game.UnitJobs[unitIndex].manaCost;
+        const goldCost = this.game.unitJobs[unitIndex].goldCost;
+        const manaCost = this.game.unitJobs[unitIndex].manaCost;
 
         player.gold -= goldCost;
         player.mana -= manaCost;
 
         const unit = this.game.manager.create.unit({
             acted: false,
-            health: this.game.UnitJobs[unitIndex].health,
+            health: this.game.unitJobs[unitIndex].health,
             owner: player,
             tile: this,
-            job: this.game.UnitJobs[unitIndex],
+            job: this.game.unitJobs[unitIndex],
             title,
-            moves: this.game.UnitJobs[unitIndex].moves,
+            moves: this.game.unitJobs[unitIndex].moves,
         });
         this.game.units.push(unit);
         player.units.push(unit);
@@ -483,17 +492,14 @@ export class Tile extends GameObject implements BaseTile {
         if (this.unit) {
             if (this.numGhouls !== 0) {
                 this.numGhouls += 1;
-            }
-            else {
+            } else {
                 this.numHounds += 1;
             }
-        }
-        else {
+        } else {
             this.unit = unit;
             if (title === "hound") {
                 this.numHounds = 1;
-            }
-            else if (title === "ghoul") {
+            } else if (title === "ghoul") {
                 this.numGhouls = 1;
             }
         }
@@ -515,15 +521,17 @@ export class Tile extends GameObject implements BaseTile {
      */
     protected invalidateSpawnWorker(
         player: Player,
-    ): void | string | ITileSpawnWorkerArgs {
+    ): void | string | TileSpawnWorkerArgs {
         // <<-- Creer-Merge: invalidate-spawnWorker -->>
 
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
         }
 
-        if (player.gold < this.game.UnitJobs[0].goldCost
-            || player.mana < this.game.UnitJobs[0].manaCost) {
+        if (
+            player.gold < this.game.unitJobs[0].goldCost ||
+            player.mana < this.game.unitJobs[0].manaCost
+        ) {
             return `You cannot afford to spawn a worker.`;
         }
 
@@ -551,20 +559,20 @@ export class Tile extends GameObject implements BaseTile {
     protected async spawnWorker(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: spawnWorker -->>
 
-        const goldCost = this.game.UnitJobs[0].goldCost;
-        const manaCost = this.game.UnitJobs[0].manaCost;
+        const goldCost = this.game.unitJobs[0].goldCost;
+        const manaCost = this.game.unitJobs[0].manaCost;
 
         player.gold -= goldCost;
         player.mana -= manaCost;
 
-        let unit = this.game.manager.create.unit({
+        const unit = this.game.manager.create.unit({
             acted: false,
-            health: this.game.UnitJobs[0].health,
+            health: this.game.unitJobs[0].health,
             owner: player,
             tile: this,
-            job: this.game.UnitJobs[0],
+            job: this.game.unitJobs[0],
             title: "worker",
-            moves: this.game.UnitJobs[0].moves,
+            moves: this.game.unitJobs[0].moves,
         });
 
         this.unit = unit;

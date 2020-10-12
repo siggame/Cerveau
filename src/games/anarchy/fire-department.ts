@@ -1,6 +1,8 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IFireDepartmentExtinguishArgs,
-         IFireDepartmentProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    FireDepartmentConstructorArgs,
+    FireDepartmentExtinguishArgs,
+} from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 
@@ -33,12 +35,12 @@ export class FireDepartment extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<BuildingArgs & IFireDepartmentProperties & {
+        args: FireDepartmentConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-    // You can add more constructor args in here
+            // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -69,7 +71,7 @@ export class FireDepartment extends Building {
     protected invalidateExtinguish(
         player: Player,
         building: Building,
-    ): void | string | IFireDepartmentExtinguishArgs {
+    ): void | string | FireDepartmentExtinguishArgs {
         // <<-- Creer-Merge: invalidate-extinguish -->>
 
         const invalid = this.invalidateBribe(player);

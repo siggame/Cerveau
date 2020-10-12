@@ -4,30 +4,39 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Checkers game
+ * The interface that the Player for the Checkers game
  * must implement from mixed in game logic.
  */
-export interface IBaseCheckersPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface BaseCheckersPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -69,8 +78,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Checker. */
-export interface ICheckerProperties {
+/** All the possible properties for Checker instances. */
+export interface CheckerProperties {
     /**
      * If the checker has been kinged and can move backwards.
      */
@@ -90,7 +99,6 @@ export interface ICheckerProperties {
      * The y coordinate of the checker.
      */
     y?: number;
-
 }
 
 /**
@@ -98,15 +106,14 @@ export interface ICheckerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICheckerIsMineArgs {
-}
+export interface CheckerIsMineArgs {}
 
 /**
  * Argument overrides for Checker's move function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICheckerMoveArgs {
+export interface CheckerMoveArgs {
     /**
      * The x coordinate to move to.
      */
@@ -117,12 +124,11 @@ export interface ICheckerMoveArgs {
     y?: number;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * All the checkers currently in the game owned by this player.
      */
@@ -173,8 +179,31 @@ export interface IPlayerProperties {
      * The direction your checkers must go along the y-axis until kinged.
      */
     yDirection?: number;
-
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Checker.
+ */
+export type CheckerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<CheckerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseCheckersPlayer & PlayerProperties & T>;
 
 export * from "./checker";
 export * from "./game-object";
@@ -192,7 +221,7 @@ import { CheckersGame } from "./game";
 import { CheckersGameManager } from "./game-manager";
 import { CheckersGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Checker */
+/** The arguments used to construct a Checker. */
 export type CheckerArgs = FirstArgumentFromConstructor<typeof Checker>;
 
 /**
@@ -203,16 +232,13 @@ export class CheckersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Checker in the Game and tracks it for all players.
      *
-     * @param args - Data about the Checker to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Checker to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Checker hooked up in the game and ready for you to use.
      */
-    public checker<T extends CheckerArgs>(
-        args: Readonly<T>,
-    ): Checker & T {
+    public checker<T extends CheckerArgs>(args: Readonly<T>): Checker & T {
         return this.createGameObject("Checker", Checker, args);
     }
-
 }
 
 /**
@@ -235,8 +261,7 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CheckersGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 gotCaptured: {
                     args: [
@@ -252,8 +277,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -321,8 +345,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Checker: {
             parentClassName: "GameObject",
@@ -344,8 +367,7 @@ export const Namespace = makeNamespace({
             },
             functions: {
                 isMine: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -441,9 +463,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "49f1e5586cc4c62b6f74081e803d8edf9f54e8315f221c62c638f963cea8ab31",
+    gameVersion:
+        "49f1e5586cc4c62b6f74081e803d8edf9f54e8315f221c62c638f963cea8ab31",
 });

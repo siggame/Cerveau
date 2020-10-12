@@ -30,7 +30,7 @@ export function setupThread(): void {
 /**
  * Setups up the current thread with data from a loaded config file.
  *
- * @param processTitle - the title to set this thread to (for *Unix)
+ * @param processTitle - The title to set this thread to (for *Unix).
  */
 export function setupThreadWithConfig(processTitle: string): void {
     process.title = processTitle || "Cerveau Game Server";

@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { CatastropheGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -12,9 +12,8 @@ import { Unit } from "./unit";
 // <<-- Creer-Merge: imports -->>
 import { arrayHasElements, Mutable, removeElements } from "~/utils";
 import { jobStats } from "./jobs-stats";
-import { StructureType } from "./structure";
 
-/** A player that we can mutate before the game begins */
+/** A player that we can mutate before the game begins. */
 type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
@@ -23,10 +22,10 @@ type MutablePlayer = Mutable<Player>;
  * wasteland.
  */
 export class CatastropheGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: CatastropheGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -48,10 +47,9 @@ export class CatastropheGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The amount of turns it takes for a Tile that was just harvested to grow
@@ -172,7 +170,9 @@ export class CatastropheGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** New structures created but not yet inserted into the structures array */
+    /**
+     * New structures created but not yet inserted into the structures array.
+     */
     public readonly newStructures: Structure[] = [];
 
     // <<-- /Creer-Merge: attributes -->>
@@ -185,7 +185,7 @@ export class CatastropheGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CatastropheGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -231,10 +231,10 @@ export class CatastropheGame extends BaseClasses.Game {
     /**
      * Gets the cost of a given structure type.
      *
-     * @param structureType - The type of the structure
+     * @param structureType - The type of the structure.
      * @returns A number of its cost.
      */
-    public getStructureCost(structureType: StructureType): number {
+    public getStructureCost(structureType: Structure["type"]): number {
         switch (structureType) {
             case "neutral":
                 return this.neutralMaterials;
@@ -252,10 +252,10 @@ export class CatastropheGame extends BaseClasses.Game {
     /**
      * Gets the range of a Structure by its type.
      *
-     * @param structureType The type of the structure to get for
+     * @param structureType - The type of the structure to get for.
      * @returns A number representing its range.
      */
-    public getStructureRange(structureType: StructureType): number {
+    public getStructureRange(structureType: Structure["type"]): number {
         switch (structureType) {
             case "neutral":
             case "road":
@@ -278,14 +278,13 @@ export class CatastropheGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Generates the map and places the resources, players, and starting units
+     * Generates the map and places the resources, players, and starting units.
      */
     private generateMap(): void {
         const structureChance = 0.025;
@@ -312,8 +311,7 @@ export class CatastropheGame extends BaseClasses.Game {
                         tile,
                         type: "road",
                     });
-                }
-                else {
+                } else {
                     const cx = this.mapWidth / 2;
                     const cy = this.mapHeight / 2;
                     const exp = 2;
@@ -322,15 +320,16 @@ export class CatastropheGame extends BaseClasses.Game {
                     const maxD = cx ** exp + cy ** exp;
 
                     // This is a fancy function based on some easing functions
-                    const factor = Math.abs(
-                        Math.pow(Math.abs(x - cx) - cx, exp)
-                        +
-                        Math.pow(Math.abs(y - cy) - cy, exp),
-                    ) / maxD;
+                    const factor =
+                        Math.abs(
+                            Math.pow(Math.abs(x - cx) - cx, exp) +
+                                Math.pow(Math.abs(y - cy) - cy, exp),
+                        ) / maxD;
 
                     // Food chance increases toward center of map
                     const foodChanceRange = maxFoodChance - minFoodChance;
-                    const foodChance = factor * foodChanceRange + minFoodChance;
+                    const foodChance =
+                        factor * foodChanceRange + minFoodChance;
 
                     // Try to place food or structure
                     if (this.manager.random.float() < foodChance) {
@@ -339,13 +338,16 @@ export class CatastropheGame extends BaseClasses.Game {
                         const dx = cx - x;
                         const dy = cy - y;
                         const distFromCenter = Math.sqrt(dx * dx + dy * dy);
-                        const harvestRateMult = 1 - distFromCenter / maxDistFromCenter;
-                        const harvestRateRange = maxHarvestRate - minHarvestRate;
+                        const harvestRateMult =
+                            1 - distFromCenter / maxDistFromCenter;
+                        const harvestRateRange =
+                            maxHarvestRate - minHarvestRate;
 
                         // Generate food spawner
-                        tile.harvestRate = minHarvestRate + Math.ceil(harvestRateRange * harvestRateMult);
-                    }
-                    else if (this.manager.random.float() < structureChance) {
+                        tile.harvestRate =
+                            minHarvestRate +
+                            Math.ceil(harvestRateRange * harvestRateMult);
+                    } else if (this.manager.random.float() < structureChance) {
                         // Generate neutral structures
                         tile.structure = this.manager.create.structure({
                             tile,
@@ -364,7 +366,10 @@ export class CatastropheGame extends BaseClasses.Game {
             }
 
             // Make sure tile is close enough to a corner of the map
-            return t.x < halfWidth / 2 && (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2);
+            return (
+                t.x < halfWidth / 2 &&
+                (t.y < halfWidth / 2 || this.mapHeight - t.y < halfWidth / 2)
+            );
         });
 
         if (!arrayHasElements(possibleTiles)) {
@@ -381,11 +386,14 @@ export class CatastropheGame extends BaseClasses.Game {
         });
 
         // Cat
-        (this.players[0] as MutablePlayer).cat = selected.unit = this.manager.create.unit({
-            owner: this.players[0],
-            tile: selected,
-            job: this.jobs.find((j) => j.title === "cat overlord"),
-        });
+        (this
+            .players[0] as MutablePlayer).cat = selected.unit = this.manager.create.unit(
+            {
+                owner: this.players[0],
+                tile: selected,
+                job: this.jobs.find((j) => j.title === "cat overlord"),
+            },
+        );
 
         // Place starting units
         const cat = this.players[0].cat;
@@ -414,12 +422,17 @@ export class CatastropheGame extends BaseClasses.Game {
                     }
 
                     // Check if the tile is close enough to the cat
-                    return Math.abs(cat.tile.x - t.x) <= maxDist && Math.abs(cat.tile.y - t.y) <= maxDist;
+                    return (
+                        Math.abs(cat.tile.x - t.x) <= maxDist &&
+                        Math.abs(cat.tile.y - t.y) <= maxDist
+                    );
                 });
             }
 
             if (!arrayHasElements(possibleTiles)) {
-                throw new Error("No possible tiles to generate map from again.");
+                throw new Error(
+                    "No possible tiles to generate map from again.",
+                );
             }
 
             // Choose a tile
@@ -436,10 +449,15 @@ export class CatastropheGame extends BaseClasses.Game {
         for (let x = 0; x < halfWidth; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const orig = this.getTile(x, y);
-                const target = this.getTile(this.mapWidth - x - 1, this.mapHeight - y - 1);
+                const target = this.getTile(
+                    this.mapWidth - x - 1,
+                    this.mapHeight - y - 1,
+                );
 
                 if (!orig || !target) {
-                    throw new Error("No origin or target tile to mirror the map with");
+                    throw new Error(
+                        "No origin or target tile to mirror the map with",
+                    );
                 }
 
                 // Copy data
@@ -450,7 +468,9 @@ export class CatastropheGame extends BaseClasses.Game {
                     target.structure = this.manager.create.structure({
                         tile: target,
                         type: orig.structure.type,
-                        owner: orig.structure.owner && orig.structure.owner.opponent,
+                        owner:
+                            orig.structure.owner &&
+                            orig.structure.owner.opponent,
                     });
                 }
 

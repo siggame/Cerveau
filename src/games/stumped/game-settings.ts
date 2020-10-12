@@ -14,10 +14,11 @@ export class StumpedGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    public get schema() {
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             ...(super.schema || (this as any).schema),
 
             // Stumped game specific settings
@@ -33,12 +34,14 @@ export class StumpedGameSettingsManager extends BaseClasses.GameSettings {
             minBranchSpawners: {
                 default: 3,
                 min: 1,
-                description: "The minimum number of branch spawners to create.",
+                description:
+                    "The minimum number of branch spawners to create.",
             },
             maxBranchSpawners: {
                 default: 12,
                 min: 1,
-                description: "The maximum number of branch spawners to create.",
+                description:
+                    "The maximum number of branch spawners to create.",
             },
 
             minFoodSpawners: {
@@ -75,14 +78,18 @@ export class StumpedGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 200,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
 
             // Tiled settings
@@ -91,29 +98,34 @@ export class StumpedGameSettingsManager extends BaseClasses.GameSettings {
                 default: 32,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
-                description: "The width (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The width (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
                 default: 16,
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
-                description: "The height (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The height (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
-
         });
     }
 
     /**
-     * The current values for the game's settings
+     * The current values for the game's settings.
      */
     public values!: SettingsFromSchema<StumpedGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
-     * @param someSettings A subset of settings that will be tested
-     * @returns An error if the settings fail to validate.
+     *
+     * @param someSettings - A subset of settings that will be tested.
+     * @returns An error if the settings fail to validate, otherwise the
+     * valid game settings for this game.
      */
     protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);

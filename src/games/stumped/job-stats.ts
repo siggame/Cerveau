@@ -1,7 +1,7 @@
-import { IJobProperties } from "./";
+import { JobProperties } from "./";
 
-/** The default stats for each job if not overridden */
-const defaultJobStats: IJobProperties = {
+/** The default stats for each job if not overridden. */
+const defaultJobStats: JobProperties = {
     cost: 3,
     damage: 1,
     health: 3,
@@ -14,29 +14,29 @@ const defaultJobStats: IJobProperties = {
 };
 
 /** The job stats for each Job, indexed by job name. */
-export const jobStats: { [jobName: string]: IJobProperties } = {
-    "Basic": {},
-    "Fighter": {
+export const jobStats: { [jobName: string]: JobProperties } = {
+    Basic: {},
+    Fighter: {
         cost: 12,
         damage: 3,
         health: 4,
         moves: 2,
         carryLimit: 6,
     },
-    "Bulky": {
+    Bulky: {
         cost: 12,
         damage: 2,
         health: 10,
         moves: 2,
         carryLimit: 2,
     },
-    "Hungry": {
+    Hungry: {
         cost: 8,
         munching: 3,
         distractionPower: 1,
         carryLimit: 15,
     },
-    "Swift": {
+    Swift: {
         cost: 6,
         munching: 2,
         moves: 5,
@@ -47,7 +47,7 @@ export const jobStats: { [jobName: string]: IJobProperties } = {
         distractionPower: 3,
         carryLimit: 1,
     },
-    "Builder": {
+    Builder: {
         cost: 6,
         chopping: 3,
         carryLimit: 15,

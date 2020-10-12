@@ -1,6 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BuildingArgs, IPoliceDepartmentProperties, IPoliceDepartmentRaidArgs,
-       } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { PoliceDepartmentConstructorArgs, PoliceDepartmentRaidArgs } from "./";
 import { Building } from "./building";
 import { Player } from "./player";
 import { Warehouse } from "./warehouse";
@@ -28,12 +27,12 @@ export class PoliceDepartment extends Building {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<BuildingArgs & IPoliceDepartmentProperties & {
+        args: PoliceDepartmentConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -64,7 +63,7 @@ export class PoliceDepartment extends Building {
     protected invalidateRaid(
         player: Player,
         warehouse: Warehouse,
-    ): void | string | IPoliceDepartmentRaidArgs {
+    ): void | string | PoliceDepartmentRaidArgs {
         // <<-- Creer-Merge: invalidate-raid -->>
 
         const invalid = this.invalidateBribe(player);
@@ -76,8 +75,8 @@ export class PoliceDepartment extends Building {
     }
 
     /**
-     * Bribe the police to raid a Warehouse, dealing damage equal based on the
-     * Warehouse's current exposure, and then resetting it to 0.
+     * Bribe the police to raid a Warehouse, dealing damage equal based on
+     * the Warehouse's current exposure, and then resetting it to 0.
      *
      * @param player - The player that called this.
      * @param warehouse - The warehouse you want to raid.

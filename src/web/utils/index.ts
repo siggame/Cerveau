@@ -1,13 +1,21 @@
 import { hostname } from "os";
-import { IGamelogInfo } from "~/core/game";
+import { GamelogInfo } from "~/core/game";
 import { Immutable } from "~/utils";
 
 const defaultHostname = hostname();
 
-function formatHostname(url: string | undefined, host: string | undefined): string {
-    return url
-        ? url.replace("__HOSTNAME__", host || defaultHostname)
-        : "";
+/**
+ * Attempts to format a url with a known hostname used to connect to us.
+ *
+ * @param url - The URL to attempt to format.
+ * @param host - The hostname to replace within the url.
+ * @returns The paramter `url` with the hostname injected if found.
+ */
+function formatHostname(
+    url: string | undefined,
+    host: string | undefined,
+): string {
+    return url ? url.replace("__HOSTNAME__", host || defaultHostname) : "";
 }
 
 /**
@@ -18,9 +26,9 @@ function formatHostname(url: string | undefined, host: string | undefined): stri
  * @returns A new array of new gamelog infos with host names filled in.
  */
 export function formatGamelogInfos(
-    gamelogInfos: Immutable<IGamelogInfo[]>,
+    gamelogInfos: Immutable<GamelogInfo[]>,
     host?: string,
-): IGamelogInfo[] {
+): GamelogInfo[] {
     return gamelogInfos.map((info) => ({
         ...info,
         // replace __HOSTNAME__ with the request's host for them, or a default hostname

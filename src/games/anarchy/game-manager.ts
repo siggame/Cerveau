@@ -19,7 +19,7 @@ import { WeatherStation } from "./weather-station";
  * together.
  */
 export class AnarchyGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -28,10 +28,10 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: AnarchyGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: AnarchyGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -44,18 +44,27 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
      * @returns A new building of that type.
      */
     public createBuilding(
-        type: "FireDepartment" | "PoliceDepartment" | "Warehouse" | "WeatherStation" | string,
+        type:
+            | "FireDepartment"
+            | "PoliceDepartment"
+            | "Warehouse"
+            | "WeatherStation"
+            | string,
         data: BuildingArgs,
     ): Building {
         let building: Building | undefined;
         switch (type) {
             case "FireDepartment":
                 building = this.create.fireDepartment(data);
-                building.owner.fireDepartments.push(building as FireDepartment);
+                building.owner.fireDepartments.push(
+                    building as FireDepartment,
+                );
                 break;
             case "PoliceDepartment":
                 building = this.create.policeDepartment(data);
-                building.owner.policeDepartments.push(building as PoliceDepartment);
+                building.owner.policeDepartments.push(
+                    building as PoliceDepartment,
+                );
                 break;
             case "Warehouse":
                 building = this.create.warehouse(data);
@@ -63,10 +72,14 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
                 break;
             case "WeatherStation":
                 building = this.create.weatherStation(data);
-                building.owner.weatherStations.push(building as WeatherStation);
+                building.owner.weatherStations.push(
+                    building as WeatherStation,
+                );
                 break;
             default:
-                throw new Error(`${type} is not a valid building type to create`);
+                throw new Error(
+                    `${type} is not a valid building type to create`,
+                );
         }
 
         this.game.buildingsGrid[building.x][building.y] = building;
@@ -130,22 +143,38 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
 
                 // Try to spread the fire
                 if (this.game.currentForecast.intensity > 0) {
-                    const buildingSpreadingTo = building.getNeighbor(this.game.currentForecast.direction);
+                    const buildingSpreadingTo = building.getNeighbor(
+                        this.game.currentForecast.direction,
+                    );
                     if (buildingSpreadingTo) {
                         fireSpreads.push({
                             building: buildingSpreadingTo,
-                            fire: Math.min(building.fire, this.game.currentForecast.intensity),
+                            fire: Math.min(
+                                building.fire,
+                                this.game.currentForecast.intensity,
+                            ),
                         });
                     }
                 }
 
                 // it dies down after dealing damage
-                building.fire = Math.max(0, building.fire - this.game.settings.firePerTurnReduction);
+                building.fire = Math.max(
+                    0,
+                    building.fire - this.game.settings.firePerTurnReduction,
+                );
             }
 
-            if (building instanceof Warehouse && building.exposure > 0 && !building.bribed) {
+            if (
+                building instanceof Warehouse &&
+                building.exposure > 0 &&
+                !building.bribed
+            ) {
                 // then they didn't act, so their exposure drops
-                building.exposure = Math.max(building.exposure - this.game.settings.exposurePerTurnReduction, 0);
+                building.exposure = Math.max(
+                    building.exposure -
+                        this.game.settings.exposurePerTurnReduction,
+                    0,
+                );
             }
 
             building.bribed = false;
@@ -153,7 +182,10 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
 
         // spread fire, now that everything has taken fire damage
         for (const fireSpread of fireSpreads) {
-            fireSpread.building.fire = Math.max(fireSpread.building.fire, fireSpread.fire);
+            fireSpread.building.fire = Math.max(
+                fireSpread.building.fire,
+                fireSpread.fire,
+            );
         }
 
         if (this.game.nextForecast) {
@@ -161,7 +193,9 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             this.game.currentForecast = this.game.nextForecast;
         }
         // Turn isn't incremented until super statement
-        this.game.nextForecast = this.game.forecasts[this.game.currentTurn + 1];
+        this.game.nextForecast = this.game.forecasts[
+            this.game.currentTurn + 1
+        ];
 
         for (const player of this.game.players) {
             const num = playersBurnedDownBuildings.get(player) || 0;
@@ -186,12 +220,15 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         let loser: Player | undefined;
         let gameOver = false;
         for (const player of this.game.players) {
-            if (player.headquarters.health <= 0) { // then it burned down, and they have lost
+            if (player.headquarters.health <= 0) {
+                // then it burned down, and they have lost
                 if (loser) {
                     // someone else already lost this turn...
                     // so they both lost their headquarters this turn,
                     // so check secondary win conditions (and the game is over)
-                    this.secondaryWinConditions("Both headquarters reached zero health on the same turn");
+                    this.secondaryWinConditions(
+                        "Both headquarters reached zero health on the same turn",
+                    );
                     gameOver = true;
                     loser = undefined;
                     break;
@@ -203,7 +240,10 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         if (gameOver) {
             if (loser) {
                 this.declareLoser("Headquarters reached zero health.", loser);
-                this.declareWinner("Reduced health of enemy's headquarters to zero.", loser.opponent);
+                this.declareWinner(
+                    "Reduced health of enemy's headquarters to zero.",
+                    loser.opponent,
+                );
             }
 
             return true; // the game is over
@@ -218,7 +258,9 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
@@ -229,9 +271,14 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
             .sort((a, b) => b.health - a.health);
 
         if (headquarters[0].health !== headquarters[1].health) {
-            this.declareWinner(`${reason} - Your headquarters had the most health remaining.`, headquarters[0].owner);
-            this.declareLoser(`${reason} - Your headquarters had less health remaining than another player.`,
-                              headquarters[1].owner);
+            this.declareWinner(
+                `${reason} - Your headquarters had the most health remaining.`,
+                headquarters[0].owner,
+            );
+            this.declareLoser(
+                `${reason} - Your headquarters had less health remaining than another player.`,
+                headquarters[1].owner,
+            );
 
             return;
         }
@@ -244,23 +291,35 @@ export class AnarchyGameManager extends BaseClasses.GameManager {
         if (buildingsAlive[0].length !== buildingsAlive[1].length) {
             // store the winner as the loser could be lost in this scope if their array is empty
             const winner = buildingsAlive[0][0].owner;
-            this.declareWinner(`${reason} - You had the most buildings not burned down.`, winner);
-            this.declareLoser(`${reason} - You had more buildings burned down than another player.`, winner.opponent);
+            this.declareWinner(
+                `${reason} - You had the most buildings not burned down.`,
+                winner,
+            );
+            this.declareLoser(
+                `${reason} - You had more buildings burned down than another player.`,
+                winner.opponent,
+            );
 
             return;
         }
 
         // 3. Else, check if one player has a higher sum of the buildings' healths
-        const buildingsHealthSum = this.game.players
-            .map((p) => p.buildings.reduce((sum, b) => sum + b.health, 0));
+        const buildingsHealthSum = this.game.players.map((p) =>
+            p.buildings.reduce((sum, b) => sum + b.health, 0),
+        );
 
         if (buildingsHealthSum[0] !== buildingsHealthSum[1]) {
-            const winner = this.game.players[buildingsHealthSum[0] > buildingsHealthSum[1]
-                ? 0
-                : 1
+            const winner = this.game.players[
+                buildingsHealthSum[0] > buildingsHealthSum[1] ? 0 : 1
             ];
-            this.declareWinner(`${reason} - You had the highest health sum among your Buildings.`, winner);
-            this.declareLoser(`${reason} - You had a lower health sum than the other player.`, winner.opponent);
+            this.declareWinner(
+                `${reason} - You had the highest health sum among your Buildings.`,
+                winner,
+            );
+            this.declareLoser(
+                `${reason} - You had a lower health sum than the other player.`,
+                winner.opponent,
+            );
 
             return;
         }

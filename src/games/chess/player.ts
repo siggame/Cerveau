@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseChessPlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseChessPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 
@@ -16,8 +16,8 @@ export type PlayerColor = "black" | "white";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseChessPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseChessPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -27,8 +27,8 @@ export class Player extends GameObject implements IBaseChessPlayer {
     public readonly clientType!: string;
 
     /**
-     * The color (side) of this player. Either 'white' or 'black', with the
-     * 'white' player having the first move.
+     * The color (side) of this player. Either 'white' or 'black', with
+     * the 'white' player having the first move.
      */
     public readonly color!: "black" | "white";
 
@@ -83,8 +83,8 @@ export class Player extends GameObject implements IBaseChessPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseChessPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

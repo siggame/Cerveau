@@ -1,20 +1,25 @@
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameSettingsManager } from "~/core/game/base";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameSettingsManager,
+} from "~/core/game/base";
 import { Constructor } from "~/utils";
 
-/** The BaseAI Constructor for mixins */
+/** The BaseAI Constructor for mixins. */
 export type BaseAIConstructor = Constructor<BaseAI>;
 
-/** The BaseGame Constructor for mixins */
+/** The BaseGame Constructor for mixins. */
 export type BaseGameConstructor = Constructor<BaseGame>;
 
-/** The BaseGameManager Constructor for mixins */
+/** The BaseGameManager Constructor for mixins. */
 export type BaseGameManagerConstructor = Constructor<BaseGameManager>;
 
-/** The BaseGameObject Constructor for mixins */
+/** The BaseGameObject Constructor for mixins. */
 export type BaseGameObjectConstructor = Constructor<BaseGameObject>;
 
-/** The BaseGameSettingsManager Constructor for mixins */
+/** The BaseGameSettingsManager Constructor for mixins. */
 export type BaseGameSettingsManagerConstructor = Constructor<
     BaseGameSettingsManager
 >;

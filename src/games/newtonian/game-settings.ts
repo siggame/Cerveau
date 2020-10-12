@@ -14,59 +14,69 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    public get schema() {
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             ...(super.schema || (this as any).schema),
 
             // Newtonian game specific settings
             internCap: {
-                description: "The maximum number of interns a player can have.",
+                description:
+                    "The maximum number of interns a player can have.",
                 // <<-- Creer-Merge: internCap -->>
                 default: 4,
                 min: 0,
                 // <<-- /Creer-Merge: internCap -->>
             },
+
             managerCap: {
-                description: "The maximum number of managers a player can "
-                           + "have.",
+                description:
+                    "The maximum number of managers a player can have.",
                 // <<-- Creer-Merge: managerCap -->>
                 default: 4,
                 min: 0,
                 // <<-- /Creer-Merge: managerCap -->>
             },
+
             materialSpawn: {
-                description: "The number of materials that spawn per spawn "
-                           + "cycle.",
+                description:
+                    "The number of materials that spawn per spawn cycle.",
                 // <<-- Creer-Merge: materialSpawn -->>
                 default: 2,
                 min: 0,
                 // <<-- /Creer-Merge: materialSpawn -->>
             },
+
             physicistCap: {
-                description: "The maximum number of physicists a player can "
-                           + "have.",
+                description:
+                    "The maximum number of physicists a player can have.",
                 // <<-- Creer-Merge: physicistCap -->>
                 default: 4,
                 min: 0,
                 // <<-- /Creer-Merge: physicistCap -->>
             },
+
             refinedValue: {
-                description: "The amount of victory points added when a "
-                           + "refined ore is consumed by the generator.",
+                description:
+                    "The amount of victory points added when a refined ore " +
+                    "is consumed by the generator.",
                 // <<-- Creer-Merge: refinedValue -->>
                 default: 5,
                 min: 1,
                 // <<-- /Creer-Merge: refinedValue -->>
             },
+
             regenerateRate: {
-                description: "The percent of max HP regained when a unit end "
-                           + "their turn on a tile owned by their player.",
+                description:
+                    "The percent of max HP regained when a unit end their " +
+                    "turn on a tile owned by their player.",
                 // <<-- Creer-Merge: regenerateRate -->>
                 default: 0.5,
                 // <<-- /Creer-Merge: regenerateRate -->>
             },
+
             spawnTime: {
                 description: "The amount of turns it takes a unit to spawn.",
                 // <<-- Creer-Merge: spawnTime -->>
@@ -74,34 +84,40 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
                 // <<-- /Creer-Merge: spawnTime -->>
             },
+
             stunTime: {
-                description: "The amount of turns a unit cannot do anything "
-                           + "when stunned.",
+                description:
+                    "The amount of turns a unit cannot do anything when " +
+                    "stunned.",
                 // <<-- Creer-Merge: stunTime -->>
                 default: 2,
                 min: 1,
                 // <<-- /Creer-Merge: stunTime -->>
             },
+
             timeImmune: {
-                description: "The number turns a unit is immune to being "
-                           + "stunned.",
+                description:
+                    "The number turns a unit is immune to being stunned.",
                 // <<-- Creer-Merge: timeImmune -->>
                 default: 4,
                 min: 1,
                 // <<-- /Creer-Merge: timeImmune -->>
             },
+
             victoryAmount: {
-                description: "The amount of combined heat and pressure that "
-                           + "you need to win.",
+                description:
+                    "The amount of combined heat and pressure that you need" +
+                    " to win.",
                 // <<-- Creer-Merge: victoryAmount -->>
                 default: 800,
                 min: 1,
                 // <<-- /Creer-Merge: victoryAmount -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
-        // you can add more settings here, e.g.:
-        /*
+            // you can add more settings here, e.g.:
+            /*
         someVariableLikeUnitHealth: {
             description: "Describe what this setting does for the players.",
             default: 1337,
@@ -126,14 +142,18 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 default: 2e9, // 2 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 200,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
 
             // Tiled settings
@@ -142,29 +162,34 @@ export class NewtonianGameSettingsManager extends BaseClasses.GameSettings {
                 default: 51,
                 // <<-- /Creer-Merge: map-width -->>
                 min: 2,
-                description: "The width (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The width (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
                 default: 29,
                 // <<-- /Creer-Merge: map-height -->>
                 min: 2,
-                description: "The height (in Tiles) for the game map to be initialized to.",
+                description:
+                    "The height (in Tiles) for the game map to be " +
+                    "initialized to.",
             },
-
         });
     }
 
     /**
-     * The current values for the game's settings
+     * The current values for the game's settings.
      */
     public values!: SettingsFromSchema<NewtonianGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
-     * @param someSettings A subset of settings that will be tested
-     * @returns An error if the settings fail to validate.
+     *
+     * @param someSettings - A subset of settings that will be tested.
+     * @returns An error if the settings fail to validate, otherwise the
+     * valid game settings for this game.
      */
     protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);

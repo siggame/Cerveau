@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ITowerAttackArgs, ITowerProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { TowerAttackArgs, TowerConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Tile } from "./tile";
@@ -31,7 +31,7 @@ export class Tower extends GameObject {
     /**
      * What type of tower this is (it's job).
      */
-    public readonly job!: TowerJob;
+    public readonly job: TowerJob;
 
     /**
      * The player that built / owns this tower.
@@ -41,14 +41,14 @@ export class Tower extends GameObject {
     /**
      * The Tile this Tower is on.
      */
-    public readonly tile?: Tile;
+    public readonly tile: Tile;
 
     // <<-- Creer-Merge: attributes -->>
-    
+
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
-    
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -58,26 +58,30 @@ export class Tower extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ITowerProperties & {
+        args: TowerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            // You can add more constructor args in here
+            /** The TowerJob to assign this tower to. */
+            job: TowerJob;
+            /** The starting tile. */
+            tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+        this.job = args.job;
+        this.tile = args.tile;
         // <<-- /Creer-Merge: constructor -->>
     }
 
     // <<-- Creer-Merge: public-functions -->>
-    
+
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
-    
+
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
@@ -94,7 +98,7 @@ export class Tower extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | ITowerAttackArgs {
+    ): void | string | TowerAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
         const range = 2.2; // Attack range
 
@@ -104,8 +108,7 @@ export class Tower extends GameObject {
         }
 
         // Check if any unit belongs to the player
-        if ((tile.unit) && (tile.unit.owner === player))
-        {
+        if (tile.unit && tile.unit.owner === player) {
             return `${this}, cannot attack allied units!`;
         }
 
@@ -128,17 +131,21 @@ export class Tower extends GameObject {
         }
 
         if (this.job.title === "cleansing") {
-            if (tile.unit.job.title !== "wraith" && tile.unit.job.title !== "abomination") {
+            if (
+                tile.unit.job.title !== "wraith" &&
+                tile.unit.job.title !== "abomination"
+            ) {
                 return `Cleansing towers can only attack wraiths and abominations!`;
             }
-        }
-        else if (tile.unit.job.title === "wraith") {
+        } else if (
+            this.job.title !== "castle" &&
+            tile.unit.job.title === "wraith"
+        ) {
             return `${this} cannot attack wraiths! They are incorporeal!`;
         }
 
         // Check if tower has zero health
-        if (this.health <= 0)
-        {
+        if (this.health <= 0) {
             return `${this}, cannot attack because it has been destroyed!`;
         }
 
@@ -156,15 +163,14 @@ export class Tower extends GameObject {
         }
 
         // Check if tile is in range
-        if (range < this.distance(this.tile.x, this.tile.y, tile.x , tile.y)) {
+        if (range < this.distance(this.tile.x, this.tile.y, tile.x, tile.y)) {
             return `${this}, cannot attack because target tile is out of range`;
         }
 
         // Check if job is valid
         if (!this.job) {
             return `${this}, has an unknown job`;
-        }
-        else {
+        } else {
             if (!this.job.title) {
                 return `${this}, has an unknown job name`;
             }
@@ -193,8 +199,8 @@ export class Tower extends GameObject {
         this.cooldown = this.job.turnsBetweenAttacks;
 
         // Get all units on target tile
-        let tileUnits = [];
-        for (let unit of this.game.units) {
+        const tileUnits = [];
+        for (const unit of this.game.units) {
             if (unit.tile === tile) {
                 tileUnits.push(unit);
             }
@@ -204,12 +210,11 @@ export class Tower extends GameObject {
             return false;
         }
 
-        if (this.job.title === "aoe") {
-            for (let unit of tileUnits) {
+        if (this.job.title === "aoe" || this.job.title === "castle") {
+            for (const unit of tileUnits) {
                 unit.health = Math.max(0, unit.health - this.job.damage);
             }
-        }
-        else {
+        } else {
             tile.unit.health = Math.max(0, tile.unit.health - this.job.damage);
         }
 
@@ -219,22 +224,21 @@ export class Tower extends GameObject {
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
-    /*
-     * Returns the distance between the points
+    /**
+     * Returns the distance between the points.
      *
-     * @param x1: the first x coordinate.
-     * @param y1: the first y coordinate.
-     * @param x2: the second x coordinate.
-     * @param y2: the second y coordinate.
-     *
-     * @returns the distance between the points.
+     * @param x1 - The first x coordinate.
+     * @param y1 - The first y coordinate.
+     * @param x2 - The second x coordinate.
+     * @param y2 - The second y coordinate.
+     * @returns The distance between the points.
      */
     private distance(x1: number, y1: number, x2: number, y2: number): number {
         // Calculate differences
-        const xDif: number = (x1 - x2);
-        const yDif: number = (y1 - y2);
+        const xDif: number = x1 - x2;
+        const yDif: number = y1 - y2;
 
-        return Math.sqrt((xDif ** 2) + (yDif ** 2));
+        return Math.sqrt(xDif ** 2 + yDif ** 2);
     }
 
     // <<-- /Creer-Merge: protected-private-functions -->>

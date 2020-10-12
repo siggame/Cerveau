@@ -2,7 +2,7 @@ import { BaseAIManager } from "./base-ai-manager";
 
 /**
  * A way to interact with a client/player's AI via simple async methods for
- * orders
+ * orders.
  */
 // NOTE: this is basically a wrapper around the AI, so that some public
 // functions cannot be seen to games, but can be seen to those with the access
@@ -12,7 +12,7 @@ export class BaseAI {
     /**
      * Creates an AI interface.
      *
-     * @param manager - the AI manager for this AI that actually does the heavy
+     * @param manager - The AI manager for this AI that actually does the heavy
      * lifting.
      */
     constructor(private readonly manager: BaseAIManager) {}
@@ -22,14 +22,12 @@ export class BaseAI {
      * command to this AI.
      *
      * @param name - The name of the function (order) to execute.
-     * @param args - optional **positional** arguments to send to the function.
+     * @param args - Optional **positional** arguments to send to the function.
      * @returns A promise that resolves to the value the AI returned from that
      * order, once they finish that order.
      */
-    protected executeOrder(
-        name: string,
-        ...args: unknown[]
-    ): Promise<any> /* tslint:disable-line:no-any - this is dynamic */ {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    protected executeOrder(name: string, ...args: unknown[]): Promise<any> {
         return this.manager.executeOrder(name, ...args);
     }
 }

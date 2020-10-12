@@ -1,25 +1,24 @@
-// tslint:disable:max-classes-per-file
-// ^ because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface
-// ^ because the some mixins have nothing to add
-
 import { BaseGameObject, BasePlayer } from "~/core/game";
 import { getNextWrapAround } from "~/utils";
 import * as Base from "./base";
 
-/** A player in a turn based game */
-export interface ITurnBasedPlayer extends BasePlayer {}
+/** A player in a turn based game. */
+export type TurnBasedPlayer = BasePlayer;
 
 /**
  * A base game that is turn based, with helper functions that should be common
- * between turn based games. defined in Creer data and implemented here so we
+ * between turn based games. Defined in Creer data and implemented here so we
  * don't have to re-code it all the time.
  *
- * @param base the base classes to mixin turn based logic into
- * @returns a new BaseGame class with TwoPlayerGame logic mixed in
+ * @param base - The base classes to mixin turn based logic into.
+ * @param base.AI - The AI to extend.
+ * @param base.Game - The Game to extend.
+ * @param base.GameManager - The GameManager to extend.
+ * @param base.GameObject - The GameObject to extend.
+ * @param base.GameSettings - The GameSettings to extend.
+ * @returns A new BaseGame class with TwoPlayerGame logic mixed in.
  */
-// Because it will be a weird mixin type inferred from the return statement.
-// tslint:disable-next-line:typedef
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mixTurnBased<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -46,29 +45,31 @@ export function mixTurnBased<
          * @returns A promise that resolves to if they want to end their turn.
          */
         public async runTurn(): Promise<boolean> {
-            return this.executeOrder("runTurn");
+            return this.executeOrder("runTurn") as Promise<boolean>;
         }
     }
 
     /** Game settings to control turn timing. */
     class TurnBaseGameSettings extends base.GameSettings {
         /** The schema for turn based settings. */
-        public get schema() { // tslint:disable-line:typedef
+        public get schema() {
             return this.makeSchema({
                 // HACK: super should work. but schema is undefined on it
-                // tslint:disable-next-line:no-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
                 ...(super.schema || (this as any).schema),
                 timeAddedPerTurn: {
                     default: 1e9, // 1 sec in ns,
                     min: 0,
-                    description: "The amount of time (in nano-seconds) to add "
-                            + "after each player performs a turn.",
+                    description:
+                        "The amount of time (in nano-seconds) to add " +
+                        "after each player performs a turn.",
                 },
                 maxTurns: {
                     default: 200,
                     min: 1,
-                    description: "The maximum number of turns before the game is "
-                            + "force ended and a winner is determined.",
+                    description:
+                        "The maximum number of turns before the game is " +
+                        "force ended and a winner is determined.",
                 },
             });
         }
@@ -85,7 +86,7 @@ export function mixTurnBased<
         public getMaxPlayerTime(): number {
             const { maxTurns, timeAddedPerTurn } = this.values;
 
-            return super.getMaxPlayerTime() + (maxTurns * timeAddedPerTurn);
+            return super.getMaxPlayerTime() + maxTurns * timeAddedPerTurn;
         }
     }
 
@@ -93,7 +94,7 @@ export function mixTurnBased<
     class TurnBasedGame extends base.Game {
         /**
          * The amount of time added to a player's timeRemaining at the end of
-         * each of their turns
+         * each of their turns.
          */
         public readonly timeAddedPerTurn!: number; // 1 sec in ns
 
@@ -116,13 +117,13 @@ export function mixTurnBased<
         public readonly game!: TurnBasedGame;
 
         /**
-         * Begins the turn based game to the first player,
+         * Begins the turn based game to the first player,.
          *
          * @param args - All the args to pipe to our super.
          */
-        constructor(...args: any[]) { // tslint:disable-line:no-any
-                                      // any[] is required for mixin
-                                      // constructor signature
+        // any[] is required for mixin constructor signature
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        constructor(...args: any[]) {
             super(...args);
 
             this.game.currentPlayer = this.game.players[0];
@@ -161,9 +162,9 @@ export function mixTurnBased<
             }
         }
 
-        /** Starts the game */
+        /** Starts the game. */
         protected start(): void {
-            this.runCurrentTurn();
+            void this.runCurrentTurn();
         }
 
         /**
@@ -186,7 +187,9 @@ export function mixTurnBased<
          * checked to find the winner/looser.
          */
         protected maxTurnsReached(): void {
-            this.secondaryWinConditions(`Max turns reached (${this.game.maxTurns})`);
+            this.secondaryWinConditions(
+                `Max turns reached (${this.game.maxTurns})`,
+            );
 
             this.endGame();
         }
@@ -206,7 +209,7 @@ export function mixTurnBased<
         /**
          * Intended to be inherited with secondary win condition checking.
          *
-         * @param reason The reason why a secondary victory condition is being
+         * @param reason - The reason why a secondary victory condition is being
          * checked.
          */
         protected secondaryWinConditions(reason: string): void {
@@ -215,11 +218,11 @@ export function mixTurnBased<
             );
         }
 
-        /** Runs a turn, invoking all protected methods around it */
+        /** Runs a turn, invoking all protected methods around it. */
         private async runCurrentTurn(): Promise<void> {
             await this.beforeTurn();
 
-            const turnBasedAI = (this.game.currentPlayer.ai as TurnBasedAI);
+            const turnBasedAI = this.game.currentPlayer.ai as TurnBasedAI;
             const done = await turnBasedAI.runTurn();
 
             if (done) {
@@ -230,8 +233,7 @@ export function mixTurnBased<
                     this.maxTurnsReached();
 
                     return;
-                }
-                else if (this.primaryWinConditionsCheck()) {
+                } else if (this.primaryWinConditionsCheck()) {
                     this.endGame();
 
                     return;
@@ -247,15 +249,16 @@ export function mixTurnBased<
                 );
 
                 if (!nextPlayer) {
-                    throw new Error("Cannot find the next player for their turn!");
+                    throw new Error(
+                        "Cannot find the next player for their turn!",
+                    );
                 }
 
                 this.game.currentPlayer = nextPlayer;
                 this.game.currentPlayer.timeRemaining += this.game.timeAddedPerTurn;
-
             }
 
-            this.runCurrentTurn();
+            void this.runCurrentTurn();
         }
     }
 

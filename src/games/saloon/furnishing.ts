@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IFurnishingProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { FurnishingConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -52,13 +52,13 @@ export class Furnishing extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IFurnishingProperties & {
+        args: FurnishingConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Tile to spawn this Furnishing upon. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -84,14 +84,16 @@ export class Furnishing extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Damages this Furnishing for some amount of damage, setting isDestroyed if it dies
+     * Damages this Furnishing for some amount of damage, setting isDestroyed
+     * if it dies.
      *
-     * @param damage How much damage to do to this.
+     * @param damage - How much damage to do to this.
      */
     public damage(damage: number): void {
         this.health = Math.max(0, this.health - damage);
 
-        if (this.health === 0) { // it has been destroyed
+        if (this.health === 0) {
+            // it has been destroyed
             this.isDestroyed = true;
             this.isPlaying = false;
             if (this.tile) {

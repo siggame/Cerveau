@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { ChessGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -9,7 +9,7 @@ import { Player } from "./player";
 import * as chessjs from "chess.js";
 import { Mutable } from "~/utils";
 
-/** A player that can be mutated BEFORE the game starts */
+/** A player that can be mutated BEFORE the game starts. */
 type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
@@ -17,10 +17,10 @@ type MutablePlayer = Mutable<Player>;
  * The traditional 8x8 chess board with pieces.
  */
 export class ChessGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: ChessGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -31,15 +31,14 @@ export class ChessGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
-     * The list of [known] moves that have occurred in the game, in Standard
-     * Algebraic Notation (SAN) format. The first element is the first move,
-     * with the last being the most recent.
+     * The list of [known] moves that have occurred in the game,
+     * in Universal Chess Inferface (UCI) format. The first element is the first
+     * move, with the last element being the most recent.
      */
     public history!: string[];
 
@@ -68,15 +67,14 @@ export class ChessGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: ChessGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
         if (this.settings.fen) {
             this.chess.load(this.settings.fen);
-        }
-        else if (this.settings.pgn) {
+        } else if (this.settings.pgn) {
             this.chess.load_pgn(this.settings.pgn);
         }
 

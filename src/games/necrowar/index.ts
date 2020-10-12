@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Necrowar game
+ * The interface that the Player for the Necrowar game
  * must implement from mixed in game logic.
  */
-export interface IBaseNecrowarPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseNecrowarPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,12 +82,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -152,11 +162,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The amount of corpses on this tile.
      */
@@ -230,8 +239,8 @@ export interface ITileProperties {
     numZombies?: number;
 
     /**
-     * Which player owns this tile, only applies to grass tiles for workers,
-     * NULL otherwise.
+     * Which player owns this tile, only applies to grass tiles for
+     * workers, NULL otherwise.
      */
     owner?: Player;
 
@@ -278,15 +287,14 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
 /**
  * Argument overrides for Tile's res function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface ITileResArgs {
+export interface TileResArgs {
     /**
      * Number of zombies to resurrect.
      */
@@ -298,7 +306,7 @@ export interface ITileResArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ITileSpawnUnitArgs {
+export interface TileSpawnUnitArgs {
     /**
      * The title of the desired unit type.
      */
@@ -307,14 +315,13 @@ export interface ITileSpawnUnitArgs {
 
 /**
  * Argument overrides for Tile's spawnWorker function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface ITileSpawnWorkerArgs {
-}
+export interface TileSpawnWorkerArgs {}
 
-/** All the possible properties for an Tower. */
-export interface ITowerProperties {
+/** All the possible properties for Tower instances. */
+export interface TowerProperties {
     /**
      * Whether this tower has attacked this turn or not.
      */
@@ -344,7 +351,6 @@ export interface ITowerProperties {
      * The Tile this Tower is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -352,15 +358,15 @@ export interface ITowerProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ITowerAttackArgs {
+export interface TowerAttackArgs {
     /**
      * The Tile to attack.
      */
     tile?: Tile;
 }
 
-/** All the possible properties for an TowerJob. */
-export interface ITowerJobProperties {
+/** All the possible properties for TowerJob instances. */
+export interface TowerJobProperties {
     /**
      * Whether this tower type hits all of the units on a tile (true) or one at
      * a time (false).
@@ -401,11 +407,10 @@ export interface ITowerJobProperties {
      * How many turns have to take place between this type's attacks.
      */
     turnsBetweenAttacks?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn (attack or
      * build).
@@ -436,7 +441,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -444,7 +448,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -456,7 +460,7 @@ export interface IUnitAttackArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitBuildArgs {
+export interface UnitBuildArgs {
     /**
      * The tower type to build, as a string.
      */
@@ -465,10 +469,10 @@ export interface IUnitBuildArgs {
 
 /**
  * Argument overrides for Unit's fish function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitFishArgs {
+export interface UnitFishArgs {
     /**
      * The tile the unit will stand on as it fishes.
      */
@@ -477,10 +481,10 @@ export interface IUnitFishArgs {
 
 /**
  * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMineArgs {
+export interface UnitMineArgs {
     /**
      * The tile the mine is located on.
      */
@@ -489,18 +493,18 @@ export interface IUnitMineArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
     tile?: Tile;
 }
 
-/** All the possible properties for an UnitJob. */
-export interface IUnitJobProperties {
+/** All the possible properties for UnitJob instances. */
+export interface UnitJobProperties {
     /**
      * The amount of damage this type does per attack.
      */
@@ -537,12 +541,75 @@ export interface IUnitJobProperties {
     range?: number;
 
     /**
-     * The type title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination',
-     * 'wraith' or 'horseman'.
+     * The type
+     * title. 'worker', 'zombie', 'ghoul', 'hound', 'abomination', 'wraith'
+     * or 'horseman'.
      */
-    title?: "worker" | "zombie" | "ghoul" | "hound" | "abomination" | "wraith" | "horseman";
-
+    title?:
+        | "worker"
+        | "zombie"
+        | "ghoul"
+        | "hound"
+        | "abomination"
+        | "wraith"
+        | "horseman";
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseNecrowarPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tower.
+ */
+export type TowerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TowerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of TowerJob.
+ */
+export type TowerJobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TowerJobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of UnitJob.
+ */
+export type UnitJobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitJobProperties & T>;
 
 export * from "./game-object";
 export * from "./player";
@@ -568,19 +635,19 @@ import { NecrowarGame } from "./game";
 import { NecrowarGameManager } from "./game-manager";
 import { NecrowarGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Tower */
+/** The arguments used to construct a Tower. */
 export type TowerArgs = FirstArgumentFromConstructor<typeof Tower>;
 
-/** The arguments used to construct a TowerJob */
+/** The arguments used to construct a TowerJob. */
 export type TowerJobArgs = FirstArgumentFromConstructor<typeof TowerJob>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
-/** The arguments used to construct a UnitJob */
+/** The arguments used to construct a UnitJob. */
 export type UnitJobArgs = FirstArgumentFromConstructor<typeof UnitJob>;
 
 /**
@@ -591,13 +658,11 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -608,9 +673,7 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Tower hooked up in the game and ready for you to use.
      */
-    public tower<T extends TowerArgs>(
-        args: Readonly<T>,
-    ): Tower & T {
+    public tower<T extends TowerArgs>(args: Readonly<T>): Tower & T {
         return this.createGameObject("Tower", Tower, args);
     }
 
@@ -621,38 +684,31 @@ export class NecrowarGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new TowerJob hooked up in the game and ready for you to use.
      */
-    public towerJob<T extends TowerJobArgs>(
-        args: Readonly<T>,
-    ): TowerJob & T {
+    public towerJob<T extends TowerJobArgs>(args: Readonly<T>): TowerJob & T {
         return this.createGameObject("TowerJob", TowerJob, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
 
     /**
      * Creates a new UnitJob in the Game and tracks it for all players.
      *
-     * @param args - Data about the UnitJob to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the UnitJob to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new UnitJob hooked up in the game and ready for you to use.
      */
-    public unitJob<T extends UnitJobArgs>(
-        args: Readonly<T>,
-    ): UnitJob & T {
+    public unitJob<T extends UnitJobArgs>(args: Readonly<T>): UnitJob & T {
         return this.createGameObject("UnitJob", UnitJob, args);
     }
-
 }
 
 /**
@@ -675,12 +731,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new NecrowarGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -689,22 +743,6 @@ export const Namespace = makeNamespace({
         },
         Game: {
             attributes: {
-                TowerJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: TowerJob,
-                        nullable: false,
-                    },
-                },
-                UnitJobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: UnitJob,
-                        nullable: false,
-                    },
-                },
                 currentPlayer: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
@@ -767,11 +805,27 @@ export const Namespace = makeNamespace({
                 timeAddedPerTurn: {
                     typeName: "int",
                 },
+                towerJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: TowerJob,
+                        nullable: false,
+                    },
+                },
                 towers: {
                     typeName: "list",
                     valueType: {
                         typeName: "gameObject",
                         gameObjectClass: Tower,
+                        nullable: false,
+                    },
+                },
+                unitJobs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: UnitJob,
                         nullable: false,
                     },
                 },
@@ -784,8 +838,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -887,8 +940,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -1003,8 +1055,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 spawnWorker: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1081,14 +1132,19 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "arrow",
-                    literals: ["arrow", "aoe", "ballista", "cleansing", "castle"],
+                    literals: [
+                        "arrow",
+                        "aoe",
+                        "ballista",
+                        "cleansing",
+                        "castle",
+                    ],
                 },
                 turnsBetweenAttacks: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1216,11 +1272,20 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "worker",
-                    literals: ["worker", "zombie", "ghoul", "hound", "abomination", "wraith", "horseman"],
+                    literals: [
+                        "worker",
+                        "zombie",
+                        "ghoul",
+                        "hound",
+                        "abomination",
+                        "wraith",
+                        "horseman",
+                    ],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
+    gameVersion:
+        "935f0e64ba290cdce31688a40bd90d1eb5375f36aeebd67482238fc0da25ef86",
 });

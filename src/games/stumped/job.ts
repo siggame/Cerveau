@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IJobProperties, IJobRecruitArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { JobConstructorArgs, JobRecruitArgs } from "./";
 import { Beaver } from "./beaver";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
@@ -78,12 +78,12 @@ export class Job extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IJobProperties & {
+        args: JobConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -115,7 +115,7 @@ export class Job extends GameObject {
     protected invalidateRecruit(
         player: Player,
         tile: Tile,
-    ): void | string | IJobRecruitArgs {
+    ): void | string | JobRecruitArgs {
         // <<-- Creer-Merge: invalidate-recruit -->>
 
         if (!player || player !== this.game.currentPlayer) {
@@ -130,7 +130,10 @@ export class Job extends GameObject {
         if (tile.beaver) {
             return `There's already ${tile.beaver} at that lodge`;
         }
-        if (player.getAliveBeavers().length >= this.game.freeBeaversCount && tile.food < this.cost) {
+        if (
+            player.getAliveBeavers().length >= this.game.freeBeaversCount &&
+            tile.food < this.cost
+        ) {
             return `${tile} does not have enough food available. (${tile.food}/${this.cost})`;
         }
 
@@ -138,7 +141,7 @@ export class Job extends GameObject {
     }
 
     /**
-     * Recruits a Beaver of this Job to a lodge
+     * Recruits a Beaver of this Job to a lodge.
      *
      * @param player - The player that called this.
      * @param tile - The Tile that is a lodge owned by you that you wish to

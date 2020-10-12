@@ -33,3 +33,12 @@ dist
 
 # too many devs stumble over this and commit merge conflicts. Easier to just deal with the chore or re-generating
 package-lock.json
+
+# OS files
+desktop.ini
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

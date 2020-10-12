@@ -1,6 +1,9 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpiderlingAttackArgs, ISpiderlingMoveArgs, ISpiderlingProperties,
-         SpiderArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    SpiderlingAttackArgs,
+    SpiderlingConstructorArgs,
+    SpiderlingMoveArgs,
+} from "./";
 import { Nest } from "./nest";
 import { Player } from "./player";
 import { Spider } from "./spider";
@@ -14,7 +17,14 @@ import { removeElements } from "~/utils";
  * When empty string this Spiderling is not busy, and can act. Otherwise a
  * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
  */
-export type SpiderlingBusy = "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+export type SpiderlingBusy =
+    | ""
+    | "Moving"
+    | "Attacking"
+    | "Strengthening"
+    | "Weakening"
+    | "Cutting"
+    | "Spitting";
 
 /**
  * A Spider spawned by the BroodMother.
@@ -24,7 +34,14 @@ export class Spiderling extends Spider {
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    public busy!: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+    public busy!:
+        | ""
+        | "Moving"
+        | "Attacking"
+        | "Strengthening"
+        | "Weakening"
+        | "Cutting"
+        | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -65,12 +82,12 @@ export class Spiderling extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderArgs & ISpiderlingProperties & {
+        args: SpiderlingConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -81,7 +98,7 @@ export class Spiderling extends Spider {
 
     // <<-- Creer-Merge: public-functions -->>
 
-    /** Kills the Spiderling */
+    /** Kills the Spiderling. */
     public kill(): void {
         super.kill();
 
@@ -104,14 +121,14 @@ export class Spiderling extends Spider {
     }
 
     /**
-     * Tells the Spiderling to finish what it is doing
-     * (moving, cutting, spitting, weaving)
-     *   Note: coworkers are finished in the Game class, not here
+     * Tells the Spiderling to finish what it is doing.
+     * Example: moving, cutting, spitting, or weaving.
+     * Note: coworkers are finished in the Game class, not here.
      *
-     * @param forceFinish - True if the task was not finished by THIS spiderling
-     * @returns true if finished, false otherwise
+     * @param forceFinish - If it should force finish.
+     * @returns True if finished, false otherwise.
      */
-    public finish(forceFinish: boolean = false): boolean {
+    public finish(forceFinish = false): boolean {
         const finishing = this.busy;
         this.busy = "";
         this.workRemaining = 0;
@@ -131,7 +148,10 @@ export class Spiderling extends Spider {
             const enemyBroodMother = this.owner.opponent.broodMother;
             if (this.nest === enemyBroodMother.nest) {
                 // then we reached the enemy's BroodMother! Kamikaze into her!
-                enemyBroodMother.health = Math.max(enemyBroodMother.health - 1, 0);
+                enemyBroodMother.health = Math.max(
+                    enemyBroodMother.health - 1,
+                    0,
+                );
                 if (enemyBroodMother.health === 0) {
                     enemyBroodMother.isDead = true;
                 }
@@ -139,11 +159,10 @@ export class Spiderling extends Spider {
             }
 
             return true;
-        }
-        else if (finishing === "Attacking") {
+        } else if (finishing === "Attacking") {
             return true;
-        }
-        else { // they finished doing a different action (cut, weave, spit)
+        } else {
+            // they finished doing a different action (cut, weave, spit)
             this.coworkers.clear();
             this.numberOfCoworkers = this.coworkers.size;
 
@@ -167,7 +186,7 @@ export class Spiderling extends Spider {
     protected invalidateAttack(
         player: Player,
         spiderling: Spiderling,
-    ): void | string | ISpiderlingAttackArgs {
+    ): void | string | SpiderlingAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const invalid = super.invalidate(player);
@@ -195,7 +214,7 @@ export class Spiderling extends Spider {
     }
 
     /**
-     * Attacks another Spiderling
+     * Attacks another Spiderling.
      *
      * @param player - The player that called this.
      * @param spiderling - The Spiderling to attack.
@@ -211,23 +230,30 @@ export class Spiderling extends Spider {
         // Cutter > Weaver > Spitter > Cutter
         // Ties, both die
 
-        if (this.gameObjectName === spiderling.gameObjectName) { // they are the same type, so
+        if (this.gameObjectName === spiderling.gameObjectName) {
+            // they are the same type, so
             this.kill();
             spiderling.kill();
         }
 
         if (
-            (this.gameObjectName === "Cutter" && spiderling.gameObjectName === "Weaver") ||
-            (this.gameObjectName === "Weaver" && spiderling.gameObjectName === "Spitter") ||
-            (this.gameObjectName === "Spitter" && spiderling.gameObjectName === "Cutter")
+            (this.gameObjectName === "Cutter" &&
+                spiderling.gameObjectName === "Weaver") ||
+            (this.gameObjectName === "Weaver" &&
+                spiderling.gameObjectName === "Spitter") ||
+            (this.gameObjectName === "Spitter" &&
+                spiderling.gameObjectName === "Cutter")
         ) {
             spiderling.kill();
         }
 
         if (
-            (spiderling.gameObjectName === "Cutter" && this.gameObjectName === "Weaver") ||
-            (spiderling.gameObjectName === "Weaver" && this.gameObjectName === "Spitter") ||
-            (spiderling.gameObjectName === "Spitter" && this.gameObjectName === "Cutter")
+            (spiderling.gameObjectName === "Cutter" &&
+                this.gameObjectName === "Weaver") ||
+            (spiderling.gameObjectName === "Weaver" &&
+                this.gameObjectName === "Spitter") ||
+            (spiderling.gameObjectName === "Spitter" &&
+                this.gameObjectName === "Cutter")
         ) {
             this.kill();
         }
@@ -256,7 +282,7 @@ export class Spiderling extends Spider {
     protected invalidateMove(
         player: Player,
         web: Web,
-    ): void | string | ISpiderlingMoveArgs {
+    ): void | string | SpiderlingMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const invalid = super.invalidate(player);

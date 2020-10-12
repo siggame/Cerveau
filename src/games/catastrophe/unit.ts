@@ -1,8 +1,17 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitChangeJobArgs, IUnitConstructArgs,
-         IUnitConvertArgs, IUnitDeconstructArgs, IUnitDropArgs,
-         IUnitHarvestArgs, IUnitMoveArgs, IUnitPickupArgs, IUnitProperties,
-         IUnitRestArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    UnitAttackArgs,
+    UnitChangeJobArgs,
+    UnitConstructArgs,
+    UnitConstructorArgs,
+    UnitConvertArgs,
+    UnitDeconstructArgs,
+    UnitDropArgs,
+    UnitHarvestArgs,
+    UnitMoveArgs,
+    UnitPickupArgs,
+    UnitRestArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -22,7 +31,7 @@ export class Unit extends GameObject {
     public acted!: boolean;
 
     /**
-     * The amount of energy this Unit has (from 0.0 to 100.0).
+     * The amount of energy this Unit has (from 0 to 100).
      */
     public energy!: number;
 
@@ -96,12 +105,12 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
+        args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             // You can add more constructor args in here
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -119,8 +128,7 @@ export class Unit extends GameObject {
         if (this.owner) {
             this.owner.units.push(this);
             this.owner.calculateSquads();
-        }
-        else {
+        } else {
             this.squad = [this];
         }
 
@@ -149,7 +157,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true, false);
@@ -171,14 +179,12 @@ export class Unit extends GameObject {
 
         if (tile.structure && tile.structure.type !== "road") {
             // Attacking a structure, no checks needed here
-        }
-        else if (tile.unit) {
+        } else if (tile.unit) {
             // Attacking a unit
             if (tile.unit.owner === player) {
                 return `${this} can't attack friends!`;
             }
-        }
-        else {
+        } else {
             return `There is nothing on ${tile} for ${this} to attack!`;
         }
 
@@ -202,7 +208,8 @@ export class Unit extends GameObject {
         const toDie = new Set<Unit>(); // update dead later
         for (const soldier of this.squad) {
             let attackMod = 1; // damage modifier, if unit near allied monument
-            if (!soldier.acted) { // if soldier hasn't acted
+            if (!soldier.acted) {
+                // if soldier hasn't acted
                 if (soldier.isInRange("monument")) {
                     attackMod = this.game.monumentCostMult;
                 } // if ally monument nearby, take less dmg from contributing
@@ -210,7 +217,8 @@ export class Unit extends GameObject {
                 soldier.acted = true;
                 soldier.moves = 0;
                 attackSum += soldier.job.actionCost;
-                if (soldier.energy <= 0) { // if died
+                if (soldier.energy <= 0) {
+                    // if died
                     // soldier.energy is negative here, can only contribute as much energy as unit has
                     attackSum += soldier.energy / attackMod;
                     toDie.add(soldier);
@@ -219,7 +227,8 @@ export class Unit extends GameObject {
         }
 
         // EVERYTHING BEFORE IS CALCULATING DAMAGE, AFTER IS DEALING THE DAMAGE
-        if (tile.structure && tile.structure.type !== "road") { // checking if unit or attack-able structure
+        if (tile.structure && tile.structure.type !== "road") {
+            // checking if unit or attack-able structure
             // Attack a structure
             tile.structure.materials -= attackSum;
             if (tile.structure.materials <= 0) {
@@ -227,11 +236,13 @@ export class Unit extends GameObject {
                 tile.structure.tile = undefined;
                 tile.structure = undefined;
             }
-        }
-        else { // assuming unit, which it should be if not a structure
+        } else {
+            // assuming unit, which it should be if not a structure
             // Attack a unit/squad
             if (!tile.unit) {
-                throw new Error(`${this} attacking ${tile} with no unit on it!`);
+                throw new Error(
+                    `${this} attacking ${tile} with no unit on it!`,
+                );
             }
 
             for (const target of tile.unit.squad) {
@@ -240,7 +251,8 @@ export class Unit extends GameObject {
                     // if near enemy monument, take less dmg
                     attackMod = this.game.monumentCostMult;
                 }
-                target.energy -= attackSum * attackMod / tile.unit.squad.length;
+                target.energy -=
+                    (attackSum * attackMod) / tile.unit.squad.length;
                 if (target.energy <= 0) {
                     toDie.add(target);
                 }
@@ -272,8 +284,7 @@ export class Unit extends GameObject {
                     // Make sure the previous owner can't control it anymore
                     dead.owner = undefined;
                 }
-            }
-            else {
+            } else {
                 // Neutral fresh human, will get removed from arrays in next turn logic
                 dead.tile.unit = undefined;
                 dead.tile = undefined;
@@ -304,7 +315,7 @@ export class Unit extends GameObject {
     protected invalidateChangeJob(
         player: Player,
         job: "soldier" | "gatherer" | "builder" | "missionary",
-    ): void | string | IUnitChangeJobArgs {
+    ): void | string | UnitChangeJobArgs {
         // <<-- Creer-Merge: invalidate-changeJob -->>
 
         const reason = this.invalidate(player, true, false);
@@ -332,8 +343,9 @@ export class Unit extends GameObject {
             return `Player's Cat ${player.cat} is not on a Tile!`;
         }
 
-        if (Math.abs(this.tile.x - player.cat.tile.x) > 1
-         || Math.abs(this.tile.y - player.cat.tile.y) > 1
+        if (
+            Math.abs(this.tile.x - player.cat.tile.x) > 1 ||
+            Math.abs(this.tile.y - player.cat.tile.y) > 1
         ) {
             return `${this} must be adjacent or diagonal to your cat to change jobs`;
         }
@@ -342,7 +354,7 @@ export class Unit extends GameObject {
     }
 
     /**
-     * Changes this Unit's Job. Must be at max energy (100.0) to change Jobs.
+     * Changes this Unit's Job. Must be at max energy (100) to change Jobs.
      *
      * @param player - The player that called this.
      * @param job - The name of the Job to change to.
@@ -383,8 +395,8 @@ export class Unit extends GameObject {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to construct the Structure on. It must have
-     * enough materials on it for a Structure to be constructed.
+     * @param tile - The Tile to construct the Structure on. It must have enough
+     * materials on it for a Structure to be constructed.
      * @param type - The type of Structure to construct on that Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
@@ -394,18 +406,16 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         type: "neutral" | "shelter" | "monument" | "wall" | "road",
-    ): void | string | IUnitConstructArgs {
+    ): void | string | UnitConstructArgs {
         // <<-- Creer-Merge: invalidate-construct -->>
 
         const reason = this.invalidate(player, true, true);
 
         if (reason) {
             return reason;
-        }
-        else if (this.job.title !== "builder") {
+        } else if (this.job.title !== "builder") {
             return `${this} is not a builder. Only builders can construct!`;
-        }
-        else if (tile.structure) {
+        } else if (tile.structure) {
             return `${tile} already has a structure! ${this} cannot construct here!`;
         }
 
@@ -434,8 +444,8 @@ export class Unit extends GameObject {
      * Constructs a Structure on an adjacent Tile.
      *
      * @param player - The player that called this.
-     * @param tile - The Tile to construct the Structure on. It must have
-     * enough materials on it for a Structure to be constructed.
+     * @param tile - The Tile to construct the Structure on. It must have enough
+     * materials on it for a Structure to be constructed.
      * @param type - The type of Structure to construct on that Tile.
      * @returns True if successfully constructed a structure, false otherwise.
      */
@@ -478,7 +488,7 @@ export class Unit extends GameObject {
     protected invalidateConvert(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitConvertArgs {
+    ): void | string | UnitConvertArgs {
         // <<-- Creer-Merge: invalidate-convert -->>
 
         const reason = this.invalidate(player, true, true);
@@ -562,7 +572,7 @@ export class Unit extends GameObject {
     protected invalidateDeconstruct(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitDeconstructArgs {
+    ): void | string | UnitDeconstructArgs {
         // <<-- Creer-Merge: invalidate-deconstruct -->>
 
         const reason = this.invalidate(player, true, true);
@@ -576,18 +586,14 @@ export class Unit extends GameObject {
 
         if (tile.structure.type === "road") {
             return `${this} cannot deconstruct roads!`;
-        }
-
-        else if (this.job.title !== "builder") {
+        } else if (this.job.title !== "builder") {
             return `${this} is not a builder. Only builders can deconstruct.`;
-        }
-
-        else if (this.owner === tile.structure.owner) {
-            return `${this} cannot deconstruct friendly structures. `
-                 + "Soldiers can destroy them by attacking them, though.";
-        }
-
-        else if (this.materials + this.food >= this.job.carryLimit) {
+        } else if (this.owner === tile.structure.owner) {
+            return (
+                `${this} cannot deconstruct friendly structures. ` +
+                "Soldiers can destroy them by attacking them, though."
+            );
+        } else if (this.materials + this.food >= this.job.carryLimit) {
             return `${this} cannot carry any more materials.`;
         }
 
@@ -604,16 +610,13 @@ export class Unit extends GameObject {
 
     /**
      * Removes materials from an adjacent Tile's Structure. You cannot
-     * deconstruct friendly structures (see Unit.attack).
+     * deconstruct friendly structures (see `Unit.attack`).
      *
      * @param player - The player that called this.
      * @param tile - The Tile to deconstruct. It must have a Structure on it.
      * @returns True if successfully deconstructed, false otherwise.
      */
-    protected async deconstruct(
-        player: Player,
-        tile: Tile,
-    ): Promise<boolean> {
+    protected async deconstruct(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: deconstruct -->>
 
         const structure = tile.structure;
@@ -666,8 +669,8 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
-    ): void | string | IUnitDropArgs {
+        amount = 0,
+    ): void | string | UnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
 
         const reason = this.invalidate(player, false, false);
@@ -687,27 +690,23 @@ export class Unit extends GameObject {
             if (tile.structure.type === "shelter") {
                 if (tile.structure.owner !== player) {
                     return `${this} can't drop things in enemy shelters. Nice thought though.`;
-                }
-                else if (resource[0] !== "f" && resource[0] !== "F") {
+                } else if (
+                    !resource.startsWith("f") &&
+                    !resource.startsWith("F")
+                ) {
                     return `${this} can only store food in shelters.`;
                 }
-            }
-            else if (tile.structure.type !== "road") {
+            } else if (tile.structure.type !== "road") {
                 return `${this} can't drop resources on structures.`;
             }
         }
 
-        const maxAmount = resource === "food"
-            ? this.food
-            : this.materials;
+        const maxAmount = resource === "food" ? this.food : this.materials;
 
         return {
             // ensure the amount is within the max amount, and if less than 1
             // then they drop everything
-            amount: Math.min(maxAmount, amount < 1
-                ? maxAmount
-                : amount,
-            ),
+            amount: Math.min(maxAmount, amount < 1 ? maxAmount : amount),
         };
 
         // <<-- /Creer-Merge: invalidate-drop -->>
@@ -728,21 +727,23 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: drop -->>
 
         // Drop the resource
         if (resource === "food") {
-            if (tile.structure && tile.structure.type === "shelter" && this.owner) {
+            if (
+                tile.structure &&
+                tile.structure.type === "shelter" &&
+                this.owner
+            ) {
                 this.owner.food += amount;
-            }
-            else {
+            } else {
                 tile.food += amount;
             }
             this.food -= amount;
-        }
-        else {
+        } else {
             tile.materials += amount;
             this.materials -= amount;
         }
@@ -766,7 +767,7 @@ export class Unit extends GameObject {
     protected invalidateHarvest(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitHarvestArgs {
+    ): void | string | UnitHarvestArgs {
         // <<-- Creer-Merge: invalidate-harvest -->>
 
         const reason = this.invalidate(player, true, true);
@@ -784,14 +785,15 @@ export class Unit extends GameObject {
 
         // Make sure unit is harvesting a valid tile
         if (tile.structure) {
-            if (tile.structure.type !== "shelter" || tile.structure.owner === player) {
+            if (
+                tile.structure.type !== "shelter" ||
+                tile.structure.owner === player
+            ) {
                 return "You can only steal from enemy shelters.";
             }
-        }
-        else if (tile.harvestRate < 1) {
+        } else if (tile.harvestRate < 1) {
             return "You can't harvest food from that tile.";
-        }
-        else if (tile.turnsToHarvest !== 0) {
+        } else if (tile.turnsToHarvest !== 0) {
             return "This tile isn't ready to harvest.";
         }
 
@@ -818,13 +820,14 @@ export class Unit extends GameObject {
         if (tile.structure && tile.structure.owner) {
             pickup = Math.min(tile.structure.owner.food, carry);
             tile.structure.owner.food -= pickup;
-        }
-        else {
+        } else {
             pickup = Math.min(tile.harvestRate, carry);
             tile.turnsToHarvest = this.game.turnsBetweenHarvests;
         }
 
-        const mult = this.isInRange("monument") ? this.game.monumentCostMult : 1;
+        const mult = this.isInRange("monument")
+            ? this.game.monumentCostMult
+            : 1;
         this.energy -= this.job.actionCost * mult;
         this.food += pickup;
         this.acted = true;
@@ -848,7 +851,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         const reason = this.invalidate(player, false, false);
         if (reason) {
@@ -871,7 +874,11 @@ export class Unit extends GameObject {
             return "Your unit must move to a tile to the north, south, east, or west.";
         }
 
-        if (tile.structure && tile.structure.type !== "road" && tile.structure.type !== "shelter") {
+        if (
+            tile.structure &&
+            tile.structure.type !== "road" &&
+            tile.structure.type !== "shelter"
+        ) {
             return "Units cannot move onto structures other than roads and shelters.";
         }
 
@@ -916,8 +923,7 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to pickup materials/food from.
-     * @param resource - The type of resource to pickup ('materials' or
-     * 'food').
+     * @param resource - The type of resource to pickup ('materials' or 'food').
      * @param amount - The amount of the resource to pickup. Amounts <= 0 will
      * pickup as much as possible.
      * @returns If the arguments are invalid, return a string explaining to
@@ -928,8 +934,8 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
-    ): void | string | IUnitPickupArgs {
+        amount = 0,
+    ): void | string | UnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         const reason = this.invalidate(player, false, false);
@@ -948,9 +954,8 @@ export class Unit extends GameObject {
             return `${this} can only pickup resources on or adjacent to its tile.`;
         }
 
-        let actualAmount = amount < 1
-            ? tile[resource]
-            : Math.min(tile[resource], amount);
+        let actualAmount =
+            amount < 1 ? tile[resource] : Math.min(tile[resource], amount);
 
         // Make sure it picks up more than 0 resources
         if (Math.floor(this.energy) <= 0) {
@@ -983,8 +988,7 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile to pickup materials/food from.
-     * @param resource - The type of resource to pickup ('materials' or
-     * 'food').
+     * @param resource - The type of resource to pickup ('materials' or 'food').
      * @param amount - The amount of the resource to pickup. Amounts <= 0 will
      * pickup as much as possible.
      * @returns True if successfully picked up a resource, false otherwise.
@@ -993,7 +997,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         resource: "materials" | "food",
-        amount: number = 0,
+        amount = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: pickup -->>
 
@@ -1016,7 +1020,7 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
+    protected invalidateRest(player: Player): void | string | UnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true, false);
@@ -1050,24 +1054,28 @@ export class Unit extends GameObject {
         }
 
         // Get all shelters this unit is in range of
-        const nearbyShelters = this.owner.getAllStructures().filter((structure) => {
-            // Make sure this structure isn't destroyed
-            if (!structure.tile) {
-                return false;
-            }
+        const nearbyShelters = this.owner
+            .getAllStructures()
+            .filter((structure) => {
+                // Make sure this structure isn't destroyed
+                if (!structure.tile) {
+                    return false;
+                }
 
-            // Make sure this structure is a shelter
-            if (structure.type !== "shelter") {
-                return false;
-            }
+                // Make sure this structure is a shelter
+                if (structure.type !== "shelter") {
+                    return false;
+                }
 
-            // Make sure this shelter is in range of this unit
-            const radius = structure.effectRadius;
+                // Make sure this shelter is in range of this unit
+                const radius = structure.effectRadius;
 
-            return this.tile
-                && Math.abs(this.tile.x - structure.tile.x) <= radius
-                && Math.abs(this.tile.y - structure.tile.y) <= radius;
-        });
+                return (
+                    this.tile &&
+                    Math.abs(this.tile.x - structure.tile.x) <= radius &&
+                    Math.abs(this.tile.y - structure.tile.y) <= radius
+                );
+            });
 
         // Get a nearby shelter with a cat in range of it, or undefined if none
         const catShelter = nearbyShelters.find((shelter) => {
@@ -1075,9 +1083,13 @@ export class Unit extends GameObject {
             const cat = this.owner && this.owner.cat;
             const radius = shelter.effectRadius;
 
-            return Boolean(cat && cat.tile && shelter && shelter.tile
-                && Math.abs(cat.tile.x - shelter.tile.x) <= radius
-                && Math.abs(cat.tile.y - shelter.tile.y) <= radius,
+            return Boolean(
+                cat &&
+                    cat.tile &&
+                    shelter &&
+                    shelter.tile &&
+                    Math.abs(cat.tile.x - shelter.tile.x) <= radius &&
+                    Math.abs(cat.tile.y - shelter.tile.y) <= radius,
             );
         });
 
@@ -1108,17 +1120,17 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
-     * @param checkEnergy - true to check if this Unit has enough energy
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
+     * @param checkEnergy - True to check if this Unit has enough energy.
      * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,
-        checkAction: boolean = false,
-        checkEnergy: boolean = false,
+        checkAction = false,
+        checkEnergy = false,
     ): string | undefined {
         if (this.owner !== player) {
             return `${this} isn't owned by you.`;
@@ -1128,7 +1140,9 @@ export class Unit extends GameObject {
             return `${this} cannot perform another action this turn.`;
         }
 
-        const mult = this.isInRange("monument") ? this.game.monumentCostMult : 1;
+        const mult = this.isInRange("monument")
+            ? this.game.monumentCostMult
+            : 1;
         if (checkEnergy && this.energy < this.job.actionCost * mult) {
             return `${this} doesn't have enough energy.`;
         }
@@ -1137,21 +1151,30 @@ export class Unit extends GameObject {
     /**
      * Checks if this unit is in range of a structure of the given type.
      *
-     * @param type - The type of structure to search for
-     * @returns The structure this unit is in range of, or undefined if none exist
+     * @param type - The type of structure to search for.
+     * @returns The structure this unit is in range of, or undefined if none exist.
      */
     private isInRange(type: StructureType): boolean {
-        return Boolean(this.game.structures.concat(
-            this.game.newStructures).find((structure) => {
-                if (!this.tile || !structure.tile || structure.owner !== this.owner || structure.type !== type) {
-                    return false;
-                }
+        return Boolean(
+            this.game.structures
+                .concat(this.game.newStructures)
+                .find((structure) => {
+                    if (
+                        !this.tile ||
+                        !structure.tile ||
+                        structure.owner !== this.owner ||
+                        structure.type !== type
+                    ) {
+                        return false;
+                    }
 
-                const radius = structure.effectRadius;
+                    const radius = structure.effectRadius;
 
-                return Math.abs(this.tile.x - structure.tile.x) <= radius
-                    && Math.abs(this.tile.y - structure.tile.y) <= radius;
-            }, this),
+                    return (
+                        Math.abs(this.tile.x - structure.tile.x) <= radius &&
+                        Math.abs(this.tile.y - structure.tile.y) <= radius
+                    );
+                }, this),
         );
     }
 
@@ -1159,7 +1182,7 @@ export class Unit extends GameObject {
      * Returns how much stuff this unit can pickup or be given before hitting
      * the carry limit.
      *
-     * @returns How much this can still carry
+     * @returns How much this can still carry.
      */
     private getCarryLeft(): number {
         return this.job.carryLimit - this.materials - this.food;

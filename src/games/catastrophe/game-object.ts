@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { BaseClasses, IGameObjectProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseClasses, GameObjectConstructorArgs } from "./";
 import { CatastropheGame } from "./game";
 import { CatastropheGameManager } from "./game-manager";
 
@@ -12,10 +12,10 @@ import { CatastropheGameManager } from "./game-manager";
  * inherit from automatically.
  */
 export class GameObject extends BaseClasses.GameObject {
-    /** The game this game object is in */
+    /** The game this game object is in. */
     public readonly game!: CatastropheGame;
 
-    /** The manager of the game that controls this */
+    /** The manager of the game that controls this. */
     public readonly manager!: CatastropheGameManager;
 
     /**
@@ -53,8 +53,8 @@ export class GameObject extends BaseClasses.GameObject {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IGameObjectProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: GameObjectConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { ISpawnerProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { SpawnerConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
 
@@ -40,7 +40,7 @@ export class Spawner extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    /** The cooldown on being harvested */
+    /** The cooldown on being harvested. */
     public harvestCooldown = 0;
 
     // <<-- /Creer-Merge: attributes -->>
@@ -52,7 +52,7 @@ export class Spawner extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<ISpawnerProperties & {
+        args: SpawnerConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Tile to place this Spawner upon. */
             tile: Tile;
@@ -60,7 +60,7 @@ export class Spawner extends GameObject {
             type: "branches" | "food";
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

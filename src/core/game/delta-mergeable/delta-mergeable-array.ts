@@ -1,8 +1,9 @@
-// tslint:disable:no-any no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
 import { SHARED_CONSTANTS } from "~/core/constants";
-import { ISanitizableType } from "~/core/sanitize/sanitizable-interfaces";
+import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { Immutable } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
@@ -20,7 +21,8 @@ class DeltaArray<T> extends Array<T> {
      *
      * This implementation below is less efficient, however it ensures an index
      * is never undefined, to maintain type safety at all times.
-     * @param items  Elements to insert at the start of the Array.
+     *
+     * @param items -  Elements to insert at the start of the Array.
      * @returns The new length of the array.
      */
     public unshift(...items: T[]): number {
@@ -30,8 +32,7 @@ class DeltaArray<T> extends Array<T> {
         for (let i = 0; i < newLength; i++) {
             if (i < this.length) {
                 this[i] = newThis[i];
-            }
-            else {
+            } else {
                 this.push(newThis[i]);
             }
         }
@@ -42,14 +43,18 @@ class DeltaArray<T> extends Array<T> {
 
 /**
  * Creates a DeltaMergeable for an Array with a Proxy wrapper.
- * @param args - The creation args
+ *
+ * @param args - The creation args.
+ * @param args.key - The key of this array in its parent delta mergable.
+ * @param args.childType - The type of all children in this Array.
+ * @param args.parent - The parent of this node.
  * @returns A new DeltaMergeable wrapping an Array.
  */
 export function createArray<T = any>(args: {
     /** The key of this array in its parent delta mergable. */
     key: string;
     /** The type of all children in this Array. */
-    childType: Immutable<ISanitizableType>;
+    childType: Immutable<SanitizableType>;
     /** The parent of this node. */
     parent?: DeltaMergeable;
 }): DeltaMergeable<T[]> {
@@ -79,11 +84,18 @@ export function createArray<T = any>(args: {
         initialValue: 0,
     });
 
+    /**
+     * Checks if the array was Delta updated given an index.
+     *
+     * @param index - Index in the array updated.
+     * @param value - The value at that index updated to.
+     */
     function checkIfUpdated(index?: number, value?: T): void {
         let newLength = array.length;
 
-        if (index !== undefined
-            && (index >= oldLength || index >= array.length)
+        if (
+            index !== undefined &&
+            (index >= oldLength || index >= array.length)
         ) {
             newLength = index + 1;
         }
@@ -98,8 +110,8 @@ export function createArray<T = any>(args: {
                     if (values[i]) {
                         container.adopt(values[i]);
                         values[i].set(currentValue, true);
-                    }
-                    else {
+                    } else {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                         values[i] = createDeltaMergeable({
                             key: String(i),
                             parent: container,
@@ -110,8 +122,8 @@ export function createArray<T = any>(args: {
 
                     array[i] = values[i].get()!;
                 }
-            }
-            else { // newLength < oldLength
+            } else {
+                // newLength < oldLength
                 for (let i = newLength; i < oldLength; i++) {
                     values[i].delete();
                 }

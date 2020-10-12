@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Saloon game
+ * The interface that the Player for the Saloon game
  * must implement from mixed in game logic.
  */
-export interface IBaseSaloonPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseSaloonPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,8 +82,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Bottle. */
-export interface IBottleProperties {
+/** All the possible properties for Bottle instances. */
+export interface BottleProperties {
     /**
      * The Direction this Bottle is flying and will move to between turns, can
      * be 'North', 'East', 'South', or 'West'.
@@ -80,8 +91,8 @@ export interface IBottleProperties {
     direction?: "North" | "East" | "South" | "West";
 
     /**
-     * The direction any Cowboys hit by this will move, can be 'North', 'East',
-     * 'South', or 'West'.
+     * The direction any Cowboys hit by this will move, can
+     * be 'North', 'East', 'South', or 'West'.
      */
     drunkDirection?: "North" | "East" | "South" | "West";
 
@@ -95,20 +106,19 @@ export interface IBottleProperties {
      * The Tile this bottle is currently flying over.
      */
     tile?: Tile;
-
 }
 
-/** All the possible properties for an Cowboy. */
-export interface ICowboyProperties {
+/** All the possible properties for Cowboy instances. */
+export interface CowboyProperties {
     /**
      * If the Cowboy can be moved this turn via its owner.
      */
     canMove?: boolean;
 
     /**
-     * The direction this Cowboy is moving while drunk. Will be 'North',
-     * 'East', 'South', or 'West' when drunk; or '' (empty string) when not
-     * drunk.
+     * The direction this Cowboy is moving while drunk. Will
+     * be 'North', 'East', 'South', or 'West' when drunk; or '' (empty string)
+     * when not drunk.
      */
     drunkDirection?: "" | "North" | "East" | "South" | "West";
 
@@ -160,7 +170,6 @@ export interface ICowboyProperties {
      * can `act()` or `play()` again.
      */
     turnsBusy?: number;
-
 }
 
 /**
@@ -168,14 +177,14 @@ export interface ICowboyProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyActArgs {
+export interface CowboyActArgs {
     /**
      * The Tile you want this Cowboy to act on.
      */
     tile?: Tile;
     /**
-     * The direction the bottle will cause drunk cowboys to be in, can be
-     * 'North', 'East', 'South', or 'West'.
+     * The direction the bottle will cause drunk cowboys to be in, can
+     * be 'North', 'East', 'South', or 'West'.
      */
     drunkDirection?: "" | "North" | "East" | "South" | "West";
 }
@@ -185,7 +194,7 @@ export interface ICowboyActArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyMoveArgs {
+export interface CowboyMoveArgs {
     /**
      * The Tile you want to move this Cowboy to.
      */
@@ -197,15 +206,15 @@ export interface ICowboyMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICowboyPlayArgs {
+export interface CowboyPlayArgs {
     /**
      * The Furnishing that is a piano you want to play.
      */
     piano?: Furnishing;
 }
 
-/** All the possible properties for an Furnishing. */
-export interface IFurnishingProperties {
+/** All the possible properties for Furnishing instances. */
+export interface FurnishingProperties {
     /**
      * How much health this Furnishing currently has.
      */
@@ -231,15 +240,13 @@ export interface IFurnishingProperties {
      * The Tile that this Furnishing is located on.
      */
     tile?: Tile;
-
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -312,11 +319,10 @@ export interface IPlayerProperties {
      * The YoungGun this Player uses to call in new Cowboys.
      */
     youngGun?: YoungGun;
-
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The beer Bottle currently flying over this Tile, undefined otherwise.
      */
@@ -382,14 +388,13 @@ export interface ITileProperties {
      * The YoungGun on this tile, undefined otherwise.
      */
     youngGun?: YoungGun;
-
 }
 
-/** All the possible properties for an YoungGun. */
-export interface IYoungGunProperties {
+/** All the possible properties for YoungGun instances. */
+export interface YoungGunProperties {
     /**
-     * The Tile that a Cowboy will be called in on if this YoungGun calls in a
-     * Cowboy.
+     * The Tile that a Cowboy will be called in on if this YoungGun calls in
+     * a Cowboy.
      */
     callInTile?: Tile;
 
@@ -407,20 +412,75 @@ export interface IYoungGunProperties {
      * The Tile this YoungGun is currently on.
      */
     tile?: Tile;
-
 }
 
 /**
  * Argument overrides for YoungGun's callIn function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IYoungGunCallInArgs {
+export interface YoungGunCallInArgs {
     /**
      * The job you want the Cowboy being brought to have.
      */
     job?: "Bartender" | "Brawler" | "Sharpshooter";
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Bottle.
+ */
+export type BottleConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BottleProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Cowboy.
+ */
+export type CowboyConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<CowboyProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Furnishing.
+ */
+export type FurnishingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<FurnishingProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseSaloonPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of YoungGun.
+ */
+export type YoungGunConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<YoungGunProperties & T>;
 
 export * from "./bottle";
 export * from "./cowboy";
@@ -446,19 +506,19 @@ import { SaloonGame } from "./game";
 import { SaloonGameManager } from "./game-manager";
 import { SaloonGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Bottle */
+/** The arguments used to construct a Bottle. */
 export type BottleArgs = FirstArgumentFromConstructor<typeof Bottle>;
 
-/** The arguments used to construct a Cowboy */
+/** The arguments used to construct a Cowboy. */
 export type CowboyArgs = FirstArgumentFromConstructor<typeof Cowboy>;
 
-/** The arguments used to construct a Furnishing */
+/** The arguments used to construct a Furnishing. */
 export type FurnishingArgs = FirstArgumentFromConstructor<typeof Furnishing>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a YoungGun */
+/** The arguments used to construct a YoungGun. */
 export type YoungGunArgs = FirstArgumentFromConstructor<typeof YoungGun>;
 
 /**
@@ -473,9 +533,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Bottle hooked up in the game and ready for you to use.
      */
-    public bottle<T extends BottleArgs>(
-        args: Readonly<T>,
-    ): Bottle & T {
+    public bottle<T extends BottleArgs>(args: Readonly<T>): Bottle & T {
         return this.createGameObject("Bottle", Bottle, args);
     }
 
@@ -486,9 +544,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cowboy hooked up in the game and ready for you to use.
      */
-    public cowboy<T extends CowboyArgs>(
-        args: Readonly<T>,
-    ): Cowboy & T {
+    public cowboy<T extends CowboyArgs>(args: Readonly<T>): Cowboy & T {
         return this.createGameObject("Cowboy", Cowboy, args);
     }
 
@@ -497,8 +553,7 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Furnishing to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Furnishing hooked up in the game and ready for you to
-     * use.
+     * @returns A new Furnishing hooked up in the game and ready for you to use.
      */
     public furnishing<T extends FurnishingArgs>(
         args: Readonly<T>,
@@ -509,13 +564,11 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
@@ -526,12 +579,9 @@ export class SaloonGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new YoungGun hooked up in the game and ready for you to use.
      */
-    public youngGun<T extends YoungGunArgs>(
-        args: Readonly<T>,
-    ): YoungGun & T {
+    public youngGun<T extends YoungGunArgs>(args: Readonly<T>): YoungGun & T {
         return this.createGameObject("YoungGun", YoungGun, args);
     }
-
 }
 
 /**
@@ -554,12 +604,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new SaloonGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -670,8 +718,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Bottle: {
             parentClassName: "GameObject",
@@ -695,8 +742,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Cowboy: {
             parentClassName: "GameObject",
@@ -815,8 +861,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -902,8 +947,7 @@ export const Namespace = makeNamespace({
                     nullable: false,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -961,8 +1005,7 @@ export const Namespace = makeNamespace({
                     nullable: true,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         YoungGun: {
             parentClassName: "GameObject",
@@ -1006,5 +1049,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
+    gameVersion:
+        "fbaeac2bae9020bdd5a8816cb9ae38215c277e4bf7874a2f70c3995cd8eee8d3",
 });

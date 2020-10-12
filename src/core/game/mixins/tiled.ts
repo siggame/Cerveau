@@ -1,24 +1,26 @@
-// tslint:disable:max-classes-per-file
-// ^ because the mixin define multiple classes while maintaining scope to each
-// tslint:disable:no-empty-interface
-// ^ because the some mixins have nothing to add
-
-import { BaseGameObject, BaseGameObjectFactory, BasePlayer,
-       } from "~/core/game";
-import { IPoint, Mutable } from "~/utils";
+import {
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BasePlayer,
+} from "~/core/game";
+import { Point, Mutable } from "~/utils";
 import * as Base from "./base";
 
-/** The possible directions a tile can be in */
+/** The possible directions a tile can be in. */
 export type TileDirection = "North" | "East" | "South" | "West";
 
 /** The valid direction strings tile based games use. */
-const TILE_DIRECTIONS: [ "North", "South", "East", "West" ] =
-                       [ "North", "South", "East", "West" ];
+const TILE_DIRECTIONS: ["North", "South", "East", "West"] = [
+    "North",
+    "South",
+    "East",
+    "West",
+];
 
 /** A player in a tile based game. */
-export interface ITiledPlayer extends BasePlayer {}
+export type TiledPlayer = BasePlayer;
 
-/** A base tile for super tiles to extend */
+/** A base tile for super tiles to extend. */
 export abstract class BaseTile extends BaseGameObject {
     /** The X coordinate of the tile. */
     public readonly x!: number;
@@ -42,7 +44,7 @@ export abstract class BaseTile extends BaseGameObject {
      * Gets the adjacent direction between this tile and an adjacent tile
      * (if one exists).
      *
-     * @param adjacentTile - A tile that should be adjacent to this tile
+     * @param adjacentTile - A tile that should be adjacent to this tile.
      * @returns - The string direction, or undefined if the
      * tile is invalid, or there is no adjacent direction between this tile
      * and that tile
@@ -103,26 +105,26 @@ export abstract class BaseTile extends BaseGameObject {
     }
 
     /**
-     * Checks if a Tile has another tile as its neighbor
+     * Checks if a Tile has another tile as its neighbor.
      *
-     * @param tile - tile to check
-     * @returns true if neighbor, false otherwise
+     * @param tile - Tile to check.
+     * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: BaseTile | undefined): boolean {
         return Boolean(this.getAdjacentDirection(tile));
     }
 
     /**
-     * toString override
+     * ToString override.
      *
-     * @returns a string representation of the Tile
+     * @returns A string representation of the Tile.
      */
     public toString(): string {
         return `${this.gameObjectName} #${this.id} at (${this.x}, ${this.y})`;
     }
 }
 
-/** A tile that is mutable */
+/** A tile that is mutable. */
 type MutableBaseTile = Mutable<BaseTile>;
 
 /**
@@ -130,10 +132,15 @@ type MutableBaseTile = Mutable<BaseTile>;
  * initial map and hooking it up. That's it.
  *
  * @param base - The BaseGame (or sub BaseGame) to mix in tiled logic.
+ * @param base.AI - The AI to extend.
+ * @param base.Game - The Game to extend.
+ * @param base.GameManager - The GameManager to extend.
+ * @param base.GameObject - The GameObject to extend.
+ * @param base.GameSettings - The GameSettings to extend.
  * @returns A new BaseGame class with Tiled logic mixed in.
  */
 // Because it will be a weird mixin type inferred from the return statement
-// tslint:disable-next-line:typedef
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mixTiled<
     TBaseAI extends Base.BaseAIConstructor,
     TBaseGame extends Base.BaseGameConstructor,
@@ -152,25 +159,27 @@ export function mixTiled<
     /** The GameSettings to extend. */
     GameSettings: TBaseGameSettings;
 }) {
-    /** The settings for a Tiled game */
+    /** The settings for a Tiled game. */
     class TiledGameSettings extends base.GameSettings {
         /** The schema for a Tiled game, adding in configurable map sizes. */
-        public get schema() { // tslint:disable-line:typedef
+        public get schema() {
             return this.makeSchema({
                 // HACK: super should work. but schema is undefined on it
-                // tslint:disable-next-line:no-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
                 ...(super.schema || (this as any).schema),
                 mapWidth: {
                     default: 32,
                     min: 2,
-                    description: "The width (in Tiles) for the game map to be "
-                            + "initialized to.",
+                    description:
+                        "The width (in Tiles) for the game map to be " +
+                        "initialized to.",
                 },
                 mapHeight: {
                     default: 16,
                     min: 2,
-                    description: "The height (in Tiles) for the game map to be "
-                            + "initialized to.",
+                    description:
+                        "The height (in Tiles) for the game map to be " +
+                        "initialized to.",
                 },
             });
         }
@@ -195,9 +204,9 @@ export function mixTiled<
         /** The valid directions tiles can be in from one another. */
         public readonly tileDirections = TILE_DIRECTIONS;
 
-        constructor(...args: any[]) { // tslint:disable-line:no-any
-                                      // any[] is required for mixin
-                                      // constructor signature
+        // any[] is required for mixin constructor signature
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        constructor(...args: any[]) {
             super(...args);
 
             this.tiles.length = this.mapWidth * this.mapHeight;
@@ -206,12 +215,14 @@ export function mixTiled<
             for (let x = 0; x < this.mapWidth; x++) {
                 for (let y = 0; y < this.mapHeight; y++) {
                     const i = x + y * this.mapWidth;
-                    this.tiles[i] = (this.manager.create as (BaseGameObjectFactory & {
+                    this.tiles[i] = (this.manager
+                        .create as BaseGameObjectFactory & {
                         // All Tiled games should have this method, can't reference in this mixin.
                         /**
-                         * Creates a Tile at the given { x, y }
-                         * @param args - Must contain normal BaseGameObject data and an { x, y }
-                         * @Returns A tile of that instance from that GameObjectFactory
+                         * Creates a Tile at the given { x, y }.
+                         *
+                         * @param args - Must contain normal BaseGameObject data and an { x, y }.
+                         * @returns A tile of that instance from that GameObjectFactory.
                          */
                         tile(args: {
                             /** The X position of the Tile. */
@@ -219,7 +230,7 @@ export function mixTiled<
                             /** The Y position of the Tile. */
                             y: number;
                         }): BaseTile;
-                    })).tile({x, y});
+                    }).tile({ x, y });
                 }
             }
 
@@ -258,58 +269,58 @@ export function mixTiled<
          * @param index - The index to get.
          * @returns A point with the { x, y } value at that index's point.
          */
-        public getIndex(index: number): IPoint {
+        public getIndex(index: number): Point {
             const y = index / this.mapWidth;
-            const x = index - (y * this.mapWidth);
+            const x = index - y * this.mapWidth;
 
             return { x, y };
         }
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
         public invertTileDirection(direction: "North"): "South";
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
         public invertTileDirection(direction: "South"): "North";
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
         public invertTileDirection(direction: "East"): "West";
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
         public invertTileDirection(direction: "West"): "East";
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
@@ -318,10 +329,10 @@ export function mixTiled<
         ): "North" | "East" | "South" | "West";
 
         /**
-         * Inverts a direction string, e.g. "North" -> "South"
+         * Inverts a direction string, e.g. "North" -> "South".
          *
-         * @param direction - the direction string to invert
-         * @returns the direction inverted,
+         * @param direction - The direction string to invert.
+         * @returns The direction inverted,
          * e.g. "East" -> "West", undefined if the direction was not a valid
          * direction string.
          */
@@ -329,10 +340,14 @@ export function mixTiled<
             direction: "North" | "East" | "South" | "West",
         ): "North" | "East" | "South" | "West" {
             switch (direction) {
-                case "North": return "South";
-                case "East": return "West";
-                case "South": return "North";
-                case "West": return "East";
+                case "North":
+                    return "South";
+                case "East":
+                    return "West";
+                case "South":
+                    return "North";
+                case "West":
+                    return "East";
             }
         }
     }

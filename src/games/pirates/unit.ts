@@ -1,7 +1,15 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitAttackArgs, IUnitBuryArgs, IUnitDepositArgs, IUnitDigArgs,
-         IUnitMoveArgs, IUnitProperties, IUnitRestArgs, IUnitSplitArgs,
-         IUnitWithdrawArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    UnitAttackArgs,
+    UnitBuryArgs,
+    UnitConstructorArgs,
+    UnitDepositArgs,
+    UnitDigArgs,
+    UnitMoveArgs,
+    UnitRestArgs,
+    UnitSplitArgs,
+    UnitWithdrawArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 import { Port } from "./port";
@@ -91,20 +99,20 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
+        args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Tile to place this Unit upon. */
             tile: Tile;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
         // <<-- Creer-Merge: constructor -->>
 
         this.acted = true;
-        this.crewHealth = this.crewHealth || (this.crew * this.game.crewHealth);
+        this.crewHealth = this.crewHealth || this.crew * this.game.crewHealth;
 
         // <<-- /Creer-Merge: constructor -->>
     }
@@ -134,7 +142,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         target: "crew" | "ship",
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         const reason = this.invalidate(player, true);
@@ -158,8 +166,8 @@ export class Unit extends GameObject {
             if (tile.unit.crew <= 0) {
                 return `${tile} has got no crew for you to attack!`;
             }
-        }
-        else { // target === "ship"
+        } else {
+            // target === "ship"
             if (tile.unit.shipHealth <= 0) {
                 return `There be no ship for ${this} to attack.`;
             }
@@ -171,10 +179,8 @@ export class Unit extends GameObject {
         const dx = this.tile.x - tile.x;
         const dy = this.tile.y - tile.y;
         const distSq = dx * dx + dy * dy;
-        const range = target === "crew"
-            ? "crewRange"
-            : "shipRange";
-        if (distSq > (this.game[range] ** 2)) {
+        const range = target === "crew" ? "crewRange" : "shipRange";
+        if (distSq > this.game[range] ** 2) {
             return `${this} isn't in range for that attack. Ye don't wanna fire blindly into the wind!`;
         }
 
@@ -225,8 +231,7 @@ export class Unit extends GameObject {
                     // Mark it as dead
                     tile.unit.tile = undefined;
                     tile.unit = undefined;
-                }
-                else {
+                } else {
                     tile.unit.owner = undefined;
                     tile.unit.shipHealth = 1;
 
@@ -235,8 +240,7 @@ export class Unit extends GameObject {
                     tile.unit.path.length = 0;
                 }
             }
-        }
-        else {
+        } else {
             // Ship attacking ship
             tile.unit.shipHealth -= this.game.shipDamage;
             tile.unit.shipHealth = Math.max(0, tile.unit.shipHealth);
@@ -263,20 +267,24 @@ export class Unit extends GameObject {
         if (!merchant) {
             // Calculate each player's net worth
             const allyWorth = player.netWorth() + player.gold - gold;
-            const opponentWorth = (
-                player.opponent.netWorth() + player.opponent.gold + gold
-            ) + deadCrew * this.game.crewCost + deadShips * this.game.shipCost;
+            const opponentWorth =
+                player.opponent.netWorth() +
+                player.opponent.gold +
+                gold +
+                deadCrew * this.game.crewCost +
+                deadShips * this.game.shipCost;
 
             if (allyWorth > opponentWorth) {
                 factor = 0.5;
-            }
-            else if (allyWorth < opponentWorth) {
+            } else if (allyWorth < opponentWorth) {
                 factor = 2;
             }
         }
 
         // Calculate infamy
-        let infamy = (deadCrew * this.game.crewCost + deadShips * this.game.shipCost) * factor;
+        let infamy =
+            (deadCrew * this.game.crewCost + deadShips * this.game.shipCost) *
+            factor;
 
         if (!neutral) {
             if (!merchant) {
@@ -311,7 +319,7 @@ export class Unit extends GameObject {
     protected invalidateBury(
         player: Player,
         amount: number,
-    ): void | string | IUnitBuryArgs {
+    ): void | string | UnitBuryArgs {
         // <<-- Creer-Merge: invalidate-bury -->>
 
         const reason = this.invalidate(player);
@@ -332,21 +340,21 @@ export class Unit extends GameObject {
         }
 
         if (this.tile.gold >= this.game.settings.maxTileGold) {
-            return `${this} can't bury loot on a tile with the max amount of booty (${
-                this.game.settings.maxTileGold
-            }).`;
+            return `${this} can't bury loot on a tile with the max amount of booty (${this.game.settings.maxTileGold}).`;
         }
 
         const dx = this.tile.x - player.port.tile.x;
         const dy = this.tile.y - player.port.tile.y;
         const distSq = dx * dx + dy * dy;
-        if (distSq < this.game.minInterestDistance * this.game.minInterestDistance) {
+        if (
+            distSq <
+            this.game.minInterestDistance * this.game.minInterestDistance
+        ) {
             return `${this} is too close to home! Ye gotta bury yer loot far away from yer port.`;
         }
 
-        let actualAmount = amount <= 0
-            ? this.gold
-            : Math.min(this.gold, amount);
+        let actualAmount =
+            amount <= 0 ? this.gold : Math.min(this.gold, amount);
 
         actualAmount = Math.min(
             this.game.settings.maxTileGold - this.tile.gold,
@@ -364,7 +372,7 @@ export class Unit extends GameObject {
 
     /**
      * Buries gold on this Unit's Tile. Gold must be a certain distance away
-     * for it to get interest (Game.minInterestDistance).
+     * for it to get interest (`Game.minInterestDistance`).
      *
      * @param player - The player that called this.
      * @param amount - How much gold this Unit should bury. Amounts <= 0 will
@@ -400,8 +408,8 @@ export class Unit extends GameObject {
      */
     protected invalidateDeposit(
         player: Player,
-        amount: number = 0,
-    ): void | string | IUnitDepositArgs {
+        amount = 0,
+    ): void | string | UnitDepositArgs {
         // <<-- Creer-Merge: invalidate-deposit -->>
 
         const reason = this.invalidate(player);
@@ -413,9 +421,9 @@ export class Unit extends GameObject {
             throw new Error(`${this} has no Tile!`);
         }
 
-        const tiles = [ this.tile, ...this.tile.getNeighbors() ];
-        const found = tiles.find(
-            (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
+        const tiles = [this.tile, ...this.tile.getNeighbors()];
+        const found = tiles.find((t) =>
+            Boolean(t && t.port && t.port.owner !== player.opponent),
         );
 
         if (!found) {
@@ -438,18 +446,15 @@ export class Unit extends GameObject {
 
     /**
      * Puts gold into an adjacent Port. If that Port is the Player's port, the
-     * gold is added to that Player. If that Port is owned by merchants, it
-     * adds to that Port's investment.
+     * gold is added to that Player. If that Port is owned by merchants, it adds
+     * to that Port's investment.
      *
      * @param player - The player that called this.
      * @param amount - The amount of gold to deposit. Amounts <= 0 will deposit
      * all the gold on this Unit.
      * @returns True if successfully deposited, false otherwise.
      */
-    protected async deposit(
-        player: Player,
-        amount: number = 0,
-    ): Promise<boolean> {
+    protected async deposit(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: deposit -->>
 
         this.gold -= amount;
@@ -458,19 +463,20 @@ export class Unit extends GameObject {
             throw new Error(`${this} has no Tile to deposit gold!`);
         }
 
-        const tiles = [ this.tile, ...this.tile.getNeighbors() ];
-        let tile = tiles.find(
-            (t) => Boolean(t && t.port && t.port.owner !== player.opponent),
+        const tiles = [this.tile, ...this.tile.getNeighbors()];
+        let tile = tiles.find((t) =>
+            Boolean(t && t.port && t.port.owner !== player.opponent),
         ); // will be found as we validated it above
 
         if (tile) {
             player.gold += amount;
-        }
-        else {
+        } else {
             // Get the merchant's port
             tile = tiles.find((t) => Boolean(t && t.port && !t.port.owner));
             if (!tile) {
-                throw new Error("Could not find perchant port tile to deposit money on!");
+                throw new Error(
+                    "Could not find perchant port tile to deposit money on!",
+                );
             }
 
             if (!tile.port) {
@@ -498,8 +504,8 @@ export class Unit extends GameObject {
      */
     protected invalidateDig(
         player: Player,
-        amount: number = 0,
-    ): void | string | IUnitDigArgs {
+        amount = 0,
+    ): void | string | UnitDigArgs {
         // <<-- Creer-Merge: invalidate-dig -->>
 
         const reason = this.invalidate(player);
@@ -521,9 +527,8 @@ export class Unit extends GameObject {
             return `There be no booty for ${this} to plunder.`;
         }
 
-        const actualAmount = amount <= 0 || amount > this.tile.gold
-            ? this.tile.gold
-            : amount;
+        const actualAmount =
+            amount <= 0 || amount > this.tile.gold ? this.tile.gold : amount;
 
         return { amount: actualAmount };
 
@@ -538,10 +543,7 @@ export class Unit extends GameObject {
      * dig up as much as possible.
      * @returns True if successfully dug up, false otherwise.
      */
-    protected async dig(
-        player: Player,
-        amount: number = 0,
-    ): Promise<boolean> {
+    protected async dig(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: dig -->>
 
         if (!this.tile) {
@@ -572,7 +574,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         const reason = this.invalidate(player);
@@ -601,7 +603,12 @@ export class Unit extends GameObject {
             return `${this} refuses to share the same ground with a living foe.`;
         }
 
-        if (!ship && tile.type === "water" && !tile.port && !(tile.unit && tile.unit.shipHealth > 0)) {
+        if (
+            !ship &&
+            tile.type === "water" &&
+            !tile.port &&
+            !(tile.unit && tile.unit.shipHealth > 0)
+        ) {
             return `${this} has no ship and can't walk on water!`;
         }
 
@@ -631,8 +638,8 @@ export class Unit extends GameObject {
     /**
      * Moves this Unit from its current Tile to an adjacent Tile. If this Unit
      * merges with another one, the other Unit will be destroyed and its tile
-     * will be set to undefined. Make sure to check that your Unit's tile is
-     * not undefined before doing things with it.
+     * will be set to undefined. Make sure to check that your Unit's tile is not
+     * undefined before doing things with it.
      *
      * @param player - The player that called this.
      * @param tile - The Tile this Unit should move to.
@@ -654,8 +661,7 @@ export class Unit extends GameObject {
             this.shipHealth += other.shipHealth;
             this.acted = this.acted || other.acted || other.shipHealth > 0;
             this.moves = Math.min(this.moves - 1, other.moves);
-        }
-        else {
+        } else {
             if (!this.tile) {
                 throw new Error(`${this} has no Tile to move from!`);
             }
@@ -681,7 +687,7 @@ export class Unit extends GameObject {
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
      */
-    protected invalidateRest(player: Player): void | string | IUnitRestArgs {
+    protected invalidateRest(player: Player): void | string | UnitRestArgs {
         // <<-- Creer-Merge: invalidate-rest -->>
 
         const reason = this.invalidate(player, true);
@@ -695,7 +701,11 @@ export class Unit extends GameObject {
 
         // Check if it's in range
         const radius = this.game.restRange;
-        if (((this.tile.x - player.port.tile.x) ** 2 + (this.tile.y - player.port.tile.y) ** 2) > radius ** 2) {
+        if (
+            (this.tile.x - player.port.tile.x) ** 2 +
+                (this.tile.y - player.port.tile.y) ** 2 >
+            radius ** 2
+        ) {
             return `${this} has no nearby port to rest at. No home tavern means no free rum!`;
         }
 
@@ -712,10 +722,16 @@ export class Unit extends GameObject {
         // <<-- Creer-Merge: rest -->>
 
         // Heal the units
-        this.crewHealth += Math.ceil(this.game.crewHealth * this.game.healFactor) * this.crew;
-        this.crewHealth = Math.min(this.crewHealth, this.crew * this.game.crewHealth);
+        this.crewHealth +=
+            Math.ceil(this.game.crewHealth * this.game.healFactor) * this.crew;
+        this.crewHealth = Math.min(
+            this.crewHealth,
+            this.crew * this.game.crewHealth,
+        );
         if (this.shipHealth > 0) {
-            this.shipHealth += Math.ceil(this.game.shipHealth * this.game.healFactor);
+            this.shipHealth += Math.ceil(
+                this.game.shipHealth * this.game.healFactor,
+            );
             this.shipHealth = Math.min(this.shipHealth, this.game.shipHealth);
         }
 
@@ -737,8 +753,8 @@ export class Unit extends GameObject {
      * @param tile - The Tile to move the crew to.
      * @param amount - The number of crew to move onto that Tile. Amount <= 0
      * will move all the crew to that Tile.
-     * @param gold - The amount of gold the crew should take with them. Gold <
-     * 0 will move all the gold to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold < 0
+     * will move all the gold to that Tile.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -746,9 +762,9 @@ export class Unit extends GameObject {
     protected invalidateSplit(
         player: Player,
         tile: Tile,
-        amount: number = 1,
-        gold: number = 0,
-    ): void | string | IUnitSplitArgs {
+        amount = 1,
+        gold = 0,
+    ): void | string | UnitSplitArgs {
         // <<-- Creer-Merge: invalidate-split -->>
 
         const reason = this.invalidate(player);
@@ -784,7 +800,10 @@ export class Unit extends GameObject {
             return `${this} can't split onto water!`;
         }
 
-        if (tile.unit && (tile.unit.owner === player.opponent || tile.unit.targetPort)) {
+        if (
+            tile.unit &&
+            (tile.unit.owner === player.opponent || tile.unit.targetPort)
+        ) {
             return `${this} can't split onto enemy pirates!`;
         }
 
@@ -793,14 +812,14 @@ export class Unit extends GameObject {
         }
 
         // Adjust the amount of crew to split
-        const actualAmount = amount <= 0
-            ? this.crew
-            : Math.min(amount, this.crew);
+        const actualAmount =
+            amount <= 0 ? this.crew : Math.min(amount, this.crew);
 
         // Adjust the amount of gold to split
-        const actualGold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
-            ? this.gold
-            : Math.min(gold, this.gold);
+        const actualGold =
+            (amount === this.crew && this.shipHealth <= 0) || gold < 0
+                ? this.gold
+                : Math.min(gold, this.gold);
 
         return {
             amount: actualAmount,
@@ -818,15 +837,15 @@ export class Unit extends GameObject {
      * @param tile - The Tile to move the crew to.
      * @param amount - The number of crew to move onto that Tile. Amount <= 0
      * will move all the crew to that Tile.
-     * @param gold - The amount of gold the crew should take with them. Gold <
-     * 0 will move all the gold to that Tile.
+     * @param gold - The amount of gold the crew should take with them. Gold < 0
+     * will move all the gold to that Tile.
      * @returns True if successfully split, false otherwise.
      */
     protected async split(
         player: Player,
         tile: Tile,
-        amount: number = 1,
-        gold: number = 0,
+        amount = 1,
+        gold = 0,
     ): Promise<boolean> {
         // <<-- Creer-Merge: split -->>
 
@@ -848,24 +867,27 @@ export class Unit extends GameObject {
             acted: tile.unit && tile.unit.shipHealth > 0,
 
             // Crew health
-            crewHealth: amount === this.crew
-                ? this.crewHealth
-                : Math.ceil((this.crewHealth / originalCrew) * amount),
+            crewHealth:
+                amount === this.crew
+                    ? this.crewHealth
+                    : Math.ceil((this.crewHealth / originalCrew) * amount),
         };
 
         // Move the crew
         this.crew -= amount;
 
         // Adjust the amount of gold to split
-        newUnit.gold = ((amount === this.crew && this.shipHealth <= 0) || gold < 0)
-            ? this.gold
-            : Math.min(gold, this.gold);
+        newUnit.gold =
+            (amount === this.crew && this.shipHealth <= 0) || gold < 0
+                ? this.gold
+                : Math.min(gold, this.gold);
         this.gold -= newUnit.gold;
 
         // Crew health
-        newUnit.crewHealth = amount === this.crew
-            ? this.crewHealth
-            : Math.ceil((this.crewHealth / originalCrew) * amount);
+        newUnit.crewHealth =
+            amount === this.crew
+                ? this.crewHealth
+                : Math.ceil((this.crewHealth / originalCrew) * amount);
         this.crewHealth -= newUnit.crewHealth || 0;
 
         // Ownership
@@ -888,8 +910,7 @@ export class Unit extends GameObject {
             other.crewHealth += newUnit.crewHealth || 0;
             other.acted = other.acted || other.shipHealth > 0;
             other.moves = Math.min(newUnit.moves || 0, other.moves);
-        }
-        else {
+        } else {
             const unit = this.game.manager.create.unit(newUnit);
             if (!unit.tile) {
                 throw new Error("New unit is not on a Tile somehow!");
@@ -919,8 +940,8 @@ export class Unit extends GameObject {
      */
     protected invalidateWithdraw(
         player: Player,
-        amount: number = 0,
-    ): void | string | IUnitWithdrawArgs {
+        amount = 0,
+    ): void | string | UnitWithdrawArgs {
         // <<-- Creer-Merge: invalidate-withdraw -->>
 
         const reason = this.invalidate(player);
@@ -961,10 +982,7 @@ export class Unit extends GameObject {
      * withdraw everything.
      * @returns True if successfully withdrawn, false otherwise.
      */
-    protected async withdraw(
-        player: Player,
-        amount: number = 0,
-    ): Promise<boolean> {
+    protected async withdraw(player: Player, amount = 0): Promise<boolean> {
         // <<-- Creer-Merge: withdraw -->>
 
         this.gold += amount;
@@ -978,13 +996,16 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
-     * @returns the reason this is invalid, undefined if looks valid so far
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
+     * @returns The reason this is invalid, undefined if looks valid so far.
      */
-    private invalidate(player: Player, checkAction?: true): string | undefined {
+    private invalidate(
+        player: Player,
+        checkAction?: true,
+    ): string | undefined {
         if (!player || player !== this.game.currentPlayer) {
             return `Avast, it isn't yer turn, ${player}.`;
         }

@@ -1,6 +1,6 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties } from "./";
+import { TileConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Machine } from "./machine";
 import { Player } from "./player";
@@ -11,8 +11,8 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
- * 'west'). blank means conveyor doesn't move.
+ * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+ * or 'west'). Blank means conveyor doesn't move.
  */
 export type TileDirection = "blank" | "north" | "east" | "south" | "west";
 
@@ -42,8 +42,8 @@ export class Tile extends GameObject implements BaseTile {
     public decoration!: number;
 
     /**
-     * The direction of a conveyor belt ('blank', 'north', 'east', 'south', or
-     * 'west'). blank means conveyor doesn't move.
+     * The direction of a conveyor belt ('blank', 'north', 'east', 'south',
+     * or 'west'). Blank means conveyor doesn't move.
      */
     public readonly direction!: "blank" | "north" | "east" | "south" | "west";
 
@@ -98,8 +98,8 @@ export class Tile extends GameObject implements BaseTile {
     public readonly tileWest?: Tile;
 
     /**
-     * The type of Tile this is ('normal', 'generator', 'conveyor', or
-     * 'spawn').
+     * The type of Tile this is ('normal', 'generator', 'conveyor',
+     * or 'spawn').
      */
     public readonly type!: "normal" | "generator" | "conveyor" | "spawn";
 
@@ -134,8 +134,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: TileConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -163,8 +163,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -173,20 +175,22 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this) as Tile[];
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**
@@ -196,17 +200,15 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */
     public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
 

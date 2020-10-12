@@ -1,6 +1,12 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitActArgs, IUnitAttackArgs, IUnitDropArgs, IUnitMoveArgs,
-         IUnitPickupArgs, IUnitProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    UnitActArgs,
+    UnitAttackArgs,
+    UnitConstructorArgs,
+    UnitDropArgs,
+    UnitMoveArgs,
+    UnitPickupArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -9,7 +15,9 @@ import { Tile } from "./tile";
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 
-const materialNameToVariableName = (material: Required<IUnitPickupArgs>["material"]) => {
+const materialNameToVariableName = (
+    material: Required<UnitPickupArgs>["material"],
+) => {
     switch (material) {
         case "redium":
         case "blueium":
@@ -38,8 +46,8 @@ export class Unit extends GameObject {
     public blueium!: number;
 
     /**
-     * The amount of blueium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of blueium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     public blueiumOre!: number;
 
@@ -70,8 +78,8 @@ export class Unit extends GameObject {
     public redium!: number;
 
     /**
-     * The amount of redium ore carried by this unit. (0 to job carry capacity
-     * - other carried items).
+     * The amount of redium ore carried by this unit. (0 to job carry
+     * capacity - other carried items).
      */
     public rediumOre!: number;
 
@@ -92,11 +100,8 @@ export class Unit extends GameObject {
 
     // <<-- Creer-Merge: attributes -->>
 
-    // Any additional member attributes can go here
-    // NOTE: They will not be sent to the AIs, those must be defined
-    // in the creer file.
     /**
-     * tracks if a unit was attacked.
+     * Tracks if a unit was attacked.
      */
     public attacked: boolean;
 
@@ -109,13 +114,13 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
+        args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Job this Unit will have. */
             job: Job;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -148,7 +153,7 @@ export class Unit extends GameObject {
     protected invalidateAct(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitActArgs {
+    ): void | string | UnitActArgs {
         // <<-- Creer-Merge: invalidate-act -->>
 
         // Check all the arguments for act here and try to
@@ -166,8 +171,12 @@ export class Unit extends GameObject {
             return `${this}, is trying to act on a tile that doesn't exist`;
         }
         // make sure the tile is next to the unit
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only act on an adjacent tile.`;
         }
         // make sure valid target
@@ -183,10 +192,15 @@ export class Unit extends GameObject {
             // if there isn't a machine.
             else if (tile.machine) {
                 if (tile.machine.worked <= 0) {
-                    if (tile.machine.oreType === "redium" && tile.rediumOre < tile.machine.refineInput) {
+                    if (
+                        tile.machine.oreType === "redium" &&
+                        tile.rediumOre < tile.machine.refineInput
+                    ) {
                         return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
-                    }
-                    else if (tile.machine.oreType === "blueium" && tile.blueiumOre < tile.machine.refineInput) {
+                    } else if (
+                        tile.machine.oreType === "blueium" &&
+                        tile.blueiumOre < tile.machine.refineInput
+                    ) {
                         return `${this} tried to work the machine on ${tile} which didn't have enough input to start`;
                     }
                 }
@@ -325,7 +339,7 @@ export class Unit extends GameObject {
     protected invalidateAttack(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitAttackArgs {
+    ): void | string | UnitAttackArgs {
         // <<-- Creer-Merge: invalidate-attack -->>
 
         // Check all the arguments for attack here and try to
@@ -343,8 +357,12 @@ export class Unit extends GameObject {
             return `${this} is trying to attack a tile that doesn't exist`;
         }
         // make sure the tile is in range.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} is trying to attack ${tile} which is too far away.`;
         }
         // check if the unit is attacking a wall (not needed but we try to be funny).
@@ -415,8 +433,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be dropped on.
      * @param amount - The number of materials to dropped. Amounts <= 0 will
      * drop all the materials.
-     * @param material - The material the unit will drop. 'redium', 'blueium',
-     * 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will
+     * drop. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -426,7 +444,7 @@ export class Unit extends GameObject {
         tile: Tile,
         amount: number,
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
-    ): void | string | IUnitDropArgs {
+    ): void | string | UnitDropArgs {
         // <<-- Creer-Merge: invalidate-drop -->>
         const reason = this.invalidate(player, false);
         // if there is a reason, return it.
@@ -443,8 +461,13 @@ export class Unit extends GameObject {
             return `${this} is trying to prove flat earthers correct. Target Tile doesn't exist.`;
         }
         // make sure it is selecting a adjacent tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            tile !== this.tile &&
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -459,8 +482,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be dropped on.
      * @param amount - The number of materials to dropped. Amounts <= 0 will
      * drop all the materials.
-     * @param material - The material the unit will drop. 'redium', 'blueium',
-     * 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will
+     * drop. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns True if successfully deposited, false otherwise.
      */
     protected async drop(
@@ -480,8 +503,7 @@ export class Unit extends GameObject {
             tile.redium += this.redium;
             tile.rediumOre += this.rediumOre;
             this.blueium = this.redium = this.blueiumOre = this.rediumOre = 0;
-        }
-        else {
+        } else {
             tile[memberName] += amt;
             this[memberName] -= amt;
         }
@@ -505,7 +527,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
 
         // check widespread reasons.
@@ -535,8 +557,12 @@ export class Unit extends GameObject {
             return `${this} cannot walk through the unit on tile ${tile}. Yet.....`;
         }
         // make sure the tile is next to the unit.
-        if (this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only travel to an adjacent tile. Tile ${tile} too far away.`;
         }
         // make sure they aren't entering a spawn area.
@@ -587,8 +613,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
      * pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'redium',
-     * 'blueium', 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will pick
+     * up. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -598,7 +624,7 @@ export class Unit extends GameObject {
         tile: Tile,
         amount: number,
         material: "redium ore" | "redium" | "blueium" | "blueium ore",
-    ): void | string | IUnitPickupArgs {
+    ): void | string | UnitPickupArgs {
         // <<-- Creer-Merge: invalidate-pickup -->>
 
         // Check all the arguments for pickup here and try to
@@ -617,8 +643,13 @@ export class Unit extends GameObject {
             return `${this} can only pick things up off tiles that exist`;
         }
         // make sure the tile is adjacent to the current tile, or its tile.
-        if (tile !== this.tile && this.tile !== tile.tileEast && this.tile !== tile.tileSouth &&
-            this.tile !== tile.tileWest && this.tile !== tile.tileNorth) {
+        if (
+            tile !== this.tile &&
+            this.tile !== tile.tileEast &&
+            this.tile !== tile.tileSouth &&
+            this.tile !== tile.tileWest &&
+            this.tile !== tile.tileNorth
+        ) {
             return `${this} can only drop things on adjacent tiles or it's tile. Target tile ${tile} is too far away.`;
         }
 
@@ -656,12 +687,14 @@ export class Unit extends GameObject {
             }
         }
 
-        const actualAmount = amount <= 0
-            ? totalMaterialOnTile
-            : Math.min(totalMaterialOnTile, amount);
+        const actualAmount =
+            amount <= 0
+                ? totalMaterialOnTile
+                : Math.min(totalMaterialOnTile, amount);
 
         // Amount of materials the unit is currently carrying
-        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+        const currentLoad =
+            this.rediumOre + this.redium + this.blueium + this.blueiumOre;
         // if the unit can't carry anymore.
         if (currentLoad === this.job.carryLimit) {
             return `${this} is already carrying as many resources as it can.`;
@@ -680,8 +713,8 @@ export class Unit extends GameObject {
      * @param tile - The tile the materials will be picked up from.
      * @param amount - The amount of materials to pick up. Amounts <= 0 will
      * pick up all the materials that the unit can.
-     * @param material - The material the unit will pick up. 'redium',
-     * 'blueium', 'redium ore', or 'blueium ore'.
+     * @param material - The material the unit will pick
+     * up. 'redium', 'blueium', 'redium ore', or 'blueium ore'.
      * @returns True if successfully deposited, false otherwise.
      */
     protected async pickup(
@@ -694,12 +727,17 @@ export class Unit extends GameObject {
         const memberName = materialNameToVariableName(material);
         const totalMaterialOnTile = tile[memberName];
 
-        let actualAmount = amount <= 0
-            ? totalMaterialOnTile
-            : Math.min(totalMaterialOnTile, amount);
-        const currentLoad = this.rediumOre + this.redium + this.blueium + this.blueiumOre;
+        let actualAmount =
+            amount <= 0
+                ? totalMaterialOnTile
+                : Math.min(totalMaterialOnTile, amount);
+        const currentLoad =
+            this.rediumOre + this.redium + this.blueium + this.blueiumOre;
 
-        actualAmount = Math.min(actualAmount, this.job.carryLimit - currentLoad);
+        actualAmount = Math.min(
+            actualAmount,
+            this.job.carryLimit - currentLoad,
+        );
 
         tile[memberName] -= actualAmount;
         this[memberName] += actualAmount;
@@ -712,15 +750,15 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     /**
-     * Tries to invalidate args for an action function
+     * Tries to invalidate args for an action function.
      *
-     * @param player - the player commanding this Unit
-     * @param checkAction - true to check if this Unit has an action
+     * @param player - The player commanding this Unit.
+     * @param checkAction - True to check if this Unit has an action.
      * @returns The reason this is invalid, undefined if looks valid so far.
      */
     private invalidate(
         player: Player,
-        checkAction: boolean = false,
+        checkAction = false,
     ): string | undefined {
         if (!player || player !== this.game.currentPlayer) {
             return `It isn't your turn, ${player}.`;
