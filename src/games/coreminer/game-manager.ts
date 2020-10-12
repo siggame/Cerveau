@@ -182,7 +182,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
      * @param bombs The bombs to blow up.
      */
     private updateBombs(bombs: Unit[]): void {
-        const bombsToUpdate: Unit[] = [];
+        let bombsToUpdate: Unit[] = [];
 
         // Bombs can kill units without health upgrades
         const dmg = this.game.jobs[0].health[0];
@@ -310,7 +310,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         // Update any triggered bombs that aren't blown up already
-        bombsToUpdate.filter((bomb) => bomb.health > 0);
+        bombsToUpdate = bombsToUpdate.filter((bomb) => bomb.health > 0);
         if (bombsToUpdate.length > 0) {
             this.updateBombs(bombsToUpdate);
         }
