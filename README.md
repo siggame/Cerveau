@@ -1,12 +1,12 @@
 # Cerveau
 
 The Node.js implementation of a multi-game server intended for games with
-AIs within the [Cadre][cadre] framework using [TypeScript][ts].
+AIs within the [Cadre] framework using [TypeScript].
 
 ![{Cadre}](http://i.imgur.com/17wwI3f.png)
 
-All inspiration taken from [MST's SIG-GAME framework][siggame],
-and most of the terminology is assuming some familiarity with it as this is a
+All inspiration taken from [Missouri S&T's SIG-GAME framework], and most of the
+terminology is assuming some familiarity with it as this is a
 spiritual successor to it.
 
 ## Features
@@ -18,7 +18,7 @@ spiritual successor to it.
     and clients can choose which games to play.
 * A simple Node.js app: Simple to write, fast to run, and very easy to
   develop in.
-* Easy generation of new games using the [Creer][creer] codegen.
+* Easy generation of new games using the [Creer] codegen.
   * Most of the game code is easy to replace using generatedObjName.js files to
     ease Creer codegen re-runs.
 * Games can be turn based or real time, with turn based code abstracted into an
@@ -50,12 +50,12 @@ spiritual successor to it.
 
 Developing is super easy, especially if you just want to code games.
 
-We recommend using [Visual Studio Code][vsc] as your IDE with the
-[tslint][tslint] plugin. It comes with everything you need to build, run, and
+We recommend using [Visual Studio Code] as your IDE with the [ESLint] plugin.
+It comes with everything you need to build, run, and
 debug the game server.
 
-After that you don't need much knowledge of JS/TS. Visual Studio code, and the
-linter (tslint) will yell at you, and suggest code, to help guide you. Most
+After that you don't need much knowledge of JS/TS. [Visual Studio Code], and the
+linter ([Eslint]) will yell at you, and suggest code, to help guide you. Most
 game logic can be written by students new to programming, as 99% of the
 heavy lifting is handled by the core of this project.
 
@@ -65,8 +65,8 @@ projects.
 
 ### Requirements
 
-Node v9 is the supported version. It may run on older/newer versions,
-(epically if you babel it), but we do not support them officially.
+The node version defined in `.nvmrc` is the latest supported version.
+It may run on older/newer versions, but we do not support them officially.
 
 ## How to Run
 
@@ -112,7 +112,7 @@ process!
 
 ## How to add games
 
-Use [Creer][creer] to generate some base code given the basic game structure.
+Use [Creer] to generate some base code given the basic game structure.
 
 Then fill in the functions for the functions to you make in your game objects.
 Everything else should be handled by the base classes in both this server and
@@ -154,7 +154,7 @@ balance games faster (like a unit damage setting).
 
 ## Debugging
 
-We've included a debugging profile for [Visual Studio Code][vsc] that
+We've included a debugging profile for [Visual Studio Code] that
 requires no additional configuration. Just open this project in VSC, and hit
 "Start Debugging" (F5 by default).
 
@@ -163,11 +163,11 @@ anywhere to see what is happening. A bunch of settings are enabled/disabled
 to make debugging easier, like not timing out clients so you can poke around
 in paused code for long periods of time without killing clients.
 
-[vsc]: https://code.visualstudio.com/
-[ts]: https://www.typescriptlang.org/
-[tslint]: https://marketplace.visualstudio.com/items?itemName=eg2.tslint
-[siggame]: https://github.com/siggame
-[cadre]: https://github.com/siggame/Cadre
-[creer]: https://github.com/siggame/Creer
+[Visual Studio Code]: https://code.visualstudio.com/
+[TypeScript]: https://www.typescriptlang.org/
+[ESLint]: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
+[Missouri S&T's SIG-GAME framework]: https://github.com/siggame
+[Cadre]: https://github.com/siggame/Cadre
+[Creer]: https://github.com/siggame/Creer
 [joueur.py]: https://github.com/siggame/Joueur.py
 [joueur.js]: https://github.com/siggame/Joueur.js

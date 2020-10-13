@@ -4,30 +4,39 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Stardash game
+ * The interface that the Player for the Stardash game
  * must implement from mixed in game logic.
  */
-export interface IBaseStardashPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface BaseStardashPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -69,8 +78,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Body. */
-export interface IBodyProperties {
+/** All the possible properties for Body instances. */
+export interface BodyProperties {
     /**
      * The amount of material the object has, or energy if it is a planet.
      */
@@ -82,10 +91,15 @@ export interface IBodyProperties {
     bodyType?: "planet" | "asteroid" | "sun";
 
     /**
-     * The type of material the celestial body has. Either 'none', 'genarium',
-     * 'rarium', 'legendarium', or 'mythicite'.
+     * The type of material the celestial body
+     * has. Either 'none', 'genarium', 'rarium', 'legendarium', or 'mythicite'.
      */
-    materialType?: "none" | "genarium" | "rarium" | "legendarium" | "mythicite";
+    materialType?:
+        | "none"
+        | "genarium"
+        | "rarium"
+        | "legendarium"
+        | "mythicite";
 
     /**
      * The Player that owns and can control this Body.
@@ -106,7 +120,6 @@ export interface IBodyProperties {
      * The y value this celestial body is on.
      */
     y?: number;
-
 }
 
 /**
@@ -114,7 +127,7 @@ export interface IBodyProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodyNextXArgs {
+export interface BodyNextXArgs {
     /**
      * The number of turns in the future you wish to check.
      */
@@ -126,7 +139,7 @@ export interface IBodyNextXArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodyNextYArgs {
+export interface BodyNextYArgs {
     /**
      * The number of turns in the future you wish to check.
      */
@@ -138,7 +151,7 @@ export interface IBodyNextYArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBodySpawnArgs {
+export interface BodySpawnArgs {
     /**
      * The x value of the spawned unit.
      */
@@ -153,12 +166,11 @@ export interface IBodySpawnArgs {
     title?: string;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * How many combined resources a unit with this Job can hold at once.
      */
@@ -190,8 +202,8 @@ export interface IJobProperties {
     shield?: number;
 
     /**
-     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport', or
-     * 'miner'. (in this order from 0-4).
+     * The Job title. 'corvette', 'missileboat', 'martyr', 'transport',
+     * or 'miner'. (in this order from 0-4).
      */
     title?: "corvette" | "missileboat" | "martyr" | "transport" | "miner";
 
@@ -199,11 +211,10 @@ export interface IJobProperties {
      * How much money it costs to spawn a unit.
      */
     unitCost?: number;
-
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -271,11 +282,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Projectile. */
-export interface IProjectileProperties {
+/** All the possible properties for Projectile instances. */
+export interface ProjectileProperties {
     /**
      * The remaining health of the projectile.
      */
@@ -305,11 +315,10 @@ export interface IProjectileProperties {
      * The y value this projectile is on.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether or not this Unit has performed its action this turn.
      */
@@ -394,7 +403,6 @@ export interface IUnitProperties {
      * The y value this unit is on.
      */
     y?: number;
-
 }
 
 /**
@@ -402,7 +410,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Unit being attacked.
      */
@@ -411,10 +419,10 @@ export interface IUnitAttackArgs {
 
 /**
  * Argument overrides for Unit's dash function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitDashArgs {
+export interface UnitDashArgs {
     /**
      * The x value of the destination's coordinates.
      */
@@ -427,10 +435,10 @@ export interface IUnitDashArgs {
 
 /**
  * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMineArgs {
+export interface UnitMineArgs {
     /**
      * The object to be mined.
      */
@@ -439,10 +447,10 @@ export interface IUnitMineArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The x value of the destination's coordinates.
      */
@@ -455,10 +463,10 @@ export interface IUnitMoveArgs {
 
 /**
  * Argument overrides for Unit's safe function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitSafeArgs {
+export interface UnitSafeArgs {
     /**
      * The x position of the location you wish to arrive.
      */
@@ -474,7 +482,7 @@ export interface IUnitSafeArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitShootdownArgs {
+export interface UnitShootdownArgs {
     /**
      * The projectile being shot down.
      */
@@ -486,7 +494,7 @@ export interface IUnitShootdownArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitTransferArgs {
+export interface UnitTransferArgs {
     /**
      * The unit you are grabbing the resources from.
      */
@@ -502,6 +510,54 @@ export interface IUnitTransferArgs {
      */
     material?: "genarium" | "rarium" | "legendarium" | "mythicite";
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Body.
+ */
+export type BodyConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BodyProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Job.
+ */
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseStardashPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Projectile.
+ */
+export type ProjectileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<ProjectileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./body";
 export * from "./game-object";
@@ -525,16 +581,16 @@ import { StardashGame } from "./game";
 import { StardashGameManager } from "./game-manager";
 import { StardashGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Body */
+/** The arguments used to construct a Body. */
 export type BodyArgs = FirstArgumentFromConstructor<typeof Body>;
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Projectile */
+/** The arguments used to construct a Projectile. */
 export type ProjectileArgs = FirstArgumentFromConstructor<typeof Projectile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -545,13 +601,11 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Body in the Game and tracks it for all players.
      *
-     * @param args - Data about the Body to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Body to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Body hooked up in the game and ready for you to use.
      */
-    public body<T extends BodyArgs>(
-        args: Readonly<T>,
-    ): Body & T {
+    public body<T extends BodyArgs>(args: Readonly<T>): Body & T {
         return this.createGameObject("Body", Body, args);
     }
 
@@ -562,9 +616,7 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
@@ -573,8 +625,7 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Projectile to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Projectile hooked up in the game and ready for you to
-     * use.
+     * @returns A new Projectile hooked up in the game and ready for you to use.
      */
     public projectile<T extends ProjectileArgs>(
         args: Readonly<T>,
@@ -585,16 +636,13 @@ export class StardashGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -617,12 +665,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new StardashGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -766,8 +812,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Body: {
             parentClassName: "GameObject",
@@ -783,7 +828,13 @@ export const Namespace = makeNamespace({
                 materialType: {
                     typeName: "string",
                     defaultValue: "none",
-                    literals: ["none", "genarium", "rarium", "legendarium", "mythicite"],
+                    literals: [
+                        "none",
+                        "genarium",
+                        "rarium",
+                        "legendarium",
+                        "mythicite",
+                    ],
                 },
                 owner: {
                     typeName: "gameObject",
@@ -900,14 +951,19 @@ export const Namespace = makeNamespace({
                 title: {
                     typeName: "string",
                     defaultValue: "corvette",
-                    literals: ["corvette", "missileboat", "martyr", "transport", "miner"],
+                    literals: [
+                        "corvette",
+                        "missileboat",
+                        "martyr",
+                        "transport",
+                        "miner",
+                    ],
                 },
                 unitCost: {
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -966,8 +1022,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Projectile: {
             parentClassName: "GameObject",
@@ -995,8 +1050,7 @@ export const Namespace = makeNamespace({
                     typeName: "float",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -1163,7 +1217,12 @@ export const Namespace = makeNamespace({
                             argName: "material",
                             typeName: "string",
                             defaultValue: "genarium",
-                            literals: ["genarium", "rarium", "legendarium", "mythicite"],
+                            literals: [
+                                "genarium",
+                                "rarium",
+                                "legendarium",
+                                "mythicite",
+                            ],
                         },
                     ],
                     invalidValue: false,
@@ -1174,5 +1233,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "0fa378e83ac567ebdf3e9805d3f130023f936e2740acda173d238b37f2b5d541",
+    gameVersion:
+        "0fa378e83ac567ebdf3e9805d3f130023f936e2740acda173d238b37f2b5d541",
 });

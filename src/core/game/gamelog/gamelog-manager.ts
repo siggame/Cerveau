@@ -1,32 +1,37 @@
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import * as fs from "fs-extra";
 import { basename, join } from "path";
 import { createGzip } from "zlib";
 import { Config } from "~/core/config";
 import { gunzipFile, Immutable, stringToMoment } from "~/utils";
-import { filenameFor, GAMELOG_EXTENSION, getURL, getVisualizerURL } from "./gamelog-utils";
+import {
+    filenameFor,
+    GAMELOG_EXTENSION,
+    getURL,
+    getVisualizerURL,
+} from "./gamelog-utils";
 
-/** The default gamelogs directory */
+/** The default gamelogs directory. */
 const DEFAULT_LOGS_DIR = join(Config.LOGS_DIR, "gamelogs/");
 
-/** Represents information about an unloaded gamelog */
-export interface IGamelogInfo {
+/** Represents information about an unloaded gamelog. */
+export interface GamelogInfo {
     /**
      * The filename of the gamelog this info is about, use it to load the
      * entire gamelog.
      */
     filename: string;
 
-    /** The epoch time the gamelog was written */
+    /** The epoch time the gamelog was written. */
     epoch: number;
 
-    /** The game session id this gamelog logged */
+    /** The game session id this gamelog logged. */
     session: string;
 
-    /** The name of the game this gamelog is for */
+    /** The name of the game this gamelog is for. */
     gameName: string;
 
-    /** The uri to this gamelog on this instance */
+    /** The uri to this gamelog on this instance. */
     uri: string;
 
     /**
@@ -44,7 +49,7 @@ export class GamelogManager {
     // state-full part of the class
 
     /** Cached info about all the gamelogs sitting on disk. */
-    public readonly gamelogInfos: IGamelogInfo[] = [];
+    public readonly gamelogInfos: GamelogInfo[] = [];
 
     /** The set of filenames we are currently writing to the disk. */
     private filenamesWriting = new Set<string>();
@@ -56,11 +61,11 @@ export class GamelogManager {
      * gamelogs to.
      */
     constructor(
-        /** The directory where this will save gamelog files to */
+        /** The directory where this will save gamelog files to. */
         public readonly gamelogDirectory: string = DEFAULT_LOGS_DIR,
     ) {
         if (Config.LOAD_EXISTING_GAMELOGS) {
-            this.initializeGamelogInfos();
+            void this.initializeGamelogInfos();
         }
     }
 
@@ -71,7 +76,7 @@ export class GamelogManager {
      * representation of the gamelog.
      * @returns A promise that resolves to the filename written.
      */
-    public log(gamelog: Immutable<IGamelog>): Promise<string> {
+    public log(gamelog: Immutable<Gamelog>): Promise<string> {
         const serialized = JSON.stringify(gamelog);
         const filename = filenameFor(gamelog);
 
@@ -113,9 +118,9 @@ export class GamelogManager {
      * Gets the first gamelog matching the filename, without the extension.
      *
      * @param filename - The base filename (without gamelog extension) you want
-     * in LOGS_DIR/gamelogs/
-     * @returns - A promise to a gamelog matching passed in parameters, or
-     * undefined if no gamelog. second arg is error.
+     * in `LOGS_DIR/gamelogs/`.
+     * @returns A promise that resolves to a gamelog matching passed in
+     * parameters, or undefined if no gamelog.
      */
     public async getGamelog(filename: string): Promise<Buffer | undefined> {
         const gamelogPath = await this.checkGamelog(filename);
@@ -128,10 +133,11 @@ export class GamelogManager {
     }
 
     /**
-     * Deletes the first gamelog matching the filename, without the extension
-     * @param filename the base filename (without gamelog extension) you want
+     * Deletes the first gamelog matching the filename, without the extension.
+     *
+     * @param filename - The base filename (without gamelog extension) you want
      * in LOGS_DIR/gamelogs.
-     * @returns the a boolean if it was successfully deleted
+     * @returns The a boolean if it was successfully deleted.
      */
     public async deleteGamelog(filename: string): Promise<boolean> {
         const gamelogPath = await this.checkGamelog(filename);
@@ -157,7 +163,7 @@ export class GamelogManager {
     /**
      * Attempts to get the read stream for the gamelog's filename.
      *
-     * @param filename - The filename of the gamelog to get
+     * @param filename - The filename of the gamelog to get.
      * @returns A promise that resolves to the gamelog's read stream if found,
      * otherwise resolves to undefined.
      */
@@ -165,9 +171,10 @@ export class GamelogManager {
         filename: string,
     ): Promise<undefined | fs.ReadStream> {
         const lastGameInfo = this.gamelogInfos[this.gamelogInfos.length - 1];
-        const filenameToCheck = (filename === "latest" && lastGameInfo)
-            ? lastGameInfo.filename
-            : filename;
+        const filenameToCheck =
+            filename === "latest" && lastGameInfo
+                ? lastGameInfo.filename
+                : filename;
 
         const path = await this.checkGamelog(filenameToCheck);
 
@@ -188,7 +195,8 @@ export class GamelogManager {
         const files = await fs.readdir(this.gamelogDirectory);
 
         for (const filename of files) {
-            if (!this.filenamesWriting.has(filename) &&
+            if (
+                !this.filenamesWriting.has(filename) &&
                 filename.endsWith(GAMELOG_EXTENSION)
             ) {
                 // then it is a gamelog
@@ -227,7 +235,7 @@ export class GamelogManager {
     private async checkGamelog(filename: string): Promise<string | undefined> {
         const filenameWithExtension = filename.endsWith(GAMELOG_EXTENSION)
             ? filename
-            : (filename + GAMELOG_EXTENSION);
+            : filename + GAMELOG_EXTENSION;
 
         const gamelogPath = join(this.gamelogDirectory, filenameWithExtension);
 
@@ -239,11 +247,8 @@ export class GamelogManager {
         try {
             const stats = await fs.stat(gamelogPath);
 
-            return stats.isFile()
-                ? gamelogPath
-                : undefined;
-        }
-        catch (err) {
+            return stats.isFile() ? gamelogPath : undefined;
+        } catch (err) {
             // The file doesn't exist, or may have permission issues;
             // either way that doesn't count so this path has nothing for us.
             return;

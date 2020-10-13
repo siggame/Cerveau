@@ -1,17 +1,25 @@
 import { sanitizeArray, sanitizeType } from "~/core/sanitize/";
-import { Immutable, objectHasProperty, quoteIfString, UnknownObject } from "~/utils";
-import { IBaseGameNamespace, IBaseGameObjectFunctionSchema } from "./base-game-namespace";
+import {
+    Immutable,
+    objectHasProperty,
+    quoteIfString,
+    UnknownObject,
+} from "~/utils";
+import {
+    BaseGameNamespace,
+    BaseGameObjectFunctionSchema,
+} from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 
 /** If failed validation this shape is expected. */
-export interface IInvalidated {
+export interface Invalidated {
     /** The human readable string why it is invalid. */
     invalid: string;
 }
 
 /**
- * A collection of static functions to sanitize inputs from AI clients for the
- * Game.
+ * A collection of static functions to sanitize inputs from AI clients for
+ * the Game.
  */
 export class BaseGameSanitizer {
     /**
@@ -19,14 +27,13 @@ export class BaseGameSanitizer {
      *
      * @param namespace - The game namespace we are sanitizing for.
      */
-    constructor(protected readonly namespace: Immutable<IBaseGameNamespace>) {
-    }
+    constructor(protected readonly namespace: Immutable<BaseGameNamespace>) {}
 
     /**
      * Sanitizes arguments for an AI order.
      *
      * @param aiFunctionName - The name of the order.
-     * @param args  - The arguments for that order (in order of arguments).
+     * @param args -  - The arguments for that order (in order of arguments).
      * @returns An error if they could not be sanitized. Otherwise a new array
      * with freshly sanitized arguments.
      */
@@ -34,9 +41,13 @@ export class BaseGameSanitizer {
         aiFunctionName: string,
         args: Immutable<unknown[]>,
     ): Error | unknown[] {
-        const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
+        const schema = this.namespace.gameObjectsSchema.AI.functions[
+            aiFunctionName
+        ];
         if (!schema) {
-            return new Error(`Order ${aiFunctionName} does not exist to sanitize args for`);
+            return new Error(
+                `Order ${aiFunctionName} does not exist to sanitize args for`,
+            );
         }
 
         const argsArray = sanitizeArray(args, false);
@@ -62,9 +73,13 @@ export class BaseGameSanitizer {
         aiFunctionName: string,
         returned: unknown,
     ): unknown {
-        const schema = this.namespace.gameObjectsSchema.AI.functions[aiFunctionName];
+        const schema = this.namespace.gameObjectsSchema.AI.functions[
+            aiFunctionName
+        ];
         if (!schema) {
-            return new Error(`Order ${aiFunctionName} does not exist to sanitize returned for`);
+            return new Error(
+                `Order ${aiFunctionName} does not exist to sanitize returned for`,
+            );
         }
 
         return sanitizeType(schema.returns, returned);
@@ -75,7 +90,7 @@ export class BaseGameSanitizer {
      *
      * @param gameObject - The game object that would run this function.
      * @param functionName - The name of the function trying to run.
-     * @param args - Key/value arguments for the function
+     * @param args - Key/value arguments for the function.
      * @returns An error if validation failed, otherwise a map of sanitized
      * key/value arguments, with the iteration order respecting their argument
      * order for the function.
@@ -84,7 +99,7 @@ export class BaseGameSanitizer {
         gameObject: BaseGameObject,
         functionName: string,
         args: Readonly<UnknownObject>,
-    ): Error | Map<string, unknown> | IInvalidated {
+    ): Error | Map<string, unknown> | Invalidated {
         const schema = this.validateGameObject(gameObject, functionName);
         if (schema instanceof Error) {
             return schema;
@@ -100,9 +115,13 @@ export class BaseGameSanitizer {
 
             if (sanitized instanceof Error) {
                 return {
-                    invalid: `${gameObject.gameObjectName}.${functionName}()'s '${arg.argName}' arg was sent ${
-                        quoteIfString(value)
-                    } - ${sanitized.message}`,
+                    invalid: `${
+                        gameObject.gameObjectName
+                    }.${functionName}()'s '${
+                        arg.argName
+                    }' arg was sent ${quoteIfString(value)} - ${
+                        sanitized.message
+                    }`,
                 };
             }
 
@@ -142,13 +161,13 @@ export class BaseGameSanitizer {
      * Validates a game object has a specific function.
      *
      * @param gameObject - The game object instance.
-     * @param functionName The function name inside the game object.
+     * @param functionName - The function name inside the game object.
      * @returns The schema if valid, otherwise an error.
      */
     private validateGameObject(
         gameObject: BaseGameObject,
         functionName: string,
-    ): Error | Immutable<IBaseGameObjectFunctionSchema> {
+    ): Error | Immutable<BaseGameObjectFunctionSchema> {
         if (
             !gameObject ||
             !(gameObject instanceof BaseGameObject) ||
@@ -157,10 +176,15 @@ export class BaseGameSanitizer {
             return new Error(`${gameObject} is not a valid game object`);
         }
 
-        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
-        const functionSchema = gameObjectSchema && gameObjectSchema.functions[functionName];
+        const gameObjectSchema = this.namespace.gameObjectsSchema[
+            gameObject.gameObjectName
+        ];
+        const functionSchema =
+            gameObjectSchema && gameObjectSchema.functions[functionName];
         if (!gameObjectSchema || !functionSchema) {
-            return new Error(`${gameObject} does not have a method ${functionName}`);
+            return new Error(
+                `${gameObject} does not have a method ${functionName}`,
+            );
         }
 
         return functionSchema;

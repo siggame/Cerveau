@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseNecrowarPlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseNecrowarPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -13,8 +13,8 @@ import { Unit } from "./unit";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseNecrowarPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseNecrowarPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -99,6 +99,11 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
+    /**
+     * How many tower kills this player has for secondary win condition.
+     */
+    public towerKills!: number;
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -109,8 +114,8 @@ export class Player extends GameObject implements IBaseNecrowarPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseNecrowarPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

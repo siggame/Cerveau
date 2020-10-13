@@ -1,11 +1,15 @@
-import { IGamelog } from "@cadre/ts-utils/cadre";
+import { Gamelog } from "@cadre/ts-utils/cadre";
 import * as cluster from "cluster";
 import * as path from "path";
 import { events } from "ts-typed-events";
 import { Config } from "~/core";
 import { Immutable } from "~/utils";
 import { Room } from "./lobby-room";
-import { IWorkerGameSessionData, IWorkerOverMessage, MessageFromMainThread } from "./worker";
+import {
+    MessageFromMainThread,
+    WorkerGameSessionData,
+    WorkerOverMessage,
+} from "./worker";
 
 cluster.setupMaster({
     exec: path.join(__dirname, "worker"),
@@ -13,7 +17,7 @@ cluster.setupMaster({
 
 /**
  * A LobbyRoom that in intended to be ran in serial
- * (on one thread with the master lobby)
+ * (on one thread with the master lobby).
  */
 export class ThreadedRoom extends Room {
     /** The Worker thread running this session. */
@@ -21,7 +25,8 @@ export class ThreadedRoom extends Room {
 
     /**
      * If this session has a game instance running on a worker thread.
-     * @returns true if it is running, false otherwise
+     *
+     * @returns True if it is running, false otherwise.
      */
     public isRunning(): boolean {
         return Boolean(this.worker);
@@ -37,17 +42,16 @@ export class ThreadedRoom extends Room {
     /**
      * This happens when there are enough clients to start the game Instance.
      * We start the on a separate "worker" thread, for true multi-threading via
-     * cluster
+     * cluster.
      */
     protected threadSession(): void {
         // we can only pass strings via environment variables so serialize them
         // here and the worker threads will de-serialize them once running
-        const workerSessionData: IWorkerGameSessionData = {
+        const workerSessionData: WorkerGameSessionData = {
             mainDebugPort: (process as NodeJS.Process & {
-                /** special flag for Node to know what port the debugger can bind to. */
+                /** Special flag for Node to know what port the debugger can bind to. */
                 _debugPort?: number;
-            }
-            )._debugPort,
+            })._debugPort,
             sessionID: this.id,
             gameName: this.gameNamespace.gameName,
             gameSettings: this.gameSettingsManager.values,
@@ -69,7 +73,9 @@ export class ThreadedRoom extends Room {
                 client.stopListeningToSocket();
                 const socket = client.popNetSocket();
 
-                const clientClass = Object.getPrototypeOf(client) as typeof client;
+                const clientClass = Object.getPrototypeOf(
+                    client,
+                ) as typeof client;
 
                 const messageFromMainThread: MessageFromMainThread = {
                     type: "client",
@@ -88,7 +94,7 @@ export class ThreadedRoom extends Room {
 
             // Tell the worker thread we are done sending client + sockets to
             // them
-            this.worker.send({ type: "done"});
+            this.worker.send({ type: "done" });
 
             // And remove the clients from us, they are no longer ours to care
             // about; instead the worker thread will handle them from here-on.
@@ -97,11 +103,11 @@ export class ThreadedRoom extends Room {
             }
         });
 
-        let overData: IWorkerOverMessage = {};
+        let overData: WorkerOverMessage = {};
         // this message should only happen once, when the game is over
-        this.worker.once("message", async (data: IWorkerOverMessage) => {
+        this.worker.once("message", (data: WorkerOverMessage) => {
             overData = data;
-            this.cleanUp(data.gamelog);
+            void this.cleanUp(data.gamelog);
         });
 
         this.worker.on("exit", () => {
@@ -115,7 +121,7 @@ export class ThreadedRoom extends Room {
      * @param gamelog - The gamelog sent from the session.
      * @returns A promise that resolves once we've cleaned up.
      */
-    protected async cleanUp(gamelog?: Immutable<IGamelog>): Promise<void> {
+    protected async cleanUp(gamelog?: Immutable<Gamelog>): Promise<void> {
         this.worker = undefined; // we are done with that worker thread
 
         await super.cleanUp(gamelog);

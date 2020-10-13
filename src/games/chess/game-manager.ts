@@ -3,19 +3,22 @@
 import { BaseClasses, ChessGame, ChessGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
-import { ChessInstance, Move } from "chess.js";
+import { Move } from "chess.js";
 
 /**
- * Checks if the move a capture, promotion, or pawn movement
+ * Checks if the move a capture, promotion, or pawn movement.
  *
- * @param move - The move to check against
- * @returns True is so, false otherwise
+ * @param move - The move to check against.
+ * @returns True is so, false otherwise.
  */
 function checkMoveForSTFR(move: Move): boolean {
     return Boolean(move.captured || move.promotion || move.piece === "p");
 }
 
-const gameOver50TurnMessage = "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
+const toUCI = (move: Move) => move.from + move.to + (move.promotion || "");
+
+const gameOver50TurnMessage =
+    "Draw - 50-move rule: 50 moves completed with no pawn moved or piece captured.";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -25,7 +28,7 @@ const gameOver50TurnMessage = "Draw - 50-move rule: 50 moves completed with no p
  * together.
  */
 export class ChessGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -34,10 +37,10 @@ export class ChessGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: ChessGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: ChessGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -48,17 +51,20 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: protected-private-methods -->>
 
-    /** How many turns till 50 move draw during simplified three fold repetition */
+    /**
+     * How many turns till 50 move draw during simplified three fold
+     * repetition.
+     */
     private halfMoveCountSTFR = 0; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
-    /** Starts the game play */
+    /** Starts the game play. */
     protected start(): void {
         super.start();
-        this.runSideToMove();
+        void this.runSideToMove();
     }
 
     /**
-     * Runs the current turn of the player whose turn it is
+     * Runs the current turn of the player whose turn it is.
      *
      * @returns A promise that resolves once this specific turn is ended.
      */
@@ -68,16 +74,21 @@ export class ChessGameManager extends BaseClasses.GameManager {
 
         const move = await player.ai.makeMove();
 
-        const cleanedMove = this.cleanMove(move, this.game.chess);
+        const cleanedMove = this.cleanMove(move);
 
-        const valid = this.game.chess.move(cleanedMove, { sloppy: true });
+        const validMove = this.game.chess.move(cleanedMove, { sloppy: true });
 
-        if (!valid) {
-            this.declareLoser(`Made an invalid move ('${move}').
-Valid moves: ${this.game.chess.moves()      // Take all valid moves,
-    .map((validMove) => `'${validMove}'`)   // Wrap them in '' quotes,
-    .join(", ")                             // Then finally add commas between each for readability
-}`, player);
+        if (!validMove) {
+            this.declareLoser(
+                `Made an invalid move ('${move}').
+Valid moves: ${
+                    this.game.chess
+                        .moves({ verbose: true }) // Take all valid moves,
+                        .map((m) => `'${toUCI(m)}'`) // Wrap them in '' quotes,
+                        .join(", ") // Then finally add commas between each for readability
+                }`,
+                player,
+            );
             this.declareWinner(
                 "Opponent made an invalid move.",
                 player.opponent,
@@ -88,23 +99,22 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         }
         // else their move was accepted, update our state proxies
         this.game.fen = this.game.chess.fen();
-        this.game.history.push(valid.san);
+        this.game.history.push(toUCI(validMove));
 
         if (this.game.settings.enableSTFR) {
             // if
-            this.halfMoveCountSTFR = checkMoveForSTFR(valid)
+            this.halfMoveCountSTFR = checkMoveForSTFR(validMove)
                 ? 0 // reset turns, pawn was moved or piece captured
                 : this.halfMoveCountSTFR + 1; // else increase by 1
         }
 
-        const [ loserReason, winnerReason ] = this.checkForGameOverReasons();
+        const [loserReason, winnerReason] = this.checkForGameOverReasons();
         if (loserReason) {
             if (winnerReason) {
                 // first won, second lost
                 this.declareWinner(winnerReason, player);
                 this.declareLoser(loserReason, player.opponent);
-            }
-            else {
+            } else {
                 // they all lost because the game is a draw
                 this.declareLosers(loserReason, ...this.game.players);
             }
@@ -115,7 +125,7 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         }
 
         // now it is a new side's move
-        this.runSideToMove();
+        void this.runSideToMove();
     }
 
     /**
@@ -132,18 +142,22 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         }
 
         if (chess.insufficient_material()) {
-            return [ "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate." ];
+            return [
+                "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate.",
+            ];
         }
         if (chess.in_stalemate()) {
             return [
-                "Stalemate - The side to move has been stalemated "
-              + "because they are not in check, but have no valid moves.",
+                "Stalemate - The side to move has been stalemated " +
+                    "because they are not in check, but have no valid moves.",
             ];
         }
 
         if (this.game.settings.enableTFR) {
             if (chess.in_threefold_repetition()) {
-                return [ "Stalemate - Board position has occurred three or more times." ];
+                return [
+                    "Stalemate - Board position has occurred three or more times.",
+                ];
             }
 
             // chess.js checks for draws by checking:
@@ -153,20 +167,20 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
             // - three fold repetition
             // Keeping this check last, guarantees everything but the 50-move rule have been checked
             if (chess.in_draw()) {
-                return [ gameOver50TurnMessage ];
+                return [gameOver50TurnMessage];
             }
         }
 
         if (this.game.settings.enableSTFR) {
             if (this.isInSimplifiedThreefoldRepetition()) {
-                return [ "Draw - Simplified threefold repetition occurred." ];
+                return ["Draw - Simplified threefold repetition occurred."];
             }
 
             // chess.js.in_draw() should be true at the same time, but we are tracking the turns anyways,
             // and chess.js.in_draw() checks for more than the 50-turn rule so the checks following this one would
             // never be reached, so we must do this check because simplified TFR is different
             if (this.halfMoveCountSTFR >= 100) {
-                return [ gameOver50TurnMessage ];
+                return [gameOver50TurnMessage];
             }
         }
 
@@ -206,24 +220,28 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
             //    Two moves are identical if the starting position (file and
             //    rank) and ending position (file and rank) of the moves are
             //    identical.
-            if (move.piece !== move.piece || move.to !== nextMove.to || move.from !== nextMove.from) {
+            if (
+                move.piece !== move.piece ||
+                move.to !== nextMove.to ||
+                move.from !== nextMove.from
+            ) {
                 return false; // has not occurred
             }
         }
 
         return true; // if we got here the last 8 moves are repeats,
-                     // so it is in STFR
+        // so it is in STFR
     }
 
     /**
      * Cleans a move so chess.js can accept a wider range of moves.
      *
-     * @param uncleanedMoved - The SAN move to clean
-     * @param chess - The chess.js instance to use for move hints
-     * @returns A new SAN move that more easily works with chess.js
+     * @param uncleanedMoved - The SAN move to clean.
+     * @returns A new SAN move that more easily works with chess.js.
      */
-    private cleanMove(uncleanedMoved: string, chess: ChessInstance): string {
-        const move = uncleanedMoved.replace(/\s/g, ""); // remove all whitespace from move
+    private cleanMove(uncleanedMoved: string): string {
+        // remove all whitespace from move
+        const move = uncleanedMoved.replace(/\s/g, "");
 
         // First check for 0 vs O casteling
         if (move === "0-0" || move === "0-0-0") {
@@ -236,10 +254,12 @@ Valid moves: ${this.game.chess.moves()      // Take all valid moves,
         const promotion = move[4]; // fifth char _might_ be the promotion char
 
         // \-> now check all moves to see if the from, to, and promotion match. If so use the SAN for it
-        const moves = chess.moves({ verbose: true });
-        const ourMove = moves.find((valid) => valid.from === from
-                                           && valid.to === to
-                                           && valid.promotion === promotion,
+        const moves = this.game.chess.moves({ verbose: true });
+        const ourMove = moves.find(
+            (valid) =>
+                valid.from === from &&
+                valid.to === to &&
+                valid.promotion === promotion,
         );
 
         if (ourMove) {

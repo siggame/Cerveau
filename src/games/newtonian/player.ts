@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseNewtonianPlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseNewtonianPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -12,8 +12,8 @@ import { Unit } from "./unit";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseNewtonianPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseNewtonianPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -119,8 +119,8 @@ export class Player extends GameObject implements IBaseNewtonianPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseNewtonianPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

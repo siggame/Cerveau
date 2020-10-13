@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IForecastProperties } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { ForecastConstructorArgs } from "./";
 import { GameObject } from "./game-object";
 import { Player } from "./player";
 
@@ -25,14 +25,14 @@ export class Forecast extends GameObject {
     public readonly controllingPlayer: Player;
 
     /**
-     * The direction the wind will blow fires in. Can be 'north', 'east',
-     * 'south', or 'west'.
+     * The direction the wind will blow fires in. Can
+     * be 'north', 'east', 'south', or 'west'.
      */
     public direction!: "North" | "East" | "South" | "West";
 
     /**
-     * How much of a Building's fire that can be blown in the direction of this
-     * Forecast. Fire is duplicated (copied), not moved (transfered).
+     * How much of a Building's fire that can be blown in the direction of
+     * this Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     public intensity!: number;
 
@@ -51,7 +51,7 @@ export class Forecast extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IForecastProperties & {
+        args: ForecastConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The direction this Forecast will be. */
             direction: ForecastDirection;
@@ -61,7 +61,7 @@ export class Forecast extends GameObject {
             controllingPlayer: Player;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Delta } from "@cadre/ts-utils/cadre";
 import { SHARED_CONSTANTS } from "~/core/constants";
 import { BaseGame, BaseGameObject } from "~/core/game";
 import { isObject, objectHasProperty, UnknownObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable/";
 
-/** Manages delta states on behalf of a game */
+/** Manages delta states on behalf of a game. */
 export class DeltaManager {
     /** The root delta mergeable we use for the game to branch off. */
     public readonly rootDeltaMergeable: DeltaMergeable;
@@ -12,7 +13,7 @@ export class DeltaManager {
     /** The current delta state we are building. */
     private delta: Delta["game"] = {};
 
-    /** Manages delta states on behalf of a game */
+    /** Manages delta states on behalf of a game. */
     constructor() {
         this.rootDeltaMergeable = new DeltaMergeable({
             key: "__root__",
@@ -47,10 +48,7 @@ export class DeltaManager {
      * @param changed - The delta mergeable that mutated.
      * @param wasDeleted - A boolean indicating if the mutation was a deletion.
      */
-    protected handleDelta(
-        changed: DeltaMergeable,
-        wasDeleted: boolean = false,
-    ): void {
+    protected handleDelta(changed: DeltaMergeable, wasDeleted = false): void {
         let changedValue = changed.get();
         if (changedValue instanceof BaseGame) {
             return; // we only care about the game's children, not itself
@@ -58,7 +56,10 @@ export class DeltaManager {
 
         let pathDeltaMergeable: DeltaMergeable | undefined = changed;
         const path = [] as DeltaMergeable[];
-        while (pathDeltaMergeable && pathDeltaMergeable.getParent() !== this.rootDeltaMergeable) {
+        while (
+            pathDeltaMergeable &&
+            pathDeltaMergeable.getParent() !== this.rootDeltaMergeable
+        ) {
             path.unshift(pathDeltaMergeable);
             pathDeltaMergeable = pathDeltaMergeable.getParent();
         }
@@ -76,10 +77,12 @@ export class DeltaManager {
 
             if (Array.isArray(value)) {
                 const len = value.length;
-                (current[dm.key] as UnknownObject)[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = len;
+                (current[dm.key] as UnknownObject)[
+                    SHARED_CONSTANTS.DELTA_LIST_LENGTH
+                ] = len;
             }
 
-            if (i !== (path.length - 1)) {
+            if (i !== path.length - 1) {
                 current = current[dm.key] as UnknownObject;
             }
         }
@@ -98,19 +101,19 @@ export class DeltaManager {
             // Change the value to the special constant to tell clients
             // to delete this key from the object.
             changedValue = SHARED_CONSTANTS.DELTA_REMOVED;
-        }
-        // tslint:disable-next-line:no-unsafe-any
-        else if (isObject(changedValue)) {
+        } else if (isObject(changedValue)) {
             const originalValue = changedValue;
             changedValue = {};
-            if (originalValue instanceof BaseGameObject
-                && !(path.length === 2 && path[0].key === "gameObjects")
+            if (
+                originalValue instanceof BaseGameObject &&
+                !(path.length === 2 && path[0].key === "gameObjects")
             ) {
                 // Then it should be a game object reference.
                 (changedValue as UnknownObject).id = originalValue.id;
-            }
-            else if (Array.isArray(originalValue)) {
-                (changedValue as UnknownObject)[SHARED_CONSTANTS.DELTA_LIST_LENGTH] = originalValue.length;
+            } else if (Array.isArray(originalValue)) {
+                (changedValue as UnknownObject)[
+                    SHARED_CONSTANTS.DELTA_LIST_LENGTH
+                ] = originalValue.length;
             }
         }
         // else changed value is a primitive and is safe to copy

@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Stumped game
+ * The interface that the Player for the Stumped game
  * must implement from mixed in game logic.
  */
-export interface IBaseStumpedPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseStumpedPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,8 +82,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Beaver. */
-export interface IBeaverProperties {
+/** All the possible properties for Beaver instances. */
+export interface BeaverProperties {
     /**
      * The number of actions remaining for the Beaver this turn.
      */
@@ -123,7 +134,6 @@ export interface IBeaverProperties {
      * Number of turns this Beaver is distracted for (0 means not distracted).
      */
     turnsDistracted?: number;
-
 }
 
 /**
@@ -131,7 +141,7 @@ export interface IBeaverProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverAttackArgs {
+export interface BeaverAttackArgs {
     /**
      * The Beaver to attack. Must be on an adjacent Tile.
      */
@@ -140,18 +150,17 @@ export interface IBeaverAttackArgs {
 
 /**
  * Argument overrides for Beaver's buildLodge function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IBeaverBuildLodgeArgs {
-}
+export interface BeaverBuildLodgeArgs {}
 
 /**
  * Argument overrides for Beaver's drop function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverDropArgs {
+export interface BeaverDropArgs {
     /**
      * The Tile to drop branches/food on. Must be the same Tile that the Beaver
      * is on, or an adjacent one.
@@ -173,7 +182,7 @@ export interface IBeaverDropArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverHarvestArgs {
+export interface BeaverHarvestArgs {
     /**
      * The Spawner you want to harvest. Must be on an adjacent Tile.
      */
@@ -185,7 +194,7 @@ export interface IBeaverHarvestArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverMoveArgs {
+export interface BeaverMoveArgs {
     /**
      * The Tile this Beaver should move to.
      */
@@ -197,10 +206,10 @@ export interface IBeaverMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IBeaverPickupArgs {
+export interface BeaverPickupArgs {
     /**
-     * The Tile to pickup branches/food from. Must be the same Tile that the
-     * Beaver is on, or an adjacent one.
+     * The Tile to pickup branches/food from. Must be the same Tile that
+     * the Beaver is on, or an adjacent one.
      */
     tile?: Tile;
     /**
@@ -214,12 +223,11 @@ export interface IBeaverPickupArgs {
     amount?: number;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * The number of actions this Job can make per turn.
      */
@@ -269,7 +277,6 @@ export interface IJobProperties {
      * The Job title.
      */
     title?: string;
-
 }
 
 /**
@@ -277,7 +284,7 @@ export interface IJobProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IJobRecruitArgs {
+export interface JobRecruitArgs {
     /**
      * The Tile that is a lodge owned by you that you wish to spawn the Beaver
      * of this Job on.
@@ -285,8 +292,8 @@ export interface IJobRecruitArgs {
     tile?: Tile;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The list of Beavers owned by this Player.
      */
@@ -342,11 +349,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Spawner. */
-export interface ISpawnerProperties {
+/** All the possible properties for Spawner instances. */
+export interface SpawnerProperties {
     /**
      * True if this Spawner has been harvested this turn, and it will not heal
      * at the end of the turn, false otherwise.
@@ -368,11 +374,10 @@ export interface ISpawnerProperties {
      * What type of resource this is ('food' or 'branches').
      */
     type?: "food" | "branches";
-
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The Beaver on this Tile if present, otherwise undefined.
      */
@@ -384,8 +389,8 @@ export interface ITileProperties {
     branches?: number;
 
     /**
-     * The cardinal direction water is flowing on this Tile ('North', 'East',
-     * 'South', 'West').
+     * The cardinal direction water is flowing on
+     * this Tile ('North', 'East', 'South', 'West').
      */
     flowDirection?: "North" | "East" | "South" | "West" | "";
 
@@ -443,8 +448,55 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Beaver.
+ */
+export type BeaverConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BeaverProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Job.
+ */
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseStumpedPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Spawner.
+ */
+export type SpawnerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpawnerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 export * from "./beaver";
 export * from "./game-object";
@@ -468,16 +520,16 @@ import { StumpedGame } from "./game";
 import { StumpedGameManager } from "./game-manager";
 import { StumpedGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Beaver */
+/** The arguments used to construct a Beaver. */
 export type BeaverArgs = FirstArgumentFromConstructor<typeof Beaver>;
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Spawner */
+/** The arguments used to construct a Spawner. */
 export type SpawnerArgs = FirstArgumentFromConstructor<typeof Spawner>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
 /**
@@ -492,9 +544,7 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Beaver hooked up in the game and ready for you to use.
      */
-    public beaver<T extends BeaverArgs>(
-        args: Readonly<T>,
-    ): Beaver & T {
+    public beaver<T extends BeaverArgs>(args: Readonly<T>): Beaver & T {
         return this.createGameObject("Beaver", Beaver, args);
     }
 
@@ -505,38 +555,31 @@ export class StumpedGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
     /**
      * Creates a new Spawner in the Game and tracks it for all players.
      *
-     * @param args - Data about the Spawner to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Spawner to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Spawner hooked up in the game and ready for you to use.
      */
-    public spawner<T extends SpawnerArgs>(
-        args: Readonly<T>,
-    ): Spawner & T {
+    public spawner<T extends SpawnerArgs>(args: Readonly<T>): Spawner & T {
         return this.createGameObject("Spawner", Spawner, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
-
 }
 
 /**
@@ -559,12 +602,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new StumpedGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -666,8 +707,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Beaver: {
             parentClassName: "GameObject",
@@ -725,8 +765,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 buildLodge: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -943,8 +982,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spawner: {
             parentClassName: "GameObject",
@@ -966,8 +1004,7 @@ export const Namespace = makeNamespace({
                     literals: ["food", "branches"],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Tile: {
             parentClassName: "GameObject",
@@ -1030,9 +1067,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "7de307cae4a9a163a9b3600cb20c4b376b9f9cc42f1b990852878fea0127eed3",
+    gameVersion:
+        "7de307cae4a9a163a9b3600cb20c4b376b9f9cc42f1b990852878fea0127eed3",
 });

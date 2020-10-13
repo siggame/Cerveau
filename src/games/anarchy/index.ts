@@ -4,30 +4,39 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Anarchy game
+ * The interface that the Player for the Anarchy game
  * must implement from mixed in game logic.
  */
-export interface IBaseAnarchyPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface BaseAnarchyPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -69,8 +78,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an Building. */
-export interface IBuildingProperties {
+/** All the possible properties for Building instances. */
+export interface BuildingProperties {
     /**
      * When true this building has already been bribed this turn and cannot be
      * bribed again this turn.
@@ -108,8 +117,8 @@ export interface IBuildingProperties {
     fire?: number;
 
     /**
-     * How much health this building currently has. When this reaches 0 the
-     * Building has been burned down.
+     * How much health this building currently has. When this reaches 0
+     * the Building has been burned down.
      */
     health?: number;
 
@@ -134,17 +143,15 @@ export interface IBuildingProperties {
      * The location of the Building along the y-axis.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an FireDepartment. */
-export interface IFireDepartmentProperties {
+/** All the possible properties for FireDepartment instances. */
+export interface FireDepartmentProperties {
     /**
      * The amount of fire removed from a building when bribed to extinguish a
      * building.
      */
     fireExtinguished?: number;
-
 }
 
 /**
@@ -152,15 +159,15 @@ export interface IFireDepartmentProperties {
  * an object of this interface from the invalidate functions, the value(s) you
  * set will be used in the actual function.
  */
-export interface IFireDepartmentExtinguishArgs {
+export interface FireDepartmentExtinguishArgs {
     /**
      * The Building you want to extinguish.
      */
     building?: Building;
 }
 
-/** All the possible properties for an Forecast. */
-export interface IForecastProperties {
+/** All the possible properties for Forecast instances. */
+export interface ForecastProperties {
     /**
      * The Player that can use WeatherStations to control this Forecast when
      * its the nextForecast.
@@ -168,25 +175,23 @@ export interface IForecastProperties {
     controllingPlayer?: Player;
 
     /**
-     * The direction the wind will blow fires in. Can be 'north', 'east',
-     * 'south', or 'west'.
+     * The direction the wind will blow fires in. Can
+     * be 'north', 'east', 'south', or 'west'.
      */
     direction?: "North" | "East" | "South" | "West";
 
     /**
-     * How much of a Building's fire that can be blown in the direction of this
-     * Forecast. Fire is duplicated (copied), not moved (transfered).
+     * How much of a Building's fire that can be blown in the direction of
+     * this Forecast. Fire is duplicated (copied), not moved (transfered).
      */
     intensity?: number;
-
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * How many bribes this player has remaining to use during their turn. Each
      * action a Building does costs 1 bribe. Any unused bribes are lost at the
@@ -265,27 +270,25 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an PoliceDepartment. */
-export interface IPoliceDepartmentProperties {
-}
+/** All the possible properties for PoliceDepartment instances. */
+export interface PoliceDepartmentProperties {}
 
 /**
  * Argument overrides for PoliceDepartment's raid function. If you return an
  * object of this interface from the invalidate functions, the value(s) you set
  * will be used in the actual function.
  */
-export interface IPoliceDepartmentRaidArgs {
+export interface PoliceDepartmentRaidArgs {
     /**
      * The warehouse you want to raid.
      */
     warehouse?: Warehouse;
 }
 
-/** All the possible properties for an Warehouse. */
-export interface IWarehouseProperties {
+/** All the possible properties for Warehouse instances. */
+export interface WarehouseProperties {
     /**
      * How exposed the anarchists in this warehouse are to PoliceDepartments.
      * Raises when bribed to ignite buildings, and drops each turn if not
@@ -298,31 +301,29 @@ export interface IWarehouseProperties {
      * Headquarters add more fire than normal Warehouses.
      */
     fireAdded?: number;
-
 }
 
 /**
  * Argument overrides for Warehouse's ignite function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IWarehouseIgniteArgs {
+export interface WarehouseIgniteArgs {
     /**
      * The Building you want to light on fire.
      */
     building?: Building;
 }
 
-/** All the possible properties for an WeatherStation. */
-export interface IWeatherStationProperties {
-}
+/** All the possible properties for WeatherStation instances. */
+export interface WeatherStationProperties {}
 
 /**
  * Argument overrides for WeatherStation's intensify function. If you return an
  * object of this interface from the invalidate functions, the value(s) you set
  * will be used in the actual function.
  */
-export interface IWeatherStationIntensifyArgs {
+export interface WeatherStationIntensifyArgs {
     /**
      * By default the intensity will be increased by 1, setting this to true
      * decreases the intensity by 1.
@@ -335,13 +336,77 @@ export interface IWeatherStationIntensifyArgs {
  * object of this interface from the invalidate functions, the value(s) you set
  * will be used in the actual function.
  */
-export interface IWeatherStationRotateArgs {
+export interface WeatherStationRotateArgs {
     /**
      * By default the direction will be rotated clockwise. If you set this to
      * true we will rotate the forecast counterclockwise instead.
      */
     counterclockwise?: boolean;
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Building.
+ */
+export type BuildingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of FireDepartment.
+ */
+export type FireDepartmentConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & FireDepartmentProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Forecast.
+ */
+export type ForecastConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<ForecastProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseAnarchyPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of PoliceDepartment.
+ */
+export type PoliceDepartmentConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & PoliceDepartmentProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Warehouse.
+ */
+export type WarehouseConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & WarehouseProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of WeatherStation.
+ */
+export type WeatherStationConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BuildingArgs & WeatherStationProperties & T>;
 
 export * from "./building";
 export * from "./fire-department";
@@ -369,23 +434,29 @@ import { AnarchyGame } from "./game";
 import { AnarchyGameManager } from "./game-manager";
 import { AnarchyGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Building */
+/** The arguments used to construct a Building. */
 export type BuildingArgs = FirstArgumentFromConstructor<typeof Building>;
 
-/** The arguments used to construct a FireDepartment */
-export type FireDepartmentArgs = FirstArgumentFromConstructor<typeof FireDepartment>;
+/** The arguments used to construct a FireDepartment. */
+export type FireDepartmentArgs = FirstArgumentFromConstructor<
+    typeof FireDepartment
+>;
 
-/** The arguments used to construct a Forecast */
+/** The arguments used to construct a Forecast. */
 export type ForecastArgs = FirstArgumentFromConstructor<typeof Forecast>;
 
-/** The arguments used to construct a PoliceDepartment */
-export type PoliceDepartmentArgs = FirstArgumentFromConstructor<typeof PoliceDepartment>;
+/** The arguments used to construct a PoliceDepartment. */
+export type PoliceDepartmentArgs = FirstArgumentFromConstructor<
+    typeof PoliceDepartment
+>;
 
-/** The arguments used to construct a Warehouse */
+/** The arguments used to construct a Warehouse. */
 export type WarehouseArgs = FirstArgumentFromConstructor<typeof Warehouse>;
 
-/** The arguments used to construct a WeatherStation */
-export type WeatherStationArgs = FirstArgumentFromConstructor<typeof WeatherStation>;
+/** The arguments used to construct a WeatherStation. */
+export type WeatherStationArgs = FirstArgumentFromConstructor<
+    typeof WeatherStation
+>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -399,9 +470,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Building hooked up in the game and ready for you to use.
      */
-    public building<T extends BuildingArgs>(
-        args: Readonly<T>,
-    ): Building & T {
+    public building<T extends BuildingArgs>(args: Readonly<T>): Building & T {
         return this.createGameObject("Building", Building, args);
     }
 
@@ -426,9 +495,7 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * property in the game object's class will be automatically set for you.
      * @returns A new Forecast hooked up in the game and ready for you to use.
      */
-    public forecast<T extends ForecastArgs>(
-        args: Readonly<T>,
-    ): Forecast & T {
+    public forecast<T extends ForecastArgs>(args: Readonly<T>): Forecast & T {
         return this.createGameObject("Forecast", Forecast, args);
     }
 
@@ -436,15 +503,19 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
      * Creates a new PoliceDepartment in the Game and tracks it for all
      * players.
      *
-     * @param args - Data about the PoliceDepartment to set. Any keys matching
-     * a property in the game object's class will be automatically set for you.
+     * @param args - Data about the PoliceDepartment to set. Any keys matching a
+     * property in the game object's class will be automatically set for you.
      * @returns A new PoliceDepartment hooked up in the game and ready for you
      * to use.
      */
     public policeDepartment<T extends PoliceDepartmentArgs>(
         args: Readonly<T>,
     ): PoliceDepartment & T {
-        return this.createGameObject("PoliceDepartment", PoliceDepartment, args);
+        return this.createGameObject(
+            "PoliceDepartment",
+            PoliceDepartment,
+            args,
+        );
     }
 
     /**
@@ -473,7 +544,6 @@ export class AnarchyGameObjectFactory extends BaseGameObjectFactory {
     ): WeatherStation & T {
         return this.createGameObject("WeatherStation", WeatherStation, args);
     }
-
 }
 
 /**
@@ -496,12 +566,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new AnarchyGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -588,8 +656,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Building: {
             parentClassName: "GameObject",
@@ -638,8 +705,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         FireDepartment: {
             parentClassName: "Building",
@@ -682,8 +748,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -792,13 +857,11 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         PoliceDepartment: {
             parentClassName: "Building",
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 raid: {
                     args: [
@@ -845,8 +908,7 @@ export const Namespace = makeNamespace({
         },
         WeatherStation: {
             parentClassName: "Building",
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 intensify: {
                     args: [
@@ -877,5 +939,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "2bc66f9a5d7babd553079e149c7466feb6f553935b608ff722872e195fbadab8",
+    gameVersion:
+        "2bc66f9a5d7babd553079e149c7466feb6f553935b608ff722872e195fbadab8",
 });

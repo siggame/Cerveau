@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBasePiratesPlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BasePiratesPlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Port } from "./port";
@@ -12,8 +12,8 @@ import { Unit } from "./unit";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBasePiratesPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BasePiratesPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -93,8 +93,8 @@ export class Player extends GameObject implements IBasePiratesPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBasePiratesPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 

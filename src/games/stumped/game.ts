@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { Beaver } from "./beaver";
 import { StumpedGameManager } from "./game-manager";
@@ -25,10 +25,10 @@ type MutableTile = Mutable<Tile>;
  * Gather branches and build up your lodge as beavers fight to survive.
  */
 export class StumpedGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: StumpedGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -48,17 +48,16 @@ export class StumpedGame extends BaseClasses.Game {
     public currentTurn!: number;
 
     /**
-     * When a Player has less Beavers than this number, then recruiting other
-     * Beavers is free.
+     * When a Player has less Beavers than this number, then recruiting
+     * other Beavers is free.
      */
     public readonly freeBeaversCount!: number;
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * All the Jobs that Beavers can have in the game.
@@ -145,7 +144,7 @@ export class StumpedGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: StumpedGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -186,7 +185,6 @@ export class StumpedGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 
@@ -199,11 +197,11 @@ export class StumpedGame extends BaseClasses.Game {
 
         // Generate random metaballs where the lake will be
         const balls: Array<{
-            /** X position of the ball */
+            /** X position of the ball. */
             x: number;
-            /** Y position of the ball */
+            /** Y position of the ball. */
             y: number;
-            /** Radius of the ball */
+            /** Radius of the ball. */
             r: number;
         }> = [];
         const minRadius = 0.5;
@@ -224,8 +222,13 @@ export class StumpedGame extends BaseClasses.Game {
         // Extra balls
         for (let i = 0; i < additionalBalls; i++) {
             balls.push({
-                x: lake + this.manager.random.float() * maxOffset * 2 - maxOffset,
-                y: this.mapHeight / 2 - this.manager.random.float() * maxOffset,
+                x:
+                    lake +
+                    this.manager.random.float() * maxOffset * 2 -
+                    maxOffset,
+                y:
+                    this.mapHeight / 2 -
+                    this.manager.random.float() * maxOffset,
                 r: this.manager.random.float() * radiusRange + minRadius,
             });
         }
@@ -235,7 +238,10 @@ export class StumpedGame extends BaseClasses.Game {
             let energy = 0;
             for (const ball of balls) {
                 const r = ball.r;
-                const dist = Math.sqrt(Math.pow(ball.x - tile.x, 2) + Math.pow(ball.y - tile.y, 2));
+                const dist = Math.sqrt(
+                    Math.pow(ball.x - tile.x, 2) +
+                        Math.pow(ball.y - tile.y, 2),
+                );
                 const d = Math.max(0.0001, Math.pow(dist, gooeyNess));
                 energy += r / d;
             }
@@ -247,14 +253,16 @@ export class StumpedGame extends BaseClasses.Game {
 
         /* Generate rivers */
         const minTheta = Math.PI / 4;
-        const maxTheta = Math.PI * 3 / 4;
+        const maxTheta = (Math.PI * 3) / 4;
         const minThetaDelta = Math.PI / 6;
         const maxThetaDelta = Math.PI / 4;
         const thetaDeltaRange = maxThetaDelta - minThetaDelta;
 
         let theta = minTheta - minThetaDelta;
-        while (true) {
-            theta += this.manager.random.float() * thetaDeltaRange + minThetaDelta;
+        let bail = 0;
+        while (bail++ < 1e8) {
+            theta +=
+                this.manager.random.float() * thetaDeltaRange + minThetaDelta;
             if (theta >= maxTheta) {
                 break;
             }
@@ -262,9 +270,9 @@ export class StumpedGame extends BaseClasses.Game {
 
             // Define the line segments
             const points: Array<{
-                /** X position */
+                /** X position. */
                 x: number;
-                /** Y positoion */
+                /** Y positoion. */
                 y: number;
             }> = [];
 
@@ -322,7 +330,12 @@ export class StumpedGame extends BaseClasses.Game {
                     const nextY = Math.floor(ay + yInc);
 
                     // Verify the current tile exists
-                    if (realX >= 0 && realY >= 0 && realX < this.mapWidth && realY < this.mapHeight / 2) {
+                    if (
+                        realX >= 0 &&
+                        realY >= 0 &&
+                        realX < this.mapWidth &&
+                        realY < this.mapHeight / 2
+                    ) {
                         // Set tile to water
                         const tile = this.getTile(realX, realY) as MutableTile;
 
@@ -335,20 +348,16 @@ export class StumpedGame extends BaseClasses.Game {
                         if (tile.type !== "water") {
                             if (realY > lastY) {
                                 tile.flowDirection = "North";
-                            }
-                            else if (realY < lastY) {
+                            } else if (realY < lastY) {
                                 tile.flowDirection = "South";
-                            }
-                            else if (realX < lastX) {
+                            } else if (realX < lastX) {
                                 tile.flowDirection = "East";
-                            }
-                            else if (realX > lastX) {
+                            } else if (realX > lastX) {
                                 tile.flowDirection = "West";
                             }
 
                             tile.type = "water";
-                        }
-                        else if (tile.flowDirection !== "") {
+                        } else if (tile.flowDirection !== "") {
                             collided = true;
                         }
                     }
@@ -362,12 +371,14 @@ export class StumpedGame extends BaseClasses.Game {
 
         // create spawners
         for (const type of this.spawnerTypes as ["branches", "food"]) {
-            const max = type === "branches"
-                ? this.settings.maxBranchSpawners
-                : this.settings.maxFoodSpawners;
-            const min = type === "branches"
-                ? this.settings.minBranchSpawners
-                : this.settings.minFoodSpawners;
+            const max =
+                type === "branches"
+                    ? this.settings.maxBranchSpawners
+                    : this.settings.maxFoodSpawners;
+            const min =
+                type === "branches"
+                    ? this.settings.minBranchSpawners
+                    : this.settings.minFoodSpawners;
 
             const count = this.manager.random.int(max, min);
             const tileType = type === "food" ? "water" : "land";
@@ -388,13 +399,18 @@ export class StumpedGame extends BaseClasses.Game {
 
         /* Mirror map */
         for (const orig of this.tiles) {
-            const target = this.getTile(orig.x, this.mapHeight - orig.y - 1) as MutableTile;
+            const target = this.getTile(
+                orig.x,
+                this.mapHeight - orig.y - 1,
+            ) as MutableTile;
 
             // Copy data
             target.type = orig.type;
-            target.flowDirection = (orig.flowDirection === "North" || orig.flowDirection === "South")
-                ? this.invertTileDirection(orig.flowDirection)
-                : orig.flowDirection;
+            target.flowDirection =
+                orig.flowDirection === "North" ||
+                orig.flowDirection === "South"
+                    ? this.invertTileDirection(orig.flowDirection)
+                    : orig.flowDirection;
 
             // clone Spawner
             if (orig.spawner) {
@@ -414,14 +430,18 @@ export class StumpedGame extends BaseClasses.Game {
             );
 
             if (!p1) {
-                throw new Error("could not get random tile from expected map dimensions!");
+                throw new Error(
+                    "could not get random tile from expected map dimensions!",
+                );
             }
         } while (p1.spawner);
 
         const p2 = this.getTile(p1.x, this.mapHeight - p1.y - 1);
 
         if (!p2) {
-            throw new Error("could not get mirrored starting tile for player 2!");
+            throw new Error(
+                "could not get mirrored starting tile for player 2!",
+            );
         }
 
         // Player 1

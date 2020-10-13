@@ -1,5 +1,5 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseCatastrophePlayer } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import { BaseCatastrophePlayer, PlayerConstructorArgs } from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Structure } from "./structure";
@@ -12,8 +12,8 @@ import { Tile } from "./tile";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseCatastrophePlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseCatastrophePlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -102,8 +102,8 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseCatastrophePlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -115,12 +115,14 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
     // <<-- Creer-Merge: public-functions -->>
 
     /**
-     * Gets every structure owned by this player, including new structures
+     * Gets every structure owned by this player, including new structures.
      *
-     * @returns All of this player's structures
+     * @returns All of this player's structures.
      */
     public getAllStructures(): Structure[] {
-        return this.structures.concat(this.game.newStructures.filter((s) => s.owner === this));
+        return this.structures.concat(
+            this.game.newStructures.filter((s) => s.owner === this),
+        );
     }
 
     /**
@@ -141,7 +143,8 @@ export class Player extends GameObject implements IBaseCatastrophePlayer {
                 const cur = tile.unit;
 
                 // If the tile grabbed is null/undefined, there's no valid unit there, or we already checked this tile
-                if (!cur ||
+                if (
+                    !cur ||
                     cur.owner !== this ||
                     (unit.squad.length > 0 && cur.job.title !== "soldier") ||
                     closed.has(tile)

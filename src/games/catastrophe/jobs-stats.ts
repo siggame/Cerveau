@@ -1,7 +1,7 @@
-import { IJobProperties } from "./";
+import { JobProperties } from "./";
 
-/** The default stats for each job if not overridden */
-const defaultJobStats: IJobProperties = {
+/** The default stats for each job if not overridden. */
+const defaultJobStats: JobProperties = {
     actionCost: 75,
     carryLimit: 10,
     moves: 4,
@@ -9,8 +9,8 @@ const defaultJobStats: IJobProperties = {
     upkeep: 2,
 };
 
-/** The stats for each job in the Catastrophe game */
-export const jobStats: { [jobName: string]: IJobProperties } = {
+/** The stats for each job in the Catastrophe game. */
+export const jobStats: { [jobName: string]: JobProperties } = {
     "fresh human": {
         actionCost: 0,
         upkeep: 1,
@@ -21,20 +21,20 @@ export const jobStats: { [jobName: string]: IJobProperties } = {
         regenRate: 10,
         upkeep: 0,
     },
-    "soldier": {
+    soldier: {
         actionCost: 25,
         moves: 3,
         regenRate: 25,
         upkeep: 3,
     },
-    "gatherer": {
+    gatherer: {
         carryLimit: 100,
         upkeep: 1,
     },
-    "builder": {
+    builder: {
         carryLimit: 75,
     },
-    "missionary": {},
+    missionary: {},
 };
 
 // Inject the default values into each job's stats.

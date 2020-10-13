@@ -1,6 +1,9 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBroodMotherConsumeArgs, IBroodMotherProperties,
-         IBroodMotherSpawnArgs, SpiderArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    BroodMotherConstructorArgs,
+    BroodMotherConsumeArgs,
+    BroodMotherSpawnArgs,
+} from "./";
 import { Player } from "./player";
 import { Spider } from "./spider";
 import { Spiderling } from "./spiderling";
@@ -40,13 +43,13 @@ export class BroodMother extends Spider {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<SpiderArgs & IBroodMotherProperties & {
+        args: BroodMotherConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
             /** The Nest this BroodMother exists upon. */
             nest: Nest;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -69,8 +72,8 @@ export class BroodMother extends Spider {
      * them why it is invalid.
      *
      * @param player - The player that called this.
-     * @param spiderling - The Spiderling to consume. It must be on the same
-     * Nest as this BroodMother.
+     * @param spiderling - The Spiderling to consume. It must be on the
+     * same Nest as this BroodMother.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -78,14 +81,13 @@ export class BroodMother extends Spider {
     protected invalidateConsume(
         player: Player,
         spiderling: Spiderling,
-    ): void | string | IBroodMotherConsumeArgs {
+    ): void | string | BroodMotherConsumeArgs {
         // <<-- Creer-Merge: invalidate-consume -->>
-
         // Check all the arguments for consume here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
+        return undefined;
         // <<-- /Creer-Merge: invalidate-consume -->>
     }
 
@@ -94,8 +96,8 @@ export class BroodMother extends Spider {
      * more Spiderlings.
      *
      * @param player - The player that called this.
-     * @param spiderling - The Spiderling to consume. It must be on the same
-     * Nest as this BroodMother.
+     * @param spiderling - The Spiderling to consume. It must be on the
+     * same Nest as this BroodMother.
      * @returns True if the Spiderling was consumed. False otherwise.
      */
     protected async consume(
@@ -127,14 +129,13 @@ export class BroodMother extends Spider {
     protected invalidateSpawn(
         player: Player,
         spiderlingType: "Spitter" | "Weaver" | "Cutter",
-    ): void | string | IBroodMotherSpawnArgs {
+    ): void | string | BroodMotherSpawnArgs {
         // <<-- Creer-Merge: invalidate-spawn -->>
-
         // Check all the arguments for spawn here and try to
         // return a string explaining why the input is wrong.
         // If you need to change an argument for the real function, then
         // changing its value in this scope is enough.
-
+        return undefined;
         // <<-- /Creer-Merge: invalidate-spawn -->>
     }
 
@@ -145,8 +146,7 @@ export class BroodMother extends Spider {
      * @param player - The player that called this.
      * @param spiderlingType - The string name of the Spiderling class you want
      * to Spawn. Must be 'Spitter', 'Weaver', or 'Cutter'.
-     * @returns The newly spwaned Spiderling if successful. Undefined
-     * otherwise.
+     * @returns The newly spwaned Spiderling if successful. Undefined otherwise.
      */
     protected async spawn(
         player: Player,

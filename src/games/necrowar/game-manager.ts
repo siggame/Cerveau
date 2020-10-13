@@ -1,10 +1,10 @@
 // This file is where you should put logic to control the game and everything
 // around it.
-import { removeElements } from "~/utils";
 import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -14,7 +14,7 @@ import { BaseClasses, NecrowarGame, NecrowarGameObjectFactory } from "./";
  * together.
  */
 export class NecrowarGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -23,10 +23,10 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: NecrowarGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: NecrowarGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -46,11 +46,6 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
         for (const unit of this.game.units) {
-            if (!unit.owner || unit.owner === this.game.currentPlayer) {
-                unit.acted = false;
-                unit.moves = unit.job.moves;
-            }
-
             if (unit.tile && unit.tile.owner === unit.owner) {
                 if (unit.health > unit.job.health) {
                     unit.health = unit.job.health;
@@ -60,7 +55,7 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
 
         // Code for the river phases, clearing out workers in the island gold mine
         // Every 15 turns
-        if (this.game.currentTurn % 15 === 0) {
+        if (this.game.currentTurn % this.game.riverPhase === 0) {
             for (const unit of this.game.units) {
                 if (unit.tile) {
                     if (unit.tile.isIslandGoldMine) {
@@ -83,20 +78,23 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     protected async afterTurn(): Promise<void> {
         await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
         // add logic here after the current player's turn ends
         this.updateUnits();
         this.updateTowers();
-        for (const unit of this.game.currentPlayer.units) {
-            unit.acted = false;
-            unit.moves = unit.job.moves;
-
+        const player = this.game.currentPlayer.opponent;
+        for (const unit of player.units) {
+            if (!unit.owner || unit.owner === player) {
+                unit.acted = false;
+                unit.moves = unit.job.moves;
+            }
             if (unit.health > unit.job.health) {
                 unit.health = unit.job.health;
             }
         }
 
-        for (const tower of this.game.currentPlayer.towers) {
+        for (const tower of player.towers) {
             if (tower.cooldown > 0) {
                 tower.cooldown--;
             }
@@ -114,46 +112,33 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      */
     protected primaryWinConditionsCheck(): boolean {
         super.primaryWinConditionsCheck();
+
         // <<-- Creer-Merge: primary-win-conditions -->>
-        // Add logic here checking for the primary win condition(s)
-        let castleStandingOne = false;
-        let castleStandingTwo = false;
+        const playersWithCastlesStanding = this.game.players.filter(
+            (player) =>
+                player.towers.length > 0 &&
+                player.towers[0].job.title === "castle",
+        );
 
-        for (const player of this.game.players) {
-            if (player.towers.length > 0) {
-                if (player.towers[0].job.title === "castle") {
-                    if (player === this.game.players[0]) {
-                        castleStandingOne = true;
-                    }
-                    else if (player === this.game.players[1]) {
-                        castleStandingTwo = true;
-                    }
-                }
-            }
+        if (playersWithCastlesStanding.length === 0) {
+            this.secondaryWinConditions("Both castles fell at the same time.");
+
+            return true;
         }
 
-        if (!castleStandingOne) {
-            if (!castleStandingTwo) {
-                this.secondaryWinConditions("Both castles fell at the same time.");
-            }
-            else {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[0]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[0].opponent);
+        if (playersWithCastlesStanding.length === 1) {
+            this.declareWinner(
+                "You defeated the enemy Necromancer!",
+                playersWithCastlesStanding[0],
+            );
+            this.declareLosers(
+                "The enemy Necromancer has bested you!",
+                playersWithCastlesStanding[0].opponent,
+            );
 
-                return true;
-            }
+            return true;
         }
-        else {
-            if (!castleStandingTwo) {
-                this.declareWinner("You defeated the enemy Necromancer!", this.game.players[1]);
-                this.declareLosers("The enemy Necromancer has bested you!", this.game.players[1].opponent);
 
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -163,19 +148,60 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         // Add logic here for the secondary win conditions
 
-        if (this.game.players[0].towers[0].health > this.game.players[1].towers[0].health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[0]);
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[1]);
-        }
-        else if (this.game.players[1].towers[0].health > this.game.players[0].towers[0].health) {
-            this.declareWinner(`${reason}: You had higher castle health!`, this.game.players[1]);
-            this.declareLoser(`${reason}: Your opponent's castle had higher health!`, this.game.players[0]);
+        if (
+            this.game.players[0].towerKills > this.game.players[1].towerKills
+        ) {
+            this.declareWinner(
+                `${reason}: You had more tower kills!`,
+                this.game.players[0],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent had more tower kills!`,
+                this.game.players[1],
+            );
+        } else if (
+            this.game.players[1].towerKills > this.game.players[0].towerKills
+        ) {
+            this.declareWinner(
+                `${reason}: You had more tower kills!`,
+                this.game.players[1],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent had more tower kills!`,
+                this.game.players[0],
+            );
+        } else if (
+            this.game.players[0].towers[0].health >
+            this.game.players[1].towers[0].health
+        ) {
+            this.declareWinner(
+                `${reason}: You had higher castle health!`,
+                this.game.players[0],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent's castle had higher health!`,
+                this.game.players[1],
+            );
+        } else if (
+            this.game.players[1].towers[0].health >
+            this.game.players[0].towers[0].health
+        ) {
+            this.declareWinner(
+                `${reason}: You had higher castle health!`,
+                this.game.players[1],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent's castle had higher health!`,
+                this.game.players[0],
+            );
         }
 
         // <<-- /Creer-Merge: secondary-win-conditions -->>
@@ -188,9 +214,14 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
     // <<-- Creer-Merge: protected-private-methods -->>
 
     // any additional protected/private methods you need can be added here
+    /**
+     * Updates units.
+     */
     private updateUnits(): void {
         // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+        const deadUnits = this.game.units.filter(
+            (u) => !u.tile || u.health <= 0,
+        );
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {
@@ -198,11 +229,20 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
-         // mark them dead
+        // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
                 if (unit.job.title !== "zombie") {
                     unit.tile.corpses++;
+                }
+                if (unit.job.title === "zombie") {
+                    unit.tile.numZombies--;
+                }
+                if (unit.job.title === "ghoul") {
+                    unit.tile.numGhouls--;
+                }
+                if (unit.job.title === "hound") {
+                    unit.tile.numHounds--;
                 }
                 unit.tile.unit = undefined;
                 unit.tile = undefined;
@@ -210,9 +250,14 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
     }
 
+    /**
+     * Updates towers.
+     */
     private updateTowers(): void {
         // Properly remove all killed towers
-        const deadTowers = this.game.towers.filter((t) => !t.tile || t.health <= 0);
+        const deadTowers = this.game.towers.filter(
+            (t) => !t.tile || t.health <= 0,
+        );
 
         // remove dead towers from all player's towers list
         for (const player of this.game.players) {
@@ -220,9 +265,11 @@ export class NecrowarGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.towers, ...deadTowers);
-         // mark them dead
+        // mark them dead
         for (const tower of deadTowers) {
             if (tower.tile) {
+                tower.tile.isGrass = true;
+                tower.tile.isTower = false;
                 tower.tile.tower = undefined;
             }
         }

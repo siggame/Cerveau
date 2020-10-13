@@ -1,17 +1,22 @@
-import { IFinishedDelta, IGameObjectReference, IOrderDelta, IRanDelta } from "@cadre/ts-utils/cadre";
+import {
+    FinishedDelta,
+    GameObjectReference,
+    OrderDelta,
+    RanDelta,
+} from "@cadre/ts-utils/cadre";
 import { upperFirst } from "lodash";
 import { Event, events } from "ts-typed-events";
 import { BaseClient } from "~/core/clients";
 import { serialize, unSerialize } from "~/core/serializer";
 import { Immutable, mapToObject, quoteIfString, UnknownObject } from "~/utils";
 import { BaseGame } from "./base-game";
-import { IBaseGameNamespace } from "./base-game-namespace";
+import { BaseGameNamespace } from "./base-game-namespace";
 import { BaseGameObject } from "./base-game-object";
 import { BaseGameSanitizer } from "./base-game-sanitizer";
 import { BasePlayer } from "./base-player";
 
 /** Represents an order sent to an AI. */
-interface IOrder {
+interface Order {
     /** The index of the order, used like a unique identifier. */
     // TODO: This should probably be an id in the future,
     // but clients currently only know the numbered index
@@ -20,18 +25,24 @@ interface IOrder {
     /** The name of the function to execute for the order. */
     name: string;
 
-    /** the arguments (in call order) for the function. */
+    /** The arguments (in call order) for the function. */
     args: unknown[]; // should be the serialized args
 
-    /** number of errors encountered for said order. */
+    /** Number of errors encountered for said order. */
     errors: number;
 
-    /** the resolver callback of the Promise for this order. */
+    /** The resolver callback of the Promise for this order. */
     resolve(returned: unknown): void;
 
-    /** the rejector callback of the Promise for this order. */
+    /** The rejector callback of the Promise for this order. */
     reject(err: unknown): void;
 }
+
+/** The expected shape of an invalidation function. */
+type ReflectableGameObject = BaseGameObject & {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [functionName: string]: (player: BasePlayer, ...args: unknown[]) => any;
+};
 
 /**
  * The maximum number of times an AI can error trying to execute a single order
@@ -41,20 +52,20 @@ const MAX_ORDER_ERRORS = 10;
 
 /**
  * Manages the AI that actually plays games, basically a wrapper for public
- * functions so games can't see those and get themselves into deep shit
+ * functions so games can't see those and get themselves into deep shit.
  */
 export class BaseAIManager {
-    /** The events this AI (manager) emits */
+    /** The events this AI (manager) emits. */
     public readonly events = events({
-        ordered: new Event<Immutable<IOrderDelta["data"]>>(),
-        finished: new Event<Immutable<IFinishedDelta["data"]>>(),
-        ran: new Event<Immutable<IRanDelta["data"]>>(),
+        ordered: new Event<Immutable<OrderDelta["data"]>>(),
+        finished: new Event<Immutable<FinishedDelta["data"]>>(),
+        ran: new Event<Immutable<RanDelta["data"]>>(),
     });
 
-    /** **This must be set externally before use** */
+    /** **This must be set externally before use**. */
     public game!: BaseGame;
 
-    /** **This one too** */
+    /** **This one too**. */
     public invalidateRun!: (
         player: BasePlayer,
         gameObject: BaseGameObject,
@@ -62,10 +73,10 @@ export class BaseAIManager {
         args: Map<string, unknown>,
     ) => string | undefined;
 
-    /** The orders that have been sent to clients */
-    private readonly orders = new Map<number, IOrder | undefined>();
+    /** The orders that have been sent to clients. */
+    private readonly orders = new Map<number, Order | undefined>();
 
-    /** The next number to use for an order's index */
+    /** The next number to use for an order's index. */
     private nextOrderIndex = 0;
 
     /**
@@ -79,14 +90,14 @@ export class BaseAIManager {
     constructor(
         private readonly client: BaseClient,
         private readonly gameSanitizer: BaseGameSanitizer,
-        private readonly namespace: Immutable<IBaseGameNamespace>,
+        private readonly namespace: Immutable<BaseGameNamespace>,
     ) {
         this.client.sent.finished.on((finished) => {
             this.finishedOrder(finished.orderIndex, finished.returned);
         });
 
         this.client.sent.run.on((run) => {
-            this.requestedRun(run.caller, run.functionName, run.args);
+            void this.requestedRun(run.caller, run.functionName, run.args);
         });
     }
 
@@ -111,7 +122,9 @@ export class BaseAIManager {
             if (sanitizedArgs instanceof Error) {
                 // Then the structure of the order is so bad that we
                 // can't figure out what to do
-                this.client.disconnect(`We could not make you execute ${name}.`);
+                void this.client.disconnect(
+                    `We could not make you execute ${name}.`,
+                );
                 reject(sanitizedArgs);
 
                 return;
@@ -120,12 +133,12 @@ export class BaseAIManager {
             const args = sanitizedArgs.map(serialize);
             const index = this.nextOrderIndex++;
 
-            const order: IOrder = {
+            const order: Order = {
                 index,
                 name,
                 args,
                 errors: 0, // keep track of how many errors the client makes
-                           // trying to execute this order.
+                // trying to execute this order.
                 // When the client sends back that they resolved this order,
                 // we will resolve via this stored resolve callback
                 resolve,
@@ -154,7 +167,7 @@ export class BaseAIManager {
      * NOTE: while game logic runs a delta will probably be sent out.
      */
     private async requestedRun<T>(
-        callerReference: Immutable<IGameObjectReference>,
+        callerReference: Immutable<GameObjectReference>,
         functionName: string,
         unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
@@ -172,7 +185,7 @@ export class BaseAIManager {
     }
 
     /**
-     * Attempts to run some game logic
+     * Attempts to run some game logic.
      *
      * @param callerReference - The game object reference of the instance
      * in the game.
@@ -182,12 +195,12 @@ export class BaseAIManager {
      * this run command, or undefined if the command is incomprehensible.
      */
     private async tryToRun<T>(
-        callerReference: Immutable<IGameObjectReference>,
+        callerReference: Immutable<GameObjectReference>,
         functionName: string,
         unsanitizedArgs: Immutable<UnknownObject>,
     ): Promise<T | undefined> {
         if (!this.client.player) {
-            this.client.disconnect(
+            void this.client.disconnect(
                 "You do not have a Player to send run commands for",
             );
 
@@ -195,14 +208,19 @@ export class BaseAIManager {
         }
 
         const callerID = callerReference && callerReference.id;
-        const gameObject = this.game.gameObjects[callerID];
+        const rawGameObject = this.game.gameObjects[callerID];
 
-        if (!gameObject) {
+        if (!rawGameObject) {
             // they sent us an invalid caller
-            this.client.disconnect(`Cannot determine the calling game object of ${callerReference} to run for.`);
+            void this.client.disconnect(
+                `Cannot determine the calling game object of ${callerReference} to run for.`,
+            );
 
             return undefined;
         }
+
+        // adds semi-hack-y indexing to grab functions for the game object out of.
+        const gameObject = rawGameObject as ReflectableGameObject;
 
         const sanitizedArgs = this.gameSanitizer.validateRunArgs(
             gameObject,
@@ -213,15 +231,19 @@ export class BaseAIManager {
         if (sanitizedArgs instanceof Error) {
             // The structure of their run command is so malformed we can't even
             // run it, so something is wrong with their client, disconnect them
-            this.client.disconnect(sanitizedArgs.message);
+            void this.client.disconnect(sanitizedArgs.message);
 
             return undefined;
         }
 
-        const gameObjectSchema = this.namespace.gameObjectsSchema[gameObject.gameObjectName];
+        const gameObjectSchema = this.namespace.gameObjectsSchema[
+            gameObject.gameObjectName
+        ];
         if (!gameObjectSchema) {
             // the caller is malformed in some unexpected way
-            this.client.disconnect(`Cannot find schema for game object '${gameObject.gameObjectName}'.`);
+            void this.client.disconnect(
+                `Cannot find schema for game object '${gameObject.gameObjectName}'.`,
+            );
 
             return undefined;
         }
@@ -230,46 +252,44 @@ export class BaseAIManager {
         // game object has the appropriate function
         const schema = gameObjectSchema.functions[functionName];
         if (!schema) {
-            throw new Error(`Invalid state: no schema found for ${gameObject}'s function ${functionName}.`);
+            throw new Error(
+                `Invalid state: no schema found for ${gameObject}'s function ${functionName}.`,
+            );
         }
 
         let returned = schema.invalidValue;
 
-        let invalid = sanitizedArgs instanceof Map
-            // if it appears valid, try to invalidate
-            ? this.invalidateRun(
-                this.client.player,
-                gameObject,
-                functionName,
-                sanitizedArgs,
-            )
-            // else, failed to even sanitize
-            : sanitizedArgs.invalid;
+        let invalid =
+            sanitizedArgs instanceof Map
+                ? // if it appears valid, try to invalidate
+                  this.invalidateRun(
+                      this.client.player,
+                      gameObject,
+                      functionName,
+                      sanitizedArgs,
+                  )
+                : // else, failed to even sanitize
+                  sanitizedArgs.invalid;
 
         // If the game said the run is invalid for all runs
         if (invalid) {
             // Tell the client it is invalid
-            this.client.send({
+            void this.client.send({
                 event: "invalid",
                 data: { message: invalid },
             });
-        }
-        else {
+        } else {
             // else, the game is ok with trying to have
             // the calling game object try to invalidate the run
-            let argsMap = (sanitizedArgs as Map<string, unknown>);
+            let argsMap = sanitizedArgs as Map<string, unknown>;
 
             const invalidateName = `invalidate${upperFirst(functionName)}`;
-            //  ↙ We are getting this function via reflection, no easier way to do this.
-            // tslint:disable-next-line:no-any no-unsafe-any
-            const validated = (gameObject as any)[invalidateName](
-                this.client.player,
-                ...argsMap.values(),
-            ) as void | string | UnknownObject;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const validated: string | void | UnknownObject = gameObject[
+                invalidateName
+            ](this.client.player, ...argsMap.values());
 
-            invalid = typeof validated === "string"
-                ? validated
-                : undefined;
+            invalid = typeof validated === "string" ? validated : undefined;
 
             if (typeof validated === "object") {
                 // they returns an object for new args, so re-validate them
@@ -284,13 +304,15 @@ export class BaseAIManager {
                     // Somehow a game dev returned an invalid object,
                     // so this is a server error
                     throw new Error(
-`Invalidate function for ${gameObject.gameObjectName}.${functionName} returned invalid object:
+                        `Invalidate function for ${
+                            gameObject.gameObjectName
+                        }.${functionName} returned invalid object:
 ${JSON.stringify(validated)}
 from:
 ${JSON.stringify(mapToObject(argsMap))}
-`);
-                }
-                else if (newArgsMap instanceof Map) {
+`,
+                    );
+                } else if (newArgsMap instanceof Map) {
                     argsMap = newArgsMap;
                 }
             }
@@ -298,19 +320,22 @@ ${JSON.stringify(mapToObject(argsMap))}
             if (invalid) {
                 // Their arguments did not validate,
                 // so they get told it was invalid
-                this.client.send({
+                void this.client.send({
                     event: "invalid",
                     data: { message: invalid },
                 });
-            }
-            else {
+            } else {
                 // It's valid!
-                // tslint:disable-next-line:no-any no-unsafe-any
-                const unsanitizedReturned = await (gameObject as any)[functionName](
-                    this.client.player,
-                    ...argsMap.values(),
-                ) as unknown;
-                returned = this.gameSanitizer.validateRanReturned(gameObject, functionName, unsanitizedReturned);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const unsanitizedReturned: unknown = await gameObject[
+                    functionName
+                ](this.client.player, ...argsMap.values());
+
+                returned = this.gameSanitizer.validateRanReturned(
+                    gameObject,
+                    functionName,
+                    unsanitizedReturned,
+                );
             }
         }
 
@@ -330,7 +355,7 @@ ${JSON.stringify(mapToObject(argsMap))}
             returned,
         });
 
-        this.client.send({ event: "ran", data: returned });
+        void this.client.send({ event: "ran", data: returned });
 
         return returned as T;
     }
@@ -338,9 +363,9 @@ ${JSON.stringify(mapToObject(argsMap))}
     /**
      * Sends an order to our client and notifies upstream that we did so.
      *
-     * @param order The order to send
+     * @param order - The order to send.
      */
-    private sendOrder(order: Immutable<IOrder>): void {
+    private sendOrder(order: Immutable<Order>): void {
         const simpleOrder = {
             name: order.name,
             index: order.index,
@@ -348,7 +373,9 @@ ${JSON.stringify(mapToObject(argsMap))}
         };
 
         if (!this.client.player) {
-            throw new Error(`Cannot send an order to client ${this.client} as it is not playing!`);
+            throw new Error(
+                `Cannot send an order to client ${this.client} as it is not playing!`,
+            );
         }
 
         // This is basically to notify upstream for the gamelog manager
@@ -358,13 +385,14 @@ ${JSON.stringify(mapToObject(argsMap))}
             order: simpleOrder,
         });
 
-        this.client.send({ event: "order", data: simpleOrder });
+        void this.client.send({ event: "order", data: simpleOrder });
     }
 
     /**
      * Invoked by a client when they claim to have finished an order.
      *
      * This should resolve the promised generated in `executeOrder`.
+     *
      * @param orderIndex - The index (id) of the order they finished executing.
      * @param unsanitizedReturned - The value they returned from executing
      * that order.
@@ -375,7 +403,7 @@ ${JSON.stringify(mapToObject(argsMap))}
     ): void {
         const order = this.orders.get(orderIndex);
         if (!order || !this.client.player) {
-            this.client.disconnect(
+            void this.client.disconnect(
                 `Cannot find order # ${orderIndex} you claim to have finished.`,
             );
 
@@ -397,9 +425,8 @@ ${JSON.stringify(mapToObject(argsMap))}
             unSerialize(unsanitizedReturned, this.game),
         );
 
-        const invalid = validated instanceof Error
-            ? validated.message
-            : undefined;
+        const invalid =
+            validated instanceof Error ? validated.message : undefined;
 
         // This is basically to notify upstream for the gamelog manager and
         // session to record/send these
@@ -411,7 +438,7 @@ ${JSON.stringify(mapToObject(argsMap))}
         });
 
         if (invalid) {
-            this.client.send({
+            void this.client.send({
                 event: "invalid",
                 data: {
                     message: `Return value (${quoteIfString(
@@ -423,12 +450,11 @@ ${JSON.stringify(mapToObject(argsMap))}
             order.errors++;
 
             if (order.errors >= MAX_ORDER_ERRORS) {
-                this.client.disconnect(
-                    `Exceeded max number of errors (${MAX_ORDER_ERRORS}) `
-                  + `executing order '${order.name}' #${order.index}.`,
+                void this.client.disconnect(
+                    `Exceeded max number of errors (${MAX_ORDER_ERRORS}) ` +
+                        `executing order '${order.name}' #${order.index}.`,
                 );
-            }
-            else {
+            } else {
                 // re-send them the same order, as they fucked up last time.
                 this.sendOrder(order);
 
@@ -439,8 +465,7 @@ ${JSON.stringify(mapToObject(argsMap))}
 
         if (invalid) {
             order.reject(validated); // will be an Error
-        }
-        else {
+        } else {
             order.resolve(validated);
         }
     }

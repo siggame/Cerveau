@@ -1,7 +1,8 @@
-// tslint:disable:no-any no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ^ as DeltaMergeables are black magic anyways
 
-import { ISanitizableType, sanitizeType } from "~/core/sanitize/";
+import { SanitizableType, sanitizeType } from "~/core/sanitize/";
 import { Immutable, TypedObject } from "~/utils";
 import { DeltaMergeable } from "./delta-mergeable";
 import { createArray } from "./delta-mergeable-array";
@@ -10,14 +11,12 @@ import { createObject } from "./delta-mergeable-object";
 /**
  * Creates a sanitization transform function for delta mergeables.
  *
- * @param type They type to sanitize.
- * @returns a function that will accept a value and try to sanitize it.
+ * @param type - They type to sanitize.
+ * @returns A function that will accept a value and try to sanitize it.
  */
-function sanitize(type: Immutable<ISanitizableType>): (
-    val: unknown,
-    current: any,
-    forceSet: boolean,
-) => any {
+function sanitize(
+    type: Immutable<SanitizableType>,
+): (val: unknown, current: any, forceSet: boolean) => any {
     return function transformSanitize(
         val: unknown,
         current: any,
@@ -47,16 +46,22 @@ function sanitize(type: Immutable<ISanitizableType>): (
 
 /**
  * Creates a delta mergeable given a type.
- * @param args - The data about the delta mergeable to create
+ *
+ * @param args - The data about the delta mergeable to create.
+ * @param args.key - The key of the DeltaMergeable to create.
+ * @param args.type - The type of the DeltaMergeable to create.
+ * @param args.childTypes - The child types of this DeltaMergeable.
+ * @param args.parent - The parent DeltaMergable, if none then assumed to be root node.
+ * @param args.initialValue - The initial value of this DeltaMergable.
  * @returns A newly created DeltaMergeable instance of the given type.
  */
 export function createDeltaMergeable(args: {
     /** The key of the DeltaMergeable to create. */
     key: string;
     /** The type of the DeltaMergeable to create. */
-    type: Immutable<ISanitizableType>;
+    type: Immutable<SanitizableType>;
     /** The child types of this DeltaMergeable. */
-    childTypes?: Immutable<TypedObject<ISanitizableType>>;
+    childTypes?: Immutable<TypedObject<SanitizableType>>;
     /** The parent DeltaMergable, if none then assumed to be root node. */
     parent?: DeltaMergeable;
     /** The initial value of this DeltaMergable. */

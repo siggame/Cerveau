@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { SpidersGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -8,22 +8,22 @@ import { Player } from "./player";
 import { Web } from "./web";
 
 // <<-- Creer-Merge: imports -->>
-import { arrayHasElements, euclideanDistance, IPoint, Mutable } from "~/utils";
+import { arrayHasElements, euclideanDistance, Point, Mutable } from "~/utils";
 
-/** A Player that can mutate before the game begins */
+/** A Player that can mutate before the game begins. */
 type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
  * There's an infestation of enemy spiders challenging your queen broodmother
- * spider! Protect her and attack the other broodmother in this turn based,
- * node based, game.
+ * spider! Protect her and attack the other broodmother in this turn based, node
+ * based, game.
  */
 export class SpidersGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: SpidersGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -50,10 +50,9 @@ export class SpidersGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * The starting strength for Webs.
@@ -133,7 +132,7 @@ export class SpidersGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: SpidersGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -157,7 +156,7 @@ export class SpidersGame extends BaseClasses.Game {
         let retries = 1000;
         for (let i = 0; i < numNests; i++) {
             while (--retries > 0) {
-                let point: IPoint | undefined = {
+                let point: Point | undefined = {
                     x: this.manager.random.int(mapWidth / 2 - deadzone / 2),
                     y: this.manager.random.int(mapHeight),
                 };
@@ -200,10 +199,13 @@ export class SpidersGame extends BaseClasses.Game {
         }
 
         // create the BroodMother
-        (this.players[0] as MutablePlayer).broodMother = this.manager.create.broodMother({
-            owner: this.players[0],
-            nest: this.manager.random.element(this.nests),
-        });
+        (this
+            .players[0] as MutablePlayer).broodMother = this.manager.create.broodMother(
+            {
+                owner: this.players[0],
+                nest: this.manager.random.element(this.nests),
+            },
+        );
 
         // now mirror it
 
@@ -235,12 +237,17 @@ export class SpidersGame extends BaseClasses.Game {
         }
 
         // webs that cross the middle of the game
-        const numCrossWebs = this.manager.random.int(minCrossWebs, maxCrossWebs);
+        const numCrossWebs = this.manager.random.int(
+            minCrossWebs,
+            maxCrossWebs,
+        );
         for (let i = 0; i < numCrossWebs; i++) {
             // the first half the the array has the nests on player 0's side
             const nestA = this.nests[this.manager.random.int(numNests - 1)];
-             // and the other half has player 1's
-            const nestB = this.nests[this.manager.random.int(numNests, numNests * 2 - 1)];
+            // and the other half has player 1's
+            const nestB = this.nests[
+                this.manager.random.int(numNests, numNests * 2 - 1)
+            ];
             this.manager.create.web({ nestA, nestB });
 
             const mirrorA = mirrorNests.get(nestA);

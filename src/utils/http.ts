@@ -13,24 +13,27 @@ export function httpRequest(url: string): Promise<string> {
     const asURL = new URL(url);
 
     return new Promise((resolve, reject) => {
-        get({
-            hostname: asURL.hostname,
-            path: asURL.pathname,
-            agent: globalAgent,
-            headers: {
-                "User-Agent": "Node.js",
+        get(
+            {
+                hostname: asURL.hostname,
+                path: asURL.pathname,
+                agent: globalAgent,
+                headers: {
+                    "User-Agent": "Node.js",
+                },
             },
-        }, (response) => {
-            // A chunk of data has been received.
-            response.on("data", (chunk) => {
-                data += chunk;
-            });
+            (response) => {
+                // A chunk of data has been received.
+                response.on("data", (chunk) => {
+                    data += chunk;
+                });
 
-            // The whole response has been received. Print out the result.
-            response.on("end", () => {
-                resolve(data);
-            });
-        }).on("error", (err) => {
+                // The whole response has been received. Print out the result.
+                response.on("end", () => {
+                    resolve(data);
+                });
+            },
+        ).on("error", (err) => {
             reject(err);
         });
     });

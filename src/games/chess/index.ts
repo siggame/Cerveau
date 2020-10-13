@@ -4,25 +4,28 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
+import { TwoPlayerPlayer, mixTwoPlayer } from "~/core/game/mixins";
 
 /**
- * The interface the Player for the Chess game
+ * The interface that the Player for the Chess game
  * must implement from mixed in game logic.
  */
-export interface IBaseChessPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer {
-}
+export interface BaseChessPlayer extends BasePlayer, TwoPlayerPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -63,12 +66,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -76,8 +78,8 @@ export interface IPlayerProperties {
     clientType?: string;
 
     /**
-     * The color (side) of this player. Either 'white' or 'black', with the
-     * 'white' player having the first move.
+     * The color (side) of this player. Either 'white' or 'black', with
+     * the 'white' player having the first move.
      */
     color?: "black" | "white";
 
@@ -115,8 +117,23 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseChessPlayer & PlayerProperties & T>;
 
 export * from "./game-object";
 export * from "./player";
@@ -136,8 +153,7 @@ import { ChessGameSettingsManager } from "./game-settings";
  * The factory that **must** be used to create any game objects in
  * the Chess game.
  */
-export class ChessGameObjectFactory extends BaseGameObjectFactory {
-}
+export class ChessGameObjectFactory extends BaseGameObjectFactory {}
 
 /**
  * The shared namespace for Chess that is used to
@@ -159,12 +175,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new ChessGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 makeMove: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "string",
                     },
@@ -205,8 +219,7 @@ export const Namespace = makeNamespace({
                     typeName: "string",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -272,9 +285,9 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "cfa5f5c1685087ce2899229c04c26e39f231e897ecc8fe036b44bc22103ef801",
+    gameVersion:
+        "cfa5f5c1685087ce2899229c04c26e39f231e897ecc8fe036b44bc22103ef801",
 });

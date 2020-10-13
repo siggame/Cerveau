@@ -12,8 +12,7 @@ optional=True, help=False)}
  * the AI orders to execute.
  */
 export class AI extends BaseClasses.AI {
-
-${merge('// ', 'attributes',
+${merge('    // ', 'attributes',
 """// If the AI needs additional attributes add them here.
 // NOTE: these are not set in client AIs.""",
 optional=True, help=False)}
@@ -23,16 +22,21 @@ optional=True, help=False)}
         continue #//this is implimented in based mixins for this project
     function_parms = ai['functions'][function_name]
     ret = function_parms['returns']
+    ret_type = 'void'
+    if ret:
+        ret_type = shared['cerveau']['type'](function_parms['returns']['type'])
 %>${shared['cerveau']['formatted_function_top'](function_name, ai, scope='public')}
-        ${'return ' if ret else ''}this.executeOrder("${function_name}"${"" if not function_parms['arguments'] else '' + (
-",\n            ".join([''] + [arg['name'] for arg in function_parms['arguments']]) + ",\n        "
-)});
+${shared['cerveau']['wrap_between'](
+    ('return ' if ret else '') + 'this.executeOrder(',
+    ['"{}"'.format(function_name)] + [arg['name'] for arg in function_parms['arguments']],
+    ') as Promise<' + ret_type + '>;',
+    indent=2
+)}
     }
-% endfor
 
-${merge('// ', 'functions',
+% endfor
+${merge('    // ', 'functions',
 """// If the AI needs additional attributes add them here.
 /// NOTE: these will not be callable in client AIs.""",
 optional=True, help=False)}
-
 }

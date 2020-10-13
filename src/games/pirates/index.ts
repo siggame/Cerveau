@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Pirates game
+ * The interface that the Player for the Pirates game
  * must implement from mixed in game logic.
  */
-export interface IBasePiratesPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BasePiratesPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,12 +82,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
@@ -137,11 +147,10 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Port. */
-export interface IPortProperties {
+/** All the possible properties for Port instances. */
+export interface PortProperties {
     /**
      * For players, how much more gold this Port can spend this turn. For
      * merchants, how much gold this Port has accumulated (it will spawn a ship
@@ -164,7 +173,6 @@ export interface IPortProperties {
      * The Tile this Port is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -172,15 +180,15 @@ export interface IPortProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IPortSpawnArgs {
+export interface PortSpawnArgs {
     /**
      * What type of Unit to create ('crew' or 'ship').
      */
     type?: "crew" | "ship";
 }
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * (Visualizer only) Whether this tile is deep sea or grassy. This has no
      * effect on gameplay, but feel free to use it if you want.
@@ -240,11 +248,10 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
      * Whether this Unit has performed its action this turn.
      */
@@ -305,7 +312,6 @@ export interface IUnitProperties {
      * The Tile this Unit is on.
      */
     tile?: Tile;
-
 }
 
 /**
@@ -313,7 +319,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitAttackArgs {
+export interface UnitAttackArgs {
     /**
      * The Tile to attack.
      */
@@ -327,10 +333,10 @@ export interface IUnitAttackArgs {
 
 /**
  * Argument overrides for Unit's bury function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitBuryArgs {
+export interface UnitBuryArgs {
     /**
      * How much gold this Unit should bury. Amounts <= 0 will bury as much as
      * possible.
@@ -343,7 +349,7 @@ export interface IUnitBuryArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitDepositArgs {
+export interface UnitDepositArgs {
     /**
      * The amount of gold to deposit. Amounts <= 0 will deposit all the gold on
      * this Unit.
@@ -353,10 +359,10 @@ export interface IUnitDepositArgs {
 
 /**
  * Argument overrides for Unit's dig function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitDigArgs {
+export interface UnitDigArgs {
     /**
      * How much gold this Unit should take. Amounts <= 0 will dig up as much as
      * possible.
@@ -366,10 +372,10 @@ export interface IUnitDigArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -378,18 +384,17 @@ export interface IUnitMoveArgs {
 
 /**
  * Argument overrides for Unit's rest function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitRestArgs {
-}
+export interface UnitRestArgs {}
 
 /**
  * Argument overrides for Unit's split function. If you return an object of
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitSplitArgs {
+export interface UnitSplitArgs {
     /**
      * The Tile to move the crew to.
      */
@@ -411,12 +416,52 @@ export interface IUnitSplitArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitWithdrawArgs {
+export interface UnitWithdrawArgs {
     /**
      * The amount of gold to withdraw. Amounts <= 0 will withdraw everything.
      */
     amount?: number;
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BasePiratesPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Port.
+ */
+export type PortConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<PortProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./player";
@@ -438,13 +483,13 @@ import { PiratesGame } from "./game";
 import { PiratesGameManager } from "./game-manager";
 import { PiratesGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Port */
+/** The arguments used to construct a Port. */
 export type PortArgs = FirstArgumentFromConstructor<typeof Port>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -455,42 +500,35 @@ export class PiratesGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Port in the Game and tracks it for all players.
      *
-     * @param args - Data about the Port to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Port to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Port hooked up in the game and ready for you to use.
      */
-    public port<T extends PortArgs>(
-        args: Readonly<T>,
-    ): Port & T {
+    public port<T extends PortArgs>(args: Readonly<T>): Port & T {
         return this.createGameObject("Port", Port, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -513,12 +551,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new PiratesGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -642,8 +678,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -723,8 +758,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Port: {
             parentClassName: "GameObject",
@@ -814,8 +848,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -939,8 +972,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 rest: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -986,5 +1018,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "d51fca49d06cb7164f9dbf9c3515ab0f9b5a17113a5946bddcc75aaba125967f",
+    gameVersion:
+        "d51fca49d06cb7164f9dbf9c3515ab0f9b5a17113a5946bddcc75aaba125967f",
 });

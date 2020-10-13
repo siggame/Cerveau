@@ -4,30 +4,39 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITurnBasedPlayer, ITwoPlayerPlayer, mixTurnBased, mixTwoPlayer,
-       } from "~/core/game/mixins";
+import {
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Spiders game
+ * The interface that the Player for the Spiders game
  * must implement from mixed in game logic.
  */
-export interface IBaseSpidersPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer {
-}
+export interface BaseSpidersPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -69,8 +78,8 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an BroodMother. */
-export interface IBroodMotherProperties {
+/** All the possible properties for BroodMother instances. */
+export interface BroodMotherProperties {
     /**
      * How many eggs the BroodMother has to spawn Spiderlings this turn.
      */
@@ -81,7 +90,6 @@ export interface IBroodMotherProperties {
      * and her owner loses.
      */
     health?: number;
-
 }
 
 /**
@@ -89,34 +97,33 @@ export interface IBroodMotherProperties {
  * object of this interface from the invalidate functions, the value(s) you set
  * will be used in the actual function.
  */
-export interface IBroodMotherConsumeArgs {
+export interface BroodMotherConsumeArgs {
     /**
-     * The Spiderling to consume. It must be on the same Nest as this
-     * BroodMother.
+     * The Spiderling to consume. It must be on the same Nest as
+     * this BroodMother.
      */
     spiderling?: Spiderling;
 }
 
 /**
  * Argument overrides for BroodMother's spawn function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IBroodMotherSpawnArgs {
+export interface BroodMotherSpawnArgs {
     /**
-     * The string name of the Spiderling class you want to Spawn. Must be
-     * 'Spitter', 'Weaver', or 'Cutter'.
+     * The string name of the Spiderling class you want to Spawn. Must
+     * be 'Spitter', 'Weaver', or 'Cutter'.
      */
     spiderlingType?: "Spitter" | "Weaver" | "Cutter";
 }
 
-/** All the possible properties for an Cutter. */
-export interface ICutterProperties {
+/** All the possible properties for Cutter instances. */
+export interface CutterProperties {
     /**
      * The Web that this Cutter is trying to cut. Undefined if not cutting.
      */
     cuttingWeb?: Web;
-
 }
 
 /**
@@ -124,7 +131,7 @@ export interface ICutterProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ICutterCutArgs {
+export interface CutterCutArgs {
     /**
      * The web you want to Cut. Must be connected to the Nest this Cutter is
      * currently on.
@@ -132,12 +139,11 @@ export interface ICutterCutArgs {
     web?: Web;
 }
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Nest. */
-export interface INestProperties {
+/** All the possible properties for Nest instances. */
+export interface NestProperties {
     /**
      * The Player that 'controls' this Nest as they have the most Spiders on
      * this nest.
@@ -163,11 +169,10 @@ export interface INestProperties {
      * The Y coordinate of the Nest. Used for distance calculations.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * This player's BroodMother. If it dies they lose the game.
      */
@@ -228,19 +233,18 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
-/** All the possible properties for an Spider. */
-export interface ISpiderProperties {
+/** All the possible properties for Spider instances. */
+export interface SpiderProperties {
     /**
      * If this Spider is dead and has been removed from the game.
      */
     isDead?: boolean;
 
     /**
-     * The Nest that this Spider is currently on. Undefined when moving on a
-     * Web.
+     * The Nest that this Spider is currently on. Undefined when moving on
+     * a Web.
      */
     nest?: Nest;
 
@@ -248,16 +252,22 @@ export interface ISpiderProperties {
      * The Player that owns this Spider, and can command it.
      */
     owner?: Player;
-
 }
 
-/** All the possible properties for an Spiderling. */
-export interface ISpiderlingProperties {
+/** All the possible properties for Spiderling instances. */
+export interface SpiderlingProperties {
     /**
      * When empty string this Spiderling is not busy, and can act. Otherwise a
      * string representing what it is busy with, e.g. 'Moving', 'Attacking'.
      */
-    busy?: "" | "Moving" | "Attacking" | "Strengthening" | "Weakening" | "Cutting" | "Spitting";
+    busy?:
+        | ""
+        | "Moving"
+        | "Attacking"
+        | "Strengthening"
+        | "Weakening"
+        | "Cutting"
+        | "Spitting";
 
     /**
      * The Web this Spiderling is using to move. Undefined if it is not moving.
@@ -280,15 +290,14 @@ export interface ISpiderlingProperties {
      * See docs for the Work forumla.
      */
     workRemaining?: number;
-
 }
 
 /**
  * Argument overrides for Spiderling's attack function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface ISpiderlingAttackArgs {
+export interface SpiderlingAttackArgs {
     /**
      * The Spiderling to attack.
      */
@@ -297,24 +306,23 @@ export interface ISpiderlingAttackArgs {
 
 /**
  * Argument overrides for Spiderling's move function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface ISpiderlingMoveArgs {
+export interface SpiderlingMoveArgs {
     /**
      * The Web you want to move across to the other Nest.
      */
     web?: Web;
 }
 
-/** All the possible properties for an Spitter. */
-export interface ISpitterProperties {
+/** All the possible properties for Spitter instances. */
+export interface SpitterProperties {
     /**
      * The Nest that this Spitter is creating a Web to spit at, thus connecting
      * them. Undefined if not spitting.
      */
     spittingWebToNest?: Nest;
-
 }
 
 /**
@@ -322,7 +330,7 @@ export interface ISpitterProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface ISpitterSpitArgs {
+export interface SpitterSpitArgs {
     /**
      * The Nest you want to spit a Web to, thus connecting that Nest and the
      * one the Spitter is on.
@@ -330,8 +338,8 @@ export interface ISpitterSpitArgs {
     nest?: Nest;
 }
 
-/** All the possible properties for an Weaver. */
-export interface IWeaverProperties {
+/** All the possible properties for Weaver instances. */
+export interface WeaverProperties {
     /**
      * The Web that this Weaver is strengthening. Undefined if not
      * strengthening.
@@ -342,18 +350,17 @@ export interface IWeaverProperties {
      * The Web that this Weaver is weakening. Undefined if not weakening.
      */
     weakeningWeb?: Web;
-
 }
 
 /**
  * Argument overrides for Weaver's strengthen function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IWeaverStrengthenArgs {
+export interface WeaverStrengthenArgs {
     /**
-     * The web you want to strengthen. Must be connected to the Nest this
-     * Weaver is currently on.
+     * The web you want to strengthen. Must be connected to the Nest
+     * this Weaver is currently on.
      */
     web?: Web;
 }
@@ -363,7 +370,7 @@ export interface IWeaverStrengthenArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IWeaverWeakenArgs {
+export interface WeaverWeakenArgs {
     /**
      * The web you want to weaken. Must be connected to the Nest this Weaver is
      * currently on.
@@ -371,8 +378,8 @@ export interface IWeaverWeakenArgs {
     web?: Web;
 }
 
-/** All the possible properties for an Web. */
-export interface IWebProperties {
+/** All the possible properties for Web instances. */
+export interface WebProperties {
     /**
      * How long this Web is, i.e., the distance between its nestA and nestB.
      */
@@ -404,8 +411,87 @@ export interface IWebProperties {
      * and all the Spiders on it.
      */
     strength?: number;
-
 }
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of BroodMother.
+ */
+export type BroodMotherConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderArgs & BroodMotherProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Cutter.
+ */
+export type CutterConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & CutterProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Nest.
+ */
+export type NestConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<NestProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseSpidersPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Spider.
+ */
+export type SpiderConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Spiderling.
+ */
+export type SpiderlingConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderArgs & SpiderlingProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Spitter.
+ */
+export type SpitterConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & SpitterProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Weaver.
+ */
+export type WeaverConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<SpiderlingArgs & WeaverProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Web.
+ */
+export type WebConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<WebProperties & T>;
 
 export * from "./brood-mother";
 export * from "./cutter";
@@ -437,28 +523,28 @@ import { SpidersGame } from "./game";
 import { SpidersGameManager } from "./game-manager";
 import { SpidersGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a BroodMother */
+/** The arguments used to construct a BroodMother. */
 export type BroodMotherArgs = FirstArgumentFromConstructor<typeof BroodMother>;
 
-/** The arguments used to construct a Cutter */
+/** The arguments used to construct a Cutter. */
 export type CutterArgs = FirstArgumentFromConstructor<typeof Cutter>;
 
-/** The arguments used to construct a Nest */
+/** The arguments used to construct a Nest. */
 export type NestArgs = FirstArgumentFromConstructor<typeof Nest>;
 
-/** The arguments used to construct a Spider */
+/** The arguments used to construct a Spider. */
 export type SpiderArgs = FirstArgumentFromConstructor<typeof Spider>;
 
-/** The arguments used to construct a Spiderling */
+/** The arguments used to construct a Spiderling. */
 export type SpiderlingArgs = FirstArgumentFromConstructor<typeof Spiderling>;
 
-/** The arguments used to construct a Spitter */
+/** The arguments used to construct a Spitter. */
 export type SpitterArgs = FirstArgumentFromConstructor<typeof Spitter>;
 
-/** The arguments used to construct a Weaver */
+/** The arguments used to construct a Weaver. */
 export type WeaverArgs = FirstArgumentFromConstructor<typeof Weaver>;
 
-/** The arguments used to construct a Web */
+/** The arguments used to construct a Web. */
 export type WebArgs = FirstArgumentFromConstructor<typeof Web>;
 
 /**
@@ -487,22 +573,18 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Cutter hooked up in the game and ready for you to use.
      */
-    public cutter<T extends CutterArgs>(
-        args: Readonly<T>,
-    ): Cutter & T {
+    public cutter<T extends CutterArgs>(args: Readonly<T>): Cutter & T {
         return this.createGameObject("Cutter", Cutter, args);
     }
 
     /**
      * Creates a new Nest in the Game and tracks it for all players.
      *
-     * @param args - Data about the Nest to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Nest to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Nest hooked up in the game and ready for you to use.
      */
-    public nest<T extends NestArgs>(
-        args: Readonly<T>,
-    ): Nest & T {
+    public nest<T extends NestArgs>(args: Readonly<T>): Nest & T {
         return this.createGameObject("Nest", Nest, args);
     }
 
@@ -513,9 +595,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Spider hooked up in the game and ready for you to use.
      */
-    public spider<T extends SpiderArgs>(
-        args: Readonly<T>,
-    ): Spider & T {
+    public spider<T extends SpiderArgs>(args: Readonly<T>): Spider & T {
         return this.createGameObject("Spider", Spider, args);
     }
 
@@ -524,8 +604,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      *
      * @param args - Data about the Spiderling to set. Any keys matching a
      * property in the game object's class will be automatically set for you.
-     * @returns A new Spiderling hooked up in the game and ready for you to
-     * use.
+     * @returns A new Spiderling hooked up in the game and ready for you to use.
      */
     public spiderling<T extends SpiderlingArgs>(
         args: Readonly<T>,
@@ -536,13 +615,11 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
     /**
      * Creates a new Spitter in the Game and tracks it for all players.
      *
-     * @param args - Data about the Spitter to set. Any keys matching a
-     * property in the game object's class will be automatically set for you.
+     * @param args - Data about the Spitter to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
      * @returns A new Spitter hooked up in the game and ready for you to use.
      */
-    public spitter<T extends SpitterArgs>(
-        args: Readonly<T>,
-    ): Spitter & T {
+    public spitter<T extends SpitterArgs>(args: Readonly<T>): Spitter & T {
         return this.createGameObject("Spitter", Spitter, args);
     }
 
@@ -553,9 +630,7 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * in the game object's class will be automatically set for you.
      * @returns A new Weaver hooked up in the game and ready for you to use.
      */
-    public weaver<T extends WeaverArgs>(
-        args: Readonly<T>,
-    ): Weaver & T {
+    public weaver<T extends WeaverArgs>(args: Readonly<T>): Weaver & T {
         return this.createGameObject("Weaver", Weaver, args);
     }
 
@@ -566,12 +641,9 @@ export class SpidersGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Web hooked up in the game and ready for you to use.
      */
-    public web<T extends WebArgs>(
-        args: Readonly<T>,
-    ): Web & T {
+    public web<T extends WebArgs>(args: Readonly<T>): Web & T {
         return this.createGameObject("Web", Web, args);
     }
-
 }
 
 /**
@@ -594,12 +666,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new SpidersGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -685,8 +755,7 @@ export const Namespace = makeNamespace({
                     },
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         BroodMother: {
             parentClassName: "Spider",
@@ -817,8 +886,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -869,8 +937,7 @@ export const Namespace = makeNamespace({
                     typeName: "boolean",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spider: {
             parentClassName: "GameObject",
@@ -889,8 +956,7 @@ export const Namespace = makeNamespace({
                     nullable: false,
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Spiderling: {
             parentClassName: "Spider",
@@ -898,7 +964,15 @@ export const Namespace = makeNamespace({
                 busy: {
                     typeName: "string",
                     defaultValue: "",
-                    literals: ["", "Moving", "Attacking", "Strengthening", "Weakening", "Cutting", "Spitting"],
+                    literals: [
+                        "",
+                        "Moving",
+                        "Attacking",
+                        "Strengthening",
+                        "Weakening",
+                        "Cutting",
+                        "Spitting",
+                    ],
                 },
                 movingOnWeb: {
                     typeName: "gameObject",
@@ -1050,9 +1124,9 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
     },
-    gameVersion: "a8df6038306b6855bb35959d7698f8dcbf98f48e7e148de59fef940ccb241bdf",
+    gameVersion:
+        "a8df6038306b6855bb35959d7698f8dcbf98f48e7e148de59fef940ccb241bdf",
 });

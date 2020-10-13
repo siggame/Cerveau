@@ -17,7 +17,7 @@ export function registerRouteArchives(app: Express): void {
 
     const lobby = Lobby.getInstance();
 
-    app.get("/archives/:gameName?/:pageStart?/:pageCount?", async (req, res) => {
+    app.get("/archives/:gameName?/:pageStart?/:pageCount?", (req, res) => {
         const params = req.params as {
             /** The name of the game. */
             gameName: unknown;
@@ -40,24 +40,29 @@ export function registerRouteArchives(app: Express): void {
         }
 
         const { gamelogInfos } = lobby.gamelogManager;
-        const startIndex = Math.max(gamelogInfos.length - (pageStart * pageCount), 0);
+        const startIndex = Math.max(
+            gamelogInfos.length - pageStart * pageCount,
+            0,
+        );
         const endIndex = startIndex + pageCount;
 
         // Because logs (all the gamelogs GamelogManager found) is pre-sorted
         // with the newest gamelogs at the END, startIndex starts at the end.
         // We want to first show the NEWEST gamelogs.
-        const gamelogs = formatGamelogInfos(gamelogInfos
-            .slice(startIndex, endIndex)
-            .reverse(),
-        req.headers.host);
+        const gamelogs = formatGamelogInfos(
+            gamelogInfos.slice(startIndex, endIndex).reverse(),
+            req.headers.host,
+        );
 
-        const newerUri = endIndex < gamelogInfos.length
-            ? (`/archives/${gameName}/${pageStart - 1}`)
-            : undefined;
+        const newerUri =
+            endIndex < gamelogInfos.length
+                ? `/archives/${gameName}/${pageStart - 1}`
+                : undefined;
 
-        const olderUri = startIndex > 0
-            ? (`/archives/${gameName}/${pageStart + 1}`)
-            : undefined;
+        const olderUri =
+            startIndex > 0
+                ? `/archives/${gameName}/${pageStart + 1}`
+                : undefined;
 
         res.render("archives", {
             gamelogs,

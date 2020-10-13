@@ -14,10 +14,11 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
      * This describes the structure of the game settings, and is used to
      * generate the values, as well as basic type and range checking.
      */
-    public get schema() { // tslint:disable-line:typedef
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    public get schema() {
         return this.makeSchema({
             // HACK: `super` should work. but schema is undefined on it at run time.
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             ...(super.schema || (this as any).schema),
 
             // Spiders game specific settings
@@ -27,57 +28,68 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 default: 2,
                 // <<-- /Creer-Merge: cutSpeed -->>
             },
+
             eggsScalar: {
-                description: "Constant used to calculate how many eggs "
-                           + "BroodMothers get on their owner's turns.",
+                description:
+                    "Constant used to calculate how many eggs BroodMothers " +
+                    "get on their owner's turns.",
                 // <<-- Creer-Merge: eggsScalar -->>
-                default: 0.10,
+                default: 0.1,
                 // <<-- /Creer-Merge: eggsScalar -->>
             },
+
             initialWebStrength: {
                 description: "The starting strength for Webs.",
                 // <<-- Creer-Merge: initialWebStrength -->>
                 default: 5,
                 // <<-- /Creer-Merge: initialWebStrength -->>
             },
+
             maxWebStrength: {
-                description: "The maximum strength a web can be strengthened "
-                           + "to.",
+                description:
+                    "The maximum strength a web can be strengthened to.",
                 // <<-- Creer-Merge: maxWebStrength -->>
                 default: 15,
                 // <<-- /Creer-Merge: maxWebStrength -->>
             },
+
             movementSpeed: {
                 description: "The speed at which Spiderlings move on Webs.",
                 // <<-- Creer-Merge: movementSpeed -->>
                 default: 10,
                 // <<-- /Creer-Merge: movementSpeed -->>
             },
+
             spitSpeed: {
-                description: "The speed at which Spitters work to spit new "
-                           + "Webs.",
+                description:
+                    "The speed at which Spitters work to spit new Webs.",
                 // <<-- Creer-Merge: spitSpeed -->>
                 default: 24,
                 // <<-- /Creer-Merge: spitSpeed -->>
             },
+
             weavePower: {
-                description: "How much web strength is added or removed from "
-                           + "Webs when they are weaved.",
+                description:
+                    "How much web strength is added or removed from Webs " +
+                    "when they are weaved.",
                 // <<-- Creer-Merge: weavePower -->>
                 default: 1,
                 // <<-- /Creer-Merge: weavePower -->>
             },
+
             weaveSpeed: {
-                description: "The speed at which Weavers work to do "
-                           + "strengthens and weakens on Webs.",
+                description:
+                    "The speed at which Weavers work to do strengthens and " +
+                    "weakens on Webs.",
                 // <<-- Creer-Merge: weaveSpeed -->>
                 default: 16,
                 // <<-- /Creer-Merge: weaveSpeed -->>
             },
+
             // <<-- Creer-Merge: schema -->>
 
-        // you can add more settings here, e.g.:
-        /*
+            // you can add more settings here, e.g.:
+            /*
         someVariableLikeUnitHealth: {
             description: "Describe what this setting does for the players.",
             default: 1337,
@@ -102,29 +114,34 @@ export class SpidersGameSettingsManager extends BaseClasses.GameSettings {
                 default: 1e9, // 1 sec in ns,
                 // <<-- /Creer-Merge: time-added-per-turn -->>
                 min: 0,
-                description: "The amount of time (in nano-seconds) to add after each player performs a turn.",
+                description:
+                    "The amount of time (in nano-seconds) to add after " +
+                    "each player performs a turn.",
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
                 default: 300,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
-                description: "The maximum number of turns before the game is force ended and a winner is determined.",
+                description:
+                    "The maximum number of turns before the game " +
+                    "is force ended and a winner is determined.",
             },
-
         });
     }
 
     /**
-     * The current values for the game's settings
+     * The current values for the game's settings.
      */
     public values!: SettingsFromSchema<SpidersGameSettingsManager["schema"]>;
 
     /**
      * Try to invalidate all the game settings here, so invalid values do not
      * reach the game.
-     * @param someSettings A subset of settings that will be tested
-     * @returns An error if the settings fail to validate.
+     *
+     * @param someSettings - A subset of settings that will be tested.
+     * @returns An error if the settings fail to validate, otherwise the
+     * valid game settings for this game.
      */
     protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
         const invalidated = super.invalidate(someSettings);
