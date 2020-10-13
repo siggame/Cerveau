@@ -1,5 +1,9 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IBaseCoreminerPlayer, IPlayerSpawnMinerArgs } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    BaseCoreminerPlayer,
+    PlayerConstructorArgs,
+    PlayerSpawnMinerArgs,
+} from "./";
 import { AI } from "./ai";
 import { GameObject } from "./game-object";
 import { Tile } from "./tile";
@@ -12,8 +16,8 @@ import { Unit } from "./unit";
 /**
  * A player in this game. Every AI controls one player.
  */
-export class Player extends GameObject implements IBaseCoreminerPlayer {
-    /** The AI controlling this Player */
+export class Player extends GameObject implements BaseCoreminerPlayer {
+    /** The AI controlling this Player. */
     public readonly ai!: AI;
 
     /**
@@ -103,8 +107,8 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<IBaseCoreminerPlayer>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: PlayerConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -133,7 +137,7 @@ export class Player extends GameObject implements IBaseCoreminerPlayer {
      */
     protected invalidateSpawnMiner(
         player: Player,
-    ): void | string | IPlayerSpawnMinerArgs {
+    ): void | string | PlayerSpawnMinerArgs {
         // <<-- Creer-Merge: invalidate-spawnMiner -->>
 
         if (this !== this.game.currentPlayer) {

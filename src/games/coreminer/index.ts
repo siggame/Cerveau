@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Coreminer game
+ * The interface that the Player for the Coreminer game
  * must implement from mixed in game logic.
  */
-export interface IBaseCoreminerPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseCoreminerPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,12 +82,11 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
-}
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for Job instances. */
+export interface JobProperties {
     /**
      * The amount of cargo capacity this Unit starts with per level.
      */
@@ -101,11 +111,10 @@ export interface IJobProperties {
      * The Job title. 'miner' or 'bomb'.
      */
     title?: "miner" | "bomb";
-
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The Tile this Player's base is on.
      */
@@ -176,19 +185,17 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /**
  * Argument overrides for Player's spawnMiner function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IPlayerSpawnMinerArgs {
-}
+export interface PlayerSpawnMinerArgs {}
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
     /**
      * The amount of dirt on this Tile.
      */
@@ -272,14 +279,13 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Unit instances. */
+export interface UnitProperties {
     /**
-     * The number of bombs being carried by this Unit. (0 to job cargo capacity
-     * - other carried materials).
+     * The number of bombs being carried by this Unit. (0 to job cargo
+     * capacity - other carried materials).
      */
     bombs?: number;
 
@@ -355,7 +361,6 @@ export interface IUnitProperties {
      * The upgrade level of this unit. Starts at 0.
      */
     upgradeLevel?: number;
-
 }
 
 /**
@@ -363,7 +368,7 @@ export interface IUnitProperties {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitBuildArgs {
+export interface UnitBuildArgs {
     /**
      * The Tile to build on.
      */
@@ -376,10 +381,10 @@ export interface IUnitBuildArgs {
 
 /**
  * Argument overrides for Unit's buy function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitBuyArgs {
+export interface UnitBuyArgs {
     /**
      * The type of resource to buy.
      */
@@ -392,10 +397,10 @@ export interface IUnitBuyArgs {
 
 /**
  * Argument overrides for Unit's dump function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitDumpArgs {
+export interface UnitDumpArgs {
     /**
      * The tile the materials will be dumped on.
      */
@@ -413,10 +418,10 @@ export interface IUnitDumpArgs {
 
 /**
  * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMineArgs {
+export interface UnitMineArgs {
     /**
      * The Tile the materials will be mined from.
      */
@@ -430,10 +435,10 @@ export interface IUnitMineArgs {
 
 /**
  * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
  */
-export interface IUnitMoveArgs {
+export interface UnitMoveArgs {
     /**
      * The Tile this Unit should move to.
      */
@@ -445,7 +450,7 @@ export interface IUnitMoveArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitTransferArgs {
+export interface UnitTransferArgs {
     /**
      * The Unit to transfer materials to.
      */
@@ -465,8 +470,47 @@ export interface IUnitTransferArgs {
  * this interface from the invalidate functions, the value(s) you set will be
  * used in the actual function.
  */
-export interface IUnitUpgradeArgs {
-}
+export interface UnitUpgradeArgs {}
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
+ */
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Job.
+ */
+export type JobConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<JobProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Player.
+ */
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseCoreminerPlayer & PlayerProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Tile.
+ */
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
+
+/**
+ * The default args passed to a constructor function for class
+ * instances of Unit.
+ */
+export type UnitConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UnitProperties & T>;
 
 export * from "./game-object";
 export * from "./job";
@@ -488,13 +532,13 @@ import { CoreminerGame } from "./game";
 import { CoreminerGameManager } from "./game-manager";
 import { CoreminerGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
+/** The arguments used to construct a Job. */
 export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
+/** The arguments used to construct a Unit. */
 export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
 
 /**
@@ -509,38 +553,31 @@ export class CoreminerGameObjectFactory extends BaseGameObjectFactory {
      * the game object's class will be automatically set for you.
      * @returns A new Job hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
+    public job<T extends JobArgs>(args: Readonly<T>): Job & T {
         return this.createGameObject("Job", Job, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
     /**
      * Creates a new Unit in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Unit to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Unit hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
+    public unit<T extends UnitArgs>(args: Readonly<T>): Unit & T {
         return this.createGameObject("Unit", Unit, args);
     }
-
 }
 
 /**
@@ -563,12 +600,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CoreminerGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -680,8 +715,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -745,8 +779,7 @@ export const Namespace = makeNamespace({
                     literals: ["miner", "bomb"],
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Player: {
             parentClassName: "GameObject",
@@ -815,8 +848,7 @@ export const Namespace = makeNamespace({
             },
             functions: {
                 spawnMiner: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -891,8 +923,7 @@ export const Namespace = makeNamespace({
                     typeName: "int",
                 },
             },
-            functions: {
-            },
+            functions: {},
         },
         Unit: {
             parentClassName: "GameObject",
@@ -976,7 +1007,12 @@ export const Namespace = makeNamespace({
                             argName: "resource",
                             typeName: "string",
                             defaultValue: "dirt",
-                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                            literals: [
+                                "dirt",
+                                "ore",
+                                "bomb",
+                                "buildingMaterials",
+                            ],
                         },
                         {
                             argName: "amount",
@@ -1056,7 +1092,12 @@ export const Namespace = makeNamespace({
                             argName: "resource",
                             typeName: "string",
                             defaultValue: "dirt",
-                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                            literals: [
+                                "dirt",
+                                "ore",
+                                "bomb",
+                                "buildingMaterials",
+                            ],
                         },
                         {
                             argName: "amount",
@@ -1069,8 +1110,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 upgrade: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1079,5 +1119,6 @@ export const Namespace = makeNamespace({
             },
         },
     },
-    gameVersion: "d9d8a113b95637751dbb349edb0a873d53ebb6df7c375956772b72fba4dff9f3",
+    gameVersion:
+        "d9d8a113b95637751dbb349edb0a873d53ebb6df7c375956772b72fba4dff9f3",
 });

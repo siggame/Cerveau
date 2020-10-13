@@ -1,4 +1,4 @@
-import { IBaseGameRequiredData } from "~/core/game";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
 import { CoreminerGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
@@ -16,10 +16,10 @@ import { Mutable } from "~/utils";
  * Mine resources to obtain more value than your opponent.
  */
 export class CoreminerGame extends BaseClasses.Game {
-    /** The manager of this game, that controls everything around it */
+    /** The manager of this game, that controls everything around it. */
     public readonly manager!: CoreminerGameManager;
 
-    /** The settings used to initialize the game, as set by players */
+    /** The settings used to initialize the game, as set by players. */
     public readonly settings = Object.freeze(this.settingsManager.values);
 
     /**
@@ -55,10 +55,9 @@ export class CoreminerGame extends BaseClasses.Game {
 
     /**
      * A mapping of every game object's ID to the actual game object. Primarily
-     * used by the server and client to easily refer to the game objects via
-     * ID.
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public gameObjects!: {[id: string]: GameObject};
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
      * A list of all jobs.
@@ -169,7 +168,7 @@ export class CoreminerGame extends BaseClasses.Game {
      */
     constructor(
         protected settingsManager: CoreminerGameSettingsManager,
-        required: Readonly<IBaseGameRequiredData>,
+        required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
@@ -203,7 +202,6 @@ export class CoreminerGame extends BaseClasses.Game {
      * @returns The Tile at (x, y) if valid, undefined otherwise.
      */
     public getTile(x: number, y: number): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
         return super.getTile(x, y) as Tile | undefined;
     }
 
@@ -211,24 +209,29 @@ export class CoreminerGame extends BaseClasses.Game {
 
     /** Creates all the jobs in the game. */
     private createJobs(): void {
-        this.jobs.push(
-            this.manager.create.job({
-                title: "miner",
-                health: [25, 50, 75, 100],
-                moves: [2, 3, 4, 5],
-                miningPower: [50, 100, 150, 200],
-                cargoCapacity: [250, 500, 750, 1000],
-            }),
+        let job;
 
-            this.manager.create.job({
-                title: "bomb",
-                cost: 0,
-                health: [],
-                moves: [],
-                miningPower: [],
-                cargoCapacity: [],
-            }),
-        );
+        job = this.manager.create.job({
+            title: "miner",
+            health: [],
+            moves: [],
+            miningPower: [],
+            cargoCapacity: [],
+        });
+        job.health.push(25, 50, 75, 100);
+        job.moves.push(2, 3, 4, 5);
+        job.miningPower.push(50, 100, 150, 200);
+        job.cargoCapacity.push(250, 500, 750, 1000);
+        this.jobs.push(job);
+
+        job = this.manager.create.job({
+            title: "bomb",
+            health: [],
+            moves: [],
+            miningPower: [],
+            cargoCapacity: [],
+        });
+        this.jobs.push(job);
     }
 
     /** Create the game map. */
@@ -240,6 +243,7 @@ export class CoreminerGame extends BaseClasses.Game {
          * running createMap(), and it wraps the current scope, so that `this`
          * refers to the Game running `createMap()`, even though the game was
          * not passed.
+         *
          * @param x - The x coordinate. If off map throws an Error.
          * @param y - The y coordinate. If off map throws an Error.
          * @returns A Tile that is mutable JUST for this function scope.
@@ -248,7 +252,9 @@ export class CoreminerGame extends BaseClasses.Game {
             const tile = this.getTile(x, y);
 
             if (!tile) {
-                throw new Error(`Cannot get a tile for map generation at (${x}, ${y})`);
+                throw new Error(
+                    `Cannot get a tile for map generation at (${x}, ${y})`,
+                );
             }
 
             return tile;
@@ -282,7 +288,7 @@ export class CoreminerGame extends BaseClasses.Game {
         }
 
         // Define an array that holds each row of dirt Tiles
-        const rows: Tile[][] = Array(this.mapHeight - 1);
+        const rows: Tile[][] = Array<Tile[]>(this.mapHeight - 1);
 
         for (let i = 0; i < rows.length; i++) {
             rows[i] = [];
@@ -311,8 +317,7 @@ export class CoreminerGame extends BaseClasses.Game {
                         tile.owner = this.players[0];
                         this.players[0].baseTile = tile as Tile;
                     }
-                }
-                else {
+                } else {
                     // Dirt layers
                     for (let i = 0; i < layerCount; i++) {
                         if (y < layerDepths[i]) {
@@ -326,7 +331,7 @@ export class CoreminerGame extends BaseClasses.Game {
         }
 
         // Define an array that groups each row by layer
-        const layerRows: Tile[][][] = Array(layerCount);
+        const layerRows: Tile[][][] = Array<Tile[][]>(layerCount);
 
         for (let i = 0; i < layerCount; i++) {
             layerRows[i] = [];
@@ -353,12 +358,16 @@ export class CoreminerGame extends BaseClasses.Game {
          * @param max - The maximum (excluded) value for the RNG.
          * @returns An integer number that is biased in some way towards the map center.
          */
-        const getBiasedInt = (influence: number, min: number = 0, max: number = side): number => {
+        const getBiasedInt = (
+            influence: number,
+            min = 0,
+            max: number = side,
+        ): number => {
             const bias = max - 1;
 
             const rnd = this.manager.random.int(max, min);
             const mix = this.manager.random.float(1, 0) * influence;
-            const value = rnd * (1 - mix) + (bias * mix);
+            const value = rnd * (1 - mix) + bias * mix;
 
             return Math.floor(value);
         };
@@ -366,8 +375,9 @@ export class CoreminerGame extends BaseClasses.Game {
         // Define number of ore deposits per layer (on one side)
         // Numbers are percentage of tiles in the layer with ore
         // Must be between 0 and 1 (0% ore to 100% ore)
-        const layerOreCounts: number[] = [0.07, 0.10, 0.15, 0.20]
-        .map((c, i) => Math.round(c * layerRows[i].length * side));
+        const layerOreCounts: number[] = [0.07, 0.1, 0.15, 0.2].map((c, i) =>
+            Math.round(c * layerRows[i].length * side),
+        );
 
         // Define influence values for biases per layer
         // Must be between 0 and 1 (weak to strong)
@@ -383,8 +393,14 @@ export class CoreminerGame extends BaseClasses.Game {
 
         for (let c = cacheOreCount; c > 0; c--) {
             const randomY = getBiasedInt(cacheYBias, 0, cacheLayer.length);
-            const cacheMinX = Math.floor(cacheLayer[randomY].length * cacheWidth);
-            const randomX = getBiasedInt(cacheXBias, cacheMinX, cacheLayer[randomY].length);
+            const cacheMinX = Math.floor(
+                cacheLayer[randomY].length * cacheWidth,
+            );
+            const randomX = getBiasedInt(
+                cacheXBias,
+                cacheMinX,
+                cacheLayer[randomY].length,
+            );
 
             cacheLayer[randomY][randomX].ore = cacheOreDensity;
             cacheLayer[randomY][randomX].dirt = 0;
@@ -400,7 +416,11 @@ export class CoreminerGame extends BaseClasses.Game {
         layerRows.forEach((layer, i) => {
             for (let c = layerOreCounts[i]; c > 0; c--) {
                 const randomY = this.manager.random.int(layer.length, 0);
-                const randomX = getBiasedInt(layerInfluences[i], 0, layerRows[i][randomY].length);
+                const randomX = getBiasedInt(
+                    layerInfluences[i],
+                    0,
+                    layerRows[i][randomY].length,
+                );
 
                 const chosenTile = layerRows[i][randomY][randomX];
                 const oreAmount = layerOreDensities[i];

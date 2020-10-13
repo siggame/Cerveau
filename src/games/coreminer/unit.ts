@@ -1,7 +1,14 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
-import { IUnitBuildArgs, IUnitBuyArgs, IUnitDumpArgs, IUnitMineArgs,
-         IUnitMoveArgs, IUnitProperties, IUnitTransferArgs, IUnitUpgradeArgs,
-       } from "./";
+import { BaseGameObjectRequiredData } from "~/core/game";
+import {
+    UnitBuildArgs,
+    UnitBuyArgs,
+    UnitConstructorArgs,
+    UnitDumpArgs,
+    UnitMineArgs,
+    UnitMoveArgs,
+    UnitTransferArgs,
+    UnitUpgradeArgs,
+} from "./";
 import { GameObject } from "./game-object";
 import { Job } from "./job";
 import { Player } from "./player";
@@ -16,8 +23,8 @@ import { Tile } from "./tile";
  */
 export class Unit extends GameObject {
     /**
-     * The number of bombs being carried by this Unit. (0 to job cargo capacity
-     * - other carried materials).
+     * The number of bombs being carried by this Unit. (0 to job cargo
+     * capacity - other carried materials).
      */
     public bombs!: number;
 
@@ -109,13 +116,13 @@ export class Unit extends GameObject {
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        args: Readonly<IUnitProperties & {
+        args: UnitConstructorArgs<{
             // <<-- Creer-Merge: constructor-args -->>
-            /** The job this unit will have */
+            /** The job this unit will have. */
             job: Job;
             // <<-- /Creer-Merge: constructor-args -->>
         }>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -148,7 +155,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         type: "support" | "ladder" | "shield",
-    ): void | string | IUnitBuildArgs {
+    ): void | string | UnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
         if (!this) {
             return "This unit does not exist!";
@@ -187,8 +194,13 @@ export class Unit extends GameObject {
         }
 
         // Tile must be adjacent to or the same as the tile the unit is on
-        if (tile !== this.tile.tileEast && tile !== this.tile.tileNorth &&
-            tile !== this.tile.tileWest && tile !== this.tile.tileSouth && tile !== this.tile) {
+        if (
+            tile !== this.tile.tileEast &&
+            tile !== this.tile.tileNorth &&
+            tile !== this.tile.tileWest &&
+            tile !== this.tile.tileSouth &&
+            tile !== this.tile
+        ) {
             return "That tile is too far away to be built on.";
         }
         switch (type) {
@@ -219,11 +231,9 @@ export class Unit extends GameObject {
             case "shield":
                 if (tile.dirt === 0 && tile.ore === 0) {
                     return "You can't build a shield on an empty tile.";
-                }
-                else if (tile.shielding === 2) {
+                } else if (tile.shielding === 2) {
                     return "This tile already has full shield.";
-                }
-                else if (this.buildingMaterials < this.game.shieldCost) {
+                } else if (this.buildingMaterials < this.game.shieldCost) {
                     return "You don't have enough building materials to build a shield";
                 }
                 break;
@@ -284,7 +294,7 @@ export class Unit extends GameObject {
         player: Player,
         resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
         amount: number,
-    ): void | string | IUnitBuyArgs {
+    ): void | string | UnitBuyArgs {
         // <<-- Creer-Merge: invalidate-buy -->>
 
         if (!this) {
@@ -303,18 +313,26 @@ export class Unit extends GameObject {
             return `A bomb cannot buy!`;
         }
 
-        if (this.tile.getNeighbors().indexOf(player.baseTile) === -1 &&
-            this.tile !== player.baseTile) {
-            if (!(this.tile.tileNorth && this.tile.tileNorth.isHopper) &&
+        if (
+            this.tile.getNeighbors().indexOf(player.baseTile) === -1 &&
+            this.tile !== player.baseTile
+        ) {
+            if (
+                !(this.tile.tileNorth && this.tile.tileNorth.isHopper) &&
                 !(this.tile.tileEast && this.tile.tileEast.isHopper) &&
                 !(this.tile.tileSouth && this.tile.tileSouth.isHopper) &&
                 !(this.tile.tileWest && this.tile.tileWest.isHopper) &&
-                !this.tile.isHopper) {
+                !this.tile.isHopper
+            ) {
                 return `A unit cannot buy unless it is near an allied hopper or base!`;
             }
         }
 
-        const cargo = this.ore + this.dirt + (this.bombs * this.game.bombSize) + this.buildingMaterials;
+        const cargo =
+            this.ore +
+            this.dirt +
+            this.bombs * this.game.bombSize +
+            this.buildingMaterials;
 
         switch (resource) {
             case "dirt":
@@ -332,7 +350,10 @@ export class Unit extends GameObject {
                 if (player.money < amount * this.game.bombPrice) {
                     return `You cannot afford that many bombs!`;
                 }
-                if (cargo + (amount * this.game.bombSize) > this.maxCargoCapacity) {
+                if (
+                    cargo + amount * this.game.bombSize >
+                    this.maxCargoCapacity
+                ) {
                     return `This unit cannot hold that many bombs!`;
                 }
                 break;
@@ -388,8 +409,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt', 'ore', or
-     * 'bomb'.
+     * @param material - The material the Unit will drop. 'dirt', 'ore',
+     * or 'bomb'.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns If the arguments are invalid, return a string explaining to
@@ -401,7 +422,7 @@ export class Unit extends GameObject {
         tile: Tile,
         material: "dirt" | "ore" | "bomb",
         amount: number,
-    ): void | string | IUnitDumpArgs {
+    ): void | string | UnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
         if (this.owner !== player || this.owner === undefined) {
             return `${this} isn't owned by you.`;
@@ -422,17 +443,26 @@ export class Unit extends GameObject {
         }
 
         // Checks if the tile is a ladder
-        if (this.tile.isLadder && (material === `dirt` || material === `ore`)) {
+        if (
+            this.tile.isLadder &&
+            (material === `dirt` || material === `ore`)
+        ) {
             return `You cannot dump dirt or ore onto a ladder tile.`;
         }
 
         // Checks if the tile is a support
-        if (this.tile.isSupport && (material === `dirt` || material === `ore`)) {
+        if (
+            this.tile.isSupport &&
+            (material === `dirt` || material === `ore`)
+        ) {
             return `You cannot dump dirt or ore onto a support tile.`;
         }
 
         // Checks if tile is falling.
-        if (this.tile.isFalling && (material === `dirt` || material === `ore`)) {
+        if (
+            this.tile.isFalling &&
+            (material === `dirt` || material === `ore`)
+        ) {
             return `This tile is falling, you have bigger things to worry about than dumping dirt or ore.`;
         }
 
@@ -470,8 +500,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The tile the materials will be dumped on.
-     * @param material - The material the Unit will drop. 'dirt', 'ore', or
-     * 'bomb'.
+     * @param material - The material the Unit will drop. 'dirt', 'ore',
+     * or 'bomb'.
      * @param amount - The number of materials to drop. Amounts <= 0 will drop
      * all the materials.
      * @returns True if successfully dumped materials, false otherwise.
@@ -491,22 +521,17 @@ export class Unit extends GameObject {
             player.money += trueAmount * this.game.oreValue;
             player.value += trueAmount;
             this.ore -= trueAmount;
-        }
-
-        else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
+        } else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
             if (amount <= 0) {
                 trueAmount = this.dirt;
             }
             player.money += trueAmount;
             // Dirt grants no value
             this.dirt -= trueAmount;
-        }
-
-        else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
+        } else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
             player.money += amount * this.game.bombPrice; // sell bombs at sale price
             this.bombs -= amount;
-        }
-        else {
+        } else {
             // Not dumping into base/hopper
             if (material === `dirt`) {
                 tile.dirt += trueAmount;
@@ -546,8 +571,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will
-     * mine all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
+     * all the materials that the Unit can.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -556,7 +581,7 @@ export class Unit extends GameObject {
         player: Player,
         tile: Tile,
         amount: number,
-    ): void | string | IUnitMineArgs {
+    ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
         if (!this) {
             return `Unit doesn't exist`;
@@ -584,22 +609,30 @@ export class Unit extends GameObject {
 
         let trueAmount = amount;
         if (amount < 0) {
-            trueAmount = tile.dirt + tile.ore +
-            (tile.isSupport ? this.game.settings.supportCost : 0) +
-            (tile.isLadder ? this.game.settings.ladderCost : 0);
+            trueAmount =
+                tile.dirt +
+                tile.ore +
+                (tile.isSupport ? this.game.settings.supportCost : 0) +
+                (tile.isLadder ? this.game.settings.ladderCost : 0);
         }
 
-        const cargo = this.ore + this.dirt + this.buildingMaterials + (this.bombs * this.game.bombSize);
-        trueAmount = Math.min(trueAmount, this.miningPower, this.maxCargoCapacity - cargo);
+        const cargo =
+            this.ore +
+            this.dirt +
+            this.buildingMaterials +
+            this.bombs * this.game.bombSize;
+        trueAmount = Math.min(
+            trueAmount,
+            this.miningPower,
+            this.maxCargoCapacity - cargo,
+        );
 
         if (trueAmount === 0) {
             if (this.miningPower === 0) {
                 return `This unit is out of mining power!`;
-            }
-            else if (this.maxCargoCapacity - cargo === 0) {
+            } else if (this.maxCargoCapacity - cargo === 0) {
                 return `This unit is out of cargo space!`;
-            }
-            else {
+            } else {
                 return `There is nothing for this unit to mine!`;
             }
         }
@@ -611,8 +644,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will
-     * mine all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
+     * all the materials that the Unit can.
      * @returns True if successfully mined, false otherwise.
      */
     protected async mine(
@@ -636,8 +669,11 @@ export class Unit extends GameObject {
         if (amountLeft <= 0) {
             amountLeft = tile.ore + tile.dirt;
         }
-        let currentLoad = (this.bombs * this.game.bombSize)
-        + this.buildingMaterials + this.dirt + this.ore;
+        let currentLoad =
+            this.bombs * this.game.bombSize +
+            this.buildingMaterials +
+            this.dirt +
+            this.ore;
 
         if (tile.isLadder && this.miningPower) {
             this.miningPower -= this.game.settings.ladderCost;
@@ -653,7 +689,10 @@ export class Unit extends GameObject {
 
         if (tile.ore > 0 && this.miningPower) {
             const actualOreAmount = Math.min(
-            tile.ore, this.miningPower, this.maxCargoCapacity - currentLoad);
+                tile.ore,
+                this.miningPower,
+                this.maxCargoCapacity - currentLoad,
+            );
             tile.ore -= actualOreAmount;
             this.ore += actualOreAmount;
             this.miningPower -= actualOreAmount;
@@ -661,7 +700,10 @@ export class Unit extends GameObject {
 
         if (tile.dirt > 0 && amountLeft > 0 && this.miningPower) {
             const actualDirtAmount = Math.min(
-                tile.dirt, this.miningPower, this.maxCargoCapacity - currentLoad);
+                tile.dirt,
+                this.miningPower,
+                this.maxCargoCapacity - currentLoad,
+            );
 
             tile.dirt -= actualDirtAmount;
             this.dirt += actualDirtAmount;
@@ -673,7 +715,10 @@ export class Unit extends GameObject {
         // Check if mined tile is still filled
         if (tile.ore + tile.dirt <= 0) {
             // Check if any tiles are potentially going to fall
-            if (tile.tileNorth !== undefined && tile.tileNorth.ore + tile.tileNorth.dirt > 0) {
+            if (
+                tile.tileNorth !== undefined &&
+                tile.tileNorth.ore + tile.tileNorth.dirt > 0
+            ) {
                 this.game.fallingTiles.push(tile.tileNorth);
                 tile.isFalling = true;
             }
@@ -682,10 +727,16 @@ export class Unit extends GameObject {
             if (this.tile) {
                 if (this.tile.tileSouth && this.tile.tileSouth === tile) {
                     // Fall logic
-                    while (this.tile.tileSouth !== undefined &&
-                        this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
-                        !this.tile.tileSouth.isLadder) {
-                        this.tile.units.splice(this.tile.units.indexOf(this), 1);
+                    while (
+                        this.tile.tileSouth !== undefined &&
+                        this.tile.tileSouth.ore + this.tile.tileSouth.dirt <=
+                            0 &&
+                        !this.tile.tileSouth.isLadder
+                    ) {
+                        this.tile.units.splice(
+                            this.tile.units.indexOf(this),
+                            1,
+                        );
                         this.tile = this.tile.tileSouth;
                         this.tile.units.push(this);
                     }
@@ -711,7 +762,7 @@ export class Unit extends GameObject {
     protected invalidateMove(
         player: Player,
         tile: Tile,
-    ): void | string | IUnitMoveArgs {
+    ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
         if (!tile) {
             return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
@@ -799,8 +850,11 @@ export class Unit extends GameObject {
 
         // Fall logic
         let distance = 0;
-        while (this.tile.tileSouth !== undefined && this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
-            !this.tile.tileSouth.isLadder) {
+        while (
+            this.tile.tileSouth !== undefined &&
+            this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
+            !this.tile.tileSouth.isLadder
+        ) {
             this.tile.units = this.tile.units.filter((u) => u !== this);
             this.tile = this.tile.tileSouth;
             this.tile.units.push(this);
@@ -813,7 +867,10 @@ export class Unit extends GameObject {
             const damage = distance - (healthLevel + 1);
 
             if (damage > 0) {
-                this.health = Math.max(this.health - (damage * this.maxHealth), 0);
+                this.health = Math.max(
+                    this.health - damage * this.maxHealth,
+                    0,
+                );
             }
         }
 
@@ -840,7 +897,7 @@ export class Unit extends GameObject {
         unit: Unit,
         resource: "dirt" | "ore" | "bomb" | "buildingMaterials",
         amount: number,
-    ): void | string | IUnitTransferArgs {
+    ): void | string | UnitTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
 
         if (!this) {
@@ -867,7 +924,10 @@ export class Unit extends GameObject {
             return `The target unit is not on a tile!`;
         }
 
-        if (this.tile.getNeighbors().indexOf(unit.tile) === -1 && this.tile !== unit.tile) {
+        if (
+            this.tile.getNeighbors().indexOf(unit.tile) === -1 &&
+            this.tile !== unit.tile
+        ) {
             return `The target unit is not adjacent to this unit!`;
         }
 
@@ -901,7 +961,11 @@ export class Unit extends GameObject {
                 return `Invalid transfer material!`;
         }
 
-        const unitCargoCapacity = unit.dirt + unit.ore + (unit.bombs * this.game.bombSize) + unit.buildingMaterials;
+        const unitCargoCapacity =
+            unit.dirt +
+            unit.ore +
+            unit.bombs * this.game.bombSize +
+            unit.buildingMaterials;
         if (actualAmount > unitCargoCapacity) {
             return `The target unit cannot hold that many materials!`;
         }
@@ -966,7 +1030,7 @@ export class Unit extends GameObject {
      */
     protected invalidateUpgrade(
         player: Player,
-    ): void | string | IUnitUpgradeArgs {
+    ): void | string | UnitUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
         if (!player || player !== this.game.currentPlayer) {
             return `It's not your turn to dig deeper, ${player}.`;
@@ -992,7 +1056,10 @@ export class Unit extends GameObject {
             return `A bomb cannot be upgraded!`;
         }
 
-        if (this.tile.owner !== player || !(this.tile.isBase || this.tile.isHopper)) {
+        if (
+            this.tile.owner !== player ||
+            !(this.tile.isBase || this.tile.isHopper)
+        ) {
             return `${this} must be on your base or hopper to upgrade!`;
         }
 
