@@ -130,7 +130,7 @@ export class Tile extends GameObject implements BaseTile {
     public applyGravity(): void {
         let southTile = this.tileSouth;
         let toMove = this as Tile;
-        let distance = 1;
+        let distance = 0;
         while (
             southTile &&
             (southTile.dirt + southTile.ore <= 0 ||
@@ -142,7 +142,7 @@ export class Tile extends GameObject implements BaseTile {
             distance++;
         }
 
-        if (toMove !== this) {
+        if (distance > 0) {
             toMove.dirt = this.dirt;
             toMove.ore = this.ore;
             this.units.forEach((u) => u.takeFallDamage(distance));
