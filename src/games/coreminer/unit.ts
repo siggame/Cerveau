@@ -548,8 +548,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will
-     * mine all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
+     * all the materials that the Unit can.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -560,8 +560,9 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-        if (!this) {
-            return `Unit doesn't exist`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         if (!this.health) {
@@ -642,8 +643,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will
-     * mine all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
+     * all the materials that the Unit can.
      * @returns True if successfully mined, false otherwise.
      */
     protected async mine(
