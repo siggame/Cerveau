@@ -740,34 +740,8 @@ export class Unit extends GameObject {
         }
         // if we mined the one that units were standing on, calculate new location
         if (tile.tileNorth && tile.tileNorth.units.length > 0) {
-            let distance = 1;
-            let downward = tile;
-            let nextDownward = downward.tileSouth;
-            while (
-                nextDownward &&
-                nextDownward.dirt + nextDownward.ore <= 0 &&
-                !nextDownward.isLadder &&
-                !nextDownward.isSupport
-            ) {
-                downward = nextDownward;
-                nextDownward = nextDownward.tileSouth;
-                distance++;
-            }
-
-            // the ol swap
-            const units = tile.tileNorth.units;
-            tile.tileNorth.units = [];
-            units.forEach((u) => (u.tile = downward));
-            downward.units.push(...units);
-
-            // calc fall damage
-            // higher levels take less fall damage
-            // probably should have this constant some where since movement needs it as well.
-            const baseFallImmunity = 1;
-            units.forEach((u) => {
-                const damage = distance - (u.upgradeLevel + baseFallImmunity);
-                u.health -= Math.min(damage, u.health);
-            });
+            // call helper function that will handle falling of the units.
+            tile.applyGravity();
         }
 
         return true;
