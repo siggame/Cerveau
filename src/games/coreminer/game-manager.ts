@@ -59,14 +59,13 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
 
-        this.updateUnits();
+        this.updateArrays(); // clean up dead units
 
-        this.updateGravity();
+        this.updateUnits(); // refresh unit values if necessary
 
-        this.updateHoppers();
+        this.updateGravity(); // falling tiles
 
-        // clean up dead units
-        this.updateArrays();
+        this.updateHoppers(); // extend hoppers
         // <<-- /Creer-Merge: after-turn -->>
     }
 
