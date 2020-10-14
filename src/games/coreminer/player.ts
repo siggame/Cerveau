@@ -165,7 +165,7 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
             owner: player,
             tile: this.baseTile,
             job: this.game.jobs[0],
-            upgradeLevel: 1,
+            upgradeLevel: 0,
             health: this.game.jobs[0].health[0],
             maxHealth: this.game.jobs[0].health[0],
             miningPower: this.game.jobs[0].miningPower[0],

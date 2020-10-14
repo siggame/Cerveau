@@ -157,20 +157,13 @@ export class Unit extends GameObject {
         type: "support" | "ladder" | "shield",
     ): void | string | UnitBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
-        if (!this) {
-            return "This unit does not exist!";
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         if (!this.tile) {
             return `${this} is lost in the mines! Their tile is undefined!`;
-        }
-
-        if (this.health === 0) {
-            return "You can't build with a dead unit.";
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot build!`;
         }
 
         if (tile.isBase) {
@@ -296,21 +289,13 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitBuyArgs {
         // <<-- Creer-Merge: invalidate-buy -->>
-
-        if (!this) {
-            return `This unit does not exist!`;
-        }
-
-        if (!this.health) {
-            return `This unit is destroyed!`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         if (!this.tile) {
             return `This unit is not on a tile!`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot buy!`;
         }
 
         if (
@@ -424,22 +409,14 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
-        if (this.owner !== player || this.owner === undefined) {
-            return `${this} isn't owned by you.`;
-        }
-
-        // Make sure the unit is alive.
-        if (this.health <= 0) {
-            return `${this} is dead.`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         // Make sure the unit is on a tile.
         if (!this.tile) {
             return `${this} is not on a tile.`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot dump materials!`;
         }
 
         // Checks if the tile is a ladder
@@ -583,28 +560,9 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-        if (!this) {
-            return `Unit doesn't exist`;
-        }
-
-        if (!this.health) {
-            return `This unit is destroyed!`;
-        }
-
-        if (!tile) {
-            return `Tile doesn't exist`;
-        }
-
-        if (player !== this.owner) {
-            return `You do not own this unit`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot mine!`;
-        }
-
-        if (this.job.title !== this.game.jobs[0].title) {
-            return `${this} must be a miner to mine.`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         let trueAmount = amount;
@@ -764,24 +722,13 @@ export class Unit extends GameObject {
         tile: Tile,
     ): void | string | UnitMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
+
         if (!tile) {
             return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
-        }
-
-        if (!this) {
-            return `This unit does not exist!`;
-        }
-
-        if (this.owner !== player) {
-            return `This is not your unit!`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot move!`;
-        }
-
-        if (this.game.currentPlayer !== player) {
-            return `It is not your turn!`;
         }
 
         if (this.moves <= 0) {
@@ -899,25 +846,13 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
-
-        if (!this) {
-            return `This unit does not exist!`;
-        }
-
-        if (!this.health) {
-            return `This unit is destroyed!`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
         if (!unit) {
             return `The target unit does not exist!`;
-        }
-
-        if (!this.tile) {
-            return `This unit is not on a tile!`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot transfer resources!`;
         }
 
         if (!unit.tile) {
@@ -925,6 +860,7 @@ export class Unit extends GameObject {
         }
 
         if (
+            this.tile &&
             this.tile.getNeighbors().indexOf(unit.tile) === -1 &&
             this.tile !== unit.tile
         ) {
@@ -1032,43 +968,21 @@ export class Unit extends GameObject {
         player: Player,
     ): void | string | UnitUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
-        if (!player || player !== this.game.currentPlayer) {
-            return `It's not your turn to dig deeper, ${player}.`;
+        const generalFailure = this.invalidateGeneralUnitMethod(player);
+        if (generalFailure) {
+            return generalFailure;
         }
 
-        if (!this) {
-            return `This unit does not exist and can't dig deeper.`;
-        }
-
-        if (this.owner !== player || this.owner === undefined) {
-            return `${this} isn't under your control to dig deeper.`;
-        }
-
-        if (this.health <= 0) {
-            return `${this} is dead, it can't dig any deeper :(`;
-        }
-
-        if (!this.tile) {
-            return `${this} is not on a tile. I think you might have dug too deep.`;
-        }
-
-        if (this.job.title === "bomb") {
-            return `A bomb cannot be upgraded!`;
-        }
-
-        if (
-            this.tile.owner !== player ||
-            !(this.tile.isBase || this.tile.isHopper)
-        ) {
+        if (this.tile && this.tile.owner !== player) {
             return `${this} must be on your base or hopper to upgrade!`;
         }
 
-        if (this.upgradeLevel >= this.game.jobs[0].health.length) {
-            return `This unit is already fully upgraded!`;
+        if (this.upgradeLevel >= this.game.jobs[0].health.length - 1) {
+            return `${this} is already fully upgraded!`;
         }
 
         if (player.money < this.game.upgradePrice) {
-            return `You cannot afford this upgrade!`;
+            return `You cannot afford to upgrade this unit!`;
         }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
@@ -1094,6 +1008,48 @@ export class Unit extends GameObject {
     // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
+    /**
+     * General invalidation function for unit methods. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing.
+     */
+    protected invalidateGeneralUnitMethod(player: Player): string | void {
+        if (!player) {
+            return "This player does not exist!";
+        }
+
+        if (player !== this.game.currentPlayer) {
+            return "It is not your turn!";
+        }
+
+        if (!this) {
+            return "This unit does not exist!";
+        }
+
+        if (this.owner !== player) {
+            return "This unit does not belong to you!";
+        }
+
+        if (!this.health) {
+            return "This unit has been destroyed!";
+        }
+
+        if (!this.tile) {
+            return "This unit is lost in the mines!";
+        }
+
+        if (this.job.title === this.game.jobs[1].title) {
+            return "Bombs cannot perform actions!";
+        }
+
+        if (this.job.title !== this.game.jobs[0].title) {
+            return "This unit is not a miner when it should be!";
+        }
+    }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
 }

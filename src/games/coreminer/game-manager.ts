@@ -431,6 +431,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             }
             if (nextHopperPos.dirt === 0 && nextHopperPos.ore === 0) {
                 nextHopperPos.isHopper = true;
+                nextHopperPos.owner = currPlayer;
                 currPlayer.hopperTiles.push(nextHopperPos);
             }
         }
