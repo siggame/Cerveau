@@ -124,7 +124,36 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     // <<-- Creer-Merge: public-functions -->>
+    /**
+     * Helper function to apply gravity to a tile.
+     */
+    public applyGravity(): void {
+        let southTile = this.tileSouth;
+        let toMove = this as Tile;
+        let distance = 0;
+        while (
+            southTile &&
+            (southTile.dirt + southTile.ore <= 0 ||
+                !southTile.isLadder ||
+                !southTile.isSupport)
+        ) {
+            toMove = southTile;
+            southTile = southTile.tileSouth;
+            distance++;
+        }
 
+        if (distance > 0) {
+            toMove.dirt = this.dirt;
+            toMove.ore = this.ore;
+            this.units.forEach((u) => u.takeFallDamage(distance));
+            toMove.units.push(...this.units);
+            this.units = [];
+            this.dirt = 0;
+            this.ore = 0;
+        }
+
+        this.isFalling = false;
+    }
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
