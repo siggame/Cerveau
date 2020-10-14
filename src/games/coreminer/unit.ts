@@ -506,8 +506,11 @@ export class Unit extends GameObject {
             // Dirt grants no value
             this.dirt -= trueAmount;
         } else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
+            if (amount <= 0) {
+                trueAmount = this.bombs;
+            }
             player.money += amount * this.game.bombPrice; // sell bombs at sale price
-            this.bombs -= amount;
+            this.bombs -= trueAmount;
         } else {
             // Not dumping into base/hopper
             if (material === `dirt`) {
