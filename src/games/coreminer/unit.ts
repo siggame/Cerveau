@@ -135,6 +135,13 @@ export class Unit extends GameObject {
 
     // Any public functions can go here for other things in the game to use.
     // NOTE: Client AIs cannot call these functions, those must be defined
+    /**
+     * Function to add damage to a unit that has fallen x distance.
+     * @param distance The distance the unit has fallen.
+     */
+    public takeFallDamage(distance: number): void {
+        this.health -= Math.min(this.health, distance - this.upgradeLevel + 1);
+    }
     // in the creer file.
 
     // <<-- /Creer-Merge: public-functions -->>
