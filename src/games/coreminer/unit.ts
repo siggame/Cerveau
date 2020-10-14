@@ -1043,5 +1043,19 @@ export class Unit extends GameObject {
         }
     }
 
+    /**
+     * Simple helper function to get the amount of cargo.
+     *
+     * @returns The amount of cargo.
+     */
+    protected getCargoAmount(): number {
+        return (
+            this.dirt +
+            this.ore +
+            this.bombs * this.game.bombSize +
+            this.buildingMaterials
+        );
+    }
+
     // <<-- /Creer-Merge: protected-private-functions -->>
 }
