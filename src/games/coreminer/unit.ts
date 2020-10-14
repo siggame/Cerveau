@@ -540,8 +540,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
-     * all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will
+     * mine all the materials that the Unit can.
      * @returns If the arguments are invalid, return a string explaining to
      * human players why it is invalid. If it is valid return nothing, or an
      * object with new arguments to use in the actual function.
@@ -552,40 +552,80 @@ export class Unit extends GameObject {
         amount: number,
     ): void | string | UnitMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
-        const generalFailure = this.invalidateGeneralUnitMethod(player);
-        if (generalFailure) {
-            return generalFailure;
+        if (!this) {
+            return `Unit doesn't exist`;
         }
 
-        let trueAmount = amount;
-        if (amount < 0) {
-            trueAmount =
-                tile.dirt +
-                tile.ore +
-                (tile.isSupport ? this.game.settings.supportCost : 0) +
-                (tile.isLadder ? this.game.settings.ladderCost : 0);
+        if (!this.health) {
+            return `${this} is destroyed and can't mine!`;
         }
 
-        const cargo =
-            this.ore +
-            this.dirt +
-            this.buildingMaterials +
-            this.bombs * this.game.bombSize;
-        trueAmount = Math.min(
-            trueAmount,
-            this.miningPower,
-            this.maxCargoCapacity - cargo,
-        );
+        if (!tile) {
+            return `Tile doesn't exist`;
+        }
 
-        if (trueAmount === 0) {
-            if (this.miningPower === 0) {
-                return `This unit is out of mining power!`;
-            } else if (this.maxCargoCapacity - cargo === 0) {
-                return `This unit is out of cargo space!`;
-            } else {
-                return `There is nothing for this unit to mine!`;
+        if (player !== this.owner) {
+            return `You do not own ${this}`;
+        }
+
+        if (this.job.title !== "miner") {
+            return `${this} must be a miner to mine.`;
+        }
+
+        // Making this assumption as nothing was in there previously about it
+        if (tile.isHopper) {
+            return "A unit can't mine a hopper";
+        }
+
+        if (this.miningPower === 0) {
+            return `${this} is out of mining power`;
+        }
+
+        const settings = this.game.settings;
+        // get the total used space of the unit
+        const cargo = this.getCargoAmount();
+        // get the amount to mine if mining
+        let toMine = Math.min(amount, tile.dirt + tile.ore);
+        // if given <= 0 amount set to max possible mining
+        if (amount <= 0) {
+            // limited by amount on the tile and what we can hold.
+            toMine = Math.min(
+                tile.dirt + tile.ore,
+                this.maxCargoCapacity - cargo,
+            );
+            // once we know how much we can pick up, we need to check to see how much power is left
+            if (
+                toMine + tile.shielding * settings.shieldCost >
+                this.miningPower
+            ) {
+                // we can only mine what we have power to do, since they may be shielded
+                // need to take the power to take out shield from total (makes it so cargo check later doesn't fail)
+                // we also don't want the shield cost to be counted twice with the mining cost
+                toMine =
+                    this.miningPower - tile.shielding * settings.shieldCost;
             }
         }
+        // get mining cost
+        const miningCost =
+            toMine +
+            Number(tile.isLadder) * settings.ladderCost +
+            Number(tile.isSupport) * settings.supportCost +
+            tile.shielding * settings.shieldCost;
+
+        // if mining ladder or support, this should just be ladderCost/supportCost + shield since
+        // there shouldn't be any materials on them
+        if (miningCost > this.miningPower) {
+            return `${this} doesn't have enough mining power`;
+        }
+        if (this.maxCargoCapacity - cargo < toMine) {
+            // take consideration that they are not trying to mine resources but appliances.
+            // still shouldn't get to this point since a Ladders and Supports should be empty
+            // tiles anyways and >=0 is never < 0
+            if (!tile.isLadder && !tile.isSupport) {
+                return `${this} doesn't have enough cargo space to hold materials`;
+            }
+        }
+
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
 
@@ -594,8 +634,8 @@ export class Unit extends GameObject {
      *
      * @param player - The player that called this.
      * @param tile - The Tile the materials will be mined from.
-     * @param amount - The amount of material to mine up. Amounts <= 0 will mine
-     * all the materials that the Unit can.
+     * @param amount - The amount of material to mine up. Amounts <= 0 will
+     * mine all the materials that the Unit can.
      * @returns True if successfully mined, false otherwise.
      */
     protected async mine(
@@ -615,86 +655,114 @@ export class Unit extends GameObject {
         // Supports 3 above (add ore + dirt) - 3 * material (ore and dirt) of
         // block support is on
 
-        let amountLeft = amount;
-        if (amountLeft <= 0) {
-            amountLeft = tile.ore + tile.dirt;
-        }
-        let currentLoad =
-            this.bombs * this.game.bombSize +
-            this.buildingMaterials +
-            this.dirt +
-            this.ore;
+        const settings = this.game.settings;
 
-        if (tile.isLadder && this.miningPower) {
-            this.miningPower -= this.game.settings.ladderCost;
-        }
-
-        if (tile.isSupport && this.miningPower) {
-            this.miningPower -= this.game.settings.supportCost;
-        }
-
-        if (tile.shielding > 0 && this.miningPower) {
-            this.miningPower -= tile.shielding * this.game.settings.shieldCost;
-        }
-
-        if (tile.ore > 0 && this.miningPower) {
-            const actualOreAmount = Math.min(
-                tile.ore,
-                this.miningPower,
-                this.maxCargoCapacity - currentLoad,
-            );
-            tile.ore -= actualOreAmount;
-            this.ore += actualOreAmount;
-            this.miningPower -= actualOreAmount;
-        }
-
-        if (tile.dirt > 0 && amountLeft > 0 && this.miningPower) {
-            const actualDirtAmount = Math.min(
-                tile.dirt,
-                this.miningPower,
-                this.maxCargoCapacity - currentLoad,
-            );
-
-            tile.dirt -= actualDirtAmount;
-            this.dirt += actualDirtAmount;
-            amountLeft -= actualDirtAmount;
-            currentLoad += actualDirtAmount;
-            this.miningPower -= actualDirtAmount;
-        }
-
-        // Check if mined tile is still filled
-        if (tile.ore + tile.dirt <= 0) {
-            // Check if any tiles are potentially going to fall
+        // get the amount to mine if mining
+        let toMine =
+            amount > 0
+                ? Math.min(amount, tile.dirt + tile.ore)
+                : tile.dirt + tile.ore;
+        // if given <= 0 amount set to max possible mining
+        if (amount <= 0) {
+            toMine = tile.dirt + tile.ore;
             if (
-                tile.tileNorth !== undefined &&
-                tile.tileNorth.ore + tile.tileNorth.dirt > 0
+                toMine + tile.shielding * settings.shieldCost >
+                this.miningPower
             ) {
-                this.game.fallingTiles.push(tile.tileNorth);
-                tile.isFalling = true;
-            }
-
-            // Check if unit is going to fall
-            if (this.tile) {
-                if (this.tile.tileSouth && this.tile.tileSouth === tile) {
-                    // Fall logic
-                    while (
-                        this.tile.tileSouth !== undefined &&
-                        this.tile.tileSouth.ore + this.tile.tileSouth.dirt <=
-                            0 &&
-                        !this.tile.tileSouth.isLadder
-                    ) {
-                        this.tile.units.splice(
-                            this.tile.units.indexOf(this),
-                            1,
-                        );
-                        this.tile = this.tile.tileSouth;
-                        this.tile.units.push(this);
-                    }
-                }
+                toMine = this.miningPower;
             }
         }
+        // get mining cost
+        const miningCost =
+            toMine +
+            Number(tile.isLadder) * settings.ladderCost +
+            Number(tile.isSupport) * settings.supportCost +
+            tile.shielding * settings.shieldCost;
 
-        return false;
+        this.miningPower -= miningCost;
+
+        if (tile.isLadder) {
+            tile.isLadder = false;
+        }
+
+        if (tile.isSupport) {
+            tile.isSupport = false;
+        }
+
+        if (tile.shielding > 0) {
+            // subtract whatever we can take away, or the whole shield
+            // this may be unwanted behavior, but if user tries to mine a filled block with a shield
+            // and used <= 0 for amount, we still express success if they only had enough mining power
+            // to break/damage the shield.
+            tile.shielding -= Math.min(miningCost, tile.shielding);
+        }
+
+        // mine ore and dirt, written so easily swapped
+        // mine ore if there is ore to mine
+        if (toMine > 0 && tile.ore > 0) {
+            const mined = Math.min(tile.ore, toMine);
+            tile.ore -= mined;
+            this.ore += mined;
+            toMine -= mined;
+        }
+
+        // then mine dirt if there is dirt to mine
+        if (toMine > 0 && tile.dirt > 0) {
+            const mined = Math.min(tile.dirt, toMine);
+            tile.dirt -= mined;
+            this.dirt += mined;
+            toMine -= mined;
+        }
+
+        // set tiles that are falling
+        if (tile.ore + tile.dirt <= 0) {
+            let upward = tile.tileNorth;
+            // making the assumption that ladders and supports don't fall. if they do then extra
+            // logic needs to be in place for supports.
+            while (
+                upward &&
+                upward.dirt + upward.ore <= 0 &&
+                !upward.isLadder &&
+                !upward.isSupport
+            ) {
+                upward.isFalling = true;
+                this.game.fallingTiles.push(upward);
+                upward = upward.tileNorth;
+            }
+        }
+        // if we mined the one that units were standing on, calculate new location
+        if (tile.tileNorth && tile.tileNorth.units.length > 0) {
+            let distance = 1;
+            let downward = tile;
+            let nextDownward = downward.tileSouth;
+            while (
+                nextDownward &&
+                nextDownward.dirt + nextDownward.ore <= 0 &&
+                !nextDownward.isLadder &&
+                !nextDownward.isSupport
+            ) {
+                downward = nextDownward;
+                nextDownward = nextDownward.tileSouth;
+                distance++;
+            }
+
+            // the ol swap
+            const units = tile.tileNorth.units;
+            tile.tileNorth.units = [];
+            units.forEach((u) => (u.tile = downward));
+            downward.units.push(...units);
+
+            // calc fall damage
+            // higher levels take less fall damage
+            // probably should have this constant some where since movement needs it as well.
+            const baseFallImmunity = 1;
+            units.forEach((u) => {
+                const damage = distance - (u.upgradeLevel + baseFallImmunity);
+                u.health -= Math.min(damage, u.health);
+            });
+        }
+
+        return true;
         // <<-- /Creer-Merge: mine -->>
     }
 
