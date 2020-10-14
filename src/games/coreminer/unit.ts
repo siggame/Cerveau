@@ -723,20 +723,8 @@ export class Unit extends GameObject {
             return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
         }
 
-        if (this.moves <= 0) {
-            return `This unit is out of moves!`;
-        }
-
         if (!this.tile) {
             return `This unit is not on a tile!`;
-        }
-
-        if (this.tile.dirt + this.tile.ore > 0) {
-            return `This unit is stuck in a filled tile and cannot move!`;
-        }
-
-        if (this.tile.getNeighbor("North") === tile && !this.tile.isLadder) {
-            return `This unit cannot fly upwards! It needs a ladder!`;
         }
 
         if (tile.dirt + tile.ore > 0) {
@@ -757,10 +745,6 @@ export class Unit extends GameObject {
 
         if (this.tile.dirt + this.tile.ore > 0) {
             return `${this} is buried in ${this.tile}! This unit is stuck, and must dig itself out.`;
-        }
-
-        if (tile.dirt + tile.ore > 0) {
-            return `${this} cannot phase through dirt and ore!`;
         }
 
         if (tile === this.tile.tileNorth && !this.tile.isLadder) {
