@@ -182,8 +182,8 @@ export class Unit extends GameObject {
             return "You cannot build on a ladder.";
         }
 
-        if (tile.dirt + tile.ore > 0 && type === "shield") {
-            return "You can only build shields on a filled tile.";
+        if (tile.dirt + tile.ore > 0 && type !== "shield") {
+            return "You cannot build on a filled tile unless you are building a shield!";
         }
 
         // Tile must be adjacent to or the same as the tile the unit is on
@@ -198,35 +198,27 @@ export class Unit extends GameObject {
         }
         switch (type) {
             case "support":
-                if (tile.dirt > 0 || tile.ore > 0) {
-                    return "You can only build a support on an empty tile.";
-                }
-                if (tile.isSupport) {
-                    return "This tile already has a support!";
-                }
                 if (this.buildingMaterials < this.game.supportCost) {
                     return "You don't have enough building materials to build a support";
                 }
                 break;
 
             case "ladder":
-                if (tile.dirt > 0 || tile.ore > 0) {
-                    return "You can only build a ladder on an empty tile.";
-                }
-                if (tile.isLadder) {
-                    return "This tile already has a ladder!";
-                }
                 if (this.buildingMaterials < this.game.ladderCost) {
                     return "You don't have enough building materials to build a ladder";
                 }
                 break;
 
             case "shield":
-                if (tile.dirt === 0 && tile.ore === 0) {
+                if (tile.dirt + tile.ore === 0) {
                     return "You can't build a shield on an empty tile.";
-                } else if (tile.shielding === 2) {
+                }
+
+                if (tile.shielding === 2) {
                     return "This tile already has full shield.";
-                } else if (this.buildingMaterials < this.game.shieldCost) {
+                }
+
+                if (this.buildingMaterials < this.game.shieldCost) {
                     return "You don't have enough building materials to build a shield";
                 }
                 break;
