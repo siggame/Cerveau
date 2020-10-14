@@ -565,22 +565,6 @@ export class Unit extends GameObject {
             return generalFailure;
         }
 
-        if (!this.health) {
-            return `${this} is destroyed and can't mine!`;
-        }
-
-        if (!tile) {
-            return `Tile doesn't exist`;
-        }
-
-        if (player !== this.owner) {
-            return `You do not own ${this}`;
-        }
-
-        if (this.job.title !== "miner") {
-            return `${this} must be a miner to mine.`;
-        }
-
         // Making this assumption as nothing was in there previously about it
         if (tile.isHopper) {
             return "A unit can't mine a hopper";
