@@ -1,4 +1,3 @@
-import { removeElements } from '@cadre/ts-utils';
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { TileConstructorArgs } from "./";
