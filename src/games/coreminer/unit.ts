@@ -503,11 +503,17 @@ export class Unit extends GameObject {
         } else {
             // Not dumping into base/hopper
             if (material === `dirt`) {
+                if (amount <= 0) {
+                    trueAmount = this.dirt;
+                }
                 tile.dirt += trueAmount;
                 this.dirt -= trueAmount;
             }
 
             if (material === `ore`) {
+                if (amount <= 0) {
+                    trueAmount = this.ore;
+                }
                 tile.ore += trueAmount;
                 this.ore -= trueAmount;
             }
