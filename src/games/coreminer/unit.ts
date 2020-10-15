@@ -651,10 +651,7 @@ export class Unit extends GameObject {
         const settings = this.game.settings;
 
         // get the amount to mine if mining
-        let toMine =
-            amount > 0
-                ? Math.min(amount, tile.dirt + tile.ore)
-                : tile.dirt + tile.ore;
+        let toMine = Math.min(amount, tile.dirt + tile.ore);
         // if given <= 0 amount set to max possible mining
         if (amount <= 0) {
             toMine = tile.dirt + tile.ore;
