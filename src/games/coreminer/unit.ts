@@ -305,7 +305,7 @@ export class Unit extends GameObject {
             }
         }
         if (amount <= 0) {
-            return `${this} doesn't know how to buy negative amounts`;
+            return `${this} doesn't know how to buy negative amounts!`;
         }
 
         const cargo =
