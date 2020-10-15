@@ -540,6 +540,12 @@ export class Unit extends GameObject {
             }
         }
 
+        // If tile below exists and doesn't have resources, may need to fall, flag for falling
+        if (tile.tileSouth && tile.tileSouth.dirt + tile.tileSouth.ore <= 0) {
+            tile.isFalling = true;
+            this.game.fallingTiles.push(tile);
+        }
+
         return true;
         // <<-- /Creer-Merge: dump -->>
     }
