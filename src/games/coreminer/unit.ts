@@ -659,7 +659,8 @@ export class Unit extends GameObject {
                 toMine + tile.shielding * settings.shieldCost >
                 this.miningPower
             ) {
-                toMine = this.miningPower;
+                toMine =
+                    this.miningPower - tile.shielding * settings.shieldCost;
             }
         }
         // get mining cost
