@@ -312,6 +312,9 @@ export class Unit extends GameObject {
                 return `A unit cannot buy unless it is near an allied hopper or base!`;
             }
         }
+        if (amount <= 0) {
+            return `${this} doesn't know how to buy negative amounts!`;
+        }
 
         const cargo =
             this.ore +
