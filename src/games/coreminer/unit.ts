@@ -853,59 +853,53 @@ export class Unit extends GameObject {
             return generalFailure;
         }
 
-        if (!unit) {
-            return `The target unit does not exist!`;
+        const otherUnit = this.invalidateGeneralUnitMethod(player);
+        if (otherUnit) {
+            return otherUnit;
         }
-
-        if (!unit.tile) {
-            return `The target unit is not on a tile!`;
-        }
-
-        if (
-            this.tile &&
-            this.tile.getNeighbors().indexOf(unit.tile) === -1 &&
-            this.tile !== unit.tile
-        ) {
-            return `The target unit is not adjacent to this unit!`;
+        // this outer if is a redundant check but TS is complaining
+        // and overriding it is forbidden in the linter rules
+        if (this.tile && unit.tile) {
+            if (this.tile?.getNeighbors().indexOf(unit.tile) === -1) {
+                return `The target: ${unit} is not adjacent to ${this}!`;
+            }
         }
 
         let actualAmount;
         switch (resource) {
             case "dirt":
                 if (this.dirt < amount) {
-                    return `This unit cannot transfer more dirt than they have!`;
+                    return `${this} cannot transfer more dirt than they have!`;
                 }
-                actualAmount = amount === -1 ? this.dirt : amount;
+                actualAmount = amount <= 0 ? this.dirt : amount;
                 break;
             case "ore":
                 if (this.ore < amount) {
-                    return `This unit cannot transfer more ore than they have!`;
+                    return `${this} cannot transfer more ore than they have!`;
                 }
-                actualAmount = amount === -1 ? this.ore : amount;
+                actualAmount = amount <= 0 ? this.ore : amount;
                 break;
             case "bomb":
                 if (this.bombs < amount) {
-                    return `This unit cannot transfer more bombs than they have!`;
+                    return `${this} cannot transfer more bombs than they have!`;
                 }
-                actualAmount = amount === -1 ? this.bombs : amount;
+                actualAmount = amount <= 0 ? this.bombs : amount;
                 break;
             case "buildingMaterials":
                 if (this.buildingMaterials < amount) {
-                    return `This unit cannot transfer more building materials than they have!`;
+                    return `${this} cannot transfer more building materials than they have!`;
                 }
-                actualAmount = amount === -1 ? this.buildingMaterials : amount;
+                actualAmount = amount <= 0 ? this.buildingMaterials : amount;
                 break;
             default:
                 return `Invalid transfer material!`;
         }
 
-        const unitCargoCapacity =
-            unit.dirt +
-            unit.ore +
-            unit.bombs * this.game.bombSize +
-            unit.buildingMaterials;
-        if (actualAmount > unitCargoCapacity) {
-            return `The target unit cannot hold that many materials!`;
+        // updated to use new function
+        const unitCargoCapacity = unit.getCargoAmount();
+
+        if (actualAmount > unit.maxCargoCapacity - unitCargoCapacity) {
+            return `The target: ${unit} cannot hold that many materials!`;
         }
 
         // <<-- /Creer-Merge: invalidate-transfer -->>
@@ -931,22 +925,22 @@ export class Unit extends GameObject {
         let actualAmount;
         switch (resource) {
             case "dirt":
-                actualAmount = amount === -1 ? this.dirt : amount;
+                actualAmount = amount <= 0 ? this.dirt : amount;
                 this.dirt -= actualAmount;
                 unit.dirt += actualAmount;
                 break;
             case "ore":
-                actualAmount = amount === -1 ? this.ore : amount;
+                actualAmount = amount <= 0 ? this.ore : amount;
                 this.ore -= actualAmount;
                 unit.ore += actualAmount;
                 break;
             case "bomb":
-                actualAmount = amount === -1 ? this.bombs : amount;
+                actualAmount = amount <= 0 ? this.bombs : amount;
                 this.bombs -= actualAmount;
                 unit.bombs += actualAmount;
                 break;
             case "buildingMaterials":
-                actualAmount = amount === -1 ? this.buildingMaterials : amount;
+                actualAmount = amount <= 0 ? this.buildingMaterials : amount;
                 this.buildingMaterials -= actualAmount;
                 unit.buildingMaterials += actualAmount;
         }
