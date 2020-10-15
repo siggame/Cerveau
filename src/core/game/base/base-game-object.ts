@@ -88,9 +88,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         if (this.gameObjectName === "Player") {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
-            return `Player "${((this as unknown) as BasePlayer).name}" #${
-                this.id
-            }`;
+            const player = (this as unknown) as BasePlayer;
+            return `Player "${player.name}" #${this.id}`;
         }
 
         return `${this.gameObjectName} #${this.id}`;
@@ -113,9 +112,9 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         | undefined
         | string
         | {
-              /** The new value of the validated message to use. */
-              message?: string;
-          } {
+            /** The new value of the validated message to use. */
+            message?: string;
+        } {
         if (message.length > MAX_LOG_LENGTH) {
             return `Message is too long! Max ${MAX_LOG_LENGTH} per message.`;
         }

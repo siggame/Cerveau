@@ -88,11 +88,8 @@ export class BaseGameDeltaMergeables {
             Object.defineProperty(this, property, {
                 enumerable: true, // Show up in for of loops
                 configurable: false, // Can't be deleted
-                get:
-                    schema.typeName === "list" // Lists are behind Proxies
-                        ? () => dm.wrapper
-                        : // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                          () => dm.get(),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                get: () => dm.get(),
                 set: (val: unknown) => {
                     dm.set(val);
                 },
