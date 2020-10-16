@@ -1,9 +1,10 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { TileConstructorArgs } from "./";
+import { Bomb } from "./bomb";
 import { GameObject } from "./game-object";
+import { Miner } from "./miner";
 import { Player } from "./player";
-import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -14,17 +15,22 @@ import { Unit } from "./unit";
  */
 export class Tile extends GameObject implements BaseTile {
     /**
+     * An array of Bombs on this Tile.
+     */
+    public bombs!: Bomb[];
+
+    /**
      * The amount of dirt on this Tile.
      */
     public dirt!: number;
 
     /**
-     * Whether or not the tile is a base Tile.
+     * Whether or not the Tile is a base Tile.
      */
     public isBase!: boolean;
 
     /**
-     * Whether or not this tile is about to fall.
+     * Whether or not this Tile is about to fall after this turn.
      */
     public isFalling!: boolean;
 
@@ -42,6 +48,11 @@ export class Tile extends GameObject implements BaseTile {
      * Whether or not a support is built on this Tile.
      */
     public isSupport!: boolean;
+
+    /**
+     * An array of the Miners on this Tile.
+     */
+    public miners!: Miner[];
 
     /**
      * The amount of ore on this Tile.
@@ -81,11 +92,6 @@ export class Tile extends GameObject implements BaseTile {
      * of the map.
      */
     public readonly tileWest?: Tile;
-
-    /**
-     * An array of the Units on this Tile.
-     */
-    public units!: Unit[];
 
     /**
      * The x (horizontal) position of this Tile.

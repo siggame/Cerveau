@@ -31,7 +31,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
 
             bombSize: {
-                description: "The amount of cargo space taken up by a bomb.",
+                description: "The amount of cargo space taken up by a Bomb.",
                 // <<-- Creer-Merge: bombSize -->>
                 default: 10,
                 min: 1,
@@ -53,6 +53,22 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: dirtPrice -->>
             },
 
+            fallDamage: {
+                description: "The amount of damage taken per Tile fallen.",
+                // <<-- Creer-Merge: fallDamage -->>
+                default: 0,
+                // <<-- /Creer-Merge: fallDamage -->>
+            },
+
+            fallWeightDamage: {
+                description:
+                    "The amount of extra damage taken for falling while " +
+                    "carrying a large amount of cargo.",
+                // <<-- Creer-Merge: fallWeightDamage -->>
+                default: 0,
+                // <<-- /Creer-Merge: fallWeightDamage -->>
+            },
+
             ladderCost: {
                 description:
                     "The amount of building material required to build a " +
@@ -61,6 +77,45 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 default: 5,
                 min: 1,
                 // <<-- /Creer-Merge: ladderCost -->>
+            },
+
+            ladderHealth: {
+                description:
+                    "The amount of mining power needed to remove a ladder " +
+                    "from a Tile.",
+                // <<-- Creer-Merge: ladderHealth -->>
+                default: 0,
+                // <<-- /Creer-Merge: ladderHealth -->>
+            },
+
+            largeCargoSize: {
+                description: "The amount deemed as a large amount of cargo.",
+                // <<-- Creer-Merge: largeCargoSize -->>
+                default: 0,
+                // <<-- /Creer-Merge: largeCargoSize -->>
+            },
+
+            largeMaterialSize: {
+                description:
+                    "The amount deemed as a large amount of material.",
+                // <<-- Creer-Merge: largeMaterialSize -->>
+                default: 0,
+                // <<-- /Creer-Merge: largeMaterialSize -->>
+            },
+
+            maxShielding: {
+                description:
+                    "The maximum amount of shielding possible on a Tile.",
+                // <<-- Creer-Merge: maxShielding -->>
+                default: 0,
+                // <<-- /Creer-Merge: maxShielding -->>
+            },
+
+            maxUpgradeLevel: {
+                description: "The highest upgrade level allowed on a Miner.",
+                // <<-- Creer-Merge: maxUpgradeLevel -->>
+                default: 0,
+                // <<-- /Creer-Merge: maxUpgradeLevel -->>
             },
 
             orePrice: {
@@ -74,8 +129,8 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
 
             oreValue: {
                 description:
-                    "The amount of victory points awarded when ore is " +
-                    "dumped in the base and sold.",
+                    "The amount of value awarded when ore is dumped in the " +
+                    "base and sold.",
                 // <<-- Creer-Merge: oreValue -->>
                 default: 5,
                 min: 1,
@@ -92,11 +147,38 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: shieldCost -->>
             },
 
+            shieldHealth: {
+                description:
+                    "The amount of mining power needed to remove one unit " +
+                    "of shielding off a Tile.",
+                // <<-- Creer-Merge: shieldHealth -->>
+                default: 0,
+                // <<-- /Creer-Merge: shieldHealth -->>
+            },
+
             spawnPrice: {
                 description: "The monetary price of spawning a Miner.",
                 // <<-- Creer-Merge: spawnPrice -->>
                 default: 200,
                 // <<-- /Creer-Merge: spawnPrice -->>
+            },
+
+            suffocationDamage: {
+                description:
+                    "The amount of damage taken when suffocating inside a " +
+                    "filled Tile.",
+                // <<-- Creer-Merge: suffocationDamage -->>
+                default: 0,
+                // <<-- /Creer-Merge: suffocationDamage -->>
+            },
+
+            suffocationWeightDamage: {
+                description:
+                    "The amount of extra damage taken for suffocating under" +
+                    " a large amount of material.",
+                // <<-- Creer-Merge: suffocationWeightDamage -->>
+                default: 0,
+                // <<-- /Creer-Merge: suffocationWeightDamage -->>
             },
 
             supportCost: {
@@ -109,15 +191,25 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 // <<-- /Creer-Merge: supportCost -->>
             },
 
+            supportHealth: {
+                description:
+                    "The amount of mining power needed to remove a support " +
+                    "from a Tile.",
+                // <<-- Creer-Merge: supportHealth -->>
+                default: 0,
+                // <<-- /Creer-Merge: supportHealth -->>
+            },
+
             upgradePrice: {
-                description: "The cost to upgrade a Unit.",
+                description: "The cost to upgrade a Miner.",
                 // <<-- Creer-Merge: upgradePrice -->>
                 default: 350,
                 // <<-- /Creer-Merge: upgradePrice -->>
             },
 
             victoryAmount: {
-                description: "The amount of victory points required to win.",
+                description:
+                    "The amount of victory points (value) required to win.",
                 // <<-- Creer-Merge: victoryAmount -->>
                 default: 10000,
                 min: 10,

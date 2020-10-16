@@ -1,12 +1,13 @@
 import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
+import { Bomb } from "./bomb";
 import { CoreminerGameManager } from "./game-manager";
 import { GameObject } from "./game-object";
 import { CoreminerGameSettingsManager } from "./game-settings";
-import { Job } from "./job";
+import { Miner } from "./miner";
 import { Player } from "./player";
 import { Tile } from "./tile";
-import { Unit } from "./unit";
+import { Upgrade } from "./upgrade";
 
 // <<-- Creer-Merge: imports -->>
 import { Mutable } from "~/utils";
@@ -28,9 +29,14 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly bombPrice!: number;
 
     /**
-     * The amount of cargo space taken up by a bomb.
+     * The amount of cargo space taken up by a Bomb.
      */
     public readonly bombSize!: number;
+
+    /**
+     * Every Bomb in the game.
+     */
+    public bombs!: Bomb[];
 
     /**
      * The monetary price of building materials when bought.
@@ -54,20 +60,41 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly dirtPrice!: number;
 
     /**
+     * The amount of damage taken per Tile fallen.
+     */
+    public readonly fallDamage!: number;
+
+    /**
+     * The amount of extra damage taken for falling while carrying a large
+     * amount of cargo.
+     */
+    public readonly fallWeightDamage!: number;
+
+    /**
      * A mapping of every game object's ID to the actual game object. Primarily
      * used by the server and client to easily refer to the game objects via ID.
      */
     public gameObjects!: { [id: string]: GameObject };
 
     /**
-     * A list of all jobs.
-     */
-    public jobs!: Job[];
-
-    /**
      * The amount of building material required to build a ladder.
      */
     public readonly ladderCost!: number;
+
+    /**
+     * The amount of mining power needed to remove a ladder from a Tile.
+     */
+    public readonly ladderHealth!: number;
+
+    /**
+     * The amount deemed as a large amount of cargo.
+     */
+    public readonly largeCargoSize!: number;
+
+    /**
+     * The amount deemed as a large amount of material.
+     */
+    public readonly largeMaterialSize!: number;
 
     /**
      * The number of Tiles in the map along the y (vertical) axis.
@@ -80,9 +107,24 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly mapWidth!: number;
 
     /**
+     * The maximum amount of shielding possible on a Tile.
+     */
+    public readonly maxShielding!: number;
+
+    /**
      * The maximum number of turns before the game will automatically end.
      */
     public readonly maxTurns!: number;
+
+    /**
+     * The highest upgrade level allowed on a Miner.
+     */
+    public readonly maxUpgradeLevel!: number;
+
+    /**
+     * Every Miner in the game.
+     */
+    public miners!: Miner[];
 
     /**
      * The amount of money awarded when ore is dumped in the base and sold.
@@ -90,8 +132,7 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly orePrice!: number;
 
     /**
-     * The amount of victory points awarded when ore is dumped in the base and
-     * sold.
+     * The amount of value awarded when ore is dumped in the base and sold.
      */
     public readonly oreValue!: number;
 
@@ -111,14 +152,36 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly shieldCost!: number;
 
     /**
+     * The amount of mining power needed to remove one unit of shielding off
+     * a Tile.
+     */
+    public readonly shieldHealth!: number;
+
+    /**
      * The monetary price of spawning a Miner.
      */
     public readonly spawnPrice!: number;
 
     /**
+     * The amount of damage taken when suffocating inside a filled Tile.
+     */
+    public readonly suffocationDamage!: number;
+
+    /**
+     * The amount of extra damage taken for suffocating under a large amount of
+     * material.
+     */
+    public readonly suffocationWeightDamage!: number;
+
+    /**
      * The amount of building material required to build a support.
      */
     public readonly supportCost!: number;
+
+    /**
+     * The amount of mining power needed to remove a support from a Tile.
+     */
+    public readonly supportHealth!: number;
 
     /**
      * All the tiles in the map, stored in Row-major order. Use `x + y *
@@ -133,17 +196,17 @@ export class CoreminerGame extends BaseClasses.Game {
     public readonly timeAddedPerTurn!: number;
 
     /**
-     * Every Unit in the game.
-     */
-    public units!: Unit[];
-
-    /**
-     * The cost to upgrade a Unit.
+     * The cost to upgrade a Miner.
      */
     public readonly upgradePrice!: number;
 
     /**
-     * The amount of victory points required to win.
+     * Every Upgrade for a Miner in the game.
+     */
+    public upgrades!: Upgrade[];
+
+    /**
+     * The amount of victory points (value) required to win.
      */
     public readonly victoryAmount!: number;
 

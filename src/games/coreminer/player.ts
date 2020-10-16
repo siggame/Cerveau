@@ -5,9 +5,11 @@ import {
     PlayerSpawnMinerArgs,
 } from "./";
 import { AI } from "./ai";
+import { Bomb } from "./bomb";
 import { GameObject } from "./game-object";
+import { Miner } from "./miner";
+import { Player } from "./player";
 import { Tile } from "./tile";
-import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -26,6 +28,11 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
     public baseTile!: Tile;
 
     /**
+     * Every Bomb owned by this Player.
+     */
+    public bombs!: Bomb[];
+
+    /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
      * language. For potential data mining purposes.
      */
@@ -40,6 +47,11 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
      * If the player lost the game or not.
      */
     public lost!: boolean;
+
+    /**
+     * Every Miner owned by this Player.
+     */
+    public miners!: Miner[];
 
     /**
      * The amount of money this Player currently has.
@@ -67,19 +79,9 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
     public reasonWon!: string;
 
     /**
-     * The Tiles on this Player's side of the map.
-     */
-    public side!: Tile[];
-
-    /**
      * The amount of time (in ns) remaining for this AI to send commands.
      */
     public timeRemaining!: number;
-
-    /**
-     * Every Unit owned by this Player.
-     */
-    public units!: Unit[];
 
     /**
      * The amount of value (victory points) this Player has gained.
@@ -152,7 +154,7 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
     }
 
     /**
-     * Spawns a Miner Unit on this Player's base tile.
+     * Spawns a Miner on this Player's base Tile.
      *
      * @param player - The player that called this.
      * @returns True if successfully spawned, false otherwise.
