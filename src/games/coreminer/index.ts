@@ -107,6 +107,11 @@ export interface MinerProperties {
     buildingMaterials?: number;
 
     /**
+     * The Upgrade this Miner is on.
+     */
+    currentUpgrade?: Upgrade;
+
+    /**
      * The amount of dirt carried by this Miner.
      */
     dirt?: number;
@@ -140,11 +145,6 @@ export interface MinerProperties {
      * The Tile this Miner is on.
      */
     tile?: Tile;
-
-    /**
-     * The Upgrade this Miner is on.
-     */
-    upgrade?: Upgrade;
 
     /**
      * The upgrade level of this Miner. Starts at 0.
@@ -821,6 +821,11 @@ export const Namespace = makeNamespace({
                 buildingMaterials: {
                     typeName: "int",
                 },
+                currentUpgrade: {
+                    typeName: "gameObject",
+                    gameObjectClass: Upgrade,
+                    nullable: false,
+                },
                 dirt: {
                     typeName: "int",
                 },
@@ -845,11 +850,6 @@ export const Namespace = makeNamespace({
                     typeName: "gameObject",
                     gameObjectClass: Tile,
                     nullable: true,
-                },
-                upgrade: {
-                    typeName: "gameObject",
-                    gameObjectClass: Upgrade,
-                    nullable: false,
                 },
                 upgradeLevel: {
                     typeName: "int",
@@ -1168,5 +1168,5 @@ export const Namespace = makeNamespace({
         },
     },
     gameVersion:
-        "3418447660e65ea28b97e2a74d8d95ebd694f36bbb0b6f4bd8d43fc97a3ecd9e",
+        "ce6c632876295900d0b2fc6db0f63dfc8a20533396c67b472fa03817cb82edc4",
 });

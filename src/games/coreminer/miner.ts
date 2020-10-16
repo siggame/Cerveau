@@ -33,6 +33,11 @@ export class Miner extends GameObject {
     public buildingMaterials!: number;
 
     /**
+     * The Upgrade this Miner is on.
+     */
+    public currentUpgrade: Upgrade;
+
+    /**
      * The amount of dirt carried by this Miner.
      */
     public dirt!: number;
@@ -66,11 +71,6 @@ export class Miner extends GameObject {
      * The Tile this Miner is on.
      */
     public tile?: Tile;
-
-    /**
-     * The Upgrade this Miner is on.
-     */
-    public upgrade: Upgrade;
 
     /**
      * The upgrade level of this Miner. Starts at 0.
