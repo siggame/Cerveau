@@ -4,31 +4,42 @@
 // we need for TypeScript to know the base classes, while allowing for minimal
 // code for developers to be forced to fill out.
 
-// tslint:disable:max-classes-per-file
-// ^ because we need to build a bunch of base class wrappers here
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 // base game classes
-import { BaseAI, BaseGame, BaseGameManager, BaseGameObject,
-         BaseGameObjectFactory, BaseGameSettingsManager, BasePlayer,
-         makeNamespace } from "~/core/game";
+import {
+    BaseAI,
+    BaseGame,
+    BaseGameManager,
+    BaseGameObject,
+    BaseGameObjectFactory,
+    BaseGameSettingsManager,
+    BasePlayer,
+    makeNamespace,
+} from "~/core/game";
 
 // mixins
-import { ITiledPlayer, ITurnBasedPlayer, ITwoPlayerPlayer, mixTiled,
-         mixTurnBased, mixTwoPlayer } from "~/core/game/mixins";
+import {
+    TiledPlayer,
+    TurnBasedPlayer,
+    TwoPlayerPlayer,
+    mixTiled,
+    mixTurnBased,
+    mixTwoPlayer,
+} from "~/core/game/mixins";
 
 // extract game object constructor args
 import { FirstArgumentFromConstructor } from "~/utils";
 
 /**
- * The interface the Player for the Coreminer game
+ * The interface that the Player for the Coreminer game
  * must implement from mixed in game logic.
  */
-export interface IBaseCoreminerPlayer extends
-    BasePlayer,
-    ITwoPlayerPlayer,
-    ITurnBasedPlayer,
-    ITiledPlayer {
-}
+export interface BaseCoreminerPlayer
+    extends BasePlayer,
+        TwoPlayerPlayer,
+        TurnBasedPlayer,
+        TiledPlayer {}
 
 const base0 = {
     AI: BaseAI,
@@ -71,45 +82,198 @@ export const BaseClasses = {
 // Now all the base classes are created;
 // so we can start importing/exporting the classes that need them.
 
-/** All the possible properties for an GameObject. */
-export interface IGameObjectProperties {
+/** All the possible properties for Bomb instances. */
+export interface BombProperties {
+    /**
+     * The number of turns before this Bomb explodes. Zero means it will
+     * explode after the current turn.
+     */
+    timer?: number;
 }
 
-/** All the possible properties for an Job. */
-export interface IJobProperties {
+/** All the possible properties for GameObject instances. */
+export interface GameObjectProperties {}
+
+/** All the possible properties for Miner instances. */
+export interface MinerProperties {
     /**
-     * The amount of cargo capacity this Unit starts with per level.
+     * The number of bombs being carried by this Miner.
      */
-    cargoCapacity?: number[];
+    bombs?: number;
 
     /**
-     * The amount of starting health this Job has per level.
+     * The number of building materials carried by this Miner.
      */
-    health?: number[];
+    buildingMaterials?: number;
 
     /**
-     * The amount of mining power this Unit has per turn per level.
+     * The amount of dirt carried by this Miner.
      */
-    miningPower?: number[];
+    dirt?: number;
 
     /**
-     * The number of moves this Job can make per turn per level.
+     * The remaining health of this Miner.
      */
-    moves?: number[];
+    health?: number;
 
     /**
-     * The Job title. 'miner' or 'bomb'.
+     * The remaining mining power this Miner has this turn.
      */
-    title?: "miner" | "bomb";
+    miningPower?: number;
 
+    /**
+     * The number of moves this Miner has left this turn.
+     */
+    moves?: number;
+
+    /**
+     * The amount of ore carried by this Miner.
+     */
+    ore?: number;
+
+    /**
+     * The Player that owns and can control this Miner.
+     */
+    owner?: Player;
+
+    /**
+     * The Tile this Miner is on.
+     */
+    tile?: Tile;
+
+    /**
+     * The Upgrade this Miner is on.
+     */
+    upgrade?: Upgrade;
+
+    /**
+     * The upgrade level of this Miner. Starts at 0.
+     */
+    upgradeLevel?: number;
 }
 
-/** All the possible properties for an Player. */
-export interface IPlayerProperties {
+/**
+ * Argument overrides for Miner's build function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerBuildArgs {
+    /**
+     * The Tile to build on.
+     */
+    tile?: Tile;
+    /**
+     * The structure to build (support, ladder, or shield).
+     */
+    type?: "support" | "ladder" | "shield";
+}
+
+/**
+ * Argument overrides for Miner's buy function. If you return an object of this
+ * interface from the invalidate functions, the value(s) you set will be used in
+ * the actual function.
+ */
+export interface MinerBuyArgs {
+    /**
+     * The type of resource to buy.
+     */
+    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to buy. Amounts <= 0 will buy all of that
+     * material Player can.
+     */
+    amount?: number;
+}
+
+/**
+ * Argument overrides for Miner's dump function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerDumpArgs {
+    /**
+     * The Tile the materials will be dumped on.
+     */
+    tile?: Tile;
+    /**
+     * The material the Miner will drop. 'dirt', 'ore', or 'bomb'.
+     */
+    material?: "dirt" | "ore" | "bomb";
+    /**
+     * The number of materials to drop. Amounts <= 0 will drop all of the
+     * material.
+     */
+    amount?: number;
+}
+
+/**
+ * Argument overrides for Miner's mine function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerMineArgs {
+    /**
+     * The Tile the materials will be mined from.
+     */
+    tile?: Tile;
+    /**
+     * The amount of material to mine up. Amounts <= 0 will mine all the
+     * materials that the Miner can.
+     */
+    amount?: number;
+}
+
+/**
+ * Argument overrides for Miner's move function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerMoveArgs {
+    /**
+     * The Tile this Miner should move to.
+     */
+    tile?: Tile;
+}
+
+/**
+ * Argument overrides for Miner's transfer function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerTransferArgs {
+    /**
+     * The Miner to transfer materials to.
+     */
+    miner?: Miner;
+    /**
+     * The type of resource to transfer.
+     */
+    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
+    /**
+     * The amount of resource to transfer. Amounts <= 0 will transfer all the
+     * of the material.
+     */
+    amount?: number;
+}
+
+/**
+ * Argument overrides for Miner's upgrade function. If you return an object of
+ * this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
+ */
+export interface MinerUpgradeArgs {}
+
+/** All the possible properties for Player instances. */
+export interface PlayerProperties {
     /**
      * The Tile this Player's base is on.
      */
     baseTile?: Tile;
+
+    /**
+     * Every Bomb owned by this Player.
+     */
+    bombs?: Bomb[];
 
     /**
      * What type of client this is, e.g. 'Python', 'JavaScript', or some other
@@ -126,6 +290,11 @@ export interface IPlayerProperties {
      * If the player lost the game or not.
      */
     lost?: boolean;
+
+    /**
+     * Every Miner owned by this Player.
+     */
+    miners?: Miner[];
 
     /**
      * The amount of money this Player currently has.
@@ -153,19 +322,9 @@ export interface IPlayerProperties {
     reasonWon?: string;
 
     /**
-     * The Tiles on this Player's side of the map.
-     */
-    side?: Tile[];
-
-    /**
      * The amount of time (in ns) remaining for this AI to send commands.
      */
     timeRemaining?: number;
-
-    /**
-     * Every Unit owned by this Player.
-     */
-    units?: Unit[];
 
     /**
      * The amount of value (victory points) this Player has gained.
@@ -176,31 +335,34 @@ export interface IPlayerProperties {
      * If the player won the game or not.
      */
     won?: boolean;
-
 }
 
 /**
  * Argument overrides for Player's spawnMiner function. If you return an object
- * of this interface from the invalidate functions, the value(s) you set will
- * be used in the actual function.
+ * of this interface from the invalidate functions, the value(s) you set will be
+ * used in the actual function.
  */
-export interface IPlayerSpawnMinerArgs {
-}
+export interface PlayerSpawnMinerArgs {}
 
-/** All the possible properties for an Tile. */
-export interface ITileProperties {
+/** All the possible properties for Tile instances. */
+export interface TileProperties {
+    /**
+     * An array of Bombs on this Tile.
+     */
+    bombs?: Bomb[];
+
     /**
      * The amount of dirt on this Tile.
      */
     dirt?: number;
 
     /**
-     * Whether or not the tile is a base Tile.
+     * Whether or not the Tile is a base Tile.
      */
     isBase?: boolean;
 
     /**
-     * Whether or not this tile is about to fall.
+     * Whether or not this Tile is about to fall after this turn.
      */
     isFalling?: boolean;
 
@@ -218,6 +380,11 @@ export interface ITileProperties {
      * Whether or not a support is built on this Tile.
      */
     isSupport?: boolean;
+
+    /**
+     * An array of the Miners on this Tile.
+     */
+    miners?: Miner[];
 
     /**
      * The amount of ore on this Tile.
@@ -259,11 +426,6 @@ export interface ITileProperties {
     tileWest?: Tile;
 
     /**
-     * An array of the Units on this Tile.
-     */
-    units?: Unit[];
-
-    /**
      * The x (horizontal) position of this Tile.
      */
     x?: number;
@@ -272,230 +434,117 @@ export interface ITileProperties {
      * The y (vertical) position of this Tile.
      */
     y?: number;
-
 }
 
-/** All the possible properties for an Unit. */
-export interface IUnitProperties {
+/** All the possible properties for Upgrade instances. */
+export interface UpgradeProperties {
     /**
-     * The number of bombs being carried by this Unit. (0 to job cargo capacity
-     * - other carried materials).
+     * The amount of cargo capacity this Upgrade has.
      */
-    bombs?: number;
+    cargoCapacity?: number;
 
     /**
-     * The number of building materials carried by this Unit. (0 to job cargo
-     * capacity - other carried materials).
-     */
-    buildingMaterials?: number;
-
-    /**
-     * The amount of dirt carried by this Unit. (0 to job cargo capacity -
-     * other carried materials).
-     */
-    dirt?: number;
-
-    /**
-     * The remaining health of a Unit.
+     * The maximum amount of health this Upgrade has.
      */
     health?: number;
 
     /**
-     * The Job this Unit has.
-     */
-    job?: Job;
-
-    /**
-     * The maximum amount of cargo this Unit can carry.
-     */
-    maxCargoCapacity?: number;
-
-    /**
-     * The maximum health of this Unit.
-     */
-    maxHealth?: number;
-
-    /**
-     * The maximum mining power of this Unit.
-     */
-    maxMiningPower?: number;
-
-    /**
-     * The maximum moves this Unit can have.
-     */
-    maxMoves?: number;
-
-    /**
-     * The remaining mining power this Unit has this turn.
+     * The amount of mining power this Upgrade has per turn.
      */
     miningPower?: number;
 
     /**
-     * The number of moves this Unit has left this turn.
+     * The number of moves this Upgrade can make per turn.
      */
     moves?: number;
 
     /**
-     * The amount of ore carried by this Unit. (0 to job capacity - other
-     * carried materials).
+     * The Upgrade title.
      */
-    ore?: number;
-
-    /**
-     * The Player that owns and can control this Unit.
-     */
-    owner?: Player;
-
-    /**
-     * The Tile this Unit is on.
-     */
-    tile?: Tile;
-
-    /**
-     * The upgrade level of this unit. Starts at 0.
-     */
-    upgradeLevel?: number;
-
+    title?: string;
 }
 
 /**
- * Argument overrides for Unit's build function. If you return an object of
- * this interface from the invalidate functions, the value(s) you set will be
- * used in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of Bomb.
  */
-export interface IUnitBuildArgs {
-    /**
-     * The Tile to build on.
-     */
-    tile?: Tile;
-    /**
-     * The structure to build (support, ladder, or shield).
-     */
-    type?: "support" | "ladder" | "shield";
-}
+export type BombConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BombProperties & T>;
 
 /**
- * Argument overrides for Unit's buy function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of GameObject.
  */
-export interface IUnitBuyArgs {
-    /**
-     * The type of resource to buy.
-     */
-    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
-    /**
-     * The amount of resource to buy.
-     */
-    amount?: number;
-}
+export type GameObjectConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<GameObjectProperties & T>;
 
 /**
- * Argument overrides for Unit's dump function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of Miner.
  */
-export interface IUnitDumpArgs {
-    /**
-     * The tile the materials will be dumped on.
-     */
-    tile?: Tile;
-    /**
-     * The material the Unit will drop. 'dirt', 'ore', or 'bomb'.
-     */
-    material?: "dirt" | "ore" | "bomb";
-    /**
-     * The number of materials to drop. Amounts <= 0 will drop all the
-     * materials.
-     */
-    amount?: number;
-}
+export type MinerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<MinerProperties & T>;
 
 /**
- * Argument overrides for Unit's mine function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of Player.
  */
-export interface IUnitMineArgs {
-    /**
-     * The Tile the materials will be mined from.
-     */
-    tile?: Tile;
-    /**
-     * The amount of material to mine up. Amounts <= 0 will mine all the
-     * materials that the Unit can.
-     */
-    amount?: number;
-}
+export type PlayerConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<BaseCoreminerPlayer & PlayerProperties & T>;
 
 /**
- * Argument overrides for Unit's move function. If you return an object of this
- * interface from the invalidate functions, the value(s) you set will be used
- * in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of Tile.
  */
-export interface IUnitMoveArgs {
-    /**
-     * The Tile this Unit should move to.
-     */
-    tile?: Tile;
-}
+export type TileConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<TileProperties & T>;
 
 /**
- * Argument overrides for Unit's transfer function. If you return an object of
- * this interface from the invalidate functions, the value(s) you set will be
- * used in the actual function.
+ * The default args passed to a constructor function for class
+ * instances of Upgrade.
  */
-export interface IUnitTransferArgs {
-    /**
-     * The Unit to transfer materials to.
-     */
-    unit?: Unit;
-    /**
-     * The type of resource to transfer.
-     */
-    resource?: "dirt" | "ore" | "bomb" | "buildingMaterials";
-    /**
-     * The amount of resource to transfer.
-     */
-    amount?: number;
-}
+export type UpgradeConstructorArgs<
+    T extends Record<string, unknown> = Record<string, unknown>
+> = Readonly<UpgradeProperties & T>;
 
-/**
- * Argument overrides for Unit's upgrade function. If you return an object of
- * this interface from the invalidate functions, the value(s) you set will be
- * used in the actual function.
- */
-export interface IUnitUpgradeArgs {
-}
-
+export * from "./bomb";
 export * from "./game-object";
-export * from "./job";
+export * from "./miner";
 export * from "./player";
 export * from "./tile";
-export * from "./unit";
+export * from "./upgrade";
 export * from "./game";
 export * from "./game-manager";
 export * from "./ai";
 
+import { Bomb } from "./bomb";
 import { GameObject } from "./game-object";
-import { Job } from "./job";
+import { Miner } from "./miner";
 import { Player } from "./player";
 import { Tile } from "./tile";
-import { Unit } from "./unit";
+import { Upgrade } from "./upgrade";
 
 import { AI } from "./ai";
 import { CoreminerGame } from "./game";
 import { CoreminerGameManager } from "./game-manager";
 import { CoreminerGameSettingsManager } from "./game-settings";
 
-/** The arguments used to construct a Job */
-export type JobArgs = FirstArgumentFromConstructor<typeof Job>;
+/** The arguments used to construct a Bomb. */
+export type BombArgs = FirstArgumentFromConstructor<typeof Bomb>;
 
-/** The arguments used to construct a Tile */
+/** The arguments used to construct a Miner. */
+export type MinerArgs = FirstArgumentFromConstructor<typeof Miner>;
+
+/** The arguments used to construct a Tile. */
 export type TileArgs = FirstArgumentFromConstructor<typeof Tile>;
 
-/** The arguments used to construct a Unit */
-export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
+/** The arguments used to construct a Upgrade. */
+export type UpgradeArgs = FirstArgumentFromConstructor<typeof Upgrade>;
 
 /**
  * The factory that **must** be used to create any game objects in
@@ -503,44 +552,48 @@ export type UnitArgs = FirstArgumentFromConstructor<typeof Unit>;
  */
 export class CoreminerGameObjectFactory extends BaseGameObjectFactory {
     /**
-     * Creates a new Job in the Game and tracks it for all players.
+     * Creates a new Bomb in the Game and tracks it for all players.
      *
-     * @param args - Data about the Job to set. Any keys matching a property in
+     * @param args - Data about the Bomb to set. Any keys matching a property in
      * the game object's class will be automatically set for you.
-     * @returns A new Job hooked up in the game and ready for you to use.
+     * @returns A new Bomb hooked up in the game and ready for you to use.
      */
-    public job<T extends JobArgs>(
-        args: Readonly<T>,
-    ): Job & T {
-        return this.createGameObject("Job", Job, args);
+    public bomb<T extends BombArgs>(args: Readonly<T>): Bomb & T {
+        return this.createGameObject("Bomb", Bomb, args);
+    }
+
+    /**
+     * Creates a new Miner in the Game and tracks it for all players.
+     *
+     * @param args - Data about the Miner to set. Any keys matching a property
+     * in the game object's class will be automatically set for you.
+     * @returns A new Miner hooked up in the game and ready for you to use.
+     */
+    public miner<T extends MinerArgs>(args: Readonly<T>): Miner & T {
+        return this.createGameObject("Miner", Miner, args);
     }
 
     /**
      * Creates a new Tile in the Game and tracks it for all players.
      *
-     * @param args - Data about the Tile to set. Any keys matching a property
-     * in the game object's class will be automatically set for you.
+     * @param args - Data about the Tile to set. Any keys matching a property in
+     * the game object's class will be automatically set for you.
      * @returns A new Tile hooked up in the game and ready for you to use.
      */
-    public tile<T extends TileArgs>(
-        args: Readonly<T>,
-    ): Tile & T {
+    public tile<T extends TileArgs>(args: Readonly<T>): Tile & T {
         return this.createGameObject("Tile", Tile, args);
     }
 
     /**
-     * Creates a new Unit in the Game and tracks it for all players.
+     * Creates a new Upgrade in the Game and tracks it for all players.
      *
-     * @param args - Data about the Unit to set. Any keys matching a property
+     * @param args - Data about the Upgrade to set. Any keys matching a property
      * in the game object's class will be automatically set for you.
-     * @returns A new Unit hooked up in the game and ready for you to use.
+     * @returns A new Upgrade hooked up in the game and ready for you to use.
      */
-    public unit<T extends UnitArgs>(
-        args: Readonly<T>,
-    ): Unit & T {
-        return this.createGameObject("Unit", Unit, args);
+    public upgrade<T extends UpgradeArgs>(args: Readonly<T>): Upgrade & T {
+        return this.createGameObject("Upgrade", Upgrade, args);
     }
-
 }
 
 /**
@@ -563,12 +616,10 @@ export const Namespace = makeNamespace({
     gameSettingsManager: new CoreminerGameSettingsManager(),
     gameObjectsSchema: {
         AI: {
-            attributes: {
-            },
+            attributes: {},
             functions: {
                 runTurn: {
-                    args: [
-                    ],
+                    args: [],
                     returns: {
                         typeName: "boolean",
                     },
@@ -582,6 +633,14 @@ export const Namespace = makeNamespace({
                 },
                 bombSize: {
                     typeName: "int",
+                },
+                bombs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Bomb,
+                        nullable: false,
+                    },
                 },
                 buildingMaterialPrice: {
                     typeName: "int",
@@ -597,6 +656,12 @@ export const Namespace = makeNamespace({
                 dirtPrice: {
                     typeName: "int",
                 },
+                fallDamage: {
+                    typeName: "int",
+                },
+                fallWeightDamage: {
+                    typeName: "int",
+                },
                 gameObjects: {
                     typeName: "dictionary",
                     keyType: {
@@ -608,15 +673,16 @@ export const Namespace = makeNamespace({
                         nullable: false,
                     },
                 },
-                jobs: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Job,
-                        nullable: false,
-                    },
-                },
                 ladderCost: {
+                    typeName: "int",
+                },
+                ladderHealth: {
+                    typeName: "int",
+                },
+                largeCargoSize: {
+                    typeName: "int",
+                },
+                largeMaterialSize: {
                     typeName: "int",
                 },
                 mapHeight: {
@@ -625,8 +691,22 @@ export const Namespace = makeNamespace({
                 mapWidth: {
                     typeName: "int",
                 },
+                maxShielding: {
+                    typeName: "int",
+                },
                 maxTurns: {
                     typeName: "int",
+                },
+                maxUpgradeLevel: {
+                    typeName: "int",
+                },
+                miners: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Miner,
+                        nullable: false,
+                    },
                 },
                 orePrice: {
                     typeName: "int",
@@ -648,10 +728,22 @@ export const Namespace = makeNamespace({
                 shieldCost: {
                     typeName: "int",
                 },
+                shieldHealth: {
+                    typeName: "int",
+                },
                 spawnPrice: {
                     typeName: "int",
                 },
+                suffocationDamage: {
+                    typeName: "int",
+                },
+                suffocationWeightDamage: {
+                    typeName: "int",
+                },
                 supportCost: {
+                    typeName: "int",
+                },
+                supportHealth: {
                     typeName: "int",
                 },
                 tiles: {
@@ -665,23 +757,31 @@ export const Namespace = makeNamespace({
                 timeAddedPerTurn: {
                     typeName: "int",
                 },
-                units: {
+                upgradePrice: {
+                    typeName: "int",
+                },
+                upgrades: {
                     typeName: "list",
                     valueType: {
                         typeName: "gameObject",
-                        gameObjectClass: Unit,
+                        gameObjectClass: Upgrade,
                         nullable: false,
                     },
-                },
-                upgradePrice: {
-                    typeName: "int",
                 },
                 victoryAmount: {
                     typeName: "int",
                 },
             },
-            functions: {
+            functions: {},
+        },
+        Bomb: {
+            parentClassName: "GameObject",
+            attributes: {
+                timer: {
+                    typeName: "int",
+                },
             },
+            functions: {},
         },
         GameObject: {
             attributes: {
@@ -712,189 +812,7 @@ export const Namespace = makeNamespace({
                 },
             },
         },
-        Job: {
-            parentClassName: "GameObject",
-            attributes: {
-                cargoCapacity: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "int",
-                    },
-                },
-                health: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "int",
-                    },
-                },
-                miningPower: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "int",
-                    },
-                },
-                moves: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "int",
-                    },
-                },
-                title: {
-                    typeName: "string",
-                    defaultValue: "miner",
-                    literals: ["miner", "bomb"],
-                },
-            },
-            functions: {
-            },
-        },
-        Player: {
-            parentClassName: "GameObject",
-            attributes: {
-                baseTile: {
-                    typeName: "gameObject",
-                    gameObjectClass: Tile,
-                    nullable: false,
-                },
-                clientType: {
-                    typeName: "string",
-                },
-                hopperTiles: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Tile,
-                        nullable: false,
-                    },
-                },
-                lost: {
-                    typeName: "boolean",
-                },
-                money: {
-                    typeName: "int",
-                },
-                name: {
-                    typeName: "string",
-                },
-                opponent: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                    nullable: false,
-                },
-                reasonLost: {
-                    typeName: "string",
-                },
-                reasonWon: {
-                    typeName: "string",
-                },
-                side: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Tile,
-                        nullable: false,
-                    },
-                },
-                timeRemaining: {
-                    typeName: "float",
-                },
-                units: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Unit,
-                        nullable: false,
-                    },
-                },
-                value: {
-                    typeName: "int",
-                },
-                won: {
-                    typeName: "boolean",
-                },
-            },
-            functions: {
-                spawnMiner: {
-                    args: [
-                    ],
-                    invalidValue: false,
-                    returns: {
-                        typeName: "boolean",
-                    },
-                },
-            },
-        },
-        Tile: {
-            parentClassName: "GameObject",
-            attributes: {
-                dirt: {
-                    typeName: "int",
-                },
-                isBase: {
-                    typeName: "boolean",
-                },
-                isFalling: {
-                    typeName: "boolean",
-                },
-                isHopper: {
-                    typeName: "boolean",
-                },
-                isLadder: {
-                    typeName: "boolean",
-                },
-                isSupport: {
-                    typeName: "boolean",
-                },
-                ore: {
-                    typeName: "int",
-                },
-                owner: {
-                    typeName: "gameObject",
-                    gameObjectClass: Player,
-                    nullable: true,
-                },
-                shielding: {
-                    typeName: "int",
-                },
-                tileEast: {
-                    typeName: "gameObject",
-                    gameObjectClass: Tile,
-                    nullable: true,
-                },
-                tileNorth: {
-                    typeName: "gameObject",
-                    gameObjectClass: Tile,
-                    nullable: true,
-                },
-                tileSouth: {
-                    typeName: "gameObject",
-                    gameObjectClass: Tile,
-                    nullable: true,
-                },
-                tileWest: {
-                    typeName: "gameObject",
-                    gameObjectClass: Tile,
-                    nullable: true,
-                },
-                units: {
-                    typeName: "list",
-                    valueType: {
-                        typeName: "gameObject",
-                        gameObjectClass: Unit,
-                        nullable: false,
-                    },
-                },
-                x: {
-                    typeName: "int",
-                },
-                y: {
-                    typeName: "int",
-                },
-            },
-            functions: {
-            },
-        },
-        Unit: {
+        Miner: {
             parentClassName: "GameObject",
             attributes: {
                 bombs: {
@@ -909,23 +827,6 @@ export const Namespace = makeNamespace({
                 health: {
                     typeName: "int",
                 },
-                job: {
-                    typeName: "gameObject",
-                    gameObjectClass: Job,
-                    nullable: false,
-                },
-                maxCargoCapacity: {
-                    typeName: "int",
-                },
-                maxHealth: {
-                    typeName: "int",
-                },
-                maxMiningPower: {
-                    typeName: "int",
-                },
-                maxMoves: {
-                    typeName: "int",
-                },
                 miningPower: {
                     typeName: "int",
                 },
@@ -938,12 +839,17 @@ export const Namespace = makeNamespace({
                 owner: {
                     typeName: "gameObject",
                     gameObjectClass: Player,
-                    nullable: true,
+                    nullable: false,
                 },
                 tile: {
                     typeName: "gameObject",
                     gameObjectClass: Tile,
                     nullable: true,
+                },
+                upgrade: {
+                    typeName: "gameObject",
+                    gameObjectClass: Upgrade,
+                    nullable: false,
                 },
                 upgradeLevel: {
                     typeName: "int",
@@ -976,7 +882,12 @@ export const Namespace = makeNamespace({
                             argName: "resource",
                             typeName: "string",
                             defaultValue: "dirt",
-                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                            literals: [
+                                "dirt",
+                                "ore",
+                                "bomb",
+                                "buildingMaterials",
+                            ],
                         },
                         {
                             argName: "amount",
@@ -1047,16 +958,21 @@ export const Namespace = makeNamespace({
                 transfer: {
                     args: [
                         {
-                            argName: "unit",
+                            argName: "miner",
                             typeName: "gameObject",
-                            gameObjectClass: Unit,
+                            gameObjectClass: Miner,
                             nullable: false,
                         },
                         {
                             argName: "resource",
                             typeName: "string",
                             defaultValue: "dirt",
-                            literals: ["dirt", "ore", "bomb", "buildingMaterials"],
+                            literals: [
+                                "dirt",
+                                "ore",
+                                "bomb",
+                                "buildingMaterials",
+                            ],
                         },
                         {
                             argName: "amount",
@@ -1069,8 +985,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 upgrade: {
-                    args: [
-                    ],
+                    args: [],
                     invalidValue: false,
                     returns: {
                         typeName: "boolean",
@@ -1078,6 +993,180 @@ export const Namespace = makeNamespace({
                 },
             },
         },
+        Player: {
+            parentClassName: "GameObject",
+            attributes: {
+                baseTile: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: false,
+                },
+                bombs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Bomb,
+                        nullable: false,
+                    },
+                },
+                clientType: {
+                    typeName: "string",
+                },
+                hopperTiles: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Tile,
+                        nullable: false,
+                    },
+                },
+                lost: {
+                    typeName: "boolean",
+                },
+                miners: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Miner,
+                        nullable: false,
+                    },
+                },
+                money: {
+                    typeName: "int",
+                },
+                name: {
+                    typeName: "string",
+                },
+                opponent: {
+                    typeName: "gameObject",
+                    gameObjectClass: Player,
+                    nullable: false,
+                },
+                reasonLost: {
+                    typeName: "string",
+                },
+                reasonWon: {
+                    typeName: "string",
+                },
+                timeRemaining: {
+                    typeName: "float",
+                },
+                value: {
+                    typeName: "int",
+                },
+                won: {
+                    typeName: "boolean",
+                },
+            },
+            functions: {
+                spawnMiner: {
+                    args: [],
+                    invalidValue: false,
+                    returns: {
+                        typeName: "boolean",
+                    },
+                },
+            },
+        },
+        Tile: {
+            parentClassName: "GameObject",
+            attributes: {
+                bombs: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Bomb,
+                        nullable: false,
+                    },
+                },
+                dirt: {
+                    typeName: "int",
+                },
+                isBase: {
+                    typeName: "boolean",
+                },
+                isFalling: {
+                    typeName: "boolean",
+                },
+                isHopper: {
+                    typeName: "boolean",
+                },
+                isLadder: {
+                    typeName: "boolean",
+                },
+                isSupport: {
+                    typeName: "boolean",
+                },
+                miners: {
+                    typeName: "list",
+                    valueType: {
+                        typeName: "gameObject",
+                        gameObjectClass: Miner,
+                        nullable: false,
+                    },
+                },
+                ore: {
+                    typeName: "int",
+                },
+                owner: {
+                    typeName: "gameObject",
+                    gameObjectClass: Player,
+                    nullable: true,
+                },
+                shielding: {
+                    typeName: "int",
+                },
+                tileEast: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: true,
+                },
+                tileNorth: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: true,
+                },
+                tileSouth: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: true,
+                },
+                tileWest: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: true,
+                },
+                x: {
+                    typeName: "int",
+                },
+                y: {
+                    typeName: "int",
+                },
+            },
+            functions: {},
+        },
+        Upgrade: {
+            parentClassName: "GameObject",
+            attributes: {
+                cargoCapacity: {
+                    typeName: "int",
+                },
+                health: {
+                    typeName: "int",
+                },
+                miningPower: {
+                    typeName: "int",
+                },
+                moves: {
+                    typeName: "int",
+                },
+                title: {
+                    typeName: "string",
+                },
+            },
+            functions: {},
+        },
     },
-    gameVersion: "d9d8a113b95637751dbb349edb0a873d53ebb6df7c375956772b72fba4dff9f3",
+    gameVersion:
+        "3418447660e65ea28b97e2a74d8d95ebd694f36bbb0b6f4bd8d43fc97a3ecd9e",
 });

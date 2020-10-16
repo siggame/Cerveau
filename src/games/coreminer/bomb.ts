@@ -1,41 +1,20 @@
 import { BaseGameObjectRequiredData } from "~/core/game";
-import { BaseClasses, GameObjectConstructorArgs } from "./";
-import { CoreminerGame } from "./game";
-import { CoreminerGameManager } from "./game-manager";
+import { BombConstructorArgs } from "./";
+import { GameObject } from "./game-object";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * An object in the game. The most basic class that all game classes should
- * inherit from automatically.
+ * A Bomb in the game.
  */
-export class GameObject extends BaseClasses.GameObject {
-    /** The game this game object is in. */
-    public readonly game!: CoreminerGame;
-
-    /** The manager of the game that controls this. */
-    public readonly manager!: CoreminerGameManager;
-
+export class Bomb extends GameObject {
     /**
-     * String representing the top level Class that this game object is an
-     * instance of. Used for reflection to create new instances on clients, but
-     * exposed for convenience should AIs want this data.
+     * The number of turns before this Bomb explodes. Zero means it will
+     * explode after the current turn.
      */
-    public readonly gameObjectName!: string;
-
-    /**
-     * A unique id for each instance of a GameObject or a sub class. Used for
-     * client and server communication. Should never change value after being
-     * set.
-     */
-    public readonly id!: string;
-
-    /**
-     * Any strings logged will be stored here. Intended for debugging.
-     */
-    public logs!: string[];
+    public timer!: number;
 
     // <<-- Creer-Merge: attributes -->>
 
@@ -46,14 +25,17 @@ export class GameObject extends BaseClasses.GameObject {
     // <<-- /Creer-Merge: attributes -->>
 
     /**
-     * Called when a GameObject is created.
+     * Called when a Bomb is created.
      *
      * @param args - Initial value(s) to set member variables to.
      * @param required - Data required to initialize this (ignore it).
      */
     constructor(
-        // never directly created by game developers
-        args: GameObjectConstructorArgs,
+        args: BombConstructorArgs<{
+            // <<-- Creer-Merge: constructor-args -->>
+            // You can add more constructor args in here
+            // <<-- /Creer-Merge: constructor-args -->>
+        }>,
         required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);

@@ -1,9 +1,10 @@
-import { IBaseGameObjectRequiredData } from "~/core/game";
+import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
-import { ITileProperties } from "./";
+import { TileConstructorArgs } from "./";
+import { Bomb } from "./bomb";
 import { GameObject } from "./game-object";
+import { Miner } from "./miner";
 import { Player } from "./player";
-import { Unit } from "./unit";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
@@ -14,17 +15,22 @@ import { Unit } from "./unit";
  */
 export class Tile extends GameObject implements BaseTile {
     /**
+     * An array of Bombs on this Tile.
+     */
+    public bombs!: Bomb[];
+
+    /**
      * The amount of dirt on this Tile.
      */
     public dirt!: number;
 
     /**
-     * Whether or not the tile is a base Tile.
+     * Whether or not the Tile is a base Tile.
      */
     public isBase!: boolean;
 
     /**
-     * Whether or not this tile is about to fall.
+     * Whether or not this Tile is about to fall after this turn.
      */
     public isFalling!: boolean;
 
@@ -42,6 +48,11 @@ export class Tile extends GameObject implements BaseTile {
      * Whether or not a support is built on this Tile.
      */
     public isSupport!: boolean;
+
+    /**
+     * An array of the Miners on this Tile.
+     */
+    public miners!: Miner[];
 
     /**
      * The amount of ore on this Tile.
@@ -83,11 +94,6 @@ export class Tile extends GameObject implements BaseTile {
     public readonly tileWest?: Tile;
 
     /**
-     * An array of the Units on this Tile.
-     */
-    public units!: Unit[];
-
-    /**
      * The x (horizontal) position of this Tile.
      */
     public readonly x!: number;
@@ -113,8 +119,8 @@ export class Tile extends GameObject implements BaseTile {
      */
     constructor(
         // never directly created by game developers
-        args: Readonly<ITileProperties>,
-        required: Readonly<IBaseGameObjectRequiredData>,
+        args: TileConstructorArgs,
+        required: Readonly<BaseGameObjectRequiredData>,
     ) {
         super(args, required);
 
@@ -124,6 +130,37 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     // <<-- Creer-Merge: public-functions -->>
+    /**
+     * Helper function to apply gravity to a tile.
+     */
+    public applyGravity(): void {
+        let southTile = this.tileSouth;
+        let toMove = this as Tile;
+        let distance = 0;
+        while (
+            southTile &&
+            (southTile.dirt + southTile.ore <= 0 ||
+                !southTile.isLadder ||
+                !southTile.isSupport)
+        ) {
+            toMove = southTile;
+            southTile = southTile.tileSouth;
+            distance++;
+        }
+
+        if (distance > 0) {
+            toMove.dirt = this.dirt;
+            toMove.ore = this.ore;
+            this.units.forEach((u) => u.takeFallDamage(distance));
+            toMove.units.push(...this.units);
+            this.units = [];
+            this.dirt = 0;
+            this.ore = 0;
+        }
+
+        this.isFalling = false;
+    }
+    // <<-- /Creer-Merge: public-functions -->>
 
     /**
      * Gets the adjacent direction between this Tile and an adjacent Tile
@@ -136,8 +173,10 @@ export class Tile extends GameObject implements BaseTile {
     public getAdjacentDirection(
         adjacentTile: Tile | undefined,
     ): "North" | "South" | "East" | "West" | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getAdjacentDirection.call(this, adjacentTile);
+        return BaseTile.prototype.getAdjacentDirection.call(
+            this,
+            adjacentTile,
+        );
     }
 
     /**
@@ -146,20 +185,22 @@ export class Tile extends GameObject implements BaseTile {
      * @returns An array of all adjacent tiles. Should be between 2 to 4 tiles.
      */
     public getNeighbors(): Tile[] {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.getNeighbors.call(this) as Tile[];
     }
 
     /**
-     * Gets a neighbor in a particular direction
+     * Gets a neighbor in a particular direction.
      *
      * @param direction - The direction you want, must be
      * "North", "East", "South", or "West".
      * @returns The Tile in that direction, or undefined if there is none.
      */
-    public getNeighbor(direction: "North" | "East" | "South" | "West"): Tile | undefined {
-        // tslint:disable-next-line:no-unsafe-any
-        return BaseTile.prototype.getNeighbor.call(this, direction) as Tile | undefined;
+    public getNeighbor(
+        direction: "North" | "East" | "South" | "West",
+    ): Tile | undefined {
+        return BaseTile.prototype.getNeighbor.call(this, direction) as
+            | Tile
+            | undefined;
     }
 
     /**
@@ -169,21 +210,17 @@ export class Tile extends GameObject implements BaseTile {
      * @returns True if neighbor, false otherwise.
      */
     public hasNeighbor(tile: Tile | undefined): boolean {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.hasNeighbor.call(this, tile);
     }
 
     /**
-     * toString override.
+     * Override for `toString` for easier debugging.
      *
      * @returns A string representation of the Tile.
      */
     public toString(): string {
-        // tslint:disable-next-line:no-unsafe-any
         return BaseTile.prototype.toString.call(this);
     }
-
-    // <<-- /Creer-Merge: public-functions -->>
 
     // <<-- Creer-Merge: protected-private-functions -->>
 

@@ -1,10 +1,11 @@
 // This file is where you should put logic to control the game and everything
 // around it.
-import { BaseClasses, CoreminerGame, CoreminerGameObjectFactory, Unit } from "./";
+import { BaseClasses, CoreminerGame, CoreminerGameObjectFactory } from "./";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 import { removeElements } from "~/utils";
+import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -14,7 +15,7 @@ import { removeElements } from "~/utils";
  * together.
  */
 export class CoreminerGameManager extends BaseClasses.GameManager {
-    /** Other strings (case insensitive) that can be used as an ID */
+    /** Other strings (case insensitive) that can be used as an ID. */
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
@@ -23,10 +24,10 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         ];
     }
 
-    /** The game this GameManager is managing */
+    /** The game this GameManager is managing. */
     public readonly game!: CoreminerGame;
 
-    /** The factory that must be used to initialize new game objects */
+    /** The factory that must be used to initialize new game objects. */
     public readonly create!: CoreminerGameObjectFactory;
 
     // <<-- Creer-Merge: public-methods -->>
@@ -55,16 +56,16 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
      */
     protected async afterTurn(): Promise<void> {
         await super.afterTurn();
+
         // <<-- Creer-Merge: after-turn -->>
 
-        this.updateUnits();
+        this.updateArrays(); // clean up dead units
 
-        this.updateGravity();
+        this.updateUnits(); // refresh unit values if necessary
 
-        this.updateHoppers();
+        this.updateGravity(); // falling tiles
 
-        // clean up dead units
-        this.updateArrays();
+        this.updateHoppers(); // extend hoppers
         // <<-- /Creer-Merge: after-turn -->>
     }
 
@@ -80,17 +81,27 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         super.primaryWinConditionsCheck();
 
         // <<-- Creer-Merge: primary-win-conditions -->>
-        const winners = this.game.players.filter((player) => player.value >= this.game.victoryAmount);
+        const winners = this.game.players.filter(
+            (player) => player.value >= this.game.victoryAmount,
+        );
 
         if (winners.length === this.game.players.length) {
-            this.secondaryWinConditions("Both players qualified for a promotion!");
+            this.secondaryWinConditions(
+                "Both players qualified for a promotion!",
+            );
 
             return true;
         }
 
         if (winners.length === 1) {
-            this.declareWinner("Your performance has earned you a promotion!", winners[0]);
-            this.declareLoser("Your opponent has earned a promotion.", winners[0].opponent);
+            this.declareWinner(
+                "Your performance has earned you a promotion!",
+                winners[0],
+            );
+            this.declareLoser(
+                "Your opponent has earned a promotion.",
+                winners[0].opponent,
+            );
 
             return true;
         }
@@ -103,15 +114,23 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
      * Called when the game needs to end, but primary game ending conditions
      * are not met (like max turns reached). Use this to check for secondary
      * game win conditions to crown a winner.
-     * @param reason The reason why a secondary victory condition is happening
+     *
+     * @param reason - The reason why a secondary victory condition is
+     * happening.
      */
     protected secondaryWinConditions(reason: string): void {
         // <<-- Creer-Merge: secondary-win-conditions -->>
         const winners = this.game.players.sort((a, b) => b.value - a.value);
 
         if (winners[0].value !== winners[1].value) {
-            this.declareWinner(`${reason}: You were more valuable to the company.`, winners[0]);
-            this.declareLoser(`${reason}: Your opponent was more valuable to the company.`, winners[1]);
+            this.declareWinner(
+                `${reason}: You were more valuable to the company.`,
+                winners[0],
+            );
+            this.declareLoser(
+                `${reason}: Your opponent was more valuable to the company.`,
+                winners[1],
+            );
 
             return;
         }
@@ -126,10 +145,12 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     // any additional protected/private methods you need can be added here
 
-    /** Updates all arrays in the game with new/dead game objects */
+    /** Updates all arrays in the game with new/dead game objects. */
     private updateArrays(): void {
         // Properly remove all killed units
-        const deadUnits = this.game.units.filter((u) => !u.tile || u.health <= 0);
+        const deadUnits = this.game.units.filter(
+            (u) => !u.tile || u.health <= 0,
+        );
 
         // remove dead units from all player's units list
         for (const player of this.game.players) {
@@ -137,7 +158,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
         // and remove them from the game
         removeElements(this.game.units, ...deadUnits);
-         // mark them dead
+        // mark them dead
         for (const unit of deadUnits) {
             if (unit.tile) {
                 removeElements(unit.tile.units, unit);
@@ -146,7 +167,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates all units */
+    /** Updates all units. */
     private updateUnits(): void {
         const bombsToUpdate = [];
         for (const unit of this.game.units) {
@@ -164,8 +185,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                 if (unit.tile && unit.tile.owner === unit.owner) {
                     unit.health = unit.maxHealth;
                 }
-            }
-            else if (unit.job.title === this.game.jobs[1].title) {
+            } else if (unit.job.title === this.game.jobs[1].title) {
                 if (unit.owner === this.game.currentPlayer.opponent) {
                     bombsToUpdate.push(unit);
                 }
@@ -178,8 +198,9 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Explodes bombs
-     * @param bombs The bombs to blow up.
+    /** Explodes bombs.
+     *
+     * @param bombs - The bombs to blow up.
      */
     private updateBombs(bombs: Unit[]): void {
         let bombsToUpdate: Unit[] = [];
@@ -202,11 +223,16 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             // Shockwave on bombed tile does double damage
             for (const bystander of bomb.tile.units) {
                 if (bystander.job.title === this.game.jobs[0].title) {
-                    bystander.health = Math.max(0, bystander.health - (dmg * 2));
-                }
-                else if (bystander !== bomb && bystander.job.title === this.game.jobs[1].title) {
+                    bystander.health = Math.max(0, bystander.health - dmg * 2);
+                } else if (
+                    bystander !== bomb &&
+                    bystander.job.title === this.game.jobs[1].title
+                ) {
                     // Chain reaction explosion
-                    if (bombs.indexOf(bystander) >= 0 && bombsToUpdate.indexOf(bystander) >= 0) {
+                    if (
+                        bombs.indexOf(bystander) >= 0 &&
+                        bombsToUpdate.indexOf(bystander) >= 0
+                    ) {
                         bombsToUpdate.push(bystander);
                     }
                 }
@@ -222,86 +248,119 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                     let shockTile = tile;
                     while (shockTile.dirt + shockTile.ore <= 0) {
                         for (const bystander of shockTile.units) {
-                            if (bystander.job.title === this.game.jobs[0].title) {
-                                bystander.health = Math.max(0, bystander.health - (dmg * 2));
-                            }
-                            else if (bystander !== bomb && bystander.job.title === this.game.jobs[1].title) {
+                            if (
+                                bystander.job.title === this.game.jobs[0].title
+                            ) {
+                                bystander.health = Math.max(
+                                    0,
+                                    bystander.health - dmg * 2,
+                                );
+                            } else if (
+                                bystander !== bomb &&
+                                bystander.job.title === this.game.jobs[1].title
+                            ) {
                                 // Chain reaction explosion
-                                if (bombs.indexOf(bystander) >= 0 && bombsToUpdate.indexOf(bystander) >= 0) {
+                                if (
+                                    bombs.indexOf(bystander) >= 0 &&
+                                    bombsToUpdate.indexOf(bystander) >= 0
+                                ) {
                                     bombsToUpdate.push(bystander);
                                 }
                             }
                         }
                         if (shockTile.tileNorth) {
                             shockTile = shockTile.tileNorth;
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }
-                }
-                else if (tile === bomb.tile.tileEast) {
+                } else if (tile === bomb.tile.tileEast) {
                     let shockTile = tile;
                     while (shockTile.dirt + shockTile.ore <= 0) {
                         for (const bystander of shockTile.units) {
-                            if (bystander.job.title === this.game.jobs[0].title) {
-                                bystander.health = Math.max(0, bystander.health - (dmg * 2));
-                            }
-                            else if (bystander !== bomb && bystander.job.title === this.game.jobs[1].title) {
+                            if (
+                                bystander.job.title === this.game.jobs[0].title
+                            ) {
+                                bystander.health = Math.max(
+                                    0,
+                                    bystander.health - dmg * 2,
+                                );
+                            } else if (
+                                bystander !== bomb &&
+                                bystander.job.title === this.game.jobs[1].title
+                            ) {
                                 // Chain reaction explosion
-                                if (bombs.indexOf(bystander) >= 0 && bombsToUpdate.indexOf(bystander) >= 0) {
+                                if (
+                                    bombs.indexOf(bystander) >= 0 &&
+                                    bombsToUpdate.indexOf(bystander) >= 0
+                                ) {
                                     bombsToUpdate.push(bystander);
                                 }
                             }
                         }
                         if (shockTile.tileEast) {
                             shockTile = shockTile.tileEast;
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }
-                }
-                else if (tile === bomb.tile.tileSouth) {
+                } else if (tile === bomb.tile.tileSouth) {
                     let shockTile = tile;
                     while (shockTile.dirt + shockTile.ore <= 0) {
                         for (const bystander of shockTile.units) {
-                            if (bystander.job.title === this.game.jobs[0].title) {
-                                bystander.health = Math.max(0, bystander.health - (dmg * 2));
-                            }
-                            else if (bystander !== bomb && bystander.job.title === this.game.jobs[1].title) {
+                            if (
+                                bystander.job.title === this.game.jobs[0].title
+                            ) {
+                                bystander.health = Math.max(
+                                    0,
+                                    bystander.health - dmg * 2,
+                                );
+                            } else if (
+                                bystander !== bomb &&
+                                bystander.job.title === this.game.jobs[1].title
+                            ) {
                                 // Chain reaction explosion
-                                if (bombs.indexOf(bystander) >= 0 && bombsToUpdate.indexOf(bystander) >= 0) {
+                                if (
+                                    bombs.indexOf(bystander) >= 0 &&
+                                    bombsToUpdate.indexOf(bystander) >= 0
+                                ) {
                                     bombsToUpdate.push(bystander);
                                 }
                             }
                         }
                         if (shockTile.tileSouth) {
                             shockTile = shockTile.tileSouth;
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }
-                }
-                else if (tile === bomb.tile.tileWest) {
+                } else if (tile === bomb.tile.tileWest) {
                     let shockTile = tile;
                     while (shockTile.dirt + shockTile.ore <= 0) {
                         for (const bystander of shockTile.units) {
-                            if (bystander.job.title === this.game.jobs[0].title) {
-                                bystander.health = Math.max(0, bystander.health - (dmg * 2));
-                            }
-                            else if (bystander !== bomb && bystander.job.title === this.game.jobs[1].title) {
+                            if (
+                                bystander.job.title === this.game.jobs[0].title
+                            ) {
+                                bystander.health = Math.max(
+                                    0,
+                                    bystander.health - dmg * 2,
+                                );
+                            } else if (
+                                bystander !== bomb &&
+                                bystander.job.title === this.game.jobs[1].title
+                            ) {
                                 // Chain reaction explosion
-                                if (bombs.indexOf(bystander) >= 0 && bombsToUpdate.indexOf(bystander) >= 0) {
+                                if (
+                                    bombs.indexOf(bystander) >= 0 &&
+                                    bombsToUpdate.indexOf(bystander) >= 0
+                                ) {
                                     bombsToUpdate.push(bystander);
                                 }
                             }
                         }
                         if (shockTile.tileWest) {
                             shockTile = shockTile.tileWest;
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }
@@ -316,28 +375,37 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates all falling tiles */
+    /** Updates all falling tiles. */
     private updateGravity(): void {
         while (this.game.fallingTiles.length > 0) {
-            const tile = this.game.fallingTiles[this.game.fallingTiles.length - 1];
+            const tile = this.game.fallingTiles[
+                this.game.fallingTiles.length - 1
+            ];
             if (tile.tileSouth) {
                 let willFall = true;
                 // Supports prevent falling
                 if (tile.tileSouth.isSupport) {
                     willFall = false;
-                }
-                else if (tile.tileSouth.tileEast && tile.tileSouth.tileEast.isSupport) {
+                } else if (
+                    tile.tileSouth.tileEast &&
+                    tile.tileSouth.tileEast.isSupport
+                ) {
                     willFall = false;
-                }
-                else if (tile.tileSouth.tileWest && tile.tileSouth.tileWest.isSupport) {
+                } else if (
+                    tile.tileSouth.tileWest &&
+                    tile.tileSouth.tileWest.isSupport
+                ) {
                     willFall = false;
                 }
 
                 if (willFall) {
                     // Fall logic
                     let curTile = tile;
-                    while (curTile.tileSouth && !curTile.tileSouth.isSupport &&
-                        curTile.tileSouth.dirt + curTile.tileSouth.ore <= 0) {
+                    while (
+                        curTile.tileSouth &&
+                        !curTile.tileSouth.isSupport &&
+                        curTile.tileSouth.dirt + curTile.tileSouth.ore <= 0
+                    ) {
                         curTile.tileSouth.ore = curTile.ore;
                         curTile.tileSouth.dirt = curTile.dirt;
                         curTile.ore = 0;
@@ -351,7 +419,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
     }
 
-    /** Updates all hopper extensions */
+    /** Updates all hopper extensions. */
     private updateHoppers(): void {
         const currPlayer = this.game.currentPlayer;
         if (currPlayer.hopperTiles.length === 0) {
@@ -363,19 +431,21 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             }
             if (nextHopperPos.dirt === 0 && nextHopperPos.ore === 0) {
                 nextHopperPos.isHopper = true;
+                nextHopperPos.owner = currPlayer;
                 currPlayer.hopperTiles.push(nextHopperPos);
             }
         }
 
         if (currPlayer.hopperTiles.length > 0) {
             // try to extend hoppers
-            let nextHopperPos = currPlayer.hopperTiles[currPlayer.hopperTiles.length - 1].tileSouth;
+            let nextHopperPos =
+                currPlayer.hopperTiles[currPlayer.hopperTiles.length - 1]
+                    .tileSouth;
             while (nextHopperPos !== undefined) {
                 if (nextHopperPos.ore === 0 && nextHopperPos.dirt === 0) {
                     nextHopperPos.isHopper = true;
                     nextHopperPos = nextHopperPos.tileSouth;
-                }
-                else {
+                } else {
                     return;
                 }
             }
