@@ -103,7 +103,7 @@ export class Warehouse extends Building {
     /**
      * Bribes the Warehouse to light a Building on fire. This adds this
      * building's fireAdded to their fire, and then this building's exposure is
-     * increased based on the Manhatten distance between the two buildings.
+     * increased based on the Manhattan distance between the two buildings.
      *
      * @param player - The player that called this.
      * @param building - The Building you want to light on fire.

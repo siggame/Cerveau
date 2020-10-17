@@ -50,7 +50,7 @@ export class Unit extends GameObject {
     public genarium!: number;
 
     /**
-     * Tracks wheither or not the ship is dashing or Mining. If true, it cannot
+     * Tracks whether or not the ship is dashing or Mining. If true, it cannot
      * do anything else.
      */
     public isBusy!: boolean;
@@ -94,7 +94,7 @@ export class Unit extends GameObject {
     public rarium!: number;
 
     /**
-     * The sheild that a martyr ship has.
+     * The shield that a martyr ship has.
      */
     public shield!: number;
 

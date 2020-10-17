@@ -302,7 +302,7 @@ export interface UnitProperties {
     acted?: boolean;
 
     /**
-     * The amount of energy this Unit has (from 0 to 100).
+     * The amount of energy this Unit has (from 0.0 to 100.0).
      */
     energy?: number;
 

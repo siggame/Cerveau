@@ -61,7 +61,7 @@ export class Spiderling extends Spider {
 
     /**
      * How much work needs to be done for this Spiderling to finish being busy.
-     * See docs for the Work forumla.
+     * See docs for the Work formula.
      */
     public workRemaining!: number;
 
