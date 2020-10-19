@@ -56,7 +56,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             fallDamage: {
                 description: "The amount of damage taken per Tile fallen.",
                 // <<-- Creer-Merge: fallDamage -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: fallDamage -->>
             },
 
@@ -65,7 +65,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of extra damage taken for falling while " +
                     "carrying a large amount of cargo.",
                 // <<-- Creer-Merge: fallWeightDamage -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: fallWeightDamage -->>
             },
 
@@ -84,14 +84,15 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of mining power needed to remove a ladder " +
                     "from a Tile.",
                 // <<-- Creer-Merge: ladderHealth -->>
-                default: 0,
+                default: 10,
+                min: 1,
                 // <<-- /Creer-Merge: ladderHealth -->>
             },
 
             largeCargoSize: {
                 description: "The amount deemed as a large amount of cargo.",
                 // <<-- Creer-Merge: largeCargoSize -->>
-                default: 0,
+                default: 100,
                 // <<-- /Creer-Merge: largeCargoSize -->>
             },
 
@@ -99,7 +100,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description:
                     "The amount deemed as a large amount of material.",
                 // <<-- Creer-Merge: largeMaterialSize -->>
-                default: 0,
+                default: 100,
                 // <<-- /Creer-Merge: largeMaterialSize -->>
             },
 
@@ -107,14 +108,14 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 description:
                     "The maximum amount of shielding possible on a Tile.",
                 // <<-- Creer-Merge: maxShielding -->>
-                default: 0,
+                default: 2,
                 // <<-- /Creer-Merge: maxShielding -->>
             },
 
             maxUpgradeLevel: {
                 description: "The highest upgrade level allowed on a Miner.",
                 // <<-- Creer-Merge: maxUpgradeLevel -->>
-                default: 0,
+                default: 3,
                 // <<-- /Creer-Merge: maxUpgradeLevel -->>
             },
 
@@ -124,6 +125,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "base and sold.",
                 // <<-- Creer-Merge: orePrice -->>
                 default: 5,
+                min: 1,
                 // <<-- /Creer-Merge: orePrice -->>
             },
 
@@ -152,14 +154,15 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of mining power needed to remove one unit " +
                     "of shielding off a Tile.",
                 // <<-- Creer-Merge: shieldHealth -->>
-                default: 0,
+                default: 10,
+                min: 1,
                 // <<-- /Creer-Merge: shieldHealth -->>
             },
 
             spawnPrice: {
                 description: "The monetary price of spawning a Miner.",
                 // <<-- Creer-Merge: spawnPrice -->>
-                default: 200,
+                default: 0,
                 // <<-- /Creer-Merge: spawnPrice -->>
             },
 
@@ -168,7 +171,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of damage taken when suffocating inside a " +
                     "filled Tile.",
                 // <<-- Creer-Merge: suffocationDamage -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: suffocationDamage -->>
             },
 
@@ -177,7 +180,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of extra damage taken for suffocating under" +
                     " a large amount of material.",
                 // <<-- Creer-Merge: suffocationWeightDamage -->>
-                default: 0,
+                default: 5,
                 // <<-- /Creer-Merge: suffocationWeightDamage -->>
             },
 
@@ -196,7 +199,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of mining power needed to remove a support " +
                     "from a Tile.",
                 // <<-- Creer-Merge: supportHealth -->>
-                default: 0,
+                default: 10,
                 // <<-- /Creer-Merge: supportHealth -->>
             },
 
@@ -217,6 +220,15 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
 
             // <<-- Creer-Merge: schema -->>
+
+            // you can add more settings here, e.g.:
+            /*
+            someVariableLikeUnitHealth: {
+                description: "Describe what this does for the players.",
+                default: 1337,
+                min: 1,
+            },
+            */
 
             // <<-- /Creer-Merge: schema -->>
 

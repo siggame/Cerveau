@@ -35,7 +35,7 @@ export class Miner extends GameObject {
     /**
      * The Upgrade this Miner is on.
      */
-    public currentUpgrade: Upgrade;
+    public currentUpgrade!: Upgrade;
 
     /**
      * The amount of dirt carried by this Miner.
@@ -65,7 +65,7 @@ export class Miner extends GameObject {
     /**
      * The Player that owns and can control this Miner.
      */
-    public readonly owner: Player;
+    public readonly owner!: Player;
 
     /**
      * The Tile this Miner is on.
@@ -112,6 +112,29 @@ export class Miner extends GameObject {
     // NOTE: Client AIs cannot call these functions, those must be defined
     // in the creer file.
 
+    /**
+     * Function to add damage to a miner that has fallen x distance.
+     *
+     * @param distance - The distance the miner has fallen.
+     */
+    public takeFallDamage(distance: number): void {
+        this.health -= Math.min(this.health, distance - this.upgradeLevel + 1);
+    }
+
+    /**
+     * Simple helper function to get the amount of cargo.
+     *
+     * @returns The amount of cargo.
+     */
+    public getCargoAmount(): number {
+        return (
+            this.dirt +
+            this.ore +
+            this.buildingMaterials +
+            (this.bombs * this.game.bombSize)
+        );
+    }
+
     // <<-- /Creer-Merge: public-functions -->>
 
     /**
@@ -132,13 +155,75 @@ export class Miner extends GameObject {
         type: "support" | "ladder" | "shield",
     ): void | string | MinerBuildArgs {
         // <<-- Creer-Merge: invalidate-build -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for build here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        if (!this.tile) {
+            return `${this} is lost in the mines! Their tile is undefined!`;
+        }
 
+        if (tile.isBase) {
+            return "You cannot build on a base.";
+        }
+
+        if (tile.isHopper) {
+            return "You cannot build on a hopper.";
+        }
+
+        if (tile.isSupport) {
+            return "You cannot build on a support.";
+        }
+
+        if (tile.isLadder) {
+            return "You cannot build on a ladder.";
+        }
+
+        if (tile.dirt + tile.ore > 0 && type !== "shield") {
+            return "You cannot build on a filled tile unless you are building a shield!";
+        }
+
+        // Tile must be adjacent to or the same as the tile the miner is on
+        if (
+            tile !== this.tile.tileEast &&
+            tile !== this.tile.tileNorth &&
+            tile !== this.tile.tileWest &&
+            tile !== this.tile.tileSouth &&
+            tile !== this.tile
+        ) {
+            return "That tile is too far away to be built on.";
+        }
+        switch (type) {
+            case "support":
+                if (this.buildingMaterials < this.game.supportCost) {
+                    return "You don't have enough building materials to build a support";
+                }
+                break;
+
+            case "ladder":
+                if (this.buildingMaterials < this.game.ladderCost) {
+                    return "You don't have enough building materials to build a ladder";
+                }
+                break;
+
+            case "shield":
+                if (tile.dirt + tile.ore === 0) {
+                    return "You can't build a shield on an empty tile.";
+                }
+
+                if (tile.shielding === 2) {
+                    return "This tile already has full shield.";
+                }
+
+                if (this.buildingMaterials < this.game.shieldCost) {
+                    return "You don't have enough building materials to build a shield";
+                }
+                break;
+
+            default:
+                return "Invalid build type.";
+        }
         // <<-- /Creer-Merge: invalidate-build -->>
     }
 
@@ -157,12 +242,23 @@ export class Miner extends GameObject {
         type: "support" | "ladder" | "shield",
     ): Promise<boolean> {
         // <<-- Creer-Merge: build -->>
+        switch (type) {
+            case "support":
+                tile.isSupport = true;
+                this.buildingMaterials -= this.game.supportCost;
+                break;
 
-        // Add logic here for build.
+            case "ladder":
+                tile.isLadder = true;
+                this.buildingMaterials -= this.game.ladderCost;
+                break;
 
-        // TODO: replace this with actual logic
-        return false;
+            case "shield":
+                tile.shielding = 2;
+                this.buildingMaterials -= this.game.shieldCost;
+        }
 
+        return true;
         // <<-- /Creer-Merge: build -->>
     }
 
@@ -185,13 +281,70 @@ export class Miner extends GameObject {
         amount: number,
     ): void | string | MinerBuyArgs {
         // <<-- Creer-Merge: invalidate-buy -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for buy here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        if (!this.tile) {
+            return `This miner is not on a tile!`;
+        }
 
+        if (
+            this.tile.getNeighbors().indexOf(player.baseTile) === -1 &&
+            this.tile !== player.baseTile
+        ) {
+            if (
+                !(this.tile.tileNorth && this.tile.tileNorth.isHopper) &&
+                !(this.tile.tileEast && this.tile.tileEast.isHopper) &&
+                !(this.tile.tileSouth && this.tile.tileSouth.isHopper) &&
+                !(this.tile.tileWest && this.tile.tileWest.isHopper) &&
+                !this.tile.isHopper
+            ) {
+                return `A miner cannot buy unless it is near an allied hopper or base!`;
+            }
+        }
+        if (amount <= 0) {
+            return `${this} doesn't know how to buy negative amounts!`;
+        }
+
+        const cargo =
+            this.ore +
+            this.dirt +
+            this.bombs * this.game.bombSize +
+            this.buildingMaterials;
+
+        switch (resource) {
+            case "dirt":
+                if (player.money < amount * this.game.dirtPrice) {
+                    return `You cannot afford that much dirt!`;
+                }
+                if (cargo + amount > this.currentUpgrade.cargoCapacity) {
+                    return `This miner cannot hold that much extra dirt!`;
+                }
+                break;
+            case "ore":
+                return `You're supposed to be mining ore, not buying it! Get back to work!`;
+                break;
+            case "bomb":
+                if (player.money < amount * this.game.bombPrice) {
+                    return `You cannot afford that many bombs!`;
+                }
+                if (
+                    cargo + amount * this.game.bombSize >
+                    this.currentUpgrade.cargoCapacity
+                ) {
+                    return `This miner cannot hold that many bombs!`;
+                }
+                break;
+            case "buildingMaterials":
+                if (player.money < amount * this.game.buildingMaterialPrice) {
+                    return `You cannot afford that many building materials!`;
+                }
+                if (cargo + amount > this.currentUpgrade.cargoCapacity) {
+                    return `This miner cannot hold that many additional building materials!`;
+                }
+        }
         // <<-- /Creer-Merge: invalidate-buy -->>
     }
 
@@ -210,12 +363,23 @@ export class Miner extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: buy -->>
+        switch (resource) {
+            case "dirt":
+                this.dirt += amount;
+                player.money -= amount * this.game.dirtPrice;
+                break;
+            case "ore":
+                return false;
+            case "bomb":
+                this.bombs += amount;
+                player.money -= amount * this.game.bombPrice;
+                break;
+            case "buildingMaterials":
+                this.buildingMaterials += amount;
+                player.money -= amount * this.game.buildingMaterialPrice;
+        }
 
-        // Add logic here for buy.
-
-        // TODO: replace this with actual logic
-        return false;
-
+        return true;
         // <<-- /Creer-Merge: buy -->>
     }
 
@@ -241,13 +405,65 @@ export class Miner extends GameObject {
         amount: number,
     ): void | string | MinerDumpArgs {
         // <<-- Creer-Merge: invalidate-dump -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for dump here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        // Make sure the miner is on a tile.
+        if (!this.tile) {
+            return `${this} is not on a tile.`;
+        }
 
+        // Checks if the tile is a ladder
+        if (
+            this.tile.isLadder &&
+            (material === `dirt` || material === `ore`)
+        ) {
+            return `You cannot dump dirt or ore onto a ladder tile.`;
+        }
+
+        // Checks if the tile is a support
+        if (
+            this.tile.isSupport &&
+            (material === `dirt` || material === `ore`)
+        ) {
+            return `You cannot dump dirt or ore onto a support tile.`;
+        }
+
+        // Checks if tile is falling.
+        if (
+            this.tile.isFalling &&
+            (material === `dirt` || material === `ore`)
+        ) {
+            return `This tile is falling, you have bigger things to worry about than dumping dirt or ore.`;
+        }
+
+        // Checks if you have negative dirt.
+        if (material === `dirt` && this.dirt < 0) {
+            return "You have negative dirt. This should not happen. Contact devs.";
+        }
+
+        // Checks if you have dirt to dump
+        if (material === `dirt` && this.dirt === 0) {
+            return "You have no dirt to dump.";
+        }
+
+        if (material === `bomb` && this.bombs === 0) {
+            return `You have no bombs to dump.`;
+        }
+
+        if (material === `bomb` && this.bombs < 0) {
+            return `You have negative bombs. This should not happen. Contact devs.`;
+        }
+
+        if (material === `ore` && this.ore === 0) {
+            return `You have no ore to dump.`;
+        }
+
+        if (material === `ore` && this.ore < 0) {
+            return `You have negative ore. This should not happen. Contact devs.`;
+        }
         // <<-- /Creer-Merge: invalidate-dump -->>
     }
 
@@ -270,12 +486,68 @@ export class Miner extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: dump -->>
+        let trueAmount = amount;
+        if ((tile.isHopper || tile.isBase) && material === `ore`) {
+            if (amount <= 0) {
+                trueAmount = this.ore;
+            }
+            player.money += trueAmount * this.game.oreValue;
+            player.value += trueAmount;
+            this.ore -= trueAmount;
+        } else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
+            if (amount <= 0) {
+                trueAmount = this.dirt;
+            }
+            player.money += trueAmount;
+            // Dirt grants no value
+            this.dirt -= trueAmount;
+        } else if ((tile.isHopper || tile.isBase) && material === `bomb`) {
+            if (amount <= 0) {
+                trueAmount = this.bombs;
+            }
+            player.money += amount * this.game.bombPrice; // sell bombs at sale price
+            this.bombs -= trueAmount;
+        } else {
+            // Not dumping into base/hopper
+            if (material === `dirt`) {
+                if (amount <= 0) {
+                    trueAmount = this.dirt;
+                }
+                tile.dirt += trueAmount;
+                this.dirt -= trueAmount;
+            }
 
-        // Add logic here for dump.
+            if (material === `ore`) {
+                if (amount <= 0) {
+                    trueAmount = this.ore;
+                }
+                tile.ore += trueAmount;
+                this.ore -= trueAmount;
+            }
 
-        // TODO: replace this with actual logic
-        return false;
+            if (material === `bomb`) {
+                if (amount <= 0) {
+                    trueAmount = this.bombs;
+                }
+                for (let i = 0; i < trueAmount; i++) {
+                    const bomb = this.game.manager.create.bomb({
+                        timer: 1,
+                        tile,
+                    });
+                    this.game.bombs.push(bomb);
+                    player.bombs.push(bomb);
+                    tile.bombs.push(bomb);
+                }
+                this.bombs -= trueAmount;
+            }
+        }
 
+        // If tile below exists and doesn't have resources, may need to fall, flag for falling
+        if (tile.tileSouth && tile.tileSouth.dirt + tile.tileSouth.ore <= 0) {
+            tile.isFalling = true;
+        }
+
+        return true;
         // <<-- /Creer-Merge: dump -->>
     }
 
@@ -298,13 +570,64 @@ export class Miner extends GameObject {
         amount: number,
     ): void | string | MinerMineArgs {
         // <<-- Creer-Merge: invalidate-mine -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for mine here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        // Making this assumption as nothing was in there previously about it
+        if (tile.isHopper) {
+            return "A miner can't mine a hopper";
+        }
 
+        if (this.miningPower === 0) {
+            return `${this} is out of mining power`;
+        }
+
+        const settings = this.game.settings;
+        // get the total used space of the miner
+        const cargo = this.getCargoAmount();
+        // get the amount to mine if mining
+        let toMine = Math.min(amount, tile.dirt + tile.ore);
+        // if given <= 0 amount set to max possible mining
+        if (amount <= 0) {
+            // limited by amount on the tile and what we can hold.
+            toMine = Math.min(
+                tile.dirt + tile.ore,
+                this.currentUpgrade.cargoCapacity - cargo,
+            );
+            // once we know how much we can pick up, we need to check to see how much power is left
+            if (
+                toMine + tile.shielding * settings.shieldCost >
+                this.miningPower
+            ) {
+                // we can only mine what we have power to do, since they may be shielded
+                // need to take the power to take out shield from total (makes it so cargo check later doesn't fail)
+                // we also don't want the shield cost to be counted twice with the mining cost
+                toMine =
+                    this.miningPower - tile.shielding * settings.shieldCost;
+            }
+        }
+        // get mining cost
+        const miningCost =
+            toMine +
+            Number(tile.isLadder) * settings.ladderCost +
+            Number(tile.isSupport) * settings.supportCost +
+            tile.shielding * settings.shieldCost;
+
+        // if mining ladder or support, this should just be ladderCost/supportCost + shield since
+        // there shouldn't be any materials on them
+        if (miningCost > this.miningPower) {
+            return `${this} doesn't have enough mining power`;
+        }
+        if (this.currentUpgrade.cargoCapacity - cargo < toMine) {
+            // take consideration that they are not trying to mine resources but appliances.
+            // still shouldn't get to this point since a Ladders and Supports should be empty
+            // tiles anyways and >=0 is never < 0
+            if (!tile.isLadder && !tile.isSupport) {
+                return `${this} doesn't have enough cargo space to hold materials`;
+            }
+        }
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
 
@@ -323,12 +646,85 @@ export class Miner extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: mine -->>
+        const settings = this.game.settings;
 
-        // Add logic here for mine.
+        // get the amount to mine if mining
+        let toMine = Math.min(amount, tile.dirt + tile.ore);
+        // if given <= 0 amount set to max possible mining
+        if (amount <= 0) {
+            toMine = tile.dirt + tile.ore;
+            if (
+                toMine + tile.shielding * settings.shieldCost >
+                this.miningPower
+            ) {
+                toMine =
+                    this.miningPower - tile.shielding * settings.shieldCost;
+            }
+        }
+        // get mining cost
+        const miningCost =
+            toMine +
+            Number(tile.isLadder) * settings.ladderCost +
+            Number(tile.isSupport) * settings.supportCost +
+            tile.shielding * settings.shieldCost;
 
-        // TODO: replace this with actual logic
-        return false;
+        this.miningPower -= miningCost;
 
+        if (tile.isLadder) {
+            tile.isLadder = false;
+        }
+
+        if (tile.isSupport) {
+            tile.isSupport = false;
+        }
+
+        if (tile.shielding > 0) {
+            // subtract whatever we can take away, or the whole shield
+            // this may be unwanted behavior, but if user tries to mine a filled block with a shield
+            // and used <= 0 for amount, we still express success if they only had enough mining power
+            // to break/damage the shield.
+            tile.shielding -= Math.min(miningCost, tile.shielding);
+        }
+
+        // mine ore and dirt, written so easily swapped
+        // mine ore if there is ore to mine
+        if (toMine > 0 && tile.ore > 0) {
+            const mined = Math.min(tile.ore, toMine);
+            tile.ore -= mined;
+            this.ore += mined;
+            toMine -= mined;
+        }
+
+        // then mine dirt if there is dirt to mine
+        if (toMine > 0 && tile.dirt > 0) {
+            const mined = Math.min(tile.dirt, toMine);
+            tile.dirt -= mined;
+            this.dirt += mined;
+            toMine -= mined;
+        }
+
+        // set tiles that are falling
+        if (tile.ore + tile.dirt <= 0) {
+            let upward = tile.tileNorth;
+            // making the assumption that ladders and supports don't fall. if they do then extra
+            // logic needs to be in place for supports.
+            while (
+                upward &&
+                upward.dirt + upward.ore <= 0 &&
+                !upward.isLadder &&
+                !upward.isSupport
+            ) {
+                upward.isFalling = true;
+                upward = upward.tileNorth;
+            }
+        }
+        // if we mined the one that miners were standing on, calculate new location
+        if (tile.tileNorth && (tile.tileNorth.miners.length > 0 || tile.tileNorth.bombs.length > 0)) {
+            // call helper function that will handle falling of the miners.
+            tile.applyGravity();
+        }
+
+        return true;
         // <<-- /Creer-Merge: mine -->>
     }
 
@@ -348,13 +744,42 @@ export class Miner extends GameObject {
         tile: Tile,
     ): void | string | MinerMoveArgs {
         // <<-- Creer-Merge: invalidate-move -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for move here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        if (!tile) {
+            return `${this} cannot move to an uncharted part of the planet! Target tile does not exist!`;
+        }
 
+        if (!this.tile) {
+            return `This miner is not on a tile!`;
+        }
+
+        if (tile.dirt + tile.ore > 0) {
+            return `This miner cannot enter a filled tile!`;
+        }
+
+        if (this.moves <= 0) {
+            return `${this} is out of fuel, and must fabricate more! It cannot move any more this turn!`;
+        }
+
+        if (this.tile.getNeighbors().indexOf(tile) === -1) {
+            return `${this} cannot teleport yet! This miner can only move to adjacent tiles.`;
+        }
+
+        if (this.tile === tile) {
+            return `${this} is already on the tile it is trying to move to!`;
+        }
+
+        if (this.tile.dirt + this.tile.ore > 0) {
+            return `${this} is buried in ${this.tile}! This miner is stuck, and must dig itself out.`;
+        }
+
+        if (tile === this.tile.tileNorth && !this.tile.isLadder) {
+            return `${this} cannot fly! This miner needs a ladder!`;
+        }
         // <<-- /Creer-Merge: invalidate-move -->>
     }
 
@@ -367,12 +792,31 @@ export class Miner extends GameObject {
      */
     protected async move(player: Player, tile: Tile): Promise<boolean> {
         // <<-- Creer-Merge: move -->>
+        if (!this.tile) {
+            throw new Error(`${this} has no Tile to move from!`);
+        }
+        this.tile.miners = this.tile.miners.filter((m) => m !== this);
+        this.tile = tile;
+        tile.miners.push(this);
+        this.moves -= 1;
 
-        // Add logic here for move.
+        // Fall logic
+        let distance = 0;
+        while (
+            this.tile.tileSouth !== undefined &&
+            this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
+            !this.tile.tileSouth.isLadder
+        ) {
+            this.tile.miners = this.tile.miners.filter((u) => u !== this);
+            this.tile = this.tile.tileSouth;
+            this.tile.miners.push(this);
+            distance++;
+        }
 
-        // TODO: replace this with actual logic
-        return false;
+        // Calculate damage
+        this.takeFallDamage(distance);
 
+        return true;
         // <<-- /Creer-Merge: move -->>
     }
 
@@ -397,13 +841,59 @@ export class Miner extends GameObject {
         amount: number,
     ): void | string | MinerTransferArgs {
         // <<-- Creer-Merge: invalidate-transfer -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for transfer here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        const otherMiner = this.invalidateGeneralMinerMethod(player);
+        if (otherMiner) {
+            return otherMiner;
+        }
+        // this outer if is a redundant check but TS is complaining
+        // and overriding it is forbidden in the linter rules
+        if (this.tile && miner.tile) {
+            if (this.tile?.getNeighbors().indexOf(miner.tile) === -1) {
+                return `The target: ${miner} is not adjacent to ${this}!`;
+            }
+        }
 
+        let actualAmount;
+        switch (resource) {
+            case "dirt":
+                if (this.dirt < amount) {
+                    return `${this} cannot transfer more dirt than they have!`;
+                }
+                actualAmount = amount <= 0 ? this.dirt : amount;
+                break;
+            case "ore":
+                if (this.ore < amount) {
+                    return `${this} cannot transfer more ore than they have!`;
+                }
+                actualAmount = amount <= 0 ? this.ore : amount;
+                break;
+            case "bomb":
+                if (this.bombs < amount) {
+                    return `${this} cannot transfer more bombs than they have!`;
+                }
+                actualAmount = amount <= 0 ? this.bombs : amount;
+                break;
+            case "buildingMaterials":
+                if (this.buildingMaterials < amount) {
+                    return `${this} cannot transfer more building materials than they have!`;
+                }
+                actualAmount = amount <= 0 ? this.buildingMaterials : amount;
+                break;
+            default:
+                return `Invalid transfer material!`;
+        }
+
+        // updated to use new function
+        const minerCargoCapacity = miner.getCargoAmount();
+
+        if (actualAmount > miner.currentUpgrade.cargoCapacity - minerCargoCapacity) {
+            return `The target: ${miner} cannot hold that many materials!`;
+        }
         // <<-- /Creer-Merge: invalidate-transfer -->>
     }
 
@@ -424,12 +914,30 @@ export class Miner extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: transfer -->>
+        let actualAmount;
+        switch (resource) {
+            case "dirt":
+                actualAmount = amount <= 0 ? this.dirt : amount;
+                this.dirt -= actualAmount;
+                miner.dirt += actualAmount;
+                break;
+            case "ore":
+                actualAmount = amount <= 0 ? this.ore : amount;
+                this.ore -= actualAmount;
+                miner.ore += actualAmount;
+                break;
+            case "bomb":
+                actualAmount = amount <= 0 ? this.bombs : amount;
+                this.bombs -= actualAmount;
+                miner.bombs += actualAmount;
+                break;
+            case "buildingMaterials":
+                actualAmount = amount <= 0 ? this.buildingMaterials : amount;
+                this.buildingMaterials -= actualAmount;
+                miner.buildingMaterials += actualAmount;
+        }
 
-        // Add logic here for transfer.
-
-        // TODO: replace this with actual logic
-        return false;
-
+        return true;
         // <<-- /Creer-Merge: transfer -->>
     }
 
@@ -447,13 +955,22 @@ export class Miner extends GameObject {
         player: Player,
     ): void | string | MinerUpgradeArgs {
         // <<-- Creer-Merge: invalidate-upgrade -->>
+        const generalFailure = this.invalidateGeneralMinerMethod(player);
+        if (generalFailure) {
+            return generalFailure;
+        }
 
-        // Check all the arguments for upgrade here and try to
-        // return a string explaining why the input is wrong.
-        // If you need to change an argument for the real function, then
-        // changing its value in this scope is enough.
-        return undefined; // means nothing could be found that was ivalid.
+        if (this.tile && this.tile.owner !== player) {
+            return `${this} must be on your base or hopper to upgrade!`;
+        }
 
+        if (this.upgradeLevel >= this.game.maxUpgradeLevel) {
+            return `${this} is already fully upgraded!`;
+        }
+
+        if (player.money < this.game.upgradePrice) {
+            return `You cannot afford to upgrade this miner!`;
+        }
         // <<-- /Creer-Merge: invalidate-upgrade -->>
     }
 
@@ -465,18 +982,51 @@ export class Miner extends GameObject {
      */
     protected async upgrade(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: upgrade -->>
+        this.upgradeLevel++;
+        this.currentUpgrade = this.game.upgrades[this.upgradeLevel];
 
-        // Add logic here for upgrade.
-
-        // TODO: replace this with actual logic
-        return false;
-
+        return true;
         // <<-- /Creer-Merge: upgrade -->>
     }
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
     // Any additional protected or pirate methods can go here.
+
+    /**
+     * General invalidation function for miner methods. Try to find a reason why the passed
+     * in parameters are invalid, and return a human readable string telling
+     * them why it is invalid.
+     *
+     * @param player - The player that called this.
+     * @returns If the arguments are invalid, return a string explaining to
+     * human players why it is invalid. If it is valid return nothing.
+     */
+    protected invalidateGeneralMinerMethod(player: Player): string | void {
+        if (!player) {
+            return "This player does not exist!";
+        }
+
+        if (player !== this.game.currentPlayer) {
+            return "It is not your turn!";
+        }
+
+        if (!this) {
+            return "This miner does not exist!";
+        }
+
+        if (this.owner !== player) {
+            return "This miner does not belong to you!";
+        }
+
+        if (!this.health) {
+            return "This miner has been destroyed!";
+        }
+
+        if (!this.tile) {
+            return "This miner is lost in the mines!";
+        }
+    }
 
     // <<-- /Creer-Merge: protected-private-functions -->>
 }

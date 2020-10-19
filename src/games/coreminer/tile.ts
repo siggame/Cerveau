@@ -130,6 +130,11 @@ export class Tile extends GameObject implements BaseTile {
     }
 
     // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
     /**
      * Helper function to apply gravity to a tile.
      */
@@ -151,15 +156,18 @@ export class Tile extends GameObject implements BaseTile {
         if (distance > 0) {
             toMove.dirt = this.dirt;
             toMove.ore = this.ore;
-            this.units.forEach((u) => u.takeFallDamage(distance));
-            toMove.units.push(...this.units);
-            this.units = [];
+            this.miners.forEach((m) => m.takeFallDamage(distance));
+            toMove.miners.push(...this.miners);
+            this.miners = [];
+            toMove.bombs.push(...this.bombs);
+            this.bombs = [];
             this.dirt = 0;
             this.ore = 0;
         }
 
         this.isFalling = false;
     }
+
     // <<-- /Creer-Merge: public-functions -->>
 
     /**

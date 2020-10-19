@@ -5,7 +5,6 @@ import { BaseClasses, CoreminerGame, CoreminerGameObjectFactory } from "./";
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
 import { removeElements } from "~/utils";
-import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -19,7 +18,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-25-Coreminer",
+            "MegaMinerAI-##-Coreminer",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -58,12 +57,11 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         await super.afterTurn();
 
         // <<-- Creer-Merge: after-turn -->>
-
+        this.updateBombsAndMiners(); // update miner values and explode bombs
+        
+        this.updateGravity(); // apply gravity to falling tiles
+        
         this.updateArrays(); // clean up dead units
-
-        this.updateUnits(); // refresh unit values if necessary
-
-        this.updateGravity(); // falling tiles
 
         this.updateHoppers(); // extend hoppers
         // <<-- /Creer-Merge: after-turn -->>
@@ -147,239 +145,91 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     /** Updates all arrays in the game with new/dead game objects. */
     private updateArrays(): void {
-        // Properly remove all killed units
-        const deadUnits = this.game.units.filter(
-            (u) => !u.tile || u.health <= 0,
+        // Properly remove all killed miners
+        const deadMiners = this.game.miners.filter(
+            (m) => !m.tile || m.health <= 0,
         );
 
-        // remove dead units from all player's units list
+        // remove dead miners from all player's miners list
         for (const player of this.game.players) {
-            removeElements(player.units, ...deadUnits);
+            removeElements(player.miners, ...deadMiners);
         }
+
         // and remove them from the game
-        removeElements(this.game.units, ...deadUnits);
+        removeElements(this.game.miners, ...deadMiners);
+        
         // mark them dead
-        for (const unit of deadUnits) {
-            if (unit.tile) {
-                removeElements(unit.tile.units, unit);
-                unit.tile = undefined;
+        for (const miner of deadMiners) {
+            if (miner.tile) {
+                removeElements(miner.tile.miners, miner);
+                miner.tile = undefined;
+            }
+        }
+
+        // Properly remove all killed bombs
+        const deadBombs = this.game.bombs.filter(
+            (m) => !m.tile,
+        );
+
+        // remove dead bombs from all player's bombs list
+        for (const player of this.game.players) {
+            removeElements(player.bombs, ...deadBombs);
+        }
+
+        // and remove them from the game
+        removeElements(this.game.bombs, ...deadBombs);
+        
+        // mark them dead
+        for (const bomb of deadBombs) {
+            if (bomb.tile) {
+                removeElements(bomb.tile.bombs, bomb);
+                bomb.tile = undefined;
             }
         }
     }
 
-    /** Updates all units. */
-    private updateUnits(): void {
-        const bombsToUpdate = [];
-        for (const unit of this.game.units) {
-            if (!unit.tile) {
+    /** Updates all bombs and miners. */
+    private updateBombsAndMiners(): void {
+        for (const miner of this.game.miners) {
+            // Ignore dead miners
+            if (miner.health <= 0 || !miner.tile) {
                 continue;
             }
 
-            if (unit.job.title === this.game.jobs[0].title) {
-                // Handle miners
-                if (unit.owner === this.game.currentPlayer) {
-                    unit.miningPower = unit.maxMiningPower;
-                    unit.moves = unit.maxMoves;
-                }
+            // Refresh player miners
+            if (miner.owner === this.game.currentPlayer) {
+                miner.miningPower = miner.currentUpgrade.miningPower;
+                miner.moves = miner.currentUpgrade.miningPower;
+            }
 
-                if (unit.tile && unit.tile.owner === unit.owner) {
-                    unit.health = unit.maxHealth;
-                }
-            } else if (unit.job.title === this.game.jobs[1].title) {
-                if (unit.owner === this.game.currentPlayer.opponent) {
-                    bombsToUpdate.push(unit);
-                }
+            // Heal miners at base
+            if (miner.tile && miner.tile.owner === miner.owner && miner.tile.isBase) {
+                miner.health = miner.currentUpgrade.health;
+            }
+
+            // Apply suffocation damage
+            const currentTileAmount = miner.tile.ore + miner.tile.dirt;
+            if (currentTileAmount > 0) {
+                const dmg = this.game.suffocationDamage + Number(currentTileAmount >= this.game.largeMaterialSize) * this.game.suffocationWeightDamage;
+                miner.health = Math.max(0, miner.health - dmg);
             }
         }
 
-        // Update any bombs
-        if (bombsToUpdate.length > 0) {
-            this.updateBombs(bombsToUpdate);
-        }
-    }
-
-    /** Explodes bombs.
-     *
-     * @param bombs - The bombs to blow up.
-     */
-    private updateBombs(bombs: Unit[]): void {
-        let bombsToUpdate: Unit[] = [];
-
-        // Bombs can kill units without health upgrades
-        const dmg = this.game.jobs[0].health[0];
-
-        for (const bomb of bombs) {
-            // Destroy bomb
-            bomb.health = 0;
-
-            if (!bomb.tile) {
-                return;
+        for (const bomb of this.game.bombs) {
+            if (bomb.timer === 0) {
+                bomb.explode();
+            } else {
+                bomb.timer -= 1;
             }
-
-            // Destroy current tile
-            bomb.tile.dirt = 0;
-            bomb.tile.ore = 0;
-
-            // Shockwave on bombed tile does double damage
-            for (const bystander of bomb.tile.units) {
-                if (bystander.job.title === this.game.jobs[0].title) {
-                    bystander.health = Math.max(0, bystander.health - dmg * 2);
-                } else if (
-                    bystander !== bomb &&
-                    bystander.job.title === this.game.jobs[1].title
-                ) {
-                    // Chain reaction explosion
-                    if (
-                        bombs.indexOf(bystander) >= 0 &&
-                        bombsToUpdate.indexOf(bystander) >= 0
-                    ) {
-                        bombsToUpdate.push(bystander);
-                    }
-                }
-            }
-
-            // Destroy neighboring tiles and send out shockwave
-            for (const tile of bomb.tile.getNeighbors()) {
-                tile.dirt = 0;
-                tile.ore = 0;
-
-                // Shockwave in a direction
-                if (tile === bomb.tile.tileNorth) {
-                    let shockTile = tile;
-                    while (shockTile.dirt + shockTile.ore <= 0) {
-                        for (const bystander of shockTile.units) {
-                            if (
-                                bystander.job.title === this.game.jobs[0].title
-                            ) {
-                                bystander.health = Math.max(
-                                    0,
-                                    bystander.health - dmg * 2,
-                                );
-                            } else if (
-                                bystander !== bomb &&
-                                bystander.job.title === this.game.jobs[1].title
-                            ) {
-                                // Chain reaction explosion
-                                if (
-                                    bombs.indexOf(bystander) >= 0 &&
-                                    bombsToUpdate.indexOf(bystander) >= 0
-                                ) {
-                                    bombsToUpdate.push(bystander);
-                                }
-                            }
-                        }
-                        if (shockTile.tileNorth) {
-                            shockTile = shockTile.tileNorth;
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (tile === bomb.tile.tileEast) {
-                    let shockTile = tile;
-                    while (shockTile.dirt + shockTile.ore <= 0) {
-                        for (const bystander of shockTile.units) {
-                            if (
-                                bystander.job.title === this.game.jobs[0].title
-                            ) {
-                                bystander.health = Math.max(
-                                    0,
-                                    bystander.health - dmg * 2,
-                                );
-                            } else if (
-                                bystander !== bomb &&
-                                bystander.job.title === this.game.jobs[1].title
-                            ) {
-                                // Chain reaction explosion
-                                if (
-                                    bombs.indexOf(bystander) >= 0 &&
-                                    bombsToUpdate.indexOf(bystander) >= 0
-                                ) {
-                                    bombsToUpdate.push(bystander);
-                                }
-                            }
-                        }
-                        if (shockTile.tileEast) {
-                            shockTile = shockTile.tileEast;
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (tile === bomb.tile.tileSouth) {
-                    let shockTile = tile;
-                    while (shockTile.dirt + shockTile.ore <= 0) {
-                        for (const bystander of shockTile.units) {
-                            if (
-                                bystander.job.title === this.game.jobs[0].title
-                            ) {
-                                bystander.health = Math.max(
-                                    0,
-                                    bystander.health - dmg * 2,
-                                );
-                            } else if (
-                                bystander !== bomb &&
-                                bystander.job.title === this.game.jobs[1].title
-                            ) {
-                                // Chain reaction explosion
-                                if (
-                                    bombs.indexOf(bystander) >= 0 &&
-                                    bombsToUpdate.indexOf(bystander) >= 0
-                                ) {
-                                    bombsToUpdate.push(bystander);
-                                }
-                            }
-                        }
-                        if (shockTile.tileSouth) {
-                            shockTile = shockTile.tileSouth;
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (tile === bomb.tile.tileWest) {
-                    let shockTile = tile;
-                    while (shockTile.dirt + shockTile.ore <= 0) {
-                        for (const bystander of shockTile.units) {
-                            if (
-                                bystander.job.title === this.game.jobs[0].title
-                            ) {
-                                bystander.health = Math.max(
-                                    0,
-                                    bystander.health - dmg * 2,
-                                );
-                            } else if (
-                                bystander !== bomb &&
-                                bystander.job.title === this.game.jobs[1].title
-                            ) {
-                                // Chain reaction explosion
-                                if (
-                                    bombs.indexOf(bystander) >= 0 &&
-                                    bombsToUpdate.indexOf(bystander) >= 0
-                                ) {
-                                    bombsToUpdate.push(bystander);
-                                }
-                            }
-                        }
-                        if (shockTile.tileWest) {
-                            shockTile = shockTile.tileWest;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Update any triggered bombs that aren't blown up already
-        bombsToUpdate = bombsToUpdate.filter((bomb) => bomb.health > 0);
-        if (bombsToUpdate.length > 0) {
-            this.updateBombs(bombsToUpdate);
         }
     }
 
     /** Updates all falling tiles. */
     private updateGravity(): void {
-        while (this.game.fallingTiles.length > 0) {
-            const tile = this.game.fallingTiles[
-                this.game.fallingTiles.length - 1
+        let fallingTiles = this.game.tiles.filter((t) => t.isFalling);
+        while (fallingTiles.length > 0) {
+            const tile = fallingTiles[
+                fallingTiles.length - 1
             ];
             if (tile.tileSouth) {
                 let willFall = true;
@@ -415,7 +265,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                     }
                 }
             }
-            this.game.fallingTiles.pop();
+            fallingTiles.pop();
         }
     }
 
@@ -451,5 +301,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             }
         }
     }
+
     // <<-- /Creer-Merge: protected-private-methods -->>
 }

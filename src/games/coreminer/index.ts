@@ -85,6 +85,11 @@ export const BaseClasses = {
 /** All the possible properties for Bomb instances. */
 export interface BombProperties {
     /**
+     * The Tile this Miner is on.
+     */
+    tile?: Tile;
+
+    /**
      * The number of turns before this Bomb explodes. Zero means it will
      * explode after the current turn.
      */
@@ -777,6 +782,11 @@ export const Namespace = makeNamespace({
         Bomb: {
             parentClassName: "GameObject",
             attributes: {
+                tile: {
+                    typeName: "gameObject",
+                    gameObjectClass: Tile,
+                    nullable: true,
+                },
                 timer: {
                     typeName: "int",
                 },
@@ -1168,5 +1178,5 @@ export const Namespace = makeNamespace({
         },
     },
     gameVersion:
-        "ce6c632876295900d0b2fc6db0f63dfc8a20533396c67b472fa03817cb82edc4",
+        "a4592bb5acb0415146605769f439a09baf3768f41cdb3c7ad9dc971f42c4d96e",
 });
