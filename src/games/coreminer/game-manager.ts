@@ -58,9 +58,9 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: after-turn -->>
         this.updateBombsAndMiners(); // update miner values and explode bombs
-        
+
         this.updateGravity(); // apply gravity to falling tiles
-        
+
         this.updateArrays(); // clean up dead units
 
         this.updateHoppers(); // extend hoppers
@@ -157,7 +157,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // and remove them from the game
         removeElements(this.game.miners, ...deadMiners);
-        
+
         // mark them dead
         for (const miner of deadMiners) {
             if (miner.tile) {
@@ -167,9 +167,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         // Properly remove all killed bombs
-        const deadBombs = this.game.bombs.filter(
-            (m) => !m.tile,
-        );
+        const deadBombs = this.game.bombs.filter((m) => !m.tile);
 
         // remove dead bombs from all player's bombs list
         for (const player of this.game.players) {
@@ -178,7 +176,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // and remove them from the game
         removeElements(this.game.bombs, ...deadBombs);
-        
+
         // mark them dead
         for (const bomb of deadBombs) {
             if (bomb.tile) {
@@ -203,14 +201,21 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             }
 
             // Heal miners at base
-            if (miner.tile && miner.tile.owner === miner.owner && miner.tile.isBase) {
+            if (
+                miner.tile &&
+                miner.tile.owner === miner.owner &&
+                miner.tile.isBase
+            ) {
                 miner.health = miner.currentUpgrade.health;
             }
 
             // Apply suffocation damage
             const currentTileAmount = miner.tile.ore + miner.tile.dirt;
             if (currentTileAmount > 0) {
-                const dmg = this.game.suffocationDamage + Number(currentTileAmount >= this.game.largeMaterialSize) * this.game.suffocationWeightDamage;
+                const dmg =
+                    this.game.suffocationDamage +
+                    Number(currentTileAmount >= this.game.largeMaterialSize) *
+                        this.game.suffocationWeightDamage;
                 miner.health = Math.max(0, miner.health - dmg);
             }
         }
@@ -226,11 +231,9 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     /** Updates all falling tiles. */
     private updateGravity(): void {
-        let fallingTiles = this.game.tiles.filter((t) => t.isFalling);
+        const fallingTiles = this.game.tiles.filter((t) => t.isFalling);
         while (fallingTiles.length > 0) {
-            const tile = fallingTiles[
-                fallingTiles.length - 1
-            ];
+            const tile = fallingTiles[fallingTiles.length - 1];
             if (tile.tileSouth) {
                 let willFall = true;
                 // Supports prevent falling

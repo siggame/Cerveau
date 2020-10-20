@@ -229,6 +229,16 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                 min: 1,
             },
             */
+            bombExplosionDamage: {
+                description: "The damage done to miners on tiles adjacent to an exploding bomb",
+                default: 25,
+                min: 1,
+            },
+            bombShockwaveDamage: {
+                description: "The damage done to tiles in a bomb's shockwave.",
+                default: 20,
+                min: 1,
+            },
 
             // <<-- /Creer-Merge: schema -->>
 

@@ -131,7 +131,7 @@ export class Miner extends GameObject {
             this.dirt +
             this.ore +
             this.buildingMaterials +
-            (this.bombs * this.game.bombSize)
+            this.bombs * this.game.bombSize
         );
     }
 
@@ -719,7 +719,11 @@ export class Miner extends GameObject {
             }
         }
         // if we mined the one that miners were standing on, calculate new location
-        if (tile.tileNorth && (tile.tileNorth.miners.length > 0 || tile.tileNorth.bombs.length > 0)) {
+        if (
+            tile.tileNorth &&
+            (tile.tileNorth.miners.length > 0 ||
+                tile.tileNorth.bombs.length > 0)
+        ) {
             // call helper function that will handle falling of the miners.
             tile.applyGravity();
         }
@@ -891,7 +895,10 @@ export class Miner extends GameObject {
         // updated to use new function
         const minerCargoCapacity = miner.getCargoAmount();
 
-        if (actualAmount > miner.currentUpgrade.cargoCapacity - minerCargoCapacity) {
+        if (
+            actualAmount >
+            miner.currentUpgrade.cargoCapacity - minerCargoCapacity
+        ) {
             return `The target: ${miner} cannot hold that many materials!`;
         }
         // <<-- /Creer-Merge: invalidate-transfer -->>

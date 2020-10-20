@@ -61,8 +61,15 @@ export class Bomb extends GameObject {
      * Function to blow up a bomb.
      */
     public explode(): void {
+        if (this.timer === -99) {
+            return;
+        }
+        this.timer = -99;
+        // prevent bombs from triggering each other endlessly
+
         // Bombs can kill units without health upgrades
-        const dmg = this.game.upgrades[0].health;
+        const dmg = this.game.settings.bombExplosionDamage;
+        const shockDmg = this.game.settings.bombShockwaveDamage;
 
         if (!this.tile) {
             return;
@@ -71,16 +78,27 @@ export class Bomb extends GameObject {
         // Destroy current tile and surrounding tiles
         this.tile.ore = 0;
         this.tile.dirt = 0;
-        this.tile.miners.forEach((miner) => miner.health -= dmg);
+        this.tile.miners.forEach((miner) => (miner.health = Math.max(0, miner.health - dmg)));
         this.tile.bombs.forEach((bomb) => bomb.explode());
-        
+
+        // Bomb out cardinal directions
         for (const tile of this.tile.getNeighbors()) {
+            // Destroy direct neighboring tiles
             tile.ore = 0;
             tile.dirt = 0;
-        }
+            this.tile.miners.forEach((miner) => (miner.health -= dmg));
+            this.tile.bombs.forEach((bomb) => bomb.explode());
 
-        // Send out shockwave, destroying and detonating bombs
-        // TODO
+            const direction = this.tile.getAdjacentDirection(tile);
+            let shockTile : Tile | undefined = tile;
+            while (direction !== undefined && shockTile) {
+                shockTile = shockTile.getNeighbor(direction);
+                if (shockTile && shockTile.ore + shockTile.dirt <= 0) {
+                    this.tile.miners.forEach((miner) => (miner.health -= shockDmg));
+                    this.tile.bombs.forEach((bomb) => bomb.explode());
+                }
+            }
+        }
     }
 
     // <<-- /Creer-Merge: public-functions -->>
