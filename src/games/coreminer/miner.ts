@@ -857,7 +857,7 @@ export class Miner extends GameObject {
         // this outer if is a redundant check but TS is complaining
         // and overriding it is forbidden in the linter rules
         if (this.tile && miner.tile) {
-            if (this.tile?.getNeighbors().indexOf(miner.tile) === -1) {
+            if (this.tile.getNeighbors().indexOf(miner.tile) === -1) {
                 return `The target: ${miner} is not adjacent to ${this}!`;
             }
         }

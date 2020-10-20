@@ -230,7 +230,8 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
             */
             bombExplosionDamage: {
-                description: "The damage done to miners on tiles adjacent to an exploding bomb",
+                description:
+                    "The damage done to miners on tiles adjacent to an exploding bomb",
                 default: 25,
                 min: 1,
             },

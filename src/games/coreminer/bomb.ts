@@ -78,7 +78,9 @@ export class Bomb extends GameObject {
         // Destroy current tile and surrounding tiles
         this.tile.ore = 0;
         this.tile.dirt = 0;
-        this.tile.miners.forEach((miner) => (miner.health = Math.max(0, miner.health - dmg)));
+        this.tile.miners.forEach(
+            (miner) => (miner.health = Math.max(0, miner.health - dmg)),
+        );
         this.tile.bombs.forEach((bomb) => bomb.explode());
 
         // Bomb out cardinal directions
@@ -90,11 +92,13 @@ export class Bomb extends GameObject {
             this.tile.bombs.forEach((bomb) => bomb.explode());
 
             const direction = this.tile.getAdjacentDirection(tile);
-            let shockTile : Tile | undefined = tile;
+            let shockTile: Tile | undefined = tile;
             while (direction !== undefined && shockTile) {
                 shockTile = shockTile.getNeighbor(direction);
                 if (shockTile && shockTile.ore + shockTile.dirt <= 0) {
-                    this.tile.miners.forEach((miner) => (miner.health -= shockDmg));
+                    this.tile.miners.forEach(
+                        (miner) => (miner.health -= shockDmg),
+                    );
                     this.tile.bombs.forEach((bomb) => bomb.explode());
                 }
             }
