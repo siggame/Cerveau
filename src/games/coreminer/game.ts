@@ -10,6 +10,7 @@ import { Tile } from "./tile";
 import { Upgrade } from "./upgrade";
 
 // <<-- Creer-Merge: imports -->>
+// any additional imports you want can be placed here safely between creer runs
 import { Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
@@ -216,11 +217,6 @@ export class CoreminerGame extends BaseClasses.Game {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
-    /**
-     * Every Tile about to fall in the game.
-     */
-    public fallingTiles!: Tile[];
-
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -236,16 +232,13 @@ export class CoreminerGame extends BaseClasses.Game {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
-        this.createJobs();
+        this.createUpgrades();
 
         this.createMap();
 
         for (const player of this.players) {
             player.money = this.spawnPrice * 3;
         }
-
-        // Strangely, this starts undefined
-        this.fallingTiles = [];
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -270,31 +263,40 @@ export class CoreminerGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: protected-private-functions -->>
 
+    // Any additional protected or pirate methods can go here.
+
     /** Creates all the jobs in the game. */
-    private createJobs(): void {
-        let job;
-
-        job = this.manager.create.job({
-            title: "miner",
-            health: [],
-            moves: [],
-            miningPower: [],
-            cargoCapacity: [],
-        });
-        job.health.push(25, 50, 75, 100);
-        job.moves.push(2, 3, 4, 5);
-        job.miningPower.push(50, 100, 150, 200);
-        job.cargoCapacity.push(250, 500, 750, 1000);
-        this.jobs.push(job);
-
-        job = this.manager.create.job({
-            title: "bomb",
-            health: [],
-            moves: [],
-            miningPower: [],
-            cargoCapacity: [],
-        });
-        this.jobs.push(job);
+    private createUpgrades(): void {
+        this.upgrades.push(
+            this.manager.create.upgrade({
+                title: "Standard Issue Exominer",
+                health: 25,
+                moves: 2,
+                miningPower: 50,
+                cargoCapacity: 250,
+            }),
+            this.manager.create.upgrade({
+                title: "Exominer MK2.0",
+                health: 50,
+                moves: 3,
+                miningPower: 100,
+                cargoCapacity: 500,
+            }),
+            this.manager.create.upgrade({
+                title: "Exominer 3000",
+                health: 75,
+                moves: 4,
+                miningPower: 150,
+                cargoCapacity: 750,
+            }),
+            this.manager.create.upgrade({
+                title: "Exominer 5000 Series X",
+                health: 100,
+                moves: 5,
+                miningPower: 200,
+                cargoCapacity: 1000,
+            }),
+        );
     }
 
     /** Create the game map. */
@@ -504,9 +506,6 @@ export class CoreminerGame extends BaseClasses.Game {
             for (let y = 0; y < this.mapHeight; y++) {
                 const tile = getMutableTile(x, y);
                 const oppositeTile = getMutableTile(this.mapWidth - x - 1, y);
-
-                this.players[0].side.push(tile as Tile);
-                this.players[1].side.push(oppositeTile as Tile);
 
                 if (tile.owner !== undefined) {
                     oppositeTile.owner = tile.owner.opponent;

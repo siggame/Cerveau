@@ -8,7 +8,6 @@ import { AI } from "./ai";
 import { Bomb } from "./bomb";
 import { GameObject } from "./game-object";
 import { Miner } from "./miner";
-import { Player } from "./player";
 import { Tile } from "./tile";
 
 // <<-- Creer-Merge: imports -->>
@@ -141,7 +140,6 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
         player: Player,
     ): void | string | PlayerSpawnMinerArgs {
         // <<-- Creer-Merge: invalidate-spawnMiner -->>
-
         if (this !== this.game.currentPlayer) {
             return `It is not your turn!`;
         }
@@ -149,7 +147,6 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
         if (this.money < this.game.spawnPrice) {
             return `You do not have enough money to spawn a Miner!`;
         }
-
         // <<-- /Creer-Merge: invalidate-spawnMiner -->>
     }
 
@@ -161,28 +158,27 @@ export class Player extends GameObject implements BaseCoreminerPlayer {
      */
     protected async spawnMiner(player: Player): Promise<boolean> {
         // <<-- Creer-Merge: spawnMiner -->>
-
         this.money -= this.game.spawnPrice;
-        const unit = this.game.manager.create.unit({
+
+        const miner = this.game.manager.create.miner({
             owner: player,
             tile: this.baseTile,
-            job: this.game.jobs[0],
             upgradeLevel: 0,
-            health: this.game.jobs[0].health[0],
-            maxHealth: this.game.jobs[0].health[0],
-            miningPower: this.game.jobs[0].miningPower[0],
-            maxMiningPower: this.game.jobs[0].miningPower[0],
-            moves: this.game.jobs[0].moves[0],
-            maxMoves: this.game.jobs[0].moves[0],
-            maxCargoCapacity: this.game.jobs[0].cargoCapacity[0],
+            currentUpgrade: this.game.upgrades[0],
+            health: this.game.upgrades[0].health,
+            maxHealth: this.game.upgrades[0].health,
+            miningPower: this.game.upgrades[0].miningPower,
+            maxMiningPower: this.game.upgrades[0].miningPower,
+            moves: this.game.upgrades[0].moves,
+            maxMoves: this.game.upgrades[0].moves,
+            maxCargoCapacity: this.game.upgrades[0].cargoCapacity,
         });
 
-        this.baseTile.units.push(unit);
-        this.game.units.push(unit);
-        this.units.push(unit);
+        this.baseTile.miners.push(miner);
+        this.game.miners.push(miner);
+        this.miners.push(miner);
 
         return true;
-
         // <<-- /Creer-Merge: spawnMiner -->>
     }
 
