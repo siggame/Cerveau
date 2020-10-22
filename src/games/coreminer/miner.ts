@@ -575,9 +575,17 @@ export class Miner extends GameObject {
             return generalFailure;
         }
 
+        if (
+            this.tile &&
+            this.tile.getNeighbors().indexOf(tile) === -1 &&
+            this.tile !== tile
+        ) {
+            return `${this} can only mine adjacent tiles or its own tile!`;
+        }
+
         // Making this assumption as nothing was in there previously about it
         if (tile.isHopper) {
-            return "A miner can't mine a hopper";
+            return `${this} can't mine a hopper`;
         }
 
         if (this.miningPower === 0) {
@@ -725,7 +733,7 @@ export class Miner extends GameObject {
                 tile.tileNorth.bombs.length > 0)
         ) {
             // call helper function that will handle falling of the miners.
-            tile.applyGravity();
+            tile.tileNorth.applyGravity();
         }
 
         return true;

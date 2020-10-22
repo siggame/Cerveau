@@ -144,9 +144,9 @@ export class Tile extends GameObject implements BaseTile {
         let distance = 0;
         while (
             southTile &&
-            (southTile.dirt + southTile.ore <= 0 ||
-                !southTile.isLadder ||
-                !southTile.isSupport)
+            southTile.dirt + southTile.ore <= 0 &&
+            !southTile.isLadder &&
+            !southTile.isSupport
         ) {
             toMove = southTile;
             southTile = southTile.tileSouth;
@@ -156,7 +156,10 @@ export class Tile extends GameObject implements BaseTile {
         if (distance > 0) {
             toMove.dirt = this.dirt;
             toMove.ore = this.ore;
-            this.miners.forEach((m) => m.takeFallDamage(distance));
+            this.miners.forEach((m) => {
+                m.takeFallDamage(distance);
+                m.tile = toMove;
+            });
             toMove.miners.push(...this.miners);
             this.miners = [];
             toMove.bombs.push(...this.bombs);

@@ -162,7 +162,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             spawnPrice: {
                 description: "The monetary price of spawning a Miner.",
                 // <<-- Creer-Merge: spawnPrice -->>
-                default: 0,
+                default: 200,
                 // <<-- /Creer-Merge: spawnPrice -->>
             },
 
