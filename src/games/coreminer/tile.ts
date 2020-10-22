@@ -1,3 +1,4 @@
+import { removeElements } from "@cadre/ts-utils";
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { TileConstructorArgs } from "./";
@@ -161,9 +162,9 @@ export class Tile extends GameObject implements BaseTile {
                 m.tile = toMove;
             });
             toMove.miners.push(...this.miners);
-            this.miners = [];
+            removeElements(this.miners, ...this.miners);
             toMove.bombs.push(...this.bombs);
-            this.bombs = [];
+            removeElements(this.bombs, ...this.bombs);
             this.dirt = 0;
             this.ore = 0;
         }
