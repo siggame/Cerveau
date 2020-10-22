@@ -197,7 +197,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             // Refresh player miners
             if (miner.owner === this.game.currentPlayer) {
                 miner.miningPower = miner.currentUpgrade.miningPower;
-                miner.moves = miner.currentUpgrade.miningPower;
+                miner.moves = miner.currentUpgrade.moves;
             }
 
             // Heal miners at base

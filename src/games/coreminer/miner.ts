@@ -16,6 +16,7 @@ import { Upgrade } from "./upgrade";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -807,26 +808,21 @@ export class Miner extends GameObject {
         if (!this.tile) {
             throw new Error(`${this} has no Tile to move from!`);
         }
-        this.tile.miners = this.tile.miners.filter((m) => m !== this);
+        removeElements(this.tile.miners, this);
         this.tile = tile;
         tile.miners.push(this);
         this.moves -= 1;
 
         // Fall logic
-        let distance = 0;
-        while (
-            this.tile.tileSouth !== undefined &&
+        if (
+            this.tile.tileSouth &&
             this.tile.tileSouth.ore + this.tile.tileSouth.dirt <= 0 &&
-            !this.tile.tileSouth.isLadder
+            !this.tile.tileSouth.isLadder &&
+            !this.tile.tileSouth.isHopper
         ) {
-            this.tile.miners = this.tile.miners.filter((u) => u !== this);
-            this.tile = this.tile.tileSouth;
-            this.tile.miners.push(this);
-            distance++;
+            // call helper function that will handle falling of the miners.
+            this.tile.applyGravity();
         }
-
-        // Calculate damage
-        this.takeFallDamage(distance);
 
         return true;
         // <<-- /Creer-Merge: move -->>

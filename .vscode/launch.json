@@ -14,7 +14,7 @@
                 "--no-timeout",
                 "--no-session-timeouts",
                 "--no-updater",
-                "--only-load", "Chess",
+                "--only-load", "Coreminer",
             ],
             "protocol": "inspector",
             "cwd": "${workspaceFolder}",
