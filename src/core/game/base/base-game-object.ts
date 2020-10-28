@@ -112,9 +112,9 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         | undefined
         | string
         | {
-            /** The new value of the validated message to use. */
-            message?: string;
-        } {
+              /** The new value of the validated message to use. */
+              message?: string;
+          } {
         if (message.length > MAX_LOG_LENGTH) {
             return `Message is too long! Max ${MAX_LOG_LENGTH} per message.`;
         }

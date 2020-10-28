@@ -49,7 +49,7 @@ class DeltaArray<T> extends Array<T> {
  * @param args.key - The key of this array in its parent delta mergable.
  * @param args.childType - The type of all children in this Array.
  * @param args.parent - The parent of this node.
- * @param args.initialValue
+ * @param args.initialValue - The initial values in the array.
  * @returns A new DeltaMergeable wrapping an Array.
  */
 export function createArray<T = any>(args: {
@@ -59,7 +59,7 @@ export function createArray<T = any>(args: {
     childType: Immutable<SanitizableType>;
     /** The parent of this node. */
     parent?: DeltaMergeable;
-    /** The initial value of the array */
+    /** The initial value of the array. */
     initialValue?: T[];
 }): DeltaMergeable<T[]> {
     let oldLength = 0;
