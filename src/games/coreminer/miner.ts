@@ -429,7 +429,7 @@ export class Miner extends GameObject {
         }
 
         if (
-            (this.tile.isSupport || this.tile.isLadder) &&
+            (tile.isSupport || tile.isLadder) &&
             (material === `dirt` || material === `ore`)
         ) {
             return `${this} cannot dump dirt or ore on a ladder or support tile!`;
