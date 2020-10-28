@@ -275,18 +275,18 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             // Tiled settings
             mapWidth: {
                 // <<-- Creer-Merge: map-width -->>
-                default: 60,
+                default: 30,
                 // <<-- /Creer-Merge: map-width -->>
-                min: 2,
+                min: 20,
                 description:
                     "The width (in Tiles) for the game map to be " +
                     "initialized to.",
             },
             mapHeight: {
                 // <<-- Creer-Merge: map-height -->>
-                default: 40,
+                default: 30,
                 // <<-- /Creer-Merge: map-height -->>
-                min: 2,
+                min: 20,
                 description:
                     "The height (in Tiles) for the game map to be " +
                     "initialized to.",
