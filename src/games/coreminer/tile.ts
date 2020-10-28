@@ -137,6 +137,31 @@ export class Tile extends GameObject implements BaseTile {
     // in the creer file.
 
     /**
+     * Function to set a tile to isFalling if necessary.
+     */
+    public checkFalling(): void {
+        const tileBelow = this.tileSouth;
+
+        // Check that the tile is floating, with no dirt or ore below
+        if (tileBelow && tileBelow.ore + tileBelow.dirt <= 0) {
+            const supportEast = tileBelow.tileEast;
+            const supportSouth = tileBelow.tileSouth;
+            const supportWest = tileBelow.tileWest;
+
+            // Check that there is not support below, directly or to the side
+            if (
+                (supportEast && supportEast.isSupport) ||
+                (supportSouth && supportSouth.isSupport) ||
+                (supportWest && supportWest.isSupport)
+            ) {
+                return;
+            }
+
+            this.isFalling = true;
+        }
+    }
+
+    /**
      * Helper function to apply gravity to a tile.
      */
     public applyGravity(): void {
