@@ -419,54 +419,35 @@ export class Miner extends GameObject {
             return `${this} is not on a tile.`;
         }
 
-        // Checks if the tile is a ladder
+        if (!tile) {
+            return `${this} is trying to dump on an invalid tile!`;
+        }
+
         if (
-            this.tile.isLadder &&
+            this.tile &&
+            this.tile.getNeighbors().indexOf(tile) === -1 &&
+            this.tile !== tile
+        ) {
+            return `${this} can only dump to adjacent tiles or its own tile!`;
+        }
+
+        if (
+            (tile.isSupport || tile.isLadder) &&
             (material === `dirt` || material === `ore`)
         ) {
-            return `You cannot dump dirt or ore onto a ladder tile.`;
+            return `${this} cannot dump dirt or ore on a ladder or support tile!`;
         }
 
-        // Checks if the tile is a support
-        if (
-            this.tile.isSupport &&
-            (material === `dirt` || material === `ore`)
-        ) {
-            return `You cannot dump dirt or ore onto a support tile.`;
+        if (material === `dirt` && this.dirt <= 0) {
+            return `${this} has no dirt to dump!`;
         }
 
-        // Checks if tile is falling.
-        if (
-            this.tile.isFalling &&
-            (material === `dirt` || material === `ore`)
-        ) {
-            return `This tile is falling, you have bigger things to worry about than dumping dirt or ore.`;
+        if (material === `bomb` && this.bombs <= 0) {
+            return `${this} has no bombs to dump!`;
         }
 
-        // Checks if you have negative dirt.
-        if (material === `dirt` && this.dirt < 0) {
-            return "You have negative dirt. This should not happen. Contact devs.";
-        }
-
-        // Checks if you have dirt to dump
-        if (material === `dirt` && this.dirt === 0) {
-            return "You have no dirt to dump.";
-        }
-
-        if (material === `bomb` && this.bombs === 0) {
-            return `You have no bombs to dump.`;
-        }
-
-        if (material === `bomb` && this.bombs < 0) {
-            return `You have negative bombs. This should not happen. Contact devs.`;
-        }
-
-        if (material === `ore` && this.ore === 0) {
-            return `You have no ore to dump.`;
-        }
-
-        if (material === `ore` && this.ore < 0) {
-            return `You have negative ore. This should not happen. Contact devs.`;
+        if (material === `ore` && this.ore <= 0) {
+            return `${this} has no ore to dump!`;
         }
         // <<-- /Creer-Merge: invalidate-dump -->>
     }
