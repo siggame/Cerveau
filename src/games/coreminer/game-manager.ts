@@ -162,6 +162,8 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         for (const miner of deadMiners) {
             if (miner.tile) {
                 removeElements(miner.tile.miners, miner);
+                miner.tile.ore += miner.ore;
+                miner.tile.dirt += miner.dirt;
                 miner.tile = undefined;
             }
         }
