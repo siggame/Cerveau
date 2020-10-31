@@ -119,7 +119,10 @@ export class Miner extends GameObject {
      * @param distance - The distance the miner has fallen.
      */
     public takeFallDamage(distance: number): void {
-        this.health -= Math.min(this.health, distance - this.upgradeLevel + 1);
+        this.health -= Math.min(
+            this.health,
+            distance - (this.upgradeLevel + 1),
+        );
     }
 
     /**
