@@ -256,6 +256,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                 if (willFall) {
                     // Fall logic
                     let curTile = tile;
+                    curTile.isFalling = false;
                     while (
                         curTile.tileSouth &&
                         !curTile.tileSouth.isSupport &&

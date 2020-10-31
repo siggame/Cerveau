@@ -119,7 +119,10 @@ export class Miner extends GameObject {
      * @param distance - The distance the miner has fallen.
      */
     public takeFallDamage(distance: number): void {
-        this.health -= Math.min(this.health, distance - this.upgradeLevel + 1);
+        this.health -= Math.min(
+            this.health,
+            distance - (this.upgradeLevel + 1),
+        );
     }
 
     /**
@@ -543,10 +546,7 @@ export class Miner extends GameObject {
             }
         }
 
-        // If tile below exists and doesn't have resources, may need to fall, flag for falling
-        if (tile.tileSouth && tile.tileSouth.dirt + tile.tileSouth.ore <= 0) {
-            tile.isFalling = true;
-        }
+        tile.checkFalling();
 
         return true;
         // <<-- /Creer-Merge: dump -->>
