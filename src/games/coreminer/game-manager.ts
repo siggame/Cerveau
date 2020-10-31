@@ -277,11 +277,13 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         this.game.players.forEach((p) => {
             let nextHopper;
             if (p.hopperTiles.length > 0)
-                nextHopper = p.hopperTiles[p.hopperTiles.length - 1];
+                nextHopper = p.hopperTiles[p.hopperTiles.length - 1].tileSouth;
             else nextHopper = p.baseTile.tileSouth;
+
             while (nextHopper) {
                 if (nextHopper.dirt + nextHopper.ore > 0) break;
                 if (nextHopper.isSupport || nextHopper.isLadder) break;
+
                 nextHopper.isHopper = true;
                 nextHopper.owner = p;
                 p.hopperTiles.push(nextHopper);
