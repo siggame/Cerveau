@@ -276,35 +276,22 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
     /** Updates all hopper extensions. */
     private updateHoppers(): void {
-        const currPlayer = this.game.currentPlayer;
-        if (currPlayer.hopperTiles.length === 0) {
-            // no hoppers, check from base tile
-            const nextHopperPos = this.game.currentPlayer.baseTile.tileSouth;
-            if (nextHopperPos === undefined) {
-                // there is no space for hoppers in this map
-                return;
-            }
-            if (nextHopperPos.dirt === 0 && nextHopperPos.ore === 0) {
-                nextHopperPos.isHopper = true;
-                nextHopperPos.owner = currPlayer;
-                currPlayer.hopperTiles.push(nextHopperPos);
-            }
-        }
+        this.game.players.forEach((p) => {
+            let nextHopper;
+            if (p.hopperTiles.length > 0)
+                nextHopper = p.hopperTiles[p.hopperTiles.length - 1].tileSouth;
+            else nextHopper = p.baseTile.tileSouth;
 
-        if (currPlayer.hopperTiles.length > 0) {
-            // try to extend hoppers
-            let nextHopperPos =
-                currPlayer.hopperTiles[currPlayer.hopperTiles.length - 1]
-                    .tileSouth;
-            while (nextHopperPos !== undefined) {
-                if (nextHopperPos.ore === 0 && nextHopperPos.dirt === 0) {
-                    nextHopperPos.isHopper = true;
-                    nextHopperPos = nextHopperPos.tileSouth;
-                } else {
-                    return;
-                }
+            while (nextHopper) {
+                if (nextHopper.dirt + nextHopper.ore > 0) break;
+                if (nextHopper.isSupport || nextHopper.isLadder) break;
+
+                nextHopper.isHopper = true;
+                nextHopper.owner = p;
+                p.hopperTiles.push(nextHopper);
+                nextHopper = nextHopper.tileSouth;
             }
-        }
+        });
     }
 
     // <<-- /Creer-Merge: protected-private-methods -->>
