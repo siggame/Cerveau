@@ -192,6 +192,7 @@ export class Tile extends GameObject implements BaseTile {
             removeElements(this.bombs, ...this.bombs);
             this.dirt = 0;
             this.ore = 0;
+            this.isSupport = false;
         }
 
         this.isFalling = false;
