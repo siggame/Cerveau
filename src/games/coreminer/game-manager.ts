@@ -169,7 +169,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         // Properly remove all killed bombs
-        const deadBombs = this.game.bombs.filter((m) => !m.tile);
+        const deadBombs = this.game.bombs.filter((m) => !m.tile || m.timer < 0);
 
         // remove dead bombs from all player's bombs list
         for (const player of this.game.players) {

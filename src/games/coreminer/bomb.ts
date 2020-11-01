@@ -67,7 +67,6 @@ export class Bomb extends GameObject {
         this.timer = -99;
         // prevent bombs from triggering each other endlessly
 
-        // Bombs can kill units without health upgrades
         const dmg = this.game.settings.bombExplosionDamage;
         const shockDmg = this.game.settings.bombShockwaveDamage;
 
