@@ -182,17 +182,22 @@ export class Tile extends GameObject implements BaseTile {
         if (distance > 0) {
             toMove.dirt = this.dirt;
             toMove.ore = this.ore;
+            this.dirt = 0;
+            this.ore = 0;
+            this.isSupport = false; // supports removed on fall
+
             this.miners.forEach((m) => {
                 m.takeFallDamage(distance);
                 m.tile = toMove;
             });
             toMove.miners.push(...this.miners);
             removeElements(this.miners, ...this.miners);
+
+            this.bombs.forEach((b) => {
+                b.tile = toMove;
+            });
             toMove.bombs.push(...this.bombs);
             removeElements(this.bombs, ...this.bombs);
-            this.dirt = 0;
-            this.ore = 0;
-            this.isSupport = false;
         }
 
         this.isFalling = false;

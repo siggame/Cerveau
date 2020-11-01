@@ -527,7 +527,11 @@ export class Miner extends GameObject {
             }
         }
 
-        tile.checkFalling();
+        if (material === "bomb") {
+            tile.applyGravity();
+        } else {
+            tile.checkFalling();
+        }
 
         return true;
         // <<-- /Creer-Merge: dump -->>
