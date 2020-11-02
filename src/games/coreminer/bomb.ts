@@ -81,6 +81,8 @@ export class Bomb extends GameObject {
         // Destroy current tile and surrounding tiles
         this.tile.ore = 0;
         this.tile.dirt = 0;
+        this.tile.isSupport = false;
+        this.tile.isLadder = false;
         this.tile.miners.forEach(
             (miner) => (miner.health = Math.max(0, miner.health - dmg)),
         );
@@ -91,6 +93,8 @@ export class Bomb extends GameObject {
             // Destroy direct neighboring tiles
             tile.ore = 0;
             tile.dirt = 0;
+            tile.isSupport = false;
+            tile.isLadder = false;
             tile.miners.forEach((miner) => (miner.health -= dmg));
             tile.bombs.forEach((bomb) => bomb.explode());
 
