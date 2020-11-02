@@ -140,6 +140,10 @@ export class Tile extends GameObject implements BaseTile {
      * Function to set a tile to isFalling if necessary.
      */
     public checkFalling(): void {
+        if (this.dirt + this.ore <= 0) {
+            return;
+        }
+
         const tileBelow = this.tileSouth;
 
         // Check that the tile is floating, with no dirt or ore below
@@ -185,6 +189,7 @@ export class Tile extends GameObject implements BaseTile {
             this.dirt = 0;
             this.ore = 0;
             this.isSupport = false; // supports removed on fall
+            this.shielding = 0; // shielding removed on fall
 
             this.miners.forEach((m) => {
                 m.takeFallDamage(distance);

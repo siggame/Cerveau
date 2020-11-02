@@ -99,6 +99,8 @@ export class Bomb extends GameObject {
                 continue;
             }
 
+            const direction = this.tile.getAdjacentDirection(tile);
+
             // Destroy direct neighboring tiles
             tile.ore = 0;
             tile.dirt = 0;
@@ -106,8 +108,10 @@ export class Bomb extends GameObject {
             tile.isLadder = false;
             tile.miners.forEach((miner) => (miner.health -= dmg));
             tile.bombs.forEach((bomb) => bomb.explode());
+            if (tile.tileNorth) {
+                tile.tileNorth.checkFalling();
+            }
 
-            const direction = this.tile.getAdjacentDirection(tile);
             if (!direction) {
                 return;
             }
