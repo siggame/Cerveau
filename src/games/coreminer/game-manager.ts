@@ -186,9 +186,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             if (bomb.tile) {
                 removeElements(bomb.tile.bombs, bomb);
                 removeElements(this.game.bombs, bomb);
-                this.game.players.forEach((p) =>
-                    removeElements(p.bombs, bomb),
-                );
                 bomb.tile = undefined;
             }
         }
