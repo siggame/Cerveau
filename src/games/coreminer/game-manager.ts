@@ -18,7 +18,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-Coreminer",
+            "MegaMinerAI-25-Coreminer",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -45,6 +45,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
         // <<-- Creer-Merge: before-turn -->>
         // add logic here for before the current player's turn starts
+        this.updateArrays(); // clean up dead units
         // <<-- /Creer-Merge: before-turn -->>
     }
 
@@ -60,8 +61,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         this.updateBombsAndMiners(); // update miner values and explode bombs
 
         this.updateGravity(); // apply gravity to falling tiles
-
-        this.updateArrays(); // clean up dead units
 
         this.updateHoppers(); // extend hoppers
         // <<-- /Creer-Merge: after-turn -->>
@@ -226,7 +225,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         for (const bomb of this.game.bombs) {
-            if (bomb.timer === 0) {
+            if (bomb.timer <= 1) {
                 bomb.explode();
             } else {
                 bomb.timer -= 1;

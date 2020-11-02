@@ -64,11 +64,12 @@ export class Bomb extends GameObject {
      * Function to blow up a bomb.
      */
     public explode(): void {
+        // prevent bombs from triggering each other endlessly
         if (this.exploded) {
             return;
         }
         this.exploded = true;
-        // prevent bombs from triggering each other endlessly
+        this.timer = 0;
 
         const dmg = this.game.settings.bombExplosionDamage;
         const shockDmg = this.game.settings.bombShockwaveDamage;
@@ -94,15 +95,22 @@ export class Bomb extends GameObject {
             tile.bombs.forEach((bomb) => bomb.explode());
 
             const direction = this.tile.getAdjacentDirection(tile);
-            let shockTile: Tile | undefined = tile;
-            while (direction !== undefined && shockTile) {
-                shockTile = shockTile.getNeighbor(direction);
-                if (shockTile && shockTile.ore + shockTile.dirt <= 0) {
-                    shockTile.miners.forEach(
-                        (miner) => (miner.health -= shockDmg),
-                    );
-                    shockTile.bombs.forEach((bomb) => bomb.explode());
+            if (!direction) {
+                return;
+            }
+
+            let shockTile: Tile | undefined = tile.getNeighbor(direction);
+            while (shockTile) {
+                if (shockTile.dirt + shockTile.ore > 0) {
+                    break; // if we hit a filled block we stop
                 }
+
+                shockTile.miners.forEach(
+                    (miner) => (miner.health -= shockDmg),
+                );
+                shockTile.bombs.forEach((bomb) => bomb.explode());
+
+                shockTile = shockTile.getNeighbor(direction);
             }
         }
     }
