@@ -225,10 +225,10 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         for (const bomb of this.game.bombs) {
-            if (bomb.timer <= 1) {
+            if (bomb.timer <= 0) {
                 bomb.explode();
             } else {
-                bomb.timer -= 1;
+                bomb.timer--;
             }
         }
     }
@@ -257,20 +257,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
                 if (willFall) {
                     // Fall logic
-                    let curTile = tile;
-                    curTile.isFalling = false;
-                    while (
-                        curTile.tileSouth &&
-                        !curTile.tileSouth.isSupport &&
-                        curTile.tileSouth.dirt + curTile.tileSouth.ore <= 0
-                    ) {
-                        curTile.tileSouth.ore = curTile.ore;
-                        curTile.tileSouth.dirt = curTile.dirt;
-                        curTile.ore = 0;
-                        curTile.dirt = 0;
-                        curTile.isFalling = false;
-                        curTile = curTile.tileSouth;
-                    }
+                    tile.applyGravity();
                 }
             }
             fallingTiles.pop();

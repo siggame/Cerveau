@@ -79,22 +79,39 @@ export class Bomb extends GameObject {
         }
 
         // Destroy current tile and surrounding tiles
-        this.tile.ore = 0;
-        this.tile.dirt = 0;
-        this.tile.miners.forEach(
-            (miner) => (miner.health = Math.max(0, miner.health - dmg)),
-        );
-        this.tile.bombs.forEach((bomb) => bomb.explode());
+        if (this.tile.shielding > 0) {
+            this.tile.shielding--;
+        } else {
+            this.tile.ore = 0;
+            this.tile.dirt = 0;
+            this.tile.isSupport = false;
+            this.tile.isLadder = false;
+            this.tile.miners.forEach(
+                (miner) => (miner.health = Math.max(0, miner.health - dmg)),
+            );
+            this.tile.bombs.forEach((bomb) => bomb.explode());
+        }
 
         // Bomb out cardinal directions
         for (const tile of this.tile.getNeighbors()) {
+            if (tile.shielding > 0) {
+                tile.shielding--;
+                continue;
+            }
+
+            const direction = this.tile.getAdjacentDirection(tile);
+
             // Destroy direct neighboring tiles
             tile.ore = 0;
             tile.dirt = 0;
+            tile.isSupport = false;
+            tile.isLadder = false;
             tile.miners.forEach((miner) => (miner.health -= dmg));
             tile.bombs.forEach((bomb) => bomb.explode());
+            if (tile.tileNorth) {
+                tile.tileNorth.checkFalling();
+            }
 
-            const direction = this.tile.getAdjacentDirection(tile);
             if (!direction) {
                 return;
             }
