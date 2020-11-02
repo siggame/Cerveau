@@ -28,6 +28,8 @@ export class Bomb extends GameObject {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
+    public exploded!: boolean;
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -48,6 +50,7 @@ export class Bomb extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
+        this.exploded = false;
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -61,13 +64,13 @@ export class Bomb extends GameObject {
      * Function to blow up a bomb.
      */
     public explode(): void {
-        if (this.timer === -99) {
+        // prevent bombs from triggering each other endlessly
+        if (this.exploded) {
             return;
         }
-        this.timer = -99;
-        // prevent bombs from triggering each other endlessly
+        this.exploded = true;
+        this.timer = 0;
 
-        // Bombs can kill units without health upgrades
         const dmg = this.game.settings.bombExplosionDamage;
         const shockDmg = this.game.settings.bombShockwaveDamage;
 
@@ -88,19 +91,26 @@ export class Bomb extends GameObject {
             // Destroy direct neighboring tiles
             tile.ore = 0;
             tile.dirt = 0;
-            this.tile.miners.forEach((miner) => (miner.health -= dmg));
-            this.tile.bombs.forEach((bomb) => bomb.explode());
+            tile.miners.forEach((miner) => (miner.health -= dmg));
+            tile.bombs.forEach((bomb) => bomb.explode());
 
             const direction = this.tile.getAdjacentDirection(tile);
-            let shockTile: Tile | undefined = tile;
-            while (direction !== undefined && shockTile) {
-                shockTile = shockTile.getNeighbor(direction);
-                if (shockTile && shockTile.ore + shockTile.dirt <= 0) {
-                    this.tile.miners.forEach(
-                        (miner) => (miner.health -= shockDmg),
-                    );
-                    this.tile.bombs.forEach((bomb) => bomb.explode());
+            if (!direction) {
+                return;
+            }
+
+            let shockTile: Tile | undefined = tile.getNeighbor(direction);
+            while (shockTile) {
+                if (shockTile.dirt + shockTile.ore > 0) {
+                    break; // if we hit a filled block we stop
                 }
+
+                shockTile.miners.forEach(
+                    (miner) => (miner.health -= shockDmg),
+                );
+                shockTile.bombs.forEach((bomb) => bomb.explode());
+
+                shockTile = shockTile.getNeighbor(direction);
             }
         }
     }
