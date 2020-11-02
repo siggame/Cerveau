@@ -28,6 +28,8 @@ export class Bomb extends GameObject {
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
+    public exploded!: boolean;
+
     // <<-- /Creer-Merge: attributes -->>
 
     /**
@@ -48,6 +50,7 @@ export class Bomb extends GameObject {
 
         // <<-- Creer-Merge: constructor -->>
         // setup any thing you need here
+        this.exploded = false;
         // <<-- /Creer-Merge: constructor -->>
     }
 
@@ -61,10 +64,10 @@ export class Bomb extends GameObject {
      * Function to blow up a bomb.
      */
     public explode(): void {
-        if (this.timer === -99) {
+        if (this.exploded) {
             return;
         }
-        this.timer = -99;
+        this.exploded = true;
         // prevent bombs from triggering each other endlessly
 
         const dmg = this.game.settings.bombExplosionDamage;
