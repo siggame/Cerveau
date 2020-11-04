@@ -188,8 +188,10 @@ export class Tile extends GameObject implements BaseTile {
             toMove.ore = this.ore;
             this.dirt = 0;
             this.ore = 0;
-            this.isSupport = false; // supports removed on fall
-            this.shielding = 0; // shielding removed on fall
+            toMove.isSupport = this.isSupport;
+            this.isSupport = false;
+            toMove.shielding = this.shielding;
+            this.shielding = 0;
 
             this.miners.forEach((m) => {
                 m.takeFallDamage(distance);

@@ -225,7 +225,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
         }
 
         for (const bomb of this.game.bombs) {
-            if (bomb.timer <= 0) {
+            if (bomb.timer <= 1) {
                 bomb.explode();
             } else {
                 bomb.timer--;

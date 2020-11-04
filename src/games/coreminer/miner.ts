@@ -516,7 +516,7 @@ export class Miner extends GameObject {
                 }
                 for (let i = 0; i < trueAmount; i++) {
                     const bomb = this.game.manager.create.bomb({
-                        timer: 1,
+                        timer: 2,
                         tile,
                     });
                     this.game.bombs.push(bomb);
