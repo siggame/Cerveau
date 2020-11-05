@@ -102,6 +102,10 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
             return true;
         }
+
+        if (this.game.remainingOre === 0) {
+            this.secondaryWinConditions("No more ore is available!");
+        }
         // <<-- /Creer-Merge: primary-win-conditions -->>
 
         return false; // If we get here no one won on this turn.
@@ -130,6 +134,23 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
             );
 
             return;
+        } else {
+            const moneyWinners = this.game.players.sort(
+                (a, b) => b.money - a.money,
+            );
+
+            if (moneyWinners[0].money !== moneyWinners[1].money) {
+                this.declareWinner(
+                    `${reason}: You were a more thrifty spender.`,
+                    moneyWinners[0],
+                );
+                this.declareLoser(
+                    `${reason}: Your opponent wasted fewer company funds.`,
+                    moneyWinners[1],
+                );
+
+                return;
+            }
         }
         // <<-- /Creer-Merge: secondary-win-conditions -->>
 

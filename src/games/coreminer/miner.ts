@@ -478,6 +478,7 @@ export class Miner extends GameObject {
             }
             player.money += trueAmount * this.game.oreValue;
             player.value += trueAmount;
+            this.game.remainingOre -= trueAmount;
             this.ore -= trueAmount;
         } else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
             if (amount <= 0) {

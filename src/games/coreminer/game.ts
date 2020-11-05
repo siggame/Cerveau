@@ -216,6 +216,7 @@ export class CoreminerGame extends BaseClasses.Game {
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
+    public remainingOre!: number;
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -502,6 +503,7 @@ export class CoreminerGame extends BaseClasses.Game {
         });
 
         // Mirror the map
+        this.remainingOre = 0;
         for (let x = 0; x < side; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
                 const tile = getMutableTile(x, y);
@@ -517,6 +519,7 @@ export class CoreminerGame extends BaseClasses.Game {
                 }
                 oppositeTile.dirt = tile.dirt;
                 oppositeTile.ore = tile.ore;
+                this.remainingOre += tile.ore * 2;
             }
         }
     }
