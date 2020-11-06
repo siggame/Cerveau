@@ -7,7 +7,6 @@ import { SanitizableType } from "~/core/sanitize/sanitizable-interfaces";
 import { Immutable } from "~/utils";
 import { createDeltaMergeable } from "./create-delta-mergeable";
 import { DeltaMergeable } from "./delta-mergeable";
-import { DeltaMergeableWrapped } from "./delta-mergeable-wrapped";
 
 /**
  * Overrides of build-in array methods to be type safe at run time.
@@ -49,7 +48,6 @@ class DeltaArray<T> extends Array<T> {
  * @param args.key - The key of this array in its parent delta mergable.
  * @param args.childType - The type of all children in this Array.
  * @param args.parent - The parent of this node.
- * @param args.initialValue - The initial values in the array.
  * @returns A new DeltaMergeable wrapping an Array.
  */
 export function createArray<T = any>(args: {
@@ -59,36 +57,26 @@ export function createArray<T = any>(args: {
     childType: Immutable<SanitizableType>;
     /** The parent of this node. */
     parent?: DeltaMergeable;
-    /** The initial value of the array. */
-    initialValue?: T[];
 }): DeltaMergeable<T[]> {
     let oldLength = 0;
     const array: T[] = new DeltaArray();
     const values = new Array<DeltaMergeable<T>>();
-    const wrapper = { creating: true };
-    const container = new DeltaMergeableWrapped<T[]>({
+    const container = new DeltaMergeable<T[]>({
         key: args.key,
         parent: args.parent,
         initialValue: array,
-        transform: (newArray: T[] | undefined) => {
-            if (wrapper.creating) {
-                return array;
-            }
-
+        transform: (newArray: T[] | undefined, currentValue) => {
             const copyFrom = newArray || [];
-            const currentValue = container.wrapper as T[];
-
             // We won't allow people to re-set this array,
             // instead we will mutate the current array to match `newArray`
-            currentValue.length = copyFrom.length;
             for (let i = 0; i < copyFrom.length; i++) {
-                currentValue[i] = copyFrom[i];
+                currentValue![i] = copyFrom[i];
             }
+            currentValue!.length = copyFrom.length;
 
-            return array;
+            return currentValue;
         },
     });
-    wrapper.creating = false;
 
     const lengthDeltaMergeable = new DeltaMergeable<number>({
         key: SHARED_CONSTANTS.DELTA_LIST_LENGTH,
@@ -104,6 +92,7 @@ export function createArray<T = any>(args: {
      */
     function checkIfUpdated(index?: number, value?: T): void {
         let newLength = array.length;
+
         if (
             index !== undefined &&
             (index >= oldLength || index >= array.length)
@@ -147,6 +136,7 @@ export function createArray<T = any>(args: {
     const proxyArray = new Proxy(array, {
         set(target: T[], property: string | number, value: T): boolean {
             const index = Number(property);
+
             if (isNaN(index)) {
                 if (property === "length") {
                     Reflect.set(target, property, value);
@@ -181,10 +171,6 @@ export function createArray<T = any>(args: {
     });
 
     container.wrapper = proxyArray;
-
-    if (args.initialValue) {
-        container.set(args.initialValue);
-    }
 
     return container;
 }

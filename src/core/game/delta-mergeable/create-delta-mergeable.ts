@@ -73,7 +73,6 @@ export function createDeltaMergeable(args: {
                 key: args.key,
                 parent: args.parent,
                 childType: args.type.valueType,
-                initialValue: args.initialValue,
             });
         case "dictionary":
             return createObject({
