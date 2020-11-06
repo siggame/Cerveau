@@ -659,7 +659,10 @@ export class Miner extends GameObject {
             toMine -= settings.ladderHealth;
         }
 
-        while (tile.shielding > 0 && toMine >= (settings.shieldHealth * tile.shielding)) {
+        while (
+            tile.shielding > 0 &&
+            toMine >= settings.shieldHealth * tile.shielding
+        ) {
             tile.shielding--;
             toMine -= settings.shieldHealth;
         }
@@ -684,12 +687,7 @@ export class Miner extends GameObject {
         // set tiles that are falling
         if (tile.ore + tile.dirt <= 0) {
             let upward = tile.tileNorth;
-            // making the assumption that ladders and supports don't fall. if they do then extra
-            // logic needs to be in place for supports.
-            if (
-                upward &&
-                !upward.isLadder
-            ) {
+            if (upward && !upward.isLadder) {
                 upward.isFalling = true;
                 upward = upward.tileNorth;
             }
