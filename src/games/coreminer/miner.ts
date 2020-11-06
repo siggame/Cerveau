@@ -478,6 +478,7 @@ export class Miner extends GameObject {
             }
             player.money += trueAmount * this.game.oreValue;
             player.value += trueAmount;
+            this.game.remainingOre -= trueAmount;
             this.ore -= trueAmount;
         } else if ((tile.isHopper || tile.isBase) && material === `dirt`) {
             if (amount <= 0) {
@@ -516,7 +517,7 @@ export class Miner extends GameObject {
                 }
                 for (let i = 0; i < trueAmount; i++) {
                     const bomb = this.game.manager.create.bomb({
-                        timer: 1,
+                        timer: 2,
                         tile,
                     });
                     this.game.bombs.push(bomb);
