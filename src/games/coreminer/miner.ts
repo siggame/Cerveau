@@ -602,7 +602,7 @@ export class Miner extends GameObject {
         }
 
         let toMine = amount;
-        if (amount <= 0) {
+        if (amount <= 0 || amount > maxMine) {
             toMine = Math.min(maxMine, cargoSpace, this.miningPower);
         }
 
@@ -629,42 +629,39 @@ export class Miner extends GameObject {
         // <<-- Creer-Merge: mine -->>
         const settings = this.game.settings;
 
-        // get the amount to mine if mining
-        let toMine = Math.min(amount, tile.dirt + tile.ore);
-        // if given <= 0 amount set to max possible mining
-        if (amount <= 0) {
-            toMine = tile.dirt + tile.ore;
-            if (
-                toMine + tile.shielding * settings.shieldCost >
-                this.miningPower
-            ) {
-                toMine =
-                    this.miningPower - tile.shielding * settings.shieldCost;
-            }
-        }
-        // get mining cost
-        const miningCost =
-            toMine +
+        // get the total used space of the miner
+        const cargo = this.getCargoAmount();
+
+        const cargoSpace = this.currentUpgrade.cargoCapacity - cargo;
+
+        // get total amount they could mine
+        const maxMine =
+            tile.dirt +
+            tile.ore +
             Number(tile.isLadder) * settings.ladderCost +
             Number(tile.isSupport) * settings.supportCost +
             tile.shielding * settings.shieldCost;
 
-        this.miningPower -= miningCost;
+        let toMine = amount;
+        if (amount <= 0 || amount > maxMine) {
+            toMine = Math.min(maxMine, cargoSpace, this.miningPower);
+        }
 
-        if (tile.isLadder) {
+        this.miningPower -= toMine;
+
+        if (tile.isLadder && toMine >= settings.ladderHealth) {
             tile.isLadder = false;
+            toMine -= settings.ladderHealth;
         }
 
-        if (tile.isSupport) {
+        if (tile.isSupport && toMine >= settings.supportHealth) {
             tile.isSupport = false;
+            toMine -= settings.ladderHealth;
         }
 
-        if (tile.shielding > 0) {
-            // subtract whatever we can take away, or the whole shield
-            // this may be unwanted behavior, but if user tries to mine a filled block with a shield
-            // and used <= 0 for amount, we still express success if they only had enough mining power
-            // to break/damage the shield.
-            tile.shielding -= Math.min(miningCost, tile.shielding);
+        while (tile.shielding > 0 && toMine >= (settings.shieldHealth * tile.shielding)) {
+            tile.shielding--;
+            toMine -= settings.shieldHealth;
         }
 
         // mine ore and dirt, written so easily swapped
@@ -689,11 +686,9 @@ export class Miner extends GameObject {
             let upward = tile.tileNorth;
             // making the assumption that ladders and supports don't fall. if they do then extra
             // logic needs to be in place for supports.
-            while (
+            if (
                 upward &&
-                upward.dirt + upward.ore <= 0 &&
-                !upward.isLadder &&
-                !upward.isSupport
+                !upward.isLadder
             ) {
                 upward.isFalling = true;
                 upward = upward.tileNorth;
