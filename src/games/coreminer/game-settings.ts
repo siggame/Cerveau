@@ -264,7 +264,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             },
             maxTurns: {
                 // <<-- Creer-Merge: max-turns -->>
-                default: 500,
+                default: 250,
                 // <<-- /Creer-Merge: max-turns -->>
                 min: 1,
                 description:
