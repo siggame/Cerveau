@@ -1,4 +1,3 @@
-import { removeElements } from "@cadre/ts-utils";
 import { BaseGameObjectRequiredData } from "~/core/game";
 import { BaseTile } from "~/core/game/mixins/tiled";
 import { TileConstructorArgs } from "./";
@@ -9,6 +8,7 @@ import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { removeElements } from "@cadre/ts-utils";
 // <<-- /Creer-Merge: imports -->>
 
 /**

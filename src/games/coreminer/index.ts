@@ -85,13 +85,13 @@ export const BaseClasses = {
 /** All the possible properties for Bomb instances. */
 export interface BombProperties {
     /**
-     * The Tile this Miner is on.
+     * The Tile this Bomb is on.
      */
     tile?: Tile;
 
     /**
-     * The number of turns before this Bomb explodes. Zero means it will
-     * explode after the current turn.
+     * The number of turns before this Bomb explodes. One means it will explode
+     * after the current turn.
      */
     timer?: number;
 }
