@@ -646,7 +646,7 @@ export class Miner extends GameObject {
 
         if (tile.shielding > 0 && toMine >= settings.shieldHealth) {
             // Get amount of shields we could mine based on power
-            const shieldsMinable = toMine % settings.shieldHealth;
+            const shieldsMinable = Math.floor(toMine / settings.shieldHealth);
 
             // Get number of shields we can mine based on tile
             const shieldsMined = Math.min(shieldsMinable, tile.shielding);
@@ -657,6 +657,7 @@ export class Miner extends GameObject {
 
         if (tile.shielding > 0) {
             // Didn't mine past shield
+            this.miningPower += toMine;
             return true;
         }
 
