@@ -184,6 +184,18 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                 removeElements(miner.tile.miners, miner);
                 miner.tile.ore += miner.ore;
                 miner.tile.dirt += miner.dirt;
+
+                for (let i = 0; i < miner.bombs; i++) {
+                    const bomb = this.game.manager.create.bomb({
+                        timer: 2,
+                        tile: miner.tile,
+                    });
+
+                    miner.tile.bombs.push(bomb);
+                    this.game.bombs.push(bomb);
+                    this.game.currentPlayer.bombs.push(bomb);
+                }
+
                 miner.tile = undefined;
             }
         }
