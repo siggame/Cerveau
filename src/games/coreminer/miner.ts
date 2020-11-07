@@ -601,13 +601,8 @@ export class Miner extends GameObject {
             return `${this} has no cargo space to store mined materials!`;
         }
 
-        let toMine = amount;
-        if (amount <= 0 || amount > maxMine) {
-            toMine = Math.min(maxMine, cargoSpace, this.miningPower);
-        }
-
-        if (toMine <= 0) {
-            return `${this} cannot mine anything!`;
+        if (amount > maxMine) {
+            return `${this} is trying to mine more than is on a tile!`;
         }
         // <<-- /Creer-Merge: invalidate-mine -->>
     }
@@ -643,11 +638,27 @@ export class Miner extends GameObject {
             tile.shielding * settings.shieldCost;
 
         let toMine = amount;
-        if (amount <= 0 || amount > maxMine) {
+        if (amount <= 0) {
             toMine = Math.min(maxMine, cargoSpace, this.miningPower);
         }
 
         this.miningPower -= toMine;
+
+        if (tile.shielding > 0 && toMine >= settings.shieldHealth) {
+            // Get amount of shields we could mine based on power
+            const shieldsMinable = toMine % settings.shieldHealth;
+
+            // Get number of shields we can mine based on tile
+            const shieldsMined = Math.min(shieldsMinable, tile.shielding);
+
+            toMine -= shieldsMined * settings.shieldHealth;
+            tile.shielding -= shieldsMined;
+        }
+
+        if (tile.shielding > 0) {
+            // Didn't mine past shield
+            return true;
+        }
 
         if (tile.isLadder && toMine >= settings.ladderHealth) {
             tile.isLadder = false;
@@ -657,14 +668,6 @@ export class Miner extends GameObject {
         if (tile.isSupport && toMine >= settings.supportHealth) {
             tile.isSupport = false;
             toMine -= settings.ladderHealth;
-        }
-
-        while (
-            tile.shielding > 0 &&
-            toMine >= settings.shieldHealth * tile.shielding
-        ) {
-            tile.shielding--;
-            toMine -= settings.shieldHealth;
         }
 
         // mine ore and dirt, written so easily swapped
@@ -687,7 +690,7 @@ export class Miner extends GameObject {
         // set tiles that are falling
         if (tile.ore + tile.dirt <= 0) {
             let upward = tile.tileNorth;
-            if (upward && !upward.isLadder) {
+            while (upward && !upward.isLadder) {
                 upward.isFalling = true;
                 upward = upward.tileNorth;
             }
