@@ -134,7 +134,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
                     "The amount of value awarded when ore is dumped in the " +
                     "base and sold.",
                 // <<-- Creer-Merge: oreValue -->>
-                default: 5,
+                default: 1,
                 min: 1,
                 // <<-- /Creer-Merge: oreValue -->>
             },

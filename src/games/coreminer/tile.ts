@@ -149,14 +149,16 @@ export class Tile extends GameObject implements BaseTile {
         // Check that the tile is floating, with no dirt or ore below
         if (tileBelow && tileBelow.ore + tileBelow.dirt <= 0) {
             const supportEast = tileBelow.tileEast;
-            const supportSouth = tileBelow.tileSouth;
+            const supportSouth = tileBelow;
             const supportWest = tileBelow.tileWest;
 
             // Check that there is not support below, directly or to the side
+            // Or that there is a ladder directly below
             if (
                 (supportEast && supportEast.isSupport) ||
                 (supportSouth && supportSouth.isSupport) ||
-                (supportWest && supportWest.isSupport)
+                (supportWest && supportWest.isSupport) ||
+                (supportSouth && supportSouth.isLadder)
             ) {
                 return;
             }
@@ -178,6 +180,15 @@ export class Tile extends GameObject implements BaseTile {
             !southTile.isLadder &&
             !southTile.isSupport
         ) {
+            if (this.ore + this.dirt > 0) {
+                // Filled tiles are caught by supports on their sides
+                if (
+                    (southTile.tileEast && southTile.tileEast.isSupport) ||
+                    (southTile.tileWest && southTile.tileWest.isSupport)
+                ) {
+                    break;
+                }
+            }
             toMove = southTile;
             southTile = southTile.tileSouth;
             distance++;

@@ -184,6 +184,18 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                 removeElements(miner.tile.miners, miner);
                 miner.tile.ore += miner.ore;
                 miner.tile.dirt += miner.dirt;
+
+                for (let i = 0; i < miner.bombs; i++) {
+                    const bomb = this.game.manager.create.bomb({
+                        timer: 1,
+                        tile: miner.tile,
+                    });
+
+                    miner.tile.bombs.push(bomb);
+                    this.game.bombs.push(bomb);
+                    this.game.currentPlayer.bombs.push(bomb);
+                }
+
                 miner.tile = undefined;
             }
         }
@@ -258,7 +270,11 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     private updateGravity(): void {
         const fallingTiles = this.game.tiles.filter((t) => t.isFalling);
         while (fallingTiles.length > 0) {
-            const tile = fallingTiles[fallingTiles.length - 1];
+            const tile = fallingTiles.pop();
+            if (!tile) {
+                return;
+            }
+
             if (tile.tileSouth) {
                 let willFall = true;
                 // Supports prevent falling
@@ -281,7 +297,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                     tile.applyGravity();
                 }
             }
-            fallingTiles.pop();
         }
     }
 
