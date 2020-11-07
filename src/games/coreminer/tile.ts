@@ -153,10 +153,12 @@ export class Tile extends GameObject implements BaseTile {
             const supportWest = tileBelow.tileWest;
 
             // Check that there is not support below, directly or to the side
+            // Or that there is a ladder directly below
             if (
-                (supportEast && (supportEast.isSupport || supportEast.isLadder)) ||
-                (supportSouth && (supportSouth.isSupport || supportSouth.isLadder)) ||
-                (supportWest && (supportWest.isSupport || supportWest.isLadder))
+                (supportEast && supportEast.isSupport) ||
+                (supportSouth && supportSouth.isSupport) ||
+                (supportWest && supportWest.isSupport) ||
+                (supportSouth && supportSouth.isLadder)
             ) {
                 return;
             }
