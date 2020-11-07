@@ -174,7 +174,7 @@ export class Tile extends GameObject implements BaseTile {
         if (this.isLadder) {
             return;
         }
-        
+
         let southTile = this.tileSouth;
         let toMove = this as Tile;
         let distance = 0;
@@ -182,7 +182,8 @@ export class Tile extends GameObject implements BaseTile {
             southTile &&
             southTile.dirt + southTile.ore <= 0 &&
             !southTile.isLadder &&
-            !southTile.isSupport
+            !southTile.isSupport &&
+            !southTile.isHopper
         ) {
             if (this.ore + this.dirt > 0) {
                 // Filled tiles are caught by supports on their sides
