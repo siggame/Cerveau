@@ -171,6 +171,10 @@ export class Tile extends GameObject implements BaseTile {
      * Helper function to apply gravity to a tile.
      */
     public applyGravity(): void {
+        if (this.isLadder) {
+            return;
+        }
+        
         let southTile = this.tileSouth;
         let toMove = this as Tile;
         let distance = 0;
