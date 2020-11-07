@@ -187,7 +187,7 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
 
                 for (let i = 0; i < miner.bombs; i++) {
                     const bomb = this.game.manager.create.bomb({
-                        timer: 2,
+                        timer: 1,
                         tile: miner.tile,
                     });
 

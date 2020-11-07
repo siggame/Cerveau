@@ -121,7 +121,7 @@ export class Miner extends GameObject {
     public takeFallDamage(distance: number): void {
         this.health -= Math.min(
             this.health,
-            distance - (this.upgradeLevel + 1),
+            (distance - (this.upgradeLevel + 1)) * 5,
         );
     }
 
@@ -448,6 +448,12 @@ export class Miner extends GameObject {
 
         if (material === `ore` && this.ore <= 0) {
             return `${this} has no ore to dump!`;
+        }
+
+        if (tile.isHopper || tile.isBase) {
+            if (tile.owner !== player) {
+                return `${this} cannot deposit ore in the opponent's hopper!`;
+            }
         }
         // <<-- /Creer-Merge: invalidate-dump -->>
     }
