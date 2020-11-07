@@ -32,7 +32,7 @@ export class Forecast extends GameObject {
 
     /**
      * How much of a Building's fire that can be blown in the direction of
-     * this Forecast. Fire is duplicated (copied), not moved (transfered).
+     * this Forecast. Fire is duplicated (copied), not moved (transferred).
      */
     public intensity!: number;
 

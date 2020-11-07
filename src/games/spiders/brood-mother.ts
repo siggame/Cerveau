@@ -146,7 +146,7 @@ export class BroodMother extends Spider {
      * @param player - The player that called this.
      * @param spiderlingType - The string name of the Spiderling class you want
      * to Spawn. Must be 'Spitter', 'Weaver', or 'Cutter'.
-     * @returns The newly spwaned Spiderling if successful. Undefined otherwise.
+     * @returns The newly spawned Spiderling if successful. Undefined otherwise.
      */
     protected async spawn(
         player: Player,

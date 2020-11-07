@@ -37,7 +37,7 @@ export class ChessGame extends BaseClasses.Game {
 
     /**
      * The list of [known] moves that have occurred in the game,
-     * in Universal Chess Inferface (UCI) format. The first element is the first
+     * in Universal Chess Interface (UCI) format. The first element is the first
      * move, with the last element being the most recent.
      */
     public history!: string[];

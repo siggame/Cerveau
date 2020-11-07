@@ -372,7 +372,7 @@ export class Unit extends GameObject {
 
     /**
      * Buries gold on this Unit's Tile. Gold must be a certain distance away
-     * for it to get interest (`Game.minInterestDistance`).
+     * for it to get interest (Game.minInterestDistance).
      *
      * @param player - The player that called this.
      * @param amount - How much gold this Unit should bury. Amounts <= 0 will

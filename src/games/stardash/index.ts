@@ -346,7 +346,7 @@ export interface UnitProperties {
     genarium?: number;
 
     /**
-     * Tracks wheither or not the ship is dashing or Mining. If true, it cannot
+     * Tracks whether or not the ship is dashing or Mining. If true, it cannot
      * do anything else.
      */
     isBusy?: boolean;
@@ -390,7 +390,7 @@ export interface UnitProperties {
     rarium?: number;
 
     /**
-     * The sheild that a martyr ship has.
+     * The shield that a martyr ship has.
      */
     shield?: number;
 

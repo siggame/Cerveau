@@ -14,8 +14,8 @@ import { Unit } from "./unit";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * Collect of the most of the rarest mineral orbiting aroung the sun and
- * outcompete your competetor.
+ * Collect of the most of the rarest mineral orbiting around the sun and
+ * out-compete your competitor.
  */
 export class StardashGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it. */
