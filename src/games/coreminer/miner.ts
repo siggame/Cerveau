@@ -668,7 +668,7 @@ export class Miner extends GameObject {
 
         if (tile.isSupport && toMine >= settings.supportHealth) {
             tile.isSupport = false;
-            toMine -= settings.ladderHealth;
+            toMine -= settings.supportHealth;
         }
 
         // mine ore and dirt, written so easily swapped
