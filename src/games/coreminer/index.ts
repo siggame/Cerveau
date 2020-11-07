@@ -760,7 +760,7 @@ export const Namespace = makeNamespace({
                     },
                 },
                 timeAddedPerTurn: {
-                    typeName: "int",
+                    typeName: "float",
                 },
                 upgradePrice: {
                     typeName: "int",
@@ -1178,5 +1178,5 @@ export const Namespace = makeNamespace({
         },
     },
     gameVersion:
-        "a4592bb5acb0415146605769f439a09baf3768f41cdb3c7ad9dc971f42c4d96e",
+        "b559778acd8e4c689b8d028ca6cc154714ce79c39b09cd6d171b50faf88ef747",
 });
