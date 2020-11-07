@@ -183,7 +183,9 @@ export class Tile extends GameObject implements BaseTile {
             southTile.dirt + southTile.ore <= 0 &&
             !southTile.isLadder &&
             !southTile.isSupport &&
-            !southTile.isHopper
+            !southTile.isHopper &&
+            !this.isHopper &&
+            !this.isBase
         ) {
             if (this.ore + this.dirt > 0) {
                 // Filled tiles are caught by supports on their sides
