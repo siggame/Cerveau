@@ -180,6 +180,15 @@ export class Tile extends GameObject implements BaseTile {
             !southTile.isLadder &&
             !southTile.isSupport
         ) {
+            if (this.ore + this.dirt > 0) {
+                // Filled tiles are caught by supports on their sides
+                if (
+                    (southTile.tileEast && southTile.tileEast.isSupport) ||
+                    (southTile.tileWest && southTile.tileWest.isSupport)
+                ) {
+                    break;
+                }
+            }
             toMove = southTile;
             southTile = southTile.tileSouth;
             distance++;
