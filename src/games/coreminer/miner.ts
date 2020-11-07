@@ -497,7 +497,7 @@ export class Miner extends GameObject {
             if (amount <= 0) {
                 trueAmount = this.bombs;
             }
-            player.money += amount * this.game.bombPrice; // sell bombs at sale price
+            player.money += trueAmount * this.game.bombPrice; // sell bombs at sale price
             this.bombs -= trueAmount;
         } else {
             // Not dumping into base/hopper

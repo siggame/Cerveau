@@ -162,7 +162,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             spawnPrice: {
                 description: "The monetary price of spawning a Miner.",
                 // <<-- Creer-Merge: spawnPrice -->>
-                default: 200,
+                default: 300,
                 // <<-- /Creer-Merge: spawnPrice -->>
             },
 
@@ -206,7 +206,7 @@ export class CoreminerGameSettingsManager extends BaseClasses.GameSettings {
             upgradePrice: {
                 description: "The cost to upgrade a Miner.",
                 // <<-- Creer-Merge: upgradePrice -->>
-                default: 350,
+                default: 500,
                 // <<-- /Creer-Merge: upgradePrice -->>
             },
 
