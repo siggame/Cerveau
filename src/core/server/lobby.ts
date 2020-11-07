@@ -316,9 +316,12 @@ export class Lobby {
 
             if (room.clients.length === 0) {
                 // then that room is empty, no need to keep it around
-                const rooms = this.rooms.get(room.gameNamespace.gameName);
+                const { gameName } = room.gameNamespace;
+                const rooms = this.rooms.get(gameName);
                 if (!rooms) {
-                    throw new Error("Could not find rooms client was in");
+                    throw new Error(
+                        `Could not find rooms for game named '${gameName}' that client '${client.name}' was in.`,
+                    );
                 }
                 rooms.delete(room.id);
 
