@@ -258,7 +258,11 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
     private updateGravity(): void {
         const fallingTiles = this.game.tiles.filter((t) => t.isFalling);
         while (fallingTiles.length > 0) {
-            const tile = fallingTiles[fallingTiles.length - 1];
+            const tile = fallingTiles.pop();
+            if (!tile) {
+                return;
+            }
+
             if (tile.tileSouth) {
                 let willFall = true;
                 // Supports prevent falling
@@ -281,7 +285,6 @@ export class CoreminerGameManager extends BaseClasses.GameManager {
                     tile.applyGravity();
                 }
             }
-            fallingTiles.pop();
         }
     }
 
