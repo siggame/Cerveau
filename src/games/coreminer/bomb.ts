@@ -12,13 +12,13 @@ import { Tile } from "./tile";
  */
 export class Bomb extends GameObject {
     /**
-     * The Tile this Miner is on.
+     * The Tile this Bomb is on.
      */
     public tile?: Tile;
 
     /**
-     * The number of turns before this Bomb explodes. Zero means it will
-     * explode after the current turn.
+     * The number of turns before this Bomb explodes. One means it will explode
+     * after the current turn.
      */
     public timer!: number;
 
