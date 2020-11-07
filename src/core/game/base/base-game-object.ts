@@ -88,9 +88,8 @@ export class BaseGameObject extends BaseGameDeltaMergeables {
         if (this.gameObjectName === "Player") {
             // every game has a Player game object, but it is just an interface,
             // so we have to hack run time logic in here
-            return `Player "${((this as unknown) as BasePlayer).name}" #${
-                this.id
-            }`;
+            const player = (this as unknown) as BasePlayer;
+            return `Player "${player.name}" #${this.id}`;
         }
 
         return `${this.gameObjectName} #${this.id}`;
