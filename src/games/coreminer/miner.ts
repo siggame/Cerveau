@@ -308,22 +308,24 @@ export class Miner extends GameObject {
                 return `A miner cannot buy unless it is near an allied hopper or base!`;
             }
         }
-        if (amount <= 0) {
-            return `${this} doesn't know how to buy negative amounts!`;
-        }
-
         const cargo =
             this.ore +
             this.dirt +
             this.bombs * this.game.bombSize +
             this.buildingMaterials;
 
+        let trueAmount = amount;
+        if (amount <= 0) {
+            trueAmount = this.currentUpgrade.cargoCapacity - cargo;
+        }
+
+
         switch (resource) {
             case "dirt":
-                if (player.money < amount * this.game.dirtPrice) {
+                if (player.money < trueAmount * this.game.dirtPrice) {
                     return `You cannot afford that much dirt!`;
                 }
-                if (cargo + amount > this.currentUpgrade.cargoCapacity) {
+                if (cargo + trueAmount > this.currentUpgrade.cargoCapacity) {
                     return `This miner cannot hold that much extra dirt!`;
                 }
                 break;
@@ -331,21 +333,21 @@ export class Miner extends GameObject {
                 return `You're supposed to be mining ore, not buying it! Get back to work!`;
                 break;
             case "bomb":
-                if (player.money < amount * this.game.bombPrice) {
+                if (player.money < trueAmount * this.game.bombPrice) {
                     return `You cannot afford that many bombs!`;
                 }
                 if (
-                    cargo + amount * this.game.bombSize >
+                    cargo + trueAmount * this.game.bombSize >
                     this.currentUpgrade.cargoCapacity
                 ) {
                     return `This miner cannot hold that many bombs!`;
                 }
                 break;
             case "buildingMaterials":
-                if (player.money < amount * this.game.buildingMaterialPrice) {
+                if (player.money < trueAmount * this.game.buildingMaterialPrice) {
                     return `You cannot afford that many building materials!`;
                 }
-                if (cargo + amount > this.currentUpgrade.cargoCapacity) {
+                if (cargo + trueAmount > this.currentUpgrade.cargoCapacity) {
                     return `This miner cannot hold that many additional building materials!`;
                 }
         }
@@ -367,20 +369,32 @@ export class Miner extends GameObject {
         amount: number,
     ): Promise<boolean> {
         // <<-- Creer-Merge: buy -->>
+
+        const cargo =
+            this.ore +
+            this.dirt +
+            this.bombs * this.game.bombSize +
+            this.buildingMaterials;
+
+        let trueAmount = amount;
+        if (amount <= 0) {
+            trueAmount = this.currentUpgrade.cargoCapacity - cargo;
+        }
+
         switch (resource) {
             case "dirt":
-                this.dirt += amount;
-                player.money -= amount * this.game.dirtPrice;
+                this.dirt += trueAmount;
+                player.money -= trueAmount * this.game.dirtPrice;
                 break;
             case "ore":
                 return false;
             case "bomb":
-                this.bombs += amount;
-                player.money -= amount * this.game.bombPrice;
+                this.bombs += trueAmount;
+                player.money -= trueAmount * this.game.bombPrice;
                 break;
             case "buildingMaterials":
-                this.buildingMaterials += amount;
-                player.money -= amount * this.game.buildingMaterialPrice;
+                this.buildingMaterials += trueAmount;
+                player.money -= trueAmount * this.game.buildingMaterialPrice;
         }
 
         return true;
