@@ -655,8 +655,8 @@ export class Miner extends GameObject {
         const maxMine =
             tile.dirt +
             tile.ore +
-            Number(tile.isLadder) * settings.ladderCost +
-            Number(tile.isSupport) * settings.supportCost +
+            Number(tile.isLadder) * settings.ladderHealth +
+            Number(tile.isSupport) * settings.supportHealth +
             tile.shielding * settings.shieldCost;
 
         let toMine = amount;
