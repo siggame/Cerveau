@@ -784,6 +784,10 @@ export class Miner extends GameObject {
         if (tile === this.tile.tileNorth && !this.tile.isLadder) {
             return `${this} cannot fly! This miner needs a ladder!`;
         }
+
+        if (tile === this.tile.tileSouth && this.tile.isHopper) {
+            return `${this} cannot move down through a hopper!`;
+        }
         // <<-- /Creer-Merge: invalidate-move -->>
     }
 
