@@ -319,7 +319,6 @@ export class Miner extends GameObject {
             trueAmount = this.currentUpgrade.cargoCapacity - cargo;
         }
 
-
         switch (resource) {
             case "dirt":
                 if (player.money < trueAmount * this.game.dirtPrice) {
@@ -344,7 +343,10 @@ export class Miner extends GameObject {
                 }
                 break;
             case "buildingMaterials":
-                if (player.money < trueAmount * this.game.buildingMaterialPrice) {
+                if (
+                    player.money <
+                    trueAmount * this.game.buildingMaterialPrice
+                ) {
                     return `You cannot afford that many building materials!`;
                 }
                 if (cargo + trueAmount > this.currentUpgrade.cargoCapacity) {

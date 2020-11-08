@@ -171,7 +171,7 @@ export class Tile extends GameObject implements BaseTile {
      * Helper function to apply gravity to a tile.
      */
     public applyGravity(): void {
-        if (this.isLadder) {
+        if (this.isLadder || this.isBase || this.isHopper) {
             return;
         }
 
