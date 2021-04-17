@@ -1,6 +1,8 @@
 import { Express } from "express";
 import { Lobby } from "~/core/server";
 
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 /**
  * Registers the gamelog/ route on a given Express app.
  *

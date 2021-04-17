@@ -36,7 +36,8 @@ export function setupWebServer(): void {
             app.set("view engine", "hbs");
             app.set("views", join(__dirname, "views"));
 
-            app.use("/styles", express.static(join(__dirname, "styles")));
+            const stylesHandler = express.static(join(__dirname, "styles"));
+            app.use("/styles", stylesHandler);
         }
 
         // expect POSTs to be JSON formatted
