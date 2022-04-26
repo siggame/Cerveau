@@ -8,25 +8,25 @@ class Tile {
     piece: Piece;
 
     getType() : string {
-        return this.type
+        return this.type;
     }
 
     setType(type: string) : void {
-        this.type = type
-        return
+        this.type = type;
+        return;
     }
 
     getIsOccupied() : boolean {
-        return this.isOccupied
+        return this.isOccupied;
     }
 
     setIsOccupied(isOccupied: boolean) : void {
-        this.isOccupied = isOccupied
-        return
+        this.isOccupied = isOccupied;
+        return;
     }
 
     getPiece() : Piece {
-        return this.piece
+        return this.piece;
     }
 }
 
