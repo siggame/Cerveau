@@ -11,7 +11,7 @@ class Tile {
         return this.type
     }
 
-    setType(type) : void {
+    setType(type: string) : void {
         this.type = type
         return
     }
@@ -20,7 +20,7 @@ class Tile {
         return this.isOccupied
     }
 
-    setIsOccupied(isOccupied) : void {
+    setIsOccupied(isOccupied: boolean) : void {
         this.isOccupied = isOccupied
         return
     }
