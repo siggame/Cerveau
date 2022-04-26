@@ -7,6 +7,12 @@ class Tile {
     isOccupied: boolean;
     piece: Piece;
 
+    constructor(type: string, isOccupied: boolean, piece: Piece) {
+        this.type = type;
+        this.isOccupied = isOccupied;
+        this.piece = piece;
+    }
+
     getType() : string {
         return this.type;
     }
