@@ -81,7 +81,7 @@ export interface PlayerProperties {
      * The color (side) of this player. Either 'white' or 'black', with
      * the 'white' player having the first move.
      */
-    color?: "blue" | "red";
+    color?: "white" | "black";
 
     /**
      * If the player lost the game or not.

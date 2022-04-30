@@ -78,8 +78,8 @@ export class ChessGame extends BaseClasses.Game {
             this.chess.load_pgn(this.settings.pgn);
         }
 
-        (this.players[0] as MutablePlayer).color = "blue";
-        (this.players[1] as MutablePlayer).color = "red";
+        (this.players[0] as MutablePlayer).color = "white";
+        (this.players[1] as MutablePlayer).color = "black";
 
         this.fen = this.chess.fen();
         this.history.push(...this.chess.history());
