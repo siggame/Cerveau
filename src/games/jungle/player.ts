@@ -8,9 +8,9 @@ import { GameObject } from "./game-object";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * A coin flip will decide if 'player1' or 'player2' will go first.
+ * Blue will go first.
  */
-export type PlayerColor = "Player1" | "Player2";
+export type PlayerColor = "blue" | "red";
 
 /**
  * A player in this game. Every AI controls one player.
@@ -26,9 +26,9 @@ export class Player extends GameObject implements BaseJunglePlayer {
     public readonly clientType!: string;
 
     /**
-     * A coin flip will decide if 'player1' or 'player2' will go first.
+     * Blue will go first.
      */
-    public readonly color!: "Player1" | "Player2";
+    public readonly color!: "blue" | "red";
 
     /**
      * If the player lost the game or not.
