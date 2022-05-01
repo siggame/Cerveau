@@ -30,13 +30,18 @@ class Tile {
     getPiece() : Piece {
         return this.piece;
     }
+
+    setPiece(piece: Piece) : void {
+        this.piece.copyPiece(piece);
+        return;
+    }
 }
 
 class Piece {
   rank: number;
-  color: number;
+  color: string;
 
-  constructor(rank: number, color: number) {
+  constructor(rank: number, color: string) {
       this.rank = rank;
       this.color = color;
   }
@@ -47,23 +52,35 @@ class Piece {
       this.rank = rank;
       return;
   }
-  getColor() : number {
+  getColor() : string {
       return this.color;
   }
-  setColor(color: number) : void {
+  setColor(color: string) : void {
       this.color = color;
       return;
+  }
+  copyPiece(source: Piece) : void {
+    this.rank = source.getRank();
+    this.color = source.getColor();
+    return;
   }
 }
 
 class Gameboard {
   board: Tile[][];
   activeColor: string;
-  halfmoves: integer;
-  fullmoves: integer;
+  halfMoves: number;
+  fullMoves: number;
+  maxX: number;
+  maxY: number;
 
-  constructor(board: Tile[][]) {
+  constructor(board: Tile[][], activeColor: string, halfMoves: number, fullMoves: number, maxX: number, maxY: number) {
     this.board = board;
+    this.activeColor = activeColor;
+    this.halfMoves = halfMoves;
+    this.fullMoves = fullMoves;
+    this.maxX = maxX;
+    this.maxY = maxY;
   }
 
   //copy constructor. TS doesn't have a built in copy constructor
@@ -84,82 +101,99 @@ class Gameboard {
       // fenList[1] returns active color - "b" or "r"
       //this.activeColor: string = fenList[1];
       if(fenList[1] == "b") {
-          this.activeColor = 1;
+          this.activeColor = "b";
       }
       else {
-          this.activeColor = 2;
+          this.activeColor = "r";
       }
 
       // fenList[2] returns number of half moves
-      this.halfmoves: integer = Number(fenList[2]);
+      this.halfMoves = Number(fenList[2]);
 
       // fenList[3] returns number of full moves
-      this.fullmoves: integer = Number(fenList[3]);
+      this.fullMoves = Number(fenList[3]);
       return;
   }
+  
+
+  animalToRank(character: string) {
+    let animals: string = 'rcdwptle'
+    //Check if animal is on a trap
+    return animals.indexOf(character) + 1
+  }
+
+
+  rankToAnimal(rank: number) {
+    let listRank: number = rank-1 
+    let animals: string = 'rcdwptle'
+    //Check if animal is on a trap
+    return animals[listRank]
+  }
+
 
   initBoard(blueprint: string): void {
-      var board: Tile[][]
-      let rowList: string[] = fen.split("/")
+      let rowList: string[] = blueprint.split("/")
       // Loop through each space in grid and set type
-      for(var i = 0; i < 9; i++) {
-          for(var j = 0; j < 7; j++) {
-              //rowList[i][j]
-              // let tempTile = Tile()
-              // board[i][j] = Tile(``)
-              // Set tile type based on coordinates
-              if((i == 0 && j == 2) || (i == 0 && j == 4)
-                  || (i == 1 && j == 3) || (i == 7 && j == 3)
-                  || (i == 8 && j == 2) || (i == 8 && j == 4)) {
-                      board[i][j].setType("t");
+      for(let row = 0; row < 9; row++) {
+          for(var col = 0; col < 7; col++) {
+            //set trap tiles to traps
+              if((row == 0 && col == 2) || (row == 0 && col == 4)
+                  || (row == 1 && col == 3) || (row == 7 && col == 3)
+                  || (row == 8 && col == 2) || (row == 8 && col == 4)) {
+                      this.board[row][col].setType("t");
               }
-              else if((i == 0 && j == 3) || (i == 8 && j == 3)) {
-                  board[i][j].setType("d");
+              //set den tiles to dens
+              else if((row == 0 && col == 3) || (row == 8 && col == 3)) {
+                  this.board[row][col].setType("d");
               }
-              else if((i == 3 && j == 1) || (i == 3 && j == 2)
-                  || (i == 3 && j == 4) || (i == 3 && j == 5)
-                  || (i == 4 && j == 1) || (i == 4 && j == 2)
-                  || (i == 4 && j == 4) || (i == 4 && j == 5)
-                  || (i == 5 && j == 1) || (i == 5 && j == 2)
-                  || (i == 5 && j == 4) || (i == 5 && j == 5)) {
-                      board[i][j].setType("r");
+              //set river tiles to river
+              else if((row == 3 && col == 1) || (row == 3 && col == 2)
+                  || (row == 3 && col == 4) || (row == 3 && col == 5)
+                  || (row == 4 && col == 1) || (row == 4 && col == 2)
+                  || (row == 4 && col == 4) || (row == 4 && col == 5)
+                  || (row == 5 && col == 1) || (row == 5 && col == 2)
+                  || (row == 5 && col == 4) || (row == 5 && col == 5)) {
+                      this.board[row][col].setType("r");
               }
+              //set blank tiles to blank
               else {
-                  board[i][j].setType("b");
+                  this.board[row][col].setType("b");
               }
               // Default is unoccupied
-              board[i][j].setIsOccupied(False);
+              this.board[row][col].setIsOccupied(false);
           }
       }
-      // Now parse the fen string to set the piece info
-      let board_i = 0
-      let board_j = 0
-      for(var i = 0; i < rowList.length; i++) {
-          board_j = 0;
-          for(var j = 0; j < rowList[i].length; j++) {
+
+      
+      // Now parse the fen string to set the piece info for each location
+      let boardRow = 0
+      let boardCol = 0
+      for(var row = 0; row < rowList.length; row++) {
+          boardCol = 0;
+          for(var col = 0; col < rowList[row].length; col++) {
               // If number, skip that many locations
-              if(isNumber(rowList[i][j])) {
-                  board_j = board_j + Number(rowList[i][j]);
+              if(this.isNumber(rowList[row][col])) {
+                  boardCol = boardCol + Number(rowList[row][col]);
               }
               // Else, record the animal that is there
               else {
-                  board[board_i][board_j].setIsOccupied(True);
-                  let rank = 0;
-                  let color = 1;
+                  this.board[boardRow][boardCol].setIsOccupied(true);
+                  let rank: number = 0;
+                  let color: string;
                   // If uppercase, then piece is Blue (1)
-                  if(rowList[i][j] == rowList[i][j].toUpperCase()) {
-                      color = 1;
+                  if(rowList[row][col] == rowList[row][col].toUpperCase()) {
+                      color = 'b';
                   }
                   // If lowercase, then piece is Red (2)
                   else {
-                      color = 2;
+                      color = 'r';
                   }
-                  rank = animalToRank[rowList[i][j].toLowerCase()];
-                  board[board_i][board_j].setPiece(Piece(rank,color));
-                  board_j++;
+                  rank = this.animalToRank(rowList[row][col]);
+                  this.board[boardRow][boardCol].setPiece(new Piece(rank,color));
+                  boardCol++;
               }
           }
-          board_i++;
+          boardRow++;
       }
       return;
   }
@@ -168,7 +202,7 @@ class Gameboard {
       let fen_str = "";
       let tempChar = "";
       let tempRank = 0;
-      let tempColor = 1;
+      let tempColor: string;
       let spaceCtr = 0;
       let board_str = "";
       let row_str = "";
@@ -179,13 +213,13 @@ class Gameboard {
                       row_str.concat(String(spaceCtr));
                   }
                   spaceCtr = 0;
-                  tempRank = this.board[i][j].getRank();
-                  tempColor = this.board[i][j].getColor();
+                  tempRank = this.board[i][j].getPiece().getRank();
+                  tempColor = this.board[i][j].getPiece().getColor();
                   //str3 = str1.concat(str2.toString());
                   // Get char from rank
-                  tempChar = rankToAnimal[tempRank];
+                  tempChar = this.rankToAnimal(tempRank)
                   // Adjust to uppercase based on color
-                  if(tempColor == 1) {
+                  if(tempColor == 'b') {
                       tempChar = tempChar.toUpperCase();
                   }
                   row_str = row_str.concat(tempChar.toString());
@@ -203,58 +237,54 @@ class Gameboard {
       }
 
       //color = gameState.activeColor;
-      if(this.activeColor == 1)
-      {
-          let color = "b";
-      }
-      else {
-          let color = "r";
-      }
 
-      let halfmove = String(this.halfmoves);
-      let fullmove = String(this.fullmoves);
+      let halfmove = String(this.halfMoves);
+      let fullmove = String(this.fullMoves);
 
       fen_str = board_str.concat(" ");
-      fen_str = fen_str.concat(color.toString());
+      fen_str = fen_str.concat(this.activeColor);
       fen_str = fen_str.concat(" ");
-      fen_str = fen_Str.concat(halfmove.toString());
+      fen_str = fen_str.concat(halfmove.toString());
       fen_str = fen_str.concat(" ");
-      fen_str = fen_Str.concat(fullmove.toString());
+      fen_str = fen_str.concat(fullmove.toString());
       return fen_str;
   }
 
 
-  let animalToRank = {"e":8, "l":7, "t":6, "p":5, "w":4, "d":3, "c":2, "r":1};
-  let rankToAnimal = {8:"e", 7:"l", 6:"t", 5:"p", 4:"w", 3:"d", 2:"c", 1:"r"};
-
-  function isNumber(n) {
-    return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+  isNumber(n: string) {
+    if (typeof(n[0]) == typeof(3)) {
+      return true
+    }
+    else {
+      return false
+    }
   }
 
-  let alphabetToNumber = {"g":6, "f":5, "e":4, "d":3, "c":2, "b":1, "a":0};
+  alphabetToNumber(character: string) : number {
+    let char: string[] = ['abcdefg'];
+    return char.indexOf(character) + 1;
+  }
 
   // returns if a move is off the board
-  function isValidMove (move: string) : boolean {
-      if (alphabetToNumber[move[2]] < this.maxX) && (move[3] < this.maxY) {
-          return true;
-        }
-      }
-      else {
-          return false;
-      }
-  }
-
-  // move piece to a second tile and leave an empty space on the first
-  function makeMove(move : string) : void {
-      this.board[alphabetToNumber[move[2]][move[3]].setPiece(this.[alphabetToNumber[move[0]][move[1]].getPiece()])
-      this.board[alphabetToNumber[move[2]][move[3]].setIsOccupied(true)
-      this.board[alphabetToNumber[move[0]][move[1]].setPiece(0, );
-      this.board[alphabetToNumber[move[0]][move[1]].setIsOccupied(false)
-      return;
+  isValidMove (move: string) : boolean {
+    
+    // cannot move off the board
+    if (this.alphabetToNumber(move[2]) > this.maxX && Number(move[3]) > this.maxY) {
+      return false;
+    }
+    // cannot move onto water unless piece is of rank 1, the mouse
+    if (this.board[this.alphabetToNumber(move[2])][Number(move[3])].getType() == "w" && this.board[this.alphabetToNumber(move[0])][Number(move[1])].getPiece().getRank() != 1) {
+      return false;
+    }
+    // cannot move onto higher rank piece, that would be suicide
+    if (this.board[this.alphabetToNumber(move[2])][Number(move[3])].isOccupied && !this.capture(this.board[this.alphabetToNumber(move[0])][Number(move[1])].getPiece(), this.board[this.alphabetToNumber(move[2])][Number(move[3])].getPiece())) {
+      return false;
+    }
+    return true;
   }
 
   // predator must be higher rank than prey
-  function capture(predator : Piece, prey : Piece) : bool {
+  capture(predator : Piece, prey : Piece) : boolean {
       if (predator.getRank() > prey.getRank()) {
           return true;
       }
