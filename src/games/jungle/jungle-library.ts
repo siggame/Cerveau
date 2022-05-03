@@ -1,4 +1,4 @@
-class Tile {
+export class Tile {
     type: string;
     isOccupied: boolean;
     piece: Piece;
@@ -37,7 +37,7 @@ class Tile {
     }
 }
 
-class Piece {
+export class Piece {
   rank: number;
   color: string;
 
@@ -66,7 +66,7 @@ class Piece {
   }
 }
 
-class Gameboard {
+export class Gameboard {
   board: Tile[][];
   activeColor: string;
   halfMoves: number;

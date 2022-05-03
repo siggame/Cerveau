@@ -6,7 +6,9 @@ import { JungleGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-import * as jungle from './jungle-library';
+import { Gameboard } from "./jungle-library";
+import { Tile } from "./jungle-library";
+
 import { Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
 type MutablePlayer = Mutable<Player>;
@@ -50,8 +52,8 @@ export class JungleGame extends BaseClasses.Game {
     public readonly session!: string;
 
     // <<-- Creer-Merge: attributes -->>
-
-    public readonly jungle = new jungle.Gameboard()
+    public gameboard: Tile[][] = []
+    public readonly jungle = new Gameboard(this.gameboard, 'b', 0, 0, 7, 9)
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
@@ -75,7 +77,6 @@ export class JungleGame extends BaseClasses.Game {
         (this.players[1] as MutablePlayer).color = "red";
 
         this.fen = this.jungle.boardToFen();
-        this.history.push(...this.jungle.history());
         // <<-- /Creer-Merge: constructor -->>
     }
 
