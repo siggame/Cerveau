@@ -48,7 +48,6 @@ export class JungleGameManager extends BaseClasses.GameManager {
      * How many turns till 50 move draw during simplified three fold
      * repetition.
      */
-    private halfMoveCountSTFR = 0; // 50 move rule, 50 moves are two complete turns, so 100 turns in total.
 
     /** Starts the game play. */
     protected start(): void {
@@ -75,8 +74,6 @@ export class JungleGameManager extends BaseClasses.GameManager {
                 Valid moves: ${
                     this.game.jungle
                         .getValidMoves() // Take all valid moves,
-                        .map((m) => `'${m}'`) // Wrap them in '' quotes,
-                        .join(", ") // Then finally add commas between each for readability
                 }`,
                 player,
             );
@@ -91,13 +88,6 @@ export class JungleGameManager extends BaseClasses.GameManager {
         // else their move was accepted, update our state proxies
         this.game.fen = this.game.jungle.boardToFen();
         this.game.history.push(validMove);
-
-        if (this.game.settings.enableSTFR) {
-            // if
-            this.halfMoveCountSTFR = checkMoveForSTFR(validMove)
-                ? 0 // reset turns, pawn was moved or piece captured
-                : this.halfMoveCountSTFR + 1; // else increase by 1
-        }
 
         const [loserReason, winnerReason] = this.checkForGameOverReasons();
         if (loserReason) {
