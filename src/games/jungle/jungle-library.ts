@@ -371,8 +371,7 @@ export class Gameboard {
 
   // parse fen string for blue (b) or red (r)
   getTurn() : string {
-    let color: string = fen.split(" ")[1];
-    return color;
+    return this.activeColor;
   }
 }
 //gameState = new Gameboard()
