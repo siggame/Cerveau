@@ -368,5 +368,11 @@ export class Gameboard {
       }
     return move_list
   }
+
+  // parse fen string for blue (b) or red (r)
+  getTurn() : string {
+    let color: string = fen.split(" ")[1];
+    return color;
+  }
 }
 //gameState = new Gameboard()

@@ -31,15 +31,6 @@ export class JungleGameManager extends BaseClasses.GameManager {
 
     // <<-- Creer-Merge: public-methods -->>
 
-    /**
-     * Checks if the move a capture.
-     * @param move - The move to check against.
-     * @returns True is so, false otherwise.
-     */
-     public checkMoveForSTFR(): boolean {
-         return this.game.jungle.isCapture();
-     }
-
     // <<-- /Creer-Merge: public-methods -->>
 
     // <<-- Creer-Merge: protected-private-methods -->>
@@ -73,7 +64,7 @@ export class JungleGameManager extends BaseClasses.GameManager {
                 `Made an invalid move ('${move}').
                 Valid moves: ${
                     this.game.jungle
-                        .getValidMoves() // Take all valid moves,
+                        .getAllMoves() // Take all valid moves,
                 }`,
                 player,
             );
@@ -87,7 +78,9 @@ export class JungleGameManager extends BaseClasses.GameManager {
         }
         // else their move was accepted, update our state proxies
         this.game.fen = this.game.jungle.boardToFen();
-        this.game.history.push(validMove);
+        if (validMove) {
+            this.game.history.push(move);
+        }
 
         const [loserReason, winnerReason] = this.checkForGameOverReasons();
         if (loserReason) {
@@ -122,17 +115,17 @@ export class JungleGameManager extends BaseClasses.GameManager {
             return ["Checkmated", "Checkmate!"];
         }
 
-        if (jungle.insufficient_material()) {
-            return [
-                "Draw - Insufficient material.",
-            ];
-        }
-        if (jungle.in_stalemate()) {
-            return [
-                "Stalemate - The side to move has been stalemated " +
-                    "because they are not in check, but have no valid moves.",
-            ];
-        }
+        // if (jungle.insufficient_material()) {
+        //     return [
+        //         "Draw - Insufficient material.",
+        //     ];
+        // }
+        // if (jungle.in_stalemate()) {
+        //     return [
+        //         "Stalemate - The side to move has been stalemated " +
+        //             "because they are not in check, but have no valid moves.",
+        //     ];
+        // }
         return [];
     }
 
@@ -144,9 +137,9 @@ export class JungleGameManager extends BaseClasses.GameManager {
      * @returns True if the last moves are indeed in simplified threefold
      * repetition (STFR), false otherwise.
      */
-    private isInSimplifiedThreefoldRepetition(): boolean {
-        return true
-    }
+    // private isInSimplifiedThreefoldRepetition(): boolean {
+    //     return true
+    // }
 
     // <<-- /Creer-Merge: protected-private-methods -->>
 }
