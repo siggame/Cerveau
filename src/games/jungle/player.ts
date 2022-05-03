@@ -10,7 +10,7 @@ import { GameObject } from "./game-object";
 /**
  * Blue will go first.
  */
-export type PlayerColor = "blue" | "red";
+export type PlayerColor = "b" | "r";
 
 /**
  * A player in this game. Every AI controls one player.
@@ -28,7 +28,7 @@ export class Player extends GameObject implements BaseJunglePlayer {
     /**
      * Blue will go first.
      */
-    public readonly color!: "blue" | "red";
+    public readonly color!: "b" | "r";
 
     /**
      * If the player lost the game or not.

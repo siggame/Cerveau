@@ -73,8 +73,8 @@ export class JungleGame extends BaseClasses.Game {
 
         // <<-- Creer-Merge: constructor -->>
 
-        (this.players[0] as MutablePlayer).color = "blue";
-        (this.players[1] as MutablePlayer).color = "red";
+        (this.players[0] as MutablePlayer).color = "b";
+        (this.players[1] as MutablePlayer).color = "r";
 
         this.fen = this.jungle.boardToFen();
         // <<-- /Creer-Merge: constructor -->>

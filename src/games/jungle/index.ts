@@ -80,7 +80,7 @@ export interface PlayerProperties {
     /**
      * A coin flip will decide if 'player1' or 'player2' will go first.
      */
-    color?: "Player1" | "Player2";
+    color?: "b" | "r";
 
     /**
      * If the player lost the game or not.
@@ -257,8 +257,8 @@ export const Namespace = makeNamespace({
                 },
                 color: {
                     typeName: "string",
-                    defaultValue: "Player1",
-                    literals: ["Player1", "Player2"],
+                    defaultValue: "b",
+                    literals: ["b", "r"],
                 },
                 lost: {
                     typeName: "boolean",
