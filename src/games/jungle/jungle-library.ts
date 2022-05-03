@@ -277,20 +277,96 @@ class Gameboard {
       return false;
     }
     // cannot move onto higher rank piece, that would be suicide
-    if (this.board[this.alphabetToNumber(move[2])][Number(move[3])].isOccupied && !this.capture(this.board[this.alphabetToNumber(move[0])][Number(move[1])].getPiece(), this.board[this.alphabetToNumber(move[2])][Number(move[3])].getPiece())) {
+    if (this.board[this.alphabetToNumber(move[2])][Number(move[3])].isOccupied && !this.isCapture(this.board[this.alphabetToNumber(move[0])][Number(move[1])].getPiece(), this.board[this.alphabetToNumber(move[2])][Number(move[3])].getPiece())) {
       return false;
     }
     return true;
   }
 
   // predator must be higher rank than prey
-  capture(predator : Piece, prey : Piece) : boolean {
+  isCapture(predator : Piece, prey : Piece) : boolean {
       if (predator.getRank() > prey.getRank()) {
           return true;
       }
       else {
           return false;
       }
+  }
+
+  UCIToCoords(uci: string) {
+    let beginFile: string = uci[0]
+    let beginRank: string = uci[1]
+    let endFile: string = uci[2]
+    let endRank: string = uci[3]
+    let files: string = 'abcdefg'
+    let ranks: string = '123456789'
+    let coords: number[] = [files.indexOf(beginFile), ranks.indexOf(beginRank), files.indexOf(endFile), ranks.indexOf(endRank)]
+    return coords
+ }
+
+ inDen(): boolean {
+    if(this.activeColor == "b") {
+        if((this.board[0][3]).isOccupied) {
+            return true;
+        }
+    }
+    else {
+        if((this.board[8][3]).isOccupied) {
+            return true;
+        }
+    }
+    return false;
+ }
+
+ inTrap(): boolean {
+    if(this.activeColor == "b") {
+         if(((this.board[0][2]).isOccupied) || ((this.board[1][3]).isOccupied) || ((this.board[0][4]).isOccupied)) {
+             return true;
+         }
+     }
+     else {
+         if(((this.board[8][2]).isOccupied) || ((this.board[7][3]).isOccupied) || ((this.board[8][4]).isOccupied)) {
+             return true;
+         }
+     }
+     return false;
+ }
+
+ coordToUCI(coord: number[]) {
+    let files: string = 'abcdefg';
+    let ranks: string = '123456789';
+    let file: string = files[coord[0]];
+    let rank: string = ranks[coord[1]];
+    return file.concat(rank);
+  }
+
+ getAllMoves(): string[] {
+    let move_list: string[] = [];
+    let i_offsets: number[] = [-1, 1];
+    let j_offsets: number[] = [-1, 1];
+      // Loop over all locations in grid
+      for(let row = 0; row < 9; row++) {
+          for(let col = 0; col < 7; col++) {
+              // If the cell is occupied
+              if((this.board[row][col]).isOccupied) {
+                  // If the cell contains our own piece, generate its moves
+                  if((this.board[row][col]).piece.color == this.activeColor) {
+                      let startUCI: string = this.coordToUCI([row,col]);
+                      for(let i = 0; i < 2; i ++) {
+                          for(let j = 0; j < 2; j++) {
+                              let endUCI: string = this.coordToUCI([row+i_offsets[i],col+j_offsets[j]]);
+                              //
+                              let moveUCI: string = startUCI.concat(endUCI);
+                              if(this.isValidMove(moveUCI)) {
+                                  move_list.push(moveUCI)
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+    return move_list
   }
 }
 //gameState = new Gameboard()

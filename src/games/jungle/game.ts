@@ -6,9 +6,10 @@ import { JungleGameSettingsManager } from "./game-settings";
 import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import * as jungle from './jungle-library';
+import { Mutable } from "~/utils";
 // <<-- /Creer-Merge: imports -->>
-
+type MutablePlayer = Mutable<Player>;
 /**
  * A 7x9 board game with pieces.
  */
@@ -50,7 +51,7 @@ export class JungleGame extends BaseClasses.Game {
 
     // <<-- Creer-Merge: attributes -->>
 
-    // Any additional member attributes can go here
+    public readonly jungle = new jungle.Gameboard()
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
 
@@ -62,14 +63,19 @@ export class JungleGame extends BaseClasses.Game {
      * @param settingsManager - The manager that holds initial settings.
      * @param required - Data required to initialize this (ignore it).
      */
-    constructor(
+     constructor(
         protected settingsManager: JungleGameSettingsManager,
         required: Readonly<BaseGameRequiredData>,
     ) {
         super(settingsManager, required);
 
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
+
+        (this.players[0] as MutablePlayer).color = "blue";
+        (this.players[1] as MutablePlayer).color = "red";
+
+        this.fen = this.jungle.boardToFen();
+        this.history.push(...this.jungle.history());
         // <<-- /Creer-Merge: constructor -->>
     }
 
