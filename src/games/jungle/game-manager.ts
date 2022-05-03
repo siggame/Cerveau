@@ -134,7 +134,7 @@ export class JungleGameManager extends BaseClasses.GameManager {
 
         if (jungle.insufficient_material()) {
             return [
-                "Draw - Insufficient material (K vs. K, K vs. KB, or K vs. KN) for checkmate.",
+                "Draw - Insufficient material.",
             ];
         }
         if (jungle.in_stalemate()) {

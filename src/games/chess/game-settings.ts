@@ -1,121 +1,102 @@
-import { SettingsFromSchema } from "~/core/game/base/base-game-settings";
-import { UnknownObject } from "~/utils";
+import { BaseGameRequiredData } from "~/core/game";
 import { BaseClasses } from "./";
+import { ChessGameManager } from "./game-manager";
+import { GameObject } from "./game-object";
+import { ChessGameSettingsManager } from "./game-settings";
+import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 import * as chessjs from "chess.js";
+import { Mutable } from "~/utils";
+
+/** A player that can be mutated BEFORE the game starts. */
+type MutablePlayer = Mutable<Player>;
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * The settings manager for the Chess game.
+ * The traditional 8x8 chess board with pieces.
  */
-export class ChessGameSettingsManager extends BaseClasses.GameSettings {
+export class ChessGame extends BaseClasses.Game {
+    /** The manager of this game, that controls everything around it. */
+    public readonly manager!: ChessGameManager;
+
+    /** The settings used to initialize the game, as set by players. */
+    public readonly settings = Object.freeze(this.settingsManager.values);
+
     /**
-     * This describes the structure of the game settings, and is used to
-     * generate the values, as well as basic type and range checking.
+     * Forsyth-Edwards Notation (fen), a notation that describes the game board
+     * state.
      */
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    public get schema() {
-        return this.makeSchema({
-            // HACK: `super` should work. but schema is undefined on it at run time.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            ...(super.schema || (this as any).schema),
-
-            // Chess game specific settings
-            fen: {
-                description:
-                    "Forsyth-Edwards Notation (fen), a notation that " +
-                    "describes the game board state.",
-                // <<-- Creer-Merge: fen -->>
-                default: "",
-                // <<-- /Creer-Merge: fen -->>
-            },
-
-            // <<-- Creer-Merge: schema -->>
-
-            pgn: {
-                description:
-                    "The starting board state in " +
-                    "Portable Game Notation (PGN).",
-                default: "",
-            },
-
-            enableSTFR: {
-                description:
-                    "Enable non standard chess rule " +
-                    "Simplified Three-Fold Repetition rule.",
-                default: true,
-            },
-
-            enableTFR: {
-                description:
-                    "Enable the standard chess rule " +
-                    "Three-Fold Repetition rule.",
-                default: false,
-            },
-
-            // <<-- /Creer-Merge: schema -->>
-
-            // Base settings
-            playerStartingTime: {
-                // <<-- Creer-Merge: player-starting-time -->>
-                default: 15 * 6e10, // 15 min in ns
-                // <<-- /Creer-Merge: player-starting-time -->>
-                min: 0,
-                description: "The starting time (in ns) for each player.",
-            },
-        });
-    }
+    public fen!: string;
 
     /**
-     * The current values for the game's settings.
+     * A mapping of every game object's ID to the actual game object. Primarily
+     * used by the server and client to easily refer to the game objects via ID.
      */
-    public values!: SettingsFromSchema<ChessGameSettingsManager["schema"]>;
+    public gameObjects!: { [id: string]: GameObject };
 
     /**
-     * Try to invalidate all the game settings here, so invalid values do not
-     * reach the game.
+     * The list of [known] moves that have occurred in the game,
+     * in Universal Chess Interface (UCI) format. The first element is the first
+     * move, with the last element being the most recent.
+     */
+    public history!: string[];
+
+    /**
+     * List of all the players in the game.
+     */
+    public players!: Player[];
+
+    /**
+     * A unique identifier for the game instance that is being played.
+     */
+    public readonly session!: string;
+
+    // <<-- Creer-Merge: attributes -->>
+
+    /** The chess.js instance used to do all logic. */
+    public readonly chess = new chessjs.Chess();
+
+    // <<-- /Creer-Merge: attributes -->>
+
+    /**
+     * Called when a Game is created.
      *
-     * @param someSettings - A subset of settings that will be tested.
-     * @returns An error if the settings fail to validate, otherwise the
-     * valid game settings for this game.
+     * @param settingsManager - The manager that holds initial settings.
+     * @param required - Data required to initialize this (ignore it).
      */
-    protected invalidate(someSettings: UnknownObject): UnknownObject | Error {
-        const invalidated = super.invalidate(someSettings);
-        if (invalidated instanceof Error) {
-            return invalidated;
+    constructor(
+        protected settingsManager: ChessGameSettingsManager,
+        required: Readonly<BaseGameRequiredData>,
+    ) {
+        super(settingsManager, required);
+
+        // <<-- Creer-Merge: constructor -->>
+        if (this.settings.fen) {
+            this.chess.load(this.settings.fen);
+        } else if (this.settings.pgn) {
+            this.chess.load_pgn(this.settings.pgn);
         }
 
-        const settings = { ...this.values, ...someSettings, ...invalidated };
+        (this.players[0] as MutablePlayer).color = "white";
+        (this.players[1] as MutablePlayer).color = "black";
 
-        // <<-- Creer-Merge: invalidate -->>
-
-        if (settings.fen && settings.pgn) {
-            return new Error(
-                "Cannot set FEN and PGN at the same time. Use only one for an initial board state.",
-            );
-        }
-
-        const chess = new chessjs.Chess();
-        if (settings.fen) {
-            // try to validate the FEN string
-            const validated = chess.validate_fen(settings.fen);
-
-            if (!validated.valid) {
-                return new Error(`FEN invalid: ${validated.error}`);
-            }
-        }
-
-        if (settings.pgn) {
-            const valid = chess.load_pgn(settings.pgn, { sloppy: true });
-
-            if (!valid) {
-                return new Error("Could not load PGN.");
-            }
-        }
-
-        // <<-- /Creer-Merge: invalidate -->>
-
-        return settings;
+        this.fen = this.chess.fen();
+        this.history.push(...this.chess.history());
+        // <<-- /Creer-Merge: constructor -->>
     }
+
+    // <<-- Creer-Merge: public-functions -->>
+
+    // Any public functions can go here for other things in the game to use.
+    // NOTE: Client AIs cannot call these functions, those must be defined
+    // in the creer file.
+
+    // <<-- /Creer-Merge: public-functions -->>
+
+    // <<-- Creer-Merge: protected-private-functions -->>
+
+    // Any additional protected or pirate methods can go here.
+
+    // <<-- /Creer-Merge: protected-private-functions -->>
 }
