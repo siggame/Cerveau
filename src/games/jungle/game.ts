@@ -7,10 +7,13 @@ import { Player } from "./player";
 
 // <<-- Creer-Merge: imports -->>
 // any additional imports you want can be placed here safely between creer runs
+import { Gameboard } from "./jungle-library";
+import { Tile } from "./jungle-library";
 // <<-- /Creer-Merge: imports -->>
 
 /**
- * A 7x9 board game with pieces.
+ * A 7x9 board game with pieces, to win the game the players must make
+ * successful captures of the enemy and reach the opponents den.
  */
 export class JungleGame extends BaseClasses.Game {
     /** The manager of this game, that controls everything around it. */
@@ -26,8 +29,16 @@ export class JungleGame extends BaseClasses.Game {
     public gameObjects!: { [id: string]: GameObject };
 
     /**
-     * JungleFen is similar to chess FEN it starts with the board, the turn,
-     * half move, the full move.
+     * The list of [known] moves that have occurred in the game, in a format.
+     * The first element is the first move, with the last element being the most
+     * recent.
+     */
+    public history!: string[];
+
+    /**
+     * The jungleFen is similar to the chess FEN, the order looks like this,
+     * board (split into rows by '/'), whose turn it is, half move, and full
+     * move.
      */
     public jungleFen!: string;
 
@@ -46,6 +57,15 @@ export class JungleGame extends BaseClasses.Game {
     // Any additional member attributes can go here
     // NOTE: They will not be sent to the AIs, those must be defined
     // in the creer file.
+    public readonly board: Tile[][] = [[], [], [], [], [], [], [], [], []];
+    public readonly jungle: Gameboard = new Gameboard(
+        this.board,
+        "b",
+        0,
+        0,
+        7,
+        9,
+    );
 
     // <<-- /Creer-Merge: attributes -->>
 
@@ -61,8 +81,8 @@ export class JungleGame extends BaseClasses.Game {
     ) {
         super(settingsManager, required);
 
+        this.jungleFen = this.jungle.boardToFen();
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
 

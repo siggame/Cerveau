@@ -10,8 +10,8 @@ import { BaseClasses } from "./";
  */
 export class AI extends BaseClasses.AI {
     // <<-- Creer-Merge: attributes -->>
-// If the AI needs additional attributes add them here.
-// NOTE: these are not set in client AIs.
+    // If the AI needs additional attributes add them here.
+    // NOTE: these are not set in client AIs.
     // <<-- /Creer-Merge: attributes -->>
     /**
      * This is called every time it is this AI.player's turn to make a move.
@@ -24,7 +24,7 @@ export class AI extends BaseClasses.AI {
     }
 
     // <<-- Creer-Merge: functions -->>
-// If the AI needs additional attributes add them here.
-/// NOTE: these will not be callable in client AIs.
+    // If the AI needs additional attributes add them here.
+    /// NOTE: these will not be callable in client AIs.
     // <<-- /Creer-Merge: functions -->>
 }
