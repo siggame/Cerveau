@@ -324,6 +324,35 @@ export class Gameboard {
     return false;
  }
 
+ isEndGame(): boolean {
+    let hasBluePieces: boolean = false;
+    let hasRedPieces: boolean = false;
+    // Loop through whole game board
+    for(let row = 0; row < 9; row++) {
+        for(let col = 0; col < 7; col++) {
+            // Check for red and blue pieces
+            if((this.board[row][col]).isOccupied) {
+                if((this.board[row][col]).piece.color == "b") {
+                    hasBluePieces = true;
+                }
+                else {
+                    hasRedPieces = true;
+                }
+            }
+        }
+    }
+    // If no blue pieces or no red pieces on board, game over
+    if(!hasBluePieces || !hasRedPieces) {
+        return true;
+    }
+    // If got in opponent's den, game over
+    let gotInDen: boolean = this.inDen();
+    if(gotInDen) {
+        return true;
+    }
+    return false;
+ }
+ 
  inTrap(): boolean {
     if(this.activeColor == "b") {
          if(((this.board[0][2]).isOccupied) || ((this.board[1][3]).isOccupied) || ((this.board[0][4]).isOccupied)) {
