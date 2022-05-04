@@ -285,7 +285,7 @@ export class Gameboard {
 
   // predator must be higher rank than prey
   isCapture(predator : Piece, prey : Piece) : boolean {
-      if (predator.getRank() > prey.getRank()) {
+      if (predator.getRank() >= prey.getRank()) {
           return true;
       }
       else {
@@ -340,6 +340,64 @@ export class Gameboard {
     return file.concat(rank);
   }
 
+  //check if a tile is adjacent to water
+  adjToWater(x: number, y: number){
+      if ((x == 3) || (x == 4) || (x == 5)) {
+          if ((y == 1) || (y == 2) || (y == 4) || (y == 5)) {
+              return true;
+          }
+      }
+      return false;
+  }
+
+  tiger(x: number, y: number) {
+    if ((x == 2) || (x == 6)) {
+        if ((y == 1) || (y == 2) || (y == 4) || (y == 5)) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  ratInWater(x: number, y: number, jump: string) {
+    if (jump == "down") {
+        for(let i = 1; i < 4; i++) {
+            let pos: number = x + i;
+            if (this.board[pos][y].getPiece().getRank() == 1) {
+                return true;
+            }
+        }
+    } 
+    else {
+        if (jump == "up") {
+            for(let i = 4; i > 1; i--) {
+                let pos: number = x - i;
+                if (this.board[pos][y].getPiece().getRank() == 1) {
+                    return true;
+                }
+            }
+        }
+        else {
+            if (jump == "left") {
+                for(let i = 3; i > 1; i--){
+                    let pos: number = y - i;
+                    if (this.board[x][pos].getPiece().getRank() == 1) {
+                        return true;
+                    }
+                }
+            }
+            else {
+                for(let i = 1; i < 3; i++){
+                    let pos: number = y + i;
+                    if (this.board[x][pos].getPiece().getRank() == 1) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false
+  }
  getAllMoves(): string[] {
     let move_list: string[] = [];
     let i_offsets: number[] = [-1, 1];
@@ -362,10 +420,100 @@ export class Gameboard {
                               }
                           }
                       }
+                      //check for jump moves
+                      if (this.adjToWater(row,col)) {
+                        //check if the piece is a tiger
+                        if (this.board[row][col].getPiece().getRank() == 6) {
+                            if (this.tiger(row,col)) {
+                                let startUCI: string = this.coordToUCI([row,col]);
+                                let potential: number = row;
+                                if (row == 2) {
+                                    potential = row + 4
+                                }
+                                else {
+                                    potential = row - 4
+                                }
+                                let endUCI: string = this.coordToUCI([potential, col])
+                                let moveUCI: string = startUCI.concat(endUCI)
+                                let dir: string;
+                                if(row > potential) {
+                                    dir = "down"
+                                }
+                                else{
+                                    dir = "up"
+                                }
+                                if((this.isValidMove(moveUCI)) && (this.ratInWater(potential, col, dir))) {
+                                    move_list.push(moveUCI)
+                                }
+                            }
+
+                        }
+                       }
+                      else { 
+                        //check if piece is a lion
+                        if (this.board[row][col].getPiece().getRank() == 7) {
+                            //checks for vertical jumps
+                            if (this.tiger(row,col)) {
+                                let startUCI: string = this.coordToUCI([row,col]);
+                                let potential: number = row;
+                                let dir: string;
+                                if (row == 2) {
+                                    potential = row + 4
+                                    dir = "down"
+                                }
+                                else {
+                                    potential = row - 4
+                                    dir = "up"
+                                }
+                                let endUCI: string = this.coordToUCI([potential, col])
+                                let moveUCI: string = startUCI.concat(endUCI)
+                                if((this.isValidMove(moveUCI)) && (this.ratInWater(potential, col, dir))) {
+                                    move_list.push(moveUCI)
+                                }
+                            }
+                            //check for 1 direction horizontal movements
+                            if (col != 3) {
+                                let startUCI: string = this.coordToUCI([row,col]);
+                                let potential: number = col;
+                                let dir: string;
+                                if (col == 0) {
+                                    potential = col + 3
+                                    dir = "right";
+                                }
+                                else {
+                                    potential = col - 3
+                                    dir = "left";
+                                }
+                                let endUCI: string = this.coordToUCI([row,potential])
+                                let moveUCI: string = startUCI.concat(endUCI)
+                                if((this.isValidMove(moveUCI)) && (this.ratInWater(row, potential, dir))) {
+                                    move_list.push(moveUCI)
+                                }
+                            }
+                            else {
+                                let startUCI: string = this.coordToUCI([row,col]);
+                                let potential: number = col + 3;
+                                let dir: string = "right";
+                                let endUCI: string = this.coordToUCI([row,potential])
+                                let moveUCI: string = startUCI.concat(endUCI)
+                                if((this.isValidMove(moveUCI)) && (this.ratInWater(row, potential, dir))) {
+                                    move_list.push(moveUCI)
+                                }
+                                potential = col - 3;
+                                dir = "left";
+                                endUCI = this.coordToUCI([row,potential])
+                                moveUCI = startUCI.concat(endUCI)
+                                if((this.isValidMove(moveUCI)) && (this.ratInWater(row, potential, dir))) {
+                                    move_list.push(moveUCI)
+                                }
+                            }
+
+                        }
+                      }
+                    }
                   }
               }
           }
-      }
     return move_list
   }
 
