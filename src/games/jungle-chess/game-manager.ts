@@ -7,7 +7,8 @@ import {
 } from "./";
 
 // <<-- Creer-Merge: imports -->>
-// any additional imports you want can be placed here safely between creer runs
+import { Gameboard } from "./jungle-library";
+import { Tile } from "./jungle-library";
 // <<-- /Creer-Merge: imports -->>
 
 /**
@@ -21,7 +22,7 @@ export class JungleChessGameManager extends BaseClasses.GameManager {
     public static get aliases(): string[] {
         return [
             // <<-- Creer-Merge: aliases -->>
-            "MegaMinerAI-##-JungleChess",
+            "JungleChess",
             // <<-- /Creer-Merge: aliases -->>
         ];
     }
@@ -32,9 +33,42 @@ export class JungleChessGameManager extends BaseClasses.GameManager {
     /** The factory that must be used to initialize new game objects. */
     public readonly create!: JungleChessGameObjectFactory;
 
-    // <<-- Creer-Merge: public-methods -->>
+    board: Tile[][] = []
+    jungle: Gameboard = new Gameboard(this.board, 'b', 0, 0, 7, 9)
 
-    // any additional public methods you need can be added here
+    // <<-- Creer-Merge: public-methods -->>
+    private start(): void {
+        super.start();
+        void this.runSideToMove(this.jungle)
+    }
+
+    private async runSideToMove(jungle): Promise<void> {
+        const playerIndex = jungle.getTurn() === 'b' ? 0 : 1;
+        const player = this.game.players[playerIndex]
+
+        const move = await player.ai.makeMove();
+
+        if (jungle.isValidMove(move)) {
+            jungle.makeMove(move)
+        }
+        else {
+            this.declareLoser(
+                `Made an invalid move ('${move}').
+                Valid moves: ${jungle.getAllMoves()}`,
+                player,
+            );
+            this.declareWinner(
+                "Opponent made an invalid move.",
+                player.opponent
+            );
+            this.endGame();
+        }
+        //This is where we will check for game over conditions
+        //check for game over reasons
+
+        void this.runSideToMove(jungle)
+
+    }
 
     // <<-- /Creer-Merge: public-methods -->>
 

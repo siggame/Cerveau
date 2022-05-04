@@ -70,8 +70,11 @@ export class JungleChessGame extends BaseClasses.Game {
     ) {
         super(settingsManager, required);
 
+        (this.players[0] as MutablePlayer).color = "b";
+        (this.players[1] as MutablePlayer).color = "r";
+        
+        this.jungleFen = this.manager.jungle.boardToFen()
         // <<-- Creer-Merge: constructor -->>
-        // setup any thing you need here
         // <<-- /Creer-Merge: constructor -->>
     }
 

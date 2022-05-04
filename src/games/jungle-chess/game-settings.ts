@@ -28,7 +28,7 @@ export class JungleChessGameSettingsManager extends BaseClasses.GameSettings {
                     "looks like this, board (split into rows by '/'), whose" +
                     " turn it is, half move, and full move.",
                 // <<-- Creer-Merge: jungleFen -->>
-                default: "",
+                default: "l5t/1d3c1/r1p1w1e/7/7/7/E1W1P1R/1C3D1/T5L b 0 1",
                 // <<-- /Creer-Merge: jungleFen -->>
             },
 
