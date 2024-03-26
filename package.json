@@ -28,7 +28,7 @@
     "chess.js": "0.10.3",
     "delay": "4.4.0",
     "dotenv": "8.2.0",
-    "express": "4.17.1",
+    "express": "4.19.2",
     "express-handlebars": "5.1.0",
     "fs-extra": "9.0.1",
     "gaussian": "1.1.0",
